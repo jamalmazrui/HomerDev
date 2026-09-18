@@ -1,0 +1,19 @@
+﻿# .gitignore for a Homer Tools app. Rename to .gitignore in the app folder.
+#
+# Build products are release assets, not repository content.
+*.exe
+*.log
+Version.cs
+*_setup.exe
+# Maintainer scripts stay out of the public source browser.
+create*Repo.cmd
+create*Repo.ps1
+create*Repo.log
+tagRelease.cmd
+tagRelease.ps1
+# Editor and system leavings.
+notes/
+__pycache__/
+*.pyc
+Thumbs.db
+desktop.ini

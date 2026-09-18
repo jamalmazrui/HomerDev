@@ -1,0 +1,264 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Jamal Mazrui" />
+  <title>ReadMe</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">ReadMe</h1>
+<p class="author">Jamal Mazrui</p>
+</header>
+<h1 id="homerdev">HomerDev</h1>
+<p>HomerDev is the Homer Development Kit: the shared C# classes, Python
+modules, build scripts and project templates that every Homer Tools
+program is built on. One copy, in one place, so a fix reaches every
+app.</p>
+<p>It is aimed at two readers. A developer who wants to build or change
+a Homer app, and an AI asked to write one, which can be told: “use the
+Homer namespace in <code>C:\HomerDev\CSharp</code> and follow
+HomerDev.md.”</p>
+<h2 id="install">Install</h2>
+<p>Unzip <code>HomerDev.zip</code> into <code>C:\HomerDev</code>. That
+is the install.</p>
+<p>You also need, and the kit will tell you if one is missing:</p>
+<ul>
+<li>Windows 10 or later, 64-bit</li>
+<li>the .NET Framework 4.8 Developer Pack</li>
+<li>the Visual Studio Build Tools, free, for the C# compiler</li>
+<li>Python 3, for the kit’s own scripts</li>
+<li>Inno Setup 6, to build an installer</li>
+<li>git and the GitHub CLI, to publish</li>
+</ul>
+<p>If you keep the kit somewhere other than <code>C:\HomerDev</code>,
+set the <code>HOMERDEV</code> environment variable to that folder.</p>
+<h2 id="quick-start">Quick start</h2>
+<h3 id="build-the-kit">1. Build the kit</h3>
+<pre><code>cd \HomerDev
+buildHomerDev</code></pre>
+<p>It converts every document to HTML with pandoc, fetching pandoc if
+this machine does not have it, then checks the kit over and reports
+anything wrong. The detail goes to <code>buildHomerDev.log</code>.</p>
+<h3 id="start-an-app">2. Start an app</h3>
+<pre><code>newHomerApp JobDo</code></pre>
+<p>That writes <code>C:\JobDo</code> with everything a new app
+needs:</p>
+<ul>
+<li><code>JobDo.cs</code>, a working one-dialog program with the
+standard controls in place</li>
+<li><code>buildJobDo.cmd</code>, which compiles it against the kit</li>
+<li><code>JobDo_setup.iss</code>, the installer</li>
+<li><code>createJobDoRepo.cmd</code> and <code>.ps1</code>, the one-time
+GitHub bootstrap</li>
+<li><code>installOllama.cmd</code> and <code>installModels.cmd</code>,
+for local AI</li>
+<li><code>version.txt</code> and <code>.gitignore</code></li>
+</ul>
+<p>Nothing already in the folder is overwritten.</p>
+<h3 id="set-two-things-by-hand">3. Set two things by hand</h3>
+<p>Open <code>JobDo_setup.iss</code> and change the two lines marked
+CHANGE ME: a fresh AppId, and the desktop hotkey. Everything else in
+that file is already right.</p>
+<h3 id="build-and-run">4. Build and run</h3>
+<pre><code>cd \JobDo
+buildJobDo
+JobDo</code></pre>
+<p>The starter program opens its dialog, remembers what you type, and
+reports what it did. Fill in <code>runJob()</code> in
+<code>JobDo.cs</code> and it is your program.</p>
+<h3 id="publish">5. Publish</h3>
+<pre><code>createJobDoRepo
+tagRelease</code></pre>
+<p><code>createJobDoRepo</code> makes the GitHub repository and pushes
+the first commit. After that, <code>tagRelease</code> is how every
+release goes out. Copy <code>tagRelease.cmd</code> and
+<code>tagRelease.ps1</code> from <code>Tools\</code> into the app folder
+first; they need no editing.</p>
+<h2 id="what-is-in-the-kit">What is in the kit</h2>
+<ul>
+<li><code>CSharp\</code> – nine modules in the <code>Homer</code>
+namespace: Lbc (dialogs), Say (speech), Inix (settings and tables),
+Keys, KeyMap, Util, Web, inixVert, PdfRead.</li>
+<li><code>Python\homer\</code> – the same toolbox for Python and NVDA
+add-ons.</li>
+<li><code>Templates\</code> – the files a new app starts from.</li>
+<li><code>Tools\</code> – tagRelease, cleanDir, tidyRepo. No editing
+needed; they work out the app name from the folder.</li>
+<li><code>Style\</code> – the Camel Type coding guidelines.</li>
+</ul>
+<h2 id="the-other-documents">The other documents</h2>
+<ul>
+<li><code>HomerDev.md</code> – the complete guide: the
+<code>.inix</code> format, Camel Type, direct speech across screen
+readers, Lbc and the standard dialogs, the launchpad app conventions,
+keys, scripts and logs, and the installer.</li>
+<li><code>Developer.md</code> – how to change the kit itself and how a
+fix reaches the apps.</li>
+<li><code>Hotkeys.md</code> – the keys every Homer dialog and text box
+gives you.</li>
+<li><code>History.md</code> – what changed, and when.</li>
+<li><code>License.md</code> – MIT.</li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,255 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Jamal Mazrui" />
+  <title>History</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">History</h1>
+<p class="author">Jamal Mazrui</p>
+</header>
+<h1 id="history">History</h1>
+<h1 id="september-2026">1.0.0 – 18 September 2026</h1>
+<p>First release. The kit was assembled by comparing every duplicated
+shared file across DbDo, EdSharp, FileDir, HomerScribe and HomerView,
+and taking the better version of each. What that comparison found is
+recorded here, because the differences explain why the kit exists.</p>
+<h2 id="which-version-won-and-why">Which version won, and why</h2>
+<ul>
+<li><strong>Say.cs</strong> – byte for byte identical in DbDo, EdSharp
+and HomerScribe once line endings are normalized. The CRLF copy was
+taken.</li>
+<li><strong>Web.cs</strong> – identical in all four apps that carry it.
+The CRLF copy was taken.</li>
+<li><strong>Inix.cs</strong> – three generations were in circulation.
+DbDo and HomerScribe carried the original 29 KB codec. EdSharp carried
+the version that added <code>InixTable</code>, the converter between
+.inix, .csv, .tsv, Markdown and .xlsx. HomerView carried that plus
+<code>InixCodec.readValue</code>, the single-setting reader whose
+absence had every caller reading the whole file and walking the sections
+itself. HomerView’s is a strict superset and was taken, which also means
+DbDo and HomerScribe had been two generations behind.</li>
+<li><strong>Lbc.cs</strong> – neither of the two newest copies was a
+superset of the other, so they were merged. EdSharp’s is the base: it
+holds <code>LbcBandLayout</code>, <code>LbcBandDialog</code> and
+<code>LbcInixForm</code>, better access-key handling in the button row,
+the rule that Enter presses the button meaning accept wherever it sits,
+and <code>sortedIgnoringCase</code>. HomerScribe’s contributed the
+horizontal band API – <code>addBand</code>, <code>endBand</code>,
+<code>bandTarget</code> and <code>addButton</code> – with all thirteen
+<code>add</code> methods rerouted through <code>bandTarget()</code> and
+<code>addSeparator</code> closing an open band. Without that merge,
+HomerScribe would not compile against the kit and EdSharp would lose its
+form work.</li>
+<li><strong>KeyMap.cs, Keys.cs, Util.cs, inixVert.cs,
+PdfRead.cs</strong> – one copy each, no contest. Keys.cs came from
+HomerView, the rest from EdSharp and HomerScribe.</li>
+<li><strong>The Python homer package</strong> – only HomerView carries
+it, and it was already written to know nothing about HomerView.</li>
+<li><strong>tagRelease, cleanDir, tidyRepo, homerPolicy</strong> – these
+four say in their own headers that they are app-independent, and they
+are: tagRelease takes the app name from the directory, and cleanDir and
+tidyRepo decide what belongs by reading the project’s own
+<code>&lt;App&gt;_setup.iss</code> and <code>RepoFiles.txt</code>.
+tidyRepo still named one app in five strings, and those were replaced
+with a name taken from the folder.</li>
+<li><strong>The install scripts for Pandoc, the GitHub CLI, Python, Node
+and Ollama</strong> – these read as generic but each writes to its own
+app’s folder and its own app’s log, so they are not portable files. The
+pattern is documented in HomerDev.md instead, and the kit ships fresh
+generic <code>installOllama.cmd</code> and
+<code>installModels.cmd</code> for the local AI case.</li>
+<li><strong>The build script and the installer script</strong> –
+HomerScribe’s are the newest and most refined of each, and became the
+templates.</li>
+</ul>
+<h2 id="one-behavior-deliberately-changed-in-the-merge">One behavior
+deliberately changed in the merge</h2>
+<p>HomerScribe’s Lbc selects the text of the field that opens with the
+focus, and extends that to the first focusable control rather than only
+an explicitly set one. That was taken, with one change: a
+<strong>multi-line</strong> box now gets the caret at position 0 instead
+of a full selection, because its value is a document rather than a field
+and the Homer rule is that the caret opens on the first line. This is
+the only place in the kit where the merged file is not simply the union
+of what already existed.</p>
+<h2 id="what-is-new-rather-than-merged">What is new rather than
+merged</h2>
+<ul>
+<li><code>buildHomerDev.cmd</code> and <code>.py</code> – convert the
+documents and audit the kit: components present, encodings right,
+templates still holding their placeholder, no empty files.</li>
+<li><code>newHomerApp.cmd</code> and <code>.py</code> – write a new app
+folder from the templates.</li>
+<li><code>Templates\_APP_.cs</code> – a working launchpad app with the
+standard controls, the two message boxes, the matching command line, and
+settings saved as they are answered.</li>
+<li><code>Templates\installOllama.cmd</code> and
+<code>installModels.cmd</code> – local AI as an installer checkbox, now
+that more than one Homer app uses a model.</li>
+<li>The documentation set.</li>
+</ul>
+</body>
+</html>

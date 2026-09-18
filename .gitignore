@@ -1,0 +1,12 @@
+﻿# HomerDev -- the Homer Development Kit.
+#
+# The kit is source. The only things kept out are the generated HTML, the run
+# logs, and the maintainer scripts.
+*.log
+createHomerDevRepo.cmd
+createHomerDevRepo.ps1
+notes/
+__pycache__/
+*.pyc
+Thumbs.db
+desktop.ini
