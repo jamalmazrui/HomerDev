@@ -643,21 +643,48 @@ public class LbcDialog : IDisposable
     // user can chain searches across multiple lists.
     private string                      sListSearchTerm = "";
 
+    // True when this builder was handed an existing form -- an MDI child --
+    // rather than making its own dialog. It changes two things and no more:
+    // the window styles above are left alone, and the form is never shown here.
+    private bool                        bAdopted = false;
+
+    // AN MDI CHILD IS BUILT BY THIS SAME BUILDER.
+    //
+    // A dialog and an MDI child differ in how they are shown, not in how they
+    // are laid out: both want add order to be focus order, a status line at the
+    // foot, the list search, the line chords and the access keys. Passing a
+    // form here adopts it instead of making one, so Mdi.cs gets the whole of
+    // Lbc without a second implementation of it. Everything after the
+    // window-style block below is identical for both.
+    //
+    // A dialog is finished with run, runOkCancel or runWithButtons, which show
+    // it. An adopted form is finished with layoutIntoForm, which does the same
+    // sizing and opening-focus work and does not show anything -- the frame
+    // shows the child.
     public LbcDialog(string sTitle, IWin32Window ownerWindow)
+        : this(sTitle, ownerWindow, null)
+    {
+    }
+
+    public LbcDialog(string sTitle, IWin32Window ownerWindow, Form frmAdopt)
     {
         owner = ownerWindow;
-        frm = new LbcForm();
+        bAdopted = (frmAdopt != null);
+        frm = frmAdopt ?? new LbcForm();
         // The caption IS the accessible name of a Form.  Setting AccessibleName to
         // the same string made the reader speak the dialog title twice when the
         // dialog opened (once for the window caption, once for the name).  A screen
         // reader announces the title of a newly activated window by itself, so the
         // caption alone is both necessary and sufficient.
-        frm.Text = sTitle ?? "";
-        frm.StartPosition = FormStartPosition.CenterParent;
-        frm.FormBorderStyle = FormBorderStyle.Sizable;
-        frm.MaximizeBox = false;
-        frm.MinimizeBox = false;
-        frm.ShowInTaskbar = false;
+        if (!bAdopted)
+        {
+            frm.Text = sTitle ?? "";
+            frm.StartPosition = FormStartPosition.CenterParent;
+            frm.FormBorderStyle = FormBorderStyle.Sizable;
+            frm.MaximizeBox = false;
+            frm.MinimizeBox = false;
+            frm.ShowInTaskbar = false;
+        }
         frm.KeyPreview = true;
         // EdSharp-style text-edit hotkeys: route every keystroke
         // through onFormKeyDown so we can intercept Ctrl+C/X,
@@ -667,8 +694,11 @@ public class LbcDialog : IDisposable
         // don't match the EdSharp hotkey set. Master enable flag
         // [Lbc] extraKeys in DbDo.inix, defaults Y.
         frm.KeyDown += new KeyEventHandler(onFormKeyDown);
-        frm.MinimumSize = new Size(360, 200);
-        frm.ClientSize = new Size(DefaultDialogWidth, 200);
+        if (!bAdopted)
+        {
+            frm.MinimumSize = new Size(360, 200);
+            frm.ClientSize = new Size(DefaultDialogWidth, 200);
+        }
 
         // Status bar at the bottom of the form. Updates as the
         // user tabs through controls -- each control's focus
@@ -1450,6 +1480,36 @@ public class LbcDialog : IDisposable
     // ------- Finish and show -------
 
     // runOkCancel: convenience wrapper. Returns true on OK.
+    // layoutIntoForm: finish an adopted form -- size it to what was added and
+    // set the control that opens with the focus -- without showing it. The
+    // frame shows an MDI child, so this must not call ShowDialog.
+    public bool layoutIntoForm()
+    {
+        if (ctlFirstFocusable != null) frm.ActiveControl = ctlFirstFocusable;
+        Control ctlFocusLater = ctlInitialFocus != null ? ctlInitialFocus : ctlFirstFocusable;
+        if (ctlFocusLater != null)
+        {
+            Control ctlOpenOn = ctlFocusLater;
+            frm.Shown += delegate(object o, EventArgs e)
+            {
+                try
+                {
+                    ctlOpenOn.Focus();
+                    TextBoxBase tbOpen = ctlOpenOn as TextBoxBase;
+                    if (tbOpen != null && !tbOpen.ReadOnly && tbOpen.Text.Length > 0)
+                    {
+                        // A field opens selected; a document opens on its first
+                        // line. The same Homer rule as for a dialog.
+                        if (tbOpen.Multiline) { tbOpen.SelectionStart = 0; tbOpen.SelectionLength = 0; }
+                        else tbOpen.SelectAll();
+                    }
+                }
+                catch { }
+            };
+        }
+        return true;
+    }
+
     public bool runOkCancel()
     {
         return string.Equals(runWithButtons(new string[] { "OK", "Cancel" }),

@@ -1,0 +1,37 @@
+﻿; accept.inix -- what "done" means for _APP_, written down before the code is.
+;
+; MODULE 1 OF THE METHOD IS "SPECIFY BEFORE YOU GENERATE", and this file is
+; where that specification lands. Each [check] is one thing that must be true
+; for the program to be finished, stated so a script can settle it rather than
+; a person having to remember.
+;
+;   Name    what the check is for, in a few words
+;   Run     a command, run in this folder
+;   Expect  the exit code it must return; 0 unless you mean otherwise
+;   Wants   optional: a string its output must contain
+;
+; That is the whole language, on purpose. A criterion nobody can read is a
+; criterion nobody writes.
+;
+; checkHomerApp runs every one of these and records the command, the exit code
+; and the verdict in the evidence report. A criterion that cannot be written
+; this way is still worth writing -- put it in self.md under what a person has
+; to check by hand, so it is not quietly forgotten.
+
+FileTask = accept
+
+[check]
+Name = the program starts and answers for itself
+Run = _APP_.exe --help
+Expect = 0
+Wants = --source
+
+[check]
+Name = a bad switch is refused rather than ignored
+Run = _APP_.exe --nonsense
+Expect = 1
+
+[check]
+Name = a missing source is reported, not crashed on
+Run = _APP_.exe --source nothing-here.txt
+Expect = 1

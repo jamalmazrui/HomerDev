@@ -1,0 +1,45 @@
+﻿; accept.inix -- what "done" means for the fruit basket samples.
+;
+; Two programs, one specification. Both are built from the same source folder,
+; so both are checked here, and the checks are the same for each because the
+; whole claim of the samples is that the two behave alike.
+;
+; checkHomerApp runs these and records each command with its exit code in the
+; evidence report.
+
+FileTask = accept
+
+[check]
+Name = the C# build script runs clean
+Run = buildFruitBasketCs.cmd nobump
+Expect = 0
+
+[check]
+Name = the C# program was produced
+Run = cmd /c if exist FruitBasketCs.exe (exit 0) else (exit 1)
+Expect = 0
+
+[check]
+Name = the MDI build script runs clean
+Run = buildFruitBasketMdi.cmd nobump
+Expect = 0
+
+[check]
+Name = the MDI program was produced
+Run = cmd /c if exist FruitBasketMdi.exe (exit 0) else (exit 1)
+Expect = 0
+
+[check]
+Name = the Python build script runs clean
+Run = buildFruitBasketPy.cmd nobump
+Expect = 0
+
+[check]
+Name = the Python program was produced
+Run = cmd /c if exist FruitBasketPy.exe (exit 0) else (exit 1)
+Expect = 0
+
+[check]
+Name = both programs write a session log where the convention says
+Run = cmd /c if exist "%LOCALAPPDATA%\FruitBasketCs\logs" (exit 0) else (exit 1)
+Expect = 0

@@ -1,26 +1,38 @@
 @echo off
 rem ============================================================
-rem  tagRelease.cmd  -  Launcher for tagRelease.ps1.
+rem  tagRelease.cmd  -  launcher for tagRelease.ps1.
 rem
-rem  Generic: drop tagRelease.cmd and tagRelease.ps1 into any repo
-rem  root (e.g. C:\EdSharp, C:\FileDir, C:\DbDo) and run this. The
-rem  PowerShell script takes the app name from the directory name,
-rem  finds the matching <App>_setup.iss, handles the version number,
-rem  and publishes the GitHub release.
+rem  Generic. It acts on the CURRENT DIRECTORY, never on its own
+rem  location, so one copy in a tools folder on the PATH serves
+rem  every project:
+rem
+rem      C:\bin\tagRelease.cmd
+rem      C:\bin\tagRelease.ps1
+rem
+rem      cd C:\EdSharp
+rem      tagRelease
+rem
+rem  or, without changing directory:
+rem
+rem      tagRelease -Path C:\EdSharp
+rem
+rem  A copy beside the project works the same way.
 rem
 rem  Invokes PowerShell with execution policy bypass for this single
-rem  invocation only (does not change the system policy), forwarding
-rem  any arguments. A fresh .\tagRelease.log is written on every run.
+rem  invocation only (it does not change the system policy), and
+rem  forwards every argument. A fresh tagRelease.log is written in
+rem  the repository on every run -- with the repo rather than with
+rem  the script, because the log is about that release.
 rem
 rem  Usage:
-rem    tagRelease.cmd                  the normal command; no flags needed.
-rem                                    Bumps the version only if the current one
-rem                                    was already released, so running it again
-rem                                    after a rebuild publishes that same version.
-rem    tagRelease.cmd -Version 5.1     set an explicit version
-rem    tagRelease.cmd -NoBump          never bump, even if already released
-rem    tagRelease.cmd -PrepareOnly     update the version files only, no release
-rem    tagRelease.cmd -SkipStaleCheck  publish even if the installer looks stale
+rem    tagRelease                      the normal command; no flags needed
+rem    tagRelease -Path C:\EdSharp     act on another folder
+rem    tagRelease -Version 5.1         set an explicit version
+rem                                    (source-only projects; an app with an
+rem                                    installer takes its version from the
+rem                                    installer itself)
+rem    tagRelease -NoCommit            do not commit anything
+rem    tagRelease -SkipStaleCheck      publish even if the version looks released
 rem ============================================================
 
 setlocal

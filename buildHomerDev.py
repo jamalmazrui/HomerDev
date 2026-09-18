@@ -26,26 +26,111 @@ import sys
 import traceback
 
 c_lsExpected = [
-    "CSharp/Inix.cs", "CSharp/Keys.cs", "CSharp/KeyMap.cs", "CSharp/Lbc.cs",
+    "CSharp/Inix.cs", "CSharp/KeyName.cs", "CSharp/KeyMap.cs", "CSharp/Lbc.cs",
+    "CSharp/Log.cs", "CSharp/Mdi.cs", "CSharp/Paths.cs",
     "CSharp/PdfRead.cs", "CSharp/Say.cs", "CSharp/Util.cs", "CSharp/Web.cs",
     "CSharp/inixVert.cs",
-    "Python/homer/__init__.py", "Python/homer/inix.py", "Python/homer/lbc.py",
-    "Python/homer/say.py", "Python/homer/util.py", "Python/homer/version.py",
-    "Python/homer/web.py",
-    "Templates/build_APP_.cmd", "Templates/_APP__setup.iss", "Templates/_APP_.cs",
+    "homer/__init__.py", "homer/inix.py", "homer/lbc.py", "homer/log.py",
+    "homer/paths.py", "homer/say.py", "homer/util.py", "homer/version.py", "homer/web.py",
+    "Templates/build_APP_.cmd", "Templates/build_APP_Py.cmd",
+    "Templates/_APP__setup.iss", "Templates/_APP_.cs",
     "Templates/installOllama.cmd", "Templates/installModels.cmd",
+    "Templates/installScreenReaderSupport.cmd", "Templates/homerFinish.cmd",
     "Templates/create_APP_Repo.cmd", "Templates/create_APP_Repo.ps1",
-    "Templates/gitignore.txt", "Templates/version.txt",
-    "Tools/tagRelease.cmd", "Tools/tagRelease.ps1",
-    "Tools/cleanDir.cmd", "Tools/cleanDir.py", "Tools/homerPolicy.py",
-    "Tools/tidyRepo.cmd", "Tools/tidyRepo.py",
-    "Style/CamelType_CSharp.md", "Style/CamelType_CSharp_Reference.md",
-    "Style/CamelType_JAWSScript.md",
-    "ReadMe.md", "HomerDev.md", "Developer.md", "Hotkeys.md", "History.md",
+    "Templates/accept.inix", "Templates/gitignore.txt", "Templates/self.md", "Templates/version.txt",
+    "Tools/tagRelease.cmd", "Tools/tagRelease.ps1", "RepoFiles.txt",
+    "Samples/FruitBasketCs.cs", "Samples/FruitBasketMdi.cs", "Samples/FruitBasketPy.py",
+    "Samples/accept.inix",
+    "Samples/buildFruitBasketCs.cmd", "Samples/buildFruitBasketMdi.cmd",
+    "Samples/buildFruitBasketPy.cmd",
+    "checkHomerDev.cmd", "checkHomerDev.py",
+    "Tools/gitPush.cmd", "Tools/gitRelease.cmd",
+    "Tools/checkHomerApp.cmd", "Tools/checkHomerApp.py",
+    "Tools/homerTidy.cmd", "Tools/homerTidy.py",
+    "Tools/sayTutorial.cmd", "Tools/sayTutorial.py",
+    "help/CamelType_CSharp.md", "help/CamelType_CSharp_Reference.md",
+    "help/CamelType_JAWSScript.md",
+    "ReadMe.md", "License.md",
+    "help/Announce.md", "help/Developer.md", "help/History.md", "help/HomerDev.md",
+    "help/Hotkeys.md", "help/Tutorials.md",
+    "help/Tutorial_HomerDev.inix",
     "License.md", "version.txt",
 ]
 
 c_sLogName = "buildHomerDev.log"
+
+# Folders a build makes, which are none of the kit's business. Walking into one
+# means auditing thousands of somebody else's files: a virtual environment alone
+# holds the whole of PyInstaller. Lowercase alphabetical, as every list in Homer
+# code is.
+c_lsSkipFolders = [".git", ".venv", "__pycache__", "build", "dist", "notes", "venv"]
+
+# How many problems to print before saying how many more there are. The log
+# always holds every one of them.
+c_iShowProblems = 20
+
+# Files a build writes. They are generated on every build, they are in the
+# never-pushed list, and auditing their encoding says nothing about the kit.
+c_lsGeneratedFiles = ["version.py", "version.cs"]
+
+# Reports a check writes; they are dated, disposable and not part of the kit.
+c_sEvidencePrefix = "evidence-"
+
+# The standard document set. ReadMe and License sit at the top of the project;
+# every other document lives in help, which is where the Homer layout puts them.
+c_lsDocumentsTop = ["License", "ReadMe"]
+
+# WHERE FILES USED TO BE, AND WHERE THEY ARE NOW.
+#
+# A zip unarchived over an existing folder adds and replaces; it never deletes.
+# So when the kit moves a file, the old copy stays on every machine that had the
+# earlier version, and the result is two HomerDev.md files with different
+# contents -- which is worse than either.
+#
+# Telling somebody to delete the old ones by hand is not an answer. A script
+# that makes the change is, and this is it: for each pair below, when BOTH the
+# old and the new file exist, the old one is removed. Both must exist, so
+# nothing is ever deleted without its replacement already in place.
+#
+# Add a pair here whenever a file moves. Old entries can be dropped once nobody
+# could still be carrying that version.
+c_lMoved = [
+    ("Announce.md", "help/Announce.md"),
+    ("Announce.htm", "help/Announce.htm"),
+    ("Developer.md", "help/Developer.md"),
+    ("Developer.htm", "help/Developer.htm"),
+    ("History.md", "help/History.md"),
+    ("History.htm", "help/History.htm"),
+    ("HomerDev.md", "help/HomerDev.md"),
+    ("HomerDev.htm", "help/HomerDev.htm"),
+    ("Hotkeys.md", "help/Hotkeys.md"),
+    ("Hotkeys.htm", "help/Hotkeys.htm"),
+    ("Style/CamelType_CSharp.md", "help/CamelType_CSharp.md"),
+    ("Style/CamelType_CSharp.htm", "help/CamelType_CSharp.htm"),
+    ("Style/CamelType_CSharp_Reference.md", "help/CamelType_CSharp_Reference.md"),
+    ("Style/CamelType_CSharp_Reference.htm", "help/CamelType_CSharp_Reference.htm"),
+    ("Style/CamelType_JAWSScript.md", "help/CamelType_JAWSScript.md"),
+    ("Style/CamelType_JAWSScript.htm", "help/CamelType_JAWSScript.htm"),
+    ("Tutorial_HomerDev.inix", "help/Tutorial_HomerDev.inix"),
+    ("Tutorials.md", "help/Tutorials.md"),
+    ("Tutorials.htm", "help/Tutorials.htm"),
+    ("self.md", "help/self.md"),
+    ("self.htm", "help/self.htm"),
+    ("Samples/FruitBasketCs/FruitBasketCs.cs", "Samples/FruitBasketCs.cs"),
+    ("Samples/FruitBasketMdi/FruitBasketMdi.cs", "Samples/FruitBasketMdi.cs"),
+    ("Samples/FruitBasketPy/FruitBasketPy.py", "Samples/FruitBasketPy.py"),
+    ("Python/homer/inix.py", "homer/inix.py"),
+    ("Python/homer/lbc.py", "homer/lbc.py"),
+    ("Python/homer/say.py", "homer/say.py"),
+    ("Python/homer/util.py", "homer/util.py"),
+    ("Python/homer/web.py", "homer/web.py"),
+    ("CSharp/Keys.cs", "CSharp/KeyName.cs"),
+]
+
+# Folders that existed in an earlier layout and hold nothing the kit wants now.
+# Removed only when empty, which they are once the pairs above have been applied.
+c_lsOldFolders = ["Python/homer", "Python", "Samples/FruitBasketCs",
+                  "Samples/FruitBasketMdi", "Samples/FruitBasketPy", "Style"]
 sScriptDir = os.path.dirname(os.path.abspath(__file__))
 sLogPath = os.path.join(sScriptDir, c_sLogName)
 oLog = None
@@ -114,10 +199,53 @@ def normalizeHomer(sPath):
     return True
 
 
+def removeMoved():
+    """Delete a file the kit has moved, once its replacement is in place.
+
+    Unarchiving over an existing folder never deletes, so without this a machine
+    that had an earlier kit keeps both copies of every document that moved. Two
+    files with the same name and different contents is worse than either alone,
+    and working out which is which is not the user's job.
+
+    Both the old and the new file must exist before anything is removed, so a
+    file is never deleted without its replacement already in place.
+    """
+    iRemoved = 0
+    for sOld, sNew in c_lMoved:
+        sOldPath = os.path.join(sScriptDir, sOld.replace("/", os.sep))
+        sNewPath = os.path.join(sScriptDir, sNew.replace("/", os.sep))
+        if not (os.path.isfile(sOldPath) and os.path.isfile(sNewPath)): continue
+        try:
+            os.remove(sOldPath)
+            iRemoved += 1
+            logLine("MOVED: %s is now %s; removed the old copy" % (sOld, sNew))
+        except Exception as oError:
+            logLine("COULD NOT REMOVE %s: %s" % (sOldPath, oError))
+
+    for sFolder in c_lsOldFolders:
+        sPath = os.path.join(sScriptDir, sFolder.replace("/", os.sep))
+        try:
+            if os.path.isdir(sPath) and not os.listdir(sPath):
+                os.rmdir(sPath)
+                iRemoved += 1
+                logLine("REMOVED EMPTY FOLDER: %s" % sPath)
+        except Exception as oError:
+            logLine("COULD NOT REMOVE FOLDER %s: %s" % (sPath, oError))
+
+    if iRemoved:
+        sayLine("Removed %d file%s left by an earlier layout." %
+                (iRemoved, "" if iRemoved == 1 else "s"))
+    return iRemoved
+
+
 def convertDocs(sPandoc):
     """Write a .htm beside every .md in the kit. Returns the number converted."""
     iDone = 0
     for sRoot, lsDirs, lsFiles in os.walk(sScriptDir):
+        lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders]
+        # Templates are not documents: Templates\self.md is a starter for a new
+        # app, and converting it would leave a stray .htm in the kit.
+        if os.path.basename(sRoot).lower() == "templates": continue
         for sName in sorted(lsFiles):
             if not sName.lower().endswith(".md"): continue
             sMd = os.path.join(sRoot, sName)
@@ -148,7 +276,10 @@ def checkKit():
     # which take CRLF and no BOM.
     lsTextExt = (".cs", ".py", ".ps1", ".md", ".htm", ".inix", ".txt", ".iss", ".cmd")
     for sRoot, lsDirs, lsFiles in os.walk(sScriptDir):
+        lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders]
         for sName in sorted(lsFiles):
+            if sName.lower() in c_lsGeneratedFiles: continue
+            if sName.lower().startswith(c_sEvidencePrefix): continue
             if not sName.lower().endswith(lsTextExt): continue
             sPath = os.path.join(sRoot, sName)
             sShown = os.path.relpath(sPath, sScriptDir).replace(os.sep, "/")
@@ -168,7 +299,7 @@ def checkKit():
                                   (sShown, iLf - iCrLf, iLf))
 
     # A template that has lost its token would silently produce a broken app.
-    for sName in ["build_APP_.cmd", "_APP__setup.iss", "_APP_.cs",
+    for sName in ["build_APP_.cmd", "build_APP_Py.cmd", "_APP__setup.iss", "_APP_.cs",
                   "create_APP_Repo.cmd", "create_APP_Repo.ps1"]:
         sPath = os.path.join(sScriptDir, "Templates", sName)
         if not os.path.exists(sPath): continue
@@ -202,6 +333,7 @@ def main():
         if sPandoc == "":
             sayLine("Pandoc is not available, so the .htm files were left as they are.")
         else:
+            removeMoved()
             iDone = convertDocs(sPandoc)
             sayLine("%d document%s converted to HTML." % (iDone, "" if iDone == 1 else "s"))
 
@@ -212,8 +344,15 @@ def main():
         return 0
 
     sayLine("%d problem%s found:" % (len(lsProblems), "" if len(lsProblems) == 1 else "s"))
-    for sProblem in lsProblems:
+    # The console gets the first few; the log gets all of them. A console that
+    # scrolls for a minute tells a screen reader user nothing at all.
+    for sProblem in lsProblems[:c_iShowProblems]:
         sayLine("  " + sProblem)
+    for sProblem in lsProblems[c_iShowProblems:]:
+        logLine("PROBLEM: " + sProblem)
+    if len(lsProblems) > c_iShowProblems:
+        sayLine("  and %d more, all of them in %s." %
+                (len(lsProblems) - c_iShowProblems, c_sLogName))
     logLine("Finished with problems %s" % datetime.datetime.now().isoformat(" ", "seconds"))
     return 1
 

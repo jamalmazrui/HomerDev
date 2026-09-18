@@ -27,7 +27,10 @@ setlocal EnableExtensions EnableDelayedExpansion
 set "c_sModel=llama3.2"
 set "c_sModelSize=about 2 GB"
 
+rem The app name comes from the folder this script is installed into. That is
+rem exec in an installed copy, so climb one level when it is.
 for %%d in ("%~dp0.") do set "sApp=%%~nxd"
+if /i "%sApp%"=="exec" for %%d in ("%~dp0..") do set "sApp=%%~nxd"
 set "sLogDir=%LOCALAPPDATA%\%sApp%\logs"
 set "sLog=%sLogDir%\%sApp%_setup.log"
 if not exist "%sLogDir%" mkdir "%sLogDir%" >nul 2>&1

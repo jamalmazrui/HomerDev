@@ -4,12 +4,15 @@
 Usage (through the wrapper, which is how it is meant to be run):
 
     newHomerApp                     ask for the app name, write into C:\\<App>
-    newHomerApp JobDo               write C:\\JobDo
+    newHomerApp JobDo               write C:\\JobDo, a C# app
+    newHomerApp JobDo --python      write C:\\JobDo, a Python app
     newHomerApp JobDo D:\\Work\\JobDo  write somewhere else
 
 What it writes into the app folder, from Templates\\:
 
     build<App>.cmd          the build script, compiling from C:\\HomerDev
+    help\self.md            the project's private notebook, never pushed
+    help\                   where every document goes; ReadMe stays at the top
     <App>_setup.iss         the installer script
     create<App>Repo.cmd     the one-time GitHub bootstrap
     create<App>Repo.ps1
@@ -84,7 +87,11 @@ def main():
     logLine("Working directory: %s" % os.getcwd())
     logLine("Command line: %s" % " ".join(sys.argv))
 
-    sApp = sys.argv[1] if len(sys.argv) > 1 else ""
+    lsWords = [s for s in sys.argv[1:] if s.lower() not in ("--python", "-python", "python")]
+    bPython = len(lsWords) < len(sys.argv) - 1
+    logLine("Language: %s" % ("Python" if bPython else "C#"))
+
+    sApp = lsWords[0] if len(lsWords) > 0 else ""
     if sApp == "":
         sApp = input("Name of the new app (for example JobDo): ").strip()
     if sApp == "":
@@ -96,8 +103,8 @@ def main():
             logLine("ERROR: bad character %r in app name %r" % (sBad, sApp))
             return 1
 
-    sTarget = sys.argv[2] if len(sys.argv) > 2 else os.path.join("C:\\", sApp)
-    if os.name != "nt" and len(sys.argv) <= 2:
+    sTarget = lsWords[1] if len(lsWords) > 1 else os.path.join("C:\\", sApp)
+    if os.name != "nt" and len(lsWords) <= 1:
         sTarget = os.path.join(os.getcwd(), sApp)
     sTemplates = os.path.join(sScriptDir, "Templates")
 
@@ -117,10 +124,20 @@ def main():
         ("create_APP_Repo.cmd",  "create" + sApp + "Repo.cmd"),
         ("create_APP_Repo.ps1",  "create" + sApp + "Repo.ps1"),
         ("version.txt",          "version.txt"),
+        ("accept.inix",          "accept.inix"),
         ("gitignore.txt",        ".gitignore"),
+        ("self.md",              "help/self.md"),
         ("installOllama.cmd",    "installOllama.cmd"),
         ("installModels.cmd",    "installModels.cmd"),
+        ("installScreenReaderSupport.cmd", "installScreenReaderSupport.cmd"),
+        ("homerFinish.cmd",      "homerFinish.cmd"),
     ]
+
+    if bPython:
+        #  A Python app takes the Python build script instead of the C# one and
+        #  writes its source from the Python sample rather than the C# starter.
+        lsJobs = [t for t in lsJobs if t[0] not in ("_APP_.cs", "build_APP_.cmd")]
+        lsJobs.insert(0, ("build_APP_Py.cmd", "build" + sApp + ".cmd"))
 
     os.makedirs(sTarget, exist_ok=True)
     iWritten = 0
@@ -142,8 +159,13 @@ def main():
     sayLine("%d file%s written in %s." % (iWritten, "" if iWritten == 1 else "s", sTarget))
     if iSkipped:
         sayLine("%d file%s left alone, already there." % (iSkipped, "" if iSkipped == 1 else "s"))
-    sayLine("Next: fill in runJob() in %s.cs, set the AppId and hotkey in %s_setup.iss, then run build%s."
-            % (sApp, sApp, sApp))
+    if bPython:
+        sayLine("Next: write %s.py -- Samples\\FruitBasketPy is the worked example --"
+                % sApp)
+        sayLine("set the AppId and hotkey in %s_setup.iss, then run build%s." % (sApp, sApp))
+    else:
+        sayLine("Next: fill in runJob() in %s.cs, set the AppId and hotkey in %s_setup.iss, then run build%s."
+                % (sApp, sApp, sApp))
     logLine("Finished %s" % datetime.datetime.now().isoformat(" ", "seconds"))
     return 0
 

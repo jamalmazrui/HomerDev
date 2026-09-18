@@ -1,0 +1,25 @@
+﻿# RepoFiles.txt -- what the HomerDev repository carries. The kit ships no
+# installer, so this file alone tells homerTidy what belongs here.
+#
+# One name per line. A trailing slash names a whole folder. Blank lines and
+# lines beginning with # or ; are ignored.
+
+CSharp/
+homer/
+Samples/
+Templates/
+Tools/
+ReadMe.md
+ReadMe.htm
+License.md
+License.htm
+help/
+buildHomerDev.cmd
+buildHomerDev.py
+checkHomerDev.cmd
+checkHomerDev.py
+newHomerApp.cmd
+newHomerApp.py
+version.txt
+RepoFiles.txt
+.gitignore

@@ -1,4 +1,19 @@
-﻿// Keys.cs -- part of the shared Homer toolkit (namespace Homer).
+﻿// KeyName.cs -- part of the shared Homer toolkit (namespace Homer).
+//
+// THE CLASS IS CALLED KeyName AND NOT Keys, AND THE NAME COST A BUILD.
+//
+// It was Homer.Keys until 18 September 2026, when the kit first compiled it
+// alongside Lbc.cs and the build failed with
+//
+//     error CS0721: 'Keys': static types cannot be used as parameters
+//     error CS0115: 'LbcForm.ProcessCmdKey(ref Message, Keys)': no suitable
+//                   method found to override
+//
+// System.Windows.Forms.Keys is the enum every WinForms program uses, and
+// ProcessCmdKey takes one. A static class of the same name in the same
+// namespace wins the lookup, the override no longer matches, and any app
+// writing Keys.Delete gets an ambiguity error as well. Renaming this class is
+// the only fix that leaves both usable in one file, which they have to be.
 //
 // ONE SPELLING FOR A KEY, AND ONE PLACE THAT KNOWS EVERY OTHER SPELLING.
 //
@@ -59,7 +74,7 @@ using System.Text;
 
 namespace Homer {
 
-public static class Keys
+public static class KeyName
 {
     // --- The modifiers, in Homer order -------------------------------------
     //

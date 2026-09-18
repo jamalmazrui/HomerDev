@@ -193,65 +193,189 @@ is the install.</p>
 <p>If you keep the kit somewhere other than <code>C:\HomerDev</code>,
 set the <code>HOMERDEV</code> environment variable to that folder.</p>
 <h2 id="quick-start">Quick start</h2>
-<h3 id="build-the-kit">1. Build the kit</h3>
+<h3 id="install-the-kit">1. Install the kit</h3>
+<p>Unzip <code>HomerDev.zip</code> into <code>C:\HomerDev</code>. That
+is the install. Then:</p>
 <pre><code>cd \HomerDev
 buildHomerDev</code></pre>
-<p>It converts every document to HTML with pandoc, fetching pandoc if
-this machine does not have it, then checks the kit over and reports
-anything wrong. The detail goes to <code>buildHomerDev.log</code>.</p>
-<h3 id="start-an-app">2. Start an app</h3>
-<pre><code>newHomerApp JobDo</code></pre>
-<p>That writes <code>C:\JobDo</code> with everything a new app
-needs:</p>
+<p>It converts every document to HTML with pandoc, fetching pandoc with
+winget if this machine does not have it, then checks the kit over and
+reports anything wrong. The detail goes to
+<code>buildHomerDev.log</code> beside the script.</p>
+<p>If you keep the kit somewhere else, set the <code>HomerDev</code>
+environment variable to that folder. Every build script looks there
+first, then in <code>C:\HomerDev</code>, then in the folder it is run
+from.</p>
+<h3 id="build-and-run-the-fruit-basket-in-c">2. Build and run the fruit
+basket in C</h3>
+<pre><code>cd Samples
+buildFruitBasketCs
+FruitBasketCs</code></pre>
+<p>A window opens with a fruit field, an Add button, a basket list and a
+Delete button. Type a fruit and press Enter. Arrow through the basket.
+Press Delete on one. Press Report to see the whole basket in a window
+you can read line by line. Close it and run it again: the basket is
+still there.</p>
+<p>Then try what nothing in that program had to write:</p>
 <ul>
-<li><code>JobDo.cs</code>, a working one-dialog program with the
-standard controls in place</li>
-<li><code>buildJobDo.cmd</code>, which compiles it against the kit</li>
-<li><code>JobDo_setup.iss</code>, the installer</li>
-<li><code>createJobDoRepo.cmd</code> and <code>.ps1</code>, the one-time
-GitHub bootstrap</li>
-<li><code>installOllama.cmd</code> and <code>installModels.cmd</code>,
-for local AI</li>
-<li><code>version.txt</code> and <code>.gitignore</code></li>
+<li><strong>Alt+F</strong> reaches the fruit field,
+<strong>Alt+A</strong> adds, <strong>Alt+D</strong> deletes,
+<strong>Alt+R</strong> reports. One ampersand in a label is the whole
+mechanism.</li>
+<li><strong>Control+J</strong> in the basket searches inside the list;
+<strong>F3</strong> repeats it.</li>
+<li><strong>Control+C</strong> in the fruit field copies the whole line
+with nothing selected; <strong>Alt+F8</strong> reads the field aloud;
+<strong>F8</strong> then <strong>Shift+F8</strong> marks a selection in
+two keystrokes instead of holding Shift.</li>
+<li><strong>F1</strong> opens a Help window listing every field with its
+explanation.</li>
+<li><strong>Control+Enter</strong> accepts from anywhere.</li>
 </ul>
-<p>Nothing already in the folder is overwritten.</p>
-<h3 id="set-two-things-by-hand">3. Set two things by hand</h3>
-<p>Open <code>JobDo_setup.iss</code> and change the two lines marked
-CHANGE ME: a fresh AppId, and the desktop hotkey. Everything else in
-that file is already right.</p>
-<h3 id="build-and-run">4. Build and run</h3>
+<p>All of that comes from Lbc, and the program is about 250 lines
+including its comments.</p>
+<h3 id="build-and-run-the-same-program-in-python">3. Build and run the
+same program in Python</h3>
+<pre><code>    buildFruitBasketPy
+FruitBasketPy</code></pre>
+<p>The first build makes a virtual environment beside the script and
+installs PyInstaller and wxPython into it, which takes a few minutes
+once. What comes out is one file: <code>FruitBasketPy.exe</code>, with
+Python and every dependency inside it, so whoever you give it to needs
+no Python of their own.</p>
+<h3 id="read-the-two-side-by-side">4. Read the two side by side</h3>
+<p>This is the part worth the time. Both files carry the same twelve
+markers:</p>
+<pre><code>---- BLOCK n: &lt;title&gt; ----</code></pre>
+<p>Same numbers, same titles, same function names. Nine decisions are
+marked DECISION 1 to DECISION 9 where they occur in each. They are the
+decisions a working program has to get right and an AI will not make for
+you unless you ask for them. The AI-assisted coding part of
+<code>HomerDev.md</code> is written around them.</p>
+<h3 id="look-at-where-it-put-things">5. Look at where it put things</h3>
+<pre><code>%LOCALAPPDATA%\FruitBasketCs</code></pre>
+<p>Six folders, and every one of them starts with a different letter, so
+you reach any of them by typing that letter: <code>configs</code> holds
+the settings, <code>data</code> a database, <code>jobs</code> your own
+scripts, <code>logs</code> one file per session, <code>results</code>
+what the program produced, <code>temp</code> what a crash left behind.
+An installed program adds <code>exec</code>, <code>samples</code> and
+<code>templates</code> in its own folder under Program Files.</p>
+<h3 id="look-at-the-log">6. Look at the log</h3>
+<pre><code>%LOCALAPPDATA%\FruitBasketCs\logs</code></pre>
+<p>One file per session, named for when it started, holding the
+environment, every setting and every error with its stack. Every Homer
+program writes one, from the same <code>Log</code> class, in the same
+place. So does every installer.</p>
+<h3 id="build-the-third-shape">7. Build the third shape</h3>
+<pre><code>buildFruitBasketMdi
+FruitBasketMdi</code></pre>
+<p>The same fruit basket as a multiple-document program. Press Control+N
+for another basket, F4 to pick between them, Shift+F4 to hear how many
+are open, Alt+F10 for every command in one list, and Control+F1 to turn
+on the key describer and explore the keys without running anything.</p>
+<p>Homer apps come in three shapes – a single tool with a command line
+and a dialog, a desktop-only program whose dependencies decided that,
+and a multiple-document program. They share almost everything;
+<code>HomerDev.md</code> says what differs.</p>
+<h3 id="check-the-whole-kit-with-a-compiler">8. Check the whole kit with
+a compiler</h3>
+<pre><code>checkHomerDev</code></pre>
+<p>It audits the kit, deletes what previous builds wrote, builds all
+three samples from clean, and writes an evidence report. Run it after
+changing anything in <code>CSharp</code> or <code>homer</code>, and
+before a release. It exists because three releases in a row shipped a
+fault that only a compiler could see.</p>
+<h3 id="gather-evidence">9. Gather evidence</h3>
+<pre><code>cd Tools
+checkHomerApp --path ..\Samples</code></pre>
+<p>Eleven checks run, and an <code>evidence-&lt;date&gt;.md</code>
+appears saying what was verified, what was not checked, and what remains
+uncertain. Open it. The third list is the point: it names what no script
+can settle, so you know where your own judgement is still needed.</p>
+<p><code>accept.inix</code> beside the source is where you write what
+“done” means for your own program – a name, a command, an expected exit
+code – and the checker runs every one of them.</p>
+<h3 id="start-your-own-app">10. Start your own app</h3>
+<pre><code>newHomerApp JobDo               a C# app
+newHomerApp JobDo --python      a Python app</code></pre>
+<p>That writes <code>C:\JobDo</code> with everything a new app needs: a
+working one-dialog program, the build script, the installer script, the
+GitHub bootstrap, the local AI and screen reader install scripts,
+<code>RepoFiles.txt</code>, <code>.gitignore</code>,
+<code>self.md</code> and <code>version.txt</code>. Nothing already in
+the folder is overwritten.</p>
+<p>Two things need your hand, and both are marked CHANGE ME in the
+installer script: a fresh AppId, and the desktop hotkey.</p>
+<h3 id="build-run-and-publish">11. Build, run and publish</h3>
 <pre><code>cd \JobDo
 buildJobDo
-JobDo</code></pre>
-<p>The starter program opens its dialog, remembers what you type, and
-reports what it did. Fill in <code>runJob()</code> in
-<code>JobDo.cs</code> and it is your program.</p>
-<h3 id="publish">5. Publish</h3>
-<pre><code>createJobDoRepo
+JobDo
+createJobDoRepo
 tagRelease</code></pre>
 <p><code>createJobDoRepo</code> makes the GitHub repository and pushes
-the first commit. After that, <code>tagRelease</code> is how every
+the first commit; after that <code>tagRelease</code> is how every
 release goes out. Copy <code>tagRelease.cmd</code> and
 <code>tagRelease.ps1</code> from <code>Tools\</code> into the app folder
-first; they need no editing.</p>
+first, or keep one copy in a folder on your PATH – they act on the
+current directory, so one copy serves every project.</p>
+<h3 id="listen-instead">Listen instead</h3>
+<p><code>Tutorial_HomerDev.inix</code> is the same walkthrough as a
+spoken tutorial: what the kit is, unarchiving it, building both fruit
+baskets, and hearing that the two behave the same.
+<code>Tools\sayTutorial.cmd</code> renders it to audio in two voices –
+the narration in one, the screen reader’s answers in another – using
+Windows’ own voices, with nothing installed and nothing uploaded.</p>
+<pre><code>cd Tools
+sayTutorial --list
+sayTutorial ..\Tutorial_HomerDev.inix</code></pre>
+<h3 id="what-gets-published-and-what-does-not">What gets published, and
+what does not</h3>
+<p><code>RepoFiles.txt</code> names what the repository carries, and
+<code>homerTidy --gitignore</code> turns that into a
+<code>.gitignore</code> that ignores everything else. A file dropped
+into the folder is invisible to git until somebody names it.
+<code>self.md</code>, the project’s own notebook, is in the never-pushed
+list and stays on your machine.</p>
 <h2 id="what-is-in-the-kit">What is in the kit</h2>
 <ul>
 <li><code>CSharp\</code> – nine modules in the <code>Homer</code>
 namespace: Lbc (dialogs), Say (speech), Inix (settings and tables),
-Keys, KeyMap, Util, Web, inixVert, PdfRead.</li>
-<li><code>Python\homer\</code> – the same toolbox for Python and NVDA
+KeyMap, KeyName, Util, Web, inixVert, PdfRead.</li>
+<li><code>homer\</code> – the same toolbox for Python and NVDA
 add-ons.</li>
 <li><code>Templates\</code> – the files a new app starts from.</li>
-<li><code>Tools\</code> – tagRelease, cleanDir, tidyRepo. No editing
-needed; they work out the app name from the folder.</li>
+<li><code>Tools\</code> – tagRelease and homerTidy. No editing needed;
+they work out the app name from the folder, and either can be run from a
+shared tools folder.</li>
+<li><code>Samples\</code> – two fruit basket programs, one in C# and one
+in Python, with their build scripts. The teaching material.</li>
 <li><code>Style\</code> – the Camel Type coding guidelines.</li>
+</ul>
+<h2 id="where-the-documents-are">Where the documents are</h2>
+<p><code>ReadMe</code> and <code>License</code> are here at the top.
+Everything else is in <code>help</code>:</p>
+<ul>
+<li><code>HomerDev.md</code> – the guide: the classes, the conventions,
+the three shapes of Homer app, the folder layout, the evidence checks,
+and a list of every file in the kit with a line saying why it is
+there</li>
+<li><code>Tutorials.md</code> – nine worked scenarios, and the audio
+tutorial playlist</li>
+<li><code>Developer.md</code> – how to rebuild or change the kit</li>
+<li><code>History.md</code> – what changed in each version, and why</li>
+<li><code>Hotkeys.md</code> – every key three ways</li>
+<li><code>Announce.md</code> – a ready-to-send announcement</li>
+<li><code>Tutorial_HomerDev.inix</code> – the spoken walkthrough, in two
+voices</li>
 </ul>
 <h2 id="the-other-documents">The other documents</h2>
 <ul>
 <li><code>HomerDev.md</code> – the complete guide: the
-<code>.inix</code> format, Camel Type, direct speech across screen
-readers, Lbc and the standard dialogs, the launchpad app conventions,
-keys, scripts and logs, and the installer.</li>
+<code>.inix</code> format, AI-assisted coding and how to teach with the
+samples, Camel Type, direct speech across screen readers, Lbc and the
+standard dialogs, the launchpad app conventions, keys, scripts and logs,
+and the installer.</li>
 <li><code>Developer.md</code> – how to change the kit itself and how a
 fix reaches the apps.</li>
 <li><code>Hotkeys.md</code> – the keys every Homer dialog and text box

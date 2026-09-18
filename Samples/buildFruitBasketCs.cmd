@@ -1,10 +1,10 @@
 @echo off
 rem ===================================================================
-rem build_APP_.cmd -- build _APP_.exe from _APP_.cs and the Homer
+rem buildFruitBasketCs.cmd -- build FruitBasketCs.exe from FruitBasketCs.cs and the Homer
 rem Development Kit modules in C:\HomerDev.
 rem
 rem This is the HomerDev TEMPLATE. newHomerApp.cmd writes a copy of it
-rem with _APP_ replaced by a real app name. If you are reading the copy,
+rem with FruitBasketCs replaced by a real app name. If you are reading the copy,
 rem the app name is already in place and you can edit freely.
 rem
 rem KIT: the shared C# modules are NOT copied into the app folder. They
@@ -23,14 +23,14 @@ rem VERSION: version.txt is the SINGLE source of truth. It holds one
 rem line, nothing else. This script increments it on every build --
 rem stepping over any number already released, which it learns from the
 rem repository's own tags -- then generates Version.cs from it, so the
-rem running program reports the same number. _APP__setup.iss reads
+rem running program reports the same number. FruitBasketCs_setup.iss reads
 rem version.txt directly, so the installer reports it too, and
 rem tagRelease reads it back out of the built setup's version resource
 rem to form the tag. No version literal appears anywhere else, so a
 rem stale file cannot rewind it.
 rem
-rem   build_APP_.cmd          increments the version, then builds
-rem   build_APP_.cmd nobump   keeps the current number
+rem   buildFruitBasketCs.cmd          increments the version, then builds
+rem   buildFruitBasketCs.cmd nobump   keeps the current number
 rem
 rem COMPILER: Roslyn is preferred, from Visual Studio or the free Build
 rem Tools. The pre-Roslyn csc.exe under Microsoft.NET\Framework64 is
@@ -53,14 +53,14 @@ rem parentheses, and cmd.exe scans a parenthesised block for its closing
 rem paren BEFORE expanding variables. Every search below is therefore a
 rem single-line "if not defined X if exist ... set" chain, never a block.
 rem
-rem Output in this folder: _APP_.exe, and the installer if Inno Setup is
-rem present. Everything is logged to build_APP_.log beside this script.
+rem Output in this folder: FruitBasketCs.exe, and the installer if Inno Setup is
+rem present. Everything is logged to buildFruitBasketCs.log beside this script.
 rem ===================================================================
 
 setlocal enabledelayedexpansion
 cd /d "%~dp0"
 
-set "app=_APP_"
+set "app=FruitBasketCs"
 set "log=%CD%\build%app%.log"
 echo %app% build started %DATE% %TIME%> "%log%"
 echo Script: %~f0>> "%log%"
@@ -89,18 +89,10 @@ rem ---- the Homer modules this app compiles in -------------------------
 rem Alphabetical, as every list in Homer code is unless another order is
 rem clearly more logical. Comment out the ones this app does not use; an
 rem unused module costs only build time, so when in doubt leave it in.
-rem A MODULE MAY NEED ANOTHER MODULE, and only two do. Mdi.cs uses KeyMap to
-rem register every command as it is added, so the two are switched on together:
-rem turning on Mdi without KeyMap fails to compile with "The name 'KeyMap' does
-rem not exist in the current context", which is exactly how this comment came to
-rem be written. Nothing else in the kit has a dependency of its own.
 set "homerSources="
 set "homerSources=!homerSources! "!homerDev!\CSharp\Inix.cs""
 set "homerSources=!homerSources! "!homerDev!\CSharp\KeyName.cs""
-rem MDI ONLY (EdSharp, FileDir, DbDo): a multiple-document app needs both of
-rem these, and needs them together. Uncomment the pair.
 rem set "homerSources=!homerSources! "!homerDev!\CSharp\KeyMap.cs""
-rem set "homerSources=!homerSources! "!homerDev!\CSharp\Mdi.cs""
 set "homerSources=!homerSources! "!homerDev!\CSharp\Lbc.cs""
 set "homerSources=!homerSources! "!homerDev!\CSharp\Log.cs""
 set "homerSources=!homerSources! "!homerDev!\CSharp\Paths.cs""
@@ -125,11 +117,11 @@ rem On in the template, because more than one app uses each:
 set "useConfigFile=1"
 set "useDocs=1"
 set "useIcon=1"
-set "useInstaller=1"
+rem set "useInstaller=1"   rem the sample ships as source, not as an installed program
 set "useManifest=1"
 set "useNuGet=1"
-set "useScreenReaderScripts=1"
-set "useVersionSteps=1"
+rem set "useScreenReaderScripts=1"   rem the sample has no scripts of its own
+rem set "useVersionSteps=1"   rem a sample is not released, so its number never moves
 rem
 rem Off in the template, each used by one app so far. The app is named so you
 rem know where to look for a working example.

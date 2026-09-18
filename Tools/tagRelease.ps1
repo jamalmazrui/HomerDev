@@ -1,7 +1,30 @@
-﻿# tagRelease.ps1
+﻿# tagRelease.ps1 -- part of the Homer Development Kit.
+#
 # Tag, push, and publish a GitHub Release for the program in the current
-# directory. Generic: works for EdSharp, FileDir, DbDo, or any sibling app
-# without editing this script.
+# directory. Generic: works for EdSharp, FileDir, DbDo, HomerView, HomerScribe
+# or any sibling app without editing this script.
+#
+# WHERE IT LIVES. The script acts on the CURRENT DIRECTORY, never on its own
+# location, so one copy in a tools folder on the PATH serves every project:
+#
+#     C:\bin\tagRelease.cmd
+#     C:\bin\tagRelease.ps1
+#
+#     cd C:\EdSharp
+#     tagRelease
+#
+# or, without changing directory, name the repo:
+#
+#     tagRelease -Path C:\EdSharp
+#
+# A copy beside the project works exactly as it always has.
+#
+# TWO KINDS OF PROJECT. An app with an installer is released from the version
+# stamped into <App>_setup.exe, with that installer attached as the release
+# asset. A project that ships SOURCE and has no <App>_setup.iss -- HomerDev is
+# one -- is released from version.txt, with no asset. Everything else is the
+# same. An earlier edition stopped with "Could not find <App>_setup.iss", which
+# is what made HomerDev unreleasable.
 #
 # Discovery (nothing is hardcoded):
 #   * App      -- the name of the current directory. C:\FileDir yields "FileDir".
@@ -59,12 +82,15 @@
 # the version files it changed (unless -NoCommit) and warns about anything else
 # still outstanding, then proceeds.
 #
-# Run from the repo root:
-#   cd C:\FileDir
-#   .\tagRelease.cmd                     the normal command; no flags needed
+# The script always acts on the CURRENT DIRECTORY, not on its own location, so
+# tagRelease.ps1 and tagRelease.cmd can live in one shared tools folder on your
+# PATH and be run against any repo. Just cd to the repo first:
+#   cd C:\EdSharp
+#   .\tagRelease.cmd                     publish the build that is on disk.  It never
+#                                        changes a version number: Build<App>.cmd
+#                                        already assigned one.
 #   .\tagRelease.cmd -Version 5.1        set an explicit version
 #   .\tagRelease.cmd -NoBump             never bump, even if already released
-#   .\tagRelease.cmd -PrepareOnly        set/sync the version files only, no release
 #
 # Requirements: git and gh in PATH, gh authenticated (gh auth login),
 # PowerShell 5.1+.
@@ -80,16 +106,27 @@
 
 [CmdletBinding()]
 param(
+    [string] $Path,
     [string] $Version,
     [switch] $NoBump,
     [switch] $NoCommit,
-    [switch] $PrepareOnly,
     [switch] $SkipStaleCheck
 )
 
 $ErrorActionPreference = 'Stop'
 
+# The repo is the CURRENT DIRECTORY unless -Path names another, so a single
+# copy in a tools folder on the PATH -- C:\bin\tagRelease.cmd -- serves every
+# project. The script's own location is never used to find the repo.
 $sRepoPath = $PWD.Path
+if ($Path) {
+    if (-not (Test-Path -LiteralPath $Path -PathType Container)) {
+        Write-Host "ERROR: -Path $Path is not a folder." -ForegroundColor Red
+        exit 1
+    }
+    $sRepoPath = (Resolve-Path -LiteralPath $Path).Path
+    Set-Location -LiteralPath $sRepoPath
+}
 $sLogPath  = Join-Path $sRepoPath 'tagRelease.log'
 
 try {
@@ -118,7 +155,10 @@ function getIssPath {
         $sList = ($aFound | ForEach-Object { $_.Name }) -join ', '
         throw "More than one setup script matches $sPattern ($sList)."
     }
-    throw "Could not find $sPattern in $sPath. tagRelease assumes the directory name is the app name (e.g. C:\FileDir -> FileDir_setup.iss)."
+    # NO SETUP SCRIPT IS A VALID ANSWER, not an error. A repository that ships
+    # source rather than an installer -- HomerDev is one -- still deserves a tag
+    # and a release. The caller decides what to do with the empty answer.
+    return ''
 }
 
 function getIssDirective {
@@ -152,107 +192,6 @@ function getIssDirective {
     return $sValue
 }
 
-function getVersionFromIss {
-    # Read AppVersion from the .iss, supporting both Inno styles:
-    #   #define AppVersion "1.0.126"     (DbDo)
-    #   AppVersion=5.0                   (EdSharp, FileDir)
-    # The #define is checked first because when both are present the directive
-    # is normally just AppVersion={#AppVersion}.
-    param([Parameter(Mandatory)] [AllowEmptyCollection()] [AllowEmptyString()] [string[]] $aLines)
-    foreach ($sLine in $aLines) {
-        if ($sLine -match '^\s*#define\s+AppVersion\s+"([^"]+)"') { return $Matches[1] }
-    }
-    foreach ($sLine in $aLines) {
-        if ($sLine -match '^\s*AppVersion\s*=\s*([^\s{]+)\s*$') { return $Matches[1] }
-    }
-    throw 'Could not find an AppVersion in the .iss (neither a #define AppVersion line nor an AppVersion= directive).'
-}
-
-function bumpVersion {
-    # Increment the last dotted-numeric part: 5.0 -> 5.0.1, 1.0.126 -> 1.0.127.
-    # A two-part version gains a third part, so an existing 5.0 install sees
-    # 5.0.1 as newer (5.0 and 5.0.0 compare EQUAL, which is exactly why simply
-    # re-posting a build at the same number never registered as an update).
-    param([Parameter(Mandatory)] [string] $sVersion)
-    $aParts = $sVersion.Split('.')
-    foreach ($sPart in $aParts) {
-        if ($sPart -notmatch '^\d+$') { throw "Version '$sVersion' is not dotted-numeric, so it cannot be bumped automatically. Pass -Version X.Y.Z or -NoBump." }
-    }
-    if ($aParts.Count -lt 3) {
-        $aParts = @($aParts) + '1'
-    } else {
-        $aParts[$aParts.Count - 1] = [string]([int]$aParts[$aParts.Count - 1] + 1)
-    }
-    return ($aParts -join '.')
-}
-
-function setIssVersion {
-    # Write the version into the .iss, updating every version-bearing line that
-    # is actually present: the #define, the AppVersion directive, and the
-    # VersionInfoVersion / AppVerName directives when they carry a literal.
-    # Lines that use the {#AppVersion} token need no change. Returns $true if
-    # the file was modified. Preserves the file's existing encoding style by
-    # writing UTF-8 and CRLF, which is what these .iss files use.
-    param(
-        [Parameter(Mandatory)] [string]   $sPath,
-        [Parameter(Mandatory)] [AllowEmptyCollection()] [AllowEmptyString()] [string[]] $aLines,
-        [Parameter(Mandatory)] [string]   $sVersion
-    )
-    $bChanged = $false
-    $aOut = @()
-    foreach ($sLine in $aLines) {
-        $sNew = $sLine
-        if ($sLine -match '^\s*#define\s+AppVersion\s+"[^"]+"') {
-            $sNew = $sLine -replace '("(?:[^"]+)")', "`"$sVersion`""
-        }
-        elseif ($sLine -match '^\s*AppVersion\s*=\s*[^\s{]+\s*$') {
-            $sNew = "AppVersion=$sVersion"
-        }
-        elseif ($sLine -match '^\s*VersionInfoVersion\s*=\s*[\d\.]+\s*$') {
-            # VersionInfoVersion must be plain numeric (no "beta" suffixes).
-            $sNew = "VersionInfoVersion=$sVersion"
-        }
-        elseif ($sLine -match '^\s*AppVerName\s*=\s*(.+)$') {
-            # Replace only a literal dotted-numeric version inside AppVerName,
-            # leaving any surrounding words (e.g. "FileDir 5.0 beta") intact.
-            $sRest = $Matches[1]
-            if ($sRest -match '\d+(\.\d+)+') {
-                $sNew = "AppVerName=" + ($sRest -replace '\d+(\.\d+)+', $sVersion)
-            }
-        }
-        if ($sNew -ne $sLine) { $bChanged = $true }
-        $aOut += $sNew
-    }
-    if ($bChanged) {
-        $sText = ($aOut -join "`r`n") + "`r`n"
-        [System.IO.File]::WriteAllText($sPath, $sText, (New-Object System.Text.UTF8Encoding($false)))
-    }
-    return $bChanged
-}
-
-function setSourceVersion {
-    # Write the version into the app's C# source, so the running .exe reports the
-    # same version that this release is tagged with. This is the half that F11
-    # actually reads (App.VersionString), and the half that used to drift.
-    # Looks for:  public const string VersionString = "X.Y.Z";
-    # Returns the path updated, or '' if the app has no such constant.
-    param(
-        [Parameter(Mandatory)] [string] $sPath,
-        [Parameter(Mandatory)] [string] $sApp,
-        [Parameter(Mandatory)] [string] $sVersion
-    )
-    $sCsPath = Join-Path $sPath "$sApp.cs"
-    if (-not (Test-Path -LiteralPath $sCsPath -PathType Leaf)) { return '' }
-    $sText = [System.IO.File]::ReadAllText($sCsPath)
-    $sPattern = '(const\s+string\s+VersionString\s*=\s*")([^"]*)(")'
-    if ($sText -notmatch $sPattern) { return '' }
-    $sCurrent = ([regex]::Match($sText, $sPattern)).Groups[2].Value
-    if ($sCurrent -eq $sVersion) { return $sCsPath }   # already correct
-    $sNewText = [regex]::Replace($sText, $sPattern, "`${1}$sVersion`${3}", 1)
-    [System.IO.File]::WriteAllText($sCsPath, $sNewText)
-    return $sCsPath
-}
-
 function getOwnerRepo {
     # Parse "owner/repo" from the origin remote, covering both HTTPS and SSH
     # forms. The remote is authoritative: the GitHub repo may differ in case
@@ -267,6 +206,21 @@ function getOwnerRepo {
     throw "Could not parse owner/repo from the origin remote: $sUrl"
 }
 
+function sameVersion {
+    # Compare two dotted-numeric versions, padding with zeros, so 5.0.2 and
+    # 5.0.2.0 (the form Windows reports for a file's version resource) match.
+    param([string] $sA, [string] $sB)
+    if (-not $sA -or -not $sB) { return $false }
+    $aA = @($sA.Trim().Split('.')); $aB = @($sB.Trim().Split('.'))
+    for ($i = 0; $i -lt 4; $i++) {
+        $iA = 0; $iB = 0
+        if ($i -lt $aA.Count) { [void][int]::TryParse($aA[$i], [ref] $iA) }
+        if ($i -lt $aB.Count) { [void][int]::TryParse($aB[$i], [ref] $iB) }
+        if ($iA -ne $iB) { return $false }
+    }
+    return $true
+}
+
 function isReleased {
     # Has this tag already been published?  Asks GitHub first (authoritative,
     # and covers a release made from another machine), then falls back to a
@@ -275,7 +229,7 @@ function isReleased {
     param([Parameter(Mandatory)] [string] $sTag)
     $ErrorActionPreference = 'Continue'
     if (Get-Command gh -ErrorAction SilentlyContinue) {
-        & gh release view $sTag 2>$null | Out-Null
+        & gh release view $sTag 2>&1 | Out-Null   # a missing release is a normal answer, not an error
         if ($LASTEXITCODE -eq 0) { return $true }
     }
     & git rev-parse --verify --quiet "refs/tags/$sTag" 2>$null | Out-Null
@@ -319,7 +273,7 @@ $iExitCode = 0
 try {
     $sApp = Split-Path -Leaf $sRepoPath
 
-    Write-Host "=== tagRelease.ps1 ==="
+    Write-Host "=== tagRelease.ps1 (HomerDev edition, 2026-09-18) ==="
     Write-Host "Started: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
     Write-Host "Log:     $sLogPath"
     Write-Host "Repo:    $sRepoPath"
@@ -334,7 +288,7 @@ try {
     $iCode = tryInvoke -sExe 'git' -aArgs @('rev-parse', '--is-inside-work-tree')
     if ($iCode -ne 0) { throw "$sRepoPath is not a git working tree." }
 
-    if (-not $PrepareOnly) {
+    if ($true) {
         if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
             throw "gh is not in PATH. Install GitHub CLI from https://cli.github.com/ and run: gh auth login"
         }
@@ -352,16 +306,23 @@ try {
     Write-Host ""
     Write-Host "--- Discovery ---"
     $sIssPath = getIssPath -sPath $sRepoPath -sApp $sApp
-    $sIssName = Split-Path -Leaf $sIssPath
-    $aIssLines = [System.IO.File]::ReadAllText($sIssPath) -split "`r?`n"
-    Write-Host "Setup script: $sIssName"
+    $bHasInstaller = [bool] $sIssPath
+    $sIssName = ''
+    $sSetupExe = ''
+    if ($bHasInstaller) {
+        $sIssName = Split-Path -Leaf $sIssPath
+        $aIssLines = [System.IO.File]::ReadAllText($sIssPath) -split "`r?`n"
+        Write-Host "Setup script: $sIssName"
 
-    # Asset name comes from OutputBaseFilename so it always matches what Inno
-    # actually emits. F11 downloads this exact name and GitHub is case-sensitive.
-    $sBase = getIssDirective -aLines $aIssLines -sName 'OutputBaseFilename'
-    if (-not $sBase) { $sBase = "$($sApp)_setup" }
-    $sSetupExe = "$sBase.exe"
-    Write-Host "Installer:    $sSetupExe  (from OutputBaseFilename)"
+        # Asset name comes from OutputBaseFilename so it always matches what Inno
+        # actually emits. F11 downloads this exact name and GitHub is case-sensitive.
+        $sBase = getIssDirective -aLines $aIssLines -sName 'OutputBaseFilename'
+        if (-not $sBase) { $sBase = "$($sApp)_setup" }
+        $sSetupExe = "$sBase.exe"
+        Write-Host "Installer:    $sSetupExe  (from OutputBaseFilename)"
+    } else {
+        Write-Host "Setup script: none. $sApp ships source, so the release carries no installer."
+    }
 
     $sOwnerRepo = getOwnerRepo
     Write-Host "GitHub repo:  $sOwnerRepo  (from the origin remote)"
@@ -369,112 +330,93 @@ try {
     # --- Version ---
     Write-Host ""
     Write-Host "--- Version ---"
-    $sOldVersion = getVersionFromIss -aLines $aIssLines
-    Write-Host "Current version in $($sIssName): $sOldVersion"
-
-    # Decide the version WITHOUT needing a flag.  The rule: a version is bumped
-    # only if it has already been released.  So if the .iss version is not yet
-    # published (typically because a previous run, or -PrepareOnly, just bumped it
-    # and you have since rebuilt), it is released as-is; re-running the script
-    # never invalidates the installer you just built.  If the .iss version IS
-    # already published, a new number is needed, so it is bumped.
-    if ($Version) {
-        $sVersion = $Version.Trim()
-        Write-Host "Using the explicit version requested: $sVersion"
-    } elseif ($NoBump) {
-        $sVersion = $sOldVersion
-        Write-Host "-NoBump: releasing the current version unchanged."
-    } elseif (isReleased -sTag "v$sOldVersion") {
-        $sVersion = bumpVersion -sVersion $sOldVersion
-        Write-Host "v$sOldVersion is already released, so a new number is needed."
-        Write-Host "Bumped to: $sVersion  (every release gets a higher number, so F11 can detect it)"
-    } else {
-        $sVersion = $sOldVersion
-        Write-Host "v$sOldVersion has not been released yet, so it is published as-is (no bump)."
-    }
-    $sTag = "v$sVersion"
-    Write-Host "Tag:       $sTag"
-
-    # Sync the version into the .iss and the app source, so the .exe's
-    # VersionString and the release tag can never disagree.
-    $aChangedFiles = @()
-    if (setIssVersion -sPath $sIssPath -aLines $aIssLines -sVersion $sVersion) {
-        Write-Host "Updated $sIssName to version $sVersion"
-        $aChangedFiles += $sIssName
-    }
-    $sCsUpdated = setSourceVersion -sPath $sRepoPath -sApp $sApp -sVersion $sVersion
-    if ($sCsUpdated) {
-        $sCsName = Split-Path -Leaf $sCsUpdated
-        Write-Host "Synced VersionString in $sCsName to $sVersion"
-        if ((& git status --porcelain -- $sCsName 2>$null | Out-String).Trim()) {
-            $aChangedFiles += $sCsName
+    # The version is taken from the INSTALLER ITSELF -- the version resource that
+    # Inno stamped into EdSharp_Setup.exe (etc.) from version.txt when you compiled
+    # it.  That file is the thing that actually ships, and its number is the one the
+    # installed program will report, so it is the only number that can be tagged
+    # truthfully.  Reading a text file instead invites every mismatch we have hit:
+    # the file says one thing, the built installer says another, and the release ends
+    # up labelled wrong.  The artifact cannot lie about what it contains.
+    $sSetupPath = ''
+    $sVersion = ''
+    if ($bHasInstaller) {
+        $sSetupPath = Join-Path $sRepoPath $sSetupExe
+        if (-not (Test-Path -LiteralPath $sSetupPath -PathType Leaf)) {
+            throw "$sSetupExe not found in $sRepoPath. Build the app, then compile $sIssName in Inno Setup."
         }
+        $oExe = Get-Item -LiteralPath $sSetupPath
+        try { $sVersion = ("" + $oExe.VersionInfo.FileVersion).Trim() } catch { }
+        if (-not $sVersion) {
+            throw "$sSetupExe carries no version resource. Check that $sIssName sets VersionInfoVersion."
+        }
+        Write-Host "Version (stamped in $sSetupExe): $sVersion"
+        Write-Host ("  built: {0}   {1:N0} bytes" -f $oExe.LastWriteTime, $oExe.Length)
     } else {
-        Write-Host "NOTE: no 'const string VersionString' found in $sApp.cs, so the .exe version was not synced." -ForegroundColor Yellow
-        Write-Host "      If this app implements Elevate Version (F11), add such a constant so the running" -ForegroundColor Yellow
-        Write-Host "      version and the release tag stay in step." -ForegroundColor Yellow
+        # No installer, so there is no artifact to read a version out of, and
+        # version.txt becomes the source of truth rather than a cross-check.
+        $sVerOnly = Join-Path $sRepoPath "version.txt"
+        if ($Version) {
+            $sVersion = $Version.Trim()
+            Write-Host "Version (given with -Version): $sVersion"
+        } elseif (Test-Path -LiteralPath $sVerOnly -PathType Leaf) {
+            $sVersion = ((Get-Content -LiteralPath $sVerOnly -TotalCount 1) + "").Trim()
+            Write-Host "Version (from version.txt): $sVersion"
+        }
+        if (-not $sVersion) {
+            throw "No version to release. $sApp has no installer, so put the version in version.txt or pass -Version."
+        }
     }
 
-    if ($PrepareOnly) {
+    # version.txt should agree.  If it does not, the installer was compiled from a
+    # different version than the build last assigned -- say so, but tag what actually
+    # ships, which is the installer.
+    $sVerPath = Join-Path $sRepoPath "version.txt"
+    if ($bHasInstaller -and (Test-Path -LiteralPath $sVerPath -PathType Leaf)) {
+        $sFileVersion = ((Get-Content -LiteralPath $sVerPath -TotalCount 1) + "").Trim()
+        if ($sFileVersion -and -not (sameVersion $sFileVersion $sVersion)) {
+            Write-Host "NOTE: version.txt says $sFileVersion but the installer carries $sVersion." -ForegroundColor Yellow
+            Write-Host "      The installer is what ships, so v$sVersion is what will be tagged." -ForegroundColor Yellow
+            Write-Host "      (Recompile $sIssName in Inno Setup if that is not what you meant.)" -ForegroundColor Yellow
+        }
+    }
+
+    if (-not $SkipStaleCheck -and (isReleased -sTag "v$sVersion")) {
         Write-Host ""
-        Write-Host "=== -PrepareOnly: version files updated; nothing was tagged or published. ===" -ForegroundColor Green
-        Write-Host "Next: rebuild the app, recompile $sIssName in Inno Setup, then run tagRelease again."
+        Write-Host "=== ALREADY RELEASED -- nothing was published. ===" -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "The installer on disk carries v$sVersion, which is already on GitHub." -ForegroundColor Yellow
+        Write-Host "So this is the same build that was released before -- there is nothing new." -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "Build$sApp.cmd takes a NEW version every time it runs, and skips any number" -ForegroundColor Yellow
+        Write-Host "that is already released.  So:" -ForegroundColor Yellow
+        Write-Host ""
+        if ($bHasInstaller) {
+            Write-Host "  1. build$sApp.cmd" -ForegroundColor Yellow
+            Write-Host "  2. Compile $sIssName in Inno Setup   <- this is the step that stamps the" -ForegroundColor Yellow
+            Write-Host "                                          new version into the installer" -ForegroundColor Yellow
+            Write-Host "  3. git add -A  /  git commit  /  git push" -ForegroundColor Yellow
+            Write-Host "  4. tagRelease" -ForegroundColor Yellow
+        } else {
+            Write-Host "  1. Raise the number in version.txt, or pass -Version" -ForegroundColor Yellow
+            Write-Host "  2. git add -A  /  git commit  /  git push" -ForegroundColor Yellow
+            Write-Host "  3. tagRelease" -ForegroundColor Yellow
+        }
+        Write-Host ""
         Stop-Transcript | Out-Null
         exit 0
     }
+    Write-Host "v$sVersion has not been released yet."
+    $sTag = "v$sVersion"
+    Write-Host "Tag:       $sTag"
 
-    # --- Asset check ---
-    Write-Host ""
-    Write-Host "--- Asset check ---"
-    if (-not (Test-Path -LiteralPath $sSetupExe -PathType Leaf)) {
-        throw "$sSetupExe not found in $sRepoPath. Build the app, compile $sIssName with Inno Setup, then re-run."
-    }
-    $oExe = Get-Item -LiteralPath $sSetupExe
-    Write-Host ("Asset:   {0}" -f $oExe.Name)
-    Write-Host ("  size:  {0:N0} bytes" -f $oExe.Length)
-    Write-Host ("  mtime: {0}" -f $oExe.LastWriteTime)
+    # Nothing to sync.  The version lives only in the .iss, and the build already
+    # compiled it into the program (Version.cs) and the installer (Inno).  This
+    # script does not write to any source file.
+    $aChangedFiles = @()
 
-    # The installer must be NEWER than both version-bearing files, or it still
-    # contains an older version number than the one being tagged -- exactly the
-    # drift that breaks F11.  This is checked every run (not only when this run
-    # changed the files), so an installer left over from an earlier version is
-    # caught too.  When it is stale the script stops cleanly and tells you what to
-    # do; it is not an error, just work still to do, so re-running plain
-    # tagRelease afterwards finishes the job (the version is not bumped again,
-    # because v$sVersion has not been released yet).
-    if (-not $SkipStaleCheck) {
-        $dtSource = (Get-Item -LiteralPath $sIssPath).LastWriteTime
-        $sCsPath = Join-Path $sRepoPath "$sApp.cs"
-        if (Test-Path -LiteralPath $sCsPath -PathType Leaf) {
-            $dtCs = (Get-Item -LiteralPath $sCsPath).LastWriteTime
-            if ($dtCs -gt $dtSource) { $dtSource = $dtCs }
-        }
-        if ($oExe.LastWriteTime -lt $dtSource) {
-            Write-Host ""
-            Write-Host "=== REBUILD NEEDED -- nothing was published. ===" -ForegroundColor Yellow
-            Write-Host ""
-            Write-Host "$sSetupExe is older than the version files, so it does not yet contain" -ForegroundColor Yellow
-            Write-Host "version $sVersion.  Publishing it would tag a release whose program reports the" -ForegroundColor Yellow
-            Write-Host "wrong version, and F11 would misbehave for your users." -ForegroundColor Yellow
-            Write-Host ""
-            Write-Host "The version files are now set to $sVersion.  Do this:" -ForegroundColor Yellow
-            Write-Host ""
-            Write-Host "  1. Build$sApp.cmd" -ForegroundColor Yellow
-            Write-Host "  2. Compile $sIssName in Inno Setup" -ForegroundColor Yellow
-            Write-Host "  3. .\tagRelease.cmd            (no flags needed)" -ForegroundColor Yellow
-            Write-Host ""
-            Write-Host "Step 3 will publish $sVersion as-is: it does not bump again, because" -ForegroundColor Yellow
-            Write-Host "v$sVersion has not been released yet." -ForegroundColor Yellow
-            Write-Host ""
-            if ($aChangedFiles.Count -gt 0 -and -not $NoCommit) {
-                Write-Host "Committing the version files so they are not lost: $($aChangedFiles -join ', ')"
-                invokeChecked -sExe 'git' -aArgs (@('add') + $aChangedFiles)
-                invokeChecked -sExe 'git' -aArgs @('commit', '-m', "$sApp $sVersion")
-            }
-            Stop-Transcript | Out-Null
-            exit 0
-        }
-    }
+    # No separate "asset check" is needed any more.  The installer was located and
+    # its version read above -- that IS the version being tagged, so the two cannot
+    # disagree.  The old check existed only because the version came from elsewhere.
 
     # --- Commit the version files ---
     # Uncommitted changes never block the release. The version files that this
@@ -517,16 +459,30 @@ try {
     Write-Host "--- Release ---"
     $iCode = tryInvoke -sExe 'gh' -aArgs @('release', 'view', $sTag)
     if ($iCode -ne 0) {
-        Write-Host "Creating release $sTag with asset $sSetupExe ..."
-        invokeChecked -sExe 'gh' -aArgs @(
-            'release', 'create', $sTag, $sSetupExe,
-            '--title', "$sApp $sVersion",
-            '--generate-notes',
-            '--latest'
-        )
+        if ($bHasInstaller) {
+            Write-Host "Creating release $sTag with asset $sSetupExe ..."
+            invokeChecked -sExe 'gh' -aArgs @(
+                'release', 'create', $sTag, $sSetupPath,
+                '--title', "$sApp $sVersion",
+                '--generate-notes',
+                '--latest'
+            )
+        } else {
+            Write-Host "Creating release $sTag (source only, no asset) ..."
+            invokeChecked -sExe 'gh' -aArgs @(
+                'release', 'create', $sTag,
+                '--title', "$sApp $sVersion",
+                '--generate-notes',
+                '--latest'
+            )
+        }
     } else {
-        Write-Host "Release $sTag already exists. Replacing asset and marking it latest ..."
-        invokeChecked -sExe 'gh' -aArgs @('release', 'upload', $sTag, $sSetupExe, '--clobber')
+        if ($bHasInstaller) {
+            Write-Host "Release $sTag already exists. Replacing asset and marking it latest ..."
+            invokeChecked -sExe 'gh' -aArgs @('release', 'upload', $sTag, $sSetupPath, '--clobber')
+        } else {
+            Write-Host "Release $sTag already exists. Marking it latest ..."
+        }
         $ErrorActionPreference = 'Continue'
         & gh release edit $sTag --latest 2>$null | Out-Null
     }
@@ -534,6 +490,15 @@ try {
     # --- Verify the public URL ---
     Write-Host ""
     Write-Host "--- URL verification ---"
+    if (-not $bHasInstaller) {
+        $sUrl = "https://github.com/$sOwnerRepo/releases/tag/$sTag"
+        Write-Host "Release page: $sUrl"
+        Write-Host ""
+        Write-Host "=== $sApp $sVersion published (source only). ===" -ForegroundColor Green
+        Write-Host ""
+        Stop-Transcript | Out-Null
+        exit 0
+    }
     $sUrl = "https://github.com/$sOwnerRepo/releases/latest/download/$sSetupExe"
     Write-Host "Public URL: $sUrl"
     try {
