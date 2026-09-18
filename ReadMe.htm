@@ -267,13 +267,19 @@ An installed program adds <code>exec</code>, <code>samples</code> and
 environment, every setting and every error with its stack. Every Homer
 program writes one, from the same <code>Log</code> class, in the same
 place. So does every installer.</p>
-<h3 id="build-the-third-shape">7. Build the third shape</h3>
-<pre><code>buildFruitBasketMdi
-FruitBasketMdi</code></pre>
+<h3 id="build-the-third-shape-in-both-languages">7. Build the third
+shape, in both languages</h3>
+<pre><code>buildFruitBasketMdiCs
+FruitBasketMdiCs
+buildFruitBasketMdiPy
+FruitBasketMdiPy</code></pre>
 <p>The same fruit basket as a multiple-document program. Press Control+N
 for another basket, F4 to pick between them, Shift+F4 to hear how many
 are open, Alt+F10 for every command in one list, and Control+F1 to turn
 on the key describer and explore the keys without running anything.</p>
+<p>Press Alt+Shift+J for the job list and Alt+Shift+C to change a
+setting while the program is running. Both are lists you reach by first
+letter, which is the whole point of them.</p>
 <p>Homer apps come in three shapes – a single tool with a command line
 and a dialog, a desktop-only program whose dependencies decided that,
 and a multiple-document program. They share almost everything;
@@ -339,19 +345,26 @@ into the folder is invisible to git until somebody names it.
 list and stays on your machine.</p>
 <h2 id="what-is-in-the-kit">What is in the kit</h2>
 <ul>
-<li><code>CSharp\</code> – nine modules in the <code>Homer</code>
-namespace: Lbc (dialogs), Say (speech), Inix (settings and tables),
-KeyMap, KeyName, Util, Web, inixVert, PdfRead.</li>
-<li><code>homer\</code> – the same toolbox for Python and NVDA
-add-ons.</li>
+<li><code>CSharp\</code> – twelve modules in the <code>Homer</code>
+namespace: Inix (settings and tables), KeyMap, KeyName, Lbc (dialogs),
+Log (the session log), Mdi (multiple-document frames), Paths (the folder
+layout), PdfRead, Say (speech), Util, Web, inixVert.</li>
+<li><code>homer\</code> – the same toolbox for Python and NVDA add-ons:
+inix, lbc, log, paths, say, util and web, with the same names and the
+same behaviour.</li>
 <li><code>Templates\</code> – the files a new app starts from.</li>
-<li><code>Tools\</code> – tagRelease and homerTidy. No editing needed;
-they work out the app name from the folder, and either can be run from a
-shared tools folder.</li>
-<li><code>Samples\</code> – two fruit basket programs, one in C# and one
-in Python, with their build scripts. The teaching material.</li>
-<li><code>Style\</code> – the Camel Type coding guidelines.</li>
+<li><code>Tools\</code> – checkHomerApp, gitPush, gitRelease, homerTidy,
+sayTutorial and tagRelease. No editing needed; they work out the app
+name from the folder, and any of them can be run from a shared tools
+folder.</li>
+<li><code>Samples\</code> – four fruit basket programs: the single
+dialog in C# and in Python, and the multiple-document version in C# and
+in Python. Each pair is the same program in two languages, written block
+for block. The teaching material.</li>
+<li><code>help\</code> – every document, and the tutorial scripts.</li>
 </ul>
+<p><code>HomerDev.md</code> lists every file in the kit with one line
+saying why it is there.</p>
 <h2 id="where-the-documents-are">Where the documents are</h2>
 <p><code>ReadMe</code> and <code>License</code> are here at the top.
 Everything else is in <code>help</code>:</p>
@@ -365,7 +378,10 @@ tutorial playlist</li>
 <li><code>Developer.md</code> – how to rebuild or change the kit</li>
 <li><code>History.md</code> – what changed in each version, and why</li>
 <li><code>Hotkeys.md</code> – every key three ways</li>
-<li><code>Announce.md</code> – a ready-to-send announcement</li>
+<li><code>FAQ.md</code> – the questions people ask, including why
+Windows only</li>
+<li><code>Announce.md</code> – three ready-to-post announcements,
+already the right length</li>
 <li><code>Tutorial_HomerDev.inix</code> – the spoken walkthrough, in two
 voices</li>
 </ul>

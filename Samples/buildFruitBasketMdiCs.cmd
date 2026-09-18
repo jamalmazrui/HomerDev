@@ -1,10 +1,10 @@
 @echo off
 rem ===================================================================
-rem buildFruitBasketMdi.cmd -- build FruitBasketMdi.exe from FruitBasketMdi.cs and the Homer
+rem buildFruitBasketMdiCs.cmd -- build FruitBasketMdiCs.exe from FruitBasketMdiCs.cs and the Homer
 rem Development Kit modules in C:\HomerDev.
 rem
 rem This is the HomerDev TEMPLATE. newHomerApp.cmd writes a copy of it
-rem with FruitBasketMdi replaced by a real app name. If you are reading the copy,
+rem with FruitBasketMdiCs replaced by a real app name. If you are reading the copy,
 rem the app name is already in place and you can edit freely.
 rem
 rem KIT: the shared C# modules are NOT copied into the app folder. They
@@ -23,14 +23,14 @@ rem VERSION: version.txt is the SINGLE source of truth. It holds one
 rem line, nothing else. This script increments it on every build --
 rem stepping over any number already released, which it learns from the
 rem repository's own tags -- then generates Version.cs from it, so the
-rem running program reports the same number. FruitBasketMdi_setup.iss reads
+rem running program reports the same number. FruitBasketMdiCs_setup.iss reads
 rem version.txt directly, so the installer reports it too, and
 rem tagRelease reads it back out of the built setup's version resource
 rem to form the tag. No version literal appears anywhere else, so a
 rem stale file cannot rewind it.
 rem
-rem   buildFruitBasketMdi.cmd          increments the version, then builds
-rem   buildFruitBasketMdi.cmd nobump   keeps the current number
+rem   buildFruitBasketMdiCs.cmd          increments the version, then builds
+rem   buildFruitBasketMdiCs.cmd nobump   keeps the current number
 rem
 rem COMPILER: Roslyn is preferred, from Visual Studio or the free Build
 rem Tools. The pre-Roslyn csc.exe under Microsoft.NET\Framework64 is
@@ -53,14 +53,14 @@ rem parentheses, and cmd.exe scans a parenthesised block for its closing
 rem paren BEFORE expanding variables. Every search below is therefore a
 rem single-line "if not defined X if exist ... set" chain, never a block.
 rem
-rem Output in this folder: FruitBasketMdi.exe, and the installer if Inno Setup is
-rem present. Everything is logged to buildFruitBasketMdi.log beside this script.
+rem Output in this folder: FruitBasketMdiCs.exe, and the installer if Inno Setup is
+rem present. Everything is logged to buildFruitBasketMdiCs.log beside this script.
 rem ===================================================================
 
 setlocal enabledelayedexpansion
 cd /d "%~dp0"
 
-set "app=FruitBasketMdi"
+set "app=FruitBasketMdiCs"
 set "log=%CD%\build%app%.log"
 echo %app% build started %DATE% %TIME%> "%log%"
 echo Script: %~f0>> "%log%"

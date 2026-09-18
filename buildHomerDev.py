@@ -31,7 +31,7 @@ c_lsExpected = [
     "CSharp/PdfRead.cs", "CSharp/Say.cs", "CSharp/Util.cs", "CSharp/Web.cs",
     "CSharp/inixVert.cs",
     "homer/__init__.py", "homer/inix.py", "homer/lbc.py", "homer/log.py",
-    "homer/paths.py", "homer/say.py", "homer/util.py", "homer/version.py", "homer/web.py",
+    "homer/mdi.py", "homer/paths.py", "homer/say.py", "homer/util.py", "homer/version.py", "homer/web.py",
     "Templates/build_APP_.cmd", "Templates/build_APP_Py.cmd",
     "Templates/_APP__setup.iss", "Templates/_APP_.cs",
     "Templates/installOllama.cmd", "Templates/installModels.cmd",
@@ -39,20 +39,22 @@ c_lsExpected = [
     "Templates/create_APP_Repo.cmd", "Templates/create_APP_Repo.ps1",
     "Templates/accept.inix", "Templates/gitignore.txt", "Templates/self.md", "Templates/version.txt",
     "Tools/tagRelease.cmd", "Tools/tagRelease.ps1", "RepoFiles.txt",
-    "Samples/FruitBasketCs.cs", "Samples/FruitBasketMdi.cs", "Samples/FruitBasketPy.py",
-    "Samples/accept.inix",
-    "Samples/buildFruitBasketCs.cmd", "Samples/buildFruitBasketMdi.cmd",
-    "Samples/buildFruitBasketPy.cmd",
-    "checkHomerDev.cmd", "checkHomerDev.py",
+    "Samples/FruitBasketCs.cs", "Samples/FruitBasketMdiCs.cs",
+    "Samples/FruitBasketMdiPy.py", "Samples/FruitBasketPy.py",
+    "Samples/accept.inix", "Samples/uiTest.inix",
+    "Samples/buildFruitBasketCs.cmd", "Samples/buildFruitBasketMdiCs.cmd",
+    "Samples/buildFruitBasketMdiPy.cmd", "Samples/buildFruitBasketPy.cmd",
+    "checkHomerDev.cmd", "checkHomerDev.py", "releaseHomerDev.cmd",
     "Tools/gitPush.cmd", "Tools/gitRelease.cmd",
     "Tools/checkHomerApp.cmd", "Tools/checkHomerApp.py",
+    "Tools/installTools.cmd", "Tools/uiCheck.cmd", "Tools/uiCheck.py",
     "Tools/homerTidy.cmd", "Tools/homerTidy.py",
     "Tools/sayTutorial.cmd", "Tools/sayTutorial.py",
     "help/CamelType_CSharp.md", "help/CamelType_CSharp_Reference.md",
     "help/CamelType_JAWSScript.md",
     "ReadMe.md", "License.md",
     "help/Announce.md", "help/Developer.md", "help/History.md", "help/HomerDev.md",
-    "help/Hotkeys.md", "help/Tutorials.md",
+    "help/FAQ.md", "help/Hotkeys.md", "help/Tutorials.md",
     "help/Tutorial_HomerDev.inix",
     "License.md", "version.txt",
 ]
@@ -79,6 +81,15 @@ c_sEvidencePrefix = "evidence-"
 # The standard document set. ReadMe and License sit at the top of the project;
 # every other document lives in help, which is where the Homer layout puts them.
 c_lsDocumentsTop = ["License", "ReadMe"]
+
+# The samples, and the script that builds each. One command builds everything,
+# so a problem anywhere is found by running one thing rather than four.
+c_lsSampleScripts = [
+    "buildFruitBasketCs.cmd",
+    "buildFruitBasketMdiCs.cmd",
+    "buildFruitBasketMdiPy.cmd",
+    "buildFruitBasketPy.cmd",
+]
 
 # WHERE FILES USED TO BE, AND WHERE THEY ARE NOW.
 #
@@ -112,6 +123,10 @@ c_lMoved = [
     ("Style/CamelType_JAWSScript.md", "help/CamelType_JAWSScript.md"),
     ("Style/CamelType_JAWSScript.htm", "help/CamelType_JAWSScript.htm"),
     ("Tutorial_HomerDev.inix", "help/Tutorial_HomerDev.inix"),
+    ("Samples/FruitBasketMdi.cs", "Samples/FruitBasketMdiCs.cs"),
+    ("Samples/FruitBasketMdi.exe", "Samples/FruitBasketMdiCs.exe"),
+    ("Samples/buildFruitBasketMdi.log", "Samples/buildFruitBasketMdiCs.log"),
+    ("Samples/buildFruitBasketMdi.cmd", "Samples/buildFruitBasketMdiCs.cmd"),
     ("Tutorials.md", "help/Tutorials.md"),
     ("Tutorials.htm", "help/Tutorials.htm"),
     ("self.md", "help/self.md"),
@@ -197,6 +212,41 @@ def normalizeHomer(sPath):
     open(sPath, "wb").write((("\ufeff" + sText) if bBom else sText).encode("utf-8"))
     logLine("NORMALIZED: %s" % sPath)
     return True
+
+
+def buildSamples():
+    """Build every sample, and report each one.
+
+    buildHomerDev is the single command. Somebody who changes a shared class
+    should not have to remember four build scripts and the order to run them in,
+    and a problem in any of them should surface from the one thing they already
+    run. Each script writes its own log beside itself; the failures are named
+    here and the detail is there.
+    """
+    sSamples = os.path.join(sScriptDir, "Samples")
+    if not os.path.isdir(sSamples): return 0
+    iFailed = 0
+    for sScript in c_lsSampleScripts:
+        if not os.path.isfile(os.path.join(sSamples, sScript)): continue
+        sName = sScript[5:-4] if sScript.lower().startswith("build") else sScript
+        logLine("RUN: %s in %s" % (sScript, sSamples))
+        try:
+            oResult = subprocess.run('"%s" nobump' % sScript, shell=True, cwd=sSamples,
+                                     capture_output=True, text=True, timeout=1800)
+            iCode = oResult.returncode
+            if oResult.stdout: logLine("STDOUT:\n" + oResult.stdout[-3000:])
+            if oResult.stderr: logLine("STDERR:\n" + oResult.stderr[-3000:])
+        except Exception as oError:
+            logLine("RUN FAILED: %s" % oError)
+            iCode = 1
+        logLine("EXIT: %d" % iCode)
+        if iCode == 0:
+            sayLine("Built %s." % sName)
+        else:
+            iFailed += 1
+            sayLine("%s FAILED. Its own log, build%s.log, has the compiler output."
+                    % (sName, sName))
+    return iFailed
 
 
 def removeMoved():
@@ -328,6 +378,7 @@ def main():
         sVersion = open(sVersionPath, "rb").read().decode("utf-8-sig").strip()
     sayLine("Homer Development Kit %s in %s" % (sVersion, sScriptDir))
 
+    iSamplesFailed = 0
     if not bCheckOnly:
         sPandoc = findPandoc()
         if sPandoc == "":
@@ -336,12 +387,18 @@ def main():
             removeMoved()
             iDone = convertDocs(sPandoc)
             sayLine("%d document%s converted to HTML." % (iDone, "" if iDone == 1 else "s"))
+        iSamplesFailed = buildSamples()
 
     lsProblems = checkKit()
-    if len(lsProblems) == 0:
+    if len(lsProblems) == 0 and iSamplesFailed == 0:
         sayLine("0 problems found. The kit is complete.")
         logLine("Finished %s" % datetime.datetime.now().isoformat(" ", "seconds"))
         return 0
+    if len(lsProblems) == 0:
+        sayLine("The kit itself is complete, but %d sample build%s failed."
+                % (iSamplesFailed, "" if iSamplesFailed == 1 else "s"))
+        logLine("Finished %s" % datetime.datetime.now().isoformat(" ", "seconds"))
+        return 1
 
     sayLine("%d problem%s found:" % (len(lsProblems), "" if len(lsProblems) == 1 else "s"))
     # The console gets the first few; the log gets all of them. A console that

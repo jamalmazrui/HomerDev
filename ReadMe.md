@@ -110,15 +110,21 @@ One file per session, named for when it started, holding the environment, every
 setting and every error with its stack. Every Homer program writes one, from the
 same `Log` class, in the same place. So does every installer.
 
-### 7. Build the third shape
+### 7. Build the third shape, in both languages
 
-    buildFruitBasketMdi
-    FruitBasketMdi
+    buildFruitBasketMdiCs
+    FruitBasketMdiCs
+    buildFruitBasketMdiPy
+    FruitBasketMdiPy
 
 The same fruit basket as a multiple-document program. Press Control+N for
 another basket, F4 to pick between them, Shift+F4 to hear how many are open,
 Alt+F10 for every command in one list, and Control+F1 to turn on the key
 describer and explore the keys without running anything.
+
+Press Alt+Shift+J for the job list and Alt+Shift+C to change a setting while
+the program is running. Both are lists you reach by first letter, which is the
+whole point of them.
 
 Homer apps come in three shapes -- a single tool with a command line and a
 dialog, a desktop-only program whose dependencies decided that, and a
@@ -196,16 +202,23 @@ own notebook, is in the never-pushed list and stays on your machine.
 
 ## What is in the kit
 
-- `CSharp\` -- nine modules in the `Homer` namespace: Lbc (dialogs), Say
-  (speech), Inix (settings and tables), KeyMap, KeyName, Util, Web, inixVert,
-  PdfRead.
-- `homer\` -- the same toolbox for Python and NVDA add-ons.
+- `CSharp\` -- twelve modules in the `Homer` namespace: Inix (settings and
+  tables), KeyMap, KeyName, Lbc (dialogs), Log (the session log), Mdi
+  (multiple-document frames), Paths (the folder layout), PdfRead, Say (speech),
+  Util, Web, inixVert.
+- `homer\` -- the same toolbox for Python and NVDA add-ons: inix, lbc, log,
+  paths, say, util and web, with the same names and the same behaviour.
 - `Templates\` -- the files a new app starts from.
-- `Tools\` -- tagRelease and homerTidy. No editing needed; they work out the
-  app name from the folder, and either can be run from a shared tools folder.
-- `Samples\` -- two fruit basket programs, one in C# and one in Python, with
-  their build scripts. The teaching material.
-- `Style\` -- the Camel Type coding guidelines.
+- `Tools\` -- checkHomerApp, gitPush, gitRelease, homerTidy, sayTutorial and
+  tagRelease. No editing needed; they work out the app name from the folder, and
+  any of them can be run from a shared tools folder.
+- `Samples\` -- four fruit basket programs: the single dialog in C# and in
+  Python, and the multiple-document version in C# and in Python. Each pair is
+  the same program in two languages, written block for block. The teaching
+  material.
+- `help\` -- every document, and the tutorial scripts.
+
+`HomerDev.md` lists every file in the kit with one line saying why it is there.
 
 ## Where the documents are
 
@@ -218,7 +231,8 @@ own notebook, is in the never-pushed list and stays on your machine.
 - `Developer.md` -- how to rebuild or change the kit
 - `History.md` -- what changed in each version, and why
 - `Hotkeys.md` -- every key three ways
-- `Announce.md` -- a ready-to-send announcement
+- `FAQ.md` -- the questions people ask, including why Windows only
+- `Announce.md` -- three ready-to-post announcements, already the right length
 - `Tutorial_HomerDev.inix` -- the spoken walkthrough, in two voices
 
 ## The other documents

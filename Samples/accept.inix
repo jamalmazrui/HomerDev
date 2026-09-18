@@ -10,6 +10,11 @@
 FileTask = accept
 
 [check]
+Name = the programs behave as documented when driven
+Run = ..\Tools\uiCheck.cmd --path .
+Expect = 0
+
+[check]
 Name = the C# build script runs clean
 Run = buildFruitBasketCs.cmd nobump
 Expect = 0
@@ -20,13 +25,23 @@ Run = cmd /c if exist FruitBasketCs.exe (exit 0) else (exit 1)
 Expect = 0
 
 [check]
-Name = the MDI build script runs clean
-Run = buildFruitBasketMdi.cmd nobump
+Name = the C# MDI build script runs clean
+Run = buildFruitBasketMdiCs.cmd nobump
 Expect = 0
 
 [check]
-Name = the MDI program was produced
-Run = cmd /c if exist FruitBasketMdi.exe (exit 0) else (exit 1)
+Name = the C# MDI program was produced
+Run = cmd /c if exist FruitBasketMdiCs.exe (exit 0) else (exit 1)
+Expect = 0
+
+[check]
+Name = the Python MDI build script runs clean
+Run = buildFruitBasketMdiPy.cmd nobump
+Expect = 0
+
+[check]
+Name = the Python MDI program was produced
+Run = cmd /c if exist FruitBasketMdiPy.exe (exit 0) else (exit 1)
 Expect = 0
 
 [check]

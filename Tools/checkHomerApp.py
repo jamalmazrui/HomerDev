@@ -72,7 +72,7 @@ import traceback
 # The standard document set. ReadMe and License sit at the top of the project;
 # everything else lives in help, which is where the Homer layout puts documents.
 c_lsDocumentsTop = ["License", "ReadMe"]
-c_lsDocumentsHelp = ["Announce", "Developer", "History", "Hotkeys", "Tutorials"]
+c_lsDocumentsHelp = ["Announce", "Developer", "FAQ", "History", "Hotkeys", "Tutorials"]
 c_lsSkipFolders = [".git", ".venv", "__pycache__", "build", "dist", "notes", "venv"]
 c_lsGeneratedFiles = ["version.py", "version.cs"]   # written by every build
 c_lsTextExt = (".cs", ".py", ".ps1", ".md", ".htm", ".inix", ".txt", ".iss", ".cmd", ".bat")

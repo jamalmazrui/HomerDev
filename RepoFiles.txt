@@ -19,6 +19,7 @@ buildHomerDev.py
 checkHomerDev.cmd
 checkHomerDev.py
 newHomerApp.cmd
+releaseHomerDev.cmd
 newHomerApp.py
 version.txt
 RepoFiles.txt

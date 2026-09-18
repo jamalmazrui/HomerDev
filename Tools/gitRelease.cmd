@@ -22,6 +22,20 @@ set "log=%~dp0gitRelease.log"
 
 if /i "%~1"=="--skip-check" goto :tag
 
+rem Releasing the kit itself? Its own check is the thorough one.
+if exist "%CD%\checkHomerDev.cmd" (
+    echo Checking before releasing...
+    call "%CD%\checkHomerDev.cmd" >> "%log%" 2>&1
+    if errorlevel 1 (
+        echo Something failed the check, so nothing was released.
+        echo CHECK FAILED>> "%log%"
+        endlocal
+        exit /b 1
+    )
+    echo The check passed.
+    goto :tag
+)
+
 if exist "%~dp0checkHomerApp.cmd" (
     echo Checking before releasing...
     call "%~dp0checkHomerApp.cmd" --build >> "%log%" 2>&1

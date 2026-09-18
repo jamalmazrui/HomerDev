@@ -1,0 +1,125 @@
+﻿; uiTest.inix -- what the sample programs must actually do when run.
+;
+; uiCheck starts each program, sends these keys, and reads the Windows UI
+; Automation tree back -- the same tree a screen reader reads. A control with no
+; accessible name is invisible to both, so a step that finds nothing has found
+; something worth knowing.
+;
+; Keys are pywinauto syntax: {ENTER} {ESC} {F4} {TAB}, %x for Alt+x, ^x for
+; Control+x, +x for Shift+x. Text is typed as written.
+
+FileTask = uiTest
+
+; ---------------- the single dialog, in C# ----------------
+
+[test]
+Name = FruitBasketCs takes a fruit and shows it
+Run = FruitBasketCs.exe
+
+[step]
+Keys = apple{ENTER}
+Wants = apple
+Note = the fruit is in the basket after Enter
+
+[step]
+Keys = pear{ENTER}
+Wants = pear
+Note = a second fruit goes in too
+
+[step]
+Keys = %r
+Title = Fruit basket report
+Escape = yes
+Note = Alt+R opens the report window
+
+[step]
+Keys = {F1}
+Wants = Fruit
+Escape = yes
+Note = F1 opens help, which lists the fields by name
+
+; ---------------- the single dialog, in Python ----------------
+
+[test]
+Name = FruitBasketPy behaves the same as FruitBasketCs
+Run = FruitBasketPy.exe
+
+[step]
+Keys = cherry{ENTER}
+Wants = cherry
+Note = the same keystrokes put a fruit in the same kind of list
+
+[step]
+Keys = {TAB}
+Wants = Basket
+Note = Tab reaches the basket, which reports its own name
+
+; ---------------- the multiple-document shape, in C# ----------------
+
+[test]
+Name = FruitBasketMdiCs opens windows and lists them
+Run = FruitBasketMdiCs.exe
+
+[step]
+Keys = apple{ENTER}
+Wants = apple
+Note = the first basket takes a fruit
+
+[step]
+Keys = ^n
+Wait = 1.0
+Wants = Basket 2
+Note = Control+N opens a second basket, and its title says which
+
+[step]
+Keys = {F4}
+Title = Current Windows
+Escape = yes
+Note = F4 offers the open windows as a list
+
+[step]
+Keys = %+j
+Title = Run a Job
+Escape = yes
+Note = Alt+Shift+J offers the jobs folder as a list
+
+[step]
+Keys = %+c
+Title = Change a Setting
+Escape = yes
+Note = Alt+Shift+C offers what can be changed as a list
+
+[step]
+Keys = %{F1}
+Title = About FruitBasketMdiCs
+Escape = yes
+Note = Alt+F1 says which version this is and where its log went
+
+; ---------------- the multiple-document shape, in Python ----------------
+
+[test]
+Name = FruitBasketMdiPy behaves the same as FruitBasketMdiCs
+Run = FruitBasketMdiPy.exe
+
+[step]
+Keys = apple{ENTER}
+Wants = apple
+Note = the first basket takes a fruit
+
+[step]
+Keys = ^n
+Wait = 1.0
+Wants = Basket 2
+Note = Control+N opens a second basket, and its title says which
+
+[step]
+Keys = {F4}
+Title = Current Windows
+Escape = yes
+Note = F4 offers the open windows as a list
+
+[step]
+Keys = %+j
+Title = Run a Job
+Escape = yes
+Note = Alt+Shift+J offers the jobs folder as a list

@@ -1,4 +1,8 @@
-﻿// FruitBasketMdi.cs -- the fruit basket as an MDI app, the third Homer shape.
+﻿// FruitBasketMdiCs.cs -- the fruit basket as an MDI app, the third Homer shape.
+//
+// ITS TWIN IS FruitBasketMdiPy.py. The two are the same program in two
+// languages, as FruitBasketCs and FruitBasketPy are, so the claim the kit makes
+// -- one behaviour, either language -- holds for the MDI shape too.
 //
 // READ FruitBasketCs.cs FIRST. That one is a single dialog, and its twelve
 // numbered blocks explain the nine decisions every Homer program makes. This
@@ -21,30 +25,30 @@
 //   ---- MDI 4: each child keeps its own state ----
 //   ---- MDI 5: closing the last window closes the program ----
 //
-// Build with buildFruitBasketMdi.cmd.
+// Build with buildFruitBasketMdiCs.cmd.
 
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using Homer;
 
-namespace FruitBasketMdi
+namespace FruitBasketMdiCs
 {
 
 public static class Program
 {
 
-private const string c_sAppName = "FruitBasketMdi";
+private const string c_sAppName = "FruitBasketMdiCs";
 
 private static fruitFrame frmMain;
 
 // ---- MDI 1: the frame owns the app name, the child owns the subject ----
 //
-// The frame is titled "FruitBasketMdi" and nothing else. A child is titled
+// The frame is titled "FruitBasketMdiCs" and nothing else. A child is titled
 // "Basket 1 - 3 fruits" and nothing else. Windows merges a maximized child into
 // the frame caption, so JAWS+T reads
 //
-//     FruitBasketMdi - [Basket 1 - 3 fruits]
+//     FruitBasketMdiCs - [Basket 1 - 3 fruits]
 //
 // A child that repeated the app name made the reader say it twice, which is a
 // bug DbDo shipped once and now carries a comment against. MdiChild.setTitle is
@@ -239,4 +243,4 @@ public static int Main(string[] aArguments)
 
 } // class Program
 
-} // namespace FruitBasketMdi
+} // namespace FruitBasketMdiCs

@@ -36,6 +36,8 @@
 //     Control+F4            close this window
 //     Control+Shift+F4      close all but this one
 //     Alt+F10               alternate menu: every command in one filterable list
+//     Alt+Shift+C           change a setting, from a list of what is settable
+//     Alt+Shift+J           run a job, from a list of what is in the jobs folder
 //     Control+F1            key describer: a key says what it would do
 //     Alt+F1                about
 //     F1                    documentation
@@ -80,6 +82,10 @@ public class MdiFrame : LbcForm
 {
     private Dictionary<string, ToolStripMenuItem> dMenus =
         new Dictionary<string, ToolStripMenuItem>(StringComparer.OrdinalIgnoreCase);
+    private Dictionary<string, string> dSettable =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+    private Dictionary<string, string> dSettableSummary =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
     private MenuStrip menuBar;
     private ToolStripMenuItem menuNow;
     private string sAppName = "";
@@ -175,6 +181,10 @@ public class MdiFrame : LbcForm
         if (!dMenus.ContainsKey("Help")) addMenu("&Help");
         menuNow = dMenus["Help"];
         addItem("Documentation", Keys.F1, "Open the guide.");
+        addItem("Run a Job", Keys.Alt | Keys.Shift | Keys.J,
+                "Pick a script from the jobs folder and run it.");
+        addItem("Change a Setting", Keys.Alt | Keys.Shift | Keys.C,
+                "Change a setting and have it take effect now.");
         addItem("Alternate Menu", Keys.Alt | Keys.F10, "Every command in one list you can filter.");
         addItem("Key Help Toggle", Keys.Control | Keys.F1, "A key says what it would do instead of doing it.");
         addItem("About", Keys.Alt | Keys.F1, "The name, the version, and where this copy came from.");
@@ -224,7 +234,9 @@ public class MdiFrame : LbcForm
             case "Close All But Current Window": return closeOthers();
             case "Close Window": return closeCurrent();
             case "Current Windows": return pickWindow();
+            case "Change a Setting": return changeSetting();
             case "Documentation": return showDocumentation();
+            case "Run a Job": return runJob();
             case "Key Help Toggle":
                 KeyMap.bKeyDescriber = !KeyMap.bKeyDescriber;
                 Say.sayForced(KeyMap.bKeyDescriber ? "Key help on" : "Key help off");
@@ -298,6 +310,149 @@ public class MdiFrame : LbcForm
         }
         Say.sayForced(iClosed == 1 ? "1 window closed" : iClosed + " windows closed");
         return true;
+    }
+
+    // ------- jobs -------
+
+    // jobFiles: every job, the user's first and the shipped ones after.
+    //
+    // A job is a script the user can run: .cmd, .ps1, .py, .js, .vbs. The
+    // user's own live in the per-user tree so they survive an update; the
+    // shipped ones come with the program and are read-only.
+    public List<string> jobFiles()
+    {
+        List<string> lsFound = new List<string>();
+        List<string> lsSeen = new List<string>();
+        foreach (string sFolder in new string[] { Paths.jobs(), Paths.shippedJobs() })
+        {
+            try
+            {
+                foreach (string sPath in System.IO.Directory.GetFiles(sFolder))
+                {
+                    string sName = System.IO.Path.GetFileName(sPath);
+                    if (lsSeen.Contains(sName.ToLower())) continue;
+                    lsSeen.Add(sName.ToLower());
+                    lsFound.Add(sPath);
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+        lsFound.Sort(StringComparer.OrdinalIgnoreCase);
+        return lsFound;
+    }
+
+    // runJob: pick a job from a list and run it.
+    //
+    // A LIST, not a folder browser and not a command line. The list is the whole
+    // design: every job this program can run, in one place, reachable by first
+    // letter, with no path to type and nothing to remember.
+    public bool runJob()
+    {
+        List<string> lsJobs = jobFiles();
+        if (lsJobs.Count == 0)
+        {
+            Say.sayForced("0 jobs. Put a script in " + Paths.jobs());
+            return true;
+        }
+        List<string> lsNames = new List<string>();
+        foreach (string sPath in lsJobs) lsNames.Add(System.IO.Path.GetFileName(sPath));
+        using (LbcDialog dlg = new LbcDialog("Run a Job", this))
+        {
+            ListBox lb = dlg.addPickBox("&Job:", lsNames, "",
+                "Type a letter or two to narrow the list, then press Enter to run it.");
+            if (!dlg.runOkCancel()) return true;
+            int iPick = lb.SelectedIndex;
+            if (iPick < 0) return true;
+            string sJob = lsJobs[iPick];
+            Log.info("Running job: " + sJob);
+            try
+            {
+                System.Diagnostics.ProcessStartInfo oStart =
+                    new System.Diagnostics.ProcessStartInfo(sJob);
+                oStart.UseShellExecute = true;
+                oStart.WorkingDirectory = Paths.results();
+                System.Diagnostics.Process.Start(oStart);
+                Say.sayForced(lsNames[iPick] + " started");
+            }
+            catch (Exception oError)
+            {
+                Log.exception(oError);
+                Say.sayForced("That job could not be started. The log has why.");
+            }
+        }
+        return true;
+    }
+
+    // ------- settings -------
+
+    // addSetting: declare a setting the user may change while the program runs.
+    //
+    // The app names what is settable; the frame does the rest -- the list, the
+    // reading, the writing, and the call back into the app. A setting nobody
+    // declared cannot be changed by accident, and one that is declared needs no
+    // dialog of its own.
+    public bool addSetting(string sName, string sDefault, string sSummary)
+    {
+        dSettable[sName] = sDefault;
+        dSettableSummary[sName] = sSummary;
+        return true;
+    }
+
+    public string settingsFile()
+    {
+        return Paths.configFile(sAppName + ".inix");
+    }
+
+    public string settingValue(string sName)
+    {
+        string sDefault = dSettable.ContainsKey(sName) ? dSettable[sName] : "";
+        return InixCodec.readValue(settingsFile(), "Settings", sName, sDefault);
+    }
+
+    // changeSetting: change a setting from a list, and have it take effect now.
+    //
+    // A LIST OF WHAT IS SETTABLE, not a text file to edit and not a dialog of
+    // twenty controls. Pick the setting, type the value, and the program acts on
+    // it immediately -- no restart, no hunting for the file, no chance of
+    // breaking the syntax.
+    public bool changeSetting()
+    {
+        List<string> lsNames = new List<string>(dSettable.Keys);
+        lsNames.Sort(StringComparer.OrdinalIgnoreCase);
+        if (lsNames.Count == 0)
+        {
+            Say.sayForced("0 settings can be changed here");
+            return true;
+        }
+        string sName = "";
+        using (LbcDialog dlg = new LbcDialog("Change a Setting", this))
+        {
+            ListBox lb = dlg.addPickBox("&Setting:", lsNames, "",
+                "Pick the setting to change, then press Enter.");
+            if (!dlg.runOkCancel()) return true;
+            if (lb.SelectedIndex < 0) return true;
+            sName = lsNames[lb.SelectedIndex];
+        }
+        string sNow = settingValue(sName);
+        using (LbcDialog dlg = new LbcDialog("Change a Setting", this))
+        {
+            TextBox tb = dlg.addInputBox("&" + sName + ":", sNow,
+                dSettableSummary.ContainsKey(sName) ? dSettableSummary[sName] : "");
+            if (!dlg.runOkCancel()) return true;
+            InixCodec.writeValue(settingsFile(), "Settings", sName, tb.Text);
+            Log.info("Setting " + sName + " = " + tb.Text);
+            onSettingChanged(sName, tb.Text);
+            Say.sayForced(sName + " is now " + tb.Text);
+        }
+        return true;
+    }
+
+    // onSettingChanged: the app acts on the new value here. Nothing restarts.
+    protected virtual bool onSettingChanged(string sName, string sValue)
+    {
+        return false;
     }
 
     // ------- help -------
