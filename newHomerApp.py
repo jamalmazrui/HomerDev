@@ -117,7 +117,7 @@ def main():
         logLine("ERROR: no Templates folder at %s" % sTemplates)
         return 1
 
-    lsJobs = [
+    lsScripts = [
         ("_APP_.cs",             sApp + ".cs"),
         ("build_APP_.cmd",       "build" + sApp + ".cmd"),
         ("_APP__setup.iss",      sApp + "_setup.iss"),
@@ -136,13 +136,13 @@ def main():
     if bPython:
         #  A Python app takes the Python build script instead of the C# one and
         #  writes its source from the Python sample rather than the C# starter.
-        lsJobs = [t for t in lsJobs if t[0] not in ("_APP_.cs", "build_APP_.cmd")]
-        lsJobs.insert(0, ("build_APP_Py.cmd", "build" + sApp + ".cmd"))
+        lsScripts = [t for t in lsScripts if t[0] not in ("_APP_.cs", "build_APP_.cmd")]
+        lsScripts.insert(0, ("build_APP_Py.cmd", "build" + sApp + ".cmd"))
 
     os.makedirs(sTarget, exist_ok=True)
     iWritten = 0
     iSkipped = 0
-    for sFrom, sTo in lsJobs:
+    for sFrom, sTo in lsScripts:
         sFromPath = os.path.join(sTemplates, sFrom)
         sToPath = os.path.join(sTarget, sTo)
         if not os.path.exists(sFromPath):
@@ -164,7 +164,7 @@ def main():
                 % sApp)
         sayLine("set the AppId and hotkey in %s_setup.iss, then run build%s." % (sApp, sApp))
     else:
-        sayLine("Next: fill in runJob() in %s.cs, set the AppId and hotkey in %s_setup.iss, then run build%s."
+        sayLine("Next: fill in runScript() in %s.cs, set the AppId and hotkey in %s_setup.iss, then run build%s."
                 % (sApp, sApp, sApp))
     logLine("Finished %s" % datetime.datetime.now().isoformat(" ", "seconds"))
     return 0

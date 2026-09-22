@@ -4,7 +4,7 @@ WHERE A HOMER APP PUTS ITS FILES, AND WHY THE NAMES ARE WHAT THEY ARE.
 
 THIS MODULE AND CSharp\Paths.cs ARE THE SAME CLASS IN TWO LANGUAGES. Same
 folder names, same fallback rule, same function names: start, appName,
-installedFolder, userFolder, configs, data, jobs, logs, results, temp, the
+installedFolder, userFolder, configs, data, logs, results, temp, the
 shipped counterparts, configFile, clearTemp and tempFile.
 
 A screen reader user moves through a folder listing by first letter. Nine
@@ -16,11 +16,10 @@ starts with a different letter, and the letter is the fast way in:
     d  data        databases and seed data
     h  help        the documents: the guide, the tutorials, the history
     e  exec        the program itself: .exe, .dll, .py, .vbs
-    j  jobs        scripts, add-ons and plugins that change behaviour later
+    s  scripts     scripts, add-ons and plugins that change behaviour later
     l  logs        one file per session
     r  results     what the program produced
-    s  samples     examples that show what the program can do
-    t  temp        scratch, deletable at the start of the next run
+        t  temp        scratch, deletable at the start of the next run
     t  templates   files a user copies and fills in
 
 TWO t NAMES, AND THEY NEVER MEET. temp exists only in the per-user tree;
@@ -32,11 +31,11 @@ exists.
 THREE TREES, AND WHAT EACH HOLDS.
 
   The INSTALLED tree, C:\Program Files\<App>, read-only to the user:
-      configs, data, exec, jobs, samples, templates, and the documents at its
+      configs, data, exec, help, scripts, templates, and the documents at its
       root where a person looking for the ReadMe expects them.
 
   The PER-USER tree, %LOCALAPPDATA%\<App>, which the program owns and writes:
-      configs, data, jobs, logs, results, temp. No exec, no samples, no
+      configs, data, logs, results, scripts, temp. No exec and no
       templates: those are shipped, not made.
 
   The DEVELOPMENT folder, C:\<App>, stays flat. It is a git repository, and
@@ -109,21 +108,20 @@ def userFolder():
 
 def configs(): return _madeUnder(userFolder(), "configs")
 def data(): return _madeUnder(userFolder(), "data")
-def jobs(): return _madeUnder(userFolder(), "jobs")
+def scripts(): return _madeUnder(userFolder(), "scripts")
 def logs(): return _madeUnder(userFolder(), "logs")
 def results(): return _madeUnder(userFolder(), "results")
 def temp(): return _madeUnder(userFolder(), "temp")
 
 
 # The shipped folders, read-only, never created here: a program that has to
-# create its own samples folder has no samples.
+# create its own templates folder has no templates.
 
 def shippedConfigs(): return os.path.join(installedFolder(), "configs")
 def shippedData(): return os.path.join(installedFolder(), "data")
 def shippedExec(): return os.path.join(installedFolder(), "exec")
 def shippedHelp(): return os.path.join(installedFolder(), "help")
-def shippedJobs(): return os.path.join(installedFolder(), "jobs")
-def shippedSamples(): return os.path.join(installedFolder(), "samples")
+def shippedScripts(): return os.path.join(installedFolder(), "scripts")
 def shippedTemplates(): return os.path.join(installedFolder(), "templates")
 
 

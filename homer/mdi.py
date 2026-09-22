@@ -3,7 +3,7 @@
 THIS MODULE AND CSharp\Mdi.cs ARE THE SAME CLASS IN TWO LANGUAGES. Same command
 names, same keys, same title rule, same menus: MdiFrame and MdiChild, with
 addMenu, addItem, finishMenus, runCommand, onCommand, windowTitles, sayWindows,
-pickWindow, stepWindow, closeCurrent, closeOthers, runJob, changeSetting,
+pickWindow, stepWindow, closeCurrent, closeOthers, runScript, changeSetting,
 showAlternateMenu, showAbout, showDocumentation, setTitle and setStatusText.
 
 WHAT THE FRAME GIVES YOU, and no app should write again:
@@ -11,7 +11,7 @@ WHAT THE FRAME GIVES YOU, and no app should write again:
     Alt+F1                about
     Alt+F10               alternate menu: every command in one filterable list
     Alt+Shift+C           change a setting, from a list of what is settable
-    Alt+Shift+J           run a job, from a list of what is in the jobs folder
+    Alt+Shift+S           run a script, from a list of what is in the scripts folder
     Control+F1            key help: a key says what it would do
     Control+F4            close this window
     Control+Shift+F4      close all but this one
@@ -102,7 +102,7 @@ class MdiFrame(wx.MDIParentFrame):
 
         self.addMenu("&Help")
         self.addItem("Documentation", "F1", "Open the guide.")
-        self.addItem("Run a Job", "Alt+Shift+J", "Pick a script from the jobs folder and run it.")
+        self.addItem("Run a Script", "Alt+Shift+S", "Pick a script from the scripts folder and run it.")
         self.addItem("Change a Setting", "Alt+Shift+C", "Change a setting and have it take effect now.")
         self.addItem("Alternate Menu", "Alt+F10", "Every command in one list you can filter.")
         self.addItem("Key Help Toggle", "Ctrl+F1", "A key says what it would do instead of doing it.")
@@ -152,7 +152,7 @@ class MdiFrame(wx.MDIParentFrame):
             return True
         if sCommand == "Next Window": return self.stepWindow(1)
         if sCommand == "Previous Window": return self.stepWindow(-1)
-        if sCommand == "Run a Job": return self.runJob()
+        if sCommand == "Run a Script": return self.runScript()
         if sCommand == "Say Windows Open": return self.sayWindows()
         return False
 
@@ -206,16 +206,16 @@ class MdiFrame(wx.MDIParentFrame):
 
     # --- jobs ---
 
-    def jobFiles(self):
+    def scriptFiles(self):
         """Every job, the user's first and the shipped ones after.
 
-        A job is a script the user can run: .cmd, .ps1, .py, .js, .vbs, or
+        A script is a script the user can run: .cmd, .ps1, .py, .js, .vbs, or
         whatever else this app knows how to run. The user's own live in the
         per-user tree so they survive an update; the shipped ones come with the
         program and are read-only.
         """
         lFound = []
-        for sFolder in [paths.jobs(), paths.shippedJobs()]:
+        for sFolder in [paths.scripts(), paths.shippedScripts()]:
             try:
                 for sName in sorted(os.listdir(sFolder)):
                     sPath = os.path.join(sFolder, sName)
@@ -225,25 +225,25 @@ class MdiFrame(wx.MDIParentFrame):
                 pass
         return lFound
 
-    def runJob(self):
+    def runScript(self):
         """Pick a job from a list and run it.
 
         A LIST, not a folder browser and not a command line. The list is the
         whole design: every job this program can run, in one place, reachable by
         first letter, with no path to type and nothing to remember.
         """
-        lJobs = self.jobFiles()
-        if not lJobs:
-            say.say("0 jobs. Put a script in " + paths.jobs(), True)
+        lScripts = self.scriptFiles()
+        if not lScripts:
+            say.say("0 scripts. Put one in " + paths.scripts(), True)
             return True
-        lNames = [os.path.basename(s) for s in lJobs]
-        sPick = lbc.dialogChoose("Run a Job", "", lNames, 0)
+        lNames = [os.path.basename(s) for s in lScripts]
+        sPick = lbc.dialogChoose("Run a Script", "", lNames, 0)
         if sPick not in lNames: return True
-        sJob = lJobs[lNames.index(sPick)]
-        log.info("Running job: " + sJob)
+        sScript = lScripts[lNames.index(sPick)]
+        log.info("Running job: " + sScript)
         try:
-            subprocess.Popen(['cmd', '/c', 'start', '', sJob], cwd=paths.results())
-            say.say(os.path.basename(sJob) + " started", True)
+            subprocess.Popen(['cmd', '/c', 'start', '', sScript], cwd=paths.results())
+            say.say(os.path.basename(sScript) + " started", True)
         except Exception:
             log.exception()
             say.say("That job could not be started. The log has why.", True)

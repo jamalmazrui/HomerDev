@@ -98,7 +98,7 @@ for them. The AI-assisted coding part of `HomerDev.md` is written around them.
 
 Six folders, and every one of them starts with a different letter, so you reach
 any of them by typing that letter: `configs` holds the settings, `data` a
-database, `jobs` your own scripts, `logs` one file per session, `results` what
+database, `scripts` your own scripts, `logs` one file per session, `results` what
 the program produced, `temp` what a crash left behind. An installed program adds
 `exec`, `samples` and `templates` in its own folder under Program Files.
 
@@ -122,7 +122,7 @@ another basket, F4 to pick between them, Shift+F4 to hear how many are open,
 Alt+F10 for every command in one list, and Control+F1 to turn on the key
 describer and explore the keys without running anything.
 
-Press Alt+Shift+J for the job list and Alt+Shift+C to change a setting while
+Press Alt+Shift+S for the script list and Alt+Shift+C to change a setting while
 the program is running. Both are lists you reach by first letter, which is the
 whole point of them.
 

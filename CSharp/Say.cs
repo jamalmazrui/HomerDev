@@ -5,6 +5,9 @@
 
 using System.Windows.Automation.Provider;
 using Microsoft.Win32;
+// ASSEMBLIES: the System.Speech.dll the build script locates by full path, and
+// UIAutomationProvider.dll with UIAutomationTypes.dll for the Narrator route.
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -134,6 +137,22 @@ public static class Say
     // stop (we don't want JAWS to also receive a UIA Notification
     // and speak twice). Same for NVDA. Otherwise UIA Notification
     // fires for Narrator (and any other UIA-listening reader).
+    // onSpoken: where each utterance is logged. A runtime log that records what
+    // the program said, as well as what the user pressed, is the program's own
+    // half of the story; the screen reader's speech history is the other half.
+    // Set it to the app's log writer. Unset, the kit's Log is used.
+    public static Action<string> onSpoken = null;
+
+    private static void logSpoken(string sText, string sHow)
+    {
+        try
+        {
+            string sLine = "say" + sHow + ": " + sText;
+            if (onSpoken != null) onSpoken(sLine); else Log.line(sLine);
+        }
+        catch (Exception) { }
+    }
+
     public static void say(string sText)
     {
         // Extra-Speech gate: when off, DbDo's direct speech is
@@ -143,7 +162,7 @@ public static class Say
         // [General] extraSpeech in DbDo.inix. The toggle command
         // itself uses sayForced so the user always hears their
         // own action confirmed regardless of the flag's state.
-        if (!bExtraSpeechEnabled) return;
+        if (!bExtraSpeechEnabled) { logSpoken(sText ?? "", " (extra speech off, not spoken)"); return; }
         sayForced(sText);
     }
 
@@ -155,6 +174,7 @@ public static class Say
     public static void sayForced(string sText)
     {
         string sNew = sText ?? "";
+        logSpoken(sNew, "");
         if (isJawsRunning() && jawsSay(sNew)) { sLastPath = "JAWS COM"; return; }
         if (isNvdaRunning() && nvdaSay(sNew)) { sLastPath = "NVDA controller client"; return; }
         // Fall through to the UIA path for Narrator and any

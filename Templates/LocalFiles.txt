@@ -1,0 +1,10 @@
+﻿# LocalFiles.txt -- what belongs to _APP_ on this disk, but never in the repository.
+#
+# homerTidy keeps these where they are, and writes each line into .gitignore
+# as never pushed. One path or pattern a line; a trailing slash means a folder.
+#
+# Typical entries:
+#
+# help/Tutorial_*.inix
+# help/*.mp3
+# scripts/voices/

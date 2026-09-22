@@ -78,10 +78,10 @@ Escape = yes
 Note = F4 offers the open windows as a list
 
 [step]
-Keys = %+j
-Title = Run a Job
+Keys = %+s
+Title = Run a Script
 Escape = yes
-Note = Alt+Shift+J offers the jobs folder as a list
+Note = Alt+Shift+S offers the scripts folder as a list
 
 [step]
 Keys = %+c
@@ -119,7 +119,7 @@ Escape = yes
 Note = F4 offers the open windows as a list
 
 [step]
-Keys = %+j
-Title = Run a Job
+Keys = %+s
+Title = Run a Script
 Escape = yes
-Note = Alt+Shift+J offers the jobs folder as a list
+Note = Alt+Shift+S offers the scripts folder as a list

@@ -8,6 +8,9 @@
   <title>ReadMe</title>
   <style>
     html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
       color: #1a1a1a;
       background-color: #fdfdfd;
     }
@@ -26,16 +29,13 @@
     @media (max-width: 600px) {
       body {
         font-size: 0.9em;
-        padding: 12px;
+        padding: 1em;
       }
       h1 {
         font-size: 1.8em;
       }
     }
     @media print {
-      html {
-        background-color: white;
-      }
       body {
         background-color: transparent;
         color: black;
@@ -85,10 +85,9 @@
       color: #606060;
     }
     code {
-      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
       font-size: 85%;
       margin: 0;
-      hyphens: manual;
     }
     pre {
       margin: 1em 0;
@@ -153,17 +152,17 @@
     div.columns{display: flex; gap: min(4vw, 1.5em);}
     div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
+    ul.task-list{list-style: none;}
     ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
       width: 0.8em;
       margin: 0 0.8em 0.2em -1.6em;
       vertical-align: middle;
     }
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
 </head>
 <body>
 <header id="title-block-header">
@@ -257,11 +256,12 @@ you unless you ask for them. The AI-assisted coding part of
 <pre><code>%LOCALAPPDATA%\FruitBasketCs</code></pre>
 <p>Six folders, and every one of them starts with a different letter, so
 you reach any of them by typing that letter: <code>configs</code> holds
-the settings, <code>data</code> a database, <code>jobs</code> your own
-scripts, <code>logs</code> one file per session, <code>results</code>
-what the program produced, <code>temp</code> what a crash left behind.
-An installed program adds <code>exec</code>, <code>samples</code> and
-<code>templates</code> in its own folder under Program Files.</p>
+the settings, <code>data</code> a database, <code>scripts</code> your
+own scripts, <code>logs</code> one file per session,
+<code>results</code> what the program produced, <code>temp</code> what a
+crash left behind. An installed program adds <code>exec</code>,
+<code>samples</code> and <code>templates</code> in its own folder under
+Program Files.</p>
 <h3 id="look-at-the-log">6. Look at the log</h3>
 <pre><code>%LOCALAPPDATA%\FruitBasketCs\logs</code></pre>
 <p>One file per session, named for when it started, holding the
@@ -278,7 +278,7 @@ FruitBasketMdiPy</code></pre>
 for another basket, F4 to pick between them, Shift+F4 to hear how many
 are open, Alt+F10 for every command in one list, and Control+F1 to turn
 on the key describer and explore the keys without running anything.</p>
-<p>Press Alt+Shift+J for the job list and Alt+Shift+C to change a
+<p>Press Alt+Shift+S for the script list and Alt+Shift+C to change a
 setting while the program is running. Both are lists you reach by first
 letter, which is the whole point of them.</p>
 <p>Homer apps come in three shapes – a single tool with a command line

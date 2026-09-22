@@ -54,6 +54,12 @@ if errorlevel 1 (
   goto :done
 )
 echo Installing Ollama. This takes a few minutes.
+rem WINDOWS MAY ASK FOR PERMISSION IN A WINDOW BEHIND THIS ONE. The User
+rem Account Control prompt opens without taking focus, so a script that does not
+rem mention it looks hung: the install stops at "Starting package install..."
+rem and waits for an answer nobody knows it has asked for.
+echo Windows may ask for permission in a window behind this one.
+echo If nothing happens, press Alt+Tab and look for User Account Control.
 winget install --id Ollama.Ollama --architecture x64 --accept-source-agreements --accept-package-agreements --silent >> "%sLog%" 2>&1
 call :logLine "winget exit code: %ERRORLEVEL%"
 where ollama >nul 2>&1

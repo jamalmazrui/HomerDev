@@ -595,6 +595,77 @@ public static class HelpDialog
 //   // Or look up by name later:
 //   TextBox tbAgain = dlg.getTextBox("TextBox_UI_mode");
 // =====================================================================
+// LbcMenuItem: a menu item whose accessible name carries its shortcut, and whose
+// access letter is still reported.
+//
+// WHY. A screen reader reads a menu item's name, and the shortcut a sighted user
+// sees at the right-hand edge is not part of that name. Programs that want the
+// shortcut spoken have set AccessibleName to "Open Database   Control+O" -- and
+// replacing the name hides the item's access letter, so the reader falls back
+// to announcing the first letter instead, which often does not work. Leaving the
+// name alone keeps the letter and loses the shortcut. Both are needed: the key is
+// the fast way in, and a flat Homer menu is worth only as much as the keys a
+// person can recall from it.
+//
+// So this item keeps its Text as written, with its ampersand, and answers the
+// screen reader itself: the name is the caption plus the shortcut, and the
+// keyboard shortcut is the access letter taken from the caption. Used for items
+// that run a command. A submenu keeps the stock item, which announces itself as a
+// submenu.
+public class LbcMenuItem : ToolStripMenuItem
+{
+    public LbcMenuItem(string sText) : base(sText)
+    {
+        this.AccessibleRole = AccessibleRole.MenuItem;
+    }
+
+    protected override AccessibleObject CreateAccessibilityInstance()
+    {
+        return new LbcMenuItemAccessibleObject(this);
+    }
+
+    public class LbcMenuItemAccessibleObject : ToolStripItem.ToolStripItemAccessibleObject
+    {
+        private readonly LbcMenuItem oOwner;
+
+        public LbcMenuItemAccessibleObject(LbcMenuItem oItem) : base(oItem)
+        {
+            oOwner = oItem;
+        }
+
+        public override string Name
+        {
+            get
+            {
+                string sText = (oOwner.Text ?? "").Replace("&&", "\u0001").Replace("&", "").Replace("\u0001", "&");
+                if (sText.EndsWith("...")) sText = sText.Substring(0, sText.Length - 3).TrimEnd();
+                string sKeys = oOwner.ShortcutKeyDisplayString;
+                return string.IsNullOrEmpty(sKeys) ? sText : sText + "   " + sKeys;
+            }
+        }
+
+        public override string KeyboardShortcut
+        {
+            get
+            {
+                System.Text.RegularExpressions.Match oMatch =
+                    System.Text.RegularExpressions.Regex.Match(oOwner.Text ?? "", "&([^&])");
+                return oMatch.Success ? oMatch.Groups[1].Value.ToUpperInvariant() : "";
+            }
+        }
+
+        public override AccessibleStates State
+        {
+            get
+            {
+                AccessibleStates iState = base.State;
+                if (oOwner.Checked) iState |= AccessibleStates.Checked;
+                return iState;
+            }
+        }
+    }
+}
+
 public class LbcDialog : IDisposable
 {
     // Layout constants, all alphabetical. Sized for screen-reader

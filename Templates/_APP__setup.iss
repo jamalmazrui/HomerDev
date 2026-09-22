@@ -88,6 +88,9 @@ DefaultDirName={autopf}\{#AppName}
 DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
 UsePreviousAppDir=yes
+; Hide the destination page when a previous install of the same AppId is found:
+; a reinstall then asks nothing at all and goes where the last one went. A first
+; install still chooses the folder.
 DisableDirPage=auto
 UsePreviousGroup=yes
 
@@ -132,7 +135,7 @@ WelcomeLabel2=This will install [name/ver] on your computer.%n%n[name] is licens
 [Dirs]
 ; THE HOMER FOLDER LAYOUT. Every folder starts with a different letter, so a
 ; screen reader user reaches any of them with one keystroke:
-;   configs data exec jobs samples templates
+;   configs data exec help scripts templates
 ; temp and logs are not here: they belong to the per-user tree, which the
 ; program makes for itself. A temp folder under Program Files could not be
 ; written to anyway.
@@ -140,8 +143,7 @@ Name: "{app}\configs"
 Name: "{app}\data"
 Name: "{app}\help"
 Name: "{app}\exec"
-Name: "{app}\jobs"
-Name: "{app}\samples"
+Name: "{app}\scripts"
 Name: "{app}\templates"
 
 [Files]
@@ -173,6 +175,15 @@ Source: "_APP_.exe.config"; DestDir: "{app}\exec"; Flags: ignoreversion skipifso
 ; The finish helper: the Results box and then the launch. Always shipped, and
 ; it lives beside the program because that is what it starts.
 Source: "homerFinish.cmd"; DestDir: "{app}\exec"; Flags: ignoreversion
+; EVERY COMPONENT APPEARS THREE TIMES: one entry per state -- install, update,
+; already current -- grouped so the ones that do something come first, and only
+; one is ever shown because the others are skipped by their Check function. The
+; label carries the versions in play and nothing else:
+;     Install Ollama 0.34.1
+;     Update Ollama from 0.33.0 to 0.34.1
+;     Reinstall Ollama 0.34.1 (current version)
+; A purpose clause belongs only in the fallback label, where no version is known.
+;
 ; LOCAL AI. More than one Homer app now uses a model on the user's own machine,
 ; so these two are part of the kit. An app that calls no model deletes these two
 ; lines and the AI entries in [Run].
@@ -181,8 +192,8 @@ Source: "installModels.cmd"; DestDir: "{app}\exec"; Flags: ignoreversion skipifs
 ; SCREEN READER support: the JAWS scripts and the NVDA add-on, when the app has
 ; them, plus the script that puts them where each reader looks.
 Source: "installScreenReaderSupport.cmd"; DestDir: "{app}\exec"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "_APP__JAWS.zip"; DestDir: "{app}\jobs"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "_APP_.nvda-addon"; DestDir: "{app}\jobs"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "_APP__JAWS.zip"; DestDir: "{app}\scripts"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "_APP_.nvda-addon"; DestDir: "{app}\scripts"; Flags: ignoreversion skipifsourcedoesntexist
 
 [Icons]
 ; The documents stay at the root of the installed tree, where somebody looking
@@ -204,7 +215,7 @@ FileName: "{cmd}"; \
   Parameters: "/c """"{app}\exec\installOllama.cmd"""""; \
   WorkingDir: "{app}\exec"; \
   Description: "Install Ollama and the local AI model, so the program can work on your text on this machine (about 2 GB; nothing is uploaded)"; \
-  Check: isFreshInstall; \
+  Check: ollamaNeedsInstall; \
   Flags: postinstall skipifsilent runascurrentuser skipifdoesntexist
 
 FileName: "{cmd}"; \
@@ -254,6 +265,120 @@ FileName: "{cmd}"; \
 Type: filesandordirs; Name: "{localappdata}\_APP_"
 
 [Code]
+
+(* ---- A CHECKBOX MUST KNOW WHAT IS ALREADY INSTALLED ----
+
+   Offering to install something that is already there is worse than offering
+   nothing: it wastes a download and it tells the user the installer did not
+   look. Every optional component here is therefore gated by a Check function
+   that asks the machine first, and its label is a {code:...} function that says
+   which of install, update or reinstall this would be.
+
+   State: 0 not installed, 1 installed but out of date, 2 current.
+
+   Two ways of asking, because either alone is wrong. winget knows about
+   packages it installed and whether a newer version exists. Ollama and several
+   other tools also install PER USER, into the profile, where an elevated
+   installer's PATH does not reach -- so the tool's own executable is checked as
+   well. Anything found outside winget counts as installed: the person should be
+   offered a reinstall, not a second copy.
+
+   Answers are cached. Each query costs a second or two, and the finish page
+   asks more than once. *)
+var
+  gOllamaState: Integer;
+  gOllamaKnown: Boolean;
+
+(* PROBE QUOTING, WHICH COST THREE RELEASES TO FIND.
+   cmd /c strips the first and last quote of what follows it, so a command that
+   BEGINS with a quoted path -- "C:\...\tool.exe" --version -- loses its opening
+   quote and runs nothing. Empty output then reads as "not installed". The whole
+   command is therefore wrapped in one more pair of quotes, which is the pair
+   cmd eats.
+
+   AND DETECTION SHOULD NOT DEPEND ON RUNNING ANYTHING. Look for the file and
+   the uninstall registry key first: no process, no quoting, no PATH, and an
+   elevated installer still sees them. Run the tool only to learn its VERSION,
+   never to learn whether it is there.
+
+   AND LOG EVERY PROBE. A detection that goes wrong on somebody else's machine
+   is undiagnosable otherwise. *)
+function runCapture(sCommand: String; var sOut: String): Boolean;
+var
+  sFile: String;
+  iResult: Integer;
+  oLines: TArrayOfString;
+  i: Integer;
+begin
+  Result := False;
+  sOut := '';
+  sFile := ExpandConstant('{tmp}\homer_probe.txt');
+  if Exec(ExpandConstant('{cmd}'), '/c ""' + sCommand + ' > "' + sFile + '" 2>&1"',
+          '', SW_HIDE, ewWaitUntilTerminated, iResult) then
+  begin
+    if LoadStringsFromFile(sFile, oLines) then
+    begin
+      for i := 0 to GetArrayLength(oLines) - 1 do
+        sOut := sOut + oLines[i] + ' ';
+      Result := True;
+    end;
+    DeleteFile(sFile);
+  end;
+end;
+
+function ollamaState(): Integer;
+var
+  sOut, sUserCopy: String;
+begin
+  if gOllamaKnown then
+  begin
+    Result := gOllamaState;
+    exit;
+  end;
+  Result := 0;
+  if runCapture('winget list --id Ollama.Ollama --exact --disable-interactivity', sOut) then
+    if Pos('Ollama', sOut) > 0 then
+    begin
+      if (Pos('Available', sOut) > 0) or (Pos('available', sOut) > 0) then Result := 1
+      else Result := 2;
+    end;
+  (* The file first, because it cannot fail for a reason nobody can see. Ollama
+     installs PER USER, into a profile an elevated installer's PATH cannot
+     reach, so the profile copy and the uninstall key are both checked. *)
+  if Result = 0 then
+  begin
+    sUserCopy := ExpandConstant('{localappdata}\Programs\Ollama\ollama.exe');
+    if FileExists(sUserCopy)
+    or FileExists(ExpandConstant('{commonpf}\Ollama\ollama.exe'))
+    or RegKeyExists(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\Ollama')
+    or RegKeyExists(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\Ollama') then
+      Result := 2;
+  end;
+  gOllamaState := Result;
+  gOllamaKnown := True;
+end;
+
+function ollamaNeedsInstall(): Boolean;
+begin
+  Result := ollamaState() = 0;
+end;
+
+function ollamaIsPresent(): Boolean;
+begin
+  Result := ollamaState() > 0;
+end;
+
+function descOllama(sParam: String): String;
+begin
+  case ollamaState() of
+    1: Result := 'Update Ollama, which runs AI models on this computer';
+    2: Result := 'Reinstall or update Ollama (it is already installed)';
+  else
+    Result := 'Install Ollama, which runs AI models on this computer';
+  end;
+end;
+
+
 //  WHAT IS ALREADY ON THIS MACHINE.
 //
 //  Inno records every install under its own uninstall key, named for the AppId

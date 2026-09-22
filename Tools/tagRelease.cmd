@@ -20,9 +20,10 @@ rem  A copy beside the project works the same way.
 rem
 rem  Invokes PowerShell with execution policy bypass for this single
 rem  invocation only (it does not change the system policy), and
-rem  forwards every argument. A fresh tagRelease.log is written in
-rem  the repository on every run -- with the repo rather than with
-rem  the script, because the log is about that release.
+rem  forwards every argument. Each run writes its own log in the
+rem  project's logs folder, logs\<App>-release-<date>-<time>.log --
+rem  with the project rather than with the script, because the log is
+rem  about that release.
 rem
 rem  Usage:
 rem    tagRelease                      the normal command; no flags needed

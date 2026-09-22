@@ -71,7 +71,7 @@ class fruitFrame(mdi.MdiFrame):
         #
         # finishMenus fills in Window and Help: the window picker on F4, the
         # spoken window list on Shift+F4, next and previous, close and
-        # close-others, the job list on Alt+Shift+J, the settings list on
+        # close-others, the script list on Alt+Shift+S, the settings list on
         # Alt+Shift+C, the alternate menu on Alt+F10, the key describer on
         # Control+F1, about on Alt+F1 and the guide on F1. Not one of them is in
         # this file, and every Homer MDI app has all of them.

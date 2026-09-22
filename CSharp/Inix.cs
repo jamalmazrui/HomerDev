@@ -22,6 +22,13 @@
 // therefore needs references to System.IO.Compression.dll and
 // System.Xml.dll (BuildEdSharp adds them).
 
+// ASSEMBLIES: System.IO.Compression.dll, System.IO.Compression.FileSystem.dll.
+//
+// Reading and writing .xlsx means reading and writing a zip archive, and csc
+// does not resolve System.IO.Compression from csc.rsp. A build script that
+// leaves it out fails with "The type or namespace name 'ZipArchive' could not
+// be found", which reads as a missing using rather than a missing reference.
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;

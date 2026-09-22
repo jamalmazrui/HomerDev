@@ -11,11 +11,10 @@
 //     d  data        databases and seed data
 //     h  help        the documents: the guide, the tutorials, the history
 //     e  exec        the program itself: .exe, .dll, .py, .vbs
-//     j  jobs        scripts, add-ons and plugins that change behaviour later
+//     s  scripts     scripts, add-ons and plugins that change behaviour later
 //     l  logs        one file per session
 //     r  results     what the program produced
-//     s  samples     examples that show what the program can do
-//     t  temp        scratch, deletable at the start of the next run
+//     //     t  temp        scratch, deletable at the start of the next run
 //     t  templates   files a user copies and fills in
 //
 // TWO t NAMES, AND THEY NEVER MEET. temp exists only in the per-user tree;
@@ -27,15 +26,15 @@
 // THREE TREES, AND WHAT EACH HOLDS.
 //
 //   The INSTALLED tree, C:\Program Files\<App>, read-only to the user:
-//       <App>\configs  <App>\data  <App>\exec  <App>\jobs
-//       <App>\samples  <App>\templates
+//       <App>\configs  <App>\data  <App>\exec  <App>\help
+//       <App>\scripts  <App>\templates
 //       and the documents at its root, where a person looking for the ReadMe
 //       expects to find it.
 //
 //   The PER-USER tree, %LOCALAPPDATA%\<App>, which the program owns and writes:
-//       <App>\configs  <App>\data  <App>\jobs  <App>\logs
+//       <App>\configs  <App>\data  <App>\scripts  <App>\logs
 //       <App>\results  <App>\temp
-//       No exec, no samples, no templates: those are shipped, not made.
+//       No exec, no templates: those are shipped, not made.
 //
 //   The DEVELOPMENT folder, C:\<App>, stays flat. It is a git repository, and
 //   every tool that reads one -- the compiler, the installer script, the
@@ -128,20 +127,19 @@ public static class Paths
 
     public static string configs() { return madeUnder(userFolder, "configs"); }
     public static string data() { return madeUnder(userFolder, "data"); }
-    public static string jobs() { return madeUnder(userFolder, "jobs"); }
+    public static string scripts() { return madeUnder(userFolder, "scripts"); }
     public static string logs() { return madeUnder(userFolder, "logs"); }
     public static string results() { return madeUnder(userFolder, "results"); }
     public static string temp() { return madeUnder(userFolder, "temp"); }
 
     // The shipped folders, read-only, never created here: a program that has to
-    // create its own samples folder has no samples.
+    // create its own templates folder has no templates.
     public static string shippedConfigs() { return Path.Combine(installedFolder, "configs"); }
     public static string shippedData() { return Path.Combine(installedFolder, "data"); }
     public static string shippedExec() { return Path.Combine(installedFolder, "exec"); }
     public static string shippedHelp() { return Path.Combine(installedFolder, "help"); }
-    public static string shippedJobs() { return Path.Combine(installedFolder, "jobs"); }
-    public static string shippedSamples() { return Path.Combine(installedFolder, "samples"); }
-    public static string shippedTemplates() { return Path.Combine(installedFolder, "templates"); }
+    public static string shippedScripts() { return Path.Combine(installedFolder, "scripts"); }
+        public static string shippedTemplates() { return Path.Combine(installedFolder, "templates"); }
 
     private static string madeUnder(string sParent, string sChild)
     {

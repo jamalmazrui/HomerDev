@@ -16,8 +16,21 @@ meant two surveys, two plans, and two chances to disagree.
     homerTidy --gitignore       write the whitelist .gitignore and stop.
 
 WHAT BELONGS. Nothing is listed inside this script. A file belongs to the
-project when the installer script names it, when RepoFiles.txt names it, or
-when it is one of the standing project files every Homer project has. Those
+project when the installer script names it, when RepoFiles.txt names it, when
+LocalFiles.txt names it, or when it is one of the standing project files every
+Homer project has.
+
+LocalFiles.txt is the project's own customization: files that belong on THIS
+disk but never in the repository -- a tutorial's working scripts, fetched voice
+models, generated audio. Same form as RepoFiles.txt, one path or pattern a line,
+and every line is also written into .gitignore as never pushed.
+
+THE LAYOUT. A Homer development folder mirrors the installed tree: sources and
+build files at the top, then configs, data, exec, help, logs, scripts and
+templates. So the folder step also PUTS THINGS IN PLACE: a file at the top that
+the installer takes from exec\ or help\ is moved there, a stray .log anywhere
+goes to logs\, and exec\ and logs\ are never surveyed, being made rather than
+authored. Those
 three sources are read from the project folder itself, so this script never
 needs editing and never needs to know which program it is tidying.
 
@@ -47,9 +60,11 @@ WHAT IT DOES TO THE FOLDER
      absence would have told you something.
   2. Finds duplicates by content and keeps the one the project names, or the
      oldest when the project names neither.
-  3. Moves everything else into notes\, under a subfolder named for what it is:
-     notes\logs, notes\drafts, notes\mail, notes\archives, notes\other. Nothing
-     is deleted in this step, because a file nobody named may still be wanted.
+  3. Puts misplaced files where the layout says: into exec\ or help\ when the
+     installer takes them from there, and every stray .log into logs\.
+  4. Moves everything else into notes\, under a subfolder named for what it is:
+     notes\drafts, notes\mail, notes\archives, notes\other. Nothing is deleted
+     in this step, because a file nobody named may still be wanted.
 
 WHAT IT DOES TO THE REPOSITORY
 
@@ -67,7 +82,7 @@ A file that is large and fetched at run time -- a model, a converter, an
 installer payload -- belongs in neither place: the app's own install script
 should fetch it. This script reports such a file rather than guessing.
 
-THE LOG. homerTidy.log is written beside this script, and holds the
+THE LOG. <App>-tidy-<date>-<time>.log is written in the project's logs folder, and holds the
 environment, every setting, every command with its exit code, the whole survey,
 and any traceback. The console gets the short version.
 """
@@ -91,12 +106,12 @@ c_iLargeBytes = 10 * 1024 * 1024        # what counts as large in the history
 c_lsNeverPushed = [
     "*.exe", "*.log", "*.obj", "*.pdb", "Version.cs", "__pycache__/",
     ".venv/", "build/", "create*Repo.cmd", "create*Repo.ps1", "dist/", "notes/",
-    "self.htm", "self.md", "tagRelease.cmd", "tagRelease.ps1", "version.py",
+    "exec/", "logs/", "self.htm", "self.md", "tagRelease.cmd", "tagRelease.ps1", "version.py",
 ]
 
 # Folders a build makes. The survey does not walk into them, because what is
 # inside belongs to PyInstaller or the compiler rather than to the project.
-c_lsSkipFolders = [".git", ".venv", "__pycache__", "build", "dist", "notes", "venv"]
+c_lsSkipFolders = [".git", ".venv", "__pycache__", "build", "dist", "exec", "logs", "notes", "venv"]
 c_sLogName = "homerTidy.log"
 c_sNotes = "notes"
 
@@ -111,6 +126,7 @@ c_lsStandingNames = [
     r"^install[a-z0-9_]*\.(cmd|ps1)$", r"^get[a-z0-9_]*\.(cmd|ps1)$",
     # A project's own script logs are rewritten on every run and are already
     # ignored by git, so they stay where the script that writes them expects.
+    r"^localfiles\.txt$", r"^self\.(md|htm)$",
     r"^(homertidy|tagrelease|summarizesetup)\.log$",
     r"^(build|create|new|clean|tidy)[a-z0-9_]*\.log$",
     r"^[a-z0-9_+-]+\.(cs|py|js|iss|ico|inix|manifest|config|lua)$",
@@ -118,7 +134,6 @@ c_lsStandingNames = [
 
 # Where an unnamed file goes when it is moved out of the way.
 c_ldFolders = [
-    ("logs", [".log"]),
     ("archives", [".zip", ".7z", ".rar", ".gz", ".tar", ".cab", ".msi", ".exe"]),
     ("mail", [".eml", ".msg"]),
     ("drafts", [".md", ".htm", ".html", ".txt", ".docx", ".doc", ".rtf", ".pdf"]),
@@ -209,6 +224,38 @@ def namedByRepoFiles():
     return lsNames
 
 
+def namedByLocalFiles():
+    """Every line of LocalFiles.txt: on this disk, never in the repository."""
+    sPath = os.path.join(sRoot, "LocalFiles.txt")
+    if not os.path.exists(sPath): return []
+    lsNames = []
+    for sLine in open(sPath, "rb").read().decode("utf-8-sig", errors="replace").splitlines():
+        sLine = sLine.strip()
+        if sLine == "" or sLine.startswith("#") or sLine.startswith(";"): continue
+        lsNames.append(sLine)
+    return lsNames
+
+
+def placementFor(sRelative, lsNamed):
+    """Where a misplaced file belongs, or "" when it is not misplaced.
+
+    A file at the top whose name the installer knows only inside the exec or
+    help folder is in the wrong place: that is where the layout keeps it. A
+    .log anywhere outside the logs folder belongs in logs.
+    """
+    sNorm = sRelative.replace("\\", "/")
+    if sNorm.lower().endswith(".log") and not sNorm.lower().startswith("logs/"):
+        return "logs"
+    if "/" in sNorm: return ""
+    for sNamed in lsNamed:
+        sNamedNorm = sNamed.replace("\\", "/")
+        if "/" not in sNamedNorm or "*" in sNamedNorm: continue
+        sFolder, sName = sNamedNorm.rsplit("/", 1)
+        if sName.lower() == sNorm.lower() and sFolder.lower() in ("exec", "help"):
+            return sFolder
+    return ""
+
+
 def belongsTo(sRelative, lsNamed):
     """Does this path belong to the project?"""
     sLower = sRelative.replace("\\", "/").lower()
@@ -250,9 +297,10 @@ def hashOf(sPath):
 # --- the survey -------------------------------------------------------------
 
 def surveyFolder(lsNamed):
-    """Return (lsEmpty, ldDuplicates, lsStrays)."""
+    """Return (lsEmpty, ldDuplicates, lsStrays, ltPlace)."""
     lsEmpty = []
     lsStrays = []
+    ltPlace = []
     dByHash = {}
 
     for sDirPath, lsDirs, lsFiles in os.walk(sRoot):
@@ -262,6 +310,10 @@ def surveyFolder(lsNamed):
             sRelative = os.path.relpath(sFull, sRoot)
             if os.path.getsize(sFull) == 0:
                 lsEmpty.append(sRelative)
+                continue
+            sPlace = placementFor(sRelative, lsNamed)
+            if sPlace:
+                ltPlace.append((sRelative, sPlace))
                 continue
             if not belongsTo(sRelative, lsNamed):
                 lsStrays.append(sRelative)
@@ -273,11 +325,17 @@ def surveyFolder(lsNamed):
     ldDuplicates = []
     for sHash, lsPaths in sorted(dByHash.items()):
         if len(lsPaths) < 2: continue
+        # A copy the project names is never a duplicate to remove, however many
+        # there are. Sample folders carry their own scripts, and two samples
+        # may well carry the same one -- each is where its database looks.
         lsKeepers = [s for s in lsPaths if belongsTo(s, lsNamed)]
-        sKeep = lsKeepers[0] if lsKeepers else sorted(
-            lsPaths, key=lambda s: os.path.getmtime(os.path.join(sRoot, s)))[0]
+        if lsKeepers:
+            lsGone = [s for s in lsPaths if s not in lsKeepers]
+            if lsGone: ldDuplicates.append((lsKeepers[0], lsGone))
+            continue
+        sKeep = sorted(lsPaths, key=lambda s: os.path.getmtime(os.path.join(sRoot, s)))[0]
         ldDuplicates.append((sKeep, [s for s in lsPaths if s != sKeep]))
-    return (lsEmpty, ldDuplicates, lsStrays)
+    return (lsEmpty, ldDuplicates, lsStrays, ltPlace)
 
 
 def surveyRepo(lsNamed):
@@ -362,6 +420,11 @@ def writeWhitelistGitignore():
         lsLines.append("!/" + sClean + ("/" if sName.endswith("/") else ""))
     lsLines.append("!/.gitignore")
     lsLines.append("")
+    lsLocal = namedByLocalFiles()
+    if lsLocal:
+        lsLines.append("# On this disk only, from LocalFiles.txt.")
+        lsLines.extend(s.replace("\\", "/") for s in lsLocal)
+        lsLines.append("")
     lsLines.append("# Never pushed, whatever RepoFiles.txt says: private notes, maintainer")
     lsLines.append("# scripts, logs, and anything a build makes.")
     for sPattern in c_lsNeverPushed:
@@ -420,6 +483,14 @@ def main():
 
     if dArguments.path: sRoot = os.path.abspath(dArguments.path)
 
+    # THE LOG GOES IN THE PROJECT'S logs FOLDER, one file per run, named as the
+    # program names its own: <App>-tidy-yyyyMMdd-HHmmss.log. An alphabetical
+    # sort is a chronological one, and zipping logs gathers every session.
+    global sLogPath
+    sLogDir = os.path.join(sRoot, "logs")
+    os.makedirs(sLogDir, exist_ok=True)
+    sLogPath = os.path.join(sLogDir, "%s-tidy-%s.log" % (os.path.basename(sRoot.rstrip("\\/")),
+                            datetime.datetime.now().strftime("%Y%m%d-%H%M%S")))
     oLog = open(sLogPath, "w", encoding="utf-8")
     logLine("homerTidy started %s" % datetime.datetime.now().isoformat(" ", "seconds"))
     logLine("Script: %s" % os.path.abspath(__file__))
@@ -442,7 +513,7 @@ def main():
     if not bDoIt: sayLine("This is the plan only. Nothing will be changed.")
     sayLine()
 
-    lsNamed = namedByInstaller() + namedByRepoFiles()
+    lsNamed = namedByInstaller() + namedByRepoFiles() + namedByLocalFiles()
     logLine("Named by the project: %s" % countNoun(len(lsNamed), "entry", "entries"))
     if not lsNamed:
         sayLine("Nothing names the project's files: there is no <App>_setup.iss and")
@@ -453,8 +524,10 @@ def main():
 
     # ---- the folder ----
     if not dArguments.repo_only:
-        lsEmpty, ldDuplicates, lsStrays = surveyFolder(lsNamed)
+        lsEmpty, ldDuplicates, lsStrays, ltPlace = surveyFolder(lsNamed)
         sayLine("Folder")
+        sayLine("  %s to put in place" % countNoun(len(ltPlace), "file"))
+        for sPath, sFolder in ltPlace: logLine("PLACE: %s -> %s/" % (sPath, sFolder))
         sayLine("  %s to delete" % countNoun(len(lsEmpty), "empty file"))
         sayLine("  %s to remove" % countNoun(sum(len(l) for _, l in ldDuplicates), "duplicate"))
         sayLine("  %s to move into notes" % countNoun(len(lsStrays), "file"))
@@ -465,6 +538,20 @@ def main():
             logLine("STRAY: %s -> notes/%s" % (sPath, noteFolderFor(sPath)))
 
         if bDoIt:
+            # In place first. When the proper folder already holds a copy, that
+            # copy is the one the build made or the installer ships, and the
+            # loose one goes to notes rather than over it.
+            for sPath, sFolder in ltPlace:
+                sFrom = os.path.join(sRoot, sPath)
+                sTo = os.path.join(sRoot, sFolder, os.path.basename(sPath))
+                if not os.path.exists(sFrom): continue
+                os.makedirs(os.path.join(sRoot, sFolder), exist_ok=True)
+                if os.path.exists(sTo):
+                    moveToNotes(sPath)
+                else:
+                    shutil.move(sFrom, sTo)
+                    logLine("PLACED: %s -> %s" % (sPath, os.path.relpath(sTo, sRoot)))
+                iChanges += 1
             for sPath in lsEmpty:
                 os.remove(os.path.join(sRoot, sPath))
                 logLine("DELETED EMPTY: " + sPath)

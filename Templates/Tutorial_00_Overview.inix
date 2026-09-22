@@ -1,0 +1,58 @@
+﻿; Tutorial_00_Overview.inix -- the first walkthrough of a Homer app.
+;
+; THE FORMAT, IN ONE PLACE.
+;
+; Each [step] is one passage of narration and one of screen reader speech.
+; buildTutorials speaks them with two voices and joins them into an .mp3 per
+; script, then one .mkv with a chapter for each. makeTutorials writes the same
+; scripts into Tutorials.md and the podcast feed.
+;
+; Keys in a [step]:
+;   Say=    what the narrator says. One idea, no padding, no transitions.
+;   Key=    the keystroke being demonstrated, in Homer key-name form.
+;   Hear=   what the screen reader answers. One line per utterance, written the
+;           way a fresh reader at its middle verbosity would say it: name, role,
+;           value, state, position. Repeat the key for several utterances.
+;   Note=   written only, never spoken. The aside a reader wants and a listener
+;           does not.
+;   Pause=  seconds of silence before the passage. SSML calls this
+;           <break time="2s"/>; this is the same idea without the brackets.
+;
+; Keys in [about]: Title (numbered, "00 - Overview"), Intro, Setup, Homework.
+; Keys in [feed], on the FIRST script only: Title, Description, Author, Email.
+;
+; ALWAYS SAY THE WORD THE KEY COMES FROM. "Shift plus C is Say Cell -- C for
+; Cell." A key whose mnemonic goes unsaid is a key somebody has to memorise
+; rather than understand, and the memory association is the whole reason the
+; key was chosen.
+
+[feed]
+Title=_APP_ Walkthroughs
+Description=Short simulated walks through _APP_. Each one is about three minutes, with something to try at the end.
+Author=Your Name
+Email=you@example.com
+Base=
+
+[about]
+Title=00 - Overview and Table of Contents
+Intro=A simulated walk through _APP_, made with AI: a person working, and a screen reader answering.
+Setup=Nothing yet. This one is two minutes of what to expect.
+Homework=Pick the one that matches what you want to do today.
+
+[step]
+Say=What this program is, in two sentences.
+Key=
+Hear=
+Note=Say what it does and who it is for, and stop.
+
+[step]
+Say=What each walkthrough covers, in the order they are numbered.
+Key=
+Hear=
+Note=Name the two that have to be taken in order, and say the rest can be taken as needed.
+
+[step]
+Say=Every key is named with the word it comes from, so the key and the command stay together in memory.
+Key=
+Hear=
+Note=Control plus F1 is the key describer in every Homer app: press it, then a key, and it says what the key does instead of doing it.

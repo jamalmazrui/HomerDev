@@ -45,3 +45,4 @@ self.md
 tagRelease.cmd
 tagRelease.ps1
 version.py
+logs/

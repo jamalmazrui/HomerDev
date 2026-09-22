@@ -37,7 +37,7 @@
 //     Control+Shift+F4      close all but this one
 //     Alt+F10               alternate menu: every command in one filterable list
 //     Alt+Shift+C           change a setting, from a list of what is settable
-//     Alt+Shift+J           run a job, from a list of what is in the jobs folder
+//     Alt+Shift+S           run a script, from a list of what is in the scripts folder
 //     Control+F1            key describer: a key says what it would do
 //     Alt+F1                about
 //     F1                    documentation
@@ -181,8 +181,8 @@ public class MdiFrame : LbcForm
         if (!dMenus.ContainsKey("Help")) addMenu("&Help");
         menuNow = dMenus["Help"];
         addItem("Documentation", Keys.F1, "Open the guide.");
-        addItem("Run a Job", Keys.Alt | Keys.Shift | Keys.J,
-                "Pick a script from the jobs folder and run it.");
+        addItem("Run a Script", Keys.Alt | Keys.Shift | Keys.S,
+                "Pick a script from the scripts folder and run it.");
         addItem("Change a Setting", Keys.Alt | Keys.Shift | Keys.C,
                 "Change a setting and have it take effect now.");
         addItem("Alternate Menu", Keys.Alt | Keys.F10, "Every command in one list you can filter.");
@@ -236,7 +236,7 @@ public class MdiFrame : LbcForm
             case "Current Windows": return pickWindow();
             case "Change a Setting": return changeSetting();
             case "Documentation": return showDocumentation();
-            case "Run a Job": return runJob();
+            case "Run a Script": return runScript();
             case "Key Help Toggle":
                 KeyMap.bKeyDescriber = !KeyMap.bKeyDescriber;
                 Say.sayForced(KeyMap.bKeyDescriber ? "Key help on" : "Key help off");
@@ -314,16 +314,16 @@ public class MdiFrame : LbcForm
 
     // ------- jobs -------
 
-    // jobFiles: every job, the user's first and the shipped ones after.
+    // scriptFiles: every job, the user's first and the shipped ones after.
     //
-    // A job is a script the user can run: .cmd, .ps1, .py, .js, .vbs. The
+    // A script is a script the user can run: .cmd, .ps1, .py, .js, .vbs. The
     // user's own live in the per-user tree so they survive an update; the
     // shipped ones come with the program and are read-only.
-    public List<string> jobFiles()
+    public List<string> scriptFiles()
     {
         List<string> lsFound = new List<string>();
         List<string> lsSeen = new List<string>();
-        foreach (string sFolder in new string[] { Paths.jobs(), Paths.shippedJobs() })
+        foreach (string sFolder in new string[] { Paths.scripts(), Paths.shippedScripts() })
         {
             try
             {
@@ -343,34 +343,34 @@ public class MdiFrame : LbcForm
         return lsFound;
     }
 
-    // runJob: pick a job from a list and run it.
+    // runScript: pick a job from a list and run it.
     //
     // A LIST, not a folder browser and not a command line. The list is the whole
     // design: every job this program can run, in one place, reachable by first
     // letter, with no path to type and nothing to remember.
-    public bool runJob()
+    public bool runScript()
     {
-        List<string> lsJobs = jobFiles();
-        if (lsJobs.Count == 0)
+        List<string> lsScripts = scriptFiles();
+        if (lsScripts.Count == 0)
         {
-            Say.sayForced("0 jobs. Put a script in " + Paths.jobs());
+            Say.sayForced("0 scripts. Put one in " + Paths.scripts());
             return true;
         }
         List<string> lsNames = new List<string>();
-        foreach (string sPath in lsJobs) lsNames.Add(System.IO.Path.GetFileName(sPath));
-        using (LbcDialog dlg = new LbcDialog("Run a Job", this))
+        foreach (string sPath in lsScripts) lsNames.Add(System.IO.Path.GetFileName(sPath));
+        using (LbcDialog dlg = new LbcDialog("Run a Script", this))
         {
-            ListBox lb = dlg.addPickBox("&Job:", lsNames, "",
+            ListBox lb = dlg.addPickBox("&Script:", lsNames, "",
                 "Type a letter or two to narrow the list, then press Enter to run it.");
             if (!dlg.runOkCancel()) return true;
             int iPick = lb.SelectedIndex;
             if (iPick < 0) return true;
-            string sJob = lsJobs[iPick];
-            Log.info("Running job: " + sJob);
+            string sScript = lsScripts[iPick];
+            Log.info("Running job: " + sScript);
             try
             {
                 System.Diagnostics.ProcessStartInfo oStart =
-                    new System.Diagnostics.ProcessStartInfo(sJob);
+                    new System.Diagnostics.ProcessStartInfo(sScript);
                 oStart.UseShellExecute = true;
                 oStart.WorkingDirectory = Paths.results();
                 System.Diagnostics.Process.Start(oStart);

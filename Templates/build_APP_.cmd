@@ -54,14 +54,19 @@ rem paren BEFORE expanding variables. Every search below is therefore a
 rem single-line "if not defined X if exist ... set" chain, never a block.
 rem
 rem Output in this folder: _APP_.exe, and the installer if Inno Setup is
-rem present. Everything is logged to build_APP_.log beside this script.
+rem present. Everything is logged to logs\_APP_-build-<date>-<time>.log.
 rem ===================================================================
 
 setlocal enabledelayedexpansion
 cd /d "%~dp0"
 
 set "app=_APP_"
-set "log=%CD%\build%app%.log"
+rem EVERY SESSION ITS OWN LOG, IN logs\, named as the program names its own:
+rem <App>-build-yyyyMMdd-HHmmss.log. An alphabetical sort is then a
+rem chronological one, and zipping logs\ gathers everything.
+for /f %%i in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd-HHmmss"') do set "sStamp=%%i"
+if not exist "%~dp0logs" mkdir "%~dp0logs"
+set "log=%~dp0logs\%app%-build-%sStamp%.log"
 echo %app% build started %DATE% %TIME%> "%log%"
 echo Script: %~f0>> "%log%"
 echo Folder: %CD%>> "%log%"
@@ -363,7 +368,16 @@ rem lines that name .htm are skipped.
 if not defined useDocs goto :docsDone
 where pandoc >nul 2>&1
 if errorlevel 1 (
-  echo Pandoc was not found, so the .htm files were not rebuilt.>> "%log%"
+  rem FETCH IT RATHER THAN ASK FOR IT. "Install pandoc and run me again" is a
+  rem manual step, and a Homer build script does not leave one.
+  echo Installing pandoc, which writes the .htm copies of the documents...
+  echo Pandoc not found; installing with winget>> "%log%"
+  winget install --id JohnMacFarlane.Pandoc --silent --accept-source-agreements --accept-package-agreements >> "%log%" 2>&1
+)
+where pandoc >nul 2>&1
+if errorlevel 1 (
+  echo Pandoc could not be installed, so the .htm files were not rebuilt.>> "%log%"
+  echo NOTE: pandoc could not be installed, so the .htm files were not rebuilt.
 ) else (
   for %%m in (*.md) do (
     pandoc -f markdown -t html5 --standalone --metadata title="%%~nm" -o "%%~nm.htm" "%%m" >> "%log%" 2>&1
@@ -390,23 +404,48 @@ if exist "addon\manifest.ini" (
 )
 :readersDone
 
+rem ---- spoken tutorials, when the app has any ----
+rem
+rem Scripts in help\Tutorial_NN_*.inix become Tutorials.md, one .mp3 each, and
+rem Tutorials.mkv with a chapter per tutorial. The voices -- kristin and john,
+rem both trained on public domain recordings, so the audio can be published --
+rem are fetched on the first run and never again.
+rem
+rem Skipped silently when the app has no tutorial scripts, which most do not.
+if exist "help\Tutorial_*.inix" (
+  echo Building the spoken tutorials...
+  call "%homerDev%\Tools\buildTutorials.cmd" >> "%log%" 2>&1
+)
+
 rem ---- installer, if Inno Setup is present --------------------------
 if not defined useInstaller goto :done
 set "iscc="
 if exist "!progFiles86!\Inno Setup 6\ISCC.exe" set "iscc=!progFiles86!\Inno Setup 6\ISCC.exe"
 if not defined iscc if exist "!progFiles!\Inno Setup 6\ISCC.exe" set "iscc=!progFiles!\Inno Setup 6\ISCC.exe"
 if not defined iscc (
-  echo Inno Setup was not found, so no installer was built.>> "%log%"
-  echo(
-  echo Inno Setup was not found. To produce %app%_setup.exe, open
-  echo %app%_setup.iss in Inno Setup and click Compile.
-  goto :done
+  rem FETCH IT RATHER THAN ASK FOR IT, as with pandoc above. The installer is
+  rem part of a release, so building it is part of the build.
+  echo Installing Inno Setup, which builds %app%_setup.exe...
+  echo Inno Setup not found; installing with winget>> "%log%"
+  winget install --id JRSoftware.InnoSetup --silent --accept-source-agreements --accept-package-agreements >> "%log%" 2>&1
+  if exist "!progFiles86!\Inno Setup 6\ISCC.exe" set "iscc=!progFiles86!\Inno Setup 6\ISCC.exe"
+  if not defined iscc if exist "!progFiles!\Inno Setup 6\ISCC.exe" set "iscc=!progFiles!\Inno Setup 6\ISCC.exe"
+)
+if not defined iscc (
+  echo Inno Setup could not be installed, so no installer was built.>> "%log%"
+  echo ERROR: Inno Setup could not be installed, so %app%_setup.exe was not built.
+  goto :failed
 )
 echo Inno Setup: !iscc!>> "%log%"
 "!iscc!" "%app%_setup.iss" >> "%log%" 2>&1
 if errorlevel 1 (
   echo ERROR: the installer build failed. See %log%.
   echo ERROR: the installer build failed.>> "%log%"
+  goto :failed
+)
+if not exist "%app%_setup.exe" (
+  echo ERROR: Inno Setup returned 0 but wrote no %app%_setup.exe.>> "%log%"
+  echo ERROR: Inno Setup returned 0 but wrote no %app%_setup.exe.
   goto :failed
 )
 echo Built %app%_setup.exe version !ver!>> "%log%"

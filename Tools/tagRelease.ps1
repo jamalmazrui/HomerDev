@@ -96,7 +96,7 @@
 # PowerShell 5.1+.
 #
 # This is a maintainer script. Keep tagRelease.ps1, tagRelease.cmd, and
-# tagRelease.log in .gitignore so they stay out of the source browser.
+# logs/ in .gitignore so they stay out of the source browser.
 
 # Note: the parameters that receive the .iss text are marked AllowEmptyString /
 # AllowEmptyCollection. A PowerShell [Parameter(Mandatory)] on a [string[]] is
@@ -127,7 +127,14 @@ if ($Path) {
     $sRepoPath = (Resolve-Path -LiteralPath $Path).Path
     Set-Location -LiteralPath $sRepoPath
 }
-$sLogPath  = Join-Path $sRepoPath 'tagRelease.log'
+# THE LOG GOES IN THE PROJECT'S logs FOLDER, one file per release run, named as
+# the program names its runtime logs: <App>-release-yyyyMMdd-HHmmss.log. An
+# alphabetical sort is then a chronological one, and zipping logs gathers every
+# build, clean, tidy and release together. It used to be tagRelease.log at the
+# top of the project, overwritten on every run.
+$sLogDir = Join-Path $sRepoPath 'logs'
+if (-not (Test-Path -LiteralPath $sLogDir)) { New-Item -ItemType Directory -Path $sLogDir | Out-Null }
+$sLogPath = Join-Path $sLogDir ((Split-Path -Leaf $sRepoPath) + '-release-' + (Get-Date -Format 'yyyyMMdd-HHmmss') + '.log')
 
 try {
     Start-Transcript -LiteralPath $sLogPath -Force | Out-Null
@@ -273,7 +280,7 @@ $iExitCode = 0
 try {
     $sApp = Split-Path -Leaf $sRepoPath
 
-    Write-Host "=== tagRelease.ps1 (HomerDev edition, 2026-09-18) ==="
+    Write-Host "=== tagRelease.ps1 (HomerDev edition, 2026-09-21) ==="
     Write-Host "Started: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
     Write-Host "Log:     $sLogPath"
     Write-Host "Repo:    $sRepoPath"

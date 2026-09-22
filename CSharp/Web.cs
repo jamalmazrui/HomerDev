@@ -8,6 +8,8 @@
 // extraction from a page's HTML (so EdSharp no longer needs Internet Explorer to
 // gather links). It uses only the .NET base class library.
 
+// ASSEMBLIES: System.Net.Http.dll, System.Web.Extensions.dll.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
