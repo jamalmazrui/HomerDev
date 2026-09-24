@@ -153,8 +153,84 @@ public static class Say
         catch (Exception) { }
     }
 
+    // ---- NOT TWICE: the shared guard against repeated speech ----
+    //
+    // Two things have made Homer programs say the same thing twice, over and
+    // over, for years:
+    //
+    //   1. An accessible name set to words the control already carries -- its
+    //      caption, or the label beside it. That is a mistake in the app, and
+    //      no guard here can undo it; Lbc no longer does it and the app audits
+    //      check for it.
+    //   2. Direct speech that says what the screen reader is about to say
+    //      anyway: the window title as a dialog opens, the name of the control
+    //      that just took focus, or the same sentence twice in a breath.
+    //
+    // This guard handles the second. A line is dropped when it repeats the last
+    // line within a second and a half, or when it is the title of the window in
+    // front or the name of the control with focus. Both are things the reader
+    // announces on its own.
+    //
+    // sayForced is never guarded: a toggle that answers "Marked" twice running
+    // is answering a question each time, and silence there would be a bug.
+    // Anything dropped is logged, so a missing announcement can be traced.
+    public static int guardMillis = 1500;
+    private static string sLastGuarded = "";
+    private static long iLastGuardedTicks = 0;
+
+    private static string flatten(string sText)
+    {
+        if (sText == null) return "";
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+        foreach (char c in sText) if (char.IsLetterOrDigit(c)) sb.Append(char.ToLowerInvariant(c));
+        return sb.ToString();
+    }
+
+    private static string focusWords()
+    {
+        try
+        {
+            Form oForm = Form.ActiveForm;
+            if (oForm == null) return "";
+            Control oFocused = oForm.ActiveControl;
+            string sName = "";
+            if (oFocused != null)
+            {
+                sName = oFocused.AccessibleName;
+                if (string.IsNullOrEmpty(sName)) sName = oFocused.Text;
+            }
+            return (oForm.Text ?? "") + "\u0001" + (sName ?? "");
+        }
+        catch (Exception) { return ""; }
+    }
+
+    private static bool alreadySaid(string sText)
+    {
+        string sFlat = flatten(sText);
+        if (sFlat.Length == 0) return false;
+        long iNow = DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond;
+        if (sFlat == sLastGuarded && (iNow - iLastGuardedTicks) < guardMillis)
+        {
+            logSpoken(sText, " (dropped: the same line a moment ago)");
+            return true;
+        }
+        foreach (string sPart in focusWords().Split('\u0001'))
+        {
+            if (sPart.Length == 0) continue;
+            if (flatten(sPart) == sFlat)
+            {
+                logSpoken(sText, " (dropped: the screen reader says this itself)");
+                return true;
+            }
+        }
+        sLastGuarded = sFlat;
+        iLastGuardedTicks = iNow;
+        return false;
+    }
+
     public static void say(string sText)
     {
+        if (alreadySaid(sText)) return;
         // Extra-Speech gate: when off, DbDo's direct speech is
         // suppressed but the screen reader's natural focus and
         // selection announcements still occur. The flag is toggled

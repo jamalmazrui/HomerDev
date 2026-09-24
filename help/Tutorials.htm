@@ -1,0 +1,427 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Jamal Mazrui" />
+  <title>Tutorials</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Tutorials</h1>
+<p class="author">Jamal Mazrui</p>
+</header>
+<h1 id="homerdev-tutorials">HomerDev Tutorials</h1>
+<p>Short walkthroughs of the things you will actually do with the kit.
+Each one is a scenario, start to finish, with the commands you type and
+what comes back.</p>
+<p>Read <code>ReadMe.md</code> first if you have not installed the kit.
+Read <code>HomerDev.md</code> for the reference: what each class does
+and why the conventions are what they are.</p>
+<h2 id="contents">Contents</h2>
+<ul>
+<li>Audio tutorials — the spoken walkthroughs and how to make more</li>
+<li>Scenario 1: start a new app from nothing</li>
+<li>Scenario 2: add a field to a dialog</li>
+<li>Scenario 3: work out what a key already does</li>
+<li>Scenario 4: turn a one-window app into a multiple-document app</li>
+<li>Scenario 5: find out why something failed</li>
+<li>Scenario 6: write down what “done” means, then prove it</li>
+<li>Scenario 7: change a shared class without breaking four apps</li>
+<li>Scenario 8: release it</li>
+<li>Scenario 9: ask an AI for a Homer app and get one</li>
+</ul>
+<h2 id="audio-tutorials">Audio tutorials</h2>
+<p>The spoken tutorials live in <code>help</code>, beside this file, as
+<code>Tutorial_*.inix</code>. Each is a script: what the narrator says,
+the key to press, and what the screen reader answers in a different
+voice.</p>
+<h3 id="the-playlist">The playlist</h3>
+<ol type="1">
+<li><strong>Tutorial_HomerDev</strong> — the kit in twelve minutes: what
+it is, unarchiving it into <code>C:\HomerDev</code>, running
+<code>buildHomerDev</code>, building and running both fruit baskets, and
+hearing that the two behave the same. Start here.</li>
+</ol>
+<p>Two more are planned. Neither is written yet, and they are listed so
+the shape of the series is clear rather than to promise a date:</p>
+<ol start="2" type="1">
+<li><strong>Tutorial_Verify</strong> — the session that becomes the
+conference demonstration: specify a small change, generate it, reveal a
+plausible failure, show the check that catches it, fix it, and run the
+evidence again.</li>
+<li><strong>Tutorial_Mdi</strong> — the third shape, and why a window
+beats a tab for somebody using a screen reader.</li>
+</ol>
+<h3 id="making-the-audio">Making the audio</h3>
+<pre><code>cd Tools
+sayTutorial --list
+sayTutorial ..\help\Tutorial_HomerDev.inix</code></pre>
+<p>Two voices, from Windows’ own speech: the narration in one, the
+screen reader’s answers in another. Nothing is installed and nothing is
+uploaded. One <code>.wav</code> per spoken line is kept, so a single
+sentence can be re-recorded, and the parts are joined into one
+<code>.mp3</code> when ffmpeg is on the PATH.</p>
+<h3 id="writing-one">Writing one</h3>
+<p>One <code>[step]</code> per keystroke. <code>Say</code> is the
+narration, <code>Key</code> is what to press, <code>Hear</code> is what
+the screen reader answers – repeat it for several lines – and
+<code>Note</code> is for the written version only and is never
+spoken.</p>
+<p>Write every <code>Hear</code> line the way the reader actually says
+it, not the way the screen looks. “1 fruit in the basket”, not “Count:
+1”.</p>
+<h2 id="scenario-1-start-a-new-app-from-nothing">Scenario 1: start a new
+app from nothing</h2>
+<p>You want a tool that renames files from a pattern. Call it
+PatternRename.</p>
+<pre><code>cd \HomerDev
+newHomerApp PatternRename
+cd \PatternRename
+buildPatternRename
+PatternRename</code></pre>
+<p><code>newHomerApp</code> writes a working one-dialog program, the
+build script, the installer script, the GitHub bootstrap,
+<code>accept.inix</code>, <code>RepoFiles.txt</code>,
+<code>.gitignore</code>, <code>self.md</code> and
+<code>version.txt</code>. Nothing already there is overwritten. Add
+<code>--python</code> for a Python app instead.</p>
+<p>Two things need your hand, both marked CHANGE ME in the installer
+script: a fresh AppId, and the desktop hotkey.</p>
+<p>Then open <code>self.md</code> and write the first entry: what this
+is for in two sentences, which Homer components it uses, and what is
+still undecided. Two minutes now saves an hour in a month.</p>
+<h2 id="scenario-2-add-a-field-to-a-dialog">Scenario 2: add a field to a
+dialog</h2>
+<p>You want a “Prefix” box between the pattern and the folder.</p>
+<p>Find the <code>add</code> calls in your source and put one line where
+the field belongs:</p>
+<pre><code>txtPrefix = dlg.addInputBox(&quot;&amp;Prefix:&quot;, &quot;&quot;, &quot;Text to put in front of each name.&quot;);</code></pre>
+<p>That is the whole change. <strong>Add order is focus order</strong>,
+so where you put the line is where the field lands in the tab order. The
+ampersand is the whole of the access key. The tip appears in the status
+line when focus arrives and again in the Help window on F1.</p>
+<p>Then check what you just did:</p>
+<pre><code>cd \HomerDev\Tools
+checkHomerApp --path \PatternRename</code></pre>
+<p>If <code>&amp;P</code> was already taken, the keys check says so.
+That is the check earning its place: two controls claiming one letter is
+invisible when you read the code and obvious when a script counts.</p>
+<h2 id="scenario-3-work-out-what-a-key-already-does">Scenario 3: work
+out what a key already does</h2>
+<p>Before you bind Alt+Shift+R to something, find out what has it.</p>
+<p>In an MDI app, press <strong>Control+F1</strong>. That is the key
+describer: every key now says what it would do instead of doing it.
+Press the key you are wondering about, listen, and press Control+F1
+again to turn it off.</p>
+<p>Outside a running program, <code>Hotkeys.md</code> in
+<code>help</code> lists every key three ways – by key, by description,
+and by binding – and <code>KeyMap</code> reports a key claimed twice
+into the session log when the menus are built.</p>
+<p>The rules that decide what you may use are in
+<code>HomerDev.md</code>: never Alt+Control (Windows desktop shortcuts
+own it), never a key whose Windows meaning is selection or navigation,
+and prefer Alt+Shift plus a letter that means something in the command’s
+name.</p>
+<h2
+id="scenario-4-turn-a-one-window-app-into-a-multiple-document-app">Scenario
+4: turn a one-window app into a multiple-document app</h2>
+<p>Your tool now opens one file at a time and you want several.</p>
+<ol type="1">
+<li>In the build script, uncomment the KeyMap and Mdi pair. They go on
+together: <code>Mdi.cs</code> registers every command with KeyMap, and
+turning on one without the other does not compile.</li>
+<li>Make your form a <code>MdiFrame</code> subclass, declare the menus
+with <code>addMenu</code> and <code>addItem</code>, and call
+<code>finishMenus</code>.</li>
+<li>Make your window a <code>MdiChild</code> subclass. Build its
+controls through <code>child.lbc</code>, which is the same builder a
+dialog uses, and finish with <code>finishLayout</code> instead of
+<code>run</code>.</li>
+<li>Title it with <code>setTitle(subject, view)</code> and never include
+the app name – the frame already carries it, and Windows merges the
+two.</li>
+</ol>
+<p>What you get without writing it: the window picker on F4, the spoken
+window list on Shift+F4, next and previous, close and close-others, the
+alternate menu on Alt+F10, the key describer on Control+F1, about on
+Alt+F1, the guide on F1.</p>
+<p><code>Samples\FruitBasketMdiCs.cs</code> and
+<code>Samples\FruitBasketMdiPy.py</code> are the worked examples, and
+its five marked blocks are exactly the five things that change.</p>
+<h2
+id="scenario-4b-let-people-extend-your-app-without-your-help">Scenario
+4b: let people extend your app without your help</h2>
+<p>Drop a script into the scripts folder and it is in the program’s
+script list, at once, with nothing to register.</p>
+<pre><code>%LOCALAPPDATA%\PatternRename\jobs\Weekly report.cmd</code></pre>
+<p>Press Alt+Shift+S in the app, arrow or type the first letter, press
+Enter. The shipped jobs come with the program; the user’s own live in
+the per-user tree where an update cannot overwrite them, and both appear
+in one list with the user’s first.</p>
+<p>For settings, declare what may change:</p>
+<pre><code>addSetting(&quot;folder&quot;, &quot;&quot;, &quot;Where renamed files go.&quot;);</code></pre>
+<p>and the frame gives you Alt+Shift+C: a list of what is settable, one
+field for the new value, saved at once and handed back to your code
+through <code>onSettingChanged</code>. No settings file to edit by hand,
+no preferences dialog to build, and no restart.</p>
+<h2 id="scenario-5-find-out-why-something-failed">Scenario 5: find out
+why something failed</h2>
+<p>Something went wrong and the screen said one short sentence, as it
+should.</p>
+<pre><code>%LOCALAPPDATA%\PatternRename\logs</code></pre>
+<p>Open the newest file. It is named for the moment the session began,
+and it holds the version, the program path, the working directory, the
+command line, the Windows build, every setting, every external command
+with its exit code, and every error with its stack.</p>
+<p>If the failure was in a build rather than a run, the log is
+<code>buildPatternRename.log</code> beside the build script, because
+that is a developer’s file and the developer is standing in that
+folder.</p>
+<p>If the failure was in an install, the setup log is in the same
+<code>logs</code> folder, named
+<code>PatternRename-setup-&lt;date&gt;.log</code>.</p>
+<p>The rule behind all three: the console is for a person, the log is
+for debugging. Never add a print statement where a log line belongs.</p>
+<h2 id="scenario-6-write-down-what-done-means-then-prove-it">Scenario 6:
+write down what “done” means, then prove it</h2>
+<p>Before you ask an AI for anything, write
+<code>accept.inix</code>:</p>
+<pre><code>[check]
+Name   = the help text names every switch
+Run    = PatternRename.exe --help
+Expect = 0
+Wants  = --pattern
+
+[check]
+Name   = a bad switch is refused rather than ignored
+Run    = PatternRename.exe --nonsense
+Expect = 1</code></pre>
+<p>Four fields and no more. Then:</p>
+<pre><code>checkHomerApp --path \PatternRename --build</code></pre>
+<p>It builds, smoke-runs <code>--help</code>, runs every acceptance
+check, and writes <code>evidence-&lt;date&gt;.md</code> saying what was
+verified, what was not checked, and what remains uncertain.</p>
+<p>Read the third list. It names what no script can settle – whether the
+program does the right thing, what a screen reader actually says,
+whether the code is secure – so you know exactly where your own
+judgement is still required.</p>
+<h2
+id="scenario-7-change-a-shared-class-without-breaking-four-apps">Scenario
+7: change a shared class without breaking four apps</h2>
+<p>You fixed something in <code>Lbc.cs</code>. Four programs compile
+against it.</p>
+<pre><code>cd \HomerDev
+checkHomerDev</code></pre>
+<p>It audits the kit, checks that every module’s REQUIRES line is
+satisfied by every build script, deletes what previous builds wrote, and
+builds all three samples from clean. Exit code 1 if anything failed.</p>
+<p>Then build the real apps, because <code>checkHomerDev</code> does
+not: EdSharp, FileDir, DbDo and HomerScribe all carry these modules, and
+a kit change that compiles against three samples can still break one of
+them. The evidence report says so in its uncertain list, every time.</p>
+<p>Finally, write what you changed and why in <code>self.md</code>.
+<code>History.md</code> is public and is about releases;
+<code>self.md</code> is where the rejected alternative goes.</p>
+<h2 id="scenario-8-release-it">Scenario 8: release it</h2>
+<pre><code>cd \PatternRename
+checkHomerApp --build
+gitPush &quot;Add the prefix field.&quot;
+gitRelease</code></pre>
+<p><code>gitPush</code> stages everything the whitelist allows, commits
+with your message, and pushes. <code>gitRelease</code> runs
+<code>tagRelease</code>, which reads <code>version.txt</code>, tags, and
+publishes the installer as a release asset.</p>
+<p>What gets pushed is decided by <code>RepoFiles.txt</code>, not by
+habit: <code>homerTidy --gitignore</code> turns that list into a
+<code>.gitignore</code> that ignores everything else, so a file you
+dropped in the folder cannot go up by accident.</p>
+<h2 id="scenario-9-ask-an-ai-for-a-homer-app-and-get-one">Scenario 9:
+ask an AI for a Homer app and get one</h2>
+<p>Three sentences carry the kit into an AI session:</p>
+<blockquote>
+<p>This is a Windows program for screen reader users, built on the Homer
+Development Kit at <code>C:\HomerDev</code>. Use <code>Lbc</code> for
+every dialog, <code>Inix</code> for settings, <code>Log</code> for the
+session log, <code>Paths</code> for folders, and <code>Say</code> only
+for what a screen reader cannot work out for itself. Follow the nine
+decisions marked in <code>Samples\FruitBasketCs.cs</code>.</p>
+</blockquote>
+<p>Then work in this order, which is the method the whole kit is shaped
+around:</p>
+<ol type="1">
+<li><strong>Specify before you generate.</strong> Write
+<code>accept.inix</code> first. An AI asked for “a tool that does X”
+gives you its idea of done; an AI asked to satisfy five named checks
+gives you yours.</li>
+<li><strong>Build in small, recoverable steps.</strong> One change, one
+build, one <code>checkHomerApp</code>, one commit.</li>
+<li><strong>Verify without sight.</strong> The checks for what a script
+can settle, the log for what happened, your own ears for the rest.</li>
+<li><strong>Package, document and defend.</strong> The build makes the
+installer; the evidence report answers “what gives you confidence that
+it works?”</li>
+</ol>
+<p>Paste the sample into the session when the answers drift. A model
+that has read FruitBasketCs writes Homer code; a model that has not
+writes pixel coordinates and a tab order that is an accident.</p>
+</body>
+</html>

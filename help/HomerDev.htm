@@ -1,0 +1,2246 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Jamal Mazrui" />
+  <title>HomerDev</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">HomerDev</h1>
+<p class="author">Jamal Mazrui</p>
+</header>
+<h1 id="homerdev-the-homer-development-kit">HomerDev: the Homer
+Development Kit</h1>
+<p>HomerDev is the shared toolbox behind the Homer Tools programs. It
+holds the C# classes, the Python package, the build and release scripts,
+the project templates, and the writing conventions that every Homer app
+is built on.</p>
+<p>Before HomerDev, a fix to a shared class lived in whichever app
+folder it was made in, and the next app to need it got whatever copy
+happened to be found first. Now there is one copy, in
+<code>C:\HomerDev</code>, and every app compiles against it.</p>
+<p>This guide explains what is in the kit and how to use it. It is
+written for a person, and for an AI asked to write a Homer app. An AI
+can be told: “use the Homer namespace in <code>C:\HomerDev\CSharp</code>
+and follow HomerDev.md.”</p>
+<p>It is also a teaching kit, and the teaching is the subject of its own
+part below: <strong>AI-assisted coding</strong>, which is the name this
+kit uses for what other people call vibe coding. The difference is not
+the AI. It is that the person holding the keyboard knows what a good
+program is before the AI writes one.</p>
+<h1 id="getting-started">Getting started</h1>
+<h2 id="what-you-need">What you need</h2>
+<ul>
+<li>Windows 10 or later, 64-bit.</li>
+<li>The .NET Framework 4.8 Developer Pack, which supplies the reference
+assemblies the build needs.</li>
+<li>The Visual Studio Build Tools, free, for the Roslyn C#
+compiler.</li>
+<li>Python 3, for the kit’s own scripts.</li>
+<li>Inno Setup 6, if you want an installer.</li>
+<li>Git and the GitHub CLI (<code>gh</code>), if you want to
+publish.</li>
+</ul>
+<h2 id="install-the-kit">Install the kit</h2>
+<p>Unzip <code>HomerDev.zip</code> into <code>C:\HomerDev</code>. That
+is the whole install. Then run:</p>
+<pre><code>buildHomerDev</code></pre>
+<p>It converts every document to HTML with pandoc, fetching pandoc if
+the machine does not have it, and then checks the kit over: every
+component present, every text file in the right encoding, every template
+still holding its placeholder, and no empty files. It reports problems
+plainly and writes the detail to <code>buildHomerDev.log</code>.</p>
+<p>If you keep the kit somewhere else, set the <code>HOMERDEV</code>
+environment variable to that folder. Every build script looks there
+first.</p>
+<h2 id="start-a-new-app">Start a new app</h2>
+<pre><code>newHomerApp JobDo</code></pre>
+<p>That writes <code>C:\JobDo</code> holding a starter
+<code>JobDo.cs</code>, <code>buildJobDo.cmd</code>,
+<code>JobDo_setup.iss</code>, <code>createJobDoRepo.cmd</code> and
+<code>.ps1</code>, the local AI install scripts,
+<code>version.txt</code>, and <code>.gitignore</code>. Nothing already
+in the folder is touched. Two things need your hand afterwards, and both
+are marked CHANGE ME in the installer script: a fresh AppId, and the
+desktop hotkey.</p>
+<p>Then:</p>
+<pre><code>cd \JobDo
+buildJobDo</code></pre>
+<h1 id="what-is-in-the-kit">What is in the kit</h1>
+<h2 id="csharp">CSharp</h2>
+<p>Twelve modules, all in the <code>Homer</code> namespace. Add
+<code>using Homer;</code> and compile the ones you use straight from
+<code>C:\HomerDev\CSharp</code>; the build template already does.</p>
+<ul>
+<li><strong>Mdi.cs</strong> – the frame and child of a multiple-document
+app.</li>
+<li><strong>Lbc.cs</strong> – Layout By Code. Dialogs built from
+labelled standard controls. The biggest and most used module. Its own
+section is below.</li>
+<li><strong>Log.cs</strong> – the session log every Homer program
+writes.</li>
+<li><strong>Say.cs</strong> – direct speech to whichever screen reader
+is running.</li>
+<li><strong>Inix.cs</strong> – the <code>.inix</code> settings format,
+plus table conversion between <code>.inix</code>, <code>.csv</code>,
+<code>.tsv</code>, Markdown and <code>.xlsx</code>.</li>
+<li><strong>KeyName.cs</strong> – one spelling for every key, and
+converters to what each API wants.</li>
+<li><strong>KeyMap.cs</strong> – one table of commands, summaries, and
+their keys, which the menus, the key describer and the hotkey list all
+read from.</li>
+<li><strong>Util.cs</strong> – string and file helpers, ported from the
+older HomerLib so the names match.</li>
+<li><strong>Web.cs</strong> – a small dependency-free web client: fetch
+a page, pull its links, download a file with a sensible name.</li>
+<li><strong>inixVert.cs</strong> – a command-line wrapper over the table
+converter in Inix.cs.</li>
+<li><strong>PdfRead.cs</strong> – reading a PDF with position and font
+size, so headings can be worked out. Optional: it needs the PdfPig
+package, which the app’s own build script fetches.</li>
+</ul>
+<h2 id="python">Python</h2>
+<p><code>homer\</code> is the Python side of the same toolbox:
+<code>inix</code>, <code>lbc</code>, <code>log</code>, <code>say</code>,
+<code>util</code>, <code>web</code> and <code>version</code>. It was
+written for NVDA add-ons and follows three rules that make it portable.
+Nothing imports NVDA at the top of a module, so every module can be
+imported and tested in plain Python. Nothing depends on anything outside
+the standard library except wx, which NVDA already has. Nothing knows
+the name of the program using it.</p>
+<p>Copy the <code>homer</code> folder into an add-on, or put
+<code>C:\HomerDev\Python</code> on the path.</p>
+<h2 id="templates">Templates</h2>
+<p>The files a new app needs, with <code>_APP_</code> where its name
+goes. <code>newHomerApp</code> fills them in.</p>
+<h2 id="tools">Tools</h2>
+<p>Scripts that need no editing at all. They work out the app name from
+the folder they are run in.</p>
+<ul>
+<li><strong>tagRelease</strong> – tag, push, and publish a GitHub
+release. It acts on the current directory, or on
+<code>-Path &lt;folder&gt;</code>, so one copy in <code>C:\bin</code> on
+the PATH serves every project. An app with an installer is released from
+the version stamped into <code>&lt;App&gt;_setup.exe</code>, with the
+installer attached; a project that ships source and has no
+<code>&lt;App&gt;_setup.iss</code> is released from
+<code>version.txt</code>, with no asset.</li>
+<li><strong>homerTidy</strong> – tidy the folder and the repository in
+one pass. It replaces cleanDir and tidyRepo, which asked the same
+question of two places and could disagree about the answer.</li>
+</ul>
+<p>Copy the pair you want into the app folder and run it there.</p>
+<h2 id="samples">Samples</h2>
+<p>Two fruit basket programs, the same design in two languages, each
+with the build script that produces it:</p>
+<ul>
+<li><code>Samples\</code> – <code>FruitBasketCs.cs</code> and
+<code>buildFruitBasketCs.cmd</code>, which produce
+<code>FruitBasketCs.exe</code> on the C# classes.</li>
+<li><code>Samples\</code> – <code>FruitBasketPy.py</code> and
+<code>buildFruitBasketPy.cmd</code>, which produce
+<code>FruitBasketPy.exe</code> on the Python package, with Python and
+every dependency inside the one file.</li>
+</ul>
+<p>The two are written to be opened side by side: twelve blocks with the
+same numbers and titles in each, and the same function names
+throughout.</p>
+<p>Both are read alongside the AI-assisted coding part below, which is
+what they are for.</p>
+<h2 id="style">Style</h2>
+<p>The Camel Type documents: the short rules, the long reference, and
+the JAWS scripting version.</p>
+<h1 id="camel-type">Camel Type</h1>
+<p>Camel Type is the house coding style. It exists for one reason: code
+is read by listening, and a name that carries its own type saves a trip
+back to the declaration.</p>
+<ul>
+<li><strong>A prefix says the type.</strong> <code>s</code> string,
+<code>i</code> integer, <code>n</code> real, <code>b</code> boolean,
+<code>a</code> array, <code>l</code> list, <code>d</code> dictionary,
+<code>dt</code> date and time, <code>f</code> file, <code>h</code>
+window handle, <code>bin</code> binary buffer, <code>o</code> any other
+object, <code>v</code> a variant. For other classes, use the class name
+in lower camel case, or the usual short form: <code>pd</code> for
+Pandas, <code>browser</code> for a browser object.</li>
+<li><strong>Lower camel case for names you define</strong> – functions,
+methods, variables, properties. Avoid upper camel case and snake case
+except where the language or an API demands them.</li>
+<li><strong>A constant is a variable with <code>c_</code> in
+front</strong>: <code>c_sFormat</code>, <code>c_iMaximum</code>.</li>
+<li><strong>Functions, not subprocedures.</strong> If a routine is
+needed, make it a function, even when the result is ignored.</li>
+<li><strong>A simple if-then goes on one line</strong>, condition and
+consequence together.</li>
+<li><strong>Iterate the collection, not an index</strong>, wherever
+for-each will do.</li>
+<li><strong>Declarations go at the top</strong>, one line per type, each
+line’s names in alphabetical order, and the lines themselves in
+alphabetical order by type.</li>
+<li><strong>Double quotes</strong> for strings in any language that
+offers a choice.</li>
+<li><strong>Database identifiers are lower_snake_case</strong>, which is
+the one place the rule turns over, because that is what SQL reads
+well.</li>
+</ul>
+<p><code>help\CamelType_CSharp.md</code> has the rules with examples;
+the Reference file has the long form; the JAWS Script version covers
+that language’s differences.</p>
+<h1 id="the-.inix-format">The .inix format</h1>
+<p><code>.inix</code> is the settings and small-table format every Homer
+app uses. It is classic <code>.ini</code> with four additions, and any
+plain <code>.ini</code> file is already valid <code>.inix</code>.</p>
+<h2 id="the-basics">The basics</h2>
+<pre><code>; a comment. # also starts one.
+[Section]
+Name = value
+Another = value</code></pre>
+<p>Section and key names are matched without regard to case. A file may
+start with keys before any section header; those belong to an implicit
+<code>[Global]</code> section. Reading a file and writing it back
+preserves the order of everything, so a program editing one setting does
+not reshuffle the file.</p>
+<h2 id="multi-line-values-are-verbatim">Multi-line values are
+verbatim</h2>
+<p>A value may be fenced, and what is inside is taken exactly as it
+stands:</p>
+<pre><code>Message = `
+Dear friend,
+
+    This whole block, including the blank line and the indent, is the value.
+`</code></pre>
+<p>The fence is a line holding only a backtick. When the value itself
+contains a backtick, use a triple-quote fence instead. Nothing is
+trimmed and nothing is transformed on the way in or out. If a program
+wants the value trimmed, that is the program’s decision after reading
+it, not the format’s.</p>
+<h2 id="arrays">Arrays</h2>
+<p>A key may hold several values. A few short items with no spaces or
+commas can sit on one line:</p>
+<pre><code>SelectFields = last_name, first_name, enterprise</code></pre>
+<p>Anything longer goes one item per line inside a fence, most recent
+first. Both shapes read back as the same ordered list, which is how the
+recent-file and recent-search lists in Homer apps are stored.</p>
+<h2 id="as-a-table">As a table</h2>
+<p>This is the part people are surprised by. A table in
+<code>.inix</code> is one section per record:</p>
+<pre><code>[Record001]
+title = A Walk in the Woods
+author = Bryson, Bill
+read = 2026-03-14
+
+[Record002]
+title = The Sea Around Us
+author = Carson, Rachel</code></pre>
+<p>A spreadsheet row makes you count columns to know which value you are
+hearing. A record like this puts each field on its own line with its own
+name. <code>Inix.cs</code> converts between <code>.inix</code>,
+<code>.csv</code>, <code>.tsv</code>, Markdown pipe tables and
+<code>.xlsx</code> in any direction, with <code>.inix</code> as the home
+format. The <code>.xlsx</code> side is plain OpenXML over the zip
+support in .NET, so no Office and no database driver is involved.</p>
+<p><code>inixVert.cs</code> is the command-line form of the same
+thing:</p>
+<pre><code>inixVert data.xlsx data.inix
+inixVert data.inix data.md</code></pre>
+<h2 id="in-code">In code</h2>
+<pre><code>using Homer;
+
+string sVoice = InixCodec.readValue(sPath, &quot;Speech&quot;, &quot;Voice&quot;, &quot;Default&quot;);
+InixCodec.writeValue(sPath, &quot;Speech&quot;, &quot;Voice&quot;, &quot;Zira&quot;);
+
+List&lt;InixCodec.Section&gt; lsSections = InixCodec.read(sPath);
+InixCodec.writeAsConfig(sPath, lsSections);
+
+InixTable.convertFile(&quot;report.csv&quot;, &quot;report.inix&quot;);</code></pre>
+<p><code>readValue</code> returns the default for a missing file, a
+missing section, a missing key, and a key with no value, because a
+caller asking for a setting wants a usable answer rather than four ways
+of saying no.</p>
+<p>The <code>.inix</code> extension belongs to files a Homer tool
+creates. Reading a <code>.ini</code> file somebody else wrote is
+fine.</p>
+<h1 id="direct-speech-across-screen-readers">Direct speech across screen
+readers</h1>
+<p>A Windows program cannot count on a screen reader noticing
+everything. Focus changes and window titles it will announce by itself.
+A result, a count, a status, a thing that happened in the background –
+those it cannot know about.</p>
+<p><code>Say.cs</code> is the one way a Homer app says such a thing, and
+it works the same whichever reader is running.</p>
+<pre><code>using Homer;
+
+Say.attach(frm);              // once, at startup, on the main form
+Say.say(&quot;12 rows marked&quot;);    // spoken if speech is interrupted anyway
+Say.sayForced(&quot;Backup finished&quot;);   // spoken even mid-sentence
+Say.sayParts(&quot;Row 4&quot;, &quot;Title&quot;, &quot;The Sea Around Us&quot;);</code></pre>
+<h2 id="how-it-reaches-the-reader">How it reaches the reader</h2>
+<p><code>sayForced</code> tries each route in turn and stops at the
+first that works.</p>
+<ol type="1">
+<li><strong>JAWS</strong>, through its COM interface. This is the most
+reliable route when JAWS is running, and it respects the user’s own
+speech settings.</li>
+<li><strong>NVDA</strong>, through
+<code>nvdaControllerClient.dll</code>, the controller client NV Access
+publishes for exactly this.</li>
+<li><strong>A UI Automation notification event</strong>, raised from a
+hidden provider control. This is what reaches Narrator, and it also
+reaches any other assistive technology that listens for
+notifications.</li>
+<li><strong>SAPI</strong>, the Windows voices, and only if the app turns
+it on with <code>Say.bUseSapiAsBackup</code>. It is off by default,
+because a second voice talking over the user’s screen reader is worse
+than silence.</li>
+</ol>
+<p><code>Say.speechDiagnostic()</code> reports which routes are
+available on this machine and <code>Say.lastSpeechPath()</code> reports
+which one the last message actually took. Both belong in an app’s Help
+or About, so a user can say what happened.</p>
+<h2 id="what-to-speak-and-what-not-to">What to speak, and what not
+to</h2>
+<ul>
+<li><strong>Do not repeat what the reader already says.</strong> It
+announces a dialog’s title when the dialog opens and a control’s name
+when focus lands on it. An app that says these too makes the user hear
+everything twice.</li>
+<li><strong>Do not set a control’s accessible-name property to its own
+caption or to the label before it.</strong> Same fault, same cause. That
+property is for a control with no visible text.</li>
+<li><strong>Report only what happened this session.</strong> A summary
+that lists what the program can do, rather than what it just did,
+teaches a user to ignore summaries.</li>
+<li><strong>Match the noun to the count.</strong> “1 file”, not “1
+files”. A count of zero is a real answer: “0 matches” is information,
+not an error.</li>
+</ul>
+<h1 id="lbc-building-a-dialog">Lbc: building a dialog</h1>
+<p>Lbc stands for Layout By Code. A Homer dialog is never drawn in a
+designer. It is assembled in code out of ordinary Windows controls, each
+created with its label, its accessible name and its tab position already
+correct.</p>
+<p>The reason is simple. A designer places controls by pixel, and the
+tab order ends up being whatever the mouse happened to do. Lbc has one
+rule instead:</p>
+<blockquote>
+<p><strong>Add order is focus order.</strong></p>
+</blockquote>
+<p>The order the <code>add</code> calls appear in is the order the user
+tabs through, which is the order the dialog is read in, and the layout
+follows from that rather than the other way round. When the order is
+wrong, the fix belongs in Lbc or in the order of the calls, never in a
+pile of <code>TabIndex</code> assignments in the app.</p>
+<h2 id="the-shape-of-a-dialog">The shape of a dialog</h2>
+<pre><code>using (LbcDialog dlg = new LbcDialog(&quot;Find&quot;, frm))
+{
+    TextBox tbFind = dlg.addInputBox(&quot;&amp;Find what:&quot;, sLast,
+        &quot;The text to look for. The last ten searches are remembered.&quot;);
+    CheckBox cbCase = dlg.addCheckBox(&quot;Match &amp;case&quot;, bCase,
+        &quot;Off means a and A are the same.&quot;);
+    if (!dlg.runOkCancel()) return false;
+    sFind = tbFind.Text;
+    bCase = cbCase.Checked;
+}</code></pre>
+<p>That is the whole pattern. The dialog is disposable, every
+<code>add</code> returns the real control so you can read it afterwards,
+and <code>runOkCancel</code> returns true when the user accepted.</p>
+<h2 id="what-you-can-add">What you can add</h2>
+<p>Every one of these takes a label with an <code>&amp;</code> before
+its access-key letter, and most take a tip that appears in the dialog’s
+status bar when focus arrives and in the Help box.</p>
+<ul>
+<li><code>addLabel</code> – a line of text.</li>
+<li><code>addInputBox</code>, <code>addTextLine</code>,
+<code>addInlineInputBox</code> – a single-line box. The inline form puts
+the label and box on one row.</li>
+<li><code>addMemoBox</code>, <code>addTextMemo</code>,
+<code>addMemo</code> – a multi-line box. A memo eats a bare Enter, which
+is why Control+Enter also accepts the dialog.</li>
+<li><code>addCheckBox</code> – a true or false answer.</li>
+<li><code>addRadioButton</code> – one of several.</li>
+<li><code>addListBox</code>, <code>addPickBox</code> – a list to choose
+one item from.</li>
+<li><code>addCheckListBox</code> – a list to tick several items in.</li>
+<li><code>addComboBox</code>, <code>addComboPickBox</code>,
+<code>addComboEditBox</code>, <code>addComboHistoryBox</code> – a combo
+box; the history form is prefilled with recent answers.</li>
+<li><code>addNumericUpDown</code> – a number with arrows.</li>
+<li><code>addButton</code> – a push button on the current band.</li>
+<li><code>addSeparator</code> – a divider, which also closes an open
+band.</li>
+</ul>
+<h2 id="bands">Bands</h2>
+<p>By default each control sits on its own row. A band puts several on
+one row, which is what you want for a field and the button that fills it
+in:</p>
+<pre><code>dlg.addBand();
+TextBox tbSource = dlg.addInputBox(&quot;&amp;Source:&quot;, sSource, &quot;The file to work on.&quot;);
+Button btnBrowse = dlg.addButton(&quot;&amp;Browse source...&quot;, &quot;Pick it from a dialog.&quot;);
+dlg.endBand();</code></pre>
+<p>A band changes only the arrangement. The tab order is still the order
+of the calls.</p>
+<h2 id="showing-it">Showing it</h2>
+<ul>
+<li><code>runOkCancel()</code> – OK and Cancel; returns true on OK.</li>
+<li><code>runWithButtons(new string[] { "Default settings", "OK", "Cancel" })</code>
+– returns the label of the button pressed, or an empty string if the
+user pressed Escape or closed the window.</li>
+<li>A <strong>Help</strong> button is added for you and placed
+rightmost, per Windows layout. It lists every field with its tip, then
+the universal dialog keys. F1 does the same.</li>
+<li><strong>Enter</strong> presses the button that means accept,
+wherever it sits in the row, and <strong>Control+Enter</strong> does it
+from any control including a memo. <strong>Escape</strong> cancels.</li>
+<li>OK and Cancel deliberately get no access key: their keys are Enter
+and Escape, and an unnecessary Alt+O would take a letter another button
+may want.</li>
+</ul>
+<h2 id="other-pieces">Other pieces</h2>
+<ul>
+<li><code>LbcTextBox</code> is the text box the boxes above are made of.
+It carries the convenience keys: copy or cut the current line with no
+selection, mark a selection in two keystrokes with F8 and Shift+F8, copy
+all with Control+F8, read all with Alt+F8, delete the line with
+Control+D, and open what is under the cursor with Shift+F5.</li>
+<li><code>HelpDialog.show(owner, sTitle, sText)</code> is the plain
+read-only box: help text, results, a query answer. The user arrows
+through it line by line.</li>
+<li><code>HelpDialog.showRecordView</code> is the same box with record
+navigation, for stepping through one record at a time.</li>
+<li><code>LbcInixForm</code> builds a whole dialog from an
+<code>.inix</code> file describing the fields, and writes the answers
+back to one. It is how a form can be defined as data instead of
+code.</li>
+<li><code>setStatusText</code> writes to the dialog’s status line;
+<code>setInitialFocus</code> says which control opens with the
+focus.</li>
+</ul>
+<h2 id="opening-focus">Opening focus</h2>
+<p>The field that opens with the focus has its value selected, so typing
+or pasting replaces it and Tab leaves it alone. A
+<strong>multi-line</strong> box is the exception: its caret opens on the
+first line, because its value is a document rather than a field.</p>
+<h1 id="the-launchpad-app">The launchpad app</h1>
+<p>Most Homer tools are one dialog with one job: 2htm, extCheck,
+urlCheck, bookFido, urlFido, HomerScribe. They share a shape, and a user
+who learns one has learnt them all. <code>Templates\_APP_.cs</code> is
+that shape, ready to fill in.</p>
+<h2 id="the-controls-in-order">The controls, in order</h2>
+<p>The order below is the order they are added, which is the order they
+are tabbed through and read.</p>
+<ol type="1">
+<li><strong>Source</strong> – a text box named <code>&amp;Source</code>.
+What to work on.</li>
+<li><strong>Browse source</strong> – a button named
+<code>&amp;Browse source...</code> on the same band, opening a standard
+Open dialog.</li>
+<li><strong>Options</strong> – whatever check boxes this app needs, each
+with its own access key and tip.</li>
+<li><strong>Output</strong> – a text box named <code>&amp;Output</code>.
+Where the result goes. Blank means beside the source.</li>
+<li><strong>Choose output</strong> – a button named
+<code>&amp;Choose output...</code> on the same band, opening a standard
+folder dialog.</li>
+<li><strong>Use configuration</strong> – a check box named
+<code>&amp;Use configuration</code>. Take the saved answers next time
+without asking.</li>
+<li><strong>View output</strong> – a check box named
+<code>&amp;View output</code>. Open the result when the work
+finishes.</li>
+<li><strong>Default settings</strong> – a button that puts every field
+back as it started.</li>
+<li><strong>OK</strong> – starts the work. Enter and Control+Enter do
+the same.</li>
+<li><strong>Cancel</strong> – closes without doing anything. Escape does
+the same.</li>
+<li><strong>Help</strong> – shows the help box. F1 does the same. Lbc
+adds it and places it rightmost.</li>
+</ol>
+<h2 id="the-two-boxes">The two boxes</h2>
+<ul>
+<li>The <strong>help box</strong> says what the program does, what each
+field means, what each button does, and the command line that matches.
+It is the same text the <code>--help</code> switch prints.</li>
+<li>The <strong>results box</strong> says what this run actually did,
+one short line per fact. Only actions actually taken are listed. Counts
+match their nouns.</li>
+</ul>
+<h2 id="the-command-line-does-everything-the-dialog-does">The command
+line does everything the dialog does</h2>
+<p>Each field has a switch, and the switch is named after the field:</p>
+<pre><code>&lt;App&gt; --source &lt;path&gt; [--output &lt;path&gt;] [--config] [--view]
+&lt;App&gt; --defaults
+&lt;App&gt; --help</code></pre>
+<p>With any argument the program runs without opening a window, so it
+can be driven from a batch file, a scheduled task, or another program. A
+bare path with no switch is taken as the source, because that is what
+dropping a file on the program means.</p>
+<h2 id="settings-are-saved-as-they-are-answered">Settings are saved as
+they are answered</h2>
+<p>Every answer is written to <code>&lt;App&gt;.inix</code> the moment
+it is given, not at exit, so a crash or a kill loses nothing. The file
+sits beside the executable when that folder is writable, which is the
+portable case, and under <code>%LOCALAPPDATA%\&lt;App&gt;</code>
+otherwise, which is the installed case.</p>
+<h1 id="keys-and-key-names">Keys and key names</h1>
+<h2 id="one-spelling">One spelling</h2>
+<p><code>KeyName.cs</code> holds the one spelling for every key, taken
+from how Freedom Scientific writes key names in the JAWS key map files,
+with three Homer rules on top:</p>
+<ul>
+<li><strong>Modifiers in alphabetical order</strong>: Alt, Control,
+Shift, Windows. So <code>Alt+Control+Shift+F</code> and never
+<code>Shift+Control+Alt+F</code>.</li>
+<li><strong>“Control” spelled out</strong>, never “Ctrl”.</li>
+<li><strong>The screen reader key is “JAWS” or “NVDA”</strong>, not
+“JAWSKey”. On both readers it is usually Insert or CapsLock.</li>
+</ul>
+<p>Then convert to whatever an API wants, rather than writing that table
+again:</p>
+<pre><code>KeyName.toJawsKeyMap(&quot;Alt+Shift+H&quot;)    // for a .jkm file
+KeyName.toNvdaGesture(&quot;Alt+Shift+H&quot;)   // for an NVDA gesture
+KeyName.toWinFormsText(&quot;Alt+Shift+H&quot;)  // for a menu item&#39;s shortcut text
+KeyName.toWinFormsKeys(&quot;Alt+Shift+H&quot;)  // the .NET Keys value
+KeyName.toWx(&quot;Alt+Shift+H&quot;)            // for wxPython
+KeyName.toInnoHotKey(&quot;Alt+Shift+H&quot;)    // for an installer shortcut
+KeyName.toSpoken(&quot;Alt+Shift+H&quot;)        // for speech and documentation</code></pre>
+<p><code>KeyName.same()</code> compares two spellings of the same key,
+and <code>KeyName.parse()</code> normalizes one.</p>
+<h2 id="choosing-a-key">Choosing a key</h2>
+<ul>
+<li><strong>Give it a mnemonic</strong>: the first letter of a word in
+the command’s name.</li>
+<li><strong>Do not take a key Windows has already given a
+meaning</strong>, especially one about selection or navigation.</li>
+<li><strong>Never use Alt+Control combinations.</strong> That space
+belongs to Windows desktop shortcuts, function keys included. A desktop
+shortcut’s own hotkey is the one sanctioned use of it.</li>
+<li><strong>Prefer Alt+Shift plus a letter</strong> when dropping the
+screen reader modifier. Chromium fires a web page’s access key on
+Alt+letter, and does not on Alt+Shift+letter.</li>
+<li><strong>Aim for one key that works on both JAWS and NVDA.</strong>
+Perfect agreement is not realistic; keeping the differences few is.</li>
+</ul>
+<h2 id="keymap">KeyMap</h2>
+<p><code>KeyMap.cs</code> is the one table associating a context, a
+command name, a summary, a longer description and a key. The menus, the
+alternate menu, the key describer and the hotkey document all read from
+it, so a command is described once and every surface agrees.</p>
+<pre><code>KeyMap.register(&quot;Find Record&quot;, Keys.Control | Keys.F, mnuFind, &quot;Grid&quot;);
+KeyMap.setSummary(&quot;Find Record&quot;, &quot;Search every column for text.&quot;);</code></pre>
+<p><code>KeyMap.lsConflicts</code> lists any key claimed twice, which is
+worth showing in a developer command rather than discovering in use.</p>
+<h1 id="every-file-in-the-kit-and-why-it-is-here">Every file in the kit,
+and why it is here</h1>
+<p>One line each, so a file you have not seen before can be looked up
+rather than guessed at. Folders are in the order you meet them.</p>
+<h2 id="top-level">Top level</h2>
+<ul>
+<li><strong>ReadMe.md, ReadMe.htm</strong> – the introduction and the
+quick start; stays at the root because GitHub surfaces it and because it
+is the first thing anybody opens</li>
+<li><strong>License.md, License.htm</strong> – the MIT license, naming
+the kit and its author</li>
+<li><strong>buildHomerDev.cmd, buildHomerDev.py</strong> – converts
+every document to HTML with pandoc, fetching pandoc if the machine has
+none, then audits the kit: components present, encodings right, no empty
+files</li>
+<li><strong>releaseHomerDev.cmd</strong> – the whole release as one
+command: tools, checks, push, tag</li>
+<li><strong>checkHomerDev.cmd, checkHomerDev.py</strong> – proves the
+kit still builds by building with it: audit, dependency rule, clean, all
+three samples, evidence report</li>
+<li><strong>newHomerApp.cmd, newHomerApp.py</strong> – writes a new app
+folder from the templates, C# or Python, overwriting nothing</li>
+<li><strong><em>APP</em>.cmd</strong> – runs <code>exec\_APP_.exe</code>
+from the top of the project, so typing the program’s name there still
+runs the fresh build</li>
+<li><strong>LocalFiles.txt</strong> – what belongs on this disk but
+never in the repository; homerTidy keeps it and writes each line into
+.gitignore as never pushed</li>
+<li><strong>RepoFiles.txt</strong> – the whitelist: what the repository
+carries, and the source homerTidy generates .gitignore from</li>
+<li><strong>version.txt</strong> – the kit’s version, one line, no byte
+order mark, read by every script</li>
+<li><strong>.gitignore</strong> – generated from RepoFiles.txt; ignores
+everything and puts back only what is named</li>
+</ul>
+<h2 id="csharp-the-shared-c-classes">CSharp – the shared C# classes</h2>
+<ul>
+<li><strong>Inix.cs</strong> – the .inix settings format: read and write
+one value, or whole tables, with multiline values kept verbatim</li>
+<li><strong>KeyMap.cs</strong> – the command-to-key registry behind the
+alternate menu, the key describer and the hotkey document</li>
+<li><strong>KeyName.cs</strong> – key names as JAWS writes them, and the
+conversions to Windows, .NET, wxPython and Inno forms</li>
+<li><strong>Lbc.cs</strong> – Layout By Code: every dialog, every
+control, add order as focus order, the status line, the list search, the
+line chords</li>
+<li><strong>Log.cs</strong> – the session log: one file per run, named
+for when it began, with the environment and every error</li>
+<li><strong>Mdi.cs</strong> – the frame and child of a multiple-document
+app, with the window, job, settings and help commands built in</li>
+<li><strong>Paths.cs</strong> – the folder layout: the two trees, the
+nine folders, and the shipped-default-then-user-copy pattern</li>
+<li><strong>PdfRead.cs</strong> – reading text out of a PDF, including a
+tagged one</li>
+<li><strong>Say.cs</strong> – speech that reaches JAWS, NVDA and
+Narrator without the program knowing which is running</li>
+<li><strong>Util.cs</strong> – the small shared helpers, including the
+plural that matches a count to its noun</li>
+<li><strong>Web.cs</strong> – fetching a page, a file, or an API
+answer</li>
+<li><strong>inixVert.cs</strong> – converting .inix to and from other
+tabular formats</li>
+</ul>
+<h2 id="homer-the-same-toolbox-in-python">homer – the same toolbox in
+Python</h2>
+<ul>
+<li><strong><strong>init</strong>.py</strong> – the package</li>
+<li><strong>inix.py, lbc.py, log.py, mdi.py, paths.py, say.py, util.py,
+web.py</strong> – the Python counterparts of Inix, Lbc, Log, Paths, Say,
+Util and Web, with the same names and the same behaviour</li>
+<li><strong>version.py</strong> – written by the build; not a source
+file</li>
+</ul>
+<h2 id="samples-1">Samples</h2>
+<ul>
+<li><strong>FruitBasketCs.cs</strong> – the single-dialog shape, with
+twelve marked blocks and the nine decisions</li>
+<li><strong>FruitBasketMdiCs.cs, FruitBasketMdiPy.py</strong> – the
+multiple-document shape in both languages, marking only what changes
+when there are several windows</li>
+<li><strong>FruitBasketPy.py</strong> – the same program as
+FruitBasketCs, in Python, block for block</li>
+<li><strong>accept.inix</strong> – what done means for the samples, run
+by checkHomerApp</li>
+<li><strong>uiTest.inix</strong> – what the samples must do when driven,
+run by uiCheck</li>
+<li><strong>buildFruitBasketCs.cmd, buildFruitBasketMdiCs.cmd,
+buildFruitBasketMdiPy.cmd, buildFruitBasketPy.cmd</strong> – one build
+script each; <code>buildHomerDev</code> runs all four</li>
+</ul>
+<h2 id="templates-what-newhomerapp-copies">Templates – what newHomerApp
+copies</h2>
+<ul>
+<li><strong><em>APP</em>.cs</strong> – a working one-dialog program to
+start from</li>
+<li>**_APP__setup.iss** – the Inno installer: the structured tree, the
+component checkboxes, the setup log kept with the program’s own</li>
+<li><strong>accept.inix</strong> – the acceptance-criteria starter</li>
+<li><strong>build_APP_.cmd, build_APP_Py.cmd</strong> – the C# and
+Python build scripts, with the component switches</li>
+<li><strong>create_APP_Repo.cmd, create_APP_Repo.ps1</strong> – makes
+the GitHub repository and pushes the first commit</li>
+<li><strong>gitignore.txt</strong> – the whitelist starter, replaced by
+homerTidy</li>
+<li><strong>homerFinish.cmd</strong> – shows what the install did, then
+starts the program</li>
+<li><strong>installModels.cmd, installOllama.cmd</strong> – local AI,
+for the apps that need it</li>
+<li><strong>installScreenReaderSupport.cmd</strong> – unpacks the JAWS
+scripts and hands the add-on to NVDA</li>
+<li><strong>self.md</strong> – the private notebook a new app starts
+with</li>
+<li><strong>version.txt</strong> – 1.0.0, with no byte order mark</li>
+</ul>
+<h2 id="tools-scripts-that-act-on-a-project">Tools – scripts that act on
+a project</h2>
+<ul>
+<li><strong>checkHomerApp.cmd, checkHomerApp.py</strong> – gathers
+evidence about an app: encodings, names, keys, build, smoke run,
+acceptance criteria, and a report saying what it did not check</li>
+<li><strong>gitPush.cmd</strong> – stage, commit and push what the
+whitelist allows</li>
+<li><strong>gitRelease.cmd</strong> – check first, then tag and
+publish</li>
+<li><strong>uiCheck.cmd, uiCheck.py</strong> – starts a program, sends
+the keys, and reads the accessibility tree back; driven by uiTest.inix
+beside the program</li>
+<li><strong>installTools.cmd</strong> – copies the tools to a folder on
+the PATH, so one current copy serves every project</li>
+<li><strong>homerTidy.cmd, homerTidy.py</strong> – tidies folder and
+repository together, and generates the whitelist .gitignore</li>
+<li><strong>buildTutorials.cmd, buildTutorials.ps1</strong> – fetches
+the voices, speaks every tutorial script, joins them into Tutorials.mkv
+with a chapter each, and writes the playlist and the feed</li>
+<li><strong>makeTutorials.cmd, makeTutorials.py</strong> – writes the
+tutorial scripts into Tutorials.md and the feed, speaking nothing</li>
+<li><strong>tagRelease.cmd, tagRelease.ps1</strong> – reads version.txt,
+tags, and publishes the installer as a release asset</li>
+</ul>
+<h2 id="help-the-documents">help – the documents</h2>
+<ul>
+<li><strong>HomerDev.md</strong> – this guide: the classes, the
+conventions, the three shapes, the layout, the evidence</li>
+<li><strong>Announce.md</strong> – three ready-to-post announcements, at
+measured lengths</li>
+<li><strong>FAQ.md</strong> – the questions people ask, including why
+Windows only</li>
+<li><strong>Developer.md</strong> – how to rebuild or change the
+kit</li>
+<li><strong>History.md</strong> – what changed in each version, and
+why</li>
+<li><strong>Hotkeys.md</strong> – every key three ways: by key, by
+description, by binding</li>
+<li><strong>Tutorials.md</strong> – walkthroughs of common scenarios,
+and the audio tutorial playlist</li>
+<li><strong>Tutorial_HomerDev.inix</strong> – the spoken walkthrough,
+narration and screen reader in two voices</li>
+<li><strong>CamelType_CSharp.md, CamelType_CSharp_Reference.md,
+CamelType_JAWSScript.md</strong> – the coding style</li>
+<li><strong>self.md</strong> – the private notebook: decisions, findings
+and open items. Never pushed # Three kinds of Homer app</li>
+</ul>
+<p>Every Homer program is one of three shapes. They share far more than
+they differ, and what they share is the whole of this kit: the same
+classes, the same folder layout, the same session log, the same settings
+format, the same key conventions, the same document set, the same build,
+installer and release scripts, and the same evidence checks. What
+differs is only how the program meets the person.</p>
+<h2 id="one-a-single-tool-with-a-command-line-and-a-dialog">One: a
+single tool, with a command line and a dialog</h2>
+<p>One independent 64-bit executable that does one job. It answers
+<code>--help</code>, it can be scripted from a batch file or a scheduled
+task, and with no arguments – or with <code>--gui</code> – it opens one
+Lbc dialog instead.</p>
+<p>Both modes take the same settings and write the same log, so a person
+can learn the dialog and then automate what they learned.
+<code>FruitBasketCs.cs</code> and <code>FruitBasketPy.py</code> are this
+shape.</p>
+<p>The flags are the same in every Homer tool of this kind:</p>
+<ul>
+<li><code>--help</code> – what it does and every switch, to standard
+output, exit code 0</li>
+<li><code>--gui</code> – open the dialog even when arguments were
+given</li>
+<li><code>--version</code> – the version and nothing else</li>
+<li><code>--log</code> – say where this session’s log is</li>
+<li>an unknown switch is refused with exit code 1 rather than
+ignored</li>
+</ul>
+<h2 id="two-a-desktop-program-that-could-not-be-a-command-line">Two: a
+desktop program that could not be a command line</h2>
+<p>The same single-window shape, but graphical only, because of what it
+carries: a local AI model, a browser engine, a media pipeline, a speech
+stack. HomerScribe is this. The dependencies decide the shape, not the
+interface.</p>
+<p>It should still answer <code>--help</code> and still take arguments
+where that is meaningful, but it does not promise that every feature
+works without the desktop. Say so in its guide rather than leaving
+somebody to discover it.</p>
+<h2 id="three-a-multiple-document-program">Three: a multiple-document
+program</h2>
+<p>One frame holding many windows, each showing one thing: a file in
+EdSharp, a folder in FileDir, a table in DbDo, a basket in
+<code>FruitBasketMdi.cs</code>.</p>
+<p>Use this shape when a person genuinely works on several things at
+once, and not otherwise. A window is a first-class object to a screen
+reader – Alt+Tab reaches it, the window list names it, its title is
+announced when it activates, and it keeps its own state. A tabbed
+interface has to reimplement all of that, usually badly. That is the
+argument for MDI, and it is the only one needed.</p>
+<p><code>MdiFrame</code> and <code>MdiChild</code> in
+<code>Mdi.cs</code> carry the frame, so an app writes its own commands
+and nothing else. Free with the frame:</p>
+<ul>
+<li>F4 – current windows, as a pick list</li>
+<li>Shift+F4 – say how many windows are open, and their titles</li>
+<li>Control+Tab and Control+Shift+Tab – next and previous window</li>
+<li>Control+F4 and Control+Shift+F4 – close this window, close all but
+this one</li>
+<li>Alt+F10 – alternate menu: every command in one list you can
+filter</li>
+<li>Control+F1 – key describer: a key says what it would do instead of
+doing it</li>
+<li>Alt+F1 – about; F1 – the guide</li>
+</ul>
+<p>The design is not new. It comes from the Homer.NET MDI fruit basket
+of 2010, which already had the menu declared by name and key, a focus
+tip on every control, a window picker, an alternate menu and a key
+describer. What is new is that the three current apps can share one
+implementation instead of three that drift.</p>
+<p><strong>The title rule, which cost DbDo a bug.</strong> The frame
+carries the app name and nothing else; a child carries what it is
+showing and nothing else. Windows merges a maximized child into the
+frame caption, so JAWS+T reads
+<code>DbDo - [contacts.db - contacts]</code>. A child that repeated the
+app name made the reader say it twice. <code>MdiChild.setTitle</code> is
+the only way to set a child title, so the rule cannot be broken by
+accident.</p>
+<p><strong>One builder for both.</strong> <code>LbcDialog</code> can
+adopt an existing form instead of making one, so an MDI child is laid
+out by exactly the same code as a dialog – add order as focus order, the
+status line, the list search, the line chords, the access keys.
+<code>MdiChild.lbc</code> is that builder; finish with
+<code>finishLayout</code> rather than <code>run</code>, because the
+frame shows the window.</p>
+<h2 id="what-all-three-share">What all three share</h2>
+<p>Everything else, which is the point of the kit: <code>Inix</code> for
+settings, <code>Log</code> for the session log, <code>Paths</code> for
+the folder layout, <code>Say</code> for what the screen reader cannot
+know, <code>KeyName</code> and <code>KeyMap</code> for keys,
+<code>Lbc</code> for every control, the document set,
+<code>build&lt;App&gt;.cmd</code>, <code>&lt;App&gt;_setup.iss</code>,
+<code>RepoFiles.txt</code>, <code>accept.inix</code> and
+<code>checkHomerApp</code>. A person who learns one shape has learnt
+most of the other two.</p>
+<h1 id="scripts-and-settings-the-two-lists-every-mdi-app-gets">Scripts
+and settings: the two lists every MDI app gets</h1>
+<p>An MDI frame comes with two commands that look small and are not:</p>
+<pre><code>Alt+Shift+S    run a script: a list of what is in the scripts folder
+Alt+Shift+C    change a setting: a list of what this program lets you change</code></pre>
+<p>Both are lists. Neither is a folder browser, a command line, a text
+file to edit, or a page of check boxes. That is the design, and it comes
+from decades of doing this work by ear.</p>
+<h2 id="why-a-list-rather-than-a-path-to-type">Why a list, rather than a
+path to type</h2>
+<p>A sighted user glances at a folder and picks. Without sight, the same
+folder is a sequence: you arrow through it, each name is spoken, and the
+wrong ones have to be heard before the right one arrives. Typing the
+path instead means remembering the path exactly – every folder, every
+spelling, every extension – and getting a silent failure when you are
+one character out.</p>
+<p>A list box solves both. It holds only the things that are actually
+runnable, it is reached by one key, and <strong>first-letter navigation
+is the fast path</strong>: press the first letter of the job and you are
+on it, or near it. That is one keystroke against a dozen, and it is why
+the Homer folder names all start with different letters as well.</p>
+<p>The same argument is why <code>Run a Script</code> reads the folder
+every time rather than caching a menu. The list is always what is there
+now, so dropping a new script into the folder makes it available
+immediately, with nothing to register and no restart.</p>
+<h2 id="why-the-jobs-live-in-a-folder-not-in-the-program">Why the jobs
+live in a folder, not in the program</h2>
+<p>A script is the part of the program the user gets to write. The
+program ships the jobs it knows about; the user’s own go in the per-user
+tree, where an update cannot overwrite them. Both appear in the same
+list, the user’s first.</p>
+<p>This is the oldest pattern in this whole kit, and it predates the kit
+by a long way: a screen reader user who can automate a repetitive task
+does so, and the program’s job is to make that easy rather than to
+anticipate every need. A program with a job folder can be extended by
+the person using it, at three in the morning, without asking
+anybody.</p>
+<h2 id="why-settings-change-without-a-restart">Why settings change
+without a restart</h2>
+<p><code>Change a Setting</code> lists what the app declared with
+<code>addSetting</code>, asks for the new value in one field, writes it,
+and calls the app back so it acts at once.</p>
+<p>Three things follow from that, all of them learned the hard way:</p>
+<ul>
+<li><strong>No settings file to edit by hand.</strong> Editing INI
+syntax in a text editor is where a screen reader user loses an hour to a
+missing bracket that nothing reports.</li>
+<li><strong>No twenty-control preferences dialog.</strong> Those are
+slow to hear and slower to navigate; a list plus one field is two
+keystrokes and one answer.</li>
+<li><strong>No restart.</strong> A program that needs restarting to
+honour a setting turns a ten-second change into a minute of reopening
+files and finding your place.</li>
+</ul>
+<p>And the value is saved the moment it is answered, not at exit, so a
+crash never costs somebody the answers they already gave.</p>
+<h2 id="what-this-means-for-a-console-program">What this means for a
+console program</h2>
+<p>The same reasoning shapes the command-line shape of a Homer tool:</p>
+<ul>
+<li>Every switch has a long, spelled-out name, because a spoken
+<code>--source</code> is unambiguous and a spoken <code>-s</code> is
+not.</li>
+<li><code>--help</code> lists every switch, to standard output, exit
+code 0, so it can be read in an editor or piped to a file rather than
+scrolled past.</li>
+<li>The console says short, plain sentences; the detail goes to the log.
+A console that scrolls for a minute tells a screen reader user nothing
+at all.</li>
+<li>A count always matches its noun, and zero is a real answer said
+plainly.</li>
+<li>With no arguments – or with <code>--gui</code> – the same program
+opens one dialog, so the thing you learned in the dialog is the thing
+you can automate.</li>
+</ul>
+<h1 id="where-an-app-puts-its-files">Where an app puts its files</h1>
+<h2 id="the-letters-are-the-design">The letters are the design</h2>
+<p>A screen reader user moves through a folder listing by first letter.
+Nine folders whose names all begin with the same letter cost nine
+keystrokes each time; nine whose initials differ cost one. So every
+folder in the Homer layout starts with a different letter:</p>
+<ul>
+<li><strong>c</strong> – <code>configs</code>, settings that decide how
+the program starts</li>
+<li><strong>d</strong> – <code>data</code>, databases and seed data</li>
+<li><strong>h</strong> – <code>help</code>, the documents: the guide,
+the tutorials, the history</li>
+<li><strong>e</strong> – <code>exec</code>, the program itself:
+<code>.exe</code>, <code>.dll</code>, <code>.py</code>,
+<code>.vbs</code></li>
+<li><strong>j</strong> – <code>scripts</code>, scripts, add-ons and
+plugins that change behaviour later</li>
+<li><strong>l</strong> – <code>logs</code>, one file per session</li>
+<li><strong>r</strong> – <code>results</code>, what the program
+produced</li>
+<li><strong>t</strong> – <code>temp</code>, scratch, deletable at the
+start of the next run</li>
+<li><strong>t</strong> – <code>templates</code>, files a user copies and
+fills in</li>
+</ul>
+<p>The line between <code>configs</code> and <code>scripts</code> is
+worth stating: configs decide how the program starts, jobs change what
+it does once running. A settings file is a config; a script the user can
+invoke is a job.</p>
+<p><strong>Why <code>scripts</code> and not <code>jobs</code>.</strong>
+It was <code>jobs</code> until somebody pointed out that the word
+arrived from mainframe batch processing and that everyone now says
+scripts. The letter is the same either way; the word people already use
+wins.</p>
+<p><strong>Why there is no <code>samples</code>.</strong> A template
+that shows what is possible is a sample with a purpose, so the two
+folded into one. The alternatives all collided: <code>examples</code>
+wants <strong>e</strong>, which is <code>exec</code>, and
+<code>demos</code> wants <strong>d</strong>, which is
+<code>data</code>.</p>
+<h2 id="two-names-begin-with-t-and-they-never-meet">Two names begin with
+t, and they never meet</h2>
+<p><code>temp</code> exists only in the per-user tree.
+<code>templates</code> exists only in the installed tree. No listing
+ever holds both, so first-letter navigation stays exact, and nothing had
+to be given an unobvious name to keep it that way.</p>
+<p>That split is not a trick to save a letter; it is where those folders
+belong anyway. A <code>temp</code> folder under Program Files could not
+be written to, which is the whole reason the per-user tree exists, and
+<code>templates</code> is shipped and read-only, which is why it has no
+place in a folder the program writes.</p>
+<p>Windows’ own temporary folder is still the right home for a file that
+lives and dies inside one run. <code>&lt;App&gt;\temp</code> is for the
+other kind: what a crash left behind, somewhere the program knows to
+look at its next start rather than somewhere shared with every other
+program on the machine.</p>
+<h2 id="where-the-documents-live-and-what-github-thinks">Where the
+documents live, and what GitHub thinks</h2>
+<p><code>help</code> holds every document – the guide,
+<code>Tutorials.md</code>, <code>History.md</code>,
+<code>Hotkeys.md</code>, <code>Announce.md</code>,
+<code>Developer.md</code>, the style guides and the tutorial scripts –
+in both <code>.md</code> and <code>.htm</code>. <code>ReadMe</code> and
+<code>License</code> stay at the top of the project.</p>
+<p><strong>Why not <code>docs</code>, which is what GitHub
+expects?</strong> Because <code>d</code> is already <code>data</code> in
+this layout, and the letters are the point. The question is what that
+costs, and the answer is: one feature, which these projects do not
+use.</p>
+<p>GitHub’s own documentation says that a README placed in the
+repository’s <code>.github</code>, root, or <code>docs</code> directory
+is recognized and surfaced to visitors. Keeping <code>ReadMe.md</code>
+at the root satisfies that, so nothing is lost there. GitHub Pages can
+also publish from a <code>/docs</code> folder on the main branch, and
+that is the feature <code>help</code> gives up – but Homer apps are
+listed from the separate HomerTools site rather than from each
+repository’s own Pages, so there is nothing to give up in practice.</p>
+<p>Community health files – CONTRIBUTING, CODE_OF_CONDUCT and the issue
+templates – are the one case where GitHub really does look in named
+places. If a project ever wants them, they go in <code>.github</code>,
+which GitHub recognizes and which does not disturb the letters.</p>
+<p>So: <strong><code>ReadMe.md</code> and <code>License.md</code> at the
+root for GitHub and for a person opening the folder; everything else in
+<code>help</code> for the letter that reaches it in one
+keystroke.</strong></p>
+<h2 id="three-trees">Three trees</h2>
+<p><strong>The installed tree</strong>,
+<code>C:\Program Files\&lt;App&gt;</code>, read-only to the user:</p>
+<pre><code>&lt;App&gt;\configs   &lt;App&gt;\data   &lt;App&gt;\exec   &lt;App&gt;\help   &lt;App&gt;\scripts
+&lt;App&gt;\scripts  &lt;App&gt;\templates
+and ReadMe.md and ReadMe.htm at the root, where a person opening the folder
+for the first time will find them</code></pre>
+<p><strong>The per-user tree</strong>,
+<code>%LOCALAPPDATA%\&lt;App&gt;</code>, which the program owns and
+writes:</p>
+<pre><code>&lt;App&gt;\configs   &lt;App&gt;\data   &lt;App&gt;\scripts   &lt;App&gt;\logs
+&lt;App&gt;\results   &lt;App&gt;\temp</code></pre>
+<p>No <code>exec</code> and no <code>templates</code> there: those are
+shipped, not made.</p>
+<p><strong>The development folder</strong>, <code>C:\&lt;App&gt;</code>,
+has the same shape as the installed tree. Sources and build files stay
+at the top, with ReadMe and License, because the compiler, the installer
+script and the release script expect them there. Everything else sits in
+the folder it is installed to: the build compiles and fetches into
+<code>exec</code>, the documents live in <code>help</code>, tooling in
+<code>scripts</code>, samples in <code>templates</code>. And like the
+per-user tree it has <strong><code>logs</code></strong>: every build,
+clean, tidy, tutorial and audit run writes its own file there, named as
+the program names its runtime logs –
+<code>&lt;App&gt;-&lt;task&gt;-yyyyMMdd-HHmmss.log</code>, such as
+<code>DbDo-build-20260921-114210.log</code>. One file per session, so
+nothing is appended to or overwritten; an alphabetical sort is a
+chronological one; and zipping the folder gathers every log there is.
+Git ignores it. So what a developer sees is what a user gets, and “where
+does this file go” has one answer.</p>
+<p><code>exec</code> is built, never committed. <code>help</code> holds
+the published documents and, local only, anything like
+<code>self.md</code> the repository does not want.
+<strong>homerTidy</strong> puts a folder back into this shape: a file
+the installer takes from <code>exec</code> or <code>help</code> is moved
+there, a stray log goes to <code>logs</code>, and anything the project
+does not name goes to <code>notes</code>. What belongs is read from the
+project itself – the installer script, <code>RepoFiles.txt</code> for
+what the repository carries, and
+<strong><code>LocalFiles.txt</code></strong> for what belongs on this
+disk only, such as a tutorial’s working scripts or fetched voice models.
+There is no per-app clean-up script; LocalFiles.txt is where an app says
+what is special about it.</p>
+<p>A clean-up script must know the layout. One written before it –
+moving a <code>Scripts</code> folder as obsolete – will move
+<code>scripts</code>, which Windows treats as the same name, and take
+the tooling with it.</p>
+<h2 id="asking-for-a-folder">Asking for a folder</h2>
+<p><code>Paths</code> in C# and <code>homer.paths</code> in Python are
+the same class in two languages, and no app should work out a path for
+itself:</p>
+<pre><code>using Homer;                              from homer import paths
+Paths.start(&quot;JobDo&quot;);                     paths.start(&quot;JobDo&quot;)
+Paths.configFile(&quot;JobDo.inix&quot;);           paths.configFile(&quot;JobDo.inix&quot;)
+Paths.results();                          paths.results()
+Paths.clearTemp();                        paths.clearTemp()
+Paths.tempFile(&quot;.xml&quot;);                   paths.tempFile(&quot;.xml&quot;)</code></pre>
+<p><code>configFile</code> is the pattern every app needs: it hands back
+the user’s copy of a settings file, making it from the one that shipped
+the first time it is asked. So an update never overwrites what somebody
+changed, and the app never has to know which case it is in.</p>
+<p><code>clearTemp</code> belongs at startup, once. Whatever it finds is
+what a previous run could not clean up after itself, which is exactly
+what that folder is for.</p>
+<h1 id="evidence-and-checking-without-sight">Evidence, and checking
+without sight</h1>
+<p>A sighted developer checks by looking: skim the diff, glance at the
+window, notice that a control landed in the wrong place. A blind
+developer checks by instrumenting. With AI writing the first draft, that
+is not an accommodation. It is the only method that scales, because
+nobody reads generated code fast enough to trust it by reading.</p>
+<p>The kit’s answer is one script and one file.</p>
+<h2 id="checkhomerdev-for-the-kit-itself">checkHomerDev, for the kit
+itself</h2>
+<pre><code>checkHomerDev             audit, clean, build all three samples, report
+checkHomerDev --deep      delete the Python virtual environment too
+checkHomerDev --no-clean  build over what is there (fast, weaker)</code></pre>
+<p><code>checkHomerApp</code> checks an app. This checks the kit, and it
+does it the only way that settles the question: with a compiler. It runs
+the kit audit, checks the module dependency rule, removes what previous
+builds wrote, builds all three samples with their own scripts, and
+writes <code>evidence-kit-&lt;date&gt;.md</code>.</p>
+<p>Run it after changing anything in <code>CSharp</code> or
+<code>homer</code>, and before <code>tagRelease</code>.</p>
+<p><strong>The dependency rule.</strong> A module may declare what it
+needs, in two forms:</p>
+<pre><code>// REQUIRES: KeyMap.cs, Lbc.cs, Log.cs, Paths.cs, Say.cs, Util.cs.
+// ASSEMBLIES: System.IO.Compression.dll, System.IO.Compression.FileSystem.dll.</code></pre>
+<p>The second is the one that bites. A module needing an assembly
+reference fails as a missing TYPE –
+<code>error CS0246: The type or namespace name 'ZipArchive' could not be found</code>
+– which points at the module rather than at the build script that
+under-referenced it. <code>Inix.cs</code> reads and writes .xlsx, which
+are zip archives, and DbDo hit exactly this on its first build against
+the kit.</p>
+<p><strong>The module rule.</strong> A module may also declare what it
+needs:</p>
+<pre><code>// REQUIRES: KeyMap.cs, Lbc.cs, Log.cs, Paths.cs, Say.cs, Util.cs.</code></pre>
+<p>and the check reads every build script for one that includes a module
+without its requirements. <code>Mdi.cs</code> is the only module with a
+REQUIRES line today. The check is general anyway, because the fault
+class was invisible until it happened.</p>
+<p><strong>What it does not do.</strong> It does not run the programs –
+all three samples are windowed, and a check that needs a person to close
+a window is not a check – and it does not build EdSharp, FileDir, DbDo
+or HomerScribe, which compile against these same modules. After changing
+a shared class, build those four. Both limits are printed in every
+report.</p>
+<h2 id="checkhomerapp">checkHomerApp</h2>
+<pre><code>cd \JobDo
+checkHomerApp
+checkHomerApp --build</code></pre>
+<p>It runs every check that can answer yes or no, records the command
+and the exit code for each, and writes
+<code>evidence-&lt;yyyymmdd-hhmmss&gt;.md</code> beside itself. Eleven
+checks come with it: the document set and its HTML, file encodings,
+zero-byte files, the version’s single source of truth, the publishing
+whitelist, whether the program opens a log, accessible names that repeat
+a caption a screen reader already speaks, reserved key combinations and
+access keys claimed twice, the build, a smoke run of
+<code>--help</code>, and the app’s own acceptance criteria.</p>
+<p>It exits 0 when nothing failed and 1 when something did, so a build
+script or a scheduled task can act on it.</p>
+<h2 id="the-report-says-three-things">The report says three things</h2>
+<ul>
+<li><strong>What was verified</strong> – a check ran and passed, and
+here is the command.</li>
+<li><strong>What was not checked</strong> – a check was skipped, and
+here is why. A skip is never counted as a pass.</li>
+<li><strong>What remains uncertain</strong> – whether the program does
+the right thing, what a screen reader actually says, whether the
+keyboard order is usable, whether the code is secure, and whether any of
+it still works next month.</li>
+</ul>
+<p>That last list is the honest part, and it is printed every time. A
+report claiming everything is fine is worth nothing; one that says what
+it did not look at is worth a great deal, because it tells a person
+exactly where their own judgement is still required.</p>
+<h2
+id="accept.inix-what-done-means-written-before-the-code">accept.inix:
+what “done” means, written before the code</h2>
+<p>Acceptance criteria belong to the app, not to the checker:</p>
+<pre><code>[check]
+Name   = the help text names every switch
+Run    = JobDo.exe --help
+Expect = 0
+Wants  = --source</code></pre>
+<p><code>Run</code> is a command, <code>Expect</code> its exit code,
+<code>Wants</code> an optional string its output must contain. That is
+the whole language, on purpose: a criterion nobody can read is a
+criterion nobody writes. <code>Templates\accept.inix</code> is the
+starting point, and <code>Samples\accept.inix</code> shows a real
+one.</p>
+<p>A criterion that cannot be written this way is still worth writing.
+Put it in <code>self.md</code> under what a person has to check by hand,
+so it is not quietly forgotten.</p>
+<h2 id="a-checker-that-cries-wolf-is-worse-than-none">A checker that
+cries wolf is worse than none</h2>
+<p>Two rules were learned on its first run and are built in. It ignores
+the kit’s own modules, because a shared class sets accessible names and
+names key combinations on purpose. And it ignores comment lines, because
+a comment explaining that Alt+Control is reserved is the rule rather
+than a breach of it.</p>
+<p>On that same first run it found a real fault: both fruit basket
+samples had given <code>&amp;S</code> to two controls at once. That is
+what the tool is for.</p>
+<h1 id="automated-checks-and-the-one-thing-still-done-by-hand">Automated
+checks, and the one thing still done by hand</h1>
+<p>Four commands, each answering a different question, and between them
+almost nothing is left for a person to remember:</p>
+<pre><code>buildHomerDev      documents, all four samples, the kit audit
+checkHomerDev      the environment, a clean build of everything, the tools
+                   on your PATH, and every program driven through its keys
+checkHomerApp      one app: encodings, names, keys, build, smoke run, and
+                   the acceptance criteria you wrote
+uiCheck            one program: started, driven, and read back</code></pre>
+<p>The rule behind them is the rule behind the whole kit. <strong>A
+check a person has to remember is a check that stops happening in the
+week it matters.</strong> So every check that can be automated is, and
+the ones that cannot are named in the report rather than left to be
+inferred.</p>
+<h2 id="uicheck-pressing-the-keys-without-a-person">uiCheck: pressing
+the keys without a person</h2>
+<p><code>uiCheck</code> starts a real program, sends keystrokes to it,
+and asks the Windows UI Automation tree what is there afterwards – the
+same interface a screen reader uses to find out what is on the
+screen.</p>
+<p>That last part is what makes it worth having. A control with no
+accessible name is invisible to UI Automation and to a screen reader
+alike, so a check that finds nothing has found something real.</p>
+<p>Tests live beside the program in <code>uiTest.inix</code>, so an app
+carries its own:</p>
+<pre><code>[test]
+Name = the basket takes a fruit and shows it
+Run = FruitBasketCs.exe
+
+[step]
+Keys = apple{ENTER}
+Wants = apple
+Note = the fruit is in the list after Enter
+
+[step]
+Keys = %r
+Title = Fruit basket report
+Escape = yes</code></pre>
+<p><code>Keys</code> is pywinauto syntax – <code>{ENTER}</code>,
+<code>{ESC}</code>, <code>{F4}</code>, <code>%x</code> for Alt+x,
+<code>^x</code> for Control+x, <code>+x</code> for Shift+x.
+<code>Wants</code> is a string that must appear somewhere in the
+accessibility tree. <code>Title</code> is a window that must exist.
+<code>Escape</code> closes what the step opened. pywinauto installs
+itself on first run.</p>
+<p><code>Samples\uiTest.inix</code> drives all four samples, including
+the keys an MDI app gets free: Control+N for a second window, F4 for the
+window list, Alt+Shift+S for the jobs, Alt+Shift+C for the settings,
+Alt+F1 for about.</p>
+<h2 id="checking-the-machine-not-just-the-kit">Checking the machine, not
+just the kit</h2>
+<p><code>checkHomerDev</code> also records what the build actually ran
+with – the Python and pandoc it found – and compares every tool on your
+PATH against the kit’s copy. That second check exists because a release
+once failed on a <code>tagRelease</code> from before source-only
+releases were supported, with an error naming a file that was never
+meant to exist. One shared copy is the point of those tools, and one
+shared copy is what can go stale. <code>Tools\installTools</code> fixes
+what it reports.</p>
+<h2 id="what-is-still-not-automated">What is still not automated</h2>
+<p><strong>Speech.</strong> UI Automation reports that a control exists
+and what it is called. It does not report what JAWS said. That is the
+one gap that matters, and it is not unbridgeable: NVDA can log what it
+speaks at debug level, so a future check could run a scripted session
+and read that log back. It is written down as the next step rather than
+claimed as done.</p>
+<p>Until then, one thing is worth doing by hand before a release, once:
+open a program, tab through it, and listen. Everything else the scripts
+now do.</p>
+<h2 id="the-installers-own-pages">The installer’s own pages</h2>
+<p><code>DisableDirPage=auto</code> with
+<code>UsePreviousAppDir=yes</code>: when a previous install of the same
+AppId is found, the destination page is skipped and the update goes
+where the last one went. A first install still chooses the folder.
+<code>DisableProgramGroupPage=yes</code>, because a Homer app creates a
+desktop shortcut with a hotkey rather than a Start Menu folder.</p>
+<h2 id="anything-that-shells-out-to-an-installer-says-so-first">Anything
+that shells out to an installer says so first</h2>
+<p>A script that runs winget, an MSI or any other installer has to tell
+the person that <strong>Windows may ask for permission in a window
+behind this one</strong>, and name Alt+Tab as the way to find it. The
+User Account Control prompt opens without taking focus: a sighted user
+sees a flash on the taskbar, and a screen reader user gets nothing at
+all. The script looks hung, and is not.</p>
+<p>Where the wait can be watched, watch it: <code>consent.exe</code> IS
+the prompt, so a script polling for that process can say “Windows is
+asking for permission now” the moment it appears. And give the wait a
+time limit with a way out, so an answer that never comes ends in a
+sentence rather than a hang.</p>
+<h2 id="finish-page-checkboxes">Finish-page checkboxes</h2>
+<p><strong>Every component appears three times</strong> – one entry per
+state, install, update and already current – grouped so the ones that do
+something come first. Only one is ever shown, because the others are
+skipped by their <code>Check</code> function.</p>
+<p><strong>The label carries the versions and nothing else:</strong>
+“Install Ollama 0.34.1”, “Update Ollama from 0.33.0 to 0.34.1”,
+“Reinstall Ollama 0.34.1 (current version)”. A purpose clause belongs
+only in the fallback label, where no version is known. The launch and
+guide entries keep the wording the other apps use: “Launch <App>
+(Alt+Control+<key> starts it any time)” and “Open the user guide (F1
+opens it inside <App>)”.</p>
+<p><strong>Detect by looking, not by running.</strong> Check for the
+file and the uninstall registry key first: no process to start, no
+quoting to get wrong, no PATH to depend on, and an elevated installer
+still sees them. Run the tool only to learn its version.</p>
+<p><strong>Quote the whole probe command.</strong> <code>cmd /c</code>
+strips the first and last quote of what follows it, so a command
+beginning with a quoted path loses its opening quote and silently runs
+nothing – which reads as “not installed”. Wrap the whole command in one
+more pair.</p>
+<p><strong>Log every probe</strong>, with its command, exit code and
+output. A detection that goes wrong on somebody else’s machine cannot be
+diagnosed otherwise.</p>
+<p>A checkbox must know what is already installed. Offering to install
+something that is already there wastes a download and tells the user the
+installer did not look. Gate every optional component with a Check
+function that asks the machine, and label it with a
+<code>{code:...}</code> function that says whether this is an install,
+an update or a reinstall. Ask winget AND the tool’s own executable:
+tools like Ollama install per user, into a profile an elevated
+installer’s PATH cannot see. Cache the answers, because each query costs
+a second and the page asks twice.</p>
+<p>The last checkbox runs <code>homerFinish.cmd</code>, never the
+program directly. Inno runs the entries in order and the launch is last,
+so a program started there puts its window on top of whatever the other
+entries were still saying. <code>homerFinish.cmd</code> reads the setup
+log, shows ONE Results box, waits for it to be dismissed, and only then
+starts the program.</p>
+<p>The Results box says: that the program is installed and where; the
+disposition of each checkbox that was ticked, one line each; and where
+the log is. Nothing about a step that did not run, nothing the wizard
+already said, and every count matching its noun.</p>
+<h1 id="spoken-tutorials">Spoken tutorials</h1>
+<p>Every Homer app can carry a short set of spoken walkthroughs, built
+from text files and produced by two tools in the kit. Nothing is
+recorded: one synthetic voice works through a task and a second answers
+as a screen reader would.</p>
+<h2 id="the-format-a-demo-script">The format: a demo script</h2>
+<p>A tutorial is a <strong>demo script</strong> – an <code>.inix</code>
+whose sections are speech passages. It lives in <code>help</code>, named
+<code>Tutorial_NN_Topic.inix</code>, with two digits so ten and eleven
+sort after nine.</p>
+<p>The FIRST section is <code>[global]</code>, and what it holds governs
+every passage after it. Script 00 sets the defaults for the whole
+series; a later script may carry its own <code>[global]</code> to
+override any of them for itself. Every key is optional:</p>
+<ul>
+<li><code>FileTask = demo</code> – what kind of .inix this is, as report
+and accept files declare themselves.</li>
+<li><code>NarratorVoice</code>, <code>ReaderVoice</code> – a piper
+voice, as “kristin medium”.</li>
+<li><code>NarratorScale</code>, <code>ReaderScale</code> – duration;
+less is quicker. 0.80 for the narrator suits listeners of every age;
+0.72 proved too quick for an older ear.</li>
+<li><code>NarratorPitch</code> – semitones, applied after speaking
+without changing length. -2 lowers a woman’s voice into the range
+age-related hearing loss spares.</li>
+<li><code>ReaderFlatness</code> – piper’s noise settings, lowered
+together. 0.333 is even and screen-reader-like; piper’s own default near
+0.667 sounds like a person.</li>
+<li><code>LeadIn</code>, <code>Gap</code> – seconds of silence before
+the first word, and after each passage.</li>
+<li><code>VoiceFolder</code>, <code>PiperPath</code>,
+<code>FfmpegPath</code> – where the engines are, when they are somewhere
+the build script would not look.</li>
+</ul>
+<p>Then <code>[feed]</code> on the first script only,
+<code>[about]</code> for the title and homework, and one
+<code>[step]</code> per exchange:</p>
+<ul>
+<li><code>Say=</code> what the narrator says. One idea, no padding.</li>
+<li><code>Key=</code> the keystroke, in Homer key-name form.</li>
+<li><code>Hear=</code> what the screen reader answers – one line per
+utterance, written the way a fresh reader at its middle verbosity would
+say it: <strong>name, role, value, state, position</strong>. That order
+is nervish, and it never varies.</li>
+<li><code>Note=</code> written only, never spoken.</li>
+<li><code>Pause=</code> seconds of silence before the passage. SSML
+calls this <code>&lt;break time="2s"/&gt;</code>; this is the same idea
+without the brackets.</li>
+</ul>
+<p><code>[about]</code> carries Title, Intro, Setup and Homework.
+<code>[feed]</code>, on the first script only, carries the podcast
+details.</p>
+<p><strong>Why an .inix rather than SSML.</strong> SSML is the W3C
+standard and is the right answer when the engine speaks it – Azure,
+Google and Polly do. Piper does not, from the command line, so an SSML
+file would have to be parsed and turned back into flags. The settings
+that SSML would carry – which voice, how fast, how flat – are identical
+for every passage in a series, so they live in the build script instead,
+in one place. If a passage ever needs its own voice, add
+<code>Voice=</code> and borrow SSML’s names: rate, pitch, volume.</p>
+<h2 id="writing-from-a-speech-history">Writing from a speech
+history</h2>
+<p>The best Hear lines are copied from a real screen reader’s speech
+history, not imagined. Record one while doing the task, then keep only
+what belongs to the task. Leave out:</p>
+<ul>
+<li><strong>Task switching.</strong> “Lost focus”, “Press ALT Tab”,
+“Task Switching”, and the list of other windows while looking for the
+right one.</li>
+<li><strong>The window you came back to between steps</strong> – a file
+manager or browser announcing itself because focus passed through
+it.</li>
+<li><strong>Finding a window that did not take focus</strong>, such as a
+User Account Control prompt opened behind everything. The tutorial says
+the prompt can hide and how to find it; it does not replay the
+search.</li>
+<li><strong>Repeated group text.</strong> An installer’s finish page
+reads its whole paragraph before every option as you arrow; say it once,
+when the page arrives.</li>
+<li><strong>Structural chatter</strong> such as “level 0” on a tree view
+toggle.</li>
+</ul>
+<p>Keep: the dialog title when it appears, the focused control in name,
+role, value, state and position order, the access key where one exists,
+and the program’s own direct speech (“DbDo ready”).</p>
+<p><strong>A speech history is not a strict sequence.</strong> A line
+heard twice may be a say line, or an Up Arrow and a Down Arrow to find
+one’s place again, rather than something the program said twice. Before
+calling a repeat a bug, check the code: DbDo’s File menu seemed to list
+two items twice, and each is added once.</p>
+<p><strong>Never replace a menu item’s accessible name.</strong> Doing
+so hides its access letter, and the screen reader falls back to
+announcing the item’s first letter instead – “Add Table, A” for an item
+whose letter is T, so the letter it teaches does nothing. The shortcut
+needs no help: ShortcutKeyDisplayString carries it.</p>
+<p><strong>Check every key against the program before teaching
+it.</strong> A key written from what a command does, rather than from
+the menu that defines it, is wrong often enough to matter: DbDo’s
+tutorials once taught Control+O for Order, which is Open, and Control+S
+for Select Columns, which is Save.</p>
+<h2 id="the-tools">The tools</h2>
+<ul>
+<li><strong><code>buildTutorials</code></strong> fetches the voices if
+they are missing, speaks each script into its own <code>.mp3</code>,
+joins them into <code>Tutorials.mkv</code> with a chapter per tutorial,
+writes <code>Tutorials.m3u</code>, and rewrites the feed.</li>
+<li><strong><code>makeTutorials</code></strong> writes the same scripts
+into <code>Tutorials.md</code> and the feed, without speaking
+anything.</li>
+</ul>
+<p>Both are in <code>Tools</code>, both look for the scripts in
+<code>help</code>, and both work in any app that follows the layout.</p>
+<h2 id="the-voices-and-what-may-be-published">The voices, and what may
+be published</h2>
+<p>Choose by licence first. Most of piper’s best-known English voices
+cannot be redistributed: <strong>lessac</strong> comes from the Blizzard
+2013 corpus, research use only; <strong>ryan</strong>,
+<strong>hfc_male</strong> and <strong>hfc_female</strong> are CC
+BY-NC-SA; <strong>libritts_r</strong> is fine-tuned from lessac. The
+build script installs two that can be published anywhere:</p>
+<ul>
+<li><strong>kristin</strong>, female, trained from scratch on LJ Speech,
+public domain.</li>
+<li><strong>john</strong>, male, from LibriVox recordings, public
+domain.</li>
+</ul>
+<p>Credit them in the app’s guide even though public domain material
+requires no acknowledgement.</p>
+<h2 id="what-ships">What ships</h2>
+<p><code>Tutorials.mkv</code> goes in the repository. The
+<code>.inix</code> scripts, the <code>.mp3</code> files and the
+<code>.m3u</code> do not: the audio is rebuilt by one command and is far
+larger than the rest of the project, and the scripts are working
+material. The transcript, <code>Tutorials.md</code>, ships like any
+other document.</p>
+<h2 id="not-twice-speech-that-repeats">Not twice: speech that
+repeats</h2>
+<p>Homer programs have said the same thing twice for years, and there
+are only two mechanisms behind it.</p>
+<p><strong>An accessible name that repeats words the control already
+carries.</strong> A list box labelled “&amp;Fields:” whose
+AccessibleName is also “Fields” is named twice, and every reader says it
+twice. Set an accessible name only for a control with no words of its
+own – a grid with no label beside it. Not for a button, which carries
+its caption; not for a box with a label before it; never for a form,
+whose caption IS its accessible name. FileDir had forty-eight of these
+in one file, DbDo nineteen. <code>checkHomerApp</code> and an app’s own
+audit compare every accessible name against every caption in the same
+source and fail on a match.</p>
+<p><strong>Direct speech that says what the reader is about to say
+anyway</strong> – the window title as a dialog opens, the control that
+just took focus, the same sentence twice in a breath.
+<code>Say.say</code> now drops a line that repeats the last one within a
+second and a half, or that matches the title of the window in front or
+the name of the control with focus. <code>Say.sayForced</code> is never
+guarded: a toggle answering “Marked” twice is answering twice.
+Everything dropped is logged with the reason, so a missing announcement
+can be traced rather than guessed at.</p>
+<p>The guard is a safety net, not a licence. Speech that duplicates the
+reader is still a fault to fix where it is written; the net keeps it
+from reaching the person while it is still there.</p>
+<h2 id="evidence-for-the-ai">Evidence for the AI</h2>
+<p>Building with an AI goes as fast as the evidence it is given. Four
+records make up a session, and between them they say what happened
+without anybody having to describe it:</p>
+<ul>
+<li><strong>The build log</strong> –
+<code>logs\&lt;App&gt;-build-&lt;date&gt;-&lt;time&gt;.log</code>: every
+command the build ran and its exit code.</li>
+<li><strong>The release log</strong> –
+<code>logs\&lt;App&gt;-release-&lt;date&gt;-&lt;time&gt;.log</code>,
+from tagRelease.</li>
+<li><strong>The runtime log</strong> – under
+<code>%LOCALAPPDATA%\&lt;App&gt;\logs</code>: not only what the program
+did, but <strong>what came in and what went out</strong> – every key it
+saw, by its Homer name; every command it ran; and every sentence it
+spoke through Say, including those withheld because extra speech was
+off. Read top to bottom it is the session as it happened.
+<code>Say.onSpoken</code> sends speech to the app’s log.</li>
+<li><strong>The screen reader’s speech history</strong> – what the user
+actually heard, which is the one thing the program cannot log itself. In
+JAWS, Insert+Space then Control+H copies the whole history to the
+clipboard, and Insert+Space then Shift+H clears it, which is worth doing
+just before a session you mean to share. NVDA’s Speech Viewer, on its
+Tools menu, shows the same.</li>
+</ul>
+<p>The first three are gathered by zipping the logs folders. When a bug
+is hard to find, the fix is often first a better log: add what was
+missing, reproduce, and look again. Multiple rounds of that are normal,
+not a failure.</p>
+<p>A speech history is not a strict sequence – a line heard twice may be
+a say line or an arrow up and back. And someone else’s history holds
+their whole session, so use it only as far as they agreed.</p>
+<h2 id="why-homer-menus-are-long-and-flat">Why Homer menus are long and
+flat</h2>
+<p>Homer programs have large, flat command spaces on purpose. For a
+screen reader user, pressing Down Arrow again is cheaper than entering a
+submenu: Enter or Right Arrow, waiting for focus to settle, often some
+extra speech, exploring, and then a careful Escape or Left Arrow back –
+careful, because one press too many closes the whole menu system – and
+waiting for focus to settle again at the point you left.</p>
+<p>A flat menu is only fast if the keys behind it can be remembered.
+That is why the letter rules below matter as much as they do: a key that
+is recalled rather than looked up is a command that is available at
+once, without walking any menu.</p>
+<p><strong>Submenus, when they earn it.</strong> Never more than one
+level deep. Use one only when it helps a screen reader user more than it
+costs:</p>
+<ul>
+<li>to gather many <strong>rarely used</strong> items that would
+otherwise be arrowed past every time, such as a program’s secondary
+documents;</li>
+<li>to open a <strong>fresh set of initial letters</strong> for a group
+large enough to run out of them, such as DbDo’s thirty-seven Say
+commands;</li>
+<li>where flattening would push the parent menu past about <strong>25
+items</strong>, the limit the Windows UX guidelines set for one menu
+level.</li>
+</ul>
+<p>The published guidance agrees on the depth: Windows’ own guidelines
+recommend a single level of cascading menus and warn against putting
+frequently used commands in one, and Visual Studio’s say never to
+cascade past one level.</p>
+<h2 id="function-key-families">Function-key families</h2>
+<p>Each function key is a family of related commands, drawn from Windows
+and Office habits and extended. A command that belongs to a family takes
+a key from it; a key that belongs to one family is not spent on
+another.</p>
+<ul>
+<li><strong>F1, help.</strong> F1 the guide, Shift+F1 the history of
+changes, Alt+F1 About, Control+F1 the key describer. The rest of the
+family opens other documents.</li>
+<li><strong>F2, editing or renaming,</strong> as F2 renames a file in
+Windows.</li>
+<li><strong>F3, searching</strong> and repeating a search.</li>
+<li><strong>F4, picking, saying or closing open windows.</strong> F4
+picks one, Shift+F4 says which are open, Control+F4 closes this
+one.</li>
+<li><strong>F5, refreshing.</strong></li>
+<li><strong>F6, moving focus among panels.</strong> Control+Tab and
+Control+Shift+Tab move among the program’s windows – call them “DbDo
+windows”, not “MDI child windows”.</li>
+<li><strong>F7, spell checking or other review.</strong></li>
+<li><strong>F8, selection,</strong> copying all, or saying all.</li>
+<li><strong>F9, a more readable view,</strong> such as extracting the
+main content in HomerView.</li>
+<li><strong>F10, menus.</strong> F10 the menu bar, Shift+F10 the context
+menu, Alt+F10 the alternate menu.</li>
+<li><strong>F11, the version.</strong> Elevate sounds like eleven.</li>
+<li><strong>F12, opening or closing files, or AI.</strong></li>
+</ul>
+<h2 id="two-rules-for-letters">Two rules for letters</h2>
+<p><strong>Universal, for every key and every menu in every Homer
+app.</strong></p>
+<ol type="1">
+<li><strong>A trigger letter is the first letter of one of the command’s
+words.</strong> Never a letter from the middle of a word. It is better
+to have no letter, and no key, than one whose letter has to be memorised
+rather than understood. Standing exceptions, because the association is
+strong in another way: <strong>X</strong> for a word with the “ex” sound
+– Export, Exit, Extract; <strong>Shift reversing</strong> a command
+whose name begins Un-, as Control+M marks and Control+Shift+M unmarks;
+and <strong>Z for sleep</strong>. Every Z key is a toggle that wakes a
+behavior or puts it to sleep – catching some Z’s – and Control+Z’s
+undo-and-restore sense in Windows sits with it. Few English words
+contain a Z, so this is the letter’s best use.</li>
+<li><strong>In a menu, the trigger letter is the letter of the item’s
+hotkey,</strong> when the hotkey has one. If the hotkey is Control+Q,
+the menu letter is Q, never another. Two items may then share a letter;
+Windows cycles through them, and that is better than a letter that
+contradicts the key.</li>
+</ol>
+<p>When a key’s letter starts none of its command’s words, rename the
+command if a word honestly carries it – Open Table in New Window on
+Control+Shift+T – and rebind it if not. When nothing free fits, leave
+the command on its menu with no key at all.</p>
+<p><strong>Never replace a menu item’s accessible name</strong>, which
+hides its letter from the screen reader. If a reader then announces a
+letter that does not work, that is the reader’s fault – but the program
+must not give it cause.</p>
+<h2 id="hotkeys.md">Hotkeys.md</h2>
+<p>Generate it from the source rather than keep it by hand: every key
+lives in one place in the code, and a list kept by hand drifts the first
+time a key changes. DbDo’s <code>scripts/makeHotkeys.py</code> is the
+model; <code>build&lt;App&gt;</code> runs it before the documents are
+converted.</p>
+<p>Three sections, each an H2 with H3 groups inside: <strong>by
+menu</strong>, <strong>by key</strong> (grouped by modifier family,
+function keys together), and <strong>by command</strong>. Every entry is
+one list item whose lines are joined with a backslash hard break – the
+sorted-on thing, what it does, then the other half of the pair. Lists,
+because pandoc line blocks show their bars on GitHub and blank-line
+paragraphs split one key into three unrelated things. The <strong>memory
+association</strong> for every key is written once, in the by-menu
+section, beside its description; a group whose keys share a reason gets
+one line above them instead. The rules behind every association open the
+document.</p>
+<h2 id="say-the-word-the-key-comes-from">Say the word the key comes
+from</h2>
+<p><strong>Universal, and not only in tutorials.</strong> Wherever a key
+is introduced – a tutorial, a guide, a status line, a message box – name
+the word its letter comes from: “Shift plus C is Say Cell”, “Control
+plus W sets the Where filter”, “F2 edits in place, the same F2 that
+renames a file in Windows”. A key whose mnemonic goes unsaid is a key
+somebody has to memorise rather than understand, and the association is
+the whole reason that key was chosen over another.</p>
+<p>Where the mnemonic is a Windows convention rather than a Homer one,
+say that instead: it is the memory the person already has.</p>
+<p><strong>And this applies to headings and titles, which is where it is
+easiest to miss.</strong> A tutorial called “Sorting and Filtering”
+teaches the wrong letter: a reader reaches for S, and the key is
+Control+O, because the command is Order. The heading is called “Order
+and Where Filter” instead – the words the keys come from, with the
+plain-language idea alongside them in the first sentence rather than in
+the title.</p>
+<p>The test: <strong>if the heading were the only thing somebody
+remembered, which key would they press?</strong> Titles that fail
+it:</p>
+<ul>
+<li>“Sorting” for Order, on O</li>
+<li>“Choosing columns” for Select, on S</li>
+<li>“Producing output” for Report, Save and Copy, on R, S and C</li>
+<li>“Adding a record” for New, on N</li>
+<li>“Searching” for Find and Jump, on F and J</li>
+</ul>
+<h1 id="logging">Logging</h1>
+<p>Every Homer program writes a log, and so does every Homer installer.
+This is not a debugging aid switched on when something goes wrong; it is
+on always, because the thing that goes wrong is never reproducible on
+demand. Writing a line costs microseconds. Not having the line costs an
+evening.</p>
+<h2 id="where-a-log-goes-and-what-it-is-called">Where a log goes, and
+what it is called</h2>
+<pre><code>%LOCALAPPDATA%\&lt;App&gt;\logs\&lt;App&gt;-&lt;yyyymmdd-hhmmss&gt;.log        one per run
+%LOCALAPPDATA%\&lt;App&gt;\logs\&lt;App&gt;-setup-&lt;yyyymmdd-hhmmss&gt;.log  one per install</code></pre>
+<p>One folder holds the whole story of a program on a machine: the
+install, and every run since. Beside the program will not do, because a
+program under Program Files cannot write next to its own .exe.</p>
+<p>One file per session, named for the moment the session began, rather
+than one file appended to forever. A user who reports something an hour
+later still has the log from when it happened, and the log being read is
+never the log being written. The most recent thirty are kept and the
+rest deleted, which reaches back through a few weeks of ordinary use and
+keeps the folder readable.</p>
+<p>A build script is the exception, and it stays one:
+<code>build&lt;App&gt;.log</code> sits beside the build script, because
+that is a developer’s file and the developer is standing in that
+folder.</p>
+<h2 id="writing-to-it">Writing to it</h2>
+<p><code>Log</code> in C# and <code>homer.log</code> in Python are the
+same class in two languages, with the same method names, so a log
+written by either reads the same:</p>
+<pre><code>using Homer;                           from homer import log
+Log.start(&quot;JobDo&quot;);                    log.start(&quot;JobDo&quot;)
+Log.section(&quot;Reading the database&quot;);   log.section(&quot;Reading the database&quot;)
+Log.keyValue(&quot;Path&quot;, sPath);           log.keyValue(&quot;Path&quot;, sPath)
+Log.info(&quot;4 rows loaded&quot;);             log.info(&quot;4 rows loaded&quot;)
+Log.warn(&quot;No index; this is slow&quot;);    log.warn(&quot;No index; this is slow&quot;)
+Log.command(&quot;pandoc x.md&quot;, iCode);     log.command(&quot;pandoc x.md&quot;, iCode)
+Log.error(&quot;The file is locked&quot;);       log.error(&quot;The file is locked&quot;)
+Log.exception(oError);                 log.exception(oError)
+Log.close();                           log.close()</code></pre>
+<p><code>start</code> writes a header block first: the version, the
+log’s own path, the program, the working directory, the command line,
+the Windows build, the user, the machine, and – in C# – which screen
+reader <code>Say</code> can reach. All of it is what somebody will want
+later and cannot work out afterwards.</p>
+<p>Nothing in either throws. A program whose logging fails should still
+run.</p>
+<h2 id="what-to-log">What to log</h2>
+<ul>
+<li>The environment and every effective setting, at startup.</li>
+<li>Every external command, with its exit code. <code>Log.command</code>
+exists for this.</li>
+<li>Every error, with its stack or traceback. The stack is the part that
+saves the evening, so it is never left out.</li>
+<li>Every decision the program made that a user might question: which
+file it chose, which fallback it took, what it skipped and why.</li>
+</ul>
+<p>And the rule that governs all of it: <strong>the console is for a
+person; the log is for debugging</strong>. Short plain sentences on
+screen, everything else in the file. A log line is never spoken.</p>
+<h2 id="what-gets-published">What gets published</h2>
+<h2 id="a-whitelist-not-a-list-of-exclusions">A whitelist, not a list of
+exclusions</h2>
+<p><code>RepoFiles.txt</code> names what the repository carries.
+<code>homerTidy --gitignore</code> turns that into a
+<code>.gitignore</code> that ignores everything and then puts back
+exactly what was named:</p>
+<pre><code>/*
+!/.gitignore
+!/ReadMe.md
+!/CSharp/</code></pre>
+<p>A list of exclusions is only ever as complete as the last time
+somebody remembered to add a line, and the file that gets pushed by
+accident is always the one nobody thought of. Turning it around costs
+one line in <code>RepoFiles.txt</code> before a new file can be
+committed – which is also the line that records why the file is
+there.</p>
+<p><code>homerTidy --do-it</code> rewrites the whitelist on every pass,
+so <code>RepoFiles.txt</code> and <code>.gitignore</code> cannot drift
+apart.</p>
+<h2 id="what-is-public-and-what-stays-on-your-machine">What is public
+and what stays on your machine</h2>
+<p>Public, because somebody rebuilding the program needs it:</p>
+<ul>
+<li>the source, the installer script, <code>build&lt;App&gt;.cmd</code>,
+<code>version.txt</code></li>
+<li><code>RepoFiles.txt</code> and the generated
+<code>.gitignore</code></li>
+<li>the documentation set, in both <code>.md</code> and
+<code>.htm</code></li>
+<li><code>homerFinish.cmd</code> and the <code>install*.cmd</code>
+scripts the installer ships</li>
+</ul>
+<p>Private, and in the never-pushed list whatever
+<code>RepoFiles.txt</code> says:</p>
+<ul>
+<li><code>self.md</code> and <code>self.htm</code> – the project’s own
+notebook</li>
+<li><code>tagRelease.cmd</code> and <code>tagRelease.ps1</code> – a
+maintainer’s tools, and noise in a source browser</li>
+<li><code>create&lt;App&gt;Repo.cmd</code> and <code>.ps1</code> – run
+once, then never again</li>
+<li>every <code>.log</code>, <code>notes\</code>,
+<code>Version.cs</code>, <code>version.py</code>,
+<code>__pycache__\</code></li>
+<li>the build products: <code>&lt;App&gt;.exe</code>,
+<code>&lt;App&gt;_setup.exe</code>, any fetched <code>.dll</code></li>
+</ul>
+<p>The build products are release assets rather than repository content.
+A repository that carries its own binaries is slow to clone and wrong by
+the second commit.</p>
+<h1 id="self.md-the-projects-notebook">self.md, the project’s
+notebook</h1>
+<p>Every Homer project carries a <code>self.md</code>, and it is never
+published.</p>
+<p>It holds what a repository cannot: a decision and the alternatives it
+beat, a finding somebody would otherwise learn the same slow way, an
+honest open item. <code>History.md</code> is public and is about
+releases; <code>self.md</code> is internal and is about thinking.
+Keeping them apart is what lets both be truthful.</p>
+<p>The form is fixed so it stays readable as it grows:</p>
+<ul>
+<li>every entry starts at heading level 2 with its date, newest
+first</li>
+<li>headings below that are level 3 and further down</li>
+<li>entries are audits, plans, post-mortems and findings, not a
+diary</li>
+</ul>
+<p><code>newHomerApp</code> writes a starter into every new app. The
+kit’s own <code>self.md</code> opens with a report on what a full
+reading of the Homer apps found, and a review of each of the kit’s
+inclusion decisions against it – which is the shape a first entry should
+take.</p>
+<h1 id="the-installers-log">The installer’s log</h1>
+<p><code>SetupLogging=yes</code> makes Inno write a detailed log of
+every file, registry key and run entry. The template’s
+<code>[Code]</code> section copies it into the program’s own logs folder
+when setup finishes, after the final-page checkboxes have run, so the
+copy includes what they did.</p>
+<p>One caveat, stated because it will be noticed: the installer runs
+elevated, so <code>{localappdata}</code> is the profile of whoever
+answered the elevation prompt. When that is a different account from the
+one that will use the program, the setup log lands in the
+administrator’s folder. The program’s own logs always land in the
+user’s.</p>
+<h2 id="later">Later</h2>
+<p>Logging is not optional today, on purpose. When it becomes optional,
+the switch belongs inside the <code>Log</code> class – one setting, read
+once – and not as an <code>if</code> in every caller.</p>
+<h1 id="scripts-logs-and-the-release-routine">Scripts, logs, and the
+release routine</h1>
+<h2 id="every-script-writes-a-log">Every script writes a log</h2>
+<p>This is not optional, and the rules are the same for a build script,
+a clean-up script, a repository tidy, and a release.</p>
+<ul>
+<li><strong>The log goes beside the script</strong>, not in an output
+folder and not in whatever the current directory happened to be. The one
+exception is an <strong>installed program</strong>: something under
+Program Files cannot write beside its own executable, so its log goes
+with the output, or beside the first source file, or under
+<code>%LOCALAPPDATA%\&lt;App&gt;</code>.</li>
+<li><strong>The log is for debugging.</strong> It records the script
+path, the interpreter version, the platform, the working directory and
+the command line; then every effective setting; then every command run
+with its exit code; then any error with its full traceback. A failure
+must never produce a console traceback and an empty log.</li>
+<li><strong>The console is for a person.</strong> Short, plain sentences
+saying what is happening. Technical detail belongs in the log.</li>
+<li><strong>A <code>.ps1</code> never ships without a
+<code>.cmd</code></strong> that calls it and forwards its own arguments,
+so nobody has to type the execution-policy incantation. The same
+courtesy applies to a <code>.py</code>.</li>
+</ul>
+<h2 id="the-four-scripts">The four scripts</h2>
+<ul>
+<li><p><strong>build&lt;App&gt;.cmd</strong> – increments
+<code>version.txt</code>, generates <code>Version.cs</code> from it,
+finds the compiler and the three reference assemblies that are not on
+the default path, compiles the app with the Homer modules from
+<code>C:\HomerDev\CSharp</code>, converts the documents with pandoc, and
+compiles the installer if Inno Setup is present. It fetches what it
+needs from the web itself. Log:
+<code>build&lt;App&gt;.log</code>.</p></li>
+<li><p><strong>homerTidy</strong> – the folder and the repository,
+surveyed together and fixed in one pass. It prints the plan and stops;
+<code>--do-it</code> carries it out. In the folder: empty files deleted,
+duplicates and files the project does not name moved into
+<code>notes\logs</code>, <code>notes\drafts</code>,
+<code>notes\mail</code>, <code>notes\archives</code> or
+<code>notes\other</code>. In the repository: tracked files that do not
+belong untracked and added to <code>.gitignore</code> under a dated
+comment, then committed and pushed. Anything larger than 10 MB in the
+history is reported with the command that would remove it, and never
+rewritten automatically. What belongs is decided by the project’s own
+<code>&lt;App&gt;_setup.iss</code> and <code>RepoFiles.txt</code>, so
+there is no list to maintain. <code>--folder-only</code> and
+<code>--repo-only</code> do one half. Log:
+<code>homerTidy.log</code>.</p>
+<p>A file that is large and fetched at run time – a model, a converter,
+an installer payload – belongs in neither place. The app’s own install
+script should get it, and homerTidy reports such a file rather than
+guessing.</p></li>
+<li><p><strong>tagRelease</strong> – reads the version, bumps it if that
+number is already released, writes it back, tags, pushes, and publishes
+the GitHub release with the installer attached. Log:
+<code>tagRelease.log</code>.</p></li>
+</ul>
+<h2 id="the-release-routine">The release routine</h2>
+<ol type="1">
+<li>Unzip the app archive into <code>C:\&lt;App&gt;</code>.</li>
+<li><code>build&lt;App&gt;</code> from that folder.</li>
+<li>Run <code>&lt;App&gt;.exe</code> as a quick test.</li>
+<li>Commit, then <code>tagRelease</code>.</li>
+<li>Install from the published <code>&lt;App&gt;_setup.exe</code>, or
+update in place with F11.</li>
+</ol>
+<h1 id="the-installer">The installer</h1>
+<p><code>Templates\_APP__setup.iss</code> is the Inno Setup script every
+app starts from. What it settles, so no app has to decide again:</p>
+<ul>
+<li><strong>Machine wide, administrator required.</strong> No per-user
+fallback and no “who is this for” page. Somebody who wants a portable
+copy uses the zip.</li>
+<li><strong>64-bit only</strong>, installed under Program Files.</li>
+<li><strong>The version comes from <code>version.txt</code></strong>,
+read at compile time. No version number is written in the script, so a
+stale copy cannot rewind it.</li>
+<li><strong>Both forms of every document ship</strong>: Markdown for an
+editor or a braille display, HTML for a browser, which is what the Start
+menu shortcut opens.</li>
+<li><strong>A desktop shortcut with a hotkey</strong>, created without
+asking, and the hotkey named on the launch checkbox where the user is
+looking when it matters.</li>
+<li><strong>Local AI as a checkbox.</strong> More than one Homer app now
+uses a model running on the user’s own machine, so
+<code>installOllama.cmd</code> and <code>installModels.cmd</code> are
+part of the kit and every app that can use AI ships them. The first box
+installs Ollama and the model; the second installs the model alone, for
+somebody who already runs Ollama. Tick the first by default when the
+program cannot do its main job without a model; leave it unticked when
+the model only adds something. An app that calls no model deletes the
+two file lines and the two run lines.</li>
+<li><strong>It knows what is already installed.</strong> The
+<code>[Code]</code> section reads the version of any previous install
+from the app’s own uninstall key. The welcome page says “Install”,
+“Update from X to Y” or “Reinstall”, and each component checkbox is a
+pair of <code>[Run]</code> lines gated by a <code>Check:</code>
+function, so the wording matches the situation instead of always saying
+“Install”.</li>
+<li><strong>Screen reader scripts are checked by default.</strong> A
+checkbox that installs an app’s JAWS scripts or NVDA add-on is never
+<code>unchecked</code>. A blind user installing a Homer tool wants them,
+and a cleared box they have to notice is the friction this suite exists
+to remove. <code>installScreenReaderSupport.cmd</code> does the work: it
+unpacks <code>&lt;App&gt;_JAWS.zip</code> into every JAWS settings
+folder it finds and hands <code>&lt;App&gt;.nvda-addon</code> to NVDA,
+skipping whichever is absent.</li>
+<li><strong>The last two checkboxes are always the same two</strong>, in
+this order: documentation, unchecked, then launch, checked.</li>
+<li><strong>The Results box comes before the launch.</strong> The launch
+entry runs <code>homerFinish.cmd</code> rather than the program. That
+script reads the setup log, shows one Results box saying what this
+install actually did, and starts the program only when the box is
+dismissed. Being last in <code>[Run]</code>, it runs after every other
+checkbox, so the box can report all of them, and the program’s window
+cannot cover the summary.</li>
+<li><strong>The uninstall removes the settings too</strong>, and never
+touches what the user made with the program.</li>
+</ul>
+<h1 id="ai-assisted-coding">AI-assisted coding</h1>
+<h2 id="why-the-name">Why the name</h2>
+<p>An AI can write the fruit basket program in a minute. It can write a
+passable one in any of a dozen languages, and it will not stop to ask a
+single question worth asking. That is what makes “vibe coding” a poor
+name for what happens next: the vibe is not the hard part.</p>
+<p>The hard part is knowing, before the AI starts, what a good program
+is:</p>
+<ul>
+<li>what the platform’s conventions already are, so a program does not
+invent its own and make every user learn them</li>
+<li>what the library can do, so the request is for the thing it does
+well rather than the thing it can be forced into</li>
+<li>what a screen reader already says, so the program does not say it
+again</li>
+<li>where the focus should be after every action</li>
+<li>what the user will do next, and how many keystrokes it takes
+them</li>
+</ul>
+<p>None of that comes out of a model. All of it can be given to one, and
+the giving is the skill. <strong>AI-assisted coding</strong> is that
+skill: the AI types, and the builder decides.</p>
+<p>This kit is what makes the decisions transmissible. Every convention
+in it was paid for by somebody’s afternoon, and each is written down
+here so it can be handed to an AI in one sentence instead of discovered
+again.</p>
+<h2 id="the-method-in-four-moves">The method, in four moves</h2>
+<p>The kit is built around the same four moves a careful builder makes
+with an AI, and each has something in the kit that carries it:</p>
+<ol type="1">
+<li><strong>Specify before you generate.</strong> Write
+<code>accept.inix</code> first: what must be true for this to be
+finished, stated so a script can settle it. An AI asked for “a tool that
+does X” gives you its idea of done; an AI asked to satisfy five named
+checks gives you yours.</li>
+<li><strong>Build in small, recoverable steps.</strong> One change, one
+build, one run of <code>checkHomerApp</code>, one commit.
+<code>version.txt</code> and <code>tagRelease</code> mean any release
+can be returned to, and <code>homerTidy</code> means nothing unintended
+is ever pushed.</li>
+<li><strong>Verify without sight.</strong> <code>checkHomerApp</code>
+for what a script can settle, the session log for what happened, and
+your own ears for what the log cannot hold. The evidence report
+separates the three.</li>
+<li><strong>Package, document and defend.</strong> The build makes the
+installer, the document set travels in both Markdown and HTML, and the
+evidence report answers the only question that matters at the end: what
+gives you confidence that it works?</li>
+</ol>
+<h2 id="the-three-sentences">The three sentences</h2>
+<p>Most of the value of this kit reaches an AI in three sentences. Say
+them at the start of a session and the difference is immediate:</p>
+<ol type="1">
+<li>“Use the Homer classes in <code>C:\HomerDev\CSharp</code> (or
+<code>\Python</code>); build the dialog with Lbc, in the order the user
+should tab.”</li>
+<li>“Write in Camel Type, as
+<code>C:\HomerDev\help\CamelType_CSharp.md</code> describes.”</li>
+<li>“Follow <code>C:\HomerDev\HomerDev.md</code>: speak only what the
+screen reader cannot know, save each answer when it is given, match
+nouns to counts.”</li>
+</ol>
+<p>Everything after that is ordinary review: read what came back, run
+it, and ask for the one thing that is wrong.</p>
+<h2 id="how-to-teach-with-it">How to teach with it</h2>
+<p>The fruit basket is the exercise, and it has been since 2005, because
+it is small enough to hold in your head and big enough to get wrong in
+every interesting way. A good session runs in this order:</p>
+<ol type="1">
+<li><strong>Ask an AI for the fruit basket program</strong>, with no kit
+and no conventions. Read what comes back. It works. Note what it does
+not do: where the focus goes, what it says when the field is empty,
+whether the basket survives being closed.</li>
+<li><strong>Read <code>Samples\FruitBasketCs.cs</code>.</strong> Twelve
+marked blocks, and nine marked decisions inside them. Each decision is
+one a program has to get right and an AI will not make for you unless
+you ask.</li>
+<li><strong>Ask for the same program again</strong>, this time with the
+three sentences above. Compare.</li>
+<li><strong>Open <code>Samples\FruitBasketPy.py</code> in a second
+window</strong> and walk the two files block by block. Same twelve
+blocks, same twelve titles, same function names, same nine decisions.
+The language changed; the design did not. That is the lesson worth
+keeping.</li>
+<li><strong>Change one thing.</strong> Add a Clear button, or sort the
+basket, or keep a count. Watch which of the nine decisions the change
+touches.</li>
+</ol>
+<h2 id="twelve-blocks-two-languages">Twelve blocks, two languages</h2>
+<p><code>FruitBasketCs.cs</code> and <code>FruitBasketPy.py</code> are
+the same program in two languages, written to be read side by side in
+two windows. <code>FruitBasketMdi.cs</code> is the third shape and marks
+only what changes when a program holds several windows at once. Every
+section of each carries the same marker:</p>
+<pre><code>---- BLOCK n: &lt;title&gt; ----</code></pre>
+<p>Twelve blocks, the same twelve numbers and the same twelve titles in
+both files: what this file needs, names, where the basket is kept, the
+dialog built in the order it is read, the buttons that act without
+closing, one place that knows what every button does, what the screen
+reader cannot know, add a fruit, delete a fruit, sort the basket, the
+report, and the way in.</p>
+<p>They do not line up line for line, and trying to make them would
+teach the wrong thing. C# needs a class where Python needs none; Python
+needs no type on a variable. What matters is that nothing appears in one
+file without a counterpart in the other, and that the counterpart
+carries the same name – <code>addFruit</code>, <code>basketState</code>,
+<code>handleButton</code>, <code>saveBasket</code>,
+<code>showReport</code>, <code>showState</code>, <code>sortBasket</code>
+in both.</p>
+<p>Where the two genuinely differ, the comment says so at the place it
+happens. There are three such places, and each is worth the minute it
+takes to read:</p>
+<ul>
+<li><strong>Block 5, the buttons that act without closing.</strong> Each
+library has one way of saying “this button does work and leaves the
+window open”. In C# a button added with <code>addButton</code> has an
+ordinary <code>Click</code> handler and only the buttons named in
+<code>runWithButtons</code> end the dialog. In Python the dialog’s own
+handler is given every press and keeps the window open by answering
+<code>False</code>. Both files then route every press through one
+<code>handleButton</code>, so the dispatch reads the same.</li>
+<li><strong>Block 7, the counts.</strong> <code>Util.stringPlural</code>
+in C# returns the number and the noun together;
+<code>util.stringPlural</code> in Python returns only the noun. Same
+name, different shape. The samples each use their own correctly and say
+so, because a reader comparing the two files deserves to know it is a
+wart rather than a design.</li>
+<li><strong>Block 11 and <code>showState</code>.</strong> Lbc gives a C#
+dialog a status line at the foot; a wx dialog has none, so the Python
+file puts the same sentence in the window title.</li>
+</ul>
+<h2 id="what-the-samples-borrow-rather-than-write">What the samples
+borrow rather than write</h2>
+<p>Everything the dialog does for a screen reader comes from the kit and
+costs one call. None of it is in either sample, which is the point:</p>
+<ul>
+<li>access keys, from an ampersand in a label and nothing else</li>
+<li>bands, so a field and its button share a row</li>
+<li>Control+Enter accepting from any control, including a list or a
+memo</li>
+<li>the Help window, listing every field with its tip – and the tips
+themselves, spoken in the status line in C# and on Shift+F1 in
+Python</li>
+<li>line-editing chords inside the field: copy or cut the current line
+with no selection, mark a selection in two keystrokes, read all, delete
+the line</li>
+<li>search inside the list on Control+J, repeated with F3, and copy on
+Control+C</li>
+<li>speech that reaches JAWS, NVDA and Narrator without the program
+knowing which is running</li>
+</ul>
+<h2 id="the-nine-decisions">The nine decisions</h2>
+<p>They are marked DECISION 1 to DECISION 9 at the place each occurs,
+the same nine in both samples, so the two can be read side by side:</p>
+<ol type="1">
+<li><strong>Which library.</strong> Lbc, not hand-placed controls. An AI
+defaults to placing controls; that works and its tab order is an
+accident.</li>
+<li><strong>Add order is focus order.</strong> No <code>TabIndex</code>
+anywhere. When the order is wrong, move the call.</li>
+<li><strong>Bands.</strong> What belongs on one row, and what does
+not.</li>
+<li><strong>Access keys.</strong> An ampersand is the whole mechanism.
+OK, Cancel and Close get none, because Enter and Escape are already
+their keys.</li>
+<li><strong>What the screen reader already says.</strong> It announces
+the window title and the focused control. The program says what the
+reader cannot know.</li>
+<li><strong>Where the focus goes after an action.</strong> Back where
+the next action starts.</li>
+<li><strong>Counts that match their nouns.</strong> “1 fruit”, never “1
+fruits”; zero said plainly.</li>
+<li><strong>Saving the answer the moment it is given</strong>, not at
+exit.</li>
+<li><strong>The escape hatch.</strong> <code>dlg.form</code> in C#, the
+wx control in Python, for the one thing the wrapper does not cover.
+Reach for it rarely, and say why.</li>
+</ol>
+<p>A word on scale. The samples use more of Lbc than a fruit basket
+needs – a combo pick box for the sort order, a check box for the
+speaking, a report window, a status line. That is deliberate: a sample
+exists to show what is there. Your own program should use what it needs
+and nothing more. The kit is meant to be the easy path, not a set of
+boxes to tick, and a dialog with three controls in it is a perfectly
+good Homer dialog.</p>
+<h2 id="the-legacy-fruitbasket-collection">The legacy FruitBasket
+collection</h2>
+<p>The original collection holds thirty-six fruit baskets in thirty-six
+languages and toolkits, written between 2005 and 2015, from AutoIt and
+Boo through PowerShell and wxPython. It answered a different question –
+what does this language look like – and it answered it well.</p>
+<p>These two answer a newer one: what does a program look like when it
+is built out of components that already know the conventions. The old
+collection is still worth reading for the breadth; these two are what to
+copy.</p>
+<h2 id="tutorials-that-can-be-heard">Tutorials that can be heard</h2>
+<p><code>Tutorial_HomerDev.inix</code> is the kit’s own walkthrough,
+written in the step format the tutorial tooling reads:</p>
+<pre><code>[step]
+Say  = the narration
+Key  = the keystroke, named the way a person says it
+Hear = what the screen reader answers   (repeat for several lines)
+Note = written version only; never spoken</code></pre>
+<p><code>Tools\buildTutorials.cmd</code> turns the scripts into audio
+<strong>in two voices</strong> and into one .mkv with a chapter per
+tutorial. See the Spoken tutorials section for the format, the tools,
+the voices and what may be published.</p>
+<p>Windows’ own voices do the speaking, so nothing is installed and
+nothing leaves the machine. One <code>.wav</code> per spoken line is
+kept, so a single sentence can be re-recorded without redoing the
+tutorial, and the parts are joined into one <code>.mp3</code> when
+ffmpeg is on the PATH.</p>
+<p>Write a tutorial the same way: one <code>[step]</code> per keystroke,
+the narration short enough to say in a breath, and every screen-reader
+answer written as the reader actually says it rather than as the screen
+shows it.</p>
+<h1 id="for-an-ai-writing-a-homer-app">For an AI writing a Homer
+app</h1>
+<p>Everything above is the answer to “how should this be written”. The
+short version to hold in mind:</p>
+<ul>
+<li>Use the Homer namespace. If a shared class covers the job, use it
+instead of writing something project-specific. The more the shared
+classes are exercised, the better they get.</li>
+<li>Build every dialog from Lbc primitives, in the order the user should
+tab.</li>
+<li>Follow Camel Type, including in generated code.</li>
+<li>Settings in <code>.inix</code>, saved the moment they are
+answered.</li>
+<li>Speak only what the screen reader cannot know.</li>
+<li>Write a detailed log: <code>Log.start</code> at the top of the
+program, the environment and every setting after it, every command with
+its exit code, every error with its stack. Keep the console short.</li>
+<li>Put private thinking in <code>self.md</code>, not in a comment and
+not in History.md.</li>
+<li>Match the noun to the count, and treat zero as an answer.</li>
+<li>Sort every list alphabetically, in code and in documentation alike –
+module lists, declarations, options, switches, catalogues of anything –
+unless another order is clearly more logical, which chronology, a
+pipeline’s own sequence, and a wizard’s page order all are. A reader who
+knows the order can find an item without reading the whole list, and a
+list nobody sorted grows by accretion into one nobody can check.</li>
+<li>Do not police the user’s language. Readability and plain-language
+help are welcome; rules about which words are acceptable are not, and
+any word-policing package in a prose checker should be left out or
+switched off by name.</li>
+</ul>
+</body>
+</html>

@@ -18,6 +18,8 @@ buildHomerDev.cmd
 buildHomerDev.py
 checkHomerDev.cmd
 checkHomerDev.py
+createHomerDevRepo.cmd
+createHomerDevRepo.ps1
 newHomerApp.cmd
 releaseHomerDev.cmd
 newHomerApp.py

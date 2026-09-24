@@ -1,0 +1,1381 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Jamal Mazrui" />
+  <title>History</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">History</h1>
+<p class="author">Jamal Mazrui</p>
+</header>
+<h1 id="history">History</h1>
+<h1 id="september-2026">1.27.0 – 23 September 2026</h1>
+<p><strong>Repeated speech is handled in the kit, not app by
+app.</strong> <code>Say.say</code> drops a line that repeats the last
+one within a second and a half, or that matches the title of the window
+in front or the name of the control with focus – the three shapes of
+duplicate announcement that have been reported for years.
+<code>sayForced</code> is never guarded, so a toggle can answer twice.
+Anything dropped is logged with the reason.</p>
+<p>The other mechanism, an accessible name repeating a caption, cannot
+be fixed at run time and is now audited instead: every accessible name
+is compared against every caption in the same source, and a match fails
+the check. A new section in the guide, <strong>Not twice: speech that
+repeats</strong>, says which is which.</p>
+<h1 id="september-2026-1">1.26.0 – 22 September 2026</h1>
+<p><strong>The published repository was missing most of itself.</strong>
+The whitelist in .gitignore still named the documents at the top level,
+where they were before they moved into <code>help</code>, and named
+neither <code>help</code>, <code>Tools</code>, <code>version.txt</code>
+nor the check and release scripts. So a clone or a downloaded zip had no
+guide, no history, no tools and no checker – which is what an outside
+audit of the published archive found. The whitelist is generated from
+RepoFiles.txt again, and createHomerDevRepo is in RepoFiles.</p>
+<p><strong>The lesson worth keeping:</strong> the checker runs on the
+working folder, so it passed while the thing people actually download
+was missing sixteen paths. Check the archive, not the folder it came
+from.</p>
+<h1 id="september-2026-2">1.25.0 – 21 September 2026</h1>
+<p>Runtime logs record the conversation. <strong>Say.onSpoken</strong>
+sends every utterance to the app’s log, including those withheld because
+extra speech was off, so a runtime log holds what the program said
+beside what the user pressed. A new <strong>Evidence for the AI</strong>
+section in the guide sets out the four records of a session – build,
+release, runtime and the screen reader’s speech history – and how to
+gather each.</p>
+<p><strong><em>APP</em>.cmd</strong>, a template: with programs built
+into exec, typing the program’s name at the top of the project would
+find nothing. This wrapper runs the fresh build from there.</p>
+<h1 id="september-2026-3">1.24.0 – 21 September 2026</h1>
+<p><strong>LbcMenuItem</strong>, in Lbc.cs: a menu item that tells the
+screen reader both its shortcut and its access letter. A stock item’s
+name leaves out the shortcut; replacing the name to put it in hides the
+letter, and the reader falls back to announcing a first letter that may
+not work. LbcMenuItem answers both itself. Use it for every item that
+runs a command; submenus keep the stock item.</p>
+<p><strong>The tutorial narrator</strong> gains a NarratorPitch setting,
+in semitones, applied with ffmpeg after piper speaks so the length does
+not change. The default is -2 with NarratorScale 0.80: a beta tester
+with the high-frequency loss that comes with age found the narrator hard
+to follow at 0.72 and full pitch.</p>
+<h1 id="september-2026-4">1.23.0 – 21 September 2026</h1>
+<p>homerTidy learns the Homer layout, and apps stop writing their own
+clean-up scripts. It moves a file the installer takes from exec or help
+into that folder, sends stray logs to logs, and never surveys exec or
+logs. A project’s <strong>LocalFiles.txt</strong> names what belongs on
+this disk but not in the repository – the per-app customization that a
+separate cleanDir used to carry – and every line of it is written into
+.gitignore as never pushed.</p>
+<p>Also fixed: two identical files the project names, such as the same
+script in two sample folders, are no longer treated as duplicates to
+remove.</p>
+<h1 id="september-2026-5">1.22.1 – 21 September 2026</h1>
+<p>tagRelease joins the logs folder: each run writes
+<code>logs\&lt;App&gt;-release-&lt;date&gt;-&lt;time&gt;.log</code>
+instead of overwriting <code>tagRelease.log</code> at the top of the
+project. Install it with <code>Tools\installTools</code>, which copies
+the kit’s tools to C:.</p>
+<h1 id="september-2026-6">1.22.0 – 21 September 2026</h1>
+<p>Development logs join the tree. Every build, clean, tidy, tutorial
+and audit run writes its own file in the project’s <code>logs</code>
+folder, named as the program names its runtime logs:
+<code>&lt;App&gt;-&lt;task&gt;-yyyyMMdd-HHmmss.log</code>. One session
+per file, an alphabetical sort is a chronological one, and one zip
+gathers them all. The build template, homerTidy, buildTutorials,
+makeTutorials and makeHotkeys all follow it.</p>
+<h1 id="september-2026-7">1.21.0 – 21 September 2026</h1>
+<p>The development folder takes the installed shape. Sources and build
+files stay at the top with ReadMe and License; programs are built into
+<code>exec</code>, documents live in <code>help</code>, tooling in
+<code>scripts</code>. A clean-up script that predates the layout moved
+DbDo’s <code>scripts</code> folder as obsolete, since Windows treats
+Scripts and scripts as one name – the guide now says so.</p>
+<p>Also recorded: why Homer menus are long and flat, when a submenu
+earns its place, the function-key families, the two rules for letters
+with the X, Un- and Z exceptions, and the Hotkeys.md format.</p>
+<h1 id="september-2026-8">1.20.0 – 20 September 2026</h1>
+<p>A demo script declares its own terms.</p>
+<p>The tutorial .inix gains a <code>[global]</code> first section: the
+voices, their speeds, the screen reader’s flatness, the silence before
+the first word and between passages, and where the engines are when they
+are somewhere unusual. Script 00 sets the series defaults and any later
+script can override them for itself.</p>
+<p>That also gives the file kind a name. An .inix whose sections are
+speech passages is a <strong>demo script</strong>, and it says so:
+<code>FileTask = demo</code>, the way report and accept files declare
+themselves.</p>
+<h1 id="september-2026-9">1.19.0 – 20 September 2026</h1>
+<p>Spoken tutorials become a kit capability.</p>
+<p>DbDo grew a set of simulated walkthroughs – a narrator and a screen
+reader, built from text files – and the tooling was app-specific by
+accident rather than by design. It is in the kit now:
+<code>buildTutorials</code> and <code>makeTutorials</code> in Tools, a
+starter script in Templates, and a section in the guide covering the
+format, the tools, the voices and what may be published.</p>
+<p>Two things in that section are worth stating on their own.</p>
+<p><strong>The voices are chosen by licence first.</strong> Most of
+piper’s best-known English voices cannot be redistributed – lessac is
+Blizzard 2013, research only; ryan and the hfc pair are CC BY-NC-SA;
+libritts_r is fine-tuned from lessac. The kit installs kristin and john,
+both trained on public domain recordings, so the audio an app publishes
+is free of restrictions.</p>
+<p><strong>Say the word the key comes from.</strong> Now a universal
+guideline rather than a tutorial habit: wherever a key is introduced,
+name the word its letter comes from. A key whose mnemonic goes unsaid is
+one somebody has to memorise rather than understand, and the association
+is why that key was chosen.</p>
+<p>The same rule governs HEADINGS, which is where it is easiest to miss.
+A section called “Sorting” teaches the wrong letter, because the command
+is Order and the key is O. The test is simple: if the heading were the
+only thing somebody remembered, which key would they press?</p>
+<p>sayTutorial, which spoke a single script in two SAPI voices, is
+replaced by buildTutorials, which does that and everything after it.</p>
+<h1 id="september-2026-10">1.18.0 – 19 September 2026</h1>
+<p>A script that shells out to an installer says where the window
+went.</p>
+<p><code>buildTutorials</code> in DbDo appeared to hang while fetching a
+voice. It was not hung: a User Account Control prompt had opened behind
+everything, without taking focus, and was waiting for an answer nobody
+knew it had asked for. A sighted user gets a taskbar flash; a screen
+reader user gets silence.</p>
+<p>So the kit’s installer scripts now say, before they start, that
+Windows may ask for permission in a window behind this one, and that
+Alt+Tab finds it. Where the wait can be watched –
+<code>consent.exe</code> is the prompt itself – a script can say
+“Windows is asking for permission now” the moment it appears, and give
+the wait a time limit so an answer that never comes ends in a sentence
+rather than a hang. The guide says all three.</p>
+<h1 id="september-2026-11">1.17.0 – 19 September 2026</h1>
+<p>Everything DbDo’s installer taught this week, folded back in.</p>
+<h2 id="the-destination-page">The destination page</h2>
+<p><code>DisableDirPage=auto</code> with
+<code>UsePreviousAppDir=yes</code>. A reinstall or an update now asks
+nothing and goes where the last one went; a first install still chooses.
+HomerScribe already did this and the template did not.</p>
+<h2 id="probe-quoting-which-cost-three-releases">Probe quoting, which
+cost three releases</h2>
+<p><code>cmd /c</code> strips the first and last quote of what follows
+it, so a probe beginning with a quoted path –
+<code>"C:\...\ollama.exe" --version</code> – lost its opening quote and
+ran nothing. Empty output read as “not installed”, and an installer kept
+offering to install a tool that was already there. The whole command is
+now wrapped in one more pair of quotes.</p>
+<h2 id="detect-by-looking-not-by-running">Detect by looking, not by
+running</h2>
+<p>The file and the uninstall registry key are checked first: no
+process, no quoting, no PATH, and an elevated installer still sees them.
+The tool is run only to learn its version, never to learn whether it
+exists. Ollama installs per user, into a profile an elevated installer’s
+PATH cannot reach, which is what made this the failure it was.</p>
+<h2 id="three-entries-per-component-with-versions-in-the-label">Three
+entries per component, with versions in the label</h2>
+<p>One entry per state – install, update, already current – grouped so
+the ones that do something come first, only one ever shown. The label
+carries the versions and nothing else:</p>
+<pre><code>Install Ollama 0.34.1
+Update Ollama from 0.33.0 to 0.34.1
+Reinstall Ollama 0.34.1 (current version)</code></pre>
+<p>A purpose clause belongs only in the fallback, where no version is
+known. The launch and guide entries keep the words the other apps use,
+name and key substituted and nothing more.</p>
+<h2 id="the-results-box-is-not-a-checkbox">The Results box is not a
+checkbox</h2>
+<p>It always runs and it must run last, so it is started from code in
+<code>DeinitializeSetup</code> rather than listed on the finish page. A
+launch checkbox leaves a marker instead of starting the program, and the
+summary starts it once the box has been closed.</p>
+<h2 id="every-probe-is-logged">Every probe is logged</h2>
+<p>Command, exit code, output. Three rounds went into finding a fault
+that one logged probe would have shown at once.</p>
+<h1 id="september-2026-12">1.16.0 – 19 September 2026</h1>
+<p>Finish-page checkboxes that look before they offer.</p>
+<p>DbDo’s installer offered to install Ollama on a machine that already
+had it. The guideline said what the finish page should contain and not
+that a checkbox must first ask the machine, so the template did not
+either.</p>
+<p>Both now do. <code>ollamaState</code> asks winget, then looks for the
+per-user copy at <code>%LOCALAPPDATA%\Programs\Ollama\ollama.exe</code>,
+and caches the answer: 0 not installed, 1 out of date, 2 current.
+<code>ollamaNeedsInstall</code> and <code>ollamaIsPresent</code> gate
+the entries, and <code>descOllama</code> writes the label – install,
+update, or reinstall – so the checkbox says what it would actually do.
+The pattern is EdSharp’s <code>devToolState</code>, at the scale a
+smaller app needs.</p>
+<p>The guide also now states what was previously only in the template:
+the last checkbox runs <code>homerFinish.cmd</code> rather than the
+program, because Inno runs the entries in order and a program started
+last puts its window over whatever the other entries were still saying.
+And it says what the Results box should hold: the program and where it
+is, one line per ticked checkbox, and the log’s location. Nothing about
+a step that did not run.</p>
+<h1 id="september-2026-13">1.15.0 – 19 September 2026</h1>
+<p><code>jobs</code> became <code>scripts</code>, and
+<code>samples</code> folded into <code>templates</code>.</p>
+<p>The folder layout is now, in the installed tree:
+<code>configs</code>, <code>data</code>, <code>exec</code>,
+<code>help</code>, <code>scripts</code>, <code>templates</code>. In the
+per-user tree: <code>configs</code>, <code>data</code>,
+<code>logs</code>, <code>results</code>, <code>scripts</code>,
+<code>temp</code>. Every initial is still distinct in each listing, and
+<code>temp</code> and <code>templates</code> still never appear
+together.</p>
+<p><strong><code>jobs</code> became <code>scripts</code></strong>
+because the word arrived from mainframe batch processing and everybody
+now says scripts. Same letter, better word. <code>Paths.jobs</code> is
+<code>Paths.scripts</code>, <code>shippedJobs</code> is
+<code>shippedScripts</code>, and the MDI frame’s command is <strong>Run
+a Script on Alt+Shift+S</strong>, where it used to be Run a Job on
+Alt+Shift+J.</p>
+<p><strong><code>samples</code> folded into
+<code>templates</code>.</strong> A template that shows what is possible
+is a sample with a purpose. The alternatives collided:
+<code>examples</code> wants e, which is <code>exec</code>, and
+<code>demos</code> wants d, which is <code>data</code>. The installer
+template ships one folder now, with a comment saying why.</p>
+<p>DbDo needs no change for this: it already keeps its scripts in
+<code>Scripts\</code>.</p>
+<h1 id="september-2026-14">1.14.1 – 19 September 2026</h1>
+<p>The build template fetches what it needs.</p>
+<p>Reviewing DbDo’s build against the kit’s own showed that the kit was
+not following its own rule in two places. A build script asks the web
+for what it needs rather than asking the person, and the template said
+“Inno Setup was not found. To produce the installer, open the .iss and
+click Compile” – which is a manual step – and left pandoc to the same
+fate.</p>
+<p>Both are now installed with winget when they are missing. A missing
+Inno Setup after that attempt fails the build rather than quietly
+skipping the installer, because the installer is part of a release. And
+an ISCC that returns 0 without writing the .exe now fails too.</p>
+<h1 id="september-2026-15">1.14.0 – 19 September 2026</h1>
+<p>A module can need an assembly, and now it says so.</p>
+<p>DbDo’s first build against the kit failed with four copies of</p>
+<pre><code>error CS0246: The type or namespace name &#39;ZipArchive&#39; could not be found</code></pre>
+<p>in <code>Inix.cs</code>. Nothing was wrong with <code>Inix.cs</code>:
+reading and writing .xlsx means reading and writing a zip archive, csc
+does not resolve <code>System.IO.Compression</code> from csc.rsp, and
+DbDo’s build script did not pass it. The kit’s own template always had,
+which is why the samples never showed it.</p>
+<p>That is the same class of fault as <code>Mdi.cs</code> needing
+<code>KeyMap.cs</code>, one level lower, and nastier: a missing module
+reports a missing NAME and points at the build script, while a missing
+assembly reports a missing TYPE and points at the module.</p>
+<p>So a module now declares both:</p>
+<pre><code>// REQUIRES: KeyMap.cs, Lbc.cs, Log.cs, Paths.cs, Say.cs, Util.cs.
+// ASSEMBLIES: System.IO.Compression.dll, System.IO.Compression.FileSystem.dll.</code></pre>
+<p><code>Inix.cs</code>, <code>Say.cs</code> and <code>Web.cs</code>
+carry ASSEMBLIES lines, and <code>checkHomerDev</code> reads every build
+script – the samples’, the templates’, and any other it is pointed at –
+for one that compiles a module without the references it names.</p>
+<h1 id="september-2026-16">1.13.5 – 19 September 2026</h1>
+<p><code>Announce.md</code> carries the facts a reader asks for
+first.</p>
+<p>Jamal’s own explanation of the project, written after the first
+posting, added what the draft had left out: that the project
+consolidates decades of screen reader oriented development under
+Windows; that the classes come in equivalent C# and Python versions, the
+C# for .NET Framework 4.8 which builds on any modern Windows and the
+Python for any recent version; that the functionality covers layout by
+code, standard dialogs, and components that help a screen reader user
+work with AI assistance or by hand; and that template files help with a
+build script and an Inno Setup installer.</p>
+<p>All of that is now in the announcement, in the places where a reader
+would look for it, and the piece is still one posting at about 2,800
+characters.</p>
+<h1 id="september-2026-17">1.13.4 – 19 September 2026</h1>
+<p><code>Announce.md</code> leads with what somebody gets.</p>
+<p>The previous version listed what the kit contains and left the reader
+to work out why that mattered. It now opens with the benefit – building
+a small Windows tool of your own should not require first discovering,
+by trial and error, what makes a program work well with a screen reader
+– and the features appear underneath as what makes that possible.</p>
+<p>It also follows the form of the other Homer announcements: a title
+and subtitle, the date, the licence, the link, and plain paragraphs. One
+piece of content, 2,581 characters, which fits a LinkedIn post, a
+Facebook post, or an email as it stands.</p>
+<h1 id="september-2026-18">1.13.3 – 19 September 2026</h1>
+<p><code>Announce.md</code> is one announcement.</p>
+<p>It held three versions and a page of notes about character limits and
+editorial intent. None of that belongs in a document whose job is to be
+posted. The file is now a single piece of content, 2,241 characters of
+body, which fits LinkedIn’s 3,000-character cap, fits Facebook, and
+reads as an email.</p>
+<p>It opens with what the kit is, then says what it is built on, then
+the features, then the checks, then the samples, the licence and the
+link. No headings about where to paste it and no commentary about
+itself.</p>
+<h1 id="september-2026-19">1.13.2 – 19 September 2026</h1>
+<p>The announcements say what this actually is.</p>
+<h2 id="all-four-programs-built-at-1.13.1">All four programs built at
+1.13.1</h2>
+<p>FruitBasketCs, FruitBasketMdiCs, FruitBasketMdiPy and FruitBasketPy
+each produced their executable, and the kit audit found 0 problems.</p>
+<h2 id="announce.md-rewritten-around-the-honest-claim">Announce.md,
+rewritten around the honest claim</h2>
+<p>The three posts now say the true thing rather than the impressive
+one: this is about twenty years of learning consolidated into one place,
+with AI making the consolidation practical, so that somebody else can
+start from foundations that work rather than from a blank file.</p>
+<p>Both halves of that are stated plainly. The knowledge is not new and
+the posts do not pretend it is. The consolidation is what is new –
+gathering decisions scattered across a dozen programs, writing down why
+each is what it is, and checking that they still hold is work that was
+always worth doing and never quite got done – and it is honest to say
+that AI is what made it affordable.</p>
+<p>The posts also say that the kit covers both shapes these tools take:
+a graphical window, or a command line with the same settings and the
+same log.</p>
+<p>The file now opens with what the announcements deliberately avoid: no
+claim to be first, no promise about what somebody will build, no number
+that cannot be checked.</p>
+<p>Lengths are measured rather than estimated: the short post is about
+1,600 characters, the standard post about 2,500, and the email version
+longer because email has no limit.</p>
+<h1 id="september-2026-20">1.13.1 – 19 September 2026</h1>
+<p>One command for the whole release.</p>
+<h2 id="all-four-samples-built-at-1.13.0">All four samples built at
+1.13.0</h2>
+<p><code>buildHomerDev</code> converted the documents, built
+FruitBasketCs, FruitBasketMdiCs, FruitBasketMdiPy and FruitBasketPy, and
+found 0 problems.</p>
+<h2 id="releasehomerdev">releaseHomerDev</h2>
+<pre><code>releaseHomerDev &quot;What changed.&quot;</code></pre>
+<p>Four steps, stopping at the first failure: <code>installTools</code>
+puts the kit’s current tools on the PATH so an old
+<code>tagRelease</code> cannot refuse the release;
+<code>checkHomerDev</code> records the environment, builds everything
+from clean, checks the dependency rule and the tools on the PATH, and
+drives every program through its keys with uiCheck; <code>gitPush</code>
+commits and pushes what the whitelist allows; and
+<code>gitRelease</code> tags and publishes.</p>
+<p>Nothing in it is a test somebody has to remember. What it cannot do
+is read the third list of its own evidence report – what remains
+uncertain – and that is the one thing to do before announcing.</p>
+<p><code>gitRelease</code> now prefers <code>checkHomerDev</code> when
+the folder has one, so releasing the kit runs the kit’s own check rather
+than the per-app one.</p>
+<h1 id="september-2026-21">1.13.0 – 19 September 2026</h1>
+<p>The keys are now pressed by a script.</p>
+<h2 id="uicheck">uiCheck</h2>
+<pre><code>uiCheck                    every uiTest.inix beside the script
+uiCheck --path C:\JobDo    an app&#39;s own tests</code></pre>
+<p>It starts a real program, sends keystrokes, and reads back the
+Windows UI Automation tree – the same interface a screen reader uses to
+find out what is on the screen. A control with no accessible name is
+invisible to both, so a check that finds nothing has found something
+real.</p>
+<p>Tests live beside the program in <code>uiTest.inix</code>:
+<code>Run</code> names the program, then each <code>[step]</code> has
+<code>Keys</code> to send, <code>Wants</code> for a string that must
+appear in the tree, <code>Title</code> for a window that must exist, and
+<code>Escape</code> to close what the step opened. pywinauto does the
+driving and installs itself on first run.</p>
+<p><code>Samples\uiTest.inix</code> drives all four samples, including
+every key an MDI app gets free: Control+N for a second window, F4 for
+the window list, Alt+Shift+J for the job list, Alt+Shift+C for the
+settings list, Alt+F1 for about.</p>
+<p>This replaces the last instruction in this project that said “open it
+and press the keys”. A check a person has to remember is a check that
+stops happening in the week it matters.</p>
+<h2 id="checkhomerdev-checks-the-machine-too">checkHomerDev checks the
+machine too</h2>
+<p>Two additions, both from faults that actually happened:</p>
+<ul>
+<li><strong>The environment is recorded</strong> – which Python and
+which pandoc the run actually used – so a report says what it was
+produced with.</li>
+<li><strong>Every tool on your PATH is compared with the kit’s
+copy.</strong> A release failed on a <code>tagRelease</code> from before
+source-only releases were supported, and nothing could see it, because
+the kit only inspected itself. When the check reports a stale tool,
+<code>Tools\installTools</code> fixes it.</li>
+</ul>
+<p><code>checkHomerDev</code> now runs uiCheck as its last step, so one
+command builds everything from clean and then drives it.</p>
+<h2 id="what-is-still-not-automated">What is still not automated</h2>
+<p>Speech. UI Automation reports that a control exists and what it is
+called, not what JAWS said. NVDA can log what it speaks at debug level,
+so a future check could run a scripted session and read that log back.
+It is written down as the next step rather than claimed as done, and
+every report says so.</p>
+<h1 id="september-2026-22">1.12.1 – 19 September 2026</h1>
+<p>Everything builds; the release itself needed one more script.</p>
+<h2 id="all-four-samples-built-and-the-kit-audited-clean">All four
+samples built, and the kit audited clean</h2>
+<p><code>buildHomerDev</code> converted the documents, built
+FruitBasketCs, FruitBasketMdiCs, FruitBasketMdiPy and FruitBasketPy, and
+found 0 problems. That is the first run where the whole kit – three
+shapes, two languages, one command – came through in one pass.</p>
+<h2 id="tagrelease-failed-and-it-was-not-tagrelease">tagRelease failed,
+and it was not tagRelease</h2>
+<pre><code>Could not find HomerDev_setup.iss in C:\HomerDev</code></pre>
+<p>That is a <code>tagRelease</code> from before source-only releases
+were supported. The kit has carried the fixed one since 1.1, in
+<code>Tools</code>, but the copy that runs is the one on the PATH, and
+nothing had ever updated it.</p>
+<p><code>Tools\installTools.cmd</code> does that now. It copies
+checkHomerApp, gitPush, gitRelease, homerTidy, sayTutorial and
+tagRelease to a folder on the PATH – <code>C:\bin</code> unless another
+is named – and says plainly if that folder is not on the PATH. Run it
+after updating the kit.</p>
+<p>The lesson generalizes: a tool that acts on the current directory is
+meant to have one copy, and one copy means one copy that can go stale.
+<code>Developer.md</code> now opens with the release sequence,
+<code>installTools</code> included.</p>
+<h2 id="smaller-things">Smaller things</h2>
+<ul>
+<li>The migration list covers the MDI sample’s rename, so the old
+<code>FruitBasketMdi.exe</code> and its log go on the next build.</li>
+<li>The tutorial playlist no longer implies the two planned episodes are
+written. They are not.</li>
+</ul>
+<h1 id="september-2026-23">1.12.0 – 19 September 2026</h1>
+<p>The MDI shape in both languages, two lists that matter, and an
+FAQ.</p>
+<h2 id="fruitbasketmdics-and-fruitbasketmdipy">FruitBasketMdiCs and
+FruitBasketMdiPy</h2>
+<p>The MDI sample is now a pair, like the single-dialog one.
+<code>homer\mdi.py</code> is the Python side of <code>Mdi.cs</code>:
+same command names, same keys, same title rule, same menus. So the claim
+the kit makes – one behaviour, either language – now holds for all three
+shapes rather than two.</p>
+<p>One honest note, which is in the file as well:
+<code>lbc.Dialog</code> builds a dialog, and a wx dialog cannot be an
+MDI child, so the band layout in <code>mdi.py</code> is written again
+rather than reused. Everything that makes a control accessible IS
+reused. Lifting lbc’s building methods into a mixin that a dialog and a
+panel can share is the next refactor, and it has not been done.</p>
+<h2 id="one-command-builds-everything">One command builds
+everything</h2>
+<p><code>buildHomerDev</code> now converts the documents, <strong>builds
+all four samples</strong>, and audits the kit. Somebody who changes a
+shared class should not have to remember four build scripts; a problem
+anywhere surfaces from the one thing they already run. Each sample still
+writes its own log beside itself, and a failure is named on screen with
+the log that holds the compiler output.</p>
+<p><code>checkHomerDev</code> is unchanged in purpose and now covers all
+four: it cleans first, checks the module dependency rule, and writes the
+evidence report.</p>
+<h2 id="run-a-job-and-change-a-setting">Run a Job, and Change a
+Setting</h2>
+<p>Every MDI app now gets two more commands free:</p>
+<pre><code>Alt+Shift+J    run a job: a list of the scripts in the jobs folder
+Alt+Shift+C    change a setting: a list of what this program lets you change</code></pre>
+<p>Both are lists, and <code>HomerDev.md</code> says at length why.
+Briefly: without sight, a folder is a sequence to be heard and a typed
+path is a spelling test, while a list is reached by one key and narrowed
+by first letter. The job list is read fresh every time, so dropping a
+script into the folder makes it available with nothing to register. The
+user’s own jobs live in the per-user tree, where an update cannot
+overwrite them, and appear above the shipped ones.</p>
+<p>Settings are declared by the app with <code>addSetting</code>,
+changed through one field, saved the moment they are answered, and
+handed back to the app through <code>onSettingChanged</code> so they
+take effect at once. No file to edit by hand, no twenty-control
+preferences dialog, no restart.</p>
+<h2 id="faq.md">FAQ.md</h2>
+<p>A new standard document, in <code>help</code> with the others. It
+answers the question that comes first from outside the Windows world –
+why not Mac – plainly: this kit is built on decades of Windows screen
+reader experience and exists to make that experience as good as it can
+be; that depth is missing for other platforms, and writing conventions I
+had not lived with would produce confident guidance that turned out to
+be wrong. The code is MIT licensed and developers on those platforms are
+welcome to it.</p>
+<p>The full document set is now <code>ReadMe.md</code> and
+<code>License.md</code> at the top, and in <code>help</code>:
+<code>&lt;App&gt;.md</code>, <code>Announce.md</code>,
+<code>Developer.md</code>, <code>FAQ.md</code>, <code>History.md</code>,
+<code>Hotkeys.md</code> and <code>Tutorials.md</code>.</p>
+<h1 id="september-2026-24">1.11.0 – 19 September 2026</h1>
+<p>Ready for a first public release.</p>
+<h2 id="the-documents-now-say-what-the-kit-does">The documents now say
+what the kit does</h2>
+<p>A full pass over every document against the actual contents of the
+folder. What had drifted:</p>
+<ul>
+<li>The kit has <strong>twelve</strong> C# modules, not nine. Inix,
+KeyMap, KeyName, Lbc, Log, Mdi, Paths, PdfRead, Say, Util, Web and
+inixVert.</li>
+<li>The Python side has <strong>seven</strong> modules – inix, lbc, log,
+paths, say, util and web – plus the package file and the version file
+the build writes.</li>
+<li>There are <strong>three</strong> samples, not two.</li>
+<li><code>Style\</code> no longer exists; its files are in
+<code>help</code>. Three documents still pointed at the old path.</li>
+<li><code>Developer.md</code> carried the folder tree from three layouts
+ago.</li>
+<li><code>Hotkeys.md</code> had no section for the MDI frame’s keys,
+which every multiple-document app gets for free.</li>
+</ul>
+<h2
+id="announce.md-is-now-three-announcements-each-already-the-right-length">Announce.md
+is now three announcements, each already the right length</h2>
+<p>The Word document made from <code>Announce.md</code> was always far
+too long to paste into a post, which is the wrong way round: the
+document should hold posts that are ready to use.</p>
+<p>It now holds three, with their character counts measured rather than
+estimated:</p>
+<ul>
+<li><strong>the short post, about 1,700 characters</strong> – fits
+anywhere, including a mailing list digest or a forum with a tight
+limit</li>
+<li><strong>the standard post, about 2,200 characters</strong> – for
+LinkedIn and Facebook</li>
+<li><strong>the email version</strong> – longer, plain text, with a
+subject line</li>
+</ul>
+<p>LinkedIn caps a post at 3,000 characters including spaces, which its
+own help page states, and that is the only limit that rejects a post
+outright. Facebook’s is far larger. The limit that decides whether
+anybody reads it is smaller than either: roughly the first 140 to 210
+characters are shown before a “see more” link, so both posts are written
+to carry their point in the first two sentences.</p>
+<p>The file also says what the announcements deliberately avoid: no
+claim to be the first anything, no promise about what somebody will be
+able to build, and no number that cannot be checked.</p>
+<h1 id="september-2026-25">1.10.1 – 19 September 2026</h1>
+<p>The build now clears up after a move.</p>
+<h2 id="all-three-samples-built-at-1.10.0">All three samples built at
+1.10.0</h2>
+<p>FruitBasketCs, FruitBasketMdi and FruitBasketPy each produced their
+program again, so moving the documents disturbed nothing that
+compiles.</p>
+<h2 id="twenty-documents-when-there-are-twelve">Twenty documents, when
+there are twelve</h2>
+<p>The 1.10.0 run converted 20 documents instead of 12. Unarchiving over
+an existing folder adds and replaces; it never deletes. So every
+document that moved into <code>help</code> was still sitting at the old
+path as well, and <code>Style</code> was still there beside it. Two
+files with the same name and different contents is worse than either
+alone.</p>
+<p>The previous release answered that with a sentence telling the user
+to delete the old copies. That was the wrong kind of answer, and it
+broke a standing rule of this kit: ship a script that makes the change,
+not a step for somebody to carry out.</p>
+<p><code>buildHomerDev</code> now does it. It carries a list of pairs –
+where a file used to be, and where it is now – and removes the old copy
+when, and only when, the new one is already in place. The same list
+clears the folders an earlier layout left empty: <code>Style</code>,
+<code>Python\homer</code>, and the three per-sample folders from before
+the samples were flattened. It is logged file by file and summarized in
+one line on screen.</p>
+<p>Every move the kit has made is in that list, back to
+<code>Keys.cs</code> becoming <code>KeyName.cs</code>, so a machine
+carrying any earlier version tidies itself on the next build.</p>
+<h1 id="september-2026-26">1.10.0 – 19 September 2026</h1>
+<p>A place for the documents, and two scripts for releasing.</p>
+<h2 id="help-the-tenth-folder">help, the tenth folder</h2>
+<p><code>help</code> joins the layout, at the same level as configs,
+data, exec, jobs, logs, results, samples, temp and templates. Its
+letter, h, was free, and it holds every document – the guide,
+<code>Tutorials.md</code>, <code>History.md</code>,
+<code>Hotkeys.md</code>, <code>Announce.md</code>,
+<code>Developer.md</code>, the style guides and the tutorial scripts –
+in both <code>.md</code> and <code>.htm</code>.</p>
+<p><code>ReadMe</code> and <code>License</code> stay at the top of the
+project. That is not sentiment: it is what GitHub recognizes, and it is
+where a person opening the folder for the first time looks.</p>
+<p><strong>Why not <code>docs</code>, which is the GitHub
+convention?</strong> Because <code>d</code> is <code>data</code> here,
+and the letters are the point of the layout. What that costs is one
+feature: GitHub Pages published from a <code>/docs</code> folder. Homer
+apps are listed from the separate HomerTools site instead, so nothing is
+actually given up. README recognition is unaffected, since the ReadMe
+stays at the root. Community health files, if a project ever wants them,
+go in <code>.github</code>, which GitHub also recognizes and which
+leaves the letters alone.</p>
+<h2 id="tutorials.md-and-announce.md-join-the-standard-set">Tutorials.md
+and Announce.md join the standard set</h2>
+<p>The full documentation set is now: <code>ReadMe.md</code> and
+<code>License.md</code> at the top, and in <code>help</code>:
+<code>&lt;App&gt;.md</code>, <code>Announce.md</code>,
+<code>Developer.md</code>, <code>History.md</code>,
+<code>Hotkeys.md</code> and <code>Tutorials.md</code>. Every one has a
+matching <code>.htm</code>, and <code>checkHomerApp</code> checks for
+all of them in their right place.</p>
+<p><code>Tutorials.md</code> holds nine worked scenarios – starting an
+app, adding a field, finding out what a key does, turning one window
+into many, reading a log, writing acceptance criteria, changing a shared
+class, releasing, and asking an AI for a Homer app – plus the audio
+tutorial playlist and how to record more.</p>
+<h2 id="gitpush-and-gitrelease">gitPush and gitRelease</h2>
+<p>Both from the versions in daily use, with three changes.
+<code>gitPush</code> takes the commit message as an argument instead of
+always saying “Fix.”, refuses to run outside a git repository rather
+than creating one by accident, and writes a log. <code>gitRelease</code>
+runs <code>checkHomerApp --build</code> first and stops if anything
+failed, because a release is the one moment where a fault costs somebody
+else time rather than you. <code>--skip-check</code> is there for when
+you already know.</p>
+<p>Both stage only what the whitelist allows, so <code>git add -A</code>
+means “everything the project has named” rather than “everything in the
+folder”.</p>
+<h2 id="every-file-listed">Every file, listed</h2>
+<p><code>HomerDev.md</code> gained a manifest: every file in the kit
+with one line saying why it is there, grouped by folder. A file you have
+not seen before can now be looked up rather than guessed at.</p>
+<h1 id="september-2026-27">1.9.0 – 19 September 2026</h1>
+<p>The kit can now check itself with a compiler.</p>
+<h2 id="all-three-samples-built-at-1.8.1">All three samples built at
+1.8.1</h2>
+<p>FruitBasketCs, FruitBasketMdi and FruitBasketPy each produced their
+program. The MDI one is the news: it is the first real exercise of the
+adopting constructor added to <code>LbcDialog</code>, so an MDI child
+laid out by the same builder as a dialog now has a compiler’s word for
+it.</p>
+<h2 id="checkhomerdev">checkHomerDev</h2>
+<pre><code>checkHomerDev
+checkHomerDev --deep
+checkHomerDev --no-clean</code></pre>
+<p>It runs the kit audit, checks the module dependency rule, deletes
+what previous builds wrote, builds all three samples with their own
+scripts, and writes <code>evidence-kit-&lt;yyyymmdd-hhmmss&gt;.md</code>
+beside itself. Exit code 1 when anything failed, so a release script can
+act on it.</p>
+<p>The cleaning is the part that makes the answer mean something. A
+build that is not run still leaves yesterday’s executable in the folder,
+and an existence check would call that a pass.</p>
+<p><strong>The dependency check is new and general.</strong> Every
+module may declare what it needs in a <code>// REQUIRES:</code> line,
+and the check reads every build script – the samples’ and the templates’
+– for a script that includes a module without one of its requirements,
+ignoring commented lines, since a commented module is one deliberately
+left out. Today <code>Mdi.cs</code> is the only module with a REQUIRES
+line. The check exists because that was not true a release ago.</p>
+<p><strong>Why it exists, in three failures.</strong> 1.5.0 shipped a
+class-name collision that stopped <code>Lbc.cs</code> compiling. 1.6.0
+shipped a build script that treated a missing <code>version.txt</code>
+as fatal after the samples’ were removed. 1.8.0 shipped
+<code>Mdi.cs</code> without <code>KeyMap.cs</code> beside it. Every
+check in the kit read files; none compiled anything; a user found all
+three. A compiler is the only instrument that answers “does this still
+work.”</p>
+<p><strong>What it does not do</strong>, and says so in every report: it
+does not run the programs. All three samples are windowed, and a check
+that needs a person to close a window is not a check. What a screen
+reader says is still for a person to hear, and the report’s uncertain
+list names that first.</p>
+<h1 id="september-2026-28">1.8.1 – 19 September 2026</h1>
+<p>Three faults from the first run of 1.8.0, and one of them is a new
+kind.</p>
+<h2 id="the-mdi-sample-would-not-compile">The MDI sample would not
+compile</h2>
+<pre><code>Mdi.cs(137,13): error CS0103: The name &#39;KeyMap&#39; does not exist in the current context</code></pre>
+<p>Nine times over. <code>Mdi.cs</code> registers every command with
+<code>KeyMap</code> as it is added, and <code>KeyMap.cs</code> was
+commented out in the build script, as it has been in every Homer build
+script since the switches were written.</p>
+<p>This is a kind of fault the kit had not had before: <strong>a shared
+module that needs another shared module</strong>. The module list was
+written as though every file were independent, and until MDI arrived
+every file was. Three changes:</p>
+<ul>
+<li><code>Mdi.cs</code> now states what it requires at the top, where a
+reader looks.</li>
+<li>The build template pairs KeyMap and Mdi under one comment, since
+turning on one without the other cannot work.</li>
+<li>The MDI sample’s build script switches both on.</li>
+</ul>
+<p><code>Mdi.cs</code> and <code>KeyMap.cs</code> are the only pair in
+the kit. Everything else is independent, and the comment in the template
+says so, so nobody hunts for dependencies that are not there.</p>
+<h2 id="the-c-and-python-samples-both-built-and-ran">The C# and Python
+samples both built and ran</h2>
+<p>FruitBasketCs and FruitBasketPy each produced their program on the
+first try at 1.8.0, which means the adopting-constructor change to
+<code>LbcDialog</code> did not disturb ordinary dialogs. The MDI sample
+is still the real test of that seam.</p>
+<h2 id="the-kit-check-audited-files-the-build-had-written">The kit check
+audited files the build had written</h2>
+<p><code>Version.cs</code> and <code>version.py</code> are generated on
+every build and are already in the never-pushed list, so their encoding
+says nothing about the kit. Both the kit check and
+<code>checkHomerApp</code> now skip them.</p>
+<h1 id="september-2026-29">1.8.0 – 19 September 2026</h1>
+<p>MDI, and the three shapes named.</p>
+<h2 id="mdi.cs">Mdi.cs</h2>
+<p><code>MdiFrame</code> and <code>MdiChild</code> carry the frame of a
+multiple-document app, so EdSharp, FileDir and DbDo can share one
+implementation instead of three that drift. Free with the frame: the
+window picker on F4, the spoken window list on Shift+F4, next and
+previous, close and close-others, the alternate menu on Alt+F10, the key
+describer on Control+F1, about on Alt+F1 and the guide on F1. Commands
+are named sentences rather than control ids, registered with KeyMap as
+they are added, so the menu, the alternate menu, the key describer and
+the hotkey document cannot disagree.</p>
+<p>The design is the Homer.NET MDI fruit basket of 2010 – LbcMdiApp,
+LbcMdiFrame, LbcMdiChild, a menu declared by name and key, focus tips, a
+window picker, an alternate menu, a key describer. That program was
+right about the shape; this is the same shape with today’s classes under
+it.</p>
+<p>The title rule is enforced rather than documented: the frame carries
+the app name, a child carries its subject, and <code>setTitle</code> is
+the only way to set one.</p>
+<h2 id="lbcdialog-can-adopt-a-form">LbcDialog can adopt a form</h2>
+<p>A dialog and an MDI child differ in how they are shown, not in how
+they are laid out. <code>LbcDialog</code> now takes an optional existing
+form and builds into it, so a child gets add-order focus, the status
+line, the list search, the line chords and the access keys from the same
+code a dialog uses. An adopted form is finished with
+<code>layoutIntoForm</code>, which sizes it and sets the opening focus
+without showing anything, because the frame shows the child.</p>
+<h2 id="fruitbasketmdi.cs">FruitBasketMdi.cs</h2>
+<p>The third sample. It does not repeat the nine decisions –
+FruitBasketCs still carries those – and marks only what changes when a
+program holds several things at once: the title rule, commands as
+sentences, what the frame gives free, state per window, and closing the
+last window closing the program.</p>
+<h2 id="the-guide-names-the-three-shapes">The guide names the three
+shapes</h2>
+<p>A single tool with a command line and a dialog; a desktop-only
+program whose dependencies decided that; and a multiple-document
+program. The consistent flags for the first are written down –
+<code>--help</code>, <code>--gui</code>, <code>--version</code>,
+<code>--log</code>, and an unknown switch refused rather than ignored –
+and so is the list of everything all three share, which is nearly all of
+it.</p>
+<h1 id="september-2026-30">1.7.0 – 19 September 2026</h1>
+<p>The kit learnt to produce evidence.</p>
+<h2 id="checkhomerapp">checkHomerApp</h2>
+<pre><code>checkHomerApp
+checkHomerApp --build
+checkHomerApp --path C:\JobDo</code></pre>
+<p>Eleven checks, each recorded with the command that ran it and the
+exit code it returned: the document set and its HTML, encodings,
+zero-byte files, the version’s single source of truth, the publishing
+whitelist, whether the program opens a log, accessible names that repeat
+a caption, reserved key combinations and access keys claimed twice, the
+build, a smoke run of <code>--help</code>, and the app’s own acceptance
+criteria. It writes <code>evidence-&lt;yyyymmdd-hhmmss&gt;.md</code> and
+exits 1 when something failed, so a script can act on it.</p>
+<p>The report says three things, and the third is the point: what was
+verified, what was not checked, and what remains uncertain. A skip is
+never counted as a pass. The uncertain list is printed every time,
+because a report claiming everything is fine is worth nothing.</p>
+<p>Two rules are built in, both learned on its first run. It ignores the
+kit’s own modules, since a shared class sets accessible names and names
+key combinations on purpose, and it ignores comment lines, since a
+comment explaining that Alt+Control is reserved is the rule rather than
+a breach of it. A checker that cries wolf teaches people to ignore
+it.</p>
+<p>On that first run it found a real fault: both fruit basket samples
+had given the access key S to two controls at once. Fixed – the speaking
+check is now “Spea&amp;k each change”.</p>
+<h2 id="accept.inix">accept.inix</h2>
+<p>What “done” means, written before the code is:</p>
+<pre><code>[check]
+Name   = the help text names every switch
+Run    = JobDo.exe --help
+Expect = 0
+Wants  = --source</code></pre>
+<p>Four fields and no more, because the point is that criteria get
+written. <code>Templates\accept.inix</code> starts a new app off;
+<code>Samples\accept.inix</code> checks that both fruit baskets build
+and produce their programs.</p>
+<h2 id="the-guide-gained-two-parts">The guide gained two parts</h2>
+<p>“Evidence, and checking without sight” explains the instrument and
+the three lists. The AI-assisted coding part gained “the method, in four
+moves” – specify, build in small recoverable steps, verify, package and
+defend – with what in the kit carries each.</p>
+<h1 id="september-2026-31">1.6.1 – 19 September 2026</h1>
+<p>Two faults from the first run of 1.6.0, both mine.</p>
+<h2 id="a-missing-version.txt-stopped-the-build">A missing version.txt
+stopped the build</h2>
+<p>Flattening the samples in 1.5.0 removed their
+<code>version.txt</code> files, on the grounds that a sample is never
+released and so has no number to step. The build script still treated a
+missing one as fatal, and both samples failed at the first line that
+mattered:</p>
+<pre><code>ERROR: version.txt not found.</code></pre>
+<p>A build needs a number whatever else is true – the program reports
+it, the installer carries it, the release tag is it. So a missing
+<code>version.txt</code> is now created holding 1.0.0 and the build
+carries on, in both templates and both samples. Stopping there left a
+manual step, which no Homer build does.</p>
+<h2 id="the-kit-check-walked-into-a-virtual-environment">The kit check
+walked into a virtual environment</h2>
+<p><code>buildHomerDev</code> audits every text file in the kit. The
+Python sample’s build had left a <code>.venv</code> beside it holding
+the whole of PyInstaller, so the check dutifully audited several
+thousand files that belong to somebody else and wrote 611 KB of
+complaints about their line endings.</p>
+<p>Two changes. The check and <code>homerTidy</code> now skip the
+folders a build makes – <code>.git</code>, <code>.venv</code>,
+<code>__pycache__</code>, <code>build</code>, <code>dist</code>,
+<code>notes</code>, <code>venv</code> – and those folders join the
+never-pushed list. And the console now shows the first twenty problems
+and says how many more there are, with every one of them in the log. A
+console that scrolls for a minute tells a screen reader user nothing at
+all.</p>
+<h2 id="also">Also</h2>
+<p>The Homer module list in the C# build template is now in lowercase
+alphabetical order, which it had drifted out of when KeyName was
+renamed.</p>
+<h1 id="september-2026-32">1.6.0 – 19 September 2026</h1>
+<p>A folder layout whose initials are all different.</p>
+<h2 id="the-nine-folders">The nine folders</h2>
+<p><code>configs</code>, <code>data</code>, <code>exec</code>,
+<code>jobs</code>, <code>logs</code>, <code>results</code>,
+<code>samples</code>, <code>temp</code>, <code>templates</code>. Nine
+folders, nine different first letters, because a screen reader user
+reaches a folder by typing its initial and duplicated initials turn one
+keystroke into several.</p>
+<p><code>temp</code> and <code>templates</code> both begin with t and
+never appear together: <code>temp</code> exists only in the per-user
+tree, <code>templates</code> only in the installed tree. That is where
+each belongs anyway – a temp folder under Program Files cannot be
+written to, and templates are shipped and read-only – so no folder
+needed an unobvious name, and the rule that makes it hold is simply that
+temp always lives in the per-user tree, portable copies included.</p>
+<h2 id="paths.cs-and-homerpaths.py">Paths.cs and homer/paths.py</h2>
+<p>New, and parallel: the two trees, the nine folders, and three things
+every app was writing for itself.</p>
+<ul>
+<li><code>configFile</code> hands back the user’s copy of a settings
+file, making it from the shipped one the first time it is asked, so an
+update never overwrites a change somebody made.</li>
+<li><code>clearTemp</code> empties the temp folder at startup. Whatever
+it finds is what a previous run could not clean up after itself.</li>
+<li><code>tempFile</code> names a scratch file nothing else is
+using.</li>
+</ul>
+<p><code>Log</code> now asks <code>Paths</code> for its folder, so one
+class decides the layout.</p>
+<h2 id="the-installer-lays-the-tree-down">The installer lays the tree
+down</h2>
+<p><code>[Dirs]</code> creates the six shipped folders, and the files go
+where they belong: the executable and the DLLs in <code>exec</code>, the
+shipped <code>.inix</code> in <code>configs</code>, seed data in
+<code>data</code>, scripts and the screen reader packages in
+<code>jobs</code>, and <code>samples</code> and <code>templates</code>
+as shipped. The documents stay at the root of the installed tree, where
+somebody looking for the ReadMe expects them.</p>
+<p>One consequence to plan for: <code>{app}\&lt;App&gt;.exe</code>
+became <code>{app}\exec\&lt;App&gt;.exe</code>. Shortcuts, the uninstall
+icon and the finish helper were all updated, but an app adopting this
+layout should be reinstalled rather than updated in place the first
+time.</p>
+<h1 id="september-2026-33">1.5.0 – 18 September 2026</h1>
+<p>A failed build, a flatter tree, and a tutorial.</p>
+<h2 id="the-c-build-failed-and-the-cause-was-a-name">The C# build
+failed, and the cause was a name</h2>
+<p>The first real build of FruitBasketCs against the kit stopped
+with</p>
+<pre><code>Lbc.cs(368,60): error CS0721: &#39;Keys&#39;: static types cannot be used as parameters
+Lbc.cs(368,29): error CS0115: &#39;LbcForm.ProcessCmdKey(ref Message, Keys)&#39;:
+                no suitable method found to override</code></pre>
+<p>Homer’s key-name class was called <code>Keys</code>, and so is the
+WinForms enum that <code>ProcessCmdKey</code> takes. In one namespace
+the static class wins the lookup, the override no longer matches, and an
+app writing <code>Keys.Delete</code> gets an ambiguity error as well.
+The class is now <strong>KeyName</strong>, in
+<code>CSharp\KeyName.cs</code>, and the file says at the top what the
+old name cost. Nothing else calls it yet, so nothing else breaks.</p>
+<p>The Python build succeeded on the first try and produced
+FruitBasketPy.exe.</p>
+<h2 id="a-flatter-tree">A flatter tree</h2>
+<p>Two folder levels went, because navigating them by screen reader is
+slower than reading a longer list:</p>
+<ul>
+<li><code>Python\homer\</code> became <code>homer\</code>. A Python app
+now puts the kit itself on the path rather than a subfolder of it.</li>
+<li><code>Samples\FruitBasketCs\</code> and
+<code>Samples\FruitBasketPy\</code> became a flat <code>Samples\</code>
+holding four files. The samples’ <code>version.txt</code> files went
+with them: a sample is never released, so it never had a version to
+step.</li>
+</ul>
+<p>Nothing is deeper than two levels now. Every build script, document
+and check was repointed.</p>
+<h2 id="the-tutorial">The tutorial</h2>
+<p><code>Tutorial_HomerDev.inix</code> is a spoken walkthrough in the
+step format the existing makeTutorial.py already reads: <code>Say</code>
+for the narration, <code>Key</code> for the keystroke, <code>Hear</code>
+for what the screen reader answers, <code>Note</code> for the written
+version. It covers what the kit is, unarchiving it into
+<code>C:\HomerDev</code>, running <code>buildHomerDev</code>, building
+and running both fruit baskets, and the point the whole thing exists to
+make – that the two behave the same because the behaviour lives in the
+components rather than in either program.</p>
+<p><code>Tools\sayTutorial.cmd</code> and <code>.py</code> render it to
+audio in <strong>two voices</strong>: the narration in one, the screen
+reader’s answers in another, because a listener who cannot see the
+screen has no other way to tell the teacher from the machine. Windows’
+own voices do the speaking through System.Speech, so nothing is
+installed and nothing is uploaded. One .wav per line, kept, and one .mp3
+when ffmpeg is present.</p>
+<h1 id="september-2026-34">1.4.0 – 18 September 2026</h1>
+<p>Logging, publishing, and a notebook.</p>
+<h2 id="every-program-and-every-installer-keeps-a-log">Every program and
+every installer keeps a log</h2>
+<p><code>CSharp\Log.cs</code> and <code>homer\log.py</code> are the same
+class in two languages: same file name, same folder, same header block,
+same method names – start, close, line, info, warn, error, section,
+keyValue, command, exception, prune, show. Both were taken from the two
+implementations that already worked and had converged separately,
+HomerScribe’s C# session log and HomerView’s Python logger.</p>
+<pre><code>%LOCALAPPDATA%\&lt;App&gt;\logs\&lt;App&gt;-&lt;yyyymmdd-hhmmss&gt;.log        one per run
+%LOCALAPPDATA%\&lt;App&gt;\logs\&lt;App&gt;-setup-&lt;yyyymmdd-hhmmss&gt;.log  one per install</code></pre>
+<p>One file per session, named for when the session began, with the most
+recent thirty kept. The header block records the version, the program,
+the working directory, the command line, the Windows build, the user,
+the machine and, in C#, which screen reader Say can reach.</p>
+<p>The installer template now sets <code>SetupLogging=yes</code> and
+copies Inno’s own log into the same folder at ssDone, after the
+final-page checkboxes have run. The one caveat – an elevated installer
+writes to the elevating account’s profile – is documented where it
+happens rather than left to be discovered.</p>
+<p>Logging is deliberately not optional. When it becomes so, the switch
+goes inside the class rather than into every caller.</p>
+<h2 id="gitignore-became-a-whitelist">.gitignore became a whitelist</h2>
+<p><code>RepoFiles.txt</code> names what the repository carries, and
+<code>homerTidy --gitignore</code> turns it into a
+<code>.gitignore</code> that ignores everything and puts back exactly
+what was named. A file dropped into the folder is invisible to git until
+somebody names it.</p>
+<p>This replaces a habit rather than codifying one, so it is worth
+saying why: a list of exclusions is only ever as complete as the last
+time somebody remembered to add a line, and the tidy scripts existed
+because things got pushed that should not have. A blacklist cannot fix
+that class of problem.</p>
+<p>A never-pushed list overrides the whitelist for private and generated
+files: self.md, self.htm, tagRelease, create<App>Repo, every .log,
+notes, Version.cs, version.py, <strong>pycache</strong> and the build
+products.</p>
+<h2 id="self.md">self.md</h2>
+<p>A new Homer convention: a dated, headed notebook in every project,
+never published. It holds decisions with their rejected alternatives,
+findings, and honest open items – the things History.md cannot hold
+because History.md is public and is about releases.</p>
+<p>The kit’s own <code>self.md</code> opens with a report on what a full
+reading of DbDo, EdSharp, FileDir, HomerScribe, HomerView, 2htm,
+extCheck and urlCheck found: what the apps had already converged on,
+what they disagreed about, what they got wrong, and a review of every
+one of the kit’s inclusion decisions against that evidence.
+<code>newHomerApp</code> writes a starter into each new app.</p>
+<h2 id="smaller-things-1">Smaller things</h2>
+<ul>
+<li>Both samples now open a log first and record what they do, and their
+headers list the keys that arrive free with an Lbc text box and list
+box: Control+C with nothing selected, Control+J to search a list, F3 to
+repeat, Alt+F8 to read all, F8 and Shift+F8 to mark, Control+Enter to
+accept from anywhere.</li>
+<li>Hotkeys.md gained a list box section; the list-search keys had been
+missing.</li>
+<li>ReadMe.md’s quick start now walks the whole path: install the kit,
+build and run both fruit baskets, try the free keys, read the two side
+by side, look at the log, start an app, publish it.</li>
+</ul>
+<h1 id="september-2026-35">1.3.0 – 18 September 2026</h1>
+<p>The two samples were rewritten to be read side by side.</p>
+<h2 id="twelve-blocks-the-same-in-both">Twelve blocks, the same in
+both</h2>
+<p>Each sample now carries twelve markers of the form
+<code>---- BLOCK n: &lt;title&gt; ----</code>, with the same numbers and
+the same titles in each file, and the same function names throughout:
+addFruit, basketState, handleButton, saveBasket, settingsPath,
+showReport, showState, sortBasket. Somebody with both files open can
+move between them by block rather than by searching.</p>
+<p>They deliberately do not track line for line. C# needs a class where
+Python needs none, and pretending otherwise would teach padding rather
+than design. The rule kept instead: nothing appears in one file without
+a counterpart in the other, and the counterpart carries the same
+name.</p>
+<p>Three places where the two genuinely differ are commented where they
+happen: how each library keeps a dialog open while a button does work,
+the different shapes of stringPlural, and the status line that C# has
+and wx does not.</p>
+<h2 id="more-of-lbc-on-purpose">More of Lbc, on purpose</h2>
+<p>The samples now use a combo pick box for the sort order, a check box
+to turn the speaking off, a read-only report window, a status line in C#
+and the window title in Python, tips on every control, and the list
+search and line-editing chords that come free with a list box and a
+field. More than a fruit basket needs, which is the point of a sample;
+the guide now says so plainly, so nobody reads the sample as a
+minimum.</p>
+<h2 id="a-wart-found-by-making-them-parallel">A wart found by making
+them parallel</h2>
+<p><code>Util.stringPlural</code> in C# returns the count and the noun
+together, “3 fruits”; <code>util.stringPlural</code> in Python returns
+only the noun, “fruits”. Two functions, one name, two shapes. Neither
+was changed here, because the Python one has callers in HomerView, but
+both samples now say so where they use it, and the Python one should
+take the C# shape the next time that add-on is touched.</p>
+<h1 id="september-2026-36">1.2.0 – 18 September 2026</h1>
+<p>The kit became a teaching kit.</p>
+<h2 id="the-fruit-basket-came-back">The fruit basket came back</h2>
+<p><code>Samples\FruitBasketCs.cs</code> and
+<code>Samples\FruitBasketPy.py</code> hold the same program twice: once
+on the C# classes, once on the Python package, with
+<code>buildFruitBasketCs.cmd</code> and
+<code>buildFruitBasketPy.cmd</code> producing
+<code>FruitBasketCs.exe</code> and <code>FruitBasketPy.exe</code>. The
+Python one is a single file with Python and every dependency inside it,
+built with PyInstaller in a virtual environment beside the script, so it
+installs on the same terms as a C# program.</p>
+<p>The specification is the one from 2005, and the legacy collection of
+thirty-six implementations is what it comes from. That collection
+answered “what does this language look like”. These two answer “what
+does a program look like when it is built out of components that already
+know the conventions”, which is the question a builder working with an
+AI actually has.</p>
+<p>Nine numbered comments in each sample mark the nine decisions a
+working program has to get right and an AI will not make unless it is
+asked: which library, add order as focus order, bands, access keys, what
+the screen reader already says, where the focus goes, counts that match
+their nouns, saving as the answer is given, and the escape hatch. The
+two files number them identically so they can be read side by side.</p>
+<h2 id="ai-assisted-coding-written-down">AI-assisted coding, written
+down</h2>
+<p>A new part of HomerDev.md explains why the kit prefers that name to
+vibe coding, gives the three sentences that carry most of the kit into
+an AI session, and sets out a five-step teaching sequence around the
+samples: ask for the program cold, read the sample, ask again with the
+conventions, read the other language, then change one thing and watch
+which decisions it touches.</p>
+<h2 id="the-build-scripts-look-in-three-places">The build scripts look
+in three places</h2>
+<p>Both build templates now find the kit in this order, first hit wins:
+the <code>HomerDev</code> environment variable, then
+<code>C:\HomerDev</code>, then the current directory. The third is what
+lets a sample, a demonstration, or a machine with no kit installed still
+build, by carrying its own copy of the folder.</p>
+<h2 id="the-templates-became-opinionated">The templates became
+opinionated</h2>
+<p>Every component any Homer app has ever needed is now listed in both
+build templates as a switch. The ones used by more than one app are
+switched on – configuration file, documentation through pandoc, icon,
+installer, manifest, NuGet fetching, screen reader scripts, version
+stepping – because that is the evidence the next app will want them too.
+The ones used by a single app are commented out with the app named, so
+turning one on is one character: exiftool, ffmpeg, Markdig, NPOI,
+PdfPig, SQLite, Tesseract, Ude and Whisper on the C# side;
+beautifulsoup4, pillow, playwright, pythonnet and requests on the Python
+side.</p>
+<p>A single <code>:getNuGet</code> subroutine now does every package
+fetch, so Markdig, NPOI, PdfPig, SQLite and Ude are one line each rather
+than five variations on the same PowerShell.</p>
+<h2 id="smaller-things-2">Smaller things</h2>
+<ul>
+<li><code>newHomerApp &lt;App&gt; --python</code> writes a Python app:
+the Python build script in place of the C# one, with the rest of the set
+unchanged.</li>
+<li>Alphabetical order is now a stated convention for every list in
+Homer code and documentation, unless another order is clearly more
+logical. The module lists, the component switches and the option
+catalogues in this release all follow it.</li>
+</ul>
+<h1 id="september-2026-37">1.1.0 – 18 September 2026</h1>
+<p>Everything in this release came from running 1.0.0 for a day and from
+the logs of apps the kit had not yet been tried on.</p>
+<h2 id="tagrelease-could-not-release-a-source-only-project">tagRelease
+could not release a source-only project</h2>
+<p>The log said it plainly: “Could not find HomerDev_setup.iss in C:”.
+The kit ships source and has no installer, and the script treated a
+missing setup script as a fatal error rather than as an answer. It now
+recognizes two kinds of project. One with an installer is released
+exactly as before, from the version stamped into <App>_setup.exe with
+that installer attached. One without is released from version.txt, with
+no asset and no URL check. Nothing on the installer path changed, so
+EdSharp, FileDir, DbDo, HomerView and HomerScribe behave as they always
+have.</p>
+<p>Two smaller changes came with it. A -Path argument aims the script at
+a repo without a cd first, and the header now says outright that the
+script acts on the current directory, so one copy at C:serves
+everything. The edition line in the banner names the kit, so a log says
+which copy ran.</p>
+<p>The version of tagRelease that the kit shipped in 1.0.0 was the older
+copy from the EdSharp folder. The base is now the newer one, the copy
+actually in daily use.</p>
+<h2 id="cleandir-and-tidyrepo-became-homertidy">cleanDir and tidyRepo
+became homerTidy</h2>
+<p>They asked the same question – does this file belong to the project?
+– of two places, the folder and the repository, which meant two surveys,
+two plans, and two chances to disagree. homerTidy asks it once and fixes
+both in one pass: empty files deleted, duplicates and unnamed files
+moved into notes under subfolders named for what they are, tracked files
+that do not belong untracked and added to .gitignore under a dated
+comment, and anything large in the history reported with the command
+that would remove it. History is never rewritten automatically.</p>
+<p>What belongs is still decided by the project’s own <App>_setup.iss
+and RepoFiles.txt, so the script needs no editing. homerPolicy.py is
+gone: it is inside homerTidy now.</p>
+<h2 id="the-installer-template-learnt-what-is-already-installed">The
+installer template learnt what is already installed</h2>
+<p>The [Code] section reads the version of any previous install from the
+app’s own uninstall key. The welcome page says “Install”, “Update from X
+to Y” or “Reinstall” accordingly, and each component checkbox is now a
+pair of [Run] lines gated by a Check: function, so the wording matches
+the situation instead of always saying “Install”.</p>
+<p>Three conventions were settled at the same time:</p>
+<ul>
+<li>A checkbox that installs SCREEN READER scripts or add-ons is CHECKED
+by default. A blind user installing a Homer tool wants them, and a
+cleared box they have to notice is the friction the whole suite exists
+to remove.</li>
+<li>The last two checkboxes are always documentation, unchecked, then
+launch, checked.</li>
+<li>The launch does not start the program. It runs homerFinish.cmd,
+which reads the setup log, shows one Results box describing what this
+install actually did, and starts the program only once that box is
+dismissed. Being last, it runs after every other checkbox, so the box
+can report all of them.</li>
+</ul>
+<p>installScreenReaderSupport.cmd is new and generic: it unpacks
+<App>_JAWS.zip into every JAWS settings folder it finds and hands
+<App>.nvda-addon to NVDA, skipping without complaint whichever is
+absent.</p>
+<h2 id="smaller-things-3">Smaller things</h2>
+<ul>
+<li>version.txt is written without a byte order mark. A batch file’s
+“set /p” and Inno’s FileRead both take a mark as part of the number,
+which would have made every version wrong by one invisible
+character.</li>
+<li>The kit carries its own RepoFiles.txt, so homerTidy can tidy the
+kit.</li>
+<li>homerTidy leaves a project’s own script logs where the scripts that
+write them expect to find them, rather than filing them into notes.</li>
+</ul>
+<h1 id="september-2026-38">1.0.0 – 18 September 2026</h1>
+<p>First release. The kit was assembled by comparing every duplicated
+shared file across DbDo, EdSharp, FileDir, HomerScribe and HomerView,
+and taking the better version of each. What that comparison found is
+recorded here, because the differences explain why the kit exists.</p>
+<h2 id="which-version-won-and-why">Which version won, and why</h2>
+<ul>
+<li><strong>Say.cs</strong> – byte for byte identical in DbDo, EdSharp
+and HomerScribe once line endings are normalized. The CRLF copy was
+taken.</li>
+<li><strong>Web.cs</strong> – identical in all four apps that carry it.
+The CRLF copy was taken.</li>
+<li><strong>Inix.cs</strong> – three generations were in circulation.
+DbDo and HomerScribe carried the original 29 KB codec. EdSharp carried
+the version that added <code>InixTable</code>, the converter between
+.inix, .csv, .tsv, Markdown and .xlsx. HomerView carried that plus
+<code>InixCodec.readValue</code>, the single-setting reader whose
+absence had every caller reading the whole file and walking the sections
+itself. HomerView’s is a strict superset and was taken, which also means
+DbDo and HomerScribe had been two generations behind.</li>
+<li><strong>Lbc.cs</strong> – neither of the two newest copies was a
+superset of the other, so they were merged. EdSharp’s is the base: it
+holds <code>LbcBandLayout</code>, <code>LbcBandDialog</code> and
+<code>LbcInixForm</code>, better access-key handling in the button row,
+the rule that Enter presses the button meaning accept wherever it sits,
+and <code>sortedIgnoringCase</code>. HomerScribe’s contributed the
+horizontal band API – <code>addBand</code>, <code>endBand</code>,
+<code>bandTarget</code> and <code>addButton</code> – with all thirteen
+<code>add</code> methods rerouted through <code>bandTarget()</code> and
+<code>addSeparator</code> closing an open band. Without that merge,
+HomerScribe would not compile against the kit and EdSharp would lose its
+form work.</li>
+<li><strong>KeyMap.cs, Keys.cs, Util.cs, inixVert.cs,
+PdfRead.cs</strong> – one copy each, no contest. Keys.cs came from
+HomerView, the rest from EdSharp and HomerScribe.</li>
+<li><strong>The Python homer package</strong> – only HomerView carries
+it, and it was already written to know nothing about HomerView.</li>
+<li><strong>tagRelease, cleanDir, tidyRepo, homerPolicy</strong> – these
+four say in their own headers that they are app-independent, and they
+are: tagRelease takes the app name from the directory, and cleanDir and
+tidyRepo decide what belongs by reading the project’s own
+<code>&lt;App&gt;_setup.iss</code> and <code>RepoFiles.txt</code>.
+tidyRepo still named one app in five strings, and those were replaced
+with a name taken from the folder.</li>
+<li><strong>The install scripts for Pandoc, the GitHub CLI, Python, Node
+and Ollama</strong> – these read as generic but each writes to its own
+app’s folder and its own app’s log, so they are not portable files. The
+pattern is documented in HomerDev.md instead, and the kit ships fresh
+generic <code>installOllama.cmd</code> and
+<code>installModels.cmd</code> for the local AI case.</li>
+<li><strong>The build script and the installer script</strong> –
+HomerScribe’s are the newest and most refined of each, and became the
+templates.</li>
+</ul>
+<h2 id="one-behavior-deliberately-changed-in-the-merge">One behavior
+deliberately changed in the merge</h2>
+<p>HomerScribe’s Lbc selects the text of the field that opens with the
+focus, and extends that to the first focusable control rather than only
+an explicitly set one. That was taken, with one change: a
+<strong>multi-line</strong> box now gets the caret at position 0 instead
+of a full selection, because its value is a document rather than a field
+and the Homer rule is that the caret opens on the first line. This is
+the only place in the kit where the merged file is not simply the union
+of what already existed.</p>
+<h2 id="what-is-new-rather-than-merged">What is new rather than
+merged</h2>
+<ul>
+<li><code>buildHomerDev.cmd</code> and <code>.py</code> – convert the
+documents and audit the kit: components present, encodings right,
+templates still holding their placeholder, no empty files.</li>
+<li><code>newHomerApp.cmd</code> and <code>.py</code> – write a new app
+folder from the templates.</li>
+<li><code>Templates\_APP_.cs</code> – a working launchpad app with the
+standard controls, the two message boxes, the matching command line, and
+settings saved as they are answered.</li>
+<li><code>Templates\installOllama.cmd</code> and
+<code>installModels.cmd</code> – local AI as an installer checkbox, now
+that more than one Homer app uses a model.</li>
+<li>The documentation set.</li>
+</ul>
+</body>
+</html>

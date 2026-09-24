@@ -1,0 +1,275 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Jamal Mazrui" />
+  <title>FAQ</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">FAQ</h1>
+<p class="author">Jamal Mazrui</p>
+</header>
+<h1 id="frequently-asked-questions">Frequently Asked Questions</h1>
+<h2 id="why-windows-only-will-there-be-a-mac-or-linux-version">Why
+Windows only? Will there be a Mac or Linux version?</h2>
+<p>This kit is built on decades of doing productive work on Windows with
+a screen reader, and its purpose is to make that experience as good as
+it can be. Every convention in it – what gets spoken and what does not,
+where the focus lands, which keys are safe to use, how a dialog is laid
+out – was learned from years of using JAWS and NVDA on real work, and
+tested by shipping programs that people use.</p>
+<p>I do not have that depth of experience on macOS, iOS, Linux or
+Android. Writing conventions for VoiceOver or Orca that I had not lived
+with would produce confident guidance that turned out to be wrong, which
+is worse than none.</p>
+<p>The code is MIT licensed, and developers who do know those platforms
+are welcome to take any part of it. The ideas travel further than the
+code does: add order as focus order, speech only for what the screen
+reader cannot work out, one session log in a known place, evidence
+instead of eyeballing. None of those are Windows ideas. If somebody
+ports the kit, tell me, and I will link to it.</p>
+<h2 id="do-i-need-to-know-how-to-program">Do I need to know how to
+program?</h2>
+<p>No, but you do need to be comfortable typing exact commands and
+reading what comes back. The kit is driven from a command prompt: you
+type <code>buildHomerDev</code>, you read the lines it prints, and when
+something is wrong you open a log file and look for the word ERROR.</p>
+<p>If you have never written code, start with
+<code>help\Tutorials.md</code>, build the sample programs, and change
+one line in one of them. The samples are written to be read by somebody
+who is learning, with a comment on every decision that matters.</p>
+<h2 id="do-i-have-to-use-c-or-python">Do I have to use C#, or
+Python?</h2>
+<p>Either. The kit provides the same toolbox in both, with the same
+names. Four of the samples are pairs – the same program in both
+languages, written block for block – so you can read across and
+decide.</p>
+<p>Pick C# if you want a single .exe that needs nothing installed. Pick
+Python if you already know it, or need a library that only Python has;
+the build packs Python and every dependency into one file, so what you
+hand somebody else is still a single program.</p>
+<h2 id="which-screen-readers-does-it-work-with">Which screen readers
+does it work with?</h2>
+<p>JAWS, NVDA and Narrator. The controls are ordinary Windows controls,
+which is why every reader already knows them; <code>Say</code> reaches
+JAWS through its own interface, NVDA through its controller, and
+Narrator through a UI Automation notification, and your program does not
+have to know which is running.</p>
+<h2 id="do-i-need-visual-studio">Do I need Visual Studio?</h2>
+<p>No. The C# build uses the compiler that comes with the .NET Framework
+or with the Build Tools, and the build script finds it. If nothing
+suitable is present, the script says what to install and how.</p>
+<h2 id="will-this-work-with-my-existing-project">Will this work with my
+existing project?</h2>
+<p>The classes are plain C# and Python source files with no dependencies
+of their own, so you can add one to an existing project and use it.
+<code>Lbc</code> gives the most back for the least work: one dialog
+rewritten with it is usually enough to see whether the rest is worth
+doing.</p>
+<h2 id="why-not-a-package-on-nuget-or-pypi">Why not a package on NuGet
+or PyPI?</h2>
+<p>The kit travels by copying a file, which is deliberate. A fix is a
+file copy and a rebuild, with no version resolution, no package manager,
+and nothing to go wrong at install time on somebody else’s machine. The
+cost is drift between copies, and the kit exists precisely to stop that:
+one place holds the current version, and <code>checkHomerDev</code>
+proves it still builds.</p>
+<h2 id="why-mdi-everything-uses-tabs-now.">Why MDI? Everything uses tabs
+now.</h2>
+<p>Because a window is a first-class object to a screen reader and a tab
+is not. Alt+Tab reaches a window, the window list names it, its title is
+announced when it is activated, and it keeps its own state. A tabbed
+interface has to reimplement every one of those, and most do it badly.
+<code>help\HomerDev.md</code> has the longer argument.</p>
+<h2 id="why-is-there-so-much-logging">Why is there so much logging?</h2>
+<p>Because the failure you need to explain is never the one you can
+reproduce. Writing a line costs microseconds; not having it costs an
+evening. Every program writes one log per run to
+<code>%LOCALAPPDATA%\&lt;App&gt;\logs</code>, holding the environment,
+every setting, every external command with its exit code, and every
+error with its stack. The console stays short, because the console is
+for a person.</p>
+<h2 id="is-this-an-ai-project">Is this an AI project?</h2>
+<p>No, but it is shaped by the fact that AI now writes the first draft
+of a lot of code. A model will give you fluent, plausible work and will
+not tell you what it failed to check. The kit’s answer is evidence:
+acceptance criteria written before the code, checks that run, and a
+report that says what was verified, what was not checked, and what
+remains uncertain. That was good practice before; it is necessary
+now.</p>
+<h2 id="can-i-use-this-commercially">Can I use this commercially?</h2>
+<p>Yes. MIT licensed: use it, change it, sell what you build with it.
+Keep the license text with the code.</p>
+<h2 id="how-do-i-report-a-problem-or-ask-for-something">How do I report
+a problem or ask for something?</h2>
+<p>Open an issue on the repository. A log file helps more than a
+description: <code>%LOCALAPPDATA%\&lt;App&gt;\logs</code> for a program,
+or <code>build&lt;App&gt;.log</code> beside the build script for a
+build.</p>
+<h2 id="who-made-this-and-why-is-it-called-homer">Who made this, and why
+is it called Homer?</h2>
+<p>Jamal Mazrui, through Access Success LLC. Homer is the name the
+shared classes have carried across twenty years of tools – a blind poet
+who worked entirely by ear, which is the point.</p>
+</body>
+</html>

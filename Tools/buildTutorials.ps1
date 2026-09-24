@@ -741,10 +741,23 @@ function buildOne([string] $sScript) {
 
 # ---- step 3 of 4: speak them ----
 
+# A TUTORIAL WHOSE .mp3 IS ALREADY HERE IS NOT SPOKEN AGAIN. Speaking is the slow
+# part, and the only reliable signal that one needs redoing is that its audio is
+# gone. Delete a Tutorial_NN_*.mp3 to have it spoken again; -live and a single
+# script named on the command line always speak.
 $iDone = 0
+$iKept = 0
 foreach ($sScript in $lsScripts) {
+  $sHave = Join-Path $sHere ([System.IO.Path]::GetFileNameWithoutExtension($sScript) + ".mp3")
+  if (-not $bLive -and $sOnly -eq "" -and (Test-Path -LiteralPath $sHave)) {
+    note ("kept " + $sHave + ", already spoken")
+    $iKept = $iKept + 1
+    $iDone = $iDone + 1
+    continue
+  }
   if (buildOne $sScript) { $iDone = $iDone + 1 }
 }
+if ($iKept -gt 0) { say ("Kept " + $iKept + " tutorial" + $(if ($iKept -eq 1) { "" } else { "s" }) + " already spoken.") }
 $oSpeaker.Dispose()
 
 # ---- step 4 of 5: one file with a chapter for each tutorial ----
