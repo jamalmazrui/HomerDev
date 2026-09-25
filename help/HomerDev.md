@@ -128,14 +128,14 @@ they are run in.
 
 Copy the pair you want into the app folder and run it there.
 
-## Samples
+## Templates\samples
 
 Two fruit basket programs, the same design in two languages, each with the build
 script that produces it:
 
-- `Samples\` -- `FruitBasketCs.cs` and `buildFruitBasketCs.cmd`,
+- `Templates\samples\` -- `FruitBasketCs.cs` and `buildFruitBasketCs.cmd`,
   which produce `FruitBasketCs.exe` on the C# classes.
-- `Samples\` -- `FruitBasketPy.py` and `buildFruitBasketPy.cmd`,
+- `Templates\samples\` -- `FruitBasketPy.py` and `buildFruitBasketPy.cmd`,
   which produce `FruitBasketPy.exe` on the Python package, with Python and every
   dependency inside the one file.
 
@@ -574,7 +574,7 @@ than guessed at. Folders are in the order you meet them.
 - **inix.py, lbc.py, log.py, mdi.py, paths.py, say.py, util.py, web.py** -- the Python counterparts of Inix, Lbc, Log, Paths, Say, Util and Web, with the same names and the same behaviour
 - **version.py** -- written by the build; not a source file
 
-## Samples
+## Templates\samples
 
 - **FruitBasketCs.cs** -- the single-dialog shape, with twelve marked blocks and the nine decisions
 - **FruitBasketMdiCs.cs, FruitBasketMdiPy.py** -- the multiple-document shape in both languages, marking only what changes when there are several windows
@@ -1014,7 +1014,7 @@ Acceptance criteria belong to the app, not to the checker:
 `Run` is a command, `Expect` its exit code, `Wants` an optional string its
 output must contain. That is the whole language, on purpose: a criterion nobody
 can read is a criterion nobody writes. `Templates\accept.inix` is the starting
-point, and `Samples\accept.inix` shows a real one.
+point, and `Templates\samples\accept.inix` shows a real one.
 
 A criterion that cannot be written this way is still worth writing. Put it in
 `self.md` under what a person has to check by hand, so it is not quietly
@@ -1078,7 +1078,7 @@ for Control+x, `+x` for Shift+x. `Wants` is a string that must appear somewhere
 in the accessibility tree. `Title` is a window that must exist. `Escape` closes
 what the step opened. pywinauto installs itself on first run.
 
-`Samples\uiTest.inix` drives all four samples, including the keys an MDI app
+`Templates\samples\uiTest.inix` drives all four samples, including the keys an MDI app
 gets free: Control+N for a second window, F4 for the window list, Alt+Shift+S
 for the jobs, Alt+Shift+C for the settings, Alt+F1 for about.
 
@@ -1785,12 +1785,12 @@ interesting way. A good session runs in this order:
    Read what comes back. It works. Note what it does not do: where the focus
    goes, what it says when the field is empty, whether the basket survives
    being closed.
-2. **Read `Samples\FruitBasketCs.cs`.** Twelve marked blocks, and
+2. **Read `Templates\samples\FruitBasketCs.cs`.** Twelve marked blocks, and
    nine marked decisions inside them. Each decision is one a program has to get
    right and an AI will not make for you unless you ask.
 3. **Ask for the same program again**, this time with the three sentences
    above. Compare.
-4. **Open `Samples\FruitBasketPy.py` in a second window** and
+4. **Open `Templates\samples\FruitBasketPy.py` in a second window** and
    walk the two files block by block. Same twelve blocks, same twelve titles,
    same function names, same nine decisions. The language changed; the design
    did not. That is the lesson worth keeping.

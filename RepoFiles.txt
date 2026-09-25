@@ -6,7 +6,6 @@
 
 CSharp/
 homer/
-Samples/
 Templates/
 scripts/
 ReadMe.md

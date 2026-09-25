@@ -178,7 +178,7 @@ Source: "*.dll"; DestDir: "{app}\exec"; Flags: ignoreversion skipifsourcedoesnte
 Source: "_APP_.exe.config"; DestDir: "{app}\exec"; Flags: ignoreversion skipifsourcedoesntexist
 ; The finish helper: the Results box and then the launch. Always shipped, and
 ; it lives beside the program because that is what it starts.
-Source: "homerInstall.cmd"; DestDir: "{app}\exec"; Flags: ignoreversion
+Source: "scripts\homerInstall.cmd"; DestDir: "{app}\scripts"; Flags: ignoreversion
 ; EVERY COMPONENT APPEARS THREE TIMES: one entry per state -- install, update,
 ; already current -- grouped so the ones that do something come first, and only
 ; one is ever shown because the others are skipped by their Check function. The
@@ -191,11 +191,11 @@ Source: "homerInstall.cmd"; DestDir: "{app}\exec"; Flags: ignoreversion
 ; LOCAL AI. More than one Homer app now uses a model on the user's own machine,
 ; so these two are part of the kit. An app that calls no model deletes these two
 ; lines and the AI entries in [Run].
-Source: "installOllama.cmd"; DestDir: "{app}\exec"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "installModels.cmd"; DestDir: "{app}\exec"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "scripts\installOllama.cmd"; DestDir: "{app}\scripts"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "scripts\installModels.cmd"; DestDir: "{app}\scripts"; Flags: ignoreversion skipifsourcedoesntexist
 ; SCREEN READER support: the JAWS scripts and the NVDA add-on, when the app has
 ; them, plus the script that puts them where each reader looks.
-Source: "installScreenReaderSupport.cmd"; DestDir: "{app}\exec"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "scripts\installScreenReaderSupport.cmd"; DestDir: "{app}\scripts"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "_APP__JAWS.zip"; DestDir: "{app}\scripts"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "_APP_.nvda-addon"; DestDir: "{app}\scripts"; Flags: ignoreversion skipifsourcedoesntexist
 
@@ -230,53 +230,53 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\exec\{#AppExeName}"; WorkingD
 ; wrapper with a "set X=1 &&" prefix, which cmd /s cannot quote correctly.
 
 ; ---- 1. Install ---------------------------------------------------------------
-FileName: "{app}\exec\installScreenReaderSupport.cmd"; \
+FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
   Parameters: "noPause"; \
-  WorkingDir: "{app}\exec"; \
+  WorkingDir: "{app}\scripts"; \
   Description: "Install the JAWS scripts and the NVDA add-on for {#AppName}"; \
   Check: isFreshInstall; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
-FileName: "{app}\exec\installOllama.cmd"; \
+FileName: "{app}\scripts\installOllama.cmd"; \
   Parameters: "noPause"; \
-  WorkingDir: "{app}\exec"; \
+  WorkingDir: "{app}\scripts"; \
   Description: "{code:labelOllama}"; \
   Check: isInstallOllama; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
-FileName: "{app}\exec\installModels.cmd"; \
+FileName: "{app}\scripts\installModels.cmd"; \
   Parameters: "noPause"; \
-  WorkingDir: "{app}\exec"; \
+  WorkingDir: "{app}\scripts"; \
   Description: "{code:labelModel}"; \
   Check: isModelInstall; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
 ; ---- 2. Update ----------------------------------------------------------------
-FileName: "{app}\exec\installScreenReaderSupport.cmd"; \
+FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
   Parameters: "noPause"; \
-  WorkingDir: "{app}\exec"; \
+  WorkingDir: "{app}\scripts"; \
   Description: "Update the JAWS scripts and the NVDA add-on for {#AppName}"; \
   Check: isUpgradeOrSame; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
-FileName: "{app}\exec\installOllama.cmd"; \
+FileName: "{app}\scripts\installOllama.cmd"; \
   Parameters: "noPause"; \
-  WorkingDir: "{app}\exec"; \
+  WorkingDir: "{app}\scripts"; \
   Description: "{code:labelOllama}"; \
   Check: isUpdateOllama; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
 ; ---- 3. Reinstall, unticked ---------------------------------------------------
-FileName: "{app}\exec\installOllama.cmd"; \
+FileName: "{app}\scripts\installOllama.cmd"; \
   Parameters: "noPause"; \
-  WorkingDir: "{app}\exec"; \
+  WorkingDir: "{app}\scripts"; \
   Description: "{code:labelOllama}"; \
   Check: isReinstallOllama; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated unchecked skipifdoesntexist
 
-FileName: "{app}\exec\installModels.cmd"; \
+FileName: "{app}\scripts\installModels.cmd"; \
   Parameters: "noPause"; \
-  WorkingDir: "{app}\exec"; \
+  WorkingDir: "{app}\scripts"; \
   Description: "{code:labelModel}"; \
   Check: isModelReinstall; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated unchecked skipifdoesntexist

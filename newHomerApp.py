@@ -160,7 +160,7 @@ def main():
     if iSkipped:
         sayLine("%d file%s left alone, already there." % (iSkipped, "" if iSkipped == 1 else "s"))
     if bPython:
-        sayLine("Next: write %s.py -- Samples\\FruitBasketPy is the worked example --"
+        sayLine("Next: write %s.py -- Templates\\samples\\FruitBasketPy is the worked example --"
                 % sApp)
         sayLine("set the AppId and hotkey in %s_setup.iss, then run build%s." % (sApp, sApp))
     else:

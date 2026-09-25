@@ -73,7 +73,7 @@ c_lSamples = [
 c_lsBuildProducts = ["Version.cs", "build", "dist", "version.py"]
 
 c_sKit = os.path.dirname(os.path.abspath(__file__))
-c_sSamples = os.path.join(c_sKit, "Samples")
+c_sSamples = os.path.join(c_sKit, "Templates", "samples")
 sLogPath = os.path.join(c_sKit, "checkHomerDev.log")
 oLog = None
 lsFindings = []          # (sName, sVerdict, sEvidence)

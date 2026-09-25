@@ -406,6 +406,17 @@ if exist "addon\manifest.ini" (
 )
 :readersDone
 
+rem ---- the kit's scripts the app carries, refreshed on every build ----------
+rem One source of truth for the shared install and release scripts:
+rem homerInstall (the logging half of every install script), installOllama,
+rem installScreenReaderSupport, the tutorial tools, homerTidy, checkHomerApp,
+rem tagRelease, gitRelease, gitPush, gitUnpushed. installModels.cmd is the
+rem app's own, since it names the app's models.
+if not exist "scripts" mkdir "scripts"
+for %%F in (homerInstall.cmd installOllama.cmd installScreenReaderSupport.cmd buildTutorials.cmd buildTutorials.ps1 checkTutorial.cmd checkTutorial.py makeTutorials.py homerTidy.cmd homerTidy.py checkHomerApp.cmd checkHomerApp.py tagRelease.cmd tagRelease.ps1 gitRelease.cmd gitPush.cmd gitUnpushed.cmd gitUnpushed.py) do (
+  if exist "%homerDev%\scripts\%%F" copy /y "%homerDev%\scripts\%%F" scripts\ >nul
+)
+
 rem ---- spoken tutorials, when the app has any ---------------------------
 rem Scripts in help\Tutorial_NN_*.inix become Tutorials.md, TutorialFeed.xml,
 rem and one .mp3 per walk in help\tutorials with Tutorials.m3u beside them.
@@ -419,14 +430,15 @@ rem through sherpa-onnx, Apache 2.0, or piper's kristin and john, public
 rem domain, when Kokoro cannot be fetched -- are fetched once by the tool.
 rem Skipped silently when the app has no tutorial scripts, which most do not.
 if exist "help\Tutorial_*.inix" (
-  copy /y "%homerDev%\scripts\buildTutorials.cmd" scripts\ >nul
-  copy /y "%homerDev%\scripts\buildTutorials.ps1" scripts\ >nul
-  copy /y "%homerDev%\scripts\makeTutorials.py" scripts\ >nul
   set "tutorialsMissing="
   for %%F in (help\Tutorial_*.inix) do if not exist "help\tutorials\%%~nF.mp3" set "tutorialsMissing=1"
   if defined tutorialsMissing (
-    echo Speaking the tutorials that have no audio yet. The first time fetches the voices.
-    call "scripts\buildTutorials.cmd" >> "%log%" 2>&1
+    echo Speaking the tutorials that have no audio yet, with the voices in C:\HomerDev\exec.
+    rem The tool's own lines go to the screen: it names each tutorial as it starts
+    rem and finishes, and keeps its own log in logs\. -build is an argument of
+    rem its own, because a bare call hands the tool THIS script's arguments
+    rem through %* (a cmd quirk), and "nobump" is not a script.
+    call "scripts\buildTutorials.cmd" -build
     if errorlevel 1 echo WARN: not every tutorial could be spoken. The tutorials log in logs\ says why.
   )
 )

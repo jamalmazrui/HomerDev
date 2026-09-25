@@ -48,7 +48,7 @@ in the folder it is run from.
 
 ### 2. Build and run the fruit basket in C#
 
-    cd Samples
+    cd Templates\samples
     buildFruitBasketCs
     FruitBasketCs
 
@@ -143,7 +143,7 @@ row shipped a fault that only a compiler could see.
 ### 9. Gather evidence
 
     cd Tools
-    checkHomerApp --path ..\Samples
+    checkHomerApp --path ..\Templates\samples
 
 Eleven checks run, and an `evidence-<date>.md` appears saying what was verified,
 what was not checked, and what remains uncertain. Open it. The third list is the
@@ -212,7 +212,7 @@ own notebook, is in the never-pushed list and stays on your machine.
 - `scripts\` -- checkHomerApp, gitPush, gitRelease, homerTidy, sayTutorial and
   tagRelease. No editing needed; they work out the app name from the folder, and
   any of them can be run from a shared tools folder.
-- `Samples\` -- four fruit basket programs: the single dialog in C# and in
+- `Templates\samples\` -- four fruit basket programs: the single dialog in C# and in
   Python, and the multiple-document version in C# and in Python. Each pair is
   the same program in two languages, written block for block. The teaching
   material.

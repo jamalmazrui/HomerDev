@@ -16,7 +16,13 @@ rem from version.txt with no asset.
 rem
 rem Writes gitRelease.log beside this script.
 setlocal
-set "log=%~dp0gitRelease.log"
+rem The log goes in the project's logs folder, one file per run, named like
+rem every other Homer log. The project is the current folder: this script
+rem acts on the folder it is run in, as tagRelease does.
+if not exist "%CD%\logs" mkdir "%CD%\logs"
+for /f %%T in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd-HHmmss"') do set "sNow=%%T"
+for %%I in ("%CD%") do set "sApp=%%~nxI"
+set "log=%CD%\logs\%sApp%-release-check-%sNow%.log"
 > "%log%" echo gitRelease started %date% %time%
 >> "%log%" echo Folder: %CD%
 

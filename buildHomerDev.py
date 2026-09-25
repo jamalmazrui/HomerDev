@@ -36,25 +36,25 @@ c_lsExpected = [
     "homer/mdi.py", "homer/paths.py", "homer/say.py", "homer/util.py", "homer/version.py", "homer/web.py",
     "Templates/build_APP_.cmd", "Templates/build_APP_Py.cmd",
     "Templates/_APP__setup.iss", "Templates/_APP_.cs",
-    "Templates/installOllama.cmd", "Templates/installModels.cmd",
-    "Templates/installScreenReaderSupport.cmd", "Templates/homerFinish.cmd",
-    "Templates/HomerComponents.iss", "Templates/homerInstall.cmd",
+    "Templates/installModels.cmd",
+    "scripts/installOllama.cmd", "scripts/installScreenReaderSupport.cmd", "scripts/homerFinish.cmd",
+    "Templates/HomerComponents.iss", "scripts/homerInstall.cmd",
     "Templates/create_APP_Repo.cmd", "Templates/create_APP_Repo.ps1",
     "Templates/accept.inix", "Templates/gitignore.txt", "Templates/self.md", "Templates/version.txt",
     "scripts/tagRelease.cmd", "scripts/tagRelease.ps1", "RepoFiles.txt", "LocalFiles.txt",
-    "Samples/FruitBasketCs.cs", "Samples/FruitBasketMdiCs.cs",
-    "Samples/FruitBasketMdiPy.py", "Samples/FruitBasketPy.py",
-    "Samples/accept.inix", "Samples/uiTest.inix",
-    "Samples/buildFruitBasketCs.cmd", "Samples/buildFruitBasketMdiCs.cmd",
-    "Samples/buildFruitBasketMdiPy.cmd", "Samples/buildFruitBasketPy.cmd",
+    "Templates/samples/FruitBasketCs.cs", "Templates/samples/FruitBasketMdiCs.cs",
+    "Templates/samples/FruitBasketMdiPy.py", "Templates/samples/FruitBasketPy.py",
+    "Templates/samples/accept.inix", "Templates/samples/uiTest.inix",
+    "Templates/samples/buildFruitBasketCs.cmd", "Templates/samples/buildFruitBasketMdiCs.cmd",
+    "Templates/samples/buildFruitBasketMdiPy.cmd", "Templates/samples/buildFruitBasketPy.cmd", "Templates/samples/version.txt",
     "checkHomerDev.cmd", "checkHomerDev.py", "releaseHomerDev.cmd",
-    "scripts/gitPush.cmd", "scripts/gitRelease.cmd",
+    "scripts/gitPush.cmd", "scripts/gitRelease.cmd", "scripts/gitUnpushed.cmd", "scripts/gitUnpushed.py",
     "scripts/checkHomerApp.cmd", "scripts/checkHomerApp.py",
     "scripts/installTools.cmd", "scripts/uiCheck.cmd", "scripts/uiCheck.py",
     "scripts/homerTidy.cmd", "scripts/homerTidy.py",
-    "scripts/buildTutorials.cmd", "scripts/buildTutorials.ps1",
+    "scripts/buildTutorials.cmd", "scripts/buildTutorials.ps1", "scripts/checkTutorial.cmd", "scripts/checkTutorial.py",
     "scripts/makeTutorials.cmd", "scripts/makeTutorials.py",
-    "Templates/Tutorial_00_Overview.inix",
+    "Templates/Tutorial_00_Overview.inix", "Templates/skills/homer-tutorial/SKILL.md",
     "Templates/makeHotkeys.py",
     "Templates/LocalFiles.txt",
     "Templates/_APP_.cmd",
@@ -131,17 +131,17 @@ c_lMoved = [
     ("Style/CamelType_JAWSScript.md", "help/CamelType_JAWSScript.md"),
     ("Style/CamelType_JAWSScript.htm", "help/CamelType_JAWSScript.htm"),
     ("Tutorial_HomerDev.inix", "help/Tutorial_HomerDev.inix"),
-    ("Samples/FruitBasketMdi.cs", "Samples/FruitBasketMdiCs.cs"),
-    ("Samples/FruitBasketMdi.exe", "Samples/FruitBasketMdiCs.exe"),
-    ("Samples/buildFruitBasketMdi.log", "Samples/buildFruitBasketMdiCs.log"),
+    ("Samples/FruitBasketMdi.cs", "Templates/samples/FruitBasketMdiCs.cs"),
+    ("Samples/FruitBasketMdi.exe", "Templates/samples/FruitBasketMdiCs.exe"),
+    ("Samples/buildFruitBasketMdi.log", "Templates/samples/buildFruitBasketMdiCs.log"),
     ("Samples/buildFruitBasketMdi.cmd", "Samples/buildFruitBasketMdiCs.cmd"),
     ("Tutorials.md", "help/Tutorials.md"),
     ("Tutorials.htm", "help/Tutorials.htm"),
     ("self.md", "help/self.md"),
     ("self.htm", "help/self.htm"),
-    ("Samples/FruitBasketCs/FruitBasketCs.cs", "Samples/FruitBasketCs.cs"),
-    ("Samples/FruitBasketMdi/FruitBasketMdi.cs", "Samples/FruitBasketMdi.cs"),
-    ("Samples/FruitBasketPy/FruitBasketPy.py", "Samples/FruitBasketPy.py"),
+    ("Samples/FruitBasketCs/FruitBasketCs.cs", "Templates/samples/FruitBasketCs.cs"),
+    ("Samples/FruitBasketMdi/FruitBasketMdi.cs", "Templates/samples/FruitBasketMdi.cs"),
+    ("Samples/FruitBasketPy/FruitBasketPy.py", "Templates/samples/FruitBasketPy.py"),
     ("Python/homer/inix.py", "homer/inix.py"),
     ("Python/homer/lbc.py", "homer/lbc.py"),
     ("Python/homer/say.py", "homer/say.py"),
@@ -157,10 +157,31 @@ c_lMoved = [
     ("Inno/HomerComponents.iss", "Templates/HomerComponents.iss"),
     ("Scripts/homerInstall.cmd", "Templates/homerInstall.cmd"),
     ("buildHomerDev.log", "buildHomerDev.py"),
-    ("Samples/buildFruitBasketCs.log", "Samples/buildFruitBasketCs.cmd"),
-    ("Samples/buildFruitBasketMdiCs.log", "Samples/buildFruitBasketMdiCs.cmd"),
-    ("Samples/buildFruitBasketMdiPy.log", "Samples/buildFruitBasketMdiPy.cmd"),
-    ("Samples/buildFruitBasketPy.log", "Samples/buildFruitBasketPy.cmd"),
+    ("Samples/buildFruitBasketCs.log", "Templates/samples/buildFruitBasketCs.cmd"),
+    ("Samples/buildFruitBasketMdiCs.log", "Templates/samples/buildFruitBasketMdiCs.cmd"),
+    ("Samples/buildFruitBasketMdiPy.log", "Templates/samples/buildFruitBasketMdiPy.cmd"),
+    ("Samples/buildFruitBasketPy.log", "Templates/samples/buildFruitBasketPy.cmd"),
+    # 1.37.0: Samples shared its first letter with scripts, so the sample programs
+    # live under Templates, the folder for what an app starts from.
+    ("Samples/FruitBasketCs.cs", "Templates/samples/FruitBasketCs.cs"),
+    ("Samples/FruitBasketMdiCs.cs", "Templates/samples/FruitBasketMdiCs.cs"),
+    ("Samples/FruitBasketMdiPy.py", "Templates/samples/FruitBasketMdiPy.py"),
+    ("Samples/FruitBasketMdiPy.spec", "Templates/samples/FruitBasketMdiPy.spec"),
+    ("Samples/FruitBasketPy.py", "Templates/samples/FruitBasketPy.py"),
+    ("Samples/FruitBasketPy.spec", "Templates/samples/FruitBasketPy.spec"),
+    ("Samples/accept.inix", "Templates/samples/accept.inix"),
+    ("Samples/buildFruitBasketCs.cmd", "Templates/samples/buildFruitBasketCs.cmd"),
+    ("Samples/buildFruitBasketMdiCs.cmd", "Templates/samples/buildFruitBasketMdiCs.cmd"),
+    ("Samples/buildFruitBasketMdiPy.cmd", "Templates/samples/buildFruitBasketMdiPy.cmd"),
+    ("Samples/buildFruitBasketPy.cmd", "Templates/samples/buildFruitBasketPy.cmd"),
+    ("Samples/uiTest.inix", "Templates/samples/uiTest.inix"),
+    ("Samples/version.txt", "Templates/samples/version.txt"),
+    # 1.37.0: the shared install scripts are scripts, refreshed into every app,
+    # not starters; only installModels.cmd stays a template, naming an app's models.
+    ("Templates/installOllama.cmd", "scripts/installOllama.cmd"),
+    ("Templates/homerInstall.cmd", "scripts/homerInstall.cmd"),
+    ("Templates/installScreenReaderSupport.cmd", "scripts/installScreenReaderSupport.cmd"),
+    ("Templates/homerFinish.cmd", "scripts/homerFinish.cmd"),
     # 1.34.0: the kit follows the layout it asks of every app. Tools is scripts.
     ("Tools/buildTutorials.cmd", "scripts/buildTutorials.cmd"),
     ("Tools/buildTutorials.ps1", "scripts/buildTutorials.ps1"),
@@ -188,8 +209,8 @@ c_lMoved = [
 
 # Folders that existed in an earlier layout and hold nothing the kit wants now.
 # Removed only when empty, which they are once the pairs above have been applied.
-c_lsOldFolders = ["Docs", "Inno", "Python/homer", "Python", "Samples/FruitBasketCs",
-                  "Samples/FruitBasketMdi", "Samples/FruitBasketPy", "Scripts", "Style", "Tools"]
+c_lsOldFolders = ["Docs", "Inno", "Python/homer", "Python", "Templates/samples/FruitBasketCs",
+                  "Templates/samples/FruitBasketMdi", "Templates/samples/FruitBasketPy", "Samples", "Scripts", "Style", "Tools"]
 sScriptDir = os.path.dirname(os.path.abspath(__file__))
 sLogPath = os.path.join(sScriptDir, "logs", c_sLogName)
 oLog = None
@@ -267,7 +288,7 @@ def buildSamples():
     run. Each script writes its own log beside itself; the failures are named
     here and the detail is there.
     """
-    sSamples = os.path.join(sScriptDir, "Samples")
+    sSamples = os.path.join(sScriptDir, "Templates", "samples")
     if not os.path.isdir(sSamples): return 0
     iFailed = 0
     for sScript in c_lsSampleScripts:
@@ -291,6 +312,38 @@ def buildSamples():
             sayLine("%s FAILED. Its own log, build%s.log, has the compiler output."
                     % (sName, sName))
     return iFailed
+
+
+def buildTutorials():
+    """Fetch the shared voices and speak the kit's own tutorials.
+
+    THE KIT'S BUILD IS THE ONE THING THAT DOWNLOADS THE VOICES (25 Sep 2026).
+    They live in exec, shared by every Homer app's build, so this is where
+    they are fetched -- once -- with -fetch, which an app's build never passes.
+    Then any kit tutorial without audio is spoken. The tool logs to
+    logs\\HomerDev-tutorials-<stamp>.log; only the outcome is repeated here.
+    """
+    sTool = os.path.join(sScriptDir, "scripts", "buildTutorials.cmd")
+    if not os.path.isfile(sTool):
+        logLine("no scripts/buildTutorials.cmd; voices not fetched")
+        return False
+    # THE TOOL'S OWN LINES REACH THE SCREEN. It names each tutorial as it
+    # starts and finishes, and the minutes between are speaking, not a
+    # download; capturing them left seven silent minutes on 25 Sep 2026. It
+    # keeps its own log in logs, so only the exit code is recorded here.
+    sayLine("Fetching any voices not yet in exec, and speaking any tutorial without audio ...")
+    logLine("RUN: %s -fetch -build (output on the console; its log is in logs)" % sTool)
+    try:
+        iCode = subprocess.call(["cmd.exe", "/c", sTool, "-fetch", "-build"])
+    except Exception as oError:
+        logLine("RUN FAILED: %s" % oError)
+        iCode = 1
+    logLine("EXIT: %d" % iCode)
+    if iCode == 0:
+        sayLine("Voices are in exec; tutorials are spoken.")
+    else:
+        sayLine("The voices or tutorials could not be completed; the tutorials log in logs says why.")
+    return iCode == 0
 
 
 def removeMoved():
@@ -433,6 +486,7 @@ def main():
             iDone = convertDocs(sPandoc)
             sayLine("%d document%s converted to HTML." % (iDone, "" if iDone == 1 else "s"))
         iSamplesFailed = buildSamples()
+        buildTutorials()
 
     lsProblems = checkKit()
     if len(lsProblems) == 0 and iSamplesFailed == 0:

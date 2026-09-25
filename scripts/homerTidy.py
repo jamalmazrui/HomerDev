@@ -89,6 +89,7 @@ and any traceback. The console gets the short version.
 
 import argparse
 import datetime
+import fnmatch
 import hashlib
 import os
 import platform
@@ -314,6 +315,38 @@ def belongsTo(sRelative, lsNamed):
         # A folder named wholesale.
         if sNamedLower.endswith("/") and sLower.startswith(sNamedLower): return True
     return False
+
+
+# FETCHED THINGS ARE DELETED, NEVER ARCHIVED (25 Sep 2026). On this date a
+# tidy found the tutorial voices left in an app's scripts\voices -- piper,
+# its models, a sherpa-onnx package -- called all 486 files strays, moved
+# them into notes\other, and committed them. A thing the build fetches from
+# the web belongs in neither the folder nor the history: it is deleted, and
+# the log says so. The patterns are the engines and models the kit fetches.
+c_lsRefetchable = ["*.lib", "*.onnx", "*.onnx.json", "*.ort", "*.tar.bz2", "espeak-ng-data",
+                   "espeak-ng.dll", "kokoro-*", "onnxruntime*", "piper", "piper.exe",
+                   "piper_phonemize.dll", "sherpa-onnx*", "voices"]
+
+
+def isRefetchable(sRelative):
+    """True when any part of the path names something the build fetches."""
+    lsParts = re.split(r"[\\/]", sRelative)
+    for sPart in lsParts:
+        for sPattern in c_lsRefetchable:
+            if fnmatch.fnmatch(sPart.lower(), sPattern.lower()): return True
+    return False
+
+
+def deleteRefetchable(sRelative):
+    sPath = os.path.join(sRoot, sRelative)
+    try:
+        if os.path.isdir(sPath): shutil.rmtree(sPath)
+        elif os.path.exists(sPath): os.remove(sPath)
+        logLine("DELETED FETCHED: %s (the build fetches it again when needed)" % sRelative)
+        return True
+    except Exception as oError:
+        logLine("COULD NOT DELETE %s: %s" % (sRelative, oError))
+        return False
 
 
 def noteFolderFor(sName):
@@ -575,7 +608,8 @@ def main():
         for sKeep, lsGone in ldDuplicates:
             logLine("DUPLICATE: keeping %s, removing %s" % (sKeep, ", ".join(lsGone)))
         for sPath in lsStrays:
-            logLine("STRAY: %s -> notes/%s" % (sPath, noteFolderFor(sPath)))
+            if isRefetchable(sPath): logLine("STRAY, FETCHED: %s -> deleted" % sPath)
+            else: logLine("STRAY: %s -> notes/%s" % (sPath, noteFolderFor(sPath)))
 
         if bDoIt:
             # In place first. When the proper folder already holds a copy, that
@@ -602,9 +636,19 @@ def main():
                         moveToNotes(sPath)
                         iChanges += 1
             for sPath in lsStrays:
-                if os.path.exists(os.path.join(sRoot, sPath)):
+                if not os.path.exists(os.path.join(sRoot, sPath)): continue
+                if isRefetchable(sPath):
+                    if deleteRefetchable(sPath): iChanges += 1
+                else:
                     moveToNotes(sPath)
                     iChanges += 1
+            # And anything fetched that an earlier tidy archived into notes.
+            sNotes = os.path.join(sRoot, "notes")
+            if os.path.isdir(sNotes):
+                for sDir, lsDirs, lsFiles in os.walk(sNotes):
+                    for sName in lsFiles:
+                        sRel = os.path.relpath(os.path.join(sDir, sName), sRoot)
+                        if isRefetchable(sRel) and deleteRefetchable(sRel): iChanges += 1
         sayLine()
 
     # ---- the repository ----
@@ -631,11 +675,21 @@ def main():
                 sayLine("  Something large that the program fetches at run time belongs in")
                 sayLine("  neither the folder nor the history; let the install script get it.")
 
-            if bDoIt:
+            # NOTHING IS STAGED WITHOUT A WHITELIST (25 Sep 2026). With no
+            # RepoFiles.txt, "git add -A" swept 480 fetched files into a commit.
+            # The whitelist .gitignore is what makes add -A safe, and it can be
+            # written only from RepoFiles.txt; without one the repository is
+            # left exactly as it was.
+            bWhitelist = os.path.isfile(os.path.join(sRoot, "RepoFiles.txt"))
+            if bDoIt and not bWhitelist:
+                sayLine("  No RepoFiles.txt here, so nothing was staged, committed or pushed.")
+                sayLine("  RepoFiles.txt names what the repository carries; add it and run again.")
+                logLine("git phase skipped: no RepoFiles.txt")
+            if bDoIt and bWhitelist:
                 # The whitelist is rewritten on every pass, so RepoFiles.txt and
                 # .gitignore cannot drift apart.
                 writeWhitelistGitignore()
-            if bDoIt and lsTrackedStrays:
+            if bDoIt and bWhitelist and lsTrackedStrays:
                 for sPath in lsTrackedStrays:
                     runGit(["rm", "--cached", "--quiet", sPath])
                     iChanges += 1

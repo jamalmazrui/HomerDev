@@ -8,6 +8,9 @@
   <title>Tutorials</title>
   <style>
     html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
       color: #1a1a1a;
       background-color: #fdfdfd;
     }
@@ -26,16 +29,13 @@
     @media (max-width: 600px) {
       body {
         font-size: 0.9em;
-        padding: 12px;
+        padding: 1em;
       }
       h1 {
         font-size: 1.8em;
       }
     }
     @media print {
-      html {
-        background-color: white;
-      }
       body {
         background-color: transparent;
         color: black;
@@ -85,10 +85,9 @@
       color: #606060;
     }
     code {
-      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
       font-size: 85%;
       margin: 0;
-      hyphens: manual;
     }
     pre {
       margin: 1em 0;
@@ -153,17 +152,17 @@
     div.columns{display: flex; gap: min(4vw, 1.5em);}
     div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
+    ul.task-list{list-style: none;}
     ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
       width: 0.8em;
       margin: 0 0.8em 0.2em -1.6em;
       vertical-align: middle;
     }
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
 </head>
 <body>
 <header id="title-block-header">
@@ -239,19 +238,27 @@ yours.</li>
 <p>A walk whose <code>.mp3</code> exists is not spoken again. Delete the
 file to have it spoken again; name one script on the command line to
 speak just that one.</p>
-<h3 id="where-the-voices-live">Where the voices live</h3>
-<p>One copy, in <code>C:\HomerDev\exec</code>, fetched the first time
-any app’s build speaks a tutorial and found by every app’s build after
-that. Neither piper nor sherpa-onnx has an installer, so there is no
-default location the way there is for Whisper or Pandoc; the kit is the
-one place every Homer app already relies on, and <code>exec</code> is
-the Homer folder for binaries that are not in git – which is what a
-fetched engine and its model files are. The folder is local to the
-machine (<code>LocalFiles.txt</code> names it, so it is never pushed)
-and the kit’s own build skips it. To keep the voices somewhere else, set
-the <code>HOMER_VOICES</code> environment variable to that folder; a
-<code>Piper</code> or <code>sherpa-onnx</code> folder under Program
-Files is found too.</p>
+<h3 id="where-the-voices-live-and-who-fetches-them">Where the voices
+live, and who fetches them</h3>
+<p>One copy, in <code>C:\HomerDev\exec</code>, and <strong>only
+<code>buildHomerDev</code> fetches it</strong>. The kit’s build passes
+<code>-fetch</code> to the tutorial tool; an app’s build never does. So
+an app’s build finds the voices in the kit, or, when they are not there,
+says “Run buildHomerDev” and speaks nothing – it never downloads a copy
+of its own. Neither piper nor sherpa-onnx has an installer, so there is
+no default location the way there is for Whisper or Pandoc; the kit is
+the one place every Homer app already relies on, and <code>exec</code>
+is the Homer folder for binaries that are not in git.
+<code>LocalFiles.txt</code> names it as never pushed, and the kit’s own
+build skips it. To keep the voices somewhere else, set the
+<code>HOMER_VOICES</code> environment variable; a <code>Piper</code> or
+<code>sherpa-onnx</code> folder under Program Files is found too.</p>
+<p>The sherpa-onnx package taken is the <strong>shared</strong> one,
+<code>win-x64-shared</code>, which carries
+<code>bin\sherpa-onnx-offline-tts.exe</code>. The “static … lib”
+packages are libraries for linking, hundreds of megabytes and no
+executable; one was fetched by mistake on 25 September 2026, and the
+tool now removes such a folder when it finds one.</p>
 <h3 id="the-voices-and-why-these">The voices, and why these</h3>
 <p>Two voices, told apart three ways: who is speaking, how fast, and how
 flat. The narrator is a woman at a rate just brisker than natural; the
@@ -260,6 +267,22 @@ somebody who listens all day. A beta tester asked for the reader to be a
 bit slower, so its speed is 0.64 on piper’s scale (it was 0.56), still
 ahead of the narrator’s 0.80. <code>ReaderScale</code> in a script’s
 <code>[global]</code> section changes it for a series.</p>
+<p><strong>Two engines, one each.</strong> Kokoro speaks the narrator;
+piper’s john speaks the reader. Half the lines in a walk are the
+reader’s, and piper speaks a line in a second where Kokoro takes twenty
+– on a laptop Kokoro runs at two to three times real time, and a long
+unbroken line, such as a web address spelled out as words, far slower,
+which is what made a build look hung on 25 September 2026. Kokoro’s
+naturalness goes where it is heard, and a flattened piper voice is what
+a reader sounds like anyway. The tool cuts long text at sentences and
+commas before handing it to Kokoro, and runs it on two threads, which
+measured faster than all of them. <code>ReaderOnKokoro=1</code> in
+<code>[global]</code> puts the reader on Kokoro too, at the cost in
+minutes.</p>
+<p><strong>One loudness.</strong> Every piece is brought to the same
+measured loudness before the join, so the narrator is no longer louder
+than the reader; <code>ReaderGain</code> in <code>[global]</code> scales
+the reader’s pieces on top of that, 1.0 unless set.</p>
 <p><strong>Kokoro, when it can be fetched.</strong> Re-investigated on
 25 September 2026. Kokoro-82M is an open-weight neural voice model
 released under Apache 2.0, trained on public-domain audio, audio under
@@ -289,6 +312,27 @@ licence but need Python and, in practice, a graphics card; Kokoro gives
 the same permission at a size that runs on any processor. Licences
 change; the tool’s log names the voice used for every file, so a later
 check knows what to look at.</p>
+<h3 id="checking-one">Checking one</h3>
+<pre><code>scripts\checkTutorial              every help\Tutorial_*.inix
+scripts\checkTutorial Tutorial_01  one of them</code></pre>
+<p>The check reads each script against the format and the reader’s
+grammar and names the script and step for every problem: a key with no
+<code>Hear</code> line and nothing naming the silence;
+<code>Alt+T</code> in a <code>Hear</code> line, where the reader says
+the words; a screen reader named anywhere; a check box line out of the
+reader’s order; a file name written rather than said; a first walk that
+does not teach the repeat key. <code>buildTutorials</code> runs it first
+and speaks nothing while it reports a problem. Zero problems is a real
+answer.</p>
+<h3 id="the-skill-for-an-ai-writing-these">The skill, for an AI writing
+these</h3>
+<p><code>Templates\skills\homer-tutorial\SKILL.md</code> is a skill for
+Claude, or any assistant that reads one: the format, the four beats, the
+reader’s grammar, where the truth of a <code>Hear</code> line comes from
+(the dialog’s code, the program’s own announcements, a speech history, a
+transcript), and the check-then-build commands. Give it to the assistant
+along with the app’s dialog code and it writes walks that pass the
+check. Name no screen reader is in there too.</p>
 <h3 id="writing-one">Writing one</h3>
 <p>One <code>[step]</code> per keystroke. <code>Say</code> is the
 narration, <code>Key</code> is what to press, <code>Hear</code> is what
@@ -392,6 +436,42 @@ backslash”.</li>
 <li><strong>The reader also confirms actions the program did not ask it
 to:</strong> “Copied selection to clipboard”, “Select All”, “376
 characters”. A tutorial that copies text should expect them.</li>
+<li><strong>A slider with a value:</strong> label with colon, the value,
+the direction, the position as a percentage.
+<code>Voice rate: 68, left right slider, 25 percent</code>. An edit box
+holding a number reads the number:
+<code>Voice pitch change   percent: edit, 20</code>.</li>
+<li><strong>A tabbed dialog:</strong> the title with “dialog”, then the
+tab with “page”: <code>Properties dialog, Shortcut page</code>.</li>
+<li><strong>A list view item:</strong> name, “object” or the item’s
+kind, position; typing a letter jumps and reads the item that letter
+reached:
+<code>Folder view   list view, not selected, Recycle Bin object, 1 of 12</code>
+then, after J, <code>JAWS object, 5 of 12</code> – the name of whatever
+program it is.</li>
+<li><strong>A program’s own loading message is read before its
+title:</strong> <code>Please   wait</code> and then the window title,
+then the focused control.</li>
+<li><strong>In an edit box, the reader echoes what the keys do.</strong>
+Typing speaks each character as it lands – “T”, “H”, “E”, “space” – and
+“Enter” for a new line, “Period” for the punctuation. Right Arrow speaks
+the character it moves onto; Control plus Right Arrow speaks the word it
+lands at the start of. Backspace speaks the character it erased. An
+empty line is “Blank”. Control plus Home says “Top of file” and then the
+first line; Control plus End says “Bottom of file” and then the last
+line, which is often “Blank”. Home and End say nothing on their
+own.</li>
+<li><strong>Selecting has its own words.</strong> Shift plus Right
+Arrow: the character, then “selected”; moving back off it: “unselected”.
+Control plus Shift plus Right Arrow: the word, then “selected”. Shift
+plus Down Arrow: “Selected” and the whole line. The reader’s own
+read-selection key answers “Selection is” and the text. Control plus C
+answers “Copied selection to clipboard”.</li>
+<li><strong>Reading without moving.</strong> The reader’s say-line key
+reads the current line and the cursor stays; say-word reads the word,
+twice for a spelling; say-all reads on from the cursor until Control
+stops it. A tutorial that types into a field uses say-line to verify the
+line, the way the trainer does.</li>
 <li><strong>A direct announcement from the program is a sentence of its
 own:</strong> “Done. Introduction to Windows dot m p 3” – the kind, a
 full stop, the detail – and it arrives before the results box.</li>
@@ -471,9 +551,10 @@ two.</li>
 window list on Shift+F4, next and previous, close and close-others, the
 alternate menu on Alt+F10, the key describer on Control+F1, about on
 Alt+F1, the guide on F1.</p>
-<p><code>Samples\FruitBasketMdiCs.cs</code> and
-<code>Samples\FruitBasketMdiPy.py</code> are the worked examples, and
-its five marked blocks are exactly the five things that change.</p>
+<p><code>Templates\samples\FruitBasketMdiCs.cs</code> and
+<code>Templates\samples\FruitBasketMdiPy.py</code> are the worked
+examples, and its five marked blocks are exactly the five things that
+change.</p>
 <h2
 id="scenario-4b-let-people-extend-your-app-without-your-help">Scenario
 4b: let people extend your app without your help</h2>
@@ -570,7 +651,7 @@ Development Kit at <code>C:\HomerDev</code>. Use <code>Lbc</code> for
 every dialog, <code>Inix</code> for settings, <code>Log</code> for the
 session log, <code>Paths</code> for folders, and <code>Say</code> only
 for what a screen reader cannot work out for itself. Follow the nine
-decisions marked in <code>Samples\FruitBasketCs.cs</code>.</p>
+decisions marked in <code>Templates\samples\FruitBasketCs.cs</code>.</p>
 </blockquote>
 <p>Then work in this order, which is the method the whole kit is shaped
 around:</p>

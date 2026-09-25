@@ -8,6 +8,9 @@
   <title>ReadMe</title>
   <style>
     html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
       color: #1a1a1a;
       background-color: #fdfdfd;
     }
@@ -26,16 +29,13 @@
     @media (max-width: 600px) {
       body {
         font-size: 0.9em;
-        padding: 12px;
+        padding: 1em;
       }
       h1 {
         font-size: 1.8em;
       }
     }
     @media print {
-      html {
-        background-color: white;
-      }
       body {
         background-color: transparent;
         color: black;
@@ -85,10 +85,9 @@
       color: #606060;
     }
     code {
-      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
       font-size: 85%;
       margin: 0;
-      hyphens: manual;
     }
     pre {
       margin: 1em 0;
@@ -153,17 +152,17 @@
     div.columns{display: flex; gap: min(4vw, 1.5em);}
     div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
+    ul.task-list{list-style: none;}
     ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
       width: 0.8em;
       margin: 0 0.8em 0.2em -1.6em;
       vertical-align: middle;
     }
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
 </head>
 <body>
 <header id="title-block-header">
@@ -209,7 +208,7 @@ first, then in <code>C:\HomerDev</code>, then in the folder it is run
 from.</p>
 <h3 id="build-and-run-the-fruit-basket-in-c">2. Build and run the fruit
 basket in C</h3>
-<pre><code>cd Samples
+<pre><code>cd Templates\samples
 buildFruitBasketCs
 FruitBasketCs</code></pre>
 <p>A window opens with a fruit field, an Add button, a basket list and a
@@ -296,7 +295,7 @@ before a release. It exists because three releases in a row shipped a
 fault that only a compiler could see.</p>
 <h3 id="gather-evidence">9. Gather evidence</h3>
 <pre><code>cd Tools
-checkHomerApp --path ..\Samples</code></pre>
+checkHomerApp --path ..\Templates\samples</code></pre>
 <p>Eleven checks run, and an <code>evidence-&lt;date&gt;.md</code>
 appears saying what was verified, what was not checked, and what remains
 uncertain. Open it. The third list is the point: it names what no script
@@ -359,10 +358,10 @@ same behaviour.</li>
 homerTidy, sayTutorial and tagRelease. No editing needed; they work out
 the app name from the folder, and any of them can be run from a shared
 tools folder.</li>
-<li><code>Samples\</code> – four fruit basket programs: the single
-dialog in C# and in Python, and the multiple-document version in C# and
-in Python. Each pair is the same program in two languages, written block
-for block. The teaching material.</li>
+<li><code>Templates\samples\</code> – four fruit basket programs: the
+single dialog in C# and in Python, and the multiple-document version in
+C# and in Python. Each pair is the same program in two languages,
+written block for block. The teaching material.</li>
 <li><code>help\</code> – every document, and the tutorial scripts.</li>
 </ul>
 <p><code>HomerDev.md</code> lists every file in the kit with one line

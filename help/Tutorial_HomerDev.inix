@@ -21,11 +21,12 @@ FileTask = tutorial
 
 [about]
 Title = The Homer Development Kit, and two fruit baskets
-Setup = You need Windows 10 or later, 64-bit, and a screen reader running -- JAWS, NVDA or Narrator. Everything else the kit fetches for itself. Nothing in this tutorial costs anything.
+Setup = You need Windows 10 or later, 64-bit, and a screen reader running. Everything else the kit fetches for itself. Nothing in this tutorial costs anything.
+Homework = Build the Python fruit basket the same way, and notice that it answers every key exactly as the C sharp one did.
 Intro = This is a first look at HomerDev: what it is, how to install it, and how to build and run the two sample programs. It takes about twelve minutes. You can follow along, or just listen.
 
 [step]
-Say = HomerDev is a kit of parts for building Windows programs that work well by keyboard and screen reader. Nine C sharp classes, seven Python modules, the build and release scripts, and two sample programs that do the same job in both languages. It is free and open source.
+Say = HomerDev is a kit of parts for building Windows programs that work well by keyboard and screen reader. Nine C sharp classes, seven Python modules, the build and release scripts, and two sample programs that do the same job in both languages. It is free and open source. If you miss a line the reader says, Insert plus Up Arrow says it again.
 Note = The kit is at https://github.com/JamalMazrui/HomerDev
 
 [step]
@@ -51,9 +52,9 @@ Say = Notice the last line. Zero problems is a real answer, said plainly. That i
 Note = "1 match", never "1 matches"; "0 matches" rather than silence.
 
 [step]
-Say = Next, the samples. Change into the Samples folder. There are four files: a C sharp program, a Python program, and a build script for each. Both programs are the fruit basket -- a window with a fruit field and an Add button, a basket list and a Delete button. Blind programmers have taught with that specification since 2005.
-Key = cd Samples
-Note = The legacy FruitBasket collection has thirty-six of these, one per language. These two are different: they are parallel to each other.
+Say = Next, the samples. Change into the samples folder under Templates. There are four files: a C sharp program, a Python program, and a build script for each. Both programs are the fruit basket -- a window with a fruit field and an Add button, a basket list and a Delete button. Blind programmers have taught with that specification since 2005.
+Key = cd Templates\samples
+Note = Typed at the prompt: the reader echoes the letters, and says nothing else until the next command answers. The legacy FruitBasket collection has thirty-six of these, one per language. These two are different: they are parallel to each other.
 
 [step]
 Say = Build the C sharp one.

@@ -8,6 +8,9 @@
   <title>Developer</title>
   <style>
     html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
       color: #1a1a1a;
       background-color: #fdfdfd;
     }
@@ -26,16 +29,13 @@
     @media (max-width: 600px) {
       body {
         font-size: 0.9em;
-        padding: 12px;
+        padding: 1em;
       }
       h1 {
         font-size: 1.8em;
       }
     }
     @media print {
-      html {
-        background-color: white;
-      }
       body {
         background-color: transparent;
         color: black;
@@ -85,10 +85,9 @@
       color: #606060;
     }
     code {
-      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
       font-size: 85%;
       margin: 0;
-      hyphens: manual;
     }
     pre {
       margin: 1em 0;
@@ -153,17 +152,17 @@
     div.columns{display: flex; gap: min(4vw, 1.5em);}
     div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
+    ul.task-list{list-style: none;}
     ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
       width: 0.8em;
       margin: 0 0.8em 0.2em -1.6em;
       vertical-align: middle;
     }
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
 </head>
 <body>
 <header id="title-block-header">
@@ -180,7 +179,7 @@ read HomerDev.md.</p>
   homer\         the same toolbox for Python and NVDA add-ons: inix, lbc,
                  log, paths, say, util, web
   help\          every document, the style guides, the tutorial scripts
-  Samples\       the four fruit basket programs and their build scripts
+  Templates\samples\       the four fruit basket programs and their build scripts
   Templates\     the files a new app is written from, carrying _APP_
   scripts\         checkHomerApp, gitPush, gitRelease, homerTidy,
                  sayTutorial, tagRelease
@@ -253,6 +252,39 @@ finished.</p>
 <p>Before removing or renaming a public member, grep the apps for it.
 The merge that produced this kit exists because two apps had diverged on
 exactly that.</p>
+<h1 id="the-five-scripts-and-the-order-they-run-in">The five scripts,
+and the order they run in</h1>
+<p>Every app carries these in <code>scripts</code>, refreshed from the
+kit by its build, and runs them from its project folder. They share one
+fact: <code>.gitignore</code> is a whitelist written from
+<code>RepoFiles.txt</code>, so “add everything” means “add everything
+the project has named”.</p>
+<ol type="1">
+<li><code>build&lt;App&gt;</code> – steps <code>version.txt</code>,
+builds the program and the installer, speaks any tutorial without audio,
+refreshes these scripts from the kit.</li>
+<li><code>scripts\gitPush "message"</code> – rewrites the whitelist from
+<code>RepoFiles.txt</code>, adds what it names, refuses anything over 10
+MB, commits, pushes, shows the status. Without
+<code>RepoFiles.txt</code> it stages nothing and says so.</li>
+<li><code>scripts\homerTidy --do-it</code> – the periodic clean: strays
+into place, fetched things deleted, the whitelist rewritten, strays
+untracked, commit. Same whitelist as gitPush; it too stages nothing
+without <code>RepoFiles.txt</code>.</li>
+<li><code>scripts\tagRelease</code> – tags the pushed commit with the
+version stamped in <code>&lt;App&gt;_setup.exe</code> and publishes the
+installer. <code>scripts\gitRelease</code> runs the checks first, then
+this.</li>
+<li><code>scripts\gitUnpushed</code> – when something was committed that
+should not have been and the push has not happened: undoes the local
+commits, keeps every file, and the next gitPush or tidy makes the commit
+properly.</li>
+</ol>
+<p><code>RepoFiles.txt</code> names what the repository carries;
+<code>LocalFiles.txt</code> names what stays on this disk and is never
+pushed – fetched voices, built output, logs, generated audio. A file
+that does not go up needs one line in the first; a large file that must
+not go up needs one line in the second.</p>
 <h1 id="adding-a-module">Adding a module</h1>
 <ol type="1">
 <li>Write it in Camel Type, in <code>namespace Homer</code>, with a

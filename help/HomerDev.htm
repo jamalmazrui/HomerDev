@@ -8,6 +8,9 @@
   <title>HomerDev</title>
   <style>
     html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
       color: #1a1a1a;
       background-color: #fdfdfd;
     }
@@ -26,16 +29,13 @@
     @media (max-width: 600px) {
       body {
         font-size: 0.9em;
-        padding: 12px;
+        padding: 1em;
       }
       h1 {
         font-size: 1.8em;
       }
     }
     @media print {
-      html {
-        background-color: white;
-      }
       body {
         background-color: transparent;
         color: black;
@@ -85,10 +85,9 @@
       color: #606060;
     }
     code {
-      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
       font-size: 85%;
       margin: 0;
-      hyphens: manual;
     }
     pre {
       margin: 1em 0;
@@ -153,17 +152,17 @@
     div.columns{display: flex; gap: min(4vw, 1.5em);}
     div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
+    ul.task-list{list-style: none;}
     ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
       width: 0.8em;
       margin: 0 0.8em 0.2em -1.6em;
       vertical-align: middle;
     }
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
 </head>
 <body>
 <header id="title-block-header">
@@ -291,14 +290,14 @@ one pass. It replaces cleanDir and tidyRepo, which asked the same
 question of two places and could disagree about the answer.</li>
 </ul>
 <p>Copy the pair you want into the app folder and run it there.</p>
-<h2 id="samples">Samples</h2>
+<h2 id="templates-1">Templates</h2>
 <p>Two fruit basket programs, the same design in two languages, each
 with the build script that produces it:</p>
 <ul>
-<li><code>Samples\</code> – <code>FruitBasketCs.cs</code> and
+<li><code>Templates\samples\</code> – <code>FruitBasketCs.cs</code> and
 <code>buildFruitBasketCs.cmd</code>, which produce
 <code>FruitBasketCs.exe</code> on the C# classes.</li>
-<li><code>Samples\</code> – <code>FruitBasketPy.py</code> and
+<li><code>Templates\samples\</code> – <code>FruitBasketPy.py</code> and
 <code>buildFruitBasketPy.cmd</code>, which produce
 <code>FruitBasketPy.exe</code> on the Python package, with Python and
 every dependency inside the one file.</li>
@@ -764,7 +763,7 @@ Util and Web, with the same names and the same behaviour</li>
 <li><strong>version.py</strong> – written by the build; not a source
 file</li>
 </ul>
-<h2 id="samples-1">Samples</h2>
+<h2 id="templates-2">Templates</h2>
 <ul>
 <li><strong>FruitBasketCs.cs</strong> – the single-dialog shape, with
 twelve marked blocks and the nine decisions</li>
@@ -1257,8 +1256,8 @@ Wants  = --source</code></pre>
 <code>Wants</code> an optional string its output must contain. That is
 the whole language, on purpose: a criterion nobody can read is a
 criterion nobody writes. <code>Templates\accept.inix</code> is the
-starting point, and <code>Samples\accept.inix</code> shows a real
-one.</p>
+starting point, and <code>Templates\samples\accept.inix</code> shows a
+real one.</p>
 <p>A criterion that cannot be written this way is still worth writing.
 Put it in <code>self.md</code> under what a person has to check by hand,
 so it is not quietly forgotten.</p>
@@ -1318,10 +1317,10 @@ Escape = yes</code></pre>
 accessibility tree. <code>Title</code> is a window that must exist.
 <code>Escape</code> closes what the step opened. pywinauto installs
 itself on first run.</p>
-<p><code>Samples\uiTest.inix</code> drives all four samples, including
-the keys an MDI app gets free: Control+N for a second window, F4 for the
-window list, Alt+Shift+S for the jobs, Alt+Shift+C for the settings,
-Alt+F1 for about.</p>
+<p><code>Templates\samples\uiTest.inix</code> drives all four samples,
+including the keys an MDI app gets free: Control+N for a second window,
+F4 for the window list, Alt+Shift+S for the jobs, Alt+Shift+C for the
+settings, Alt+F1 for about.</p>
 <h2 id="checking-the-machine-not-just-the-kit">Checking the machine, not
 just the kit</h2>
 <p><code>checkHomerDev</code> also records what the build actually ran
@@ -2069,17 +2068,18 @@ every interesting way. A good session runs in this order:</p>
 and no conventions. Read what comes back. It works. Note what it does
 not do: where the focus goes, what it says when the field is empty,
 whether the basket survives being closed.</li>
-<li><strong>Read <code>Samples\FruitBasketCs.cs</code>.</strong> Twelve
-marked blocks, and nine marked decisions inside them. Each decision is
-one a program has to get right and an AI will not make for you unless
-you ask.</li>
+<li><strong>Read
+<code>Templates\samples\FruitBasketCs.cs</code>.</strong> Twelve marked
+blocks, and nine marked decisions inside them. Each decision is one a
+program has to get right and an AI will not make for you unless you
+ask.</li>
 <li><strong>Ask for the same program again</strong>, this time with the
 three sentences above. Compare.</li>
-<li><strong>Open <code>Samples\FruitBasketPy.py</code> in a second
-window</strong> and walk the two files block by block. Same twelve
-blocks, same twelve titles, same function names, same nine decisions.
-The language changed; the design did not. That is the lesson worth
-keeping.</li>
+<li><strong>Open <code>Templates\samples\FruitBasketPy.py</code> in a
+second window</strong> and walk the two files block by block. Same
+twelve blocks, same twelve titles, same function names, same nine
+decisions. The language changed; the design did not. That is the lesson
+worth keeping.</li>
 <li><strong>Change one thing.</strong> Add a Clear button, or sort the
 basket, or keep a count. Watch which of the nine decisions the change
 touches.</li>

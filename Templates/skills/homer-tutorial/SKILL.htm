@@ -1,0 +1,335 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="description" content="Write, check and build the spoken walkthroughs of a Homer Tools app – Tutorial_NN_*.inix scripts where a narrator works and a screen reader answers. Use when asked to write a tutorial, walk, or walkthrough for a Homer app, to simulate what a screen reader says, to add a Hear line, or to check tutorial scripts before building their audio. Names no screen reader in the scripts." />
+  <title>SKILL</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">SKILL</h1>
+</header>
+<h1 id="homer-tutorial-skill">Homer tutorial skill</h1>
+<p>A Homer tutorial is a dialogue: a person doing a real job in the app,
+and a screen reader answering exactly as a reader does. Each script is a
+<code>help\Tutorial_NN_Name.inix</code> file;
+<code>scripts\buildTutorials</code> speaks it into
+<code>help\tutorials\Tutorial_NN_Name.mp3</code> with two voices and
+writes the text into <code>help\Tutorials.md</code>. The reader’s lines
+are the whole value: they must be what the listener will hear on their
+own machine.</p>
+<h2 id="the-format">The format</h2>
+<pre><code>[about]
+Title=01 - Transcribe a Recording
+Intro=One sentence: what this walk does.
+Setup=The starting state: what is installed, what file exists, where focus is.
+Homework=Something to try afterwards, one sentence.
+
+[step]
+Say=What the narrator says. One idea.
+Key=Alt+T
+Hear=Transcribe audio check box, checked, Alt plus T
+Note=Written only, never spoken.
+Pause=1</code></pre>
+<p><code>Say</code> is the narrator; <code>Key</code> is the key
+pressed, in Homer key-name form (modifiers alphabetical, “Control”
+spelled out); <code>Hear</code> is what the reader answers, one line per
+utterance, repeat the key for several; <code>Note</code> is for the
+written version only; <code>Pause</code> is seconds of silence before
+the step. The first script only carries <code>[feed]</code> (title,
+description, author) and <code>[global]</code> (NarratorScale,
+ReaderScale, LeadIn).</p>
+<h2 id="four-beats-per-key">Four beats per key</h2>
+<p>Every keystroke is narrated the way a screen reader trainer does
+it:</p>
+<ol type="1">
+<li><strong>Say the key</strong>, with the word it comes from and, for a
+letter, its phonetic word: “Alt plus T is Transcribe audio, T for
+Transcribe.”</li>
+<li><strong>Press it</strong> (<code>Key=</code>).</li>
+<li><strong>Hear the reader, word for word</strong>
+(<code>Hear=</code>), untidied.</li>
+<li><strong>Say what that meant</strong> in the next step’s
+<code>Say</code>: “The reader said checked. That is the whole
+request.”</li>
+</ol>
+<p>Also:</p>
+<ul>
+<li><strong>Name silence.</strong> When the reader says nothing after a
+key, say so: “The reader did not say anything, and that is right.”
+<code>Hear=</code> stays empty; the following <code>Say</code> or the
+<code>Note</code> says why.</li>
+<li><strong>Verify after every change of focus</strong> with Insert plus
+T, and say the word “verify”.</li>
+<li><strong>Teach the repeat key early</strong>: the reader’s say-line
+key (Insert plus Up Arrow) in the first walk, before the first thing
+worth missing.</li>
+<li><strong>Counts are orientation</strong>: when the reader says “1 of
+14”, the narrator uses it.</li>
+<li><strong>Name controls as the reader names them</strong>: “edit box”,
+“check box”, “split button”, never “field”.</li>
+<li><strong>A breath before each key</strong>: <code>Pause=1</code>
+where the listener needs it.</li>
+<li><strong>Name no screen reader.</strong> Write “the screen reader” or
+“the reader”. The scripts are for everyone’s reader.</li>
+</ul>
+<h2 id="how-the-reader-phrases-a-control">How the reader phrases a
+control</h2>
+<p>At its middle verbosity. Taken from real speech; do not improve
+it.</p>
+<ul>
+<li><strong>A window appears:</strong> title alone, then “
+<title>
+dialog”, then the text, then the focused control.
+<code>HomerScribe results dialog</code> /
+<code>One source done. Took 14 minutes.</code> /
+<code>OK button</code>.</li>
+<li><strong>Check box:</strong> label, “check box”, state, access key as
+words. <code>Transcribe audio check box, checked, Alt plus T</code>.
+Toggled by its access key, the same line again with the new state.</li>
+<li><strong>Button:</strong> label, “button”, access key.
+<code>OK button</code>. A symbol is read:
+<code>Next greater button, Alt plus N</code>.</li>
+<li><strong>Radio button:</strong> label, “radio button”, state,
+position, key.
+<code>Words radio button, checked, 2 of 4, Alt plus T</code>.</li>
+<li><strong>Combo box:</strong> label with colon, “combo box”, value,
+position, key.
+<code>Use keyboard layout: combo box, Desktop, 1 of 3, Alt plus L</code>.</li>
+<li><strong>Edit box:</strong> label with colon, “edit”, contents.
+<code>Source paths: edit,   https colon slash slash ...</code>. Select
+All: <code>selected</code> and the text. Paste: nothing.</li>
+<li><strong>Slider:</strong> label, direction, value.
+<code>Rate: left right slider, 50 percent</code>.</li>
+<li><strong>Menus:</strong> <code>Menu bar</code>;
+<code>Options menu</code>; items with their letter after;
+<code>Voices submenu, V</code>; <code>Leaving menu bar</code>.</li>
+<li><strong>Slider with a value:</strong>
+<code>Voice rate: 68, left right slider, 25 percent</code>; a numeric
+edit: <code>Voice pitch change percent: edit, 20</code>.</li>
+<li><strong>Tabbed dialog:</strong>
+<code>Properties dialog, Shortcut page</code>.</li>
+<li><strong>List view item:</strong>
+<code>Folder view list view, not selected, Recycle Bin   object, 1 of 12</code>;
+a typed letter reads the item it reached.</li>
+<li><strong>A program’s loading message comes before its title:</strong>
+<code>Please wait</code>, then the title, then the focused control.</li>
+<li><strong>In an edit box:</strong> typing echoes each character,
+<code>space</code>, <code>Enter</code>, <code>Period</code>; Right Arrow
+speaks the character; Control plus Right Arrow the word; Backspace the
+character erased; an empty line <code>Blank</code>; Control plus Home
+<code>Top of file</code> then the line; Control plus End
+<code>Bottom of file</code> then the line; Home and End nothing. Shift
+plus Right Arrow: the character then <code>selected</code>; back off it
+<code>unselected</code>; Control plus Shift plus Right Arrow: the word
+then <code>selected</code>; Shift plus Down Arrow: <code>Selected</code>
+and the line; read-selection: <code>Selection is</code> and the text;
+Control plus C: <code>Copied   selection to clipboard</code>.</li>
+<li><strong>Access keys are words:</strong> <code>Alt plus T</code>,
+never <code>Alt+T</code>, in a Hear line.</li>
+<li><strong>Names as the synthesizer says them:</strong>
+<code>Introduction to Windows dot m p   3</code>,
+<code>https colon slash slash www dot</code>,
+<code>C colon backslash Users</code>.</li>
+<li><strong>A direct announcement from the program is its own
+sentence,</strong> before the results box:
+<code>Done. Introduction to Windows dot m p 3</code>.</li>
+</ul>
+<h2 id="where-the-truth-comes-from">Where the truth comes from</h2>
+<p>Write a <code>Hear</code> line from evidence, never from
+expectation:</p>
+<ol type="1">
+<li><strong>The dialog’s code.</strong> In an Lbc dialog the add order
+is the focus order; a control’s caption carries <code>&amp;</code>
+before its access letter; the label before an input box is what the
+reader says with a colon. Read the <code>addInputBox</code>,
+<code>addCheckBox</code>, <code>addButton</code> calls and take the
+words from them.</li>
+<li><strong>The program’s own announcements.</strong> Grep the source
+for <code>announce(</code>, <code>logMessage(</code> third arguments,
+results-box text; they are what the program says, and the reader reads
+them as written.</li>
+<li><strong>A speech history.</strong> When the person can paste what
+their reader spoke, that is the final word on phrasing; it beats every
+rule above.</li>
+<li><strong>A transcript of a training class</strong>, read back through
+HomerScribe, for grammar not yet in the list.</li>
+</ol>
+<p>If none of these settles a line, say so in the <code>Note</code>
+rather than guessing.</p>
+<h2 id="check-then-build">Check, then build</h2>
+<pre><code>scripts\checkTutorial              every help\Tutorial_*.inix
+scripts\checkTutorial Tutorial_01  one of them</code></pre>
+<p>The check parses each script and reports, with the script name and
+step number: a step with a <code>Key</code> and a <code>Hear</code> that
+names no silence; <code>Alt+</code> in a <code>Hear</code> line; a
+screen reader named anywhere; a Hear line for a check box out of order;
+an underscore or a bare <code>.mp3</code>/<code>.pdf</code> in a
+<code>Hear</code> line; a first script without the repeat key.
+<code>scripts\buildTutorials</code> runs it first and speaks nothing
+while it reports problems. Zero problems is a real answer.</p>
+<pre><code>scripts\buildTutorials             speak what has no audio
+scripts\buildTutorials Tutorial_01 speak one again</code></pre>
+<p>The voices live in <code>C:\HomerDev\exec</code>, fetched by
+<code>buildHomerDev</code> only.</p>
+</body>
+</html>

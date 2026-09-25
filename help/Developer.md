@@ -16,7 +16,7 @@ HomerDev.md.
       homer\         the same toolbox for Python and NVDA add-ons: inix, lbc,
                      log, paths, say, util, web
       help\          every document, the style guides, the tutorial scripts
-      Samples\       the four fruit basket programs and their build scripts
+      Templates\samples\       the four fruit basket programs and their build scripts
       Templates\     the files a new app is written from, carrying _APP_
       scripts\         checkHomerApp, gitPush, gitRelease, homerTidy,
                      sayTutorial, tagRelease
@@ -96,6 +96,33 @@ HomerScribe does not is a change that is not finished.
 
 Before removing or renaming a public member, grep the apps for it. The merge
 that produced this kit exists because two apps had diverged on exactly that.
+
+# The five scripts, and the order they run in
+
+Every app carries these in `scripts`, refreshed from the kit by its build,
+and runs them from its project folder. They share one fact: `.gitignore` is
+a whitelist written from `RepoFiles.txt`, so "add everything" means "add
+everything the project has named".
+
+1. `build<App>` -- steps `version.txt`, builds the program and the installer,
+   speaks any tutorial without audio, refreshes these scripts from the kit.
+2. `scripts\gitPush "message"` -- rewrites the whitelist from `RepoFiles.txt`,
+   adds what it names, refuses anything over 10 MB, commits, pushes, shows
+   the status. Without `RepoFiles.txt` it stages nothing and says so.
+3. `scripts\homerTidy --do-it` -- the periodic clean: strays into place,
+   fetched things deleted, the whitelist rewritten, strays untracked, commit.
+   Same whitelist as gitPush; it too stages nothing without `RepoFiles.txt`.
+4. `scripts\tagRelease` -- tags the pushed commit with the version stamped in
+   `<App>_setup.exe` and publishes the installer. `scripts\gitRelease` runs
+   the checks first, then this.
+5. `scripts\gitUnpushed` -- when something was committed that should not
+   have been and the push has not happened: undoes the local commits,
+   keeps every file, and the next gitPush or tidy makes the commit properly.
+
+`RepoFiles.txt` names what the repository carries; `LocalFiles.txt` names
+what stays on this disk and is never pushed -- fetched voices, built output,
+logs, generated audio. A file that does not go up needs one line in the
+first; a large file that must not go up needs one line in the second.
 
 # Adding a module
 

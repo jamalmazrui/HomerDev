@@ -71,18 +71,25 @@ What it writes, all under the app's `help` folder:
 A walk whose `.mp3` exists is not spoken again. Delete the file to have it
 spoken again; name one script on the command line to speak just that one.
 
-### Where the voices live
+### Where the voices live, and who fetches them
 
-One copy, in `C:\HomerDev\exec`, fetched the first time any app's build
-speaks a tutorial and found by every app's build after that. Neither piper
-nor sherpa-onnx has an installer, so there is no default location the way
-there is for Whisper or Pandoc; the kit is the one place every Homer app
-already relies on, and `exec` is the Homer folder for binaries that are not
-in git -- which is what a fetched engine and its model files are. The folder
-is local to the machine (`LocalFiles.txt` names it, so it is never pushed)
+One copy, in `C:\HomerDev\exec`, and **only `buildHomerDev` fetches it**.
+The kit's build passes `-fetch` to the tutorial tool; an app's build never
+does. So an app's build finds the voices in the kit, or, when they are not
+there, says "Run buildHomerDev" and speaks nothing -- it never downloads a
+copy of its own. Neither piper nor sherpa-onnx has an installer, so there is
+no default location the way there is for Whisper or Pandoc; the kit is the
+one place every Homer app already relies on, and `exec` is the Homer folder
+for binaries that are not in git. `LocalFiles.txt` names it as never pushed,
 and the kit's own build skips it. To keep the voices somewhere else, set the
-`HOMER_VOICES` environment variable to that folder; a `Piper` or
-`sherpa-onnx` folder under Program Files is found too.
+`HOMER_VOICES` environment variable; a `Piper` or `sherpa-onnx` folder under
+Program Files is found too.
+
+The sherpa-onnx package taken is the **shared** one, `win-x64-shared`, which
+carries `bin\sherpa-onnx-offline-tts.exe`. The "static … lib" packages are
+libraries for linking, hundreds of megabytes and no executable; one was
+fetched by mistake on 25 September 2026, and the tool now removes such a
+folder when it finds one.
 
 ### The voices, and why these
 
@@ -92,6 +99,22 @@ faster and even, the way a screen reader sounds to somebody who listens all
 day. A beta tester asked for the reader to be a bit slower, so its speed is
 0.64 on piper's scale (it was 0.56), still ahead of the narrator's 0.80.
 `ReaderScale` in a script's `[global]` section changes it for a series.
+
+**Two engines, one each.** Kokoro speaks the narrator; piper's john speaks
+the reader. Half the lines in a walk are the reader's, and piper speaks a
+line in a second where Kokoro takes twenty -- on a laptop Kokoro runs at two
+to three times real time, and a long unbroken line, such as a web address
+spelled out as words, far slower, which is what made a build look hung on
+25 September 2026. Kokoro's naturalness goes where it is heard, and a
+flattened piper voice is what a reader sounds like anyway. The tool cuts
+long text at sentences and commas before handing it to Kokoro, and runs it
+on two threads, which measured faster than all of them. `ReaderOnKokoro=1`
+in `[global]` puts the reader on Kokoro too, at the cost in minutes.
+
+**One loudness.** Every piece is brought to the same measured loudness
+before the join, so the narrator is no longer louder than the reader;
+`ReaderGain` in `[global]` scales the reader's pieces on top of that, 1.0
+unless set.
 
 **Kokoro, when it can be fetched.** Re-investigated on 25 September 2026.
 Kokoro-82M is an open-weight neural voice model released under Apache 2.0,
@@ -121,6 +144,28 @@ Parler-TTS (Apache 2.0) are clean on licence but need Python and, in
 practice, a graphics card; Kokoro gives the same permission at a size that
 runs on any processor. Licences change; the tool's log names the voice used
 for every file, so a later check knows what to look at.
+
+### Checking one
+
+    scripts\checkTutorial              every help\Tutorial_*.inix
+    scripts\checkTutorial Tutorial_01  one of them
+
+The check reads each script against the format and the reader's grammar and
+names the script and step for every problem: a key with no `Hear` line and
+nothing naming the silence; `Alt+T` in a `Hear` line, where the reader says
+the words; a screen reader named anywhere; a check box line out of the
+reader's order; a file name written rather than said; a first walk that does
+not teach the repeat key. `buildTutorials` runs it first and speaks nothing
+while it reports a problem. Zero problems is a real answer.
+
+### The skill, for an AI writing these
+
+`Templates\skills\homer-tutorial\SKILL.md` is a skill for Claude, or any
+assistant that reads one: the format, the four beats, the reader's grammar,
+where the truth of a `Hear` line comes from (the dialog's code, the program's
+own announcements, a speech history, a transcript), and the check-then-build
+commands. Give it to the assistant along with the app's dialog code and it
+writes walks that pass the check. Name no screen reader is in there too.
 
 ### Writing one
 
@@ -212,6 +257,35 @@ grammar is common to the readers people use.
 - **The reader also confirms actions the program did not ask it to:** "Copied
   selection to clipboard", "Select All", "376 characters". A tutorial that
   copies text should expect them.
+- **A slider with a value:** label with colon, the value, the direction, the
+  position as a percentage. `Voice rate: 68, left right slider, 25 percent`.
+  An edit box holding a number reads the number: `Voice pitch change
+  percent: edit, 20`.
+- **A tabbed dialog:** the title with "dialog", then the tab with "page":
+  `Properties dialog, Shortcut page`.
+- **A list view item:** name, "object" or the item's kind, position;
+  typing a letter jumps and reads the item that letter reached: `Folder view
+  list view, not selected, Recycle Bin object, 1 of 12` then, after J,
+  `JAWS object, 5 of 12` -- the name of whatever program it is.
+- **A program's own loading message is read before its title:** `Please
+  wait` and then the window title, then the focused control.
+- **In an edit box, the reader echoes what the keys do.** Typing speaks each
+  character as it lands -- "T", "H", "E", "space" -- and "Enter" for a new
+  line, "Period" for the punctuation. Right Arrow speaks the character it
+  moves onto; Control plus Right Arrow speaks the word it lands at the start
+  of. Backspace speaks the character it erased. An empty line is "Blank".
+  Control plus Home says "Top of file" and then the first line; Control plus
+  End says "Bottom of file" and then the last line, which is often "Blank".
+  Home and End say nothing on their own.
+- **Selecting has its own words.** Shift plus Right Arrow: the character,
+  then "selected"; moving back off it: "unselected". Control plus Shift plus
+  Right Arrow: the word, then "selected". Shift plus Down Arrow: "Selected"
+  and the whole line. The reader's own read-selection key answers "Selection
+  is" and the text. Control plus C answers "Copied selection to clipboard".
+- **Reading without moving.** The reader's say-line key reads the current line
+  and the cursor stays; say-word reads the word, twice for a spelling; say-all
+  reads on from the cursor until Control stops it. A tutorial that types into
+  a field uses say-line to verify the line, the way the trainer does.
 - **A direct announcement from the program is a sentence of its own:**
   "Done. Introduction to Windows dot m p 3" -- the kind, a full stop, the
   detail -- and it arrives before the results box.
@@ -296,7 +370,7 @@ What you get without writing it: the window picker on F4, the spoken window list
 on Shift+F4, next and previous, close and close-others, the alternate menu on
 Alt+F10, the key describer on Control+F1, about on Alt+F1, the guide on F1.
 
-`Samples\FruitBasketMdiCs.cs` and `Samples\FruitBasketMdiPy.py` are the worked examples, and its five marked blocks are
+`Templates\samples\FruitBasketMdiCs.cs` and `Templates\samples\FruitBasketMdiPy.py` are the worked examples, and its five marked blocks are
 exactly the five things that change.
 
 ## Scenario 4b: let people extend your app without your help
@@ -410,7 +484,7 @@ Three sentences carry the kit into an AI session:
 > Development Kit at `C:\HomerDev`. Use `Lbc` for every dialog, `Inix` for
 > settings, `Log` for the session log, `Paths` for folders, and `Say` only for
 > what a screen reader cannot work out for itself. Follow the nine decisions
-> marked in `Samples\FruitBasketCs.cs`.
+> marked in `Templates\samples\FruitBasketCs.cs`.
 
 Then work in this order, which is the method the whole kit is shaped around:
 
@@ -427,3 +501,219 @@ Then work in this order, which is the method the whole kit is shaped around:
 Paste the sample into the session when the answers drift. A model that has read
 FruitBasketCs writes Homer code; a model that has not writes pixel coordinates
 and a tab order that is an accident.
+
+<!-- walkthrough: written by makeTutorials.py, do not edit between the markers -->
+
+## 0. The Homer Development Kit, and two fruit baskets
+
+This is a first look at HomerDev: what it is, how to install it, and how to build and run the two sample programs. It takes about twelve minutes. You can follow along, or just listen.
+
+**Before you start:** You need Windows 10 or later, 64-bit, and a screen reader running. Everything else the kit fetches for itself. Nothing in this tutorial costs anything.
+
+### Step 1
+
+HomerDev is a kit of parts for building Windows programs that work well by keyboard and screen reader. Nine C sharp classes, seven Python modules, the build and release scripts, and two sample programs that do the same job in both languages. It is free and open source. If you miss a line the reader says, Insert plus Up Arrow says it again.
+
+The kit is at https://github.com/JamalMazrui/HomerDev
+
+### Step 2
+
+The idea behind it is simple. Every decision that makes a program pleasant to use without sight -- where the focus goes, what gets spoken, what the keys do -- has already been made, tested, and put in a class. You get them by calling the class rather than by remembering them.
+
+The guide calls these the nine decisions, and both samples mark them where they occur.
+
+### Step 3: Control+V
+
+Start by unarchiving HomerDev dot zip into a folder called C colon backslash HomerDev. That is the whole install. Open the archive, choose Extract All, and type the folder name.
+
+Screen reader:
+
+- Destination, edit, C colon backslash HomerDev
+
+Any folder works. If you put it somewhere else, set an environment variable called HomerDev to that path, and every build script will find it.
+
+### Step 4: buildHomerDev
+
+Now open a command prompt in that folder and run the kit's own build.
+
+Screen reader:
+
+- Homer Development Kit 1.4.0 in C colon backslash HomerDev
+- 10 documents converted to HTML
+- 0 problems found. The kit is complete.
+
+buildHomerDev converts every document to HTML with pandoc, fetching pandoc if this machine has none, then checks the kit over: every component present, every file in the right encoding, no empty files.
+
+### Step 5
+
+Notice the last line. Zero problems is a real answer, said plainly. That is a rule in this kit: a count always matches its noun, and nothing reports zero as though it were an error.
+
+"1 match", never "1 matches"; "0 matches" rather than silence.
+
+### Step 6: cd Templates\samples
+
+Next, the samples. Change into the samples folder under Templates. There are four files: a C sharp program, a Python program, and a build script for each. Both programs are the fruit basket -- a window with a fruit field and an Add button, a basket list and a Delete button. Blind programmers have taught with that specification since 2005.
+
+Typed at the prompt: the reader echoes the letters, and says nothing else until the next command answers. The legacy FruitBasket collection has thirty-six of these, one per language. These two are different: they are parallel to each other.
+
+### Step 7: buildFruitBasketCs
+
+Build the C sharp one.
+
+Screen reader:
+
+- Kit, C colon backslash HomerDev version 1.4.0
+- Compiler, Microsoft Visual Studio Build Tools
+- Built FruitBasketCs dot exe version 1.0.0
+
+The script finds the compiler, finds the three reference assemblies that are not on the default path, compiles the program together with the Homer classes straight out of the kit, and writes buildFruitBasketCs.log beside itself.
+
+### Step 8: FruitBasketCs
+
+Now run it.
+
+Screen reader:
+
+- Fruit Basket, the basket is empty
+- Fruit, edit
+
+The window title carries the state and the focus starts in the field, because typing a fruit is the first thing anybody does.
+
+### Step 9: apple, Enter
+
+Type a fruit and press Enter.
+
+Screen reader:
+
+- apple added, 1 fruit in the basket
+
+One fruit, not one fruits. The screen reader announced nothing about the field or the button, because it had nothing new to say; what you heard is the program telling you what it did.
+
+### Step 10: Tab, DownArrow
+
+Add two more, then tab to the basket and arrow through it.
+
+Screen reader:
+
+- Basket, list box, apple, 1 of 3
+
+An ordinary Windows list box. No custom control, no special mode, nothing to learn.
+
+### Step 11: Control+J
+
+Press Control plus J to search inside the list.
+
+Screen reader:
+
+- Find in list, edit
+
+That search, and F3 to repeat it, arrived with the list box. The program contains no code for either.
+
+### Step 12: Delete
+
+Press Delete on a fruit you no longer want.
+
+Screen reader:
+
+- banana deleted, 2 fruits in the basket
+
+The selection moves to the neighbour, so the list still has somewhere to speak from. A list with nothing selected says nothing, and a person who hears nothing assumes the program has stopped.
+
+### Step 13: Alt+R
+
+Press Alt plus R for the report.
+
+Screen reader:
+
+- Fruit basket report, read only edit
+
+A plain read-only window you arrow through line by line and close with Escape. The same window the Help button uses.
+
+### Step 14: F1
+
+Press F1 for help.
+
+Screen reader:
+
+- Help, Fields in this dialog, Fruit, type the name of a fruit
+
+That help was written once, as a tip beside each field, and it reaches the reader twice: in the status line when focus arrives, and in this window on demand.
+
+### Step 15: Alt+F4
+
+Close the program, then run it again.
+
+Screen reader:
+
+- Fruit Basket, 2 fruits in the basket
+
+The basket was saved the moment each fruit went in, not on the way out. A program that saves at exit loses everything when it is killed.
+
+### Step 16: buildFruitBasketPy
+
+Now the same program in Python. Build it.
+
+Screen reader:
+
+- Creating the build environment
+- Installing what the build needs
+- Built FruitBasketPy dot exe version 1.0.0
+
+The first build makes a virtual environment beside the script and installs PyInstaller and wxPython into it, which takes a few minutes once. What comes out is one file with Python and every dependency inside it, so whoever you give it to needs no Python of their own.
+
+### Step 17: FruitBasketPy
+
+Run the Python one.
+
+Screen reader:
+
+- Fruit Basket, the basket is empty
+- Fruit, edit
+
+The same title, the same first control, the same starting focus.
+
+### Step 18: cherry, Enter
+
+Type a fruit and press Enter, exactly as before.
+
+Screen reader:
+
+- cherry added, 1 fruit in the basket
+
+The same sentence, from a different language, because both programs call the same Say class through the same kit.
+
+### Step 19: Control+J
+
+Tab to the basket, press Control plus J, press Delete, press Alt plus R. Every key does what it did in the C sharp version.
+
+Screen reader:
+
+- Find in list, edit
+
+Two differences, and only two. The C sharp dialog has a status line at the foot; a wx dialog has none, so the Python one puts the same sentence in the window title. And the tips are on Shift plus F1 in Python rather than in the status line.
+
+### Step 20
+
+That is the claim this kit makes, and you have just heard it tested. Two languages, one behaviour, because the behaviour lives in the components rather than in either program.
+
+Both source files carry twelve markers -- BLOCK 1 to BLOCK 12 -- with the same numbers, the same titles and the same function names, so they can be read side by side in two windows.
+
+### Step 21
+
+One last thing. Look in your local application data folder, under FruitBasketCs, then logs.
+
+Screen reader:
+
+- FruitBasketCs dash 2026 09 18 dash 1 3 0 5 2 2 dot log
+
+One log per session, named for when the session began, holding the environment, every setting and every error with its stack. Every Homer program writes one, from the same class, in the same place. So does every installer.
+
+### Step 22
+
+That is HomerDev. The guide, HomerDev dot md, has the rest: the Lbc dialogs, the inix settings format, the coding style, the release scripts, and a part on AI-assisted coding which is what the kit is really for. Thank you for listening.
+
+Questions and corrections are welcome. The kit is early, and it improves by being used.
+
+**Something to try:** Build the Python fruit basket the same way, and notice that it answers every key exactly as the C sharp one did.
+
+<!-- walkthrough ends -->

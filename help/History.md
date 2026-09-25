@@ -5,6 +5,111 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.37.0 -- 25 September 2026
+
+Two folders that broke the first-letter rule, and the kit's copies of shared
+scripts. Samples shared its letter with scripts: the four fruit-basket
+programs and their build scripts are under Templates\samples, and the
+build's move list carries them over and removes the old folder. The shared
+install scripts -- homerInstall, installOllama, installScreenReaderSupport,
+homerFinish -- were starters in Templates that every app carried under
+scripts and let drift; they are kit scripts now, refreshed into each app's
+scripts folder by its build, and the newer installOllama from HomerScribe
+(which updates through winget rather than saying "already installed") is
+the kit's. installModels.cmd stays a template: it names an app's own
+models. The template installer ships and runs them from scripts, as
+HomerScribe does.
+
+The tutorial tool: the reader speaks through piper even when Kokoro is
+here, which halves the minutes; long text is cut at sentences and commas
+before Kokoro sees it (a spelled-out web address took 71 seconds whole);
+Kokoro runs on two threads, measured faster than all of them; every piece
+is brought to one loudness, and ReaderGain scales the reader's; and a
+"step N of M" line every four steps says the minutes are speaking.
+
+# 1.36.2 -- 25 September 2026
+
+A build was stopped by hand because its screen said one sentence and then
+nothing for three minutes, and the silence read as a second download of
+the voices. It was Kokoro speaking walk 01. Now the tutorial tool says once
+which voices it has and where from ("Voices: Kokoro, from C:\HomerDev\exec.
+Nothing is downloaded."), says "Creating <name>.mp3, N steps" as each walk
+starts and "Created <name>.mp3 in N minutes" as it finishes, and both the
+kit's build and an app's let those lines reach the screen instead of
+capturing them into the build log. Kokoro runs on every processor core
+rather than two, and its configuration and progress chatter -- which
+PowerShell had been logging as a "NativeCommandError" -- is kept out of
+the log except for its timings.
+
+# 1.36.1 -- 25 September 2026
+
+Three faults from the first full run of 1.35 and 1.36, and two more lines
+of reader grammar. Kokoro was fetched and unpacked and then not recognised:
+the int8 bundle names its model model.int8.onnx, and only model.onnx was
+looked for; both are now. "nobump" arrived in the tutorial tool as a script
+name, because cmd's %* is not reset by a bare "call": a build now passes
+-build, an argument of its own, and the tool ignores any dash-argument it
+does not know and names the scripts present when one is asked for by a
+wrong name. cleanDir, which judged the folder it was run in and logged
+beside itself, forwards to homerTidy with the same arguments. Tutorials.md
+and the skill gain the reader's phrasing of a slider with a value, a numeric
+edit, a tabbed dialog, a list view item, and a program's loading message.
+
+# 1.36.0 -- 25 September 2026
+
+The screen reader's speech in a tutorial is now checked by code and written
+by a skill. scripts\checkTutorial reads every Tutorial_*.inix against the
+format and the reader's grammar and names the script and step for each
+problem; buildTutorials runs it first and speaks nothing while a problem
+stands. It found twelve in HomerScribe's seven walks on its first run and
+seven in the kit's own. Templates\skills\homer-tutorial\SKILL.md is a
+skill for an AI writing these: the four beats, the grammar of every control
+and of an edit box, where a Hear line's truth comes from, and the commands.
+
+# 1.35.1 -- 25 September 2026
+
+gitPush, in the form Jamal has used by hand -- clear the screen, add
+everything, commit "Fix." or the message given, push, show the status --
+with the guard the day taught: it stops when there is no RepoFiles.txt,
+rewrites the whitelist .gitignore from RepoFiles.txt before staging, and
+refuses a commit that stages anything over 10 MB, naming the file. Developer.md
+gains "The five scripts, and the order they run in": build, gitPush,
+homerTidy, tagRelease, gitUnpushed, and what RepoFiles.txt and
+LocalFiles.txt each decide.
+
+# 1.35.0 -- 25 September 2026
+
+Four things learnt from one afternoon's logs.
+
+ONLY THE KIT FETCHES THE VOICES. buildHomerDev runs scripts\buildTutorials
+with -fetch, which is the one way the tool downloads engines and models; an
+app's build finds them in C:\HomerDev\exec or says "Run buildHomerDev" and
+speaks nothing. The sherpa-onnx package taken is the shared one, which
+carries the executable; the static "lib" package it took before -- hundreds
+of megabytes of link libraries and no executable -- is removed when found.
+
+FETCHED THINGS ARE DELETED, NEVER ARCHIVED. A tidy found the old per-app
+voices, called all 486 files strays, moved them into notes\other, and
+committed them. homerTidy now recognises what a build fetches -- engines,
+models, packages -- and deletes it, including anything an earlier tidy put
+into notes.
+
+NOTHING IS STAGED WITHOUT A WHITELIST. With no RepoFiles.txt, homerTidy's
+"git add -A" swept those 480 files into a commit. Without RepoFiles.txt the
+repository is now left exactly as it was, and the console says why.
+
+scripts\gitUnpushed undoes the commits not yet pushed and keeps every file,
+so a commit like that one is put right by one command and the next tidy.
+gitRelease and gitPush log to logs\ like everything else. Every app's build
+refreshes the whole tool set from the kit into its scripts folder --
+buildTutorials, makeTutorials, homerTidy, checkHomerApp, tagRelease,
+gitRelease, gitPush, gitUnpushed -- so scripts\tagRelease is the release
+command in every Homer app, and the copy in C:\bin is retired.
+
+help\Tutorials.md gains the reader's grammar inside an edit box, from a
+class on reading and editing text: typing echo, Backspace, Blank, Top and
+Bottom of file, the three ways of selecting and their words.
+
 # 1.34.0 -- 25 September 2026
 
 The kit follows the layout it asks of every app. Tools is now scripts:
