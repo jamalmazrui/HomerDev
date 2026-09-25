@@ -54,14 +54,16 @@ rem paren BEFORE expanding variables. Every search below is therefore a
 rem single-line "if not defined X if exist ... set" chain, never a block.
 rem
 rem Output in this folder: FruitBasketCs.exe, and the installer if Inno Setup is
-rem present. Everything is logged to buildFruitBasketCs.log beside this script.
+rem present. Everything is logged to buildFruitBasketCs.log in logs\ beside this script, one file per run.
 rem ===================================================================
 
 setlocal enabledelayedexpansion
 cd /d "%~dp0"
 
 set "app=FruitBasketCs"
-set "log=%CD%\build%app%.log"
+if not exist "%CD%\logs" mkdir "%CD%\logs"
+for /f %%T in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd-HHmmss"') do set "sNow=%%T"
+set "log=%CD%\logs\%app%-build-%sNow%.log"
 echo %app% build started %DATE% %TIME%> "%log%"
 echo Script: %~f0>> "%log%"
 echo Folder: %CD%>> "%log%"

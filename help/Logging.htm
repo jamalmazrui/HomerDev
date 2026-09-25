@@ -1,0 +1,221 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Logging</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Logging</h1>
+</header>
+<h1 id="homer-logging-convention">Homer logging convention</h1>
+<p>Every Homer script and program writes a log. This says where it goes
+and what it is called, so that one answer serves every tool and nobody
+has to guess.</p>
+<h2 id="where">Where</h2>
+<ul>
+<li><strong>A tool run from a project folder</strong> — a build, a
+clean, a tidy, an audit — writes into that project’s <code>logs\</code>
+folder.</li>
+<li><strong>An installed program</strong> writes into
+<code>%LOCALAPPDATA%\&lt;App&gt;\logs</code>.</li>
+<li><strong>A standalone script</strong>, run from nowhere in
+particular, writes beside itself.</li>
+</ul>
+<p>A tool in <code>scripts\</code>, <code>tools\</code> or
+<code>exec\</code> belongs to the project one level up, so it writes to
+that project’s <code>logs\</code>, not into its own folder.</p>
+<h2 id="what-it-is-called">What it is called</h2>
+<pre><code>&lt;App&gt;-&lt;task&gt;-yyyyMMdd-HHmmss.log</code></pre>
+<p>For example <code>HomerScribe-tidy-20260924-124602.log</code>.</p>
+<p><strong>One file per run.</strong> An alphabetical sort is then a
+chronological one, and the whole folder can be zipped and sent when
+something needs diagnosing.</p>
+<h2 id="why-not-one-fixed-name">Why not one fixed name</h2>
+<p>A single fixed name overwrites the run before it. That is exactly the
+file you want when something has gone wrong twice, and it is gone.</p>
+<p><code>homerTidy.py</code> wrote <code>homerTidy.log</code> beside
+itself for months. When a tidy went wrong, the only way to see what the
+previous run had done was to not run it again — which nobody remembers
+in time.</p>
+<h2 id="console-versus-log">Console versus log</h2>
+<p>The <strong>console</strong> says, briefly and in plain words, what
+was found and what was done. The <strong>log</strong> holds the detail:
+every command, its exit code, every path, every setting, and any error
+or traceback.</p>
+<p>A failure must never produce only a console message with nothing in
+the log.</p>
+<h2 id="what-a-log-opens-with">What a log opens with</h2>
+<p>Enough to tell where it came from without asking:</p>
+<ul>
+<li>the script’s full path</li>
+<li>the language runtime and platform</li>
+<li>the working directory</li>
+<li>the command line, with its arguments</li>
+<li>every effective setting</li>
+</ul>
+<h2 id="the-helper">The helper</h2>
+<p><code>homerLogPath(sScriptDir)</code> in <code>homerTidy.py</code>
+works the project folder out and returns the timestamped path. Copy it
+rather than rewriting the rule.</p>
+</body>
+</html>

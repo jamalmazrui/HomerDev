@@ -5,6 +5,49 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.29.0 -- 25 September 2026
+
+Four files delivered the day before had landed in folders the kit never had:
+Docs, Inno and Scripts. They now sit where RepoFiles.txt says kit files go --
+FinishPage.md and Logging.md in help; HomerComponents.iss and homerInstall.cmd
+in Templates, beside _APP__setup.iss and installOllama.cmd. The build's move
+list removes the old copies once the new ones are in place, and the emptied
+folders after them, so nobody deletes anything by hand.
+
+The build's log moves to logs\HomerDev-build-yyyyMMdd-HHmmss.log, one file
+per run, and each sample build's log to logs\<App>-build-yyyyMMdd-HHmmss.log
+beside its script -- the convention every Homer build follows. The fixed
+buildHomerDev.log and build<App>.log at the old places go the same way.
+
+version.txt carries no byte order mark. cmd's set /p, which the app build
+scripts use to read it, cannot strip one, and a build refused a kit of
+exactly the version it asked for when one was present. normalizeHomer
+already knew this; the file had been saved wrongly.
+
+# 1.28.0 -- 24 September 2026
+
+HomerComponents.iss gained a sixth homerAdd argument, the registry Uninstall
+key name, checked under HKLM, HKCU and WOW6432Node. An installer runs
+elevated, where winget is often unreachable and a per-user tool is not on
+the PATH, so Ollama read as absent on a machine that runs it daily. It also
+gained Ollama model detection (homerModelPresent, homerModelWanted,
+homerModelLabel) from one ollama list call, and Install-Reinstall-Update
+grouping with case-insensitive alpha sorting within each group.
+
+homerInstall.cmd resolves the app name with ~f first, so a path ending in
+".." cannot yield ".." as the name, and takes a noPause argument in place of
+an environment variable. It and the build scripts stamp their logs with
+PowerShell's Get-Date; WMIC is gone from Windows 11 and every log had been
+named with zeros.
+
+homerTidy.py writes logs\<App>-tidy-yyyyMMdd-HHmmss.log in the project the
+script belongs to, worked out by climbing out of scripts, tools or exec,
+rather than surveying whatever the current directory was.
+
+Two documents: FinishPage.md, the rule for what a finish-page checkbox says
+and whether it starts ticked; Logging.md, where logs go and what they open
+with.
+
 # 1.27.0 -- 23 September 2026
 
 **Repeated speech is handled in the kit, not app by app.** `Say.say` drops a

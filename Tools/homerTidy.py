@@ -98,6 +98,35 @@ import subprocess
 import sys
 import traceback
 
+def homerProjectRoot(sScriptDir):
+    """The project folder: the script's own, or its parent when the script
+    sits in scripts\\, tools\\ or exec\\ as the Homer layout puts it."""
+    if os.path.basename(sScriptDir).lower() in ("scripts", "tools", "exec"):
+        return os.path.dirname(sScriptDir)
+    return sScriptDir
+
+
+def homerLogPath(sScriptDir):
+    """The Homer log path: <project>\\logs\\<App>-tidy-yyyyMMdd-HHmmss.log.
+
+    One file per run, so an alphabetical sort is a chronological one and the
+    whole folder can be zipped and sent. A single fixed name beside the script
+    overwrites the evidence of the run before, which is exactly what you want
+    to read when something has gone wrong twice.
+
+    The project is the folder the script sits in, or its parent when the script
+    is in scripts\\ -- the Homer layout puts tools there and logs one level up.
+    """
+    sRoot = homerProjectRoot(sScriptDir)
+    sApp = os.path.basename(sRoot) or "Homer"
+    sLogs = os.path.join(sRoot, "logs")
+    os.makedirs(sLogs, exist_ok=True)
+    sWhen = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    return os.path.join(sLogs, "%s-tidy-%s.log" % (sApp, sWhen))
+
+
+
+
 c_iLargeBytes = 10 * 1024 * 1024        # what counts as large in the history
 
 # Never pushed, whatever RepoFiles.txt says. Alphabetical, as every list in
@@ -112,6 +141,14 @@ c_lsNeverPushed = [
 # Folders a build makes. The survey does not walk into them, because what is
 # inside belongs to PyInstaller or the compiler rather than to the project.
 c_lsSkipFolders = [".git", ".venv", "__pycache__", "build", "dist", "exec", "logs", "notes", "venv"]
+# THE LOG GOES IN logs\, WITH A TIMESTAMP IN ITS NAME. Homer convention:
+# <App>-<task>-yyyyMMdd-HHmmss.log, one per run, so an alphabetical sort is a
+# chronological one and the whole folder can be zipped and sent. A single
+# fixed name beside the script overwrites the evidence of the run before.
+# THE LOG GOES IN logs\, WITH A TIMESTAMP IN ITS NAME. Homer convention:
+# <App>-<task>-yyyyMMdd-HHmmss.log, one per run, so an alphabetical sort is a
+# chronological one and the whole folder can be zipped and sent. A single
+# fixed name beside the script overwrites the evidence of the run before.
 c_sLogName = "homerTidy.log"
 c_sNotes = "notes"
 
@@ -139,9 +176,12 @@ c_ldFolders = [
     ("drafts", [".md", ".htm", ".html", ".txt", ".docx", ".doc", ".rtf", ".pdf"]),
 ]
 
-sScriptDir = os.path.dirname(os.path.abspath(__file__))
-sRoot = os.getcwd()
-sLogPath = os.path.join(sScriptDir, c_sLogName)
+sScriptDir = homerProjectRoot(os.path.dirname(os.path.abspath(__file__)))
+# THE PROJECT, NOT WHEREVER THE PROMPT HAPPENED TO BE. Running this from
+# scripts\ surveyed scripts\ and called the project "scripts". The project is
+# the folder the script belongs to, whatever directory it was launched from.
+sRoot = homerProjectRoot(sScriptDir)
+sLogPath = homerLogPath(sScriptDir)
 oLog = None
 
 

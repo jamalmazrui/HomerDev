@@ -15,7 +15,9 @@ Usage (through buildHomerDev.cmd, which is how it is meant to be run):
     buildHomerDev              convert the documents and check the kit
     buildHomerDev check        check only, convert nothing
 
-A detailed log is written beside this script as buildHomerDev.log.
+A detailed log is written to logs\\HomerDev-build-yyyyMMdd-HHmmss.log,
+one file per run, so the log of a run that went wrong is never overwritten
+by the run that followed it.
 """
 
 import datetime
@@ -36,6 +38,7 @@ c_lsExpected = [
     "Templates/_APP__setup.iss", "Templates/_APP_.cs",
     "Templates/installOllama.cmd", "Templates/installModels.cmd",
     "Templates/installScreenReaderSupport.cmd", "Templates/homerFinish.cmd",
+    "Templates/HomerComponents.iss", "Templates/homerInstall.cmd",
     "Templates/create_APP_Repo.cmd", "Templates/create_APP_Repo.ps1",
     "Templates/accept.inix", "Templates/gitignore.txt", "Templates/self.md", "Templates/version.txt",
     "Tools/tagRelease.cmd", "Tools/tagRelease.ps1", "RepoFiles.txt",
@@ -59,12 +62,12 @@ c_lsExpected = [
     "help/CamelType_JAWSScript.md",
     "ReadMe.md", "License.md",
     "help/Announce.md", "help/Developer.md", "help/History.md", "help/HomerDev.md",
-    "help/FAQ.md", "help/Hotkeys.md", "help/Tutorials.md",
+    "help/FAQ.md", "help/FinishPage.md", "help/Hotkeys.md", "help/Logging.md", "help/Tutorials.md",
     "help/Tutorial_HomerDev.inix",
     "License.md", "version.txt",
 ]
 
-c_sLogName = "buildHomerDev.log"
+c_sLogName = "HomerDev-build-%s.log" % datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
 # Folders a build makes, which are none of the kit's business. Walking into one
 # means auditing thousands of somebody else's files: a virtual environment alone
@@ -145,14 +148,27 @@ c_lMoved = [
     ("Python/homer/util.py", "homer/util.py"),
     ("Python/homer/web.py", "homer/web.py"),
     ("CSharp/Keys.cs", "CSharp/KeyName.cs"),
+    # 1.29.0: four files delivered on 24 Sep 2026 under folders the kit never
+    # had (Docs, Inno, Scripts) now sit where RepoFiles.txt says kit files go.
+    ("Docs/FinishPage.md", "help/FinishPage.md"),
+    ("Docs/FinishPage.htm", "help/FinishPage.htm"),
+    ("Docs/Logging.md", "help/Logging.md"),
+    ("Docs/Logging.htm", "help/Logging.htm"),
+    ("Inno/HomerComponents.iss", "Templates/HomerComponents.iss"),
+    ("Scripts/homerInstall.cmd", "Templates/homerInstall.cmd"),
+    ("buildHomerDev.log", "buildHomerDev.py"),
+    ("Samples/buildFruitBasketCs.log", "Samples/buildFruitBasketCs.cmd"),
+    ("Samples/buildFruitBasketMdiCs.log", "Samples/buildFruitBasketMdiCs.cmd"),
+    ("Samples/buildFruitBasketMdiPy.log", "Samples/buildFruitBasketMdiPy.cmd"),
+    ("Samples/buildFruitBasketPy.log", "Samples/buildFruitBasketPy.cmd"),
 ]
 
 # Folders that existed in an earlier layout and hold nothing the kit wants now.
 # Removed only when empty, which they are once the pairs above have been applied.
-c_lsOldFolders = ["Python/homer", "Python", "Samples/FruitBasketCs",
-                  "Samples/FruitBasketMdi", "Samples/FruitBasketPy", "Style"]
+c_lsOldFolders = ["Docs", "Inno", "Python/homer", "Python", "Samples/FruitBasketCs",
+                  "Samples/FruitBasketMdi", "Samples/FruitBasketPy", "Scripts", "Style"]
 sScriptDir = os.path.dirname(os.path.abspath(__file__))
-sLogPath = os.path.join(sScriptDir, c_sLogName)
+sLogPath = os.path.join(sScriptDir, "logs", c_sLogName)
 oLog = None
 
 
@@ -366,6 +382,7 @@ def checkKit():
 
 def main():
     global oLog
+    if not os.path.isdir(os.path.dirname(sLogPath)): os.makedirs(os.path.dirname(sLogPath))
     oLog = open(sLogPath, "w", encoding="utf-8")
     logLine("buildHomerDev started %s" % datetime.datetime.now().isoformat(" ", "seconds"))
     logLine("Script: %s" % os.path.abspath(__file__))

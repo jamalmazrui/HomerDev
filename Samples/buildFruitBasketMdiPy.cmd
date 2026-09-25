@@ -35,14 +35,16 @@ rem own Python is left alone and two Homer apps cannot disagree about a
 rem package version. It is created on the first build and reused after.
 rem
 rem Output in this folder: FruitBasketMdiPy.exe, and the installer if Inno Setup is
-rem present. Everything is logged to buildFruitBasketMdiPyPy.log beside this script.
+rem present. Everything is logged to buildFruitBasketMdiPyPy.log in logs\ beside this script, one file per run.
 rem ===================================================================
 
 setlocal enabledelayedexpansion
 cd /d "%~dp0"
 
 set "app=FruitBasketMdiPy"
-set "log=%CD%\build%app%.log"
+if not exist "%CD%\logs" mkdir "%CD%\logs"
+for /f %%T in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd-HHmmss"') do set "sNow=%%T"
+set "log=%CD%\logs\%app%-build-%sNow%.log"
 echo %app% build started %DATE% %TIME%> "%log%"
 echo Script: %~f0>> "%log%"
 echo Folder: %CD%>> "%log%"

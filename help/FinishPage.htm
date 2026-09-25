@@ -1,0 +1,239 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>FinishPage</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">FinishPage</h1>
+</header>
+<h1 id="the-finish-page-what-is-ticked-and-why">The finish page: what is
+ticked and why</h1>
+<p>Every Homer installer ends with a list of checkboxes. This says what
+each kind of box is called and whether it starts ticked, so that
+pressing Enter does the right thing without reading the list.</p>
+<h2 id="the-rule">The rule</h2>
+<ul>
+<li><strong>Install</strong> a component or model that is missing —
+<strong>ticked</strong></li>
+<li><strong>Update</strong> a component whose newer version exists —
+<strong>ticked</strong></li>
+<li><strong>Reinstall</strong> something already current —
+<strong>unticked</strong></li>
+<li><strong>Launch</strong> the app — <strong>ticked</strong></li>
+<li><strong>Install JAWS or NVDA scripts</strong> —
+<strong>ticked</strong></li>
+<li><strong>Open documentation</strong> (the guide, the ReadMe) —
+<strong>unticked</strong></li>
+</ul>
+<p>So Enter installs everything missing, updates everything stale, puts
+the screen-reader scripts in place, and starts the app. It reinstalls
+nothing that is already current, and it does not open a browser window
+on top of the app.</p>
+<h2 id="why-the-ticks-are-the-point">Why the ticks are the point</h2>
+<p>The label alone is not enough. A person arrowing down a finish page
+should be able to trust that the default is the sensible thing, and only
+untick what they do not want. A box that proposes what has already been
+done, or that opens a document over the program they just installed,
+teaches the reader to stop trusting the page.</p>
+<h2 id="two-entries-per-component">Two entries per component</h2>
+<p>In Inno, <code>Check:</code> decides whether an entry is
+<strong>shown</strong>, not whether it is ticked. So each component has
+two <code>[Run]</code> entries with the same label function: one shown
+when the component is wanted (missing or stale), ticked; one shown when
+it is current, carrying the <code>unchecked</code> flag. The reader sees
+one box per component, with the right verb and the right default.</p>
+<p>One entry gated on “wanted” is not enough: every component already
+present simply vanishes from the page, and the person never sees a
+Reinstall box.</p>
+<h2 id="how-the-wording-is-decided">How the wording is decided</h2>
+<p>The verb comes from what the machine actually has, worked out once
+per component by <code>HomerComponents.iss</code>:</p>
+<ul>
+<li><code>homerLabel(i)</code> gives “Install X <latest>”, “Update X
+from <old> to <new>”, or “Reinstall X <version>”, with a
+three-or-four-word use in parentheses.</li>
+<li><code>homerWanted(i)</code> is the <code>Check:</code> — true when
+missing or stale.</li>
+<li><code>homerModelLabel(model, use, size)</code> and
+<code>homerModelWanted(model)</code> do the same for an Ollama model,
+asking <code>ollama list</code> rather than winget.</li>
+</ul>
+<p>Detection tries every winget id, then the file, then the executable’s
+own <code>--version</code>, then the registry uninstall key — because
+the installer runs elevated, where winget is often unreachable and
+per-user tools are not on the PATH. Missing any one of these makes an
+installed component read as absent.</p>
+<h2 id="order">Order</h2>
+<p>Install first, then Reinstall, then Update, alphabetical within each.
+Launch and documentation come last. <code>homerOrder()</code> returns
+the component indices in that order.</p>
+<h2 id="the-launch-comes-after-the-results-box">The launch comes after
+the Results box</h2>
+<p>The launch entry does not start the app. It writes a marker, and the
+app is started only after the Results box has been read and closed —
+otherwise the new window takes focus and the screen reader begins
+announcing it over the summary of what just happened. See
+<code>startIfAsked</code> in any Homer installer.</p>
+</body>
+</html>
