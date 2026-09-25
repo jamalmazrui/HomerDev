@@ -41,19 +41,19 @@ c_lsExpected = [
     "Templates/HomerComponents.iss", "Templates/homerInstall.cmd",
     "Templates/create_APP_Repo.cmd", "Templates/create_APP_Repo.ps1",
     "Templates/accept.inix", "Templates/gitignore.txt", "Templates/self.md", "Templates/version.txt",
-    "Tools/tagRelease.cmd", "Tools/tagRelease.ps1", "RepoFiles.txt",
+    "scripts/tagRelease.cmd", "scripts/tagRelease.ps1", "RepoFiles.txt", "LocalFiles.txt",
     "Samples/FruitBasketCs.cs", "Samples/FruitBasketMdiCs.cs",
     "Samples/FruitBasketMdiPy.py", "Samples/FruitBasketPy.py",
     "Samples/accept.inix", "Samples/uiTest.inix",
     "Samples/buildFruitBasketCs.cmd", "Samples/buildFruitBasketMdiCs.cmd",
     "Samples/buildFruitBasketMdiPy.cmd", "Samples/buildFruitBasketPy.cmd",
     "checkHomerDev.cmd", "checkHomerDev.py", "releaseHomerDev.cmd",
-    "Tools/gitPush.cmd", "Tools/gitRelease.cmd",
-    "Tools/checkHomerApp.cmd", "Tools/checkHomerApp.py",
-    "Tools/installTools.cmd", "Tools/uiCheck.cmd", "Tools/uiCheck.py",
-    "Tools/homerTidy.cmd", "Tools/homerTidy.py",
-    "Tools/buildTutorials.cmd", "Tools/buildTutorials.ps1",
-    "Tools/makeTutorials.cmd", "Tools/makeTutorials.py",
+    "scripts/gitPush.cmd", "scripts/gitRelease.cmd",
+    "scripts/checkHomerApp.cmd", "scripts/checkHomerApp.py",
+    "scripts/installTools.cmd", "scripts/uiCheck.cmd", "scripts/uiCheck.py",
+    "scripts/homerTidy.cmd", "scripts/homerTidy.py",
+    "scripts/buildTutorials.cmd", "scripts/buildTutorials.ps1",
+    "scripts/makeTutorials.cmd", "scripts/makeTutorials.py",
     "Templates/Tutorial_00_Overview.inix",
     "Templates/makeHotkeys.py",
     "Templates/LocalFiles.txt",
@@ -73,7 +73,7 @@ c_sLogName = "HomerDev-build-%s.log" % datetime.datetime.now().strftime("%Y%m%d-
 # means auditing thousands of somebody else's files: a virtual environment alone
 # holds the whole of PyInstaller. Lowercase alphabetical, as every list in Homer
 # code is.
-c_lsSkipFolders = [".git", ".venv", "__pycache__", "build", "dist", "notes", "venv"]
+c_lsSkipFolders = [".git", ".venv", "__pycache__", "build", "dist", "exec", "notes", "venv"]
 
 # How many problems to print before saying how many more there are. The log
 # always holds every one of them.
@@ -161,12 +161,35 @@ c_lMoved = [
     ("Samples/buildFruitBasketMdiCs.log", "Samples/buildFruitBasketMdiCs.cmd"),
     ("Samples/buildFruitBasketMdiPy.log", "Samples/buildFruitBasketMdiPy.cmd"),
     ("Samples/buildFruitBasketPy.log", "Samples/buildFruitBasketPy.cmd"),
+    # 1.34.0: the kit follows the layout it asks of every app. Tools is scripts.
+    ("Tools/buildTutorials.cmd", "scripts/buildTutorials.cmd"),
+    ("Tools/buildTutorials.ps1", "scripts/buildTutorials.ps1"),
+    ("Tools/checkHomerApp.cmd", "scripts/checkHomerApp.cmd"),
+    ("Tools/checkHomerApp.py", "scripts/checkHomerApp.py"),
+    ("Tools/cleanDir.cmd", "scripts/cleanDir.cmd"),
+    ("Tools/cleanDir.py", "scripts/cleanDir.py"),
+    ("Tools/gitPush.cmd", "scripts/gitPush.cmd"),
+    ("Tools/gitRelease.cmd", "scripts/gitRelease.cmd"),
+    ("Tools/homerPolicy.py", "scripts/homerPolicy.py"),
+    ("Tools/homerTidy.cmd", "scripts/homerTidy.cmd"),
+    ("Tools/homerTidy.py", "scripts/homerTidy.py"),
+    ("Tools/installTools.cmd", "scripts/installTools.cmd"),
+    ("Tools/makeTutorials.cmd", "scripts/makeTutorials.cmd"),
+    ("Tools/makeTutorials.py", "scripts/makeTutorials.py"),
+    ("Tools/sayTutorial.cmd", "scripts/sayTutorial.cmd"),
+    ("Tools/sayTutorial.py", "scripts/sayTutorial.py"),
+    ("Tools/tagRelease.cmd", "scripts/tagRelease.cmd"),
+    ("Tools/tagRelease.ps1", "scripts/tagRelease.ps1"),
+    ("Tools/tidyRepo.cmd", "scripts/tidyRepo.cmd"),
+    ("Tools/tidyRepo.py", "scripts/tidyRepo.py"),
+    ("Tools/uiCheck.cmd", "scripts/uiCheck.cmd"),
+    ("Tools/uiCheck.py", "scripts/uiCheck.py"),
 ]
 
 # Folders that existed in an earlier layout and hold nothing the kit wants now.
 # Removed only when empty, which they are once the pairs above have been applied.
 c_lsOldFolders = ["Docs", "Inno", "Python/homer", "Python", "Samples/FruitBasketCs",
-                  "Samples/FruitBasketMdi", "Samples/FruitBasketPy", "Scripts", "Style"]
+                  "Samples/FruitBasketMdi", "Samples/FruitBasketPy", "Scripts", "Style", "Tools"]
 sScriptDir = os.path.dirname(os.path.abspath(__file__))
 sLogPath = os.path.join(sScriptDir, "logs", c_sLogName)
 oLog = None

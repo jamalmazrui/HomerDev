@@ -189,13 +189,13 @@ rem Generated output: do not edit it, and do not commit it.
 
 rem ---- locate the compiler ------------------------------------------
 set "csc="
-if exist "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\Roslyn\csc.exe"
-if not defined csc if exist "C:\Program Files\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=C:\Program Files\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\Roslyn\csc.exe"
+if exist "C:\Program Files (x86)\Microsoft Visual Studio\2022\Buildscripts\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=C:\Program Files (x86)\Microsoft Visual Studio\2022\Buildscripts\MSBuild\Current\Bin\Roslyn\csc.exe"
+if not defined csc if exist "C:\Program Files\Microsoft Visual Studio\2022\Buildscripts\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=C:\Program Files\Microsoft Visual Studio\2022\Buildscripts\MSBuild\Current\Bin\Roslyn\csc.exe"
 if not defined csc if exist "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\Roslyn\csc.exe"
 if not defined csc if exist "C:\Program Files (x86)\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=C:\Program Files (x86)\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\Roslyn\csc.exe"
 if not defined csc if exist "C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\Roslyn\csc.exe"
 if not defined csc if exist "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\Roslyn\csc.exe"
-if not defined csc if exist "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\Roslyn\csc.exe"
+if not defined csc if exist "C:\Program Files (x86)\Microsoft Visual Studio\2019\Buildscripts\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=C:\Program Files (x86)\Microsoft Visual Studio\2019\Buildscripts\MSBuild\Current\Bin\Roslyn\csc.exe"
 if not defined csc if exist "%SystemRoot%\Microsoft.NET\Framework64\v4.0.30319\csc.exe" set "csc=%SystemRoot%\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
 if not defined csc (
   echo ERROR: no C# compiler was found. Install the Visual Studio Build Tools:
@@ -406,17 +406,29 @@ if exist "addon\manifest.ini" (
 )
 :readersDone
 
-rem ---- spoken tutorials, when the app has any ----
-rem
-rem Scripts in help\Tutorial_NN_*.inix become Tutorials.md, one .mp3 each, and
-rem Tutorials.mkv with a chapter per tutorial. The voices -- kristin and john,
-rem both trained on public domain recordings, so the audio can be published --
-rem are fetched on the first run and never again.
-rem
+rem ---- spoken tutorials, when the app has any ---------------------------
+rem Scripts in help\Tutorial_NN_*.inix become Tutorials.md, TutorialFeed.xml,
+rem and one .mp3 per walk in help\tutorials with Tutorials.m3u beside them.
+rem The three tools that make them -- buildTutorials.cmd, buildTutorials.ps1,
+rem makeTutorials.py -- are the kit's, refreshed into scripts\ on every build:
+rem one source of truth, and the app still carries what it needs. (Calling
+rem the kit's own copy in place does not work: it takes the project to be the
+rem folder it sits in, which is the kit.) Speaking happens only when a walk has
+rem no audio yet; delete an .mp3 to have it spoken again. The voices -- Kokoro
+rem through sherpa-onnx, Apache 2.0, or piper's kristin and john, public
+rem domain, when Kokoro cannot be fetched -- are fetched once by the tool.
 rem Skipped silently when the app has no tutorial scripts, which most do not.
 if exist "help\Tutorial_*.inix" (
-  echo Building the spoken tutorials...
-  call "%homerDev%\Tools\buildTutorials.cmd" >> "%log%" 2>&1
+  copy /y "%homerDev%\scripts\buildTutorials.cmd" scripts\ >nul
+  copy /y "%homerDev%\scripts\buildTutorials.ps1" scripts\ >nul
+  copy /y "%homerDev%\scripts\makeTutorials.py" scripts\ >nul
+  set "tutorialsMissing="
+  for %%F in (help\Tutorial_*.inix) do if not exist "help\tutorials\%%~nF.mp3" set "tutorialsMissing=1"
+  if defined tutorialsMissing (
+    echo Speaking the tutorials that have no audio yet. The first time fetches the voices.
+    call "scripts\buildTutorials.cmd" >> "%log%" 2>&1
+    if errorlevel 1 echo WARN: not every tutorial could be spoken. The tutorials log in logs\ says why.
+  )
 )
 
 rem ---- installer, if Inno Setup is present --------------------------

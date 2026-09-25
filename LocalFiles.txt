@@ -1,0 +1,13 @@
+﻿# LocalFiles.txt -- what belongs to HomerDev on this disk, but never in the repository.
+#
+# homerTidy keeps these where they are, and writes each line into .gitignore
+# as never pushed. One path or pattern a line; a trailing slash means a folder.
+
+# The tutorial voices, fetched once by scripts\buildTutorials.ps1 and shared by
+# every Homer app's build: piper and its two models, sherpa-onnx and the
+# Kokoro bundle. Binaries not in git, so exec, the Homer folder for those.
+# Hundreds of megabytes, and re-fetchable.
+exec/
+
+# Build, tidy and tutorial logs, one file per run.
+logs/

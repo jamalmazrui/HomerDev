@@ -1089,7 +1089,7 @@ pandoc it found -- and compares every tool on your PATH against the kit's copy.
 That second check exists because a release once failed on a `tagRelease` from
 before source-only releases were supported, with an error naming a file that was
 never meant to exist. One shared copy is the point of those tools, and one
-shared copy is what can go stale. `Tools\installTools` fixes what it reports.
+shared copy is what can go stale. `scripts\installTools` fixes what it reports.
 
 ## What is still not automated
 
@@ -1903,7 +1903,7 @@ format the tutorial tooling reads:
     Hear = what the screen reader answers   (repeat for several lines)
     Note = written version only; never spoken
 
-`Tools\buildTutorials.cmd` turns the scripts into audio **in two voices** and
+`scripts\buildTutorials.cmd` turns the scripts into audio **in two voices** and
 into one .mkv with a chapter per tutorial. See the Spoken tutorials section for
 the format, the tools, the voices and what may be published.
 

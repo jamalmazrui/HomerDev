@@ -5,6 +5,9 @@
 #
 # Typical entries:
 #
-# help/Tutorial_*.inix
-# help/*.mp3
-# scripts/voices/
+# help/tutorials/*.mp3
+# help/tutorials/Tutorials.m3u
+# logs/
+#
+# The tutorial voices are NOT listed here: they live in C:\HomerDev\exec,
+# one copy shared by every Homer app's build.

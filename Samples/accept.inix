@@ -11,7 +11,7 @@ FileTask = accept
 
 [check]
 Name = the programs behave as documented when driven
-Run = ..\Tools\uiCheck.cmd --path .
+Run = ..\scripts\uiCheck.cmd --path .
 Expect = 0
 
 [check]

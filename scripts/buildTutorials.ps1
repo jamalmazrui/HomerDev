@@ -75,7 +75,43 @@ if (-not (Test-Path -LiteralPath $sAudioDir)) { New-Item -ItemType Directory -Pa
 $sLogDir = Join-Path (Split-Path -Parent $sTool) "logs"
 if (-not (Test-Path -LiteralPath $sLogDir)) { New-Item -ItemType Directory -Path $sLogDir | Out-Null }
 $sLog = Join-Path $sLogDir ((Split-Path -Leaf (Split-Path -Parent $sTool)) + "-tutorials-" + (Get-Date -Format "yyyyMMdd-HHmmss") + ".log")
-$sTools = Join-Path $sTool "voices"
+# WHERE THE VOICES LIVE: ONE COPY, IN THE KIT'S exec FOLDER (25 Sep 2026).
+#
+# The rule for a shared component is one copy that every Homer app finds --
+# never a copy inside an app's own tree, fetched again for the next app. For
+# Whisper or Pandoc that copy is where their installer puts it; piper and
+# sherpa-onnx have no installer, so there is no default location to look in.
+# Every Homer app already relies on C:\HomerDev for its shared classes, so
+# the voices live there too, in exec: the Homer folder for binaries that are
+# not in git, which is what a fetched engine and the model files it needs
+# are -- the same shape as exiftool.exe with its runtime folder beside it.
+# C:\HomerDev\exec, fetched once, found by every app's build; LocalFiles.txt
+# names it as never pushed, and the kit's own build skips it.
+#
+# The order, first found wins: HOMER_VOICES, for a machine that keeps them
+# elsewhere; a Piper or sherpa-onnx folder somebody put under Program Files by
+# hand; the kit's exec folder; and, only when no kit can be found, the old
+# place beside this script. A script's [global] VoiceFolder still overrides
+# all of it for that series.
+function findKit() {
+  if ($env:HomerDev -and (Test-Path -LiteralPath (Join-Path $env:HomerDev "CSharp\Lbc.cs"))) { return $env:HomerDev }
+  if (Test-Path -LiteralPath "C:\HomerDev\CSharp\Lbc.cs") { return "C:\HomerDev" }
+  $sUp = Split-Path -Parent $sTool
+  if (Test-Path -LiteralPath (Join-Path $sUp "CSharp\Lbc.cs")) { return $sUp }
+  return ""
+}
+$sTools = ""
+if ($env:HOMER_VOICES -and (Test-Path -LiteralPath $env:HOMER_VOICES)) { $sTools = $env:HOMER_VOICES }
+if ($sTools -eq "") {
+  foreach ($sTry in @((Join-Path $env:ProgramFiles "Piper"), (Join-Path $env:ProgramFiles "sherpa-onnx"))) {
+    if (Test-Path -LiteralPath $sTry) { $sTools = $sTry; break }
+  }
+}
+if ($sTools -eq "") {
+  $sKit = findKit
+  if ($sKit -ne "") { $sTools = Join-Path $sKit "exec" }
+}
+if ($sTools -eq "") { $sTools = Join-Path $sTool "voices" }
 
 trap {
   $sWhere = ""
@@ -104,6 +140,7 @@ note ("PowerShell: " + $PSVersionTable.PSVersion.ToString())
 note ("platform: " + [Environment]::OSVersion.VersionString)
 note ("working directory: " + (Get-Location).Path)
 note ("command line: " + [Environment]::CommandLine)
+note ("voices folder: " + $sTools)
 
 # ---- what was asked for ----
 
@@ -339,7 +376,10 @@ if (-not $bSapi -and -not $bLive) {
   # the model and its settings file, once.
   function fetchVoice([string] $sSpeaker, [string] $sQuality) {
     $sName = "en_US-" + $sSpeaker + "-" + $sQuality
-    $sModel = Join-Path $sTools ($sName + ".onnx")
+    # Beside piper.exe, so exec holds one folder per engine.
+    $sPiperDir = Join-Path $sTools "piper"
+    if (-not (Test-Path -LiteralPath $sPiperDir)) { New-Item -ItemType Directory -Path $sPiperDir -Force | Out-Null }
+    $sModel = Join-Path $sPiperDir ($sName + ".onnx")
     $sJson = $sModel + ".json"
     $sBase = "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/" + $sSpeaker + "/" + $sQuality + "/"
     if (-not (Test-Path -LiteralPath $sModel)) {

@@ -18,7 +18,7 @@ HomerDev.md.
       help\          every document, the style guides, the tutorial scripts
       Samples\       the four fruit basket programs and their build scripts
       Templates\     the files a new app is written from, carrying _APP_
-      Tools\         checkHomerApp, gitPush, gitRelease, homerTidy,
+      scripts\         checkHomerApp, gitPush, gitRelease, homerTidy,
                      sayTutorial, tagRelease
       buildHomerDev.cmd / .py     convert the documents, audit the kit
       checkHomerDev.cmd / .py     build all three samples and report
@@ -35,7 +35,7 @@ or one step at a time:
     checkHomerDev                   environment, clean build of everything, the
                                     tools on your PATH, and every program driven
                                     through its keys by uiCheck
-    Tools\installTools              put the current tools on the PATH
+    scripts\installTools              put the current tools on the PATH
     gitPush "What changed."
     gitRelease
 

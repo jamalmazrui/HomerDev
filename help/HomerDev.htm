@@ -8,9 +8,6 @@
   <title>HomerDev</title>
   <style>
     html {
-      line-height: 1.5;
-      font-family: Georgia, serif;
-      font-size: 20px;
       color: #1a1a1a;
       background-color: #fdfdfd;
     }
@@ -29,13 +26,16 @@
     @media (max-width: 600px) {
       body {
         font-size: 0.9em;
-        padding: 1em;
+        padding: 12px;
       }
       h1 {
         font-size: 1.8em;
       }
     }
     @media print {
+      html {
+        background-color: white;
+      }
       body {
         background-color: transparent;
         color: black;
@@ -85,9 +85,10 @@
       color: #606060;
     }
     code {
-      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
       font-size: 85%;
       margin: 0;
+      hyphens: manual;
     }
     pre {
       margin: 1em 0;
@@ -152,17 +153,17 @@
     div.columns{display: flex; gap: min(4vw, 1.5em);}
     div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
     ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
       width: 0.8em;
       margin: 0 0.8em 0.2em -1.6em;
       vertical-align: middle;
     }
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
-  <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
-  <![endif]-->
 </head>
 <body>
 <header id="title-block-header">
@@ -1329,8 +1330,8 @@ PATH against the kit’s copy. That second check exists because a release
 once failed on a <code>tagRelease</code> from before source-only
 releases were supported, with an error naming a file that was never
 meant to exist. One shared copy is the point of those tools, and one
-shared copy is what can go stale. <code>Tools\installTools</code> fixes
-what it reports.</p>
+shared copy is what can go stale. <code>scripts\installTools</code>
+fixes what it reports.</p>
 <h2 id="what-is-still-not-automated">What is still not automated</h2>
 <p><strong>Speech.</strong> UI Automation reports that a control exists
 and what it is called. It does not report what JAWS said. That is the
@@ -2198,7 +2199,7 @@ Say  = the narration
 Key  = the keystroke, named the way a person says it
 Hear = what the screen reader answers   (repeat for several lines)
 Note = written version only; never spoken</code></pre>
-<p><code>Tools\buildTutorials.cmd</code> turns the scripts into audio
+<p><code>scripts\buildTutorials.cmd</code> turns the scripts into audio
 <strong>in two voices</strong> and into one .mkv with a chapter per
 tutorial. See the Spoken tutorials section for the format, the tools,
 the voices and what may be published.</p>

@@ -5,6 +5,50 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.34.0 -- 25 September 2026
+
+The kit follows the layout it asks of every app. Tools is now scripts:
+every build script, every document and RepoFiles.txt say scripts, the
+build's move list carries each of the 22 files over and removes the empty
+Tools folder, and homerTidy is at C:\HomerDev\scripts\homerTidy.cmd. The
+standard folders -- configs, data, exec, help, logs, results, scripts,
+templates -- were chosen with distinct first letters so a list of them can
+be walked by initial letter, and "tools" collided with "templates".
+
+The tutorial voices live in C:\HomerDev\exec, not a new voices folder: exec
+is the Homer folder for binaries that are not in git, and a fetched engine
+with the model files beside it is exactly that. Piper's models sit in
+exec\piper beside piper.exe, so exec holds one folder per engine.
+LocalFiles.txt names exec as never pushed. (1.33.0's voices folder was
+never released.)
+
+# 1.33.0 -- 25 September 2026
+
+The tutorial voices live in one place, C:\HomerDev\voices, fetched once and
+found by every app's build; they are no longer fetched into each app's
+scripts\voices. Neither piper nor sherpa-onnx has an installer, so the kit
+names the place, as the one folder every Homer app already relies on.
+HOMER_VOICES overrides it. The kit gains LocalFiles.txt, naming voices\ and
+logs\ as local and never pushed, and its build skips the voices folder.
+
+# 1.32.0 -- 25 September 2026
+
+The spoken tutorials change shape, and the tools that make them move with
+them. Tools\buildTutorials.ps1 writes one .mp3 per walk into help\tutorials
+with Tutorials.m3u beside them, and no Tutorials.mkv; makeTutorials.py looks
+for the audio there. The reader is a bit slower (ReaderScale 0.64, was 0.56),
+at a beta tester's request. Kokoro-82M, run through sherpa-onnx, is the voice
+when it can be fetched -- Apache 2.0 throughout, so the audio can be published
+under MIT -- with piper's kristin and john as before when it cannot; the
+licence findings are in help\Tutorials.md. Templates\build_APP_.cmd and
+Templates\_APP__setup.iss carry the new step and ship the audio: the tools
+are refreshed from the kit into the app's scripts\ on every build, because
+the kit's copy run in place takes the kit for the project.
+
+help\Tutorials.md gains "How a reader phrases a control", the grammar of a
+screen reader's speech for every control, taken from two training classes and
+naming no reader; and the tutorial scripts are to name none either.
+
 # 1.31.1 -- 25 September 2026
 
 Two build failures from 1.31.0, both fixed. homerNoteTicked was declared a

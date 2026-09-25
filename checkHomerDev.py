@@ -225,7 +225,7 @@ def checkSharedTools():
     current directory, so one copy on the PATH serves every project -- and an old
     copy on the PATH also serves every project. A release once failed on exactly
     that, with an error naming a file that was never meant to exist. Run
-    Tools/installTools to fix what this reports.
+    scripts/installTools to fix what this reports.
     """
     lsStale = []
     iChecked = 0
@@ -252,7 +252,7 @@ def checkSharedTools():
         return finding("shared tools", "skip", "0 kit tools are on the PATH")
     if lsStale:
         return finding("shared tools", "fail",
-                       "%s out of date; run Tools\\installTools" %
+                       "%s out of date; run scripts\\installTools" %
                        countNoun(len(lsStale), "tool"))
     return finding("shared tools", "pass",
                    "%s on the PATH match the kit's copies" % countNoun(iChecked, "tool"))

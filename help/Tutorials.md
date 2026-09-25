@@ -47,14 +47,80 @@ of the series is clear rather than to promise a date:
 
 ### Making the audio
 
-    cd Tools
-    sayTutorial --list
-    sayTutorial ..\help\Tutorial_HomerDev.inix
+    scripts\buildTutorials
 
-Two voices, from Windows' own speech: the narration in one, the screen reader's
-answers in another. Nothing is installed and nothing is uploaded. One `.wav` per
-spoken line is kept, so a single sentence can be re-recorded, and the parts are
-joined into one `.mp3` when ffmpeg is on the PATH.
+An app's build script runs this itself whenever a walk has no audio yet, after
+refreshing the three tools from the kit into `scripts\`: `buildTutorials.cmd`,
+`buildTutorials.ps1` and `makeTutorials.py`. The kit's copies are the source of
+truth; the app carries copies because the tool works out the project from its
+own location. Calling the kit's copy in place builds the kit's tutorials, not
+the app's.
+
+What it writes, all under the app's `help` folder:
+
+- `tutorials\<name>.mp3` -- one file per walk, named as the script is named.
+  A folder of audio files is found by anybody who looks, each is recognised as
+  audio by its extension, and a person plays the one they want. There is no
+  longer a single chaptered `Tutorials.mkv`; players treated it as one track.
+- `tutorials\Tutorials.m3u` -- a playlist of the same files in order, which the
+  Homer Player in FileDir opens as one track per walk.
+- `Tutorials.md` -- the written walks, spliced between two markers the tool
+  maintains, so the hand-written head of the file stays yours.
+- `TutorialFeed.xml` -- a podcast feed of the audio.
+
+A walk whose `.mp3` exists is not spoken again. Delete the file to have it
+spoken again; name one script on the command line to speak just that one.
+
+### Where the voices live
+
+One copy, in `C:\HomerDev\exec`, fetched the first time any app's build
+speaks a tutorial and found by every app's build after that. Neither piper
+nor sherpa-onnx has an installer, so there is no default location the way
+there is for Whisper or Pandoc; the kit is the one place every Homer app
+already relies on, and `exec` is the Homer folder for binaries that are not
+in git -- which is what a fetched engine and its model files are. The folder
+is local to the machine (`LocalFiles.txt` names it, so it is never pushed)
+and the kit's own build skips it. To keep the voices somewhere else, set the
+`HOMER_VOICES` environment variable to that folder; a `Piper` or
+`sherpa-onnx` folder under Program Files is found too.
+
+### The voices, and why these
+
+Two voices, told apart three ways: who is speaking, how fast, and how flat.
+The narrator is a woman at a rate just brisker than natural; the reader a man,
+faster and even, the way a screen reader sounds to somebody who listens all
+day. A beta tester asked for the reader to be a bit slower, so its speed is
+0.64 on piper's scale (it was 0.56), still ahead of the narrator's 0.80.
+`ReaderScale` in a script's `[global]` section changes it for a series.
+
+**Kokoro, when it can be fetched.** Re-investigated on 25 September 2026.
+Kokoro-82M is an open-weight neural voice model released under Apache 2.0,
+trained on public-domain audio, audio under permissive licences, and
+synthetic audio -- no share-alike clause and no non-commercial clause
+anywhere in its lineage, so audio made with it can be published under MIT
+beside the program. It is markedly more natural than piper's medium voices.
+The tool runs it through sherpa-onnx, also Apache 2.0, as a single Windows
+executable with the phoneme data inside the model bundle: nothing to install.
+Narrator af_sarah, reader am_michael; `KokoroNarrator` and `KokoroReader` in
+`[global]` take other speaker numbers, and `Engine=piper` forces piper.
+
+**Piper, otherwise.** kristin (LJ Speech, public domain) and john (LibriVox,
+public domain), chosen for licence before sound. Most of piper's better-known
+English voices cannot be used this way: lessac's corpus is research-only,
+ryan and the hfc voices are CC BY-NC-SA, and libritts_r is fine-tuned from
+lessac.
+
+**Ruled out again, on the evidence available.** The voices built into
+Windows, and the neural voices behind Edge's Read Aloud, come with terms
+written for reading on that computer; nothing in them clearly permits
+publishing recordings made with them, and the safe reading is that they do
+not. Among the open models: those trained on the Emilia corpus, such as
+F5-TTS, publish under a non-commercial licence; Fish Speech is CC BY-NC-SA;
+XTTS is under Coqui's non-commercial model licence. Chatterbox (MIT) and
+Parler-TTS (Apache 2.0) are clean on licence but need Python and, in
+practice, a graphics card; Kokoro gives the same permission at a size that
+runs on any processor. Licences change; the tool's log names the voice used
+for every file, so a later check knows what to look at.
 
 ### Writing one
 
@@ -108,6 +174,47 @@ cannot see the screen has come to expect.
 - **Pause before the next key.** The trainer leaves a breath between the
   reader's answer and his next instruction. `Pause=1` before each `[step]`
   is the script's breath.
+
+### How a reader phrases a control
+
+Taken from two screen reader training classes read back through HomerScribe on
+25 September 2026: one at the reader's beginner verbosity, which speaks the
+whole grammar, and one at intermediate, which drops the tutor phrase at the end.
+`Hear` lines are written at intermediate. Nothing here names a reader; the
+grammar is common to the readers people use.
+
+- **A window appears:** its title alone first, then the title again with the
+  word dialog, then the text, then the control that has focus. "HomerScribe
+  results" / "HomerScribe results dialog" / "One source done. Took 14
+  minutes." / "OK button".
+- **Check box:** label, "check box", state, access key. "Transcribe audio
+  check box, checked, Alt plus T". Toggled by its access key, the reader says
+  the whole line again with the new state.
+- **Button:** label, "button", access key. "OK button". A label with a symbol
+  is read as the symbol's name: "Next greater button, Alt plus N".
+- **Radio button:** label, "radio button", state, position, access key.
+  "Words radio button, checked, 2 of 4, Alt plus T".
+- **Combo box:** label with its colon, "combo box", the value, position,
+  access key. "Use keyboard layout: combo box, Desktop, 1 of 3, Alt plus L".
+- **Edit box:** label with its colon, "edit", then the contents. "Source paths:
+  edit, https colon slash slash ...". Select All answers "selected" and the
+  text; a paste answers nothing.
+- **Slider:** label, direction, value. "Rate: left right slider, 50 percent".
+- **Menus:** "Menu bar" on entry; each menu as "Options menu"; each item with
+  its letter after it; a submenu as "Voices submenu, V"; "Leaving menu bar" on
+  exit. Opening a dialog from a menu says "Leaving menus" first.
+- **Access keys are words:** the reader says "Alt plus T", never a plus sign,
+  so a `Hear` line writes the words.
+- **Names are read as the synthesizer reads them:** "Introduction to Windows
+  dot m p 3" for Introduction_to_Windows.mp3 at the default punctuation level;
+  a web address is spelled through -- "https colon slash slash www dot" -- and
+  a path is "C colon backslash Users backslash".
+- **The reader also confirms actions the program did not ask it to:** "Copied
+  selection to clipboard", "Select All", "376 characters". A tutorial that
+  copies text should expect them.
+- **A direct announcement from the program is a sentence of its own:**
+  "Done. Introduction to Windows dot m p 3" -- the kind, a full stop, the
+  detail -- and it arrives before the results box.
 
 ## Scenario 1: start a new app from nothing
 

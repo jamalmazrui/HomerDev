@@ -165,6 +165,13 @@ Source: "Hotkeys.htm"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesnt
 Source: "History.htm"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "License.htm"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "Developer.htm"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
+; The spoken tutorials, when the app has any: the written walks, the feed,
+; and one .mp3 per walk in help\tutorials with a playlist beside them.
+Source: "help\Tutorials.md"; DestDir: "{app}\help"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "help\Tutorials.htm"; DestDir: "{app}\help"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "help\TutorialFeed.xml"; DestDir: "{app}\help"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "help\tutorials\*.mp3"; DestDir: "{app}\help\tutorials"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "help\tutorials\Tutorials.m3u"; DestDir: "{app}\help\tutorials"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "_APP_.inix"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "_APP__hotkeys.inix"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "*.dll"; DestDir: "{app}\exec"; Flags: ignoreversion skipifsourcedoesntexist

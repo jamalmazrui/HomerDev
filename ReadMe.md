@@ -177,7 +177,7 @@ script: a fresh AppId, and the desktop hotkey.
 
 `createJobDoRepo` makes the GitHub repository and pushes the first commit; after
 that `tagRelease` is how every release goes out. Copy `tagRelease.cmd` and
-`tagRelease.ps1` from `Tools\` into the app folder first, or keep one copy in a
+`tagRelease.ps1` from `scripts\` into the app folder first, or keep one copy in a
 folder on your PATH -- they act on the current directory, so one copy serves
 every project.
 
@@ -185,7 +185,7 @@ every project.
 
 `Tutorial_HomerDev.inix` is the same walkthrough as a spoken tutorial: what the
 kit is, unarchiving it, building both fruit baskets, and hearing that the two
-behave the same. `Tools\sayTutorial.cmd` renders it to audio in two voices --
+behave the same. `scripts\sayTutorial.cmd` renders it to audio in two voices --
 the narration in one, the screen reader's answers in another -- using Windows'
 own voices, with nothing installed and nothing uploaded.
 
@@ -209,7 +209,7 @@ own notebook, is in the never-pushed list and stays on your machine.
 - `homer\` -- the same toolbox for Python and NVDA add-ons: inix, lbc, log,
   paths, say, util and web, with the same names and the same behaviour.
 - `Templates\` -- the files a new app starts from.
-- `Tools\` -- checkHomerApp, gitPush, gitRelease, homerTidy, sayTutorial and
+- `scripts\` -- checkHomerApp, gitPush, gitRelease, homerTidy, sayTutorial and
   tagRelease. No editing needed; they work out the app name from the folder, and
   any of them can be run from a shared tools folder.
 - `Samples\` -- four fruit basket programs: the single dialog in C# and in

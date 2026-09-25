@@ -8,7 +8,7 @@ CSharp/
 homer/
 Samples/
 Templates/
-Tools/
+scripts/
 ReadMe.md
 ReadMe.htm
 License.md
@@ -25,4 +25,5 @@ releaseHomerDev.cmd
 newHomerApp.py
 version.txt
 RepoFiles.txt
+LocalFiles.txt
 .gitignore

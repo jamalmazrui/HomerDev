@@ -8,9 +8,6 @@
   <title>ReadMe</title>
   <style>
     html {
-      line-height: 1.5;
-      font-family: Georgia, serif;
-      font-size: 20px;
       color: #1a1a1a;
       background-color: #fdfdfd;
     }
@@ -29,13 +26,16 @@
     @media (max-width: 600px) {
       body {
         font-size: 0.9em;
-        padding: 1em;
+        padding: 12px;
       }
       h1 {
         font-size: 1.8em;
       }
     }
     @media print {
+      html {
+        background-color: white;
+      }
       body {
         background-color: transparent;
         color: black;
@@ -85,9 +85,10 @@
       color: #606060;
     }
     code {
-      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
       font-size: 85%;
       margin: 0;
+      hyphens: manual;
     }
     pre {
       margin: 1em 0;
@@ -152,17 +153,17 @@
     div.columns{display: flex; gap: min(4vw, 1.5em);}
     div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
     ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
       width: 0.8em;
       margin: 0 0.8em 0.2em -1.6em;
       vertical-align: middle;
     }
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
-  <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
-  <![endif]-->
 </head>
 <body>
 <header id="title-block-header">
@@ -323,14 +324,14 @@ tagRelease</code></pre>
 <p><code>createJobDoRepo</code> makes the GitHub repository and pushes
 the first commit; after that <code>tagRelease</code> is how every
 release goes out. Copy <code>tagRelease.cmd</code> and
-<code>tagRelease.ps1</code> from <code>Tools\</code> into the app folder
-first, or keep one copy in a folder on your PATH – they act on the
-current directory, so one copy serves every project.</p>
+<code>tagRelease.ps1</code> from <code>scripts\</code> into the app
+folder first, or keep one copy in a folder on your PATH – they act on
+the current directory, so one copy serves every project.</p>
 <h3 id="listen-instead">Listen instead</h3>
 <p><code>Tutorial_HomerDev.inix</code> is the same walkthrough as a
 spoken tutorial: what the kit is, unarchiving it, building both fruit
 baskets, and hearing that the two behave the same.
-<code>Tools\sayTutorial.cmd</code> renders it to audio in two voices –
+<code>scripts\sayTutorial.cmd</code> renders it to audio in two voices –
 the narration in one, the screen reader’s answers in another – using
 Windows’ own voices, with nothing installed and nothing uploaded.</p>
 <pre><code>cd Tools
@@ -354,10 +355,10 @@ layout), PdfRead, Say (speech), Util, Web, inixVert.</li>
 inix, lbc, log, paths, say, util and web, with the same names and the
 same behaviour.</li>
 <li><code>Templates\</code> – the files a new app starts from.</li>
-<li><code>Tools\</code> – checkHomerApp, gitPush, gitRelease, homerTidy,
-sayTutorial and tagRelease. No editing needed; they work out the app
-name from the folder, and any of them can be run from a shared tools
-folder.</li>
+<li><code>scripts\</code> – checkHomerApp, gitPush, gitRelease,
+homerTidy, sayTutorial and tagRelease. No editing needed; they work out
+the app name from the folder, and any of them can be run from a shared
+tools folder.</li>
 <li><code>Samples\</code> – four fruit basket programs: the single
 dialog in C# and in Python, and the multiple-document version in C# and
 in Python. Each pair is the same program in two languages, written block
