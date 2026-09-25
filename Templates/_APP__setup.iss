@@ -19,23 +19,20 @@
 ; pairing two [Run] lines with Check: functions so only one of each pair
 ; appears. Nothing says "Install" over the top of a copy that is already there.
 ;
-; CHECKBOX ORDER AND DEFAULTS, in the order the user meets them:
-;   1. Components the program needs: local AI, converters, and the like.
-;      CHECKED, because a component that is missing or stale is what the user
-;      came here to get.
-;   2. SCREEN READER scripts and add-ons. ALWAYS CHECKED BY DEFAULT. A blind
-;      user installing a Homer tool wants its JAWS scripts and its NVDA add-on,
-;      and having to notice a cleared box is exactly the friction this suite
-;      exists to remove.
-;   3. Documentation, second from last. UNCHECKED: there when wanted, out of the
-;      way when not.
-;   4. Launch, last. CHECKED.
+; CHECKBOX ORDER AND DEFAULTS, in the order the user meets them (HomerDev
+; rule, 25 September 2026; the [Run] section says how it is done):
+;   1. Install entries, TICKED: screen reader scripts first -- a blind user
+;      installing a Homer tool wants its JAWS scripts and its NVDA add-on --
+;      then components in alphabetical order.
+;   2. Update entries, TICKED, alphabetical.
+;   3. Reinstall entries, UNTICKED, alphabetical.
+;   4. Launch, TICKED, after the Results box has been read.
+;   5. Open the user guide, UNTICKED: there when wanted, out of the way when not.
 ;
-; THE RESULTS BOX COMES BEFORE THE LAUNCH. The launch entry does not start the
-; program directly. It runs homerFinish.cmd, which reads the setup log, shows a
-; single Results box saying what this install actually did, and starts the
-; program only after that box is dismissed. Being last in [Run], it runs after
-; every other checkbox, so the box can report all of them.
+; THE RESULTS BOX COMES BEFORE THE LAUNCH. The Launch entry only leaves a
+; marker; CurStepChanged(ssDone) shows one Results box -- a past-tense line per
+; box that was ticked, probed after its script ran, and nothing about the rest
+; -- and starts the program only after that box is dismissed.
 
 #define AppName       "_APP_"
 
@@ -174,7 +171,7 @@ Source: "*.dll"; DestDir: "{app}\exec"; Flags: ignoreversion skipifsourcedoesnte
 Source: "_APP_.exe.config"; DestDir: "{app}\exec"; Flags: ignoreversion skipifsourcedoesntexist
 ; The finish helper: the Results box and then the launch. Always shipped, and
 ; it lives beside the program because that is what it starts.
-Source: "homerFinish.cmd"; DestDir: "{app}\exec"; Flags: ignoreversion
+Source: "homerInstall.cmd"; DestDir: "{app}\exec"; Flags: ignoreversion
 ; EVERY COMPONENT APPEARS THREE TIMES: one entry per state -- install, update,
 ; already current -- grouped so the ones that do something come first, and only
 ; one is ever shown because the others are skipped by their Check function. The
@@ -204,200 +201,142 @@ Name: "{group}\Uninstall {#AppName}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\exec\{#AppExeName}"; WorkingDir: "{userdocs}"; HotKey: "{#HotKey}"
 
 [Run]
-; ---- 1. Components the program needs --------------------------------------
-; Two lines per component, one worded for a first install and one for a
-; reinstall or update, each gated by a Check: function so only one appears.
+; FINISH-PAGE ORDER, a HomerDev rule (25 September 2026):
+;   1. Install entries, ticked -- screen reader scripts first, then components
+;      in alphabetical order.
+;   2. Update entries, ticked, alphabetical.
+;   3. Reinstall entries, UNTICKED, alphabetical.
+;   4. Launch, ticked.
+;   5. Open the user guide, unticked.
+; Inno shows [Run] entries in script order and Check: hides the ones that do not
+; apply, so three entries per component -- one per verb, each with its own
+; Check: from Templates\HomerComponents.iss -- group the page by themselves.
+; The label function words each one: "Install X 1.2 (what it is for)",
+; "Update X from 1.1 to 1.2 (...)", "Reinstall X 1.2 (...)".
 ;
-; AI NOTE FOR CUSTOMIZING: change the size and the wording to match the model
-; named in installOllama.cmd, then copy the pair for each further component
-; (Pandoc, Tesseract, Whisper, ffmpeg).
-FileName: "{cmd}"; \
-  Parameters: "/c """"{app}\exec\installOllama.cmd"""""; \
-  WorkingDir: "{app}\exec"; \
-  Description: "Install Ollama and the local AI model, so the program can work on your text on this machine (about 2 GB; nothing is uploaded)"; \
-  Check: ollamaNeedsInstall; \
-  Flags: postinstall skipifsilent runascurrentuser skipifdoesntexist
+; AI NOTE FOR CUSTOMIZING: register each component once in InitializeSetup
+; (see homerAdd below), then copy its three entries here into the three groups,
+; keeping each group in alphabetical order. A model has Install and Reinstall
+; only: ollama pull always fetches the current one.
+;
+; Scripts run DIRECTLY, with "noPause" as their argument -- never through a cmd
+; wrapper with a "set X=1 &&" prefix, which cmd /s cannot quote correctly.
 
-FileName: "{cmd}"; \
-  Parameters: "/c """"{app}\exec\installOllama.cmd"""""; \
-  WorkingDir: "{app}\exec"; \
-  Description: "Check Ollama and the local AI model, and fetch anything missing (nothing is downloaded if it is already here)"; \
-  Check: isUpgradeOrSame; \
-  Flags: postinstall skipifsilent runascurrentuser skipifdoesntexist
-
-FileName: "{cmd}"; \
-  Parameters: "/c """"{app}\exec\installModels.cmd"""""; \
-  WorkingDir: "{app}\exec"; \
-  Description: "Install the model only (tick this if Ollama is already on this machine)"; \
-  Flags: postinstall skipifsilent runascurrentuser unchecked skipifdoesntexist
-
-; ---- 2. Screen reader support, CHECKED BY DEFAULT --------------------------
-; Never "unchecked". A blind user installing a Homer tool wants its scripts.
-FileName: "{cmd}"; \
-  Parameters: "/c """"{app}\exec\installScreenReaderSupport.cmd"""""; \
+; ---- 1. Install ---------------------------------------------------------------
+FileName: "{app}\exec\installScreenReaderSupport.cmd"; \
+  Parameters: "noPause"; \
   WorkingDir: "{app}\exec"; \
   Description: "Install the JAWS scripts and the NVDA add-on for {#AppName}"; \
   Check: isFreshInstall; \
-  Flags: postinstall skipifsilent runascurrentuser skipifdoesntexist
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
-FileName: "{cmd}"; \
-  Parameters: "/c """"{app}\exec\installScreenReaderSupport.cmd"""""; \
+FileName: "{app}\exec\installOllama.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\exec"; \
+  Description: "{code:labelOllama}"; \
+  Check: isInstallOllama; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+
+FileName: "{app}\exec\installModels.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\exec"; \
+  Description: "{code:labelModel}"; \
+  Check: isModelInstall; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+
+; ---- 2. Update ----------------------------------------------------------------
+FileName: "{app}\exec\installScreenReaderSupport.cmd"; \
+  Parameters: "noPause"; \
   WorkingDir: "{app}\exec"; \
   Description: "Update the JAWS scripts and the NVDA add-on for {#AppName}"; \
   Check: isUpgradeOrSame; \
-  Flags: postinstall skipifsilent runascurrentuser skipifdoesntexist
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
-; ---- 3. Documentation, second from last, UNCHECKED -------------------------
-FileName: "{app}\ReadMe.htm"; \
-  Description: "Read the documentation for {#AppName}"; \
-  Flags: postinstall shellexec skipifsilent unchecked skipifdoesntexist
-
-; ---- 4. Launch, last, CHECKED ----------------------------------------------
-; Through homerFinish.cmd, which shows the Results box first and starts the
-; program only when that box is dismissed.
-FileName: "{cmd}"; \
-  Parameters: "/c """"{app}\exec\homerFinish.cmd"" ""{#AppExeName}"""""; \
+FileName: "{app}\exec\installOllama.cmd"; \
+  Parameters: "noPause"; \
   WorkingDir: "{app}\exec"; \
-  Description: "Show what this install did, then launch {#AppName} (desktop hotkey: {#HotKeyDisplay})"; \
-  Flags: postinstall skipifsilent runascurrentuser
+  Description: "{code:labelOllama}"; \
+  Check: isUpdateOllama; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+
+; ---- 3. Reinstall, unticked ---------------------------------------------------
+FileName: "{app}\exec\installOllama.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\exec"; \
+  Description: "{code:labelOllama}"; \
+  Check: isReinstallOllama; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated unchecked skipifdoesntexist
+
+FileName: "{app}\exec\installModels.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\exec"; \
+  Description: "{code:labelModel}"; \
+  Check: isModelReinstall; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated unchecked skipifdoesntexist
+
+; ---- 4. Launch, ticked --------------------------------------------------------
+; The entry only leaves a marker. The program starts from CurStepChanged(ssDone),
+; AFTER the Results box has been read and closed -- so the box is not hidden
+; behind the program's own window. Inno runs postinstall entries before ssDone.
+; TWO pairs of quotes: this Parameters value starts with a quote, which is the
+; one case where cmd /s strips the outer pair correctly.
+FileName: "{cmd}"; \
+  Parameters: "/c echo launch > ""{localappdata}\{#AppName}\logs\{#AppName}_launch.flag"""; \
+  Description: "Launch {#AppName} now (desktop hotkey: {#HotKeyDisplay})"; \
+  Flags: postinstall skipifsilent runhidden runasoriginaluser
+
+; ---- 5. Open the user guide, unticked -----------------------------------------
+FileName: "{app}\ReadMe.htm"; \
+  Description: "Open the user guide (F1 opens it inside {#AppName})"; \
+  Flags: postinstall shellexec nowait skipifsilent skipifdoesntexist runasoriginaluser unchecked
 
 [UninstallDelete]
-Type: filesandordirs; Name: "{localappdata}\_APP_"
+; ONLY WHAT THIS PROGRAM WROTE. Never the whole {localappdata}\{#AppName}
+; folder: every upgrade runs the uninstaller first, and a folder that may hold
+; something a user installed or made is never removed wholesale. On
+; 24 September 2026 a wholesale line here deleted Whisper on every HomerScribe
+; upgrade.
+Type: filesandordirs; Name: "{localappdata}\_APP_\logs"
+Type: files; Name: "{localappdata}\_APP_\*.inix"
 
 [Code]
-
-(* ---- A CHECKBOX MUST KNOW WHAT IS ALREADY INSTALLED ----
-
-   Offering to install something that is already there is worse than offering
-   nothing: it wastes a download and it tells the user the installer did not
-   look. Every optional component here is therefore gated by a Check function
-   that asks the machine first, and its label is a {code:...} function that says
-   which of install, update or reinstall this would be.
-
-   State: 0 not installed, 1 installed but out of date, 2 current.
-
-   Two ways of asking, because either alone is wrong. winget knows about
-   packages it installed and whether a newer version exists. Ollama and several
-   other tools also install PER USER, into the profile, where an elevated
-   installer's PATH does not reach -- so the tool's own executable is checked as
-   well. Anything found outside winget counts as installed: the person should be
-   offered a reinstall, not a second copy.
-
-   Answers are cached. Each query costs a second or two, and the finish page
-   asks more than once. *)
-var
-  gOllamaState: Integer;
-  gOllamaKnown: Boolean;
-
-(* PROBE QUOTING, WHICH COST THREE RELEASES TO FIND.
-   cmd /c strips the first and last quote of what follows it, so a command that
-   BEGINS with a quoted path -- "C:\...\tool.exe" --version -- loses its opening
-   quote and runs nothing. Empty output then reads as "not installed". The whole
-   command is therefore wrapped in one more pair of quotes, which is the pair
-   cmd eats.
-
-   AND DETECTION SHOULD NOT DEPEND ON RUNNING ANYTHING. Look for the file and
-   the uninstall registry key first: no process, no quoting, no PATH, and an
-   elevated installer still sees them. Run the tool only to learn its VERSION,
-   never to learn whether it is there.
-
-   AND LOG EVERY PROBE. A detection that goes wrong on somebody else's machine
-   is undiagnosable otherwise. *)
-function runCapture(sCommand: String; var sOut: String): Boolean;
-var
-  sFile: String;
-  iResult: Integer;
-  oLines: TArrayOfString;
-  i: Integer;
-begin
-  Result := False;
-  sOut := '';
-  sFile := ExpandConstant('{tmp}\homer_probe.txt');
-  if Exec(ExpandConstant('{cmd}'), '/c ""' + sCommand + ' > "' + sFile + '" 2>&1"',
-          '', SW_HIDE, ewWaitUntilTerminated, iResult) then
-  begin
-    if LoadStringsFromFile(sFile, oLines) then
-    begin
-      for i := 0 to GetArrayLength(oLines) - 1 do
-        sOut := sOut + oLines[i] + ' ';
-      Result := True;
-    end;
-    DeleteFile(sFile);
-  end;
-end;
-
-function ollamaState(): Integer;
-var
-  sOut, sUserCopy: String;
-begin
-  if gOllamaKnown then
-  begin
-    Result := gOllamaState;
-    exit;
-  end;
-  Result := 0;
-  if runCapture('winget list --id Ollama.Ollama --exact --disable-interactivity', sOut) then
-    if Pos('Ollama', sOut) > 0 then
-    begin
-      if (Pos('Available', sOut) > 0) or (Pos('available', sOut) > 0) then Result := 1
-      else Result := 2;
-    end;
-  (* The file first, because it cannot fail for a reason nobody can see. Ollama
-     installs PER USER, into a profile an elevated installer's PATH cannot
-     reach, so the profile copy and the uninstall key are both checked. *)
-  if Result = 0 then
-  begin
-    sUserCopy := ExpandConstant('{localappdata}\Programs\Ollama\ollama.exe');
-    if FileExists(sUserCopy)
-    or FileExists(ExpandConstant('{commonpf}\Ollama\ollama.exe'))
-    or RegKeyExists(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\Ollama')
-    or RegKeyExists(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\Ollama') then
-      Result := 2;
-  end;
-  gOllamaState := Result;
-  gOllamaKnown := True;
-end;
-
-function ollamaNeedsInstall(): Boolean;
-begin
-  Result := ollamaState() = 0;
-end;
-
-function ollamaIsPresent(): Boolean;
-begin
-  Result := ollamaState() > 0;
-end;
-
-function descOllama(sParam: String): String;
-begin
-  case ollamaState() of
-    1: Result := 'Update Ollama, which runs AI models on this computer';
-    2: Result := 'Reinstall or update Ollama (it is already installed)';
-  else
-    Result := 'Install Ollama, which runs AI models on this computer';
-  end;
-end;
-
-
-//  WHAT IS ALREADY ON THIS MACHINE.
+//  WHAT THE CODE SECTION DOES, in one screen:
+//    - registers the components this app needs, in the shared table from
+//      Templates\HomerComponents.iss, which probes each once (winget, then a
+//      file, then the exe, then the registry) and words every checkbox;
+//    - reads the version of any previous install, so the screen reader
+//      script entries say Install or Update truthfully;
+//    - records which boxes were ticked when Finish is pressed, and after
+//      the scripts have run, reports what happened to each of THOSE -- one
+//      past-tense line per ticked box, nothing about the rest;
+//    - keeps the setup log with the program's own logs;
+//    - starts the program only after the Results box has been closed.
 //
-//  Inno records every install under its own uninstall key, named for the AppId
-//  with "_is1" on the end, and puts the version in DisplayVersion. Reading it
-//  here is what lets the checkboxes say "Install" or "Update" truthfully rather
-//  than always saying the same thing.
-//
-//  Three answers, and every checkbox is worded from one of them:
-//    fresh    -- nothing of this app is installed
-//    older    -- an OLDER version is installed
-//    same     -- this same version, or a newer one, is installed
+//  The include goes INSIDE [Code], and HomerComponents.iss carries no [Code]
+//  header of its own. Comments inside [Code] use // or (* *), never ;.
+#include "C:\HomerDev\Templates\HomerComponents.iss"
 
 var
+  iOllama: Integer;
+  sActions: String;
   sPriorVersion: String;
 
+//  AI NOTE FOR CUSTOMIZING: one homerAdd per component. Arguments: name,
+//  winget ids (semicolon separated, or ''), an exe that answers --version,
+//  a file that proves it (Inno constants allowed), three or four words of
+//  use, and the uninstall registry key name (or ''). Add a var above for each.
+function InitializeSetup(): Boolean;
+begin
+  iOllama := homerAdd('Ollama', 'Ollama.Ollama', 'ollama',
+    '{localappdata}\Programs\Ollama\ollama.exe', 'runs the local AI model', 'Ollama');
+  sPriorVersion := '';
+  Result := True;
+end;
+
+//  ---- the previous install, for the screen reader script entries ----------
 function priorVersion(): String;
 var
-  sKey: String;
-  sFound: String;
+  sKey, sFound: String;
 begin
   Result := '';
   sKey := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#SetupSetting("AppId")}_is1';
@@ -407,51 +346,87 @@ end;
 
 function isFreshInstall(): Boolean;
 begin
+  if sPriorVersion = '' then sPriorVersion := priorVersion();
   Result := (sPriorVersion = '');
 end;
 
 function isUpgradeOrSame(): Boolean;
 begin
-  Result := (sPriorVersion <> '');
+  Result := not isFreshInstall();
 end;
 
-//  True when what is installed is OLDER than what is being installed. Kept
-//  separate so an app can word three cases when it wants to; the template uses
-//  two, which is enough for most.
 function isOlderInstalled(): Boolean;
 begin
   Result := False;
-  if sPriorVersion = '' then exit;
+  if isFreshInstall() then exit;
   Result := ComparePackedVersion(PackVersionString(sPriorVersion),
                                  PackVersionString('{#AppVersion}')) < 0;
 end;
 
-function InitializeSetup(): Boolean;
+//  ---- checkbox wording and visibility, one line each ----------------------
+//  AI NOTE FOR CUSTOMIZING: three functions per component, one per verb, and
+//  a label function; two per model. Name the model as installModels.cmd does.
+function labelOllama(sParam: String): String;  begin Result := homerLabel(iOllama); end;
+function isInstallOllama(): Boolean;           begin Result := homerIs(iOllama, 0); end;
+function isUpdateOllama(): Boolean;            begin Result := homerIs(iOllama, 1); end;
+function isReinstallOllama(): Boolean;         begin Result := homerIs(iOllama, 2); end;
+function labelModel(sParam: String): String;   begin Result := homerModelLabel('qwen2.5:7b', 'works on your text', 'about 4.7 GB'); end;
+function isModelInstall(): Boolean;            begin Result := homerModelIs('qwen2.5:7b', False); end;
+function isModelReinstall(): Boolean;          begin Result := homerModelIs('qwen2.5:7b', True); end;
+
+//  ---- the Results box: one line per ticked box, probed after the scripts ran
+procedure addAction(sText: String);
 begin
-  sPriorVersion := priorVersion();
-  Result := True;
+  if sText = '' then exit;
+  if sActions <> '' then sActions := sActions + #13#10;
+  sActions := sActions + '  ' + sText;
 end;
 
-//  KEEP THE SETUP LOG WITH THE PROGRAM'S OWN LOGS.
-//
-//  Inno writes a detailed log to the temporary folder when SetupLogging is on,
-//  and deletes nothing -- but nobody finds it there. Copying it to
-//  %LOCALAPPDATA%\<App>\logs, with the same name shape the program's own
-//  session logs use, means one folder holds the whole story: the install, and
-//  every run since.
-//
-//  ssDone is after the files are in place and after the final-page checkboxes
-//  have run, so the copy includes what they did.
-//
-//  ONE CAVEAT, stated because it will be noticed: this installer runs elevated,
-//  so {localappdata} is the profile of whoever answered the elevation prompt.
-//  When that is a different account from the one that will use the program, the
-//  setup log lands in the administrator's folder. The program's own logs always
-//  land in the user's.
+function NextButtonClick(CurPageID: Integer): Boolean;
+//  Finish pressed: the boxes are settled, the scripts have not yet run.
+begin
+  Result := True;
+  if CurPageID = wpFinished then homerNoteTicked();
+end;
+
+procedure startIfAsked();
+//  Starts the program if the Launch box left its marker, and removes the marker.
+//  Started from cmd so it runs as the person, not as the elevated installer.
+var
+  sFlag: String;
+  iResult: Integer;
+begin
+  sFlag := ExpandConstant('{localappdata}\{#AppName}\logs\{#AppName}_launch.flag');
+  if not FileExists(sFlag) then exit;
+  DeleteFile(sFlag);
+  Exec(ExpandConstant('{cmd}'),
+       '/s /c ""' + ExpandConstant('{app}\exec\{#AppExeName}') + '""',
+       ExpandConstant('{userdocs}'), SW_SHOW, ewNoWait, iResult);
+end;
+
+procedure reportWhatHappened();
+var
+  sBody: String;
+begin
+  //  AI NOTE FOR CUSTOMIZING: one addAction per component and per model, in
+  //  the same alphabetical order as the [Run] section.
+  addAction(homerOutcomeLine(iOllama));
+  addAction(homerModelOutcomeLine('qwen2.5:7b', 'works on your text', 'about 4.7 GB'));
+  sBody := '{#AppName} {#AppVersion} is installed.';
+  if sActions <> '' then sBody := sBody + #13#10 + #13#10 + sActions;
+  sBody := sBody + #13#10 + #13#10
+         + 'Logs are kept in ' + ExpandConstant('{localappdata}\{#AppName}\logs') + '.';
+  MsgBox(sBody, mbInformation, MB_OK);
+  startIfAsked();
+end;
+
+//  ---- keep the setup log with the program's own logs ------------------------
+//  Inno writes its log to the temporary folder, where nobody finds it. One
+//  caveat: the installer runs elevated, so {localappdata} is the profile of
+//  whoever answered the elevation prompt.
 procedure keepSetupLog();
 var
-  sFolder: String;
-  sTarget: String;
+  sFolder, sTarget: String;
 begin
   sFolder := ExpandConstant('{localappdata}\{#AppName}\logs');
   if not DirExists(sFolder) then
@@ -460,18 +435,22 @@ begin
   FileCopy(ExpandConstant('{log}'), sTarget, False);
 end;
 
-procedure CurStepChanged(iStep: TSetupStep);
+procedure CurStepChanged(CurStep: TSetupStep);
 begin
-  if iStep = ssDone then keepSetupLog();
+  if CurStep = ssDone then
+  begin
+    keepSetupLog();
+    reportWhatHappened();
+  end;
 end;
 
-procedure CurPageChanged(iPageId: Integer);
+procedure CurPageChanged(CurPageID: Integer);
+//  Say on the welcome page what is about to happen, because a user reading by
+//  ear should not have to work it out from a version number in a caption.
 begin
-  //  Say on the welcome page what is about to happen, because a user reading by
-  //  ear should not have to work it out from a version number in a caption.
-  if iPageId = wpWelcome then
+  if CurPageID = wpWelcome then
   begin
-    if sPriorVersion = '' then
+    if isFreshInstall() then
       WizardForm.WelcomeLabel1.Caption := 'Install {#AppName} {#AppVersion}'
     else if isOlderInstalled() then
       WizardForm.WelcomeLabel1.Caption := 'Update {#AppName} from ' + sPriorVersion + ' to {#AppVersion}'

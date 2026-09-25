@@ -92,6 +92,8 @@ rem Alphabetical, as every list in Homer code is unless another order is
 rem clearly more logical. Comment out the ones this app does not use; an
 rem unused module costs only build time, so when in doubt leave it in.
 set "homerSources="
+rem Elevate.cs: Lbc's Help box checks the web for a newer release through it.
+set "homerSources=!homerSources! "!homerDev!\CSharp\Elevate.cs""
 set "homerSources=!homerSources! "!homerDev!\CSharp\Inix.cs""
 set "homerSources=!homerSources! "!homerDev!\CSharp\KeyName.cs""
 rem set "homerSources=!homerSources! "!homerDev!\CSharp\KeyMap.cs""

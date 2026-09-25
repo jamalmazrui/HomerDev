@@ -21,6 +21,13 @@
 ; Keys in [about]: Title (numbered, "00 - Overview"), Intro, Setup, Homework.
 ; Keys in [feed], on the FIRST script only: Title, Description, Author, Email.
 ;
+; FOUR BEATS PER KEY, the way a screen reader trainer narrates: Say the key
+; (with its phonetic word: "Insert T, Tango"), press it, Hear the reader word
+; for word, then a second Say that translates what was heard. Name silence
+; ("(nothing)") when the reader says nothing; verify with Insert T after every
+; change of focus; teach Insert Up Arrow (repeat) in the first script. The
+; full list is in help\Tutorials.md, "How a screen reader trainer narrates".
+;
 ; ALWAYS SAY THE WORD THE KEY COMES FROM. "Shift plus C is Say Cell -- C for
 ; Cell." A key whose mnemonic goes unsaid is a key somebody has to memorise
 ; rather than understand, and the memory association is the whole reason the

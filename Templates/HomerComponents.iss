@@ -48,10 +48,17 @@ type
     sLocal:   String;
     sRemote:  String;
     bKnown:   Boolean;
+    (* the same three, probed again after the finish-page scripts have run *)
+    iStateAfter: Integer;
+    sLocalAfter: String;
+    bKnownAfter: Boolean;
   end;
 
 var
   gHomer: array of THomerComponent;
+  (* captions of the finish-page boxes that were ticked when Finish was
+     pressed, one per line -- see homerNoteTicked *)
+  gHomerTicked: String;
 
 function homerProbeLines(sCommand: String; var lsLines: TArrayOfString): Boolean;
 var
@@ -256,6 +263,21 @@ begin
   gHomer[iAt].bKnown := True;
 end;
 
+function homerIs(iAt, iState: Integer): Boolean;
+(* The Check: for one of the three entries a component has on the finish
+   page: 0 its Install entry, 1 its Update entry, 2 its Reinstall entry.
+
+   THE FINISH-PAGE ORDER IS THE ORDER OF THE [Run] SECTION. Inno shows entries
+   in script order and Check: hides those that do not apply, so an app writes
+   every Install entry first (screen reader scripts before the rest, then
+   components in alphabetical order), then every Update entry, then every
+   Reinstall entry (with the unchecked flag), then Launch, then Open the user
+   guide. Three entries per component, one per verb, and the page groups
+   itself with no sorting code at all. *)
+begin
+  Result := homerState(iAt) = iState;
+end;
+
 function homerWanted(iAt: Integer): Boolean;
 (* What a Check: expression uses. True when missing or stale -- the two cases
    where pressing Enter should act. *)
@@ -363,6 +385,86 @@ end;
 var
   gOllamaList: String;
   gOllamaListKnown: Boolean;
+  gOllamaListAfter: String;
+  gOllamaListAfterKnown: Boolean;
+
+procedure homerNoteTicked();
+(* Call from NextButtonClick when CurPageID = wpFinished: that is the moment
+   the finish page's boxes are settled and the scripts have not yet run. The
+   Results box later reports on exactly these, and on nothing else -- a box
+   nobody ticked is not an action taken this session. *)
+var
+  i: Integer;
+begin
+  gHomerTicked := '';
+  for i := 0 to WizardForm.RunList.Items.Count - 1 do
+    if WizardForm.RunList.Checked[i] then
+      gHomerTicked := gHomerTicked + WizardForm.RunList.ItemCaption[i] + #10;
+end;
+
+function homerTicked(sCaption: String): Boolean;
+begin
+  Result := Pos(#10 + sCaption + #10, #10 + gHomerTicked) > 0;
+end;
+
+function homerStateAfter(iAt: Integer): Integer;
+(* The state probed again NOW, after the scripts have run. The first probe is
+   kept untouched, because the checkbox wording and the outcome wording both
+   need to know what was true before. *)
+var
+  iState: Integer;
+  sLocal, sRemote: String;
+  bKnown: Boolean;
+begin
+  if not gHomer[iAt].bKnownAfter then
+  begin
+    iState := gHomer[iAt].iState; sLocal := gHomer[iAt].sLocal;
+    sRemote := gHomer[iAt].sRemote; bKnown := gHomer[iAt].bKnown;
+    gHomer[iAt].bKnown := False;
+    gHomer[iAt].iStateAfter := homerState(iAt);
+    gHomer[iAt].sLocalAfter := gHomer[iAt].sLocal;
+    gHomer[iAt].bKnownAfter := True;
+    gHomer[iAt].iState := iState; gHomer[iAt].sLocal := sLocal;
+    gHomer[iAt].sRemote := sRemote; gHomer[iAt].bKnown := bKnown;
+  end;
+  Result := gHomer[iAt].iStateAfter;
+end;
+
+function homerOutcomeLine(iAt: Integer): String;
+(* One Results-box line for a component whose box was ticked; '' when it was
+   not. Says what happened, in the past tense, from a probe made after the
+   script ran -- not what was hoped for when the box was drawn. *)
+var
+  sName, sBefore, sAfter: String;
+  iBefore, iAfter: Integer;
+begin
+  Result := '';
+  if not homerTicked(homerLabel(iAt)) then exit;
+  sName := gHomer[iAt].sName;
+  iBefore := homerState(iAt);
+  sBefore := gHomer[iAt].sLocal;
+  iAfter := homerStateAfter(iAt);
+  sAfter := gHomer[iAt].sLocalAfter;
+  case iBefore of
+    0:
+      if iAfter > 0 then
+        Result := sName + ' ' + sAfter + ' was installed.'
+      else
+        Result := sName + ' was not installed. Its log says why.';
+    1:
+      if (sAfter <> '') and (sAfter <> sBefore) then
+        Result := sName + ' was updated from ' + sBefore + ' to ' + sAfter + '.'
+      else if iAfter = 2 then
+        Result := sName + ' ' + sAfter + ' is current.'
+      else
+        Result := sName + ' is still ' + sBefore + '. Its log says why.';
+  else
+    if iAfter > 0 then
+      Result := sName + ' ' + sAfter + ' was reinstalled.'
+    else
+      Result := sName + ' was not reinstalled. Its log says why.';
+  end;
+end;
 
 function homerOllamaList(): String;
 var
@@ -387,11 +489,38 @@ begin
   Result := Pos(Lowercase(sModel), homerOllamaList()) > 0;
 end;
 
+function homerModelIs(sModel: String; bPresent: Boolean): Boolean;
+// The Check: for a model's Install entry (bPresent False) or Reinstall entry
+// (bPresent True). A model has no Update entry: ollama pull always fetches the
+// current one.
+begin
+  Result := homerModelPresent(sModel) = bPresent;
+end;
+
 function homerModelWanted(sModel: String): Boolean;
 // The Check: for a model box -- ticked when the model is missing.
 begin
   Result := not homerModelPresent(sModel);
 end;
+
+function homerModelPresentAfter(sModel: String): Boolean;
+(* Asks ollama again, once, after the scripts have run. The first list is kept
+   for the "before" side of the outcome. *)
+var
+  lsAfterLines: TArrayOfString;
+  iAfter: Integer;
+begin
+  if not gOllamaListAfterKnown then
+  begin
+    gOllamaListAfterKnown := True;
+    gOllamaListAfter := '';
+    if homerProbeLines('ollama list', lsAfterLines) then
+      for iAfter := 0 to GetArrayLength(lsAfterLines) - 1 do
+        gOllamaListAfter := gOllamaListAfter + Lowercase(lsAfterLines[iAfter]) + #10;
+  end;
+  Result := Pos(Lowercase(sModel), gOllamaListAfter) > 0;
+end;
+
 
 function homerModelLabel(sModel, sUse, sSize: String): String;
 // "Install <model> (<use>, <size>)" or "Reinstall <model> (<use>)".
@@ -400,4 +529,23 @@ begin
     Result := 'Reinstall ' + sModel + ' (' + sUse + ')'
   else
     Result := 'Install ' + sModel + ' (' + sUse + ', ' + sSize + ')';
+end;
+
+function homerModelOutcomeLine(sModel, sUse, sSize: String): String;
+(* The Results-box line for a model whose box was ticked; '' when it was not. *)
+var
+  bBefore, bAfter: Boolean;
+begin
+  Result := '';
+  if not homerTicked(homerModelLabel(sModel, sUse, sSize)) then exit;
+  bBefore := homerModelPresent(sModel);
+  bAfter := homerModelPresentAfter(sModel);
+  if bBefore then
+  begin
+    if bAfter then Result := 'The ' + sUse + ' model ' + sModel + ' was reinstalled.'
+    else Result := 'The ' + sUse + ' model ' + sModel + ' was not reinstalled. Its log says why.';
+  end else begin
+    if bAfter then Result := 'The ' + sUse + ' model ' + sModel + ' was installed.'
+    else Result := 'The ' + sUse + ' model ' + sModel + ' was not installed. Its log says why.';
+  end;
 end;

@@ -65,6 +65,50 @@ One `[step]` per keystroke. `Say` is the narration, `Key` is what to press,
 Write every `Hear` line the way the reader actually says it, not the way the
 screen looks. "1 fruit in the basket", not "Count: 1".
 
+### How a screen reader trainer narrates
+
+These come from a professional JAWS training recording, "Introduction to
+Windows", read back through HomerScribe on 25 September 2026. A tutorial
+script follows the same beats, because they are the ones a listener who
+cannot see the screen has come to expect.
+
+- **Say the key, then press it, then let the reader speak, then translate.**
+  Four beats, every time. "I'll press Insert T, Tango, to read the title of
+  the current window." -- key -- "Title is Excel Backstage View." -- "JAWS
+  confirmed that focus is in the Excel window." In a script that is `Say`,
+  `Key`, `Hear`, then a second `Say` that turns what was heard into what it
+  means.
+- **Spell a letter key with its phonetic word.** "Insert T, Tango." "Windows
+  key D, Delta." A single letter is the easiest thing to mishear in speech,
+  and the phonetic word costs half a second.
+- **Quote the reader word for word, then paraphrase.** "Start list box,
+  toggle start navigation menu items, collapsed, 1 of 6" is what JAWS said;
+  "JAWS reads it as toggle start navigation menu items" is what it meant. The
+  `Hear` line is the quotation, exact and unimproved; the `Say` after it is
+  the translation. Never tidy the quotation: the learner will hear the untidy
+  version on their own machine and must recognise it.
+- **Say when the reader says nothing.** "When I pressed Alt F4, JAWS didn't
+  say anything." Silence after a key is information the learner cannot see,
+  so a script names it: a `Hear` line reading exactly "(nothing)".
+- **Verify after every change of focus.** The trainer presses Insert T to
+  read the window title after every switch, and says he is doing it and why.
+  A script does the same after Alt+Tab, after opening a dialog, after
+  closing one -- and says the word: "to verify".
+- **Teach the recovery key early.** "If you type too quickly and miss what
+  is spoken, press Insert Up Arrow to repeat it." The first tutorial says
+  this before the first thing worth missing.
+- **Use the count as orientation.** "1 of 14" and "1 of 6" are how the
+  listener knows the size of the place they have landed in. When the reader
+  gives a count, the `Say` line uses it: "the first of 14 icons on the
+  desktop".
+- **Name the control as the reader names it.** "Search edit box", "list
+  box", "split button", "up down slider". A tutorial that says "the search
+  field" when the reader will say "edit box" makes the listener translate
+  twice.
+- **Pause before the next key.** The trainer leaves a breath between the
+  reader's answer and his next instruction. `Pause=1` before each `[step]`
+  is the script's breath.
+
 ## Scenario 1: start a new app from nothing
 
 You want a tool that renames files from a pattern. Call it PatternRename.

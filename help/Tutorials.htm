@@ -229,6 +229,55 @@ spoken.</p>
 <p>Write every <code>Hear</code> line the way the reader actually says
 it, not the way the screen looks. “1 fruit in the basket”, not “Count:
 1”.</p>
+<h3 id="how-a-screen-reader-trainer-narrates">How a screen reader
+trainer narrates</h3>
+<p>These come from a professional JAWS training recording, “Introduction
+to Windows”, read back through HomerScribe on 25 September 2026. A
+tutorial script follows the same beats, because they are the ones a
+listener who cannot see the screen has come to expect.</p>
+<ul>
+<li><strong>Say the key, then press it, then let the reader speak, then
+translate.</strong> Four beats, every time. “I’ll press Insert T, Tango,
+to read the title of the current window.” – key – “Title is Excel
+Backstage View.” – “JAWS confirmed that focus is in the Excel window.”
+In a script that is <code>Say</code>, <code>Key</code>,
+<code>Hear</code>, then a second <code>Say</code> that turns what was
+heard into what it means.</li>
+<li><strong>Spell a letter key with its phonetic word.</strong> “Insert
+T, Tango.” “Windows key D, Delta.” A single letter is the easiest thing
+to mishear in speech, and the phonetic word costs half a second.</li>
+<li><strong>Quote the reader word for word, then paraphrase.</strong>
+“Start list box, toggle start navigation menu items, collapsed, 1 of 6”
+is what JAWS said; “JAWS reads it as toggle start navigation menu items”
+is what it meant. The <code>Hear</code> line is the quotation, exact and
+unimproved; the <code>Say</code> after it is the translation. Never tidy
+the quotation: the learner will hear the untidy version on their own
+machine and must recognise it.</li>
+<li><strong>Say when the reader says nothing.</strong> “When I pressed
+Alt F4, JAWS didn’t say anything.” Silence after a key is information
+the learner cannot see, so a script names it: a <code>Hear</code> line
+reading exactly “(nothing)”.</li>
+<li><strong>Verify after every change of focus.</strong> The trainer
+presses Insert T to read the window title after every switch, and says
+he is doing it and why. A script does the same after Alt+Tab, after
+opening a dialog, after closing one – and says the word: “to
+verify”.</li>
+<li><strong>Teach the recovery key early.</strong> “If you type too
+quickly and miss what is spoken, press Insert Up Arrow to repeat it.”
+The first tutorial says this before the first thing worth missing.</li>
+<li><strong>Use the count as orientation.</strong> “1 of 14” and “1 of
+6” are how the listener knows the size of the place they have landed in.
+When the reader gives a count, the <code>Say</code> line uses it: “the
+first of 14 icons on the desktop”.</li>
+<li><strong>Name the control as the reader names it.</strong> “Search
+edit box”, “list box”, “split button”, “up down slider”. A tutorial that
+says “the search field” when the reader will say “edit box” makes the
+listener translate twice.</li>
+<li><strong>Pause before the next key.</strong> The trainer leaves a
+breath between the reader’s answer and his next instruction.
+<code>Pause=1</code> before each <code>[step]</code> is the script’s
+breath.</li>
+</ul>
 <h2 id="scenario-1-start-a-new-app-from-nothing">Scenario 1: start a new
 app from nothing</h2>
 <p>You want a tool that renames files from a pattern. Call it

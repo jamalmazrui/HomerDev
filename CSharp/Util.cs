@@ -45,6 +45,23 @@ return nValue.ToString() + " " + sSuffix;
 
 // Singular or plural form, depending on whether the count equals one.
 // Argument order matches HomerLib's StringPlural(sItem, iCount).
+public static string spokenLength(double nSeconds) {
+// A LENGTH IS SAID IN WORDS. A screen reader reads "19:00" as nineteen
+// hundred hours and "1:06:06" as a time of day, so how long something runs
+// or took is never written as a clock reading: "19 minutes", "1 hour and 6
+// minutes", "45 seconds". A clock reading is only for a POSITION -- where
+// in a film or a recording something is.
+int iHours, iMinutes, iWhole;
+iWhole = (int) Math.Round(nSeconds);
+if (iWhole < 60) return iWhole.ToString() + (iWhole == 1 ? " second" : " seconds");
+iHours = iWhole / 3600;
+iMinutes = (int) Math.Round((iWhole - iHours * 3600) / 60.0);
+if (iMinutes >= 60) { iHours = iHours + 1; iMinutes = 0; }
+if (iHours == 0) return iMinutes.ToString() + (iMinutes == 1 ? " minute" : " minutes");
+if (iMinutes == 0) return iHours.ToString() + (iHours == 1 ? " hour" : " hours");
+return iHours.ToString() + (iHours == 1 ? " hour" : " hours") + " and " + iMinutes.ToString() + (iMinutes == 1 ? " minute" : " minutes");
+} // spokenLength method
+
 public static string stringPlural(string sItem, int iCount) {
 string sReturn = iCount.ToString() + " " + sItem;
 if (iCount != 1) sReturn += "s";

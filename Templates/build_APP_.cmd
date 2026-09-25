@@ -100,6 +100,8 @@ rem turning on Mdi without KeyMap fails to compile with "The name 'KeyMap' does
 rem not exist in the current context", which is exactly how this comment came to
 rem be written. Nothing else in the kit has a dependency of its own.
 set "homerSources="
+rem Elevate.cs: Lbc's Help box checks the web for a newer release through it.
+set "homerSources=!homerSources! "!homerDev!\CSharp\Elevate.cs""
 set "homerSources=!homerSources! "!homerDev!\CSharp\Inix.cs""
 set "homerSources=!homerSources! "!homerDev!\CSharp\KeyName.cs""
 rem MDI ONLY (EdSharp, FileDir, DbDo): a multiple-document app needs both of

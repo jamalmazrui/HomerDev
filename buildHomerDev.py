@@ -28,7 +28,7 @@ import sys
 import traceback
 
 c_lsExpected = [
-    "CSharp/Inix.cs", "CSharp/KeyName.cs", "CSharp/KeyMap.cs", "CSharp/Lbc.cs",
+    "CSharp/Elevate.cs", "CSharp/Inix.cs", "CSharp/KeyName.cs", "CSharp/KeyMap.cs", "CSharp/Lbc.cs",
     "CSharp/Log.cs", "CSharp/Mdi.cs", "CSharp/Paths.cs",
     "CSharp/PdfRead.cs", "CSharp/Say.cs", "CSharp/Util.cs", "CSharp/Web.cs",
     "CSharp/inixVert.cs",

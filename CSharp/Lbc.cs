@@ -1611,6 +1611,15 @@ public class LbcDialog : IDisposable
     // the help dialog itself opt out, preventing recursion.
     public string runWithButtons(string[] aButtonLabels, bool bAddHelp)
     {
+        return runWithButtons(aButtonLabels, bAddHelp, null);
+    }
+
+    // sDefaultLabel names the button Enter presses from anywhere. With
+    // null, it is the first label -- so an app lists OK first. Passing
+    // a label lets a Yes/No box keep the natural Yes-then-No order while
+    // making No the default when that is the safer answer.
+    public string runWithButtons(string[] aButtonLabels, bool bAddHelp, string sDefaultLabel)
+    {
         string[] aGivenLabels = aButtonLabels;
         if (bAddHelp && Array.IndexOf(aButtonLabels, "Help") < 0)
         {
@@ -1700,7 +1709,8 @@ public class LbcDialog : IDisposable
             }
             registerWidget(btn, "Button", sCaptured);
             pnlButtonRow.Controls.Add(btn);
-            if (i == 0) btnAccept = btn;
+            if (i == 0 && sDefaultLabel == null) btnAccept = btn;
+            if (sDefaultLabel != null && string.Equals(sCaptured, sDefaultLabel, StringComparison.OrdinalIgnoreCase)) btnAccept = btn;
             if (string.Equals(sCaptured, "Cancel", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(sCaptured, "Close", StringComparison.OrdinalIgnoreCase))
                 btnCancel = btn;
@@ -1886,12 +1896,37 @@ public class LbcDialog : IDisposable
         sbHelp.AppendLine("  F7 lists the dialog's controls in navigation order; choose one and press OK to focus it (type a letter to jump in the list).");
         sbHelp.AppendLine("  In text fields: Control+C copies the current line when nothing is selected, Alt+C appends, Control+X cuts the line, Control+D deletes it, F8 and Shift+F8 start and complete a selection, Control+F8 copies all, Alt+F8 reads all, Alt+Y says counts, Shift+F1 speaks the field tip.");
         sbHelp.AppendLine("  In lists: Control+C copies the current item, Alt+C appends it; Control+J then F3 search the list.");
+        // VERSION, AND THE OFFER TO UPDATE. When the app has configured
+        // Elevate, the box ends with what version this is and whether a
+        // newer one is on the web, and its buttons become Yes and No:
+        // Yes is the default when a newer version exists, No when this is
+        // the newest. When the web could not be checked, OK alone, as
+        // before. Yes fetches the setup program and starts it.
+        int iVersionOutcome = Elevate.isConfigured ? Elevate.check() : Elevate.c_iNotConfigured;
+        string sVersionLine = Elevate.describe(iVersionOutcome);
+        bool bOfferUpdate = iVersionOutcome == Elevate.c_iNewer || iVersionOutcome == Elevate.c_iCurrent;
+        if (sVersionLine != "")
+        {
+            sbHelp.AppendLine();
+            sbHelp.AppendLine("Version:");
+            sbHelp.Append("  ").AppendLine(sVersionLine);
+            if (bOfferUpdate) sbHelp.AppendLine("  Update to the version on the web now? Yes fetches it and starts its setup program.");
+        }
         using (LbcDialog dlgHelp = new LbcDialog("Help: " + frm.Text, frm))
         {
             TextBox tbHelp = dlgHelp.addMemo(sbHelp.ToString(), null);
             tbHelp.ReadOnly = true;
             tbHelp.AccessibleName = "Help text";
-            dlgHelp.runWithButtons(new string[] { "OK" }, false);
+            if (!bOfferUpdate)
+            {
+                dlgHelp.runWithButtons(new string[] { "OK" }, false);
+                return;
+            }
+            string sAnswer = dlgHelp.runWithButtons(new string[] { "Yes", "No" }, false,
+                iVersionOutcome == Elevate.c_iNewer ? "Yes" : "No");
+            if (!string.Equals(sAnswer, "Yes", StringComparison.OrdinalIgnoreCase)) return;
+            if (!Elevate.update())
+                MessageBox.Show(frm, "The setup program could not be fetched. It is at " + Elevate.repoUrl + "/releases.", "Version", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 

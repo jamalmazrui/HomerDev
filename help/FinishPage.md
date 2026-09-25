@@ -25,16 +25,29 @@ do not want. A box that proposes what has already been done, or that opens a
 document over the program they just installed, teaches the reader to stop
 trusting the page.
 
-## Two entries per component
+## The order of the boxes
 
-In Inno, `Check:` decides whether an entry is **shown**, not whether it is
-ticked. So each component has two `[Run]` entries with the same label
-function: one shown when the component is wanted (missing or stale), ticked;
-one shown when it is current, carrying the `unchecked` flag. The reader sees
-one box per component, with the right verb and the right default.
+The finish page lists its boxes in this order, always:
 
-One entry gated on "wanted" is not enough: every component already present
-simply vanishes from the page, and the person never sees a Reinstall box.
+1. **Install** boxes, ticked. Screen reader scripts and add-ons come first;
+   then the components, in alphabetical order.
+2. **Update** boxes, ticked, in alphabetical order.
+3. **Reinstall** boxes, unticked, in alphabetical order.
+4. **Launch the app**, ticked.
+5. **Open the user guide**, unticked.
+
+Inno shows `[Run]` entries in the order they are written, and `Check:` hides
+the ones that do not apply. So each component gets three entries -- one per
+verb, each with its own `Check:` -- and the page groups itself with no
+sorting code. The kit supplies the checks: `homerIs(i, 0)` for Install,
+`homerIs(i, 1)` for Update, `homerIs(i, 2)` for Reinstall, and
+`homerModelIs(model, False)` / `homerModelIs(model, True)` for a model's
+Install and Reinstall entries (a model has no Update: `ollama pull` always
+fetches the current one). The Reinstall entries carry the `unchecked` flag.
+
+One entry per component gated on "wanted" is not enough: every component
+already present simply vanishes from the page, and the person never sees a
+Reinstall box.
 
 ## How the wording is decided
 
@@ -64,3 +77,32 @@ The launch entry does not start the app. It writes a marker, and the app is
 started only after the Results box has been read and closed — otherwise the
 new window takes focus and the screen reader begins announcing it over the
 summary of what just happened. See `startIfAsked` in any Homer installer.
+
+## The Results box afterwards
+
+The box that appears after the finish-page scripts have run reports **one line
+per box that was ticked, and nothing else**. A component nobody asked about
+is not an action taken this session, so it is not mentioned; when nothing was
+ticked, the box says only that the app is installed and where the logs are.
+
+Each line is in the past tense, from a probe made **after** the script ran:
+"Whisper 1.9.4 was installed", "Ollama was updated from 0.34.3 to 0.34.4",
+"Tesseract 5.4.0 was reinstalled", or "Whisper was not installed. Its log says
+why." The probe made when the wizard opened is kept for the checkbox wording
+and for the "before" half of the outcome; it is never what the Results box
+reports, because by then it is a minute or more out of date.
+
+The kit does this in three pieces: homerNoteTicked, called from
+NextButtonClick when the page is wpFinished, records the ticked captions
+before any script runs; homerOutcomeLine(i) and homerModelOutcomeLine(model,
+use, size) each return a line when that box was ticked and an empty string
+when it was not. The app adds each result to the box and skips the empty ones.
+
+## Say "Downloading" before a long step
+
+An install script says "Downloading" -- that plain word -- on the console
+before anything that takes more than a few seconds, with a rough size and
+time: "Downloading Ollama. This is about 1 GB and takes a few minutes." An
+update path says so too: "Checking for a newer version" followed by a silent
+two-minute download reads as a hang.
+

@@ -5,6 +5,74 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.31.1 -- 25 September 2026
+
+Two build failures from 1.31.0, both fixed. homerNoteTicked was declared a
+function with no return type, which Pascal refuses ("colon expected"); it is
+a procedure. The two C# sample builds and Templates\build_APP_.cmd compiled
+Lbc.cs without the Elevate.cs it now depends on; each lists it.
+
+help\Tutorials.md gains "How a screen reader trainer narrates": nine beats
+taken from a professional JAWS training recording -- key, press, hear, then
+translate; letters with their phonetic word; the reader quoted word for word
+and then paraphrased; silence named; focus verified after every change; the
+repeat key taught first; counts used as orientation; controls named as the
+reader names them; a breath before each key. Templates\Tutorial_00_Overview.inix
+carries the short form.
+
+# 1.31.0 -- 25 September 2026
+
+Two patterns every Homer app is to follow, asked for on this date.
+
+THE ORDER OF THE FINISH-PAGE BOXES: Install (screen reader scripts first,
+then components alphabetically), ticked; Update, ticked, alphabetical;
+Reinstall, unticked, alphabetical; Launch, ticked; Open the user guide,
+unticked. Done with three [Run] entries per component, one per verb, using
+the new homerIs(i, state) and homerModelIs(model, present) checks; Inno's
+script order and Check: do the grouping. FinishPage.md states the rule.
+Templates\_APP__setup.iss is rewritten to it -- it includes
+HomerComponents.iss, registers Ollama with homerAdd, keeps the screen reader
+script entries, reports the Results box from homerOutcomeLine, starts the
+program after that box through the launch marker, and its [UninstallDelete]
+names only logs and settings, never the whole app-data folder. homerFinish.cmd
+is no longer shipped by the template.
+
+THE HELP BOX CHECKS THE WEB FOR A NEWER VERSION. New shared class
+CSharp\Elevate.cs: an app calls Elevate.configure(owner, repo, version) once
+at startup; the Lbc Help box then ends with "This is version X. Version Y is
+on the web." and its buttons become Yes and No -- Yes the default when a newer
+version exists, No when this is the newest, OK alone when the web could not be
+checked (eight-second timeout, so an offline machine never hangs the box).
+Yes fetches <repo>_setup.exe from the latest GitHub release and starts it.
+Elevate.offer(owner) does the same conversation in a message box for an F11
+handler. LBC NOW REQUIRES ELEVATE.CS: add CSharp\Elevate.cs to every build
+that compiles Lbc.cs.
+
+Util.spokenLength(seconds) says a LENGTH in words -- "19 minutes", "1 hour
+and 6 minutes", "45 seconds" -- because a screen reader reads "19:00" as
+nineteen hundred hours and "1:06:06" as a time of day. HomerScribe reported a
+nineteen-minute run as "Took 19:00". A clock reading is only for a POSITION:
+where in a film or recording something is.
+
+Lbc.runWithButtons gains a third argument naming the default button, so a
+Yes/No box can keep Yes-then-No order with No as the default. The first
+label is the default when the argument is absent -- so list OK first: with
+Help first, Enter in HomerScribe's source paths field opened Help.
+
+# 1.30.0 -- 25 September 2026
+
+The Results box after an install reports only the boxes that were ticked,
+from a probe made after the scripts ran: homerNoteTicked records the ticked
+captions when Finish is pressed (from NextButtonClick at wpFinished);
+homerOutcomeLine and homerModelOutcomeLine each return a past-tense line for
+a ticked box and nothing for one that was not. Until now the box recited
+every component from the probe made when the wizard opened -- so a minute
+after Whisper was installed and Ollama updated, it said neither had
+happened, and it listed three components nobody had asked about.
+
+FinishPage.md gains the Results-box rule and the "Downloading" rule for
+install-script console messages.
+
 # 1.29.0 -- 25 September 2026
 
 Four files delivered the day before had landed in folders the kit never had:
