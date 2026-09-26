@@ -70,7 +70,7 @@ AppSupportURL={#AppUrl}
 AppUpdatesURL={#AppUrl}/releases
 AppCopyright={#AppCopyright}
 
-; The version resource of the built setup. tagRelease reads the FileVersion
+; The version resource of the built setup. release reads the FileVersion
 ; STRING from it and tags v<that>, so the text form is set explicitly: the tag
 ; wanted is v1.0.0, not v1.0.0.0.
 VersionInfoVersion={#AppVersion}
@@ -182,7 +182,7 @@ Source: "*.dll"; DestDir: "{app}\exec"; Flags: ignoreversion skipifsourcedoesnte
 Source: "_APP_.exe.config"; DestDir: "{app}\exec"; Flags: ignoreversion skipifsourcedoesntexist
 ; The finish helper: the Results box and then the launch. Always shipped, and
 ; it lives beside the program because that is what it starts.
-Source: "scripts\homerInstall.cmd"; DestDir: "{app}\scripts"; Flags: ignoreversion
+Source: "scripts\installCommon.cmd"; DestDir: "{app}\scripts"; Flags: ignoreversion
 ; EVERY COMPONENT APPEARS THREE TIMES: one entry per state -- install, update,
 ; already current -- grouped so the ones that do something come first, and only
 ; one is ever shown because the others are skipped by their Check function. The

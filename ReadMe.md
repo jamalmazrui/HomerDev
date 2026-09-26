@@ -143,7 +143,7 @@ row shipped a fault that only a compiler could see.
 ### 9. Gather evidence
 
     cd Tools
-    checkHomerApp --path ..\Templates\samples
+    check --path ..\Templates\samples
 
 Eleven checks run, and an `evidence-<date>.md` appears saying what was verified,
 what was not checked, and what remains uncertain. Open it. The third list is the
@@ -173,11 +173,11 @@ script: a fresh AppId, and the desktop hotkey.
     buildJobDo
     JobDo
     createJobDoRepo
-    tagRelease
+    release
 
 `createJobDoRepo` makes the GitHub repository and pushes the first commit; after
-that `tagRelease` is how every release goes out. Copy `tagRelease.cmd` and
-`tagRelease.ps1` from `scripts\` into the app folder first, or keep one copy in a
+that `release` is how every release goes out. Copy `release.cmd` and
+`release.ps1` from `scripts\` into the app folder first, or keep one copy in a
 folder on your PATH -- they act on the current directory, so one copy serves
 every project.
 
@@ -195,7 +195,7 @@ own voices, with nothing installed and nothing uploaded.
 
 ### What gets published, and what does not
 
-`RepoFiles.txt` names what the repository carries, and `homerTidy --gitignore`
+`RepoFiles.txt` names what the repository carries, and `tidy --gitignore`
 turns that into a `.gitignore` that ignores everything else. A file dropped into
 the folder is invisible to git until somebody names it. `self.md`, the project's
 own notebook, is in the never-pushed list and stays on your machine.
@@ -209,8 +209,8 @@ own notebook, is in the never-pushed list and stays on your machine.
 - `homer\` -- the same toolbox for Python and NVDA add-ons: inix, lbc, log,
   paths, say, util and web, with the same names and the same behaviour.
 - `Templates\` -- the files a new app starts from.
-- `scripts\` -- checkHomerApp, gitPush, tagRelease, homerTidy, buildTutorials and
-  tagRelease. No editing needed; they work out the app name from the folder, and
+- `scripts\` -- check, push, release, tidy, buildTutorials and
+  release. No editing needed; they work out the app name from the folder, and
   any of them can be run from a shared tools folder.
 - `Templates\samples\` -- four fruit basket programs: the single dialog in C# and in
   Python, and the multiple-document version in C# and in Python. Each pair is

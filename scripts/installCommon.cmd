@@ -1,5 +1,5 @@
 @echo off
-rem homerInstall.cmd -- the common half of every Homer install<Component>.cmd.
+rem installCommon.cmd -- the common half of every Homer install<Component>.cmd.
 rem
 rem Called, not run: an install script does `call "%~dp0homerInstall.cmd" setup`
 rem and then uses what this sets. It exists because the same forty lines had

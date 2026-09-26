@@ -277,17 +277,17 @@ goes. <code>newHomerApp</code> fills them in.</p>
 <p>Scripts that need no editing at all. They work out the app name from
 the folder they are run in.</p>
 <ul>
-<li><strong>tagRelease</strong> – tag, push, and publish a GitHub
-release. It acts on the current directory, or on
+<li><strong>release</strong> – tag, push, and publish a GitHub release.
+It acts on the current directory, or on
 <code>-Path &lt;folder&gt;</code>, so one copy in <code>C:\bin</code> on
 the PATH serves every project. An app with an installer is released from
 the version stamped into <code>&lt;App&gt;_setup.exe</code>, with the
 installer attached; a project that ships source and has no
 <code>&lt;App&gt;_setup.iss</code> is released from
 <code>version.txt</code>, with no asset.</li>
-<li><strong>homerTidy</strong> – tidy the folder and the repository in
-one pass. It replaces homerTidy and homerTidy, which asked the same
-question of two places and could disagree about the answer.</li>
+<li><strong>tidy</strong> – tidy the folder and the repository in one
+pass. It replaces tidy and tidy, which asked the same question of two
+places and could disagree about the answer.</li>
 </ul>
 <p>Copy the pair you want into the app folder and run it there.</p>
 <h2 id="templates-1">Templates</h2>
@@ -716,10 +716,10 @@ folder from the templates, C# or Python, overwriting nothing</li>
 from the top of the project, so typing the program’s name there still
 runs the fresh build</li>
 <li><strong>LocalFiles.txt</strong> – what belongs on this disk but
-never in the repository; homerTidy keeps it and writes each line into
+never in the repository; tidy keeps it and writes each line into
 .gitignore as never pushed</li>
 <li><strong>RepoFiles.txt</strong> – the whitelist: what the repository
-carries, and the source homerTidy generates .gitignore from</li>
+carries, and the source tidy generates .gitignore from</li>
 <li><strong>version.txt</strong> – the kit’s version, one line, no byte
 order mark, read by every script</li>
 <li><strong>.gitignore</strong> – generated from RepoFiles.txt; ignores
@@ -773,7 +773,7 @@ when there are several windows</li>
 <li><strong>FruitBasketPy.py</strong> – the same program as
 FruitBasketCs, in Python, block for block</li>
 <li><strong>accept.inix</strong> – what done means for the samples, run
-by checkHomerApp</li>
+by check</li>
 <li><strong>uiTest.inix</strong> – what the samples must do when driven,
 run by uiCheck</li>
 <li><strong>buildFruitBasketCs.cmd, buildFruitBasketMdiCs.cmd,
@@ -793,8 +793,8 @@ Python build scripts, with the component switches</li>
 <li><strong>create_APP_Repo.cmd, create_APP_Repo.ps1</strong> – makes
 the GitHub repository and pushes the first commit</li>
 <li><strong>gitignore.txt</strong> – the whitelist starter, replaced by
-homerTidy</li>
-<li><strong>homerFinish.cmd</strong> – shows what the install did, then
+tidy</li>
+<li><strong>finish.cmd</strong> – shows what the install did, then
 starts the program</li>
 <li><strong>installModels.cmd, installOllama.cmd</strong> – local AI,
 for the apps that need it</li>
@@ -807,27 +807,27 @@ with</li>
 <h2 id="tools-scripts-that-act-on-a-project">Tools – scripts that act on
 a project</h2>
 <ul>
-<li><strong>checkHomerApp.cmd, checkHomerApp.py</strong> – gathers
-evidence about an app: encodings, names, keys, build, smoke run,
-acceptance criteria, and a report saying what it did not check</li>
-<li><strong>gitPush.cmd</strong> – stage, commit and push what the
+<li><strong>check.cmd, check.py</strong> – gathers evidence about an
+app: encodings, names, keys, build, smoke run, acceptance criteria, and
+a report saying what it did not check</li>
+<li><strong>push.cmd</strong> – stage, commit and push what the
 whitelist allows</li>
-<li><strong>tagRelease.cmd</strong> – check first, then tag and
+<li><strong>release.cmd</strong> – check first, then tag and
 publish</li>
 <li><strong>uiCheck.cmd, uiCheck.py</strong> – starts a program, sends
 the keys, and reads the accessibility tree back; driven by uiTest.inix
 beside the program</li>
 <li><strong>installTools.cmd</strong> – copies the tools to a folder on
 the PATH, so one current copy serves every project</li>
-<li><strong>homerTidy.cmd, homerTidy.py</strong> – tidies folder and
-repository together, and generates the whitelist .gitignore</li>
+<li><strong>tidy.cmd, tidy.py</strong> – tidies folder and repository
+together, and generates the whitelist .gitignore</li>
 <li><strong>buildTutorials.cmd, buildTutorials.ps1</strong> – fetches
 the voices, speaks every tutorial script, joins them into Tutorials.mkv
 with a chapter each, and writes the playlist and the feed</li>
 <li><strong>makeTutorials.cmd, makeTutorials.py</strong> – writes the
 tutorial scripts into Tutorials.md and the feed, speaking nothing</li>
-<li><strong>tagRelease.cmd, tagRelease.ps1</strong> – reads version.txt,
-tags, and publishes the installer as a release asset</li>
+<li><strong>release.cmd, release.ps1</strong> – reads version.txt, tags,
+and publishes the installer as a release asset</li>
 </ul>
 <h2 id="help-the-documents">help – the documents</h2>
 <ul>
@@ -943,8 +943,8 @@ know, <code>KeyName</code> and <code>KeyMap</code> for keys,
 <code>Lbc</code> for every control, the document set,
 <code>build&lt;App&gt;.cmd</code>, <code>&lt;App&gt;_setup.iss</code>,
 <code>RepoFiles.txt</code>, <code>accept.inix</code> and
-<code>checkHomerApp</code>. A person who learns one shape has learnt
-most of the other two.</p>
+<code>check</code>. A person who learns one shape has learnt most of the
+other two.</p>
 <h1 id="scripts-and-settings-the-two-lists-every-mdi-app-gets">Scripts
 and settings: the two lists every MDI app gets</h1>
 <p>An MDI frame comes with two commands that look small and are not:</p>
@@ -1137,17 +1137,16 @@ Git ignores it. So what a developer sees is what a user gets, and “where
 does this file go” has one answer.</p>
 <p><code>exec</code> is built, never committed. <code>help</code> holds
 the published documents and, local only, anything like
-<code>self.md</code> the repository does not want.
-<strong>homerTidy</strong> puts a folder back into this shape: a file
-the installer takes from <code>exec</code> or <code>help</code> is moved
-there, a stray log goes to <code>logs</code>, and anything the project
-does not name goes to <code>notes</code>. What belongs is read from the
-project itself – the installer script, <code>RepoFiles.txt</code> for
-what the repository carries, and
-<strong><code>LocalFiles.txt</code></strong> for what belongs on this
-disk only, such as a tutorial’s working scripts or fetched voice models.
-There is no per-app clean-up script; LocalFiles.txt is where an app says
-what is special about it.</p>
+<code>self.md</code> the repository does not want. <strong>tidy</strong>
+puts a folder back into this shape: a file the installer takes from
+<code>exec</code> or <code>help</code> is moved there, a stray log goes
+to <code>logs</code>, and anything the project does not name goes to
+<code>notes</code>. What belongs is read from the project itself – the
+installer script, <code>RepoFiles.txt</code> for what the repository
+carries, and <strong><code>LocalFiles.txt</code></strong> for what
+belongs on this disk only, such as a tutorial’s working scripts or
+fetched voice models. There is no per-app clean-up script;
+LocalFiles.txt is where an app says what is special about it.</p>
 <p>A clean-up script must know the layout. One written before it –
 moving a <code>Scripts</code> folder as obsolete – will move
 <code>scripts</code>, which Windows treats as the same name, and take
@@ -1182,13 +1181,13 @@ itself</h2>
 <pre><code>checkHomerDev             audit, clean, build all three samples, report
 checkHomerDev --deep      delete the Python virtual environment too
 checkHomerDev --no-clean  build over what is there (fast, weaker)</code></pre>
-<p><code>checkHomerApp</code> checks an app. This checks the kit, and it
-does it the only way that settles the question: with a compiler. It runs
-the kit audit, checks the module dependency rule, removes what previous
-builds wrote, builds all three samples with their own scripts, and
-writes <code>evidence-kit-&lt;date&gt;.md</code>.</p>
+<p><code>check</code> checks an app. This checks the kit, and it does it
+the only way that settles the question: with a compiler. It runs the kit
+audit, checks the module dependency rule, removes what previous builds
+wrote, builds all three samples with their own scripts, and writes
+<code>evidence-kit-&lt;date&gt;.md</code>.</p>
 <p>Run it after changing anything in <code>CSharp</code> or
-<code>homer</code>, and before <code>tagRelease</code>.</p>
+<code>homer</code>, and before <code>release</code>.</p>
 <p><strong>The dependency rule.</strong> A module may declare what it
 needs, in two forms:</p>
 <pre><code>// REQUIRES: KeyMap.cs, Lbc.cs, Log.cs, Paths.cs, Say.cs, Util.cs.
@@ -1213,10 +1212,10 @@ a window is not a check – and it does not build EdSharp, FileDir, DbDo
 or HomerScribe, which compile against these same modules. After changing
 a shared class, build those four. Both limits are printed in every
 report.</p>
-<h2 id="checkhomerapp">checkHomerApp</h2>
+<h2 id="check">check</h2>
 <pre><code>cd \JobDo
-checkHomerApp
-checkHomerApp --build</code></pre>
+check
+check --build</code></pre>
 <p>It runs every check that can answer yes or no, records the command
 and the exit code for each, and writes
 <code>evidence-&lt;yyyymmdd-hhmmss&gt;.md</code> beside itself. Eleven
@@ -1278,7 +1277,7 @@ almost nothing is left for a person to remember:</p>
 <pre><code>buildHomerDev      documents, all four samples, the kit audit
 checkHomerDev      the environment, a clean build of everything, the tools
                    on your PATH, and every program driven through its keys
-checkHomerApp      one app: encodings, names, keys, build, smoke run, and
+check      one app: encodings, names, keys, build, smoke run, and
                    the acceptance criteria you wrote
 uiCheck            one program: started, driven, and read back</code></pre>
 <p>The rule behind them is the rule behind the whole kit. <strong>A
@@ -1326,11 +1325,11 @@ just the kit</h2>
 <p><code>checkHomerDev</code> also records what the build actually ran
 with – the Python and pandoc it found – and compares every tool on your
 PATH against the kit’s copy. That second check exists because a release
-once failed on a <code>tagRelease</code> from before source-only
-releases were supported, with an error naming a file that was never
-meant to exist. One shared copy is the point of those tools, and one
-shared copy is what can go stale. <code>scripts\installTools</code>
-fixes what it reports.</p>
+once failed on a <code>release</code> from before source-only releases
+were supported, with an error naming a file that was never meant to
+exist. One shared copy is the point of those tools, and one shared copy
+is what can go stale. <code>scripts\installTools</code> fixes what it
+reports.</p>
 <h2 id="what-is-still-not-automated">What is still not automated</h2>
 <p><strong>Speech.</strong> UI Automation reports that a control exists
 and what it is called. It does not report what JAWS said. That is the
@@ -1394,11 +1393,11 @@ an update or a reinstall. Ask winget AND the tool’s own executable:
 tools like Ollama install per user, into a profile an elevated
 installer’s PATH cannot see. Cache the answers, because each query costs
 a second and the page asks twice.</p>
-<p>The last checkbox runs <code>homerFinish.cmd</code>, never the
-program directly. Inno runs the entries in order and the launch is last,
-so a program started there puts its window on top of whatever the other
-entries were still saying. <code>homerFinish.cmd</code> reads the setup
-log, shows ONE Results box, waits for it to be dismissed, and only then
+<p>The last checkbox runs <code>finish.cmd</code>, never the program
+directly. Inno runs the entries in order and the launch is last, so a
+program started there puts its window on top of whatever the other
+entries were still saying. <code>finish.cmd</code> reads the setup log,
+shows ONE Results box, waits for it to be dismissed, and only then
 starts the program.</p>
 <p>The Results box says: that the program is installed and where; the
 disposition of each checkbox that was ticked, one line each; and where
@@ -1562,9 +1561,9 @@ twice. Set an accessible name only for a control with no words of its
 own – a grid with no label beside it. Not for a button, which carries
 its caption; not for a box with a label before it; never for a form,
 whose caption IS its accessible name. FileDir had forty-eight of these
-in one file, DbDo nineteen. <code>checkHomerApp</code> and an app’s own
-audit compare every accessible name against every caption in the same
-source and fail on a match.</p>
+in one file, DbDo nineteen. <code>check</code> and an app’s own audit
+compare every accessible name against every caption in the same source
+and fail on a match.</p>
 <p><strong>Direct speech that says what the reader is about to say
 anyway</strong> – the window title as a dialog opens, the control that
 just took focus, the same sentence twice in a breath.
@@ -1587,7 +1586,7 @@ without anybody having to describe it:</p>
 command the build ran and its exit code.</li>
 <li><strong>The release log</strong> –
 <code>logs\&lt;App&gt;-release-&lt;date&gt;-&lt;time&gt;.log</code>,
-from tagRelease.</li>
+from release.</li>
 <li><strong>The runtime log</strong> – under
 <code>%LOCALAPPDATA%\&lt;App&gt;\logs</code>: not only what the program
 did, but <strong>what came in and what went out</strong> – every key it
@@ -1618,9 +1617,9 @@ Hotkeys, below it, has none. Two items sharing a letter would make the
 reader cycle between them, and a person pressing the letter expects one
 thing to happen. The same holds inside one dialog: the first control to
 claim a letter keeps it.</p>
-<p><code>checkHomerApp</code> counts letters per menu and per dialog,
-never across a file, and fails on a duplicate, since a duplicate is now
-always a mistake.</p>
+<p><code>check</code> counts letters per menu and per dialog, never
+across a file, and fails on a duplicate, since a duplicate is now always
+a mistake.</p>
 <h2 id="altcontrol-and-the-one-exception">Alt+Control, and the one
 exception</h2>
 <p>Alt+Control with a letter or a function key belongs to Windows
@@ -1831,9 +1830,8 @@ screen, everything else in the file. A log line is never spoken.</p>
 <h2 id="a-whitelist-not-a-list-of-exclusions">A whitelist, not a list of
 exclusions</h2>
 <p><code>RepoFiles.txt</code> names what the repository carries.
-<code>homerTidy --gitignore</code> turns that into a
-<code>.gitignore</code> that ignores everything and then puts back
-exactly what was named:</p>
+<code>tidy --gitignore</code> turns that into a <code>.gitignore</code>
+that ignores everything and then puts back exactly what was named:</p>
 <pre><code>/*
 !/.gitignore
 !/ReadMe.md
@@ -1844,8 +1842,8 @@ accident is always the one nobody thought of. Turning it around costs
 one line in <code>RepoFiles.txt</code> before a new file can be
 committed – which is also the line that records why the file is
 there.</p>
-<p><code>homerTidy --do-it</code> rewrites the whitelist on every pass,
-so <code>RepoFiles.txt</code> and <code>.gitignore</code> cannot drift
+<p><code>tidy --do-it</code> rewrites the whitelist on every pass, so
+<code>RepoFiles.txt</code> and <code>.gitignore</code> cannot drift
 apart.</p>
 <h2 id="what-is-public-and-what-stays-on-your-machine">What is public
 and what stays on your machine</h2>
@@ -1857,15 +1855,15 @@ and what stays on your machine</h2>
 <code>.gitignore</code></li>
 <li>the documentation set, in both <code>.md</code> and
 <code>.htm</code></li>
-<li><code>homerFinish.cmd</code> and the <code>install*.cmd</code>
-scripts the installer ships</li>
+<li><code>finish.cmd</code> and the <code>install*.cmd</code> scripts
+the installer ships</li>
 </ul>
 <p>Private, and in the never-pushed list whatever
 <code>RepoFiles.txt</code> says:</p>
 <ul>
 <li><code>self.md</code> and <code>self.htm</code> – the project’s own
 notebook</li>
-<li><code>tagRelease.cmd</code> and <code>tagRelease.ps1</code> – a
+<li><code>release.cmd</code> and <code>release.ps1</code> – a
 maintainer’s tools, and noise in a source browser</li>
 <li><code>create&lt;App&gt;Repo.cmd</code> and <code>.ps1</code> – run
 once, then never again</li>
@@ -1950,8 +1948,8 @@ the default path, compiles the app with the Homer modules from
 compiles the installer if Inno Setup is present. It fetches what it
 needs from the web itself. Log:
 <code>build&lt;App&gt;.log</code>.</p></li>
-<li><p><strong>homerTidy</strong> – the folder and the repository,
-surveyed together and fixed in one pass. It prints the plan and stops;
+<li><p><strong>tidy</strong> – the folder and the repository, surveyed
+together and fixed in one pass. It prints the plan and stops;
 <code>--do-it</code> carries it out. In the folder: empty files deleted,
 duplicates and files the project does not name moved into
 <code>notes\logs</code>, <code>notes\drafts</code>,
@@ -1963,23 +1961,22 @@ history is reported with the command that would remove it, and never
 rewritten automatically. What belongs is decided by the project’s own
 <code>&lt;App&gt;_setup.iss</code> and <code>RepoFiles.txt</code>, so
 there is no list to maintain. <code>--folder-only</code> and
-<code>--repo-only</code> do one half. Log:
-<code>homerTidy.log</code>.</p>
+<code>--repo-only</code> do one half. Log: <code>tidy.log</code>.</p>
 <p>A file that is large and fetched at run time – a model, a converter,
 an installer payload – belongs in neither place. The app’s own install
-script should get it, and homerTidy reports such a file rather than
+script should get it, and tidy reports such a file rather than
 guessing.</p></li>
-<li><p><strong>tagRelease</strong> – reads the version, bumps it if that
+<li><p><strong>release</strong> – reads the version, bumps it if that
 number is already released, writes it back, tags, pushes, and publishes
 the GitHub release with the installer attached. Log:
-<code>tagRelease.log</code>.</p></li>
+<code>release.log</code>.</p></li>
 </ul>
 <h2 id="the-release-routine">The release routine</h2>
 <ol type="1">
 <li>Unzip the app archive into <code>C:\&lt;App&gt;</code>.</li>
 <li><code>build&lt;App&gt;</code> from that folder.</li>
 <li>Run <code>&lt;App&gt;.exe</code> as a quick test.</li>
-<li>Commit, then <code>tagRelease</code>.</li>
+<li>Commit, then <code>release</code>.</li>
 <li>Install from the published <code>&lt;App&gt;_setup.exe</code>, or
 update in place with F11.</li>
 </ol>
@@ -2027,12 +2024,12 @@ skipping whichever is absent.</li>
 <li><strong>The last two checkboxes are always the same two</strong>, in
 this order: documentation, unchecked, then launch, checked.</li>
 <li><strong>The Results box comes before the launch.</strong> The launch
-entry runs <code>homerFinish.cmd</code> rather than the program. That
-script reads the setup log, shows one Results box saying what this
-install actually did, and starts the program only when the box is
-dismissed. Being last in <code>[Run]</code>, it runs after every other
-checkbox, so the box can report all of them, and the program’s window
-cannot cover the summary.</li>
+entry runs <code>finish.cmd</code> rather than the program. That script
+reads the setup log, shows one Results box saying what this install
+actually did, and starts the program only when the box is dismissed.
+Being last in <code>[Run]</code>, it runs after every other checkbox, so
+the box can report all of them, and the program’s window cannot cover
+the summary.</li>
 <li><strong>The uninstall removes the settings too</strong>, and never
 touches what the user made with the program.</li>
 </ul>
@@ -2072,14 +2069,14 @@ finished, stated so a script can settle it. An AI asked for “a tool that
 does X” gives you its idea of done; an AI asked to satisfy five named
 checks gives you yours.</li>
 <li><strong>Build in small, recoverable steps.</strong> One change, one
-build, one run of <code>checkHomerApp</code>, one commit.
-<code>version.txt</code> and <code>tagRelease</code> mean any release
-can be returned to, and <code>homerTidy</code> means nothing unintended
-is ever pushed.</li>
-<li><strong>Verify without sight.</strong> <code>checkHomerApp</code>
-for what a script can settle, the session log for what happened, and
-your own ears for what the log cannot hold. The evidence report
-separates the three.</li>
+build, one run of <code>check</code>, one commit.
+<code>version.txt</code> and <code>release</code> mean any release can
+be returned to, and <code>tidy</code> means nothing unintended is ever
+pushed.</li>
+<li><strong>Verify without sight.</strong> <code>check</code> for what a
+script can settle, the session log for what happened, and your own ears
+for what the log cannot hold. The evidence report separates the
+three.</li>
 <li><strong>Package, document and defend.</strong> The build makes the
 installer, the document set travels in both Markdown and HTML, and the
 evidence report answers the only question that matters at the end: what

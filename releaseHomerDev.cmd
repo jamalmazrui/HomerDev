@@ -9,8 +9,8 @@ rem
 rem   1. checkHomerDev         the environment, a clean build of all four
 rem                            samples, the dependency rule, the tools on your
 rem                            PATH, and every program driven through its keys
-rem   2. scripts\gitPush         stage what the whitelist allows, commit, push
-rem   3. scripts\tagRelease      tag and publish (the check has already run, so -SkipCheck)
+rem   2. scripts\push         stage what the whitelist allows, commit, push
+rem   3. scripts\release      tag and publish (the check has already run, so -SkipCheck)
 rem
 rem Nothing here is a test you have to remember. If it finishes, the evidence
 rem reports beside checkHomerDev and uiCheck say what was verified, what was not
@@ -37,7 +37,7 @@ if errorlevel 1 (
 )
 
 echo Step 2 of 3: committing and pushing.
-call "%~dp0scripts\gitPush.cmd" "%message%"
+call "%~dp0scripts\push.cmd" "%message%"
 if errorlevel 1 (
     echo The push failed, so nothing was tagged.
     echo PUSH FAILED>> "%log%"
@@ -46,13 +46,13 @@ if errorlevel 1 (
 )
 
 echo Step 3 of 3: tagging and publishing.
-call "%~dp0scripts\tagRelease.cmd" -SkipCheck
+call "%~dp0scripts\release.cmd" -SkipCheck
 set "exitCode=%errorlevel%"
->> "%log%" echo tagRelease exit code %exitCode%
+>> "%log%" echo release exit code %exitCode%
 >> "%log%" echo releaseHomerDev finished %date% %time%
 if "%exitCode%"=="0" (
     echo Released. The evidence reports in this folder say what was checked.
 ) else (
-    echo tagRelease failed. The log has why: %log%
+    echo release failed. The log has why: %log%
 )
 endlocal & exit /b %exitCode%

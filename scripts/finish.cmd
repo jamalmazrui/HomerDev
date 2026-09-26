@@ -1,5 +1,5 @@
 @echo off
-rem homerFinish.cmd -- the last thing a Homer installer does: show ONE Results
+rem finish.cmd -- the last thing a Homer installer does: show ONE Results
 rem box saying what this install actually did, and start the program only after
 rem that box has been dismissed.
 rem
@@ -10,7 +10,7 @@ rem checkboxes were still saying, and the user would never read the outcome. So
 rem the launch entry runs this instead. It reads the setup log, reports what
 rem happened, waits, and then starts the program.
 rem
-rem   homerFinish.cmd <App>.exe [arguments for the app]
+rem   finish.cmd <App>.exe [arguments for the app]
 rem
 rem The Results box is a PowerShell message box, which a screen reader reads as
 rem an ordinary dialog. It reports only what was done in this session: an action
@@ -35,7 +35,7 @@ set "sLogDir=%LOCALAPPDATA%\%sApp%\logs"
 set "sLog=%sLogDir%\%sApp%_setup.log"
 if not exist "%sLogDir%" mkdir "%sLogDir%" >nul 2>&1
 
-echo homerFinish started %DATE% %TIME%>> "%sLog%"
+echo finish started %DATE% %TIME%>> "%sLog%"
 echo Script: %~f0>> "%sLog%"
 echo App: %sApp%, executable: %sExe%>> "%sLog%"
 
@@ -60,7 +60,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "Add-Type -AssemblyName System.Windows.Forms | Out-Null;" ^
   "[void][System.Windows.Forms.MessageBox]::Show($sBody, \"$sApp setup results\", 'OK', 'Information')"
 
-echo homerFinish: results box dismissed %DATE% %TIME%>> "%sLog%"
+echo finish: results box dismissed %DATE% %TIME%>> "%sLog%"
 
 rem Only now does the program start, so its window cannot cover the summary.
 if exist "%~dp0%sExe%" (

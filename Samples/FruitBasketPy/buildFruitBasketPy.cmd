@@ -253,7 +253,7 @@ echo Built %app%_setup.exe version !ver!
 :done
 echo Build succeeded %DATE% %TIME%>> "%log%"
 echo(
-echo To publish: commit, then run tagRelease. It reads the version from
+echo To publish: commit, then run release. It reads the version from
 echo the version resource of %app%_setup.exe and tags v!ver!.
 endlocal
 exit /b 0
@@ -271,7 +271,7 @@ rem origin remote is stepped over, so a version.txt that has fallen behind
 rem the repository cannot mint a number that is already spent.
 rem
 rem One "git ls-remote" is the only network call this step makes. If it
-rem fails, the plain increment is used and tagRelease remains the check it
+rem fails, the plain increment is used and release remains the check it
 rem has always been, so a machine with no network still builds.
 rem -------------------------------------------------------------------
 set "verOld=!ver!"

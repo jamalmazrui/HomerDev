@@ -25,7 +25,7 @@ rem stepping over any number already released, which it learns from the
 rem repository's own tags -- then generates Version.cs from it, so the
 rem running program reports the same number. FruitBasketMdiCs_setup.iss reads
 rem version.txt directly, so the installer reports it too, and
-rem tagRelease reads it back out of the built setup's version resource
+rem release reads it back out of the built setup's version resource
 rem to form the tag. No version literal appears anywhere else, so a
 rem stale file cannot rewind it.
 rem
@@ -417,7 +417,7 @@ echo Built %app%_setup.exe version !ver!
 :done
 echo Build succeeded %DATE% %TIME%>> "%log%"
 echo(
-echo To publish: commit, then run tagRelease. It reads the version from
+echo To publish: commit, then run release. It reads the version from
 echo the version resource of %app%_setup.exe and tags v!ver!.
 endlocal
 exit /b 0
@@ -469,7 +469,7 @@ rem the origin remote is stepped over, so a version.txt that has fallen
 rem behind the repository cannot mint a number that is already spent.
 rem
 rem One "git ls-remote" is the only network call the build makes. If it
-rem fails, the plain increment is used and tagRelease remains the check
+rem fails, the plain increment is used and release remains the check
 rem it has always been, so a machine with no network still builds.
 rem
 rem These are subroutines rather than parenthesised blocks, so each line

@@ -18,8 +18,8 @@ HomerDev.md.
       help\          every document, the style guides, the tutorial scripts
       Templates\samples\       the four fruit basket programs and their build scripts
       Templates\     the files a new app is written from, carrying _APP_
-      scripts\         checkHomerApp, gitPush, tagRelease, homerTidy,
-                     buildTutorials, tagRelease
+      scripts\         check, push, release, tidy,
+                     buildTutorials, release
       buildHomerDev.cmd / .py     convert the documents, audit the kit
       checkHomerDev.cmd / .py     build all three samples and report
       newHomerApp.cmd / .py       write a new app folder
@@ -36,13 +36,13 @@ or one step at a time:
                                     tools on your PATH, and every program driven
                                     through its keys by uiCheck
     scripts\installTools              put the current tools on the PATH
-    gitPush "What changed."
-    tagRelease
+    push "What changed."
+    release
 
-`installTools` matters more than it looks. `tagRelease`, `homerTidy`,
-`checkHomerApp`, `gitPush` and `tagRelease` all act on the current directory, so
+`installTools` matters more than it looks. `release`, `tidy`,
+`check`, `push` and `release` all act on the current directory, so
 one copy on the PATH serves every project -- and an OLD copy on the PATH also
-serves every project. A `tagRelease` from before source-only releases were
+serves every project. A `release` from before source-only releases were
 supported refuses to release a project that has no installer script, and the
 error names a file that was never meant to exist:
 
@@ -107,18 +107,18 @@ everything the project has named".
 1. `build<App>` -- steps `version.txt`, builds the program and the installer,
    speaks any tutorial without audio, puts the project's own files into the
    Homer encoding (`scripts\fixEncoding`), refreshes these scripts from the kit.
-2. `scripts\gitPush "message"` -- rewrites the whitelist from `RepoFiles.txt`,
+2. `scripts\push "message"` -- rewrites the whitelist from `RepoFiles.txt`,
    adds what it names, refuses anything over 10 MB, commits, pushes, shows
    the status. Without `RepoFiles.txt` it stages nothing and says so.
-3. `scripts\homerTidy --do-it` -- the periodic clean: strays into place,
+3. `scripts\tidy --do-it` -- the periodic clean: strays into place,
    fetched things deleted, the whitelist rewritten, strays untracked, commit.
-   Same whitelist as gitPush; it too stages nothing without `RepoFiles.txt`.
-4. `scripts\tagRelease` -- tags the pushed commit with the version stamped in
+   Same whitelist as push; it too stages nothing without `RepoFiles.txt`.
+4. `scripts\release` -- tags the pushed commit with the version stamped in
    `<App>_setup.exe` and publishes the installer. `scripts	agRelease` runs
    the checks first, then this.
-And `scripts\gitUnpushed` -- when something was committed that should not
+And `scripts\unpushed` -- when something was committed that should not
    have been and the push has not happened: undoes the local commits,
-   keeps every file, and the next gitPush or tidy makes the commit properly.
+   keeps every file, and the next push or tidy makes the commit properly.
 
 `RepoFiles.txt` names what the repository carries; `LocalFiles.txt` names
 what stays on this disk and is never pushed -- fetched voices, built output,
@@ -162,7 +162,7 @@ token and renames. Two rules:
 # Versioning and release
 
 `version.txt` holds one line and is the only place the kit's version is
-written. `tagRelease` reads a version from the installer's version resource,
+written. `release` reads a version from the installer's version resource,
 which the kit does not have, so the kit is tagged by hand:
 
     git tag v1.0.0
@@ -170,7 +170,7 @@ which the kit does not have, so the kit is tagged by hand:
 
 An app is different: its `build<App>.cmd` increments `version.txt`, generates
 `Version.cs` from it, and the `.iss` reads the same file, so the program, the
-installer and the tag cannot disagree. `tagRelease` then does the rest.
+installer and the tag cannot disagree. `release` then does the rest.
 
 # Publishing the kit
 

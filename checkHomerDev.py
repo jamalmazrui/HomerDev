@@ -221,7 +221,7 @@ def checkEnvironment():
 def checkSharedTools():
     """Is an older copy of a kit tool sitting on the PATH?
 
-    tagRelease, homerTidy, checkHomerApp and gitPush act on the current
+    release, tidy, check and push act on the current
     directory, and every app carries its own copies in scripts, refreshed from
     the kit by its build. So a copy anywhere on the PATH -- C:\\bin was the
     place -- is one that will go stale and run instead of the app's own. A

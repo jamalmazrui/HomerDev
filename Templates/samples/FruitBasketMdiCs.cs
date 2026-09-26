@@ -134,7 +134,7 @@ public class fruitChild : MdiChild
         // field is F&ruit and the list is Bas&ket, because Alt+F belongs to the
         // File menu and Alt+B to the Basket menu. In the single-dialog version
         // there is no menu bar and the same controls are &Fruit and &Basket.
-        // checkHomerApp found this on its first run of this file, which is
+        // check found this on its first run of this file, which is
         // exactly what it is for.
         lbc.addBand();
         txtFruit = lbc.addInputBox("F&ruit:", "", "Type a fruit, then press Enter.");

@@ -508,7 +508,7 @@ ampersand is the whole of the access key. The tip appears in the status
 line when focus arrives and again in the Help window on F1.</p>
 <p>Then check what you just did:</p>
 <pre><code>cd \HomerDev\Tools
-checkHomerApp --path \PatternRename</code></pre>
+check --path \PatternRename</code></pre>
 <p>If <code>&amp;P</code> was already taken, the keys check says so.
 That is the check earning its place: two controls claiming one letter is
 invisible when you read the code and obvious when a script counts.</p>
@@ -604,7 +604,7 @@ Name   = a bad switch is refused rather than ignored
 Run    = PatternRename.exe --nonsense
 Expect = 1</code></pre>
 <p>Four fields and no more. Then:</p>
-<pre><code>checkHomerApp --path \PatternRename --build</code></pre>
+<pre><code>check --path \PatternRename --build</code></pre>
 <p>It builds, smoke-runs <code>--help</code>, runs every acceptance
 check, and writes <code>evidence-&lt;date&gt;.md</code> saying what was
 verified, what was not checked, and what remains uncertain.</p>
@@ -631,15 +631,15 @@ them. The evidence report says so in its uncertain list, every time.</p>
 <code>self.md</code> is where the rejected alternative goes.</p>
 <h2 id="scenario-8-release-it">Scenario 8: release it</h2>
 <pre><code>cd \PatternRename
-checkHomerApp --build
-gitPush &quot;Add the prefix field.&quot;
-tagRelease</code></pre>
-<p><code>gitPush</code> stages everything the whitelist allows, commits
-with your message, and pushes. <code>tagRelease</code> runs
-<code>tagRelease</code>, which reads <code>version.txt</code>, tags, and
+check --build
+push &quot;Add the prefix field.&quot;
+release</code></pre>
+<p><code>push</code> stages everything the whitelist allows, commits
+with your message, and pushes. <code>release</code> runs
+<code>release</code>, which reads <code>version.txt</code>, tags, and
 publishes the installer as a release asset.</p>
 <p>What gets pushed is decided by <code>RepoFiles.txt</code>, not by
-habit: <code>homerTidy --gitignore</code> turns that list into a
+habit: <code>tidy --gitignore</code> turns that list into a
 <code>.gitignore</code> that ignores everything else, so a file you
 dropped in the folder cannot go up by accident.</p>
 <h2 id="scenario-9-ask-an-ai-for-a-homer-app-and-get-one">Scenario 9:
@@ -661,7 +661,7 @@ around:</p>
 gives you its idea of done; an AI asked to satisfy five named checks
 gives you yours.</li>
 <li><strong>Build in small, recoverable steps.</strong> One change, one
-build, one <code>checkHomerApp</code>, one commit.</li>
+build, one <code>check</code>, one commit.</li>
 <li><strong>Verify without sight.</strong> The checks for what a script
 can settle, the log for what happened, your own ears for the rest.</li>
 <li><strong>Package, document and defend.</strong> The build makes the

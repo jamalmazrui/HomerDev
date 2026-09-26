@@ -28,7 +28,7 @@ whole folder can be zipped and sent when something needs diagnosing.
 A single fixed name overwrites the run before it. That is exactly the file you
 want when something has gone wrong twice, and it is gone.
 
-`homerTidy.py` wrote `homerTidy.log` beside itself for months. When a tidy went
+`tidy.py` wrote `tidy.log` beside itself for months. When a tidy went
 wrong, the only way to see what the previous run had done was to not run it
 again — which nobody remembers in time.
 
@@ -52,5 +52,5 @@ Enough to tell where it came from without asking:
 
 ## The helper
 
-`homerLogPath(sScriptDir)` in `homerTidy.py` works the project folder out and
+`homerLogPath(sScriptDir)` in `tidy.py` works the project folder out and
 returns the timestamped path. Copy it rather than rewriting the rule.

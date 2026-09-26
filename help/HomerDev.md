@@ -116,14 +116,14 @@ fills them in.
 Scripts that need no editing at all. They work out the app name from the folder
 they are run in.
 
-- **tagRelease** -- tag, push, and publish a GitHub release. It acts on the
+- **release** -- tag, push, and publish a GitHub release. It acts on the
   current directory, or on `-Path <folder>`, so one copy in `C:\bin` on the
   PATH serves every project. An app with an installer is released from the
   version stamped into `<App>_setup.exe`, with the installer attached; a project
   that ships source and has no `<App>_setup.iss` is released from `version.txt`,
   with no asset.
-- **homerTidy** -- tidy the folder and the repository in one pass. It replaces
-  homerTidy and homerTidy, which asked the same question of two places and could
+- **tidy** -- tidy the folder and the repository in one pass. It replaces
+  tidy and tidy, which asked the same question of two places and could
   disagree about the answer.
 
 Copy the pair you want into the app folder and run it there.
@@ -548,8 +548,8 @@ than guessed at. Folders are in the order you meet them.
 - **checkHomerDev.cmd, checkHomerDev.py** -- proves the kit still builds by building with it: audit, dependency rule, clean, all three samples, evidence report
 - **newHomerApp.cmd, newHomerApp.py** -- writes a new app folder from the templates, C# or Python, overwriting nothing
 - **_APP_.cmd** -- runs `exec\_APP_.exe` from the top of the project, so typing the program's name there still runs the fresh build
-- **LocalFiles.txt** -- what belongs on this disk but never in the repository; homerTidy keeps it and writes each line into .gitignore as never pushed
-- **RepoFiles.txt** -- the whitelist: what the repository carries, and the source homerTidy generates .gitignore from
+- **LocalFiles.txt** -- what belongs on this disk but never in the repository; tidy keeps it and writes each line into .gitignore as never pushed
+- **RepoFiles.txt** -- the whitelist: what the repository carries, and the source tidy generates .gitignore from
 - **version.txt** -- the kit's version, one line, no byte order mark, read by every script
 - **.gitignore** -- generated from RepoFiles.txt; ignores everything and puts back only what is named
 
@@ -579,7 +579,7 @@ than guessed at. Folders are in the order you meet them.
 - **FruitBasketCs.cs** -- the single-dialog shape, with twelve marked blocks and the nine decisions
 - **FruitBasketMdiCs.cs, FruitBasketMdiPy.py** -- the multiple-document shape in both languages, marking only what changes when there are several windows
 - **FruitBasketPy.py** -- the same program as FruitBasketCs, in Python, block for block
-- **accept.inix** -- what done means for the samples, run by checkHomerApp
+- **accept.inix** -- what done means for the samples, run by check
 - **uiTest.inix** -- what the samples must do when driven, run by uiCheck
 - **buildFruitBasketCs.cmd, buildFruitBasketMdiCs.cmd, buildFruitBasketMdiPy.cmd, buildFruitBasketPy.cmd** -- one build script each; `buildHomerDev` runs all four
 
@@ -590,8 +590,8 @@ than guessed at. Folders are in the order you meet them.
 - **accept.inix** -- the acceptance-criteria starter
 - **build_APP_.cmd, build_APP_Py.cmd** -- the C# and Python build scripts, with the component switches
 - **create_APP_Repo.cmd, create_APP_Repo.ps1** -- makes the GitHub repository and pushes the first commit
-- **gitignore.txt** -- the whitelist starter, replaced by homerTidy
-- **homerFinish.cmd** -- shows what the install did, then starts the program
+- **gitignore.txt** -- the whitelist starter, replaced by tidy
+- **finish.cmd** -- shows what the install did, then starts the program
 - **installModels.cmd, installOllama.cmd** -- local AI, for the apps that need it
 - **installScreenReaderSupport.cmd** -- unpacks the JAWS scripts and hands the add-on to NVDA
 - **self.md** -- the private notebook a new app starts with
@@ -599,15 +599,15 @@ than guessed at. Folders are in the order you meet them.
 
 ## Tools -- scripts that act on a project
 
-- **checkHomerApp.cmd, checkHomerApp.py** -- gathers evidence about an app: encodings, names, keys, build, smoke run, acceptance criteria, and a report saying what it did not check
-- **gitPush.cmd** -- stage, commit and push what the whitelist allows
-- **tagRelease.cmd** -- check first, then tag and publish
+- **check.cmd, check.py** -- gathers evidence about an app: encodings, names, keys, build, smoke run, acceptance criteria, and a report saying what it did not check
+- **push.cmd** -- stage, commit and push what the whitelist allows
+- **release.cmd** -- check first, then tag and publish
 - **uiCheck.cmd, uiCheck.py** -- starts a program, sends the keys, and reads the accessibility tree back; driven by uiTest.inix beside the program
 - **installTools.cmd** -- copies the tools to a folder on the PATH, so one current copy serves every project
-- **homerTidy.cmd, homerTidy.py** -- tidies folder and repository together, and generates the whitelist .gitignore
+- **tidy.cmd, tidy.py** -- tidies folder and repository together, and generates the whitelist .gitignore
 - **buildTutorials.cmd, buildTutorials.ps1** -- fetches the voices, speaks every tutorial script, joins them into Tutorials.mkv with a chapter each, and writes the playlist and the feed
 - **makeTutorials.cmd, makeTutorials.py** -- writes the tutorial scripts into Tutorials.md and the feed, speaking nothing
-- **tagRelease.cmd, tagRelease.ps1** -- reads version.txt, tags, and publishes the installer as a release asset
+- **release.cmd, release.ps1** -- reads version.txt, tags, and publishes the installer as a release asset
 
 ## help -- the documents
 
@@ -705,7 +705,7 @@ Everything else, which is the point of the kit: `Inix` for settings, `Log` for
 the session log, `Paths` for the folder layout, `Say` for what the screen reader
 cannot know, `KeyName` and `KeyMap` for keys, `Lbc` for every control, the
 document set, `build<App>.cmd`, `<App>_setup.iss`, `RepoFiles.txt`, `accept.inix`
-and `checkHomerApp`. A person who learns one shape has learnt most of the other
+and `check`. A person who learns one shape has learnt most of the other
 two.
 
 # Scripts and settings: the two lists every MDI app gets
@@ -888,7 +888,7 @@ folder gathers every log there is. Git ignores it. So what a developer sees is w
 this file go" has one answer.
 
 `exec` is built, never committed. `help` holds the published documents and, local
-only, anything like `self.md` the repository does not want. **homerTidy**
+only, anything like `self.md` the repository does not want. **tidy**
 puts a folder back into this shape: a file the installer takes from `exec` or
 `help` is moved there, a stray log goes to `logs`, and anything the project does
 not name goes to `notes`. What belongs is read from the project itself -- the
@@ -937,12 +937,12 @@ The kit's answer is one script and one file.
     checkHomerDev --deep      delete the Python virtual environment too
     checkHomerDev --no-clean  build over what is there (fast, weaker)
 
-`checkHomerApp` checks an app. This checks the kit, and it does it the only way
+`check` checks an app. This checks the kit, and it does it the only way
 that settles the question: with a compiler. It runs the kit audit, checks the
 module dependency rule, removes what previous builds wrote, builds all three
 samples with their own scripts, and writes `evidence-kit-<date>.md`.
 
-Run it after changing anything in `CSharp` or `homer`, and before `tagRelease`.
+Run it after changing anything in `CSharp` or `homer`, and before `release`.
 
 **The dependency rule.** A module may declare what it needs, in two forms:
 
@@ -970,11 +970,11 @@ and it does not build EdSharp, FileDir, DbDo or HomerScribe, which compile
 against these same modules. After changing a shared class, build those four.
 Both limits are printed in every report.
 
-## checkHomerApp
+## check
 
     cd \JobDo
-    checkHomerApp
-    checkHomerApp --build
+    check
+    check --build
 
 It runs every check that can answer yes or no, records the command and the exit
 code for each, and writes `evidence-<yyyymmdd-hhmmss>.md` beside itself. Eleven
@@ -1038,7 +1038,7 @@ nothing is left for a person to remember:
     buildHomerDev      documents, all four samples, the kit audit
     checkHomerDev      the environment, a clean build of everything, the tools
                        on your PATH, and every program driven through its keys
-    checkHomerApp      one app: encodings, names, keys, build, smoke run, and
+    check      one app: encodings, names, keys, build, smoke run, and
                        the acceptance criteria you wrote
     uiCheck            one program: started, driven, and read back
 
@@ -1086,7 +1086,7 @@ for the jobs, Alt+Shift+C for the settings, Alt+F1 for about.
 
 `checkHomerDev` also records what the build actually ran with -- the Python and
 pandoc it found -- and compares every tool on your PATH against the kit's copy.
-That second check exists because a release once failed on a `tagRelease` from
+That second check exists because a release once failed on a `release` from
 before source-only releases were supported, with an error naming a file that was
 never meant to exist. One shared copy is the point of those tools, and one
 shared copy is what can go stale. `scripts\installTools` fixes what it reports.
@@ -1157,9 +1157,9 @@ an update or a reinstall. Ask winget AND the tool's own executable: tools like
 Ollama install per user, into a profile an elevated installer's PATH cannot see.
 Cache the answers, because each query costs a second and the page asks twice.
 
-The last checkbox runs `homerFinish.cmd`, never the program directly. Inno runs
+The last checkbox runs `finish.cmd`, never the program directly. Inno runs
 the entries in order and the launch is last, so a program started there puts its
-window on top of whatever the other entries were still saying. `homerFinish.cmd`
+window on top of whatever the other entries were still saying. `finish.cmd`
 reads the setup log, shows ONE Results box, waits for it to be dismissed, and
 only then starts the program.
 
@@ -1309,7 +1309,7 @@ and every reader says it twice. Set an accessible name only for a control with
 no words of its own -- a grid with no label beside it. Not for a button, which
 carries its caption; not for a box with a label before it; never for a form,
 whose caption IS its accessible name. FileDir had forty-eight of these in one
-file, DbDo nineteen. `checkHomerApp` and an app's own audit compare every
+file, DbDo nineteen. `check` and an app's own audit compare every
 accessible name against every caption in the same source and fail on a match.
 
 **Direct speech that says what the reader is about to say anyway** -- the window
@@ -1332,7 +1332,7 @@ describe it:
 
 - **The build log** -- `logs\<App>-build-<date>-<time>.log`: every command the
   build ran and its exit code.
-- **The release log** -- `logs\<App>-release-<date>-<time>.log`, from tagRelease.
+- **The release log** -- `logs\<App>-release-<date>-<time>.log`, from release.
 - **The runtime log** -- under `%LOCALAPPDATA%\<App>\logs`: not only what the
   program did, but **what came in and what went out** -- every key it saw, by its
   Homer name; every command it ran; and every sentence it spoke through Say,
@@ -1362,7 +1362,7 @@ sharing a letter would make the reader cycle between them, and a person
 pressing the letter expects one thing to happen. The same holds inside one
 dialog: the first control to claim a letter keeps it.
 
-`checkHomerApp` counts letters per menu and per dialog, never across a file,
+`check` counts letters per menu and per dialog, never across a file,
 and fails on a duplicate, since a duplicate is now always a mistake.
 
 ## Alt+Control, and the one exception
@@ -1573,7 +1573,7 @@ log line is never spoken.
 
 ## A whitelist, not a list of exclusions
 
-`RepoFiles.txt` names what the repository carries. `homerTidy --gitignore` turns
+`RepoFiles.txt` names what the repository carries. `tidy --gitignore` turns
 that into a `.gitignore` that ignores everything and then puts back exactly what
 was named:
 
@@ -1588,7 +1588,7 @@ the one nobody thought of. Turning it around costs one line in `RepoFiles.txt`
 before a new file can be committed -- which is also the line that records why
 the file is there.
 
-`homerTidy --do-it` rewrites the whitelist on every pass, so `RepoFiles.txt` and
+`tidy --do-it` rewrites the whitelist on every pass, so `RepoFiles.txt` and
 `.gitignore` cannot drift apart.
 
 ## What is public and what stays on your machine
@@ -1598,12 +1598,12 @@ Public, because somebody rebuilding the program needs it:
 - the source, the installer script, `build<App>.cmd`, `version.txt`
 - `RepoFiles.txt` and the generated `.gitignore`
 - the documentation set, in both `.md` and `.htm`
-- `homerFinish.cmd` and the `install*.cmd` scripts the installer ships
+- `finish.cmd` and the `install*.cmd` scripts the installer ships
 
 Private, and in the never-pushed list whatever `RepoFiles.txt` says:
 
 - `self.md` and `self.htm` -- the project's own notebook
-- `tagRelease.cmd` and `tagRelease.ps1` -- a maintainer's tools, and noise in a
+- `release.cmd` and `release.ps1` -- a maintainer's tools, and noise in a
   source browser
 - `create<App>Repo.cmd` and `.ps1` -- run once, then never again
 - every `.log`, `notes\`, `Version.cs`, `version.py`, `__pycache__\`
@@ -1683,7 +1683,7 @@ script, a repository tidy, and a release.
   `C:\HomerDev\CSharp`, converts the documents with pandoc, and compiles the
   installer if Inno Setup is present. It fetches what it needs from the web
   itself. Log: `build<App>.log`.
-- **homerTidy** -- the folder and the repository, surveyed together and fixed in
+- **tidy** -- the folder and the repository, surveyed together and fixed in
   one pass. It prints the plan and stops; `--do-it` carries it out. In the
   folder: empty files deleted, duplicates and files the project does not name
   moved into `notes\logs`, `notes\drafts`, `notes\mail`, `notes\archives` or
@@ -1693,21 +1693,21 @@ script, a repository tidy, and a release.
   would remove it, and never rewritten automatically. What belongs is decided by
   the project's own `<App>_setup.iss` and `RepoFiles.txt`, so there is no list to
   maintain. `--folder-only` and `--repo-only` do one half.
-  Log: `homerTidy.log`.
+  Log: `tidy.log`.
 
   A file that is large and fetched at run time -- a model, a converter, an
   installer payload -- belongs in neither place. The app's own install script
-  should get it, and homerTidy reports such a file rather than guessing.
-- **tagRelease** -- reads the version, bumps it if that number is already
+  should get it, and tidy reports such a file rather than guessing.
+- **release** -- reads the version, bumps it if that number is already
   released, writes it back, tags, pushes, and publishes the GitHub release with
-  the installer attached. Log: `tagRelease.log`.
+  the installer attached. Log: `release.log`.
 
 ## The release routine
 
 1. Unzip the app archive into `C:\<App>`.
 2. `build<App>` from that folder.
 3. Run `<App>.exe` as a quick test.
-4. Commit, then `tagRelease`.
+4. Commit, then `release`.
 5. Install from the published `<App>_setup.exe`, or update in place with F11.
 
 # The installer
@@ -1747,7 +1747,7 @@ What it settles, so no app has to decide again:
 - **The last two checkboxes are always the same two**, in this order:
   documentation, unchecked, then launch, checked.
 - **The Results box comes before the launch.** The launch entry runs
-  `homerFinish.cmd` rather than the program. That script reads the setup log,
+  `finish.cmd` rather than the program. That script reads the setup log,
   shows one Results box saying what this install actually did, and starts the
   program only when the box is dismissed. Being last in `[Run]`, it runs after
   every other checkbox, so the box can report all of them, and the program's
@@ -1792,9 +1792,9 @@ and each has something in the kit that carries it:
    "a tool that does X" gives you its idea of done; an AI asked to satisfy five
    named checks gives you yours.
 2. **Build in small, recoverable steps.** One change, one build, one run of
-   `checkHomerApp`, one commit. `version.txt` and `tagRelease` mean any release
-   can be returned to, and `homerTidy` means nothing unintended is ever pushed.
-3. **Verify without sight.** `checkHomerApp` for what a script can settle, the
+   `check`, one commit. `version.txt` and `release` mean any release
+   can be returned to, and `tidy` means nothing unintended is ever pushed.
+3. **Verify without sight.** `check` for what a script can settle, the
    session log for what happened, and your own ears for what the log cannot
    hold. The evidence report separates the three.
 4. **Package, document and defend.** The build makes the installer, the document

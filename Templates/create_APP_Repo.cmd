@@ -8,10 +8,10 @@ rem and never returns, ending the script silently.
 rem
 rem ONE-TIME bootstrap: turns this folder into a git repository, creates
 rem https://github.com/JamalMazrui/_APP_, and pushes the first commit. After
-rem this, publishing a release is tagRelease's job.
+rem this, publishing a release is release's job.
 rem
 rem This is a MAINTAINER script. Name it in .gitignore so it stays out of the
-rem distribution, the same treatment as tagRelease.
+rem distribution, the same treatment as release.
 rem
 rem Usage:
 rem   create_APP_Repo.cmd            create the repo and push

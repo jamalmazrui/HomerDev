@@ -27,7 +27,7 @@ rem once, and every script that calls it died at this line -- no message, no
 rem log folder, nothing to diagnose from. A missing file must announce itself.
 if not exist "%~dp0homerInstall.cmd" (
   echo(
-  echo homerInstall.cmd is missing from %~dp0
+  echo installCommon.cmd is missing from %~dp0
   echo That file is part of this program. Reinstall, or copy it from the
   echo program's zip into this folder, and run this again.
   echo(

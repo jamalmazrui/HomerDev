@@ -130,7 +130,7 @@ def main():
         ("installOllama.cmd",    "installOllama.cmd"),
         ("installModels.cmd",    "installModels.cmd"),
         ("installScreenReaderSupport.cmd", "installScreenReaderSupport.cmd"),
-        ("homerFinish.cmd",      "homerFinish.cmd"),
+        ("finish.cmd",      "finish.cmd"),
     ]
 
     if bPython:

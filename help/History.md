@@ -5,6 +5,28 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.42.1 -- 26 September 2026
+
+release no longer shows two red error blocks on a release that
+succeeded: asking git whether a tag exists, and gh whether a release
+exists, normally gets the answer no, and that answer is no longer
+recorded as an error. push now notices when GitHub says a repository
+has moved, and points origin at the new address once, so the notice
+stops. Both are patched into the scripts in place by buildHomerDev,
+keeping everything else in them.
+
+# 1.42.0 -- 26 September 2026
+
+The scripts have shorter names: tidy (was homerTidy), push (gitPush),
+unpushed (gitUnpushed), release (tagRelease), check (checkHomerApp),
+finish (homerFinish) and installCommon (homerInstall). buildHomerDev
+renames them in place, keeping their content, rewrites the old names
+in the kit's files, and adds them to the template's retired list so each
+app's build removes its old copies. Each app's own build script names
+the new ones and needs kit 1.42.0. The renaming and retiring now run
+whether or not pandoc is present. help\HomerDev_update.md now holds
+everything HomerView's migration taught, as rules.
+
 # 1.41.3 -- 26 September 2026
 
 Three fixes to the installer template, all found by building FileDir's

@@ -328,7 +328,7 @@ in the Help window on F1.
 Then check what you just did:
 
     cd \HomerDev\Tools
-    checkHomerApp --path \PatternRename
+    check --path \PatternRename
 
 If `&P` was already taken, the keys check says so. That is the check earning its
 place: two controls claiming one letter is invisible when you read the code and
@@ -432,7 +432,7 @@ Before you ask an AI for anything, write `accept.inix`:
 
 Four fields and no more. Then:
 
-    checkHomerApp --path \PatternRename --build
+    check --path \PatternRename --build
 
 It builds, smoke-runs `--help`, runs every acceptance check, and writes
 `evidence-<date>.md` saying what was verified, what was not checked, and what
@@ -464,15 +464,15 @@ is about releases; `self.md` is where the rejected alternative goes.
 ## Scenario 8: release it
 
     cd \PatternRename
-    checkHomerApp --build
-    gitPush "Add the prefix field."
-    tagRelease
+    check --build
+    push "Add the prefix field."
+    release
 
-`gitPush` stages everything the whitelist allows, commits with your message, and
-pushes. `tagRelease` runs `tagRelease`, which reads `version.txt`, tags, and
+`push` stages everything the whitelist allows, commits with your message, and
+pushes. `release` runs `release`, which reads `version.txt`, tags, and
 publishes the installer as a release asset.
 
-What gets pushed is decided by `RepoFiles.txt`, not by habit: `homerTidy
+What gets pushed is decided by `RepoFiles.txt`, not by habit: `tidy
 --gitignore` turns that list into a `.gitignore` that ignores everything else, so
 a file you dropped in the folder cannot go up by accident.
 
@@ -492,7 +492,7 @@ Then work in this order, which is the method the whole kit is shaped around:
    "a tool that does X" gives you its idea of done; an AI asked to satisfy five
    named checks gives you yours.
 2. **Build in small, recoverable steps.** One change, one build, one
-   `checkHomerApp`, one commit.
+   `check`, one commit.
 3. **Verify without sight.** The checks for what a script can settle, the log
    for what happened, your own ears for the rest.
 4. **Package, document and defend.** The build makes the installer; the evidence

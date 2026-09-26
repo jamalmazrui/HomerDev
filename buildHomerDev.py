@@ -23,6 +23,7 @@ by the run that followed it.
 import datetime
 import os
 import platform
+import re
 import subprocess
 import sys
 import traceback
@@ -37,20 +38,20 @@ c_lsExpected = [
     "Templates/build_APP_.cmd", "Templates/build_APP_Py.cmd",
     "Templates/_APP__setup.iss", "Templates/_APP_.cs",
     "Templates/installModels.cmd",
-    "scripts/installOllama.cmd", "scripts/installScreenReaderSupport.cmd", "scripts/homerFinish.cmd",
-    "Templates/HomerComponents.iss", "scripts/homerInstall.cmd",
+    "scripts/installOllama.cmd", "scripts/installScreenReaderSupport.cmd", "scripts/finish.cmd",
+    "Templates/HomerComponents.iss", "scripts/installCommon.cmd",
     "Templates/create_APP_Repo.cmd", "Templates/create_APP_Repo.ps1",
     "Templates/accept.inix", "Templates/gitignore.txt", "Templates/self.md", "Templates/version.txt",
-    "scripts/tagRelease.cmd", "scripts/tagRelease.ps1", "RepoFiles.txt", "LocalFiles.txt",
+    "scripts/release.cmd", "scripts/release.ps1", "RepoFiles.txt", "LocalFiles.txt",
     "Templates/samples/FruitBasketCs.cs", "Templates/samples/FruitBasketMdiCs.cs",
     "Templates/samples/FruitBasketMdiPy.py", "Templates/samples/FruitBasketPy.py",
     "Templates/samples/accept.inix", "Templates/samples/uiTest.inix",
     "Templates/samples/buildFruitBasketCs.cmd", "Templates/samples/buildFruitBasketMdiCs.cmd",
     "Templates/samples/buildFruitBasketMdiPy.cmd", "Templates/samples/buildFruitBasketPy.cmd", "Templates/samples/version.txt",
     "checkHomerDev.cmd", "checkHomerDev.py", "releaseHomerDev.cmd",
-    "scripts/gitPush.cmd", "scripts/gitUnpushed.cmd", "scripts/gitUnpushed.py",
-    "scripts/checkHomerApp.cmd", "scripts/checkHomerApp.py", "scripts/uiCheck.cmd", "scripts/uiCheck.py",
-    "scripts/homerTidy.cmd", "scripts/homerTidy.py",
+    "scripts/push.cmd", "scripts/unpushed.cmd", "scripts/unpushed.py",
+    "scripts/check.cmd", "scripts/check.py", "scripts/uiCheck.cmd", "scripts/uiCheck.py",
+    "scripts/tidy.cmd", "scripts/tidy.py",
     "scripts/buildTutorials.cmd", "scripts/buildTutorials.ps1", "scripts/checkTutorial.cmd", "scripts/checkTutorial.py",
     "scripts/fixEncoding.cmd", "scripts/fixEncoding.py",
     "scripts/makeTutorials.cmd", "scripts/makeTutorials.py",
@@ -178,21 +179,21 @@ c_lMoved = [
     # 1.37.0: the shared install scripts are scripts, refreshed into every app,
     # not starters; only installModels.cmd stays a template, naming an app's models.
     ("Templates/installOllama.cmd", "scripts/installOllama.cmd"),
-    ("Templates/homerInstall.cmd", "scripts/homerInstall.cmd"),
+    ("Templates/homerInstall.cmd", "scripts/installCommon.cmd"),
     ("Templates/installScreenReaderSupport.cmd", "scripts/installScreenReaderSupport.cmd"),
-    ("Templates/homerFinish.cmd", "scripts/homerFinish.cmd"),
+    ("Templates/homerFinish.cmd", "scripts/finish.cmd"),
     # 1.34.0: the kit follows the layout it asks of every app. Tools is scripts.
     ("Tools/buildTutorials.cmd", "scripts/buildTutorials.cmd"),
     ("Tools/buildTutorials.ps1", "scripts/buildTutorials.ps1"),
-    ("Tools/checkHomerApp.cmd", "scripts/checkHomerApp.cmd"),
-    ("Tools/checkHomerApp.py", "scripts/checkHomerApp.py"),
-    ("Tools/gitPush.cmd", "scripts/gitPush.cmd"),
-    ("Tools/homerTidy.cmd", "scripts/homerTidy.cmd"),
-    ("Tools/homerTidy.py", "scripts/homerTidy.py"),
+    ("Tools/checkHomerApp.cmd", "scripts/check.cmd"),
+    ("Tools/checkHomerApp.py", "scripts/check.py"),
+    ("Tools/gitPush.cmd", "scripts/push.cmd"),
+    ("Tools/homerTidy.cmd", "scripts/tidy.cmd"),
+    ("Tools/homerTidy.py", "scripts/tidy.py"),
     ("Tools/makeTutorials.cmd", "scripts/makeTutorials.cmd"),
     ("Tools/makeTutorials.py", "scripts/makeTutorials.py"),
-    ("Tools/tagRelease.cmd", "scripts/tagRelease.cmd"),
-    ("Tools/tagRelease.ps1", "scripts/tagRelease.ps1"),
+    ("Tools/tagRelease.cmd", "scripts/release.cmd"),
+    ("Tools/tagRelease.ps1", "scripts/release.ps1"),
     ("Tools/uiCheck.cmd", "scripts/uiCheck.cmd"),
     ("Tools/uiCheck.py", "scripts/uiCheck.py"),
 ]
@@ -208,6 +209,9 @@ c_lsRetired = [
     "scripts/cleanDir.cmd", "scripts/cleanDir.py", "scripts/gitRelease.cmd", "scripts/homerPolicy.py",
     "scripts/installTools.cmd", "scripts/sayTutorial.cmd", "scripts/sayTutorial.py",
     "scripts/tidyRepo.cmd", "scripts/tidyRepo.py",
+    # fixKit140 put back what kit 1.40.0 lost; every machine has long since
+    # passed that version, so the repair has nothing left to repair.
+    "scripts/fixKit140.cmd", "scripts/fixKit140.py",
     "Tools/cleanDir.cmd", "Tools/cleanDir.py", "Tools/gitRelease.cmd", "Tools/homerPolicy.py",
     "Tools/installTools.cmd", "Tools/sayTutorial.cmd", "Tools/sayTutorial.py",
     "Tools/tidyRepo.cmd", "Tools/tidyRepo.py",
@@ -378,6 +382,272 @@ def buildTutorials():
     return iCode == 0
 
 
+# THE SCRIPTS WERE RENAMED ON 26 SEPTEMBER 2026, to names a person can type.
+# The prefixes said nothing the folder did not: every script here is Homer's,
+# and git is how push and release work, not what they are. So homerTidy is
+# tidy, gitPush is push, tagRelease is release. homerInstall is installCommon
+# rather than install, because it is called by other install scripts and never
+# run, and a bare install.cmd in a scripts folder looks like something to run.
+#
+# RENAMED IN PLACE, NOT SHIPPED UNDER THE NEW NAME. The kit on a working
+# machine can be newer than any archive of it -- on 26 September the machine
+# was at 1.41.3 and the GitHub archive at 1.41.0 -- and tagRelease is not in
+# git at all, by standing rule. Shipping renamed copies would have replaced the
+# newer content with the older and then deleted the newer original. So each
+# file is renamed where it lies, keeping whatever it holds, and the old names
+# are rewritten in the kit's own text files. Both steps do nothing on a second
+# run, so this can stay in the build indefinitely.
+c_lRenamedScripts = [
+    ("checkHomerApp.cmd", "check.cmd"), ("checkHomerApp.py", "check.py"),
+    ("gitPush.cmd", "push.cmd"),
+    ("gitUnpushed.cmd", "unpushed.cmd"), ("gitUnpushed.py", "unpushed.py"),
+    ("homerFinish.cmd", "finish.cmd"),
+    ("homerInstall.cmd", "installCommon.cmd"),
+    ("homerTidy.cmd", "tidy.cmd"), ("homerTidy.py", "tidy.py"),
+    ("tagRelease.cmd", "release.cmd"), ("tagRelease.ps1", "release.ps1"),
+]
+
+# The same renames as words, for rewriting references. A name is replaced only
+# as a whole word, so tagRelease_README, which names a file of the separate
+# tagRelease project, is left alone.
+c_lRenamedWords = [
+    ("checkHomerApp", "check"), ("gitUnpushed", "unpushed"), ("gitPush", "push"),
+    ("homerFinish", "finish"), ("homerInstall", "installCommon"),
+    ("homerTidy", "tidy"), ("tagRelease", "release"),
+]
+
+# Files whose old names are history, not instructions: a dated record says
+# what was true that day, and the briefing names the old scripts on purpose so
+# a reader can recognise them in an old log. This file is here too -- it holds
+# the old names as data.
+c_lsKeepOldNames = ["buildHomerDev.py", "History.md", "History.htm",
+                    "HomerDev_update.md", "HomerDev_update.htm"]
+c_sKeepOldPrefixes = ("Kit-Findings-", "Rulings-")
+
+c_lsRewriteExtensions = (".bat", ".cmd", ".cs", ".htm", ".inix", ".iss", ".jss", ".md",
+                         ".ps1", ".py", ".txt", ".gitignore")
+
+
+def renameScripts():
+    """Rename the kit's scripts in place and rewrite their old names.
+
+    A file is renamed only when its new name is not already taken; when both
+    exist, the new one is the kit's and the old one is removed. Text files are
+    rewritten only where an old name appears, and keep their own byte order
+    mark and line endings, so a file with nothing to change is not touched.
+    """
+    sScripts = os.path.join(sScriptDir, "scripts")
+    iRenamed = iRemoved = iRewritten = 0
+    for sOld, sNew in c_lRenamedScripts:
+        sOldPath = os.path.join(sScripts, sOld)
+        sNewPath = os.path.join(sScripts, sNew)
+        if not os.path.isfile(sOldPath): continue
+        try:
+            if os.path.isfile(sNewPath):
+                os.remove(sOldPath)
+                iRemoved += 1
+                logLine("RENAMED EARLIER: scripts/%s is scripts/%s; removed the old copy" % (sOld, sNew))
+            else:
+                os.rename(sOldPath, sNewPath)
+                iRenamed += 1
+                logLine("RENAMED: scripts/%s to scripts/%s, keeping its content" % (sOld, sNew))
+        except Exception as oError:
+            logLine("COULD NOT RENAME scripts/%s: %s" % (sOld, oError))
+
+    # Reports check used to write beside itself. It writes them in logs now,
+    # and the ones left here were committed by accident.
+    if os.path.isdir(sScripts):
+        for sName in os.listdir(sScripts):
+            if sName.lower().startswith(c_sEvidencePrefix):
+                try:
+                    os.remove(os.path.join(sScripts, sName))
+                    iRemoved += 1
+                    logLine("REMOVED STRAY REPORT: scripts/%s" % sName)
+                except Exception as oError:
+                    logLine("COULD NOT REMOVE scripts/%s: %s" % (sName, oError))
+
+    lPatterns = [(re.compile(r"(?<![A-Za-z0-9_])%s(?![A-Za-z0-9_])" % re.escape(sOld)), sNew)
+                 for sOld, sNew in c_lRenamedWords]
+    for sRoot, lsDirs, lsFiles in os.walk(sScriptDir):
+        lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders and s.lower() != "logs"]
+        for sName in lsFiles:
+            if sName in c_lsKeepOldNames or sName.startswith(c_sKeepOldPrefixes): continue
+            if not sName.lower().endswith(c_lsRewriteExtensions) and sName != ".gitignore": continue
+            sPath = os.path.join(sRoot, sName)
+            try:
+                yRaw = open(sPath, "rb").read()
+            except Exception:
+                continue
+            bBom = yRaw.startswith(b"\xef\xbb\xbf")
+            try:
+                sText = yRaw[3:].decode("utf-8") if bBom else yRaw.decode("utf-8")
+            except UnicodeDecodeError:
+                continue
+            # LINE BY LINE, SO THE RETIRED LIST KEEPS ITS OLD NAMES. That list
+            # exists to name the old scripts, and rewriting it turned them into
+            # the new names -- which an app would then delete. A second run
+            # caught it: it should change nothing, and it changed that line.
+            lsLines = sText.split("\n")
+            for iLine, sLine in enumerate(lsLines):
+                if "for %%F in (cleanDir.cmd" in sLine: continue
+                for oPattern, sNew in lPatterns:
+                    sLine = oPattern.sub(sNew, sLine)
+                lsLines[iLine] = sLine
+            sNewText = "\n".join(lsLines)
+            if sNewText == sText: continue
+            yOut = (b"\xef\xbb\xbf" if bBom else b"") + sNewText.encode("utf-8")
+            try:
+                open(sPath, "wb").write(yOut)
+                iRewritten += 1
+                logLine("REWROTE old script names in %s" % os.path.relpath(sPath, sScriptDir))
+            except Exception as oError:
+                logLine("COULD NOT REWRITE %s: %s" % (sPath, oError))
+
+    # Apps delete what the template lists as retired, so the old names join
+    # that list: an app that carried homerTidy loses it on its next build
+    # instead of keeping a copy that no longer refreshes.
+    sTemplate = os.path.join(sScriptDir, "Templates", "build_APP_.cmd")
+    if os.path.isfile(sTemplate):
+        yRaw = open(sTemplate, "rb").read()
+        sText = yRaw.decode("utf-8", errors="replace")
+        sLoop = "for %%F in (cleanDir.cmd "
+        iAt = sText.find(sLoop)
+        if iAt >= 0:
+            iEnd = sText.find(")", iAt)
+            sList = sText[iAt + len("for %%F in ("):iEnd]
+            lsHave = sList.split()
+            lsAdd = [sOld for sOld, sNew in c_lRenamedScripts if sOld not in lsHave]
+            if lsAdd:
+                sText = sText[:iAt] + "for %%F in (" + " ".join(lsHave + lsAdd) + sText[iEnd:]
+                open(sTemplate, "wb").write(sText.encode("utf-8"))
+                logLine("ADDED to the template's retired list: %s" % " ".join(lsAdd))
+        else:
+            logLine("NOTE: the template's retired-scripts loop was not found, so the old names were not added to it")
+
+    # AND THE KIT'S HISTORY SAYS SO, ONCE. History.md is not shipped with this
+    # change, because the copy on a working machine may be newer than the
+    # archive; the entry is added in place, under the first heading, and a
+    # second run finds it and adds nothing.
+    sHistory = os.path.join(sScriptDir, "help", "History.md")
+    sMarker = "# 1.42.0 -- 26 September 2026"
+    if os.path.isfile(sHistory):
+        yRaw = open(sHistory, "rb").read()
+        bBom = yRaw.startswith(b"\xef\xbb\xbf")
+        sText = (yRaw[3:] if bBom else yRaw).decode("utf-8", errors="replace")
+        if sMarker not in sText:
+            sEntry = (sMarker + "\r\n\r\n"
+                "The scripts have shorter names: tidy (was homerTidy), push (gitPush),\r\n"
+                "unpushed (gitUnpushed), release (tagRelease), check (checkHomerApp),\r\n"
+                "finish (homerFinish) and installCommon (homerInstall). buildHomerDev\r\n"
+                "renames them in place, keeping their content, rewrites the old names\r\n"
+                "in the kit's files, and adds them to the template's retired list so each\r\n"
+                "app's build removes its old copies. Each app's own build script names\r\n"
+                "the new ones and needs kit 1.42.0. The renaming and retiring now run\r\n"
+                "whether or not pandoc is present. help\\HomerDev_update.md now holds\r\n"
+                "everything HomerView's migration taught, as rules.\r\n\r\n")
+            iAt = sText.find("\n# ", sText.find("# History"))
+            if iAt >= 0:
+                sText = sText[:iAt + 1] + sEntry + sText[iAt + 1:]
+                open(sHistory, "wb").write((b"\xef\xbb\xbf" if bBom else b"") + sText.encode("utf-8"))
+                iRewritten += 1
+                logLine("ADDED the 1.42.0 entry to help/History.md")
+
+    if iRenamed or iRemoved or iRewritten:
+        sayLine("Renamed %d script%s, removed %d old file%s, rewrote names in %d file%s." %
+                (iRenamed, "" if iRenamed == 1 else "s", iRemoved, "" if iRemoved == 1 else "s",
+                 iRewritten, "" if iRewritten == 1 else "s"))
+    return iRenamed + iRemoved + iRewritten
+
+
+# PATCHES MADE IN PLACE, for the same reason the renaming is: the kit's
+# scripts on a working machine can be newer than any archive, and release.ps1
+# is not in git at all. Each patch finds ONE exact line, inserts after or in
+# place of it, and marks what it did, so a second run sees the mark and does
+# nothing. A line not found is logged, never guessed at.
+#
+# QUIET PROBES (1.42.1). release asks git whether a tag exists and gh whether
+# a release exists. The normal answer is "no", which both print to stderr, and
+# Windows PowerShell 5.1 records that as a red NativeCommandError in the
+# transcript even with 2>$null -- so a clean release showed two error blocks.
+# Silencing the error stream around the probe keeps the exit code, which is
+# what the script reads.
+#
+# ORIGIN FOLLOWS A MOVE (1.42.1). GitHub answered every push with "This
+# repository moved. Please use the new location" -- the remote said
+# JamalMazrui and the account is jamalmazrui. A redirect works until it does
+# not. push now reads that message from its own log and points origin at the
+# new location, once; after that GitHub has nothing to say.
+c_lPatches = [
+    ("scripts/release.ps1", "QUIET PROBE (1.42.1)",
+     "    & $sExe @aArgs 2>$null | Out-Null",
+     "    # QUIET PROBE (1.42.1): the expected \"no\" from git or gh is not an error.\r\n"
+     "    $sPriorPreference = $ErrorActionPreference\r\n"
+     "    $ErrorActionPreference = 'SilentlyContinue'\r\n"
+     "    & $sExe @aArgs 2>$null | Out-Null\r\n"
+     "    $ErrorActionPreference = $sPriorPreference",
+     "replace"),
+    # AFTER THE FAILURE CHECK, NOT AFTER THE PUSH. The line after `git push`
+    # is `if errorlevel 1`, and anything run between them resets errorlevel:
+    # the first version of this patch sat there and would have reported every
+    # failed push as a success. The anchor is the end of that check, in the
+    # words the renaming has just written ("push finished").
+    ("scripts/push.cmd", "ORIGIN FOLLOWS A MOVE (1.42.1)",
+     ')\r\ngit status --short --branch\r\n>> "%log%" echo push finished',
+     ')\r\n'
+     'rem ORIGIN FOLLOWS A MOVE (1.42.1): when GitHub says the repository moved,\r\n'
+     'rem point origin at the new location once, so it stops saying so. Placed\r\n'
+     'rem after the push failure check, which must see git push\'s own errorlevel.\r\n'
+     'powershell -NoProfile -Command "$l = @(Get-Content -LiteralPath \'%log%\'); for ($i = 0; $i -lt $l.Count - 1; $i++) { if ($l[$i] -match \'This repository moved\') { $u = ($l[$i + 1] -replace \'^remote:\\s*\', \'\').Trim(); if ($u -match \'^https://\') { git remote set-url origin $u; \'Origin now points at \' + $u }; break } }" >> "%log%" 2>&1\r\n'
+     'git status --short --branch\r\n>> "%log%" echo push finished',
+     "replace"),
+]
+
+
+def patchScripts():
+    """Apply each patch once, in place, keeping everything else in the file."""
+    iApplied = 0
+    for sRelative, sMarker, sFind, sNew, sMode in c_lPatches:
+        sPath = os.path.join(sScriptDir, sRelative.replace("/", os.sep))
+        if not os.path.isfile(sPath): continue
+        yRaw = open(sPath, "rb").read()
+        bBom = yRaw.startswith(b"\xef\xbb\xbf")
+        sText = (yRaw[3:] if bBom else yRaw).decode("utf-8", errors="replace")
+        if sMarker in sText: continue
+        sNewline = "\r\n" if "\r\n" in sText else "\n"
+        sFindHere = sFind.replace("\r\n", sNewline)
+        if sFindHere not in sText:
+            logLine("NOTE: %s was not patched (%s); the line it expects is not there" % (sRelative, sMarker))
+            continue
+        sText = sText.replace(sFindHere, sNew.replace("\r\n", sNewline), 1)
+        open(sPath, "wb").write((b"\xef\xbb\xbf" if bBom else b"") + sText.encode("utf-8"))
+        iApplied += 1
+        logLine("PATCHED %s: %s" % (sRelative, sMarker))
+    # The 1.42.1 History entry, added once in place like the 1.42.0 one.
+    sHistory = os.path.join(sScriptDir, "help", "History.md")
+    sMarker = "# 1.42.1 -- 26 September 2026"
+    if os.path.isfile(sHistory):
+        yRaw = open(sHistory, "rb").read()
+        bBom = yRaw.startswith(b"\xef\xbb\xbf")
+        sText = (yRaw[3:] if bBom else yRaw).decode("utf-8", errors="replace")
+        if sMarker not in sText:
+            sEntry = (sMarker + "\r\n\r\n"
+                "release no longer shows two red error blocks on a release that\r\n"
+                "succeeded: asking git whether a tag exists, and gh whether a release\r\n"
+                "exists, normally gets the answer no, and that answer is no longer\r\n"
+                "recorded as an error. push now notices when GitHub says a repository\r\n"
+                "has moved, and points origin at the new address once, so the notice\r\n"
+                "stops. Both are patched into the scripts in place by buildHomerDev,\r\n"
+                "keeping everything else in them.\r\n\r\n")
+            iAt = sText.find("\n# ", sText.find("# History"))
+            if iAt >= 0:
+                sText = sText[:iAt + 1] + sEntry + sText[iAt + 1:]
+                open(sHistory, "wb").write((b"\xef\xbb\xbf" if bBom else b"") + sText.encode("utf-8"))
+                logLine("ADDED the 1.42.1 entry to help/History.md")
+    if iApplied:
+        sayLine("Patched %d script%s in place." % (iApplied, "" if iApplied == 1 else "s"))
+    return iApplied
+
+
 def removeMoved():
     """Delete a file the kit has moved, once its replacement is in place.
 
@@ -525,11 +795,16 @@ def main():
 
     iSamplesFailed = 0
     if not bCheckOnly:
+        # FIRST, AND WHETHER OR NOT PANDOC IS HERE. Renaming and retiring used
+        # to run only inside the pandoc branch, so a machine without pandoc
+        # kept every old file. Neither has anything to do with documents.
+        renameScripts()
+        patchScripts()
+        removeMoved()
         sPandoc = findPandoc()
         if sPandoc == "":
             sayLine("Pandoc is not available, so the .htm files were left as they are.")
         else:
-            removeMoved()
             iDone = convertDocs(sPandoc)
             sayLine("%d document%s converted to HTML." % (iDone, "" if iDone == 1 else "s"))
         iSamplesFailed = buildSamples()

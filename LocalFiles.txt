@@ -1,6 +1,6 @@
 ﻿# LocalFiles.txt -- what belongs to HomerDev on this disk, but never in the repository.
 #
-# homerTidy keeps these where they are, and writes each line into .gitignore
+# tidy keeps these where they are, and writes each line into .gitignore
 # as never pushed. One path or pattern a line; a trailing slash means a folder.
 
 # The tutorial voices, fetched once by scripts\buildTutorials.ps1 and shared by
@@ -13,7 +13,7 @@ exec/
 logs/
 
 # What building the sample programs leaves beside them: rebuilt by buildHomerDev,
-# never pushed, and not strays for homerTidy to carry off.
+# never pushed, and not strays for tidy to carry off.
 Templates/samples/*.exe
 Templates/samples/*.log
 Templates/samples/build/

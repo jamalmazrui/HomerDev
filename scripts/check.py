@@ -1,5 +1,5 @@
 ﻿#!/usr/bin/env python3
-r"""checkHomerApp.py -- gather evidence about a Homer app, without looking at it.
+r"""check.py -- gather evidence about a Homer app, without looking at it.
 
 WHAT THIS IS FOR
 ================
@@ -23,10 +23,10 @@ worth nothing; a report that says what it did not look at is worth a great deal.
 
 USAGE
 
-    checkHomerApp                    check the app in this folder
-    checkHomerApp --path C:\JobDo    check another one
-    checkHomerApp --build            build it first, and count that as evidence
-    checkHomerApp --quiet            the report only, no console summary
+    check                    check the app in this folder
+    check --path C:\JobDo    check another one
+    check --build            build it first, and count that as evidence
+    check --quiet            the report only, no console summary
 
 WHAT IT CHECKS
 
@@ -269,7 +269,7 @@ def isNamed(sRelative, lsNamed):
 
 def checkEncoding():
     # ONLY THE PROJECT'S OWN FILES, the ones RepoFiles.txt names. A stray in
-    # the folder is homerTidy's business; 54 of the 72 faults that refused a
+    # the folder is tidy's business; 54 of the 72 faults that refused a
     # release on 25 Sep 2026 were strays the project never named.
     lsNamed = namedByProject()
     lsWrong = []
@@ -344,7 +344,7 @@ def checkPublish():
         return finding("publish", "fail", "no RepoFiles.txt, so nothing names what may be pushed")
     if "THIS IS A WHITELIST" not in sGitignore:
         return finding("publish", "fail",
-                       ".gitignore is not the generated whitelist; run homerTidy --gitignore")
+                       ".gitignore is not the generated whitelist; run tidy --gitignore")
     return finding("publish", "pass", "RepoFiles.txt names the whitelist and .gitignore was generated from it")
 
 
@@ -545,7 +545,7 @@ def writeReport():
         "",
         "# Evidence report: %s" % appName(),
         "",
-        "Written by checkHomerApp. Every line below rests on a command that ran,",
+        "Written by check. Every line below rests on a command that ran,",
         "and the command and its exit code are in the check log beside this report.",
         "",
         "## What was verified",
@@ -597,7 +597,7 @@ def main():
     if dArguments.path: sRoot = os.path.abspath(dArguments.path)
 
     oLog = open(sLogPath, "w", encoding="utf-8")
-    logLine("checkHomerApp started %s" % datetime.datetime.now().isoformat(" ", "seconds"))
+    logLine("check started %s" % datetime.datetime.now().isoformat(" ", "seconds"))
     logLine("Script: %s" % os.path.abspath(__file__))
     logLine("Python: %s" % sys.version.replace("\n", " "))
     logLine("Platform: %s" % platform.platform())

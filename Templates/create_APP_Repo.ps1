@@ -2,7 +2,7 @@
 # JamalMazrui/_APP_ from the folder this script lives in, normally C:\_APP_,
 # and pushes the first commit.
 #
-# ONE-TIME bootstrap. After this, publishing a release is tagRelease's job.
+# ONE-TIME bootstrap. After this, publishing a release is release's job.
 # Idempotent all the same: rerunning it wires up whatever is not yet wired.
 #
 # Requires git and an authenticated gh; run "gh auth login" once beforehand.
@@ -140,4 +140,4 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Output ("[INFO] Done. The repo is at " + $sUrl)
-Write-Output "[INFO] Next: run build_APP_.cmd, commit, then tagRelease to publish a release."
+Write-Output "[INFO] Next: run build_APP_.cmd, commit, then release to publish a release."

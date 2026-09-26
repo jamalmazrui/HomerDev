@@ -4,7 +4,7 @@
 ; so both are checked here, and the checks are the same for each because the
 ; whole claim of the samples is that the two behave alike.
 ;
-; checkHomerApp runs these and records each command with its exit code in the
+; check runs these and records each command with its exit code in the
 ; evidence report.
 
 FileTask = accept

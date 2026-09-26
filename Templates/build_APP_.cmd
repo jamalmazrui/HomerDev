@@ -25,7 +25,7 @@ rem stepping over any number already released, which it learns from the
 rem repository's own tags -- then generates Version.cs from it, so the
 rem running program reports the same number. _APP__setup.iss reads
 rem version.txt directly, so the installer reports it too, and
-rem tagRelease reads it back out of the built setup's version resource
+rem release reads it back out of the built setup's version resource
 rem to form the tag. No version literal appears anywhere else, so a
 rem stale file cannot rewind it.
 rem
@@ -414,16 +414,16 @@ if exist "addon\manifest.ini" (
 
 rem ---- the kit's scripts the app carries, refreshed on every build ----------
 rem One source of truth for the shared install and release scripts:
-rem homerInstall (the logging half of every install script), installOllama,
-rem installScreenReaderSupport, the tutorial tools, homerTidy, checkHomerApp,
-rem tagRelease, tagRelease, gitPush, gitUnpushed. installModels.cmd is the
+rem installCommon (the logging half of every install script), installOllama,
+rem installScreenReaderSupport, the tutorial tools, tidy, check,
+rem release, release, push, unpushed. installModels.cmd is the
 rem app's own, since it names the app's models.
 if not exist "scripts" mkdir "scripts"
-for %%F in (homerInstall.cmd installOllama.cmd installScreenReaderSupport.cmd buildTutorials.cmd buildTutorials.ps1 checkTutorial.cmd checkTutorial.py fixEncoding.cmd fixEncoding.py makeTutorials.py homerTidy.cmd homerTidy.py checkHomerApp.cmd checkHomerApp.py tagRelease.cmd tagRelease.ps1 gitPush.cmd gitUnpushed.cmd gitUnpushed.py) do (
+for %%F in (installCommon.cmd installOllama.cmd installScreenReaderSupport.cmd buildTutorials.cmd buildTutorials.ps1 checkTutorial.cmd checkTutorial.py fixEncoding.cmd fixEncoding.py makeTutorials.py tidy.cmd tidy.py check.cmd check.py release.cmd release.ps1 push.cmd unpushed.cmd unpushed.py) do (
   if exist "%homerDev%\scripts\%%F" copy /y "%homerDev%\scripts\%%F" scripts\ >nul
 )
 rem Retired kit scripts an app may still carry from an earlier refresh: gone.
-for %%F in (cleanDir.cmd cleanDir.py gitRelease.cmd homerPolicy.py installTools.cmd sayTutorial.cmd sayTutorial.py tidyRepo.cmd tidyRepo.py) do (
+for %%F in (cleanDir.cmd cleanDir.py gitRelease.cmd homerPolicy.py installTools.cmd sayTutorial.cmd sayTutorial.py tidyRepo.cmd tidyRepo.py checkHomerApp.cmd checkHomerApp.py gitPush.cmd gitUnpushed.cmd gitUnpushed.py homerFinish.cmd homerInstall.cmd homerTidy.cmd homerTidy.py tagRelease.cmd tagRelease.ps1) do (
   if exist "scripts\%%F" del /q "scripts\%%F" && echo Removed retired scripts\%%F>> "%log%"
 )
 
@@ -499,7 +499,7 @@ echo Built %app%_setup.exe version !ver!
 :done
 echo Build succeeded %DATE% %TIME%>> "%log%"
 echo(
-echo To publish: commit, then run tagRelease. It reads the version from
+echo To publish: commit, then run release. It reads the version from
 echo the version resource of %app%_setup.exe and tags v!ver!.
 endlocal
 exit /b 0
@@ -551,7 +551,7 @@ rem the origin remote is stepped over, so a version.txt that has fallen
 rem behind the repository cannot mint a number that is already spent.
 rem
 rem One "git ls-remote" is the only network call the build makes. If it
-rem fails, the plain increment is used and tagRelease remains the check
+rem fails, the plain increment is used and release remains the check
 rem it has always been, so a machine with no network still builds.
 rem
 rem These are subroutines rather than parenthesised blocks, so each line
