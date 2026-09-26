@@ -114,6 +114,10 @@ SetupIconFile={#AppName}.ico
 #endif
 
 PrivilegesRequired=admin
+; THE PER-USER AREAS ARE USED ON PURPOSE -- the setup log and the launch marker
+; -- so Inno's warning about them is turned off rather than read past on every
+; build.
+UsedUserAreasWarning=no
 PrivilegesRequiredOverridesAllowed=
 
 ArchitecturesAllowed=x64compatible
@@ -362,12 +366,51 @@ begin
   Result := not isFreshInstall();
 end;
 
+//  versionPart: the Nth dotted number of a version, or 0 where there is none.
+//  Written out rather than using PackVersionString, which not every Inno Setup
+//  6 has: FileDir's build stopped on it. The version check must not depend on
+//  the compiler's own version.
+function versionPart(sVersion: String; iWanted: Integer): Integer;
+var
+  iAt, iPart: Integer;
+  sNumber: String;
+begin
+  Result := 0;
+  iPart := 1;
+  sNumber := '';
+  for iAt := 1 to Length(sVersion) do
+  begin
+    if sVersion[iAt] = '.' then
+    begin
+      if iPart = iWanted then begin Result := StrToIntDef(sNumber, 0); exit; end;
+      iPart := iPart + 1;
+      sNumber := '';
+    end
+    else if (sVersion[iAt] >= '0') and (sVersion[iAt] <= '9') then
+      sNumber := sNumber + sVersion[iAt];
+  end;
+  if iPart = iWanted then Result := StrToIntDef(sNumber, 0);
+end;
+
+function versionIsOlder(sHave, sWant: String): Boolean;
+var
+  iPart, iHave, iWant: Integer;
+begin
+  Result := False;
+  for iPart := 1 to 4 do
+  begin
+    iHave := versionPart(sHave, iPart);
+    iWant := versionPart(sWant, iPart);
+    if iHave < iWant then begin Result := True; exit; end;
+    if iHave > iWant then exit;
+  end;
+end;
+
 function isOlderInstalled(): Boolean;
 begin
   Result := False;
   if isFreshInstall() then exit;
-  Result := ComparePackedVersion(PackVersionString(sPriorVersion),
-                                 PackVersionString('{#AppVersion}')) < 0;
+  Result := versionIsOlder(sPriorVersion, '{#AppVersion}');
 end;
 
 //  ---- checkbox wording and visibility, one line each ----------------------
@@ -439,7 +482,7 @@ begin
   if not DirExists(sFolder) then
     if not ForceDirectories(sFolder) then exit;
   sTarget := sFolder + '\{#AppName}-setup-' + GetDateTimeString('yyyymmdd-hhnnss', #0, #0) + '.log';
-  FileCopy(ExpandConstant('{log}'), sTarget, False);
+  CopyFile(ExpandConstant('{log}'), sTarget, False);
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);

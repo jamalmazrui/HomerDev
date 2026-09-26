@@ -5,6 +5,86 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.41.3 -- 26 September 2026
+
+Three fixes to the installer template, all found by building FileDir's
+installer from it -- the first app to do so on this machine.
+
+**isOlderInstalled no longer uses PackVersionString**, which this Inno Setup 6
+does not have: the compile stopped at the Code section with "Unknown identifier".
+The comparison is written out in plain Pascal -- each dotted part read as a
+number and compared in turn -- so an installer's version check does not depend
+on the compiler's version.
+
+**CopyFile in place of FileCopy**, which Inno has renamed and reports as a hint
+on every build. The line keeps the setup log with the program's own logs.
+
+**UsedUserAreasWarning=no.** The template writes the setup log and the launch
+marker to the profile of whoever answered the elevation prompt, on purpose and
+with a comment saying so. A warning read past on every build teaches people to
+read past warnings.
+
+# 1.41.2 -- 26 September 2026
+
+`commandKey` is settable on the dialog, not only on its form. 1.41.1 put the
+hook on LbcForm, where ProcessCmdKey runs, and forgot the property on
+LbcDialog that hands it through -- so an app holding a dialog had no way to
+reach it. The dialog wraps its form; the app sets `dlg.commandKey` and never has
+to know which class holds the override.
+
+# 1.41.1 -- 26 September 2026
+
+**Lbc.cs takes in FileDir's work on it**, so that FileDir can stop carrying a
+copy and every app gets what FileDir paid for. The two files had drifted 40 per
+cent apart in both directions -- FileDir had thirty-eight methods the kit lacked
+and the kit had forty-nine FileDir lacked -- so this is a merge rather than a
+replacement, and nothing the kit already did was given up. The same merge
+shipped as 1.40.0 and 1.40.1, was compiled clean by the kit's own samples, and
+was then overwritten by the 1.41.0 update; it is recorded here so it is not lost
+again.
+
+**No control names itself after its own caption or its label.** Thirty-two
+AccessibleName assignments are gone: a screen reader reads the caption or the
+Label before the control AND the accessible name, so a name repeating either is
+heard twice. Four remain, all empty, and for the opposite reason: a layout panel
+with no name is reported under the WINDOW's name, so focus arriving through two
+nested panels made a screen reader say the dialog's title three times. Help and
+the F7 control list now work a control's name out from its Label through
+fieldName and nameFromLabel.
+
+**Finding in a list, rebuilt.** Control+J jumps by the line the list shows;
+Control+K searches everything known about each item with the keyword syntax --
+`red & blue` for both, `red | blue` for either, `chap*` for anything starting
+that way; Control+F filters by the same syntax and Control+Shift+F clears it;
+F3 and Shift+F3 repeat whichever search was last. Each prompt keeps its own last
+ten answers through the historyRead and historyWrite hooks. setListItems,
+listSourceIndex and listIsFiltered let an app rebuild a list and still know
+which item a visible row is.
+
+**Control+Home and Control+End belong to the control that has them** -- first
+and last item in a list, top and bottom in a multiline box -- and move between
+fields only where the control has no use for them. **A multiline box starts at
+its beginning**, and a read-only one keeps Enter for the default button.
+
+**The status line carries status.** setStatusExtra puts a standing note there,
+read with the screen reader's own key and never announced; where a dialog has a
+note the note is the whole line. appendStatus keeps a transcript of what a
+command said.
+
+**New to the toolkit:** LbcTrackBar and addSlider, a slider that reports its
+value in words; commandKey and dialogKey on LbcForm, claimed in ProcessCmdKey
+before any control and before the screen reader; focusedControl; runPlain and
+close, for a dialog whose buttons are commands; stackFields, which flattens
+bands; and an addButton overload with no tip.
+
+**System.Convert is written in full.** Two lines said `Convert.ToString`, which
+inside the Homer namespace binds to any app's own `Homer.Convert` class before
+it reaches the framework's -- and FileDir has one. A shared class cannot assume
+what an app does not define.
+
+Util.cs gains looksLikeText and readSample: whether a file is text at all, and
+the sample of bytes that decides it.
+
 # 1.39.1 -- 25 September 2026
 
 help\HomerDev_update.md: the briefing for bringing another Homer app up to
