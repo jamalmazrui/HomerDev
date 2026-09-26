@@ -11,3 +11,10 @@ exec/
 
 # Build, tidy and tutorial logs, one file per run.
 logs/
+
+# What building the sample programs leaves beside them: rebuilt by buildHomerDev,
+# never pushed, and not strays for homerTidy to carry off.
+Templates/samples/*.exe
+Templates/samples/*.log
+Templates/samples/build/
+Templates/samples/dist/

@@ -5,6 +5,40 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.38.1 -- 25 September 2026
+
+One rule for where a tool is run: the project is the current folder, or its
+parent when the current folder is the project's scripts or exec folder.
+homerTidy and checkTutorial already worked that way; gitPush, tagRelease,
+checkHomerApp and gitUnpushed now do too -- a push run from scripts had
+logged to scripts\logs and looked for RepoFiles.txt there, and a release run
+from scripts handed the checks the scripts folder to judge. checkHomerApp
+runs build<App>.cmd, the script named after the folder, never another
+build*.cmd: it had run buildTutorials.cmd with "nobump" as a script name,
+which is where every stray "nobump.inix is not here" came from. Its log and
+its evidence report go in logs, named like the rest. And the kit's build
+removes the copies of kit tools it finds in C:\bin -- only files bearing a
+kit tool's name, each removal logged -- since a push and a release ran from
+those stale copies today.
+
+# 1.38.0 -- 25 September 2026
+
+One tool per job, and the names that sounded alike are gone. cleanDir and
+tidyRepo, with homerPolicy that only tidyRepo read, are homerTidy; gitRelease
+is tagRelease, which now runs the app's checks itself before touching a tag
+(-SkipCheck when a caller has just run them, as releaseHomerDev does);
+sayTutorial is buildTutorials; installTools, which copied tools into C:\bin
+where they went stale, is gone, since every app refreshes its scripts from
+the kit on each build. The build deletes a retired file when it finds one and
+says so; checkHomerDev reports any kit tool found on the PATH outside the kit
+as a copy to delete; buildHomerDev warns once when C:\bin holds one.
+
+A move-pair bug: Windows does not tell Scripts from scripts, so the pair
+that had once moved Scripts\homerInstall.cmd into Templates saw the newly
+delivered scripts\homerInstall.cmd as the old copy and deleted it. The pair
+is gone and the move list skips any pair whose two sides are the same file.
+LocalFiles.txt names the sample programs' build products.
+
 # 1.37.0 -- 25 September 2026
 
 Two folders that broke the first-letter rule, and the kit's copies of shared

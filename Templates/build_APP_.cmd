@@ -410,11 +410,15 @@ rem ---- the kit's scripts the app carries, refreshed on every build ----------
 rem One source of truth for the shared install and release scripts:
 rem homerInstall (the logging half of every install script), installOllama,
 rem installScreenReaderSupport, the tutorial tools, homerTidy, checkHomerApp,
-rem tagRelease, gitRelease, gitPush, gitUnpushed. installModels.cmd is the
+rem tagRelease, tagRelease, gitPush, gitUnpushed. installModels.cmd is the
 rem app's own, since it names the app's models.
 if not exist "scripts" mkdir "scripts"
-for %%F in (homerInstall.cmd installOllama.cmd installScreenReaderSupport.cmd buildTutorials.cmd buildTutorials.ps1 checkTutorial.cmd checkTutorial.py makeTutorials.py homerTidy.cmd homerTidy.py checkHomerApp.cmd checkHomerApp.py tagRelease.cmd tagRelease.ps1 gitRelease.cmd gitPush.cmd gitUnpushed.cmd gitUnpushed.py) do (
+for %%F in (homerInstall.cmd installOllama.cmd installScreenReaderSupport.cmd buildTutorials.cmd buildTutorials.ps1 checkTutorial.cmd checkTutorial.py makeTutorials.py homerTidy.cmd homerTidy.py checkHomerApp.cmd checkHomerApp.py tagRelease.cmd tagRelease.ps1 gitPush.cmd gitUnpushed.cmd gitUnpushed.py) do (
   if exist "%homerDev%\scripts\%%F" copy /y "%homerDev%\scripts\%%F" scripts\ >nul
+)
+rem Retired kit scripts an app may still carry from an earlier refresh: gone.
+for %%F in (cleanDir.cmd cleanDir.py gitRelease.cmd homerPolicy.py installTools.cmd sayTutorial.cmd sayTutorial.py tidyRepo.cmd tidyRepo.py) do (
+  if exist "scripts\%%F" del /q "scripts\%%F" && echo Removed retired scripts\%%F>> "%log%"
 )
 
 rem ---- spoken tutorials, when the app has any ---------------------------

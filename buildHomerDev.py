@@ -48,9 +48,8 @@ c_lsExpected = [
     "Templates/samples/buildFruitBasketCs.cmd", "Templates/samples/buildFruitBasketMdiCs.cmd",
     "Templates/samples/buildFruitBasketMdiPy.cmd", "Templates/samples/buildFruitBasketPy.cmd", "Templates/samples/version.txt",
     "checkHomerDev.cmd", "checkHomerDev.py", "releaseHomerDev.cmd",
-    "scripts/gitPush.cmd", "scripts/gitRelease.cmd", "scripts/gitUnpushed.cmd", "scripts/gitUnpushed.py",
-    "scripts/checkHomerApp.cmd", "scripts/checkHomerApp.py",
-    "scripts/installTools.cmd", "scripts/uiCheck.cmd", "scripts/uiCheck.py",
+    "scripts/gitPush.cmd", "scripts/gitUnpushed.cmd", "scripts/gitUnpushed.py",
+    "scripts/checkHomerApp.cmd", "scripts/checkHomerApp.py", "scripts/uiCheck.cmd", "scripts/uiCheck.py",
     "scripts/homerTidy.cmd", "scripts/homerTidy.py",
     "scripts/buildTutorials.cmd", "scripts/buildTutorials.ps1", "scripts/checkTutorial.cmd", "scripts/checkTutorial.py",
     "scripts/makeTutorials.cmd", "scripts/makeTutorials.py",
@@ -155,7 +154,6 @@ c_lMoved = [
     ("Docs/Logging.md", "help/Logging.md"),
     ("Docs/Logging.htm", "help/Logging.htm"),
     ("Inno/HomerComponents.iss", "Templates/HomerComponents.iss"),
-    ("Scripts/homerInstall.cmd", "Templates/homerInstall.cmd"),
     ("buildHomerDev.log", "buildHomerDev.py"),
     ("Samples/buildFruitBasketCs.log", "Templates/samples/buildFruitBasketCs.cmd"),
     ("Samples/buildFruitBasketMdiCs.log", "Templates/samples/buildFruitBasketMdiCs.cmd"),
@@ -187,30 +185,37 @@ c_lMoved = [
     ("Tools/buildTutorials.ps1", "scripts/buildTutorials.ps1"),
     ("Tools/checkHomerApp.cmd", "scripts/checkHomerApp.cmd"),
     ("Tools/checkHomerApp.py", "scripts/checkHomerApp.py"),
-    ("Tools/cleanDir.cmd", "scripts/cleanDir.cmd"),
-    ("Tools/cleanDir.py", "scripts/cleanDir.py"),
     ("Tools/gitPush.cmd", "scripts/gitPush.cmd"),
-    ("Tools/gitRelease.cmd", "scripts/gitRelease.cmd"),
-    ("Tools/homerPolicy.py", "scripts/homerPolicy.py"),
     ("Tools/homerTidy.cmd", "scripts/homerTidy.cmd"),
     ("Tools/homerTidy.py", "scripts/homerTidy.py"),
-    ("Tools/installTools.cmd", "scripts/installTools.cmd"),
     ("Tools/makeTutorials.cmd", "scripts/makeTutorials.cmd"),
     ("Tools/makeTutorials.py", "scripts/makeTutorials.py"),
-    ("Tools/sayTutorial.cmd", "scripts/sayTutorial.cmd"),
-    ("Tools/sayTutorial.py", "scripts/sayTutorial.py"),
     ("Tools/tagRelease.cmd", "scripts/tagRelease.cmd"),
     ("Tools/tagRelease.ps1", "scripts/tagRelease.ps1"),
-    ("Tools/tidyRepo.cmd", "scripts/tidyRepo.cmd"),
-    ("Tools/tidyRepo.py", "scripts/tidyRepo.py"),
     ("Tools/uiCheck.cmd", "scripts/uiCheck.cmd"),
     ("Tools/uiCheck.py", "scripts/uiCheck.py"),
+]
+
+# SCRIPTS RETIRED (25 Sep 2026) because their names sounded like another's and
+# the other does the job: cleanDir and tidyRepo (with homerPolicy, which only
+# tidyRepo read) are homerTidy; gitRelease is tagRelease, which runs the
+# checks itself; sayTutorial is buildTutorials; installTools copied tools into
+# C:\bin, where they went stale, and every app refreshes its scripts from the
+# kit on each build instead. A retired file is deleted when the build finds
+# it, and the log says so. One tool per job.
+c_lsRetired = [
+    "scripts/cleanDir.cmd", "scripts/cleanDir.py", "scripts/gitRelease.cmd", "scripts/homerPolicy.py",
+    "scripts/installTools.cmd", "scripts/sayTutorial.cmd", "scripts/sayTutorial.py",
+    "scripts/tidyRepo.cmd", "scripts/tidyRepo.py",
+    "Tools/cleanDir.cmd", "Tools/cleanDir.py", "Tools/gitRelease.cmd", "Tools/homerPolicy.py",
+    "Tools/installTools.cmd", "Tools/sayTutorial.cmd", "Tools/sayTutorial.py",
+    "Tools/tidyRepo.cmd", "Tools/tidyRepo.py",
 ]
 
 # Folders that existed in an earlier layout and hold nothing the kit wants now.
 # Removed only when empty, which they are once the pairs above have been applied.
 c_lsOldFolders = ["Docs", "Inno", "Python/homer", "Python", "Templates/samples/FruitBasketCs",
-                  "Templates/samples/FruitBasketMdi", "Templates/samples/FruitBasketPy", "Samples", "Scripts", "Style", "Tools"]
+                  "Templates/samples/FruitBasketMdi", "Templates/samples/FruitBasketPy", "Samples", "Style", "Tools"]
 sScriptDir = os.path.dirname(os.path.abspath(__file__))
 sLogPath = os.path.join(sScriptDir, "logs", c_sLogName)
 oLog = None
@@ -314,6 +319,32 @@ def buildSamples():
     return iFailed
 
 
+def removeStaleBinCopies():
+    """Kit tools once copied into C:\\bin go stale there and run in place of an
+    app's own; on 25 Sep 2026 a push and a release ran from such copies. Only
+    files bearing a kit tool's name are touched, and each removal is logged."""
+    sBin = "C:\\bin"
+    if not os.path.isdir(sBin): return True
+    lsNames = ["checkHomerApp.cmd", "checkHomerApp.py", "cleanDir.cmd", "cleanDir.py", "gitPush.cmd",
+               "gitRelease.cmd", "gitUnpushed.cmd", "gitUnpushed.py", "homerPolicy.py", "homerTidy.cmd",
+               "homerTidy.py", "installTools.cmd", "sayTutorial.cmd", "sayTutorial.py", "tagRelease.cmd",
+               "tagRelease.ps1", "tidyRepo.cmd", "tidyRepo.py"]
+    lsGone = []
+    for sName in lsNames:
+        sPath = os.path.join(sBin, sName)
+        if not os.path.isfile(sPath): continue
+        try:
+            os.remove(sPath)
+            lsGone.append(sName)
+            logLine("REMOVED FROM C:\\bin: %s (every app carries its own copy in scripts)" % sName)
+        except Exception as oError:
+            logLine("COULD NOT REMOVE %s: %s" % (sPath, oError))
+            sayLine("C:\\bin\\%s could not be removed: %s" % (sName, oError))
+    if lsGone:
+        sayLine("Removed from C:\\bin: " + ", ".join(lsGone) + ". Every app carries its own copy in scripts.")
+    return True
+
+
 def buildTutorials():
     """Fetch the shared voices and speak the kit's own tutorials.
 
@@ -361,6 +392,11 @@ def removeMoved():
     for sOld, sNew in c_lMoved:
         sOldPath = os.path.join(sScriptDir, sOld.replace("/", os.sep))
         sNewPath = os.path.join(sScriptDir, sNew.replace("/", os.sep))
+        # NEVER WHEN BOTH SIDES ARE THE SAME FILE. Windows does not tell
+        # "Scripts" from "scripts": on 25 Sep 2026 a pair that had once moved
+        # Scripts/homerInstall.cmd to Templates saw the newly delivered
+        # scripts/homerInstall.cmd as the old copy and deleted it.
+        if os.path.normcase(os.path.abspath(sOldPath)) == os.path.normcase(os.path.abspath(sNewPath)): continue
         if not (os.path.isfile(sOldPath) and os.path.isfile(sNewPath)): continue
         try:
             os.remove(sOldPath)
@@ -368,6 +404,16 @@ def removeMoved():
             logLine("MOVED: %s is now %s; removed the old copy" % (sOld, sNew))
         except Exception as oError:
             logLine("COULD NOT REMOVE %s: %s" % (sOldPath, oError))
+
+    for sRetired in c_lsRetired:
+        sPath = os.path.join(sScriptDir, sRetired.replace("/", os.sep))
+        if not os.path.isfile(sPath): continue
+        try:
+            os.remove(sPath)
+            iRemoved += 1
+            logLine("RETIRED: %s removed; its job belongs to another script now" % sRetired)
+        except Exception as oError:
+            logLine("COULD NOT REMOVE %s: %s" % (sPath, oError))
 
     for sFolder in c_lsOldFolders:
         sPath = os.path.join(sScriptDir, sFolder.replace("/", os.sep))
@@ -487,6 +533,7 @@ def main():
             sayLine("%d document%s converted to HTML." % (iDone, "" if iDone == 1 else "s"))
         iSamplesFailed = buildSamples()
         buildTutorials()
+        removeStaleBinCopies()
 
     lsProblems = checkKit()
     if len(lsProblems) == 0 and iSamplesFailed == 0:

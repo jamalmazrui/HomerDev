@@ -286,7 +286,7 @@ installer attached; a project that ships source and has no
 <code>&lt;App&gt;_setup.iss</code> is released from
 <code>version.txt</code>, with no asset.</li>
 <li><strong>homerTidy</strong> – tidy the folder and the repository in
-one pass. It replaces cleanDir and tidyRepo, which asked the same
+one pass. It replaces homerTidy and homerTidy, which asked the same
 question of two places and could disagree about the answer.</li>
 </ul>
 <p>Copy the pair you want into the app folder and run it there.</p>
@@ -812,7 +812,7 @@ evidence about an app: encodings, names, keys, build, smoke run,
 acceptance criteria, and a report saying what it did not check</li>
 <li><strong>gitPush.cmd</strong> – stage, commit and push what the
 whitelist allows</li>
-<li><strong>gitRelease.cmd</strong> – check first, then tag and
+<li><strong>tagRelease.cmd</strong> – check first, then tag and
 publish</li>
 <li><strong>uiCheck.cmd, uiCheck.py</strong> – starts a program, sends
 the keys, and reads the accessibility tree back; driven by uiTest.inix

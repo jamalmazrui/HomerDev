@@ -185,13 +185,13 @@ every project.
 
 `Tutorial_HomerDev.inix` is the same walkthrough as a spoken tutorial: what the
 kit is, unarchiving it, building both fruit baskets, and hearing that the two
-behave the same. `scripts\sayTutorial.cmd` renders it to audio in two voices --
+behave the same. `scripts\buildTutorials.cmd` renders it to audio in two voices --
 the narration in one, the screen reader's answers in another -- using Windows'
 own voices, with nothing installed and nothing uploaded.
 
     cd Tools
-    sayTutorial --list
-    sayTutorial ..\Tutorial_HomerDev.inix
+    buildTutorials --list
+    buildTutorials ..\Tutorial_HomerDev.inix
 
 ### What gets published, and what does not
 
@@ -209,7 +209,7 @@ own notebook, is in the never-pushed list and stays on your machine.
 - `homer\` -- the same toolbox for Python and NVDA add-ons: inix, lbc, log,
   paths, say, util and web, with the same names and the same behaviour.
 - `Templates\` -- the files a new app starts from.
-- `scripts\` -- checkHomerApp, gitPush, gitRelease, homerTidy, sayTutorial and
+- `scripts\` -- checkHomerApp, gitPush, tagRelease, homerTidy, buildTutorials and
   tagRelease. No editing needed; they work out the app name from the folder, and
   any of them can be run from a shared tools folder.
 - `Templates\samples\` -- four fruit basket programs: the single dialog in C# and in

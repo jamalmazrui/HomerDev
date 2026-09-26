@@ -14,7 +14,7 @@
 ; screen has no other way to tell the teacher from the machine, and a tutorial
 ; that reads both in one voice is a tutorial nobody can follow.
 ;
-; sayTutorial.cmd turns this file into Tutorial_HomerDev.mp3. makeTutorial.py
+; buildTutorials.cmd turns this file into tutorials\Tutorial_HomerDev.mp3. makeTutorials.py
 ; turns it into the written walkthrough.
 
 FileTask = tutorial

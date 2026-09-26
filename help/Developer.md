@@ -18,8 +18,8 @@ HomerDev.md.
       help\          every document, the style guides, the tutorial scripts
       Templates\samples\       the four fruit basket programs and their build scripts
       Templates\     the files a new app is written from, carrying _APP_
-      scripts\         checkHomerApp, gitPush, gitRelease, homerTidy,
-                     sayTutorial, tagRelease
+      scripts\         checkHomerApp, gitPush, tagRelease, homerTidy,
+                     buildTutorials, tagRelease
       buildHomerDev.cmd / .py     convert the documents, audit the kit
       checkHomerDev.cmd / .py     build all three samples and report
       newHomerApp.cmd / .py       write a new app folder
@@ -37,10 +37,10 @@ or one step at a time:
                                     through its keys by uiCheck
     scripts\installTools              put the current tools on the PATH
     gitPush "What changed."
-    gitRelease
+    tagRelease
 
 `installTools` matters more than it looks. `tagRelease`, `homerTidy`,
-`checkHomerApp`, `gitPush` and `gitRelease` all act on the current directory, so
+`checkHomerApp`, `gitPush` and `tagRelease` all act on the current directory, so
 one copy on the PATH serves every project -- and an OLD copy on the PATH also
 serves every project. A `tagRelease` from before source-only releases were
 supported refuses to release a project that has no installer script, and the
@@ -97,7 +97,7 @@ HomerScribe does not is a change that is not finished.
 Before removing or renaming a public member, grep the apps for it. The merge
 that produced this kit exists because two apps had diverged on exactly that.
 
-# The five scripts, and the order they run in
+# The four scripts, and the order they run in
 
 Every app carries these in `scripts`, refreshed from the kit by its build,
 and runs them from its project folder. They share one fact: `.gitignore` is
@@ -113,9 +113,9 @@ everything the project has named".
    fetched things deleted, the whitelist rewritten, strays untracked, commit.
    Same whitelist as gitPush; it too stages nothing without `RepoFiles.txt`.
 4. `scripts\tagRelease` -- tags the pushed commit with the version stamped in
-   `<App>_setup.exe` and publishes the installer. `scripts\gitRelease` runs
+   `<App>_setup.exe` and publishes the installer. `scripts	agRelease` runs
    the checks first, then this.
-5. `scripts\gitUnpushed` -- when something was committed that should not
+And `scripts\gitUnpushed` -- when something was committed that should not
    have been and the push has not happened: undoes the local commits,
    keeps every file, and the next gitPush or tidy makes the commit properly.
 

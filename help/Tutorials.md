@@ -466,10 +466,10 @@ is about releases; `self.md` is where the rejected alternative goes.
     cd \PatternRename
     checkHomerApp --build
     gitPush "Add the prefix field."
-    gitRelease
+    tagRelease
 
 `gitPush` stages everything the whitelist allows, commits with your message, and
-pushes. `gitRelease` runs `tagRelease`, which reads `version.txt`, tags, and
+pushes. `tagRelease` runs `tagRelease`, which reads `version.txt`, tags, and
 publishes the installer as a release asset.
 
 What gets pushed is decided by `RepoFiles.txt`, not by habit: `homerTidy

@@ -123,7 +123,7 @@ they are run in.
   that ships source and has no `<App>_setup.iss` is released from `version.txt`,
   with no asset.
 - **homerTidy** -- tidy the folder and the repository in one pass. It replaces
-  cleanDir and tidyRepo, which asked the same question of two places and could
+  homerTidy and homerTidy, which asked the same question of two places and could
   disagree about the answer.
 
 Copy the pair you want into the app folder and run it there.
@@ -601,7 +601,7 @@ than guessed at. Folders are in the order you meet them.
 
 - **checkHomerApp.cmd, checkHomerApp.py** -- gathers evidence about an app: encodings, names, keys, build, smoke run, acceptance criteria, and a report saying what it did not check
 - **gitPush.cmd** -- stage, commit and push what the whitelist allows
-- **gitRelease.cmd** -- check first, then tag and publish
+- **tagRelease.cmd** -- check first, then tag and publish
 - **uiCheck.cmd, uiCheck.py** -- starts a program, sends the keys, and reads the accessibility tree back; driven by uiTest.inix beside the program
 - **installTools.cmd** -- copies the tools to a folder on the PATH, so one current copy serves every project
 - **homerTidy.cmd, homerTidy.py** -- tidies folder and repository together, and generates the whitelist .gitignore

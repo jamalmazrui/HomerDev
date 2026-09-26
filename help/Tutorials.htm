@@ -633,9 +633,9 @@ them. The evidence report says so in its uncertain list, every time.</p>
 <pre><code>cd \PatternRename
 checkHomerApp --build
 gitPush &quot;Add the prefix field.&quot;
-gitRelease</code></pre>
+tagRelease</code></pre>
 <p><code>gitPush</code> stages everything the whitelist allows, commits
-with your message, and pushes. <code>gitRelease</code> runs
+with your message, and pushes. <code>tagRelease</code> runs
 <code>tagRelease</code>, which reads <code>version.txt</code>, tags, and
 publishes the installer as a release asset.</p>
 <p>What gets pushed is decided by <code>RepoFiles.txt</code>, not by

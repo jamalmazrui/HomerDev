@@ -39,6 +39,10 @@
 # On this disk only, from LocalFiles.txt.
 exec/
 logs/
+Templates/samples/*.exe
+Templates/samples/*.log
+Templates/samples/build/
+Templates/samples/dist/
 
 # Never pushed, whatever RepoFiles.txt says: private notes, maintainer
 # scripts, logs, and anything a build makes.

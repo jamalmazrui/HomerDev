@@ -6,13 +6,11 @@ rem     releaseHomerDev                    uses a default commit message
 rem
 rem It runs, in order, and stops at the first failure:
 rem
-rem   1. scripts\installTools    puts the kit's current tools on the PATH, so an
-rem                            old tagRelease cannot refuse the release
-rem   2. checkHomerDev         the environment, a clean build of all four
+rem   1. checkHomerDev         the environment, a clean build of all four
 rem                            samples, the dependency rule, the tools on your
 rem                            PATH, and every program driven through its keys
-rem   3. scripts\gitPush         stage what the whitelist allows, commit, push
-rem   4. scripts\gitRelease      tag and publish (the check has already run)
+rem   2. scripts\gitPush         stage what the whitelist allows, commit, push
+rem   3. scripts\tagRelease      tag and publish (the check has already run, so -SkipCheck)
 rem
 rem Nothing here is a test you have to remember. If it finishes, the evidence
 rem reports beside checkHomerDev and uiCheck say what was verified, what was not
@@ -28,15 +26,7 @@ if "%message%"=="" set "message=Release."
 >> "%log%" echo Folder: %CD%
 >> "%log%" echo Message: %message%
 
-echo Step 1 of 4: putting the current tools on the PATH.
-call "%~dp0scripts\installTools.cmd" >> "%log%" 2>&1
-if errorlevel 1 (
-    echo installTools failed. The log has why: %log%
-    endlocal
-    exit /b 1
-)
-
-echo Step 2 of 4: building everything from clean and driving the programs.
+echo Step 1 of 3: building everything from clean and driving the programs.
 call "%~dp0checkHomerDev.cmd"
 if errorlevel 1 (
     echo Something failed the check, so nothing was released.
@@ -46,7 +36,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo Step 3 of 4: committing and pushing.
+echo Step 2 of 3: committing and pushing.
 call "%~dp0scripts\gitPush.cmd" "%message%"
 if errorlevel 1 (
     echo The push failed, so nothing was tagged.
@@ -55,10 +45,10 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo Step 4 of 4: tagging and publishing.
-call "%~dp0scripts\gitRelease.cmd" --skip-check
+echo Step 3 of 3: tagging and publishing.
+call "%~dp0scripts\tagRelease.cmd" -SkipCheck
 set "exitCode=%errorlevel%"
->> "%log%" echo gitRelease exit code %exitCode%
+>> "%log%" echo tagRelease exit code %exitCode%
 >> "%log%" echo releaseHomerDev finished %date% %time%
 if "%exitCode%"=="0" (
     echo Released. The evidence reports in this folder say what was checked.

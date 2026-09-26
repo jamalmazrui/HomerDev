@@ -13,8 +13,8 @@ rem   gitPush         commits what RepoFiles.txt names -- this script.
 rem   homerTidy       the periodic clean: puts strays in place, deletes fetched
 rem                   things, rewrites the whitelist .gitignore, commits. Same
 rem                   whitelist as here, so the two never disagree.
-rem   tagRelease      tags the pushed commit with the installer's version and
-rem                   publishes the release. gitRelease runs the checks first.
+rem   tagRelease      runs the checks, tags the pushed commit with the installer's
+rem                   version and publishes the release.
 rem
 rem WHAT "git add -A" MEANS HERE. In a Homer project .gitignore is a WHITELIST
 rem written from RepoFiles.txt: everything is ignored, then exactly the named
@@ -34,6 +34,14 @@ rem
 rem The log is logs\<App>-push-yyyyMMdd-HHmmss.log in the project folder.
 cls
 setlocal enabledelayedexpansion
+rem THE PROJECT IS THE FOLDER THIS IS RUN IN -- unless that folder is the
+rem project's scripts or exec folder, in which case it is the parent. Every
+rem Homer tool follows this one rule, so "cd scripts" and "gitPush" is the
+rem same as running it at the top. On 25 Sep 2026 a push run from scripts
+rem logged to scripts\logs and looked for RepoFiles.txt in scripts.
+for %%I in ("%CD%") do set "sLeaf=%%~nxI"
+if /i "%sLeaf%"=="scripts" (for %%I in ("%CD%\..") do cd /d "%%~fI")
+if /i "%sLeaf%"=="exec" (for %%I in ("%CD%\..") do cd /d "%%~fI")
 if not exist "%CD%\logs" mkdir "%CD%\logs"
 for /f %%T in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd-HHmmss"') do set "sNow=%%T"
 for %%I in ("%CD%") do set "sApp=%%~nxI"

@@ -219,43 +219,35 @@ def checkEnvironment():
 
 
 def checkSharedTools():
-    """Is the copy of each tool on the PATH the same as the kit's?
+    """Is an older copy of a kit tool sitting on the PATH?
 
-    tagRelease, homerTidy, checkHomerApp, gitPush and gitRelease act on the
-    current directory, so one copy on the PATH serves every project -- and an old
-    copy on the PATH also serves every project. A release once failed on exactly
-    that, with an error naming a file that was never meant to exist. Run
-    scripts/installTools to fix what this reports.
+    tagRelease, homerTidy, checkHomerApp and gitPush act on the current
+    directory, and every app carries its own copies in scripts, refreshed from
+    the kit by its build. So a copy anywhere on the PATH -- C:\\bin was the
+    place -- is one that will go stale and run instead of the app's own. A
+    release once failed on exactly that. This reports every such copy; the
+    fix is to delete it.
     """
     lsStale = []
-    iChecked = 0
-    for sName in sorted(os.listdir(os.path.join(c_sKit, "Tools"))):
+    sScripts = os.path.join(c_sKit, "scripts")
+    for sName in sorted(os.listdir(sScripts)):
         if not sName.lower().endswith((".cmd", ".ps1", ".py")): continue
-        sMine = os.path.join(c_sKit, "Tools", sName)
+        sMine = os.path.join(sScripts, sName)
         try:
             oWhere = subprocess.run(["where", sName], capture_output=True, text=True, timeout=30)
             lsPaths = [s.strip() for s in (oWhere.stdout or "").splitlines() if s.strip()]
         except Exception:
             lsPaths = []
-        lsPaths = [s for s in lsPaths if os.path.normcase(s) != os.path.normcase(sMine)]
-        if not lsPaths: continue
-        iChecked += 1
-        try:
-            binMine = open(sMine, "rb").read()
-            binTheirs = open(lsPaths[0], "rb").read()
-        except Exception:
-            continue
-        if binMine != binTheirs:
-            lsStale.append("%s on the PATH (%s) differs from the kit's" % (sName, lsPaths[0]))
-    for sLine in lsStale: logLine("STALE TOOL: " + sLine)
-    if not iChecked:
-        return finding("shared tools", "skip", "0 kit tools are on the PATH")
+        for sPath in lsPaths:
+            if os.path.normcase(sPath) == os.path.normcase(sMine): continue
+            if os.path.normcase(sPath).startswith(os.path.normcase(c_sKit)): continue
+            lsStale.append("%s is on the PATH at %s" % (sName, sPath))
+    for sLine in lsStale: logLine("COPY ON THE PATH: " + sLine)
     if lsStale:
         return finding("shared tools", "fail",
-                       "%s out of date; run scripts\\installTools" %
-                       countNoun(len(lsStale), "tool"))
-    return finding("shared tools", "pass",
-                   "%s on the PATH match the kit's copies" % countNoun(iChecked, "tool"))
+                       "%s on the PATH will go stale; delete: %s" %
+                       (countNoun(len(lsStale), "copy", "copies"), "; ".join(lsStale)))
+    return finding("shared tools", "pass", "no kit tool is on the PATH outside the kit")
 
 
 def checkPrograms():

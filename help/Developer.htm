@@ -181,8 +181,8 @@ read HomerDev.md.</p>
   help\          every document, the style guides, the tutorial scripts
   Templates\samples\       the four fruit basket programs and their build scripts
   Templates\     the files a new app is written from, carrying _APP_
-  scripts\         checkHomerApp, gitPush, gitRelease, homerTidy,
-                 sayTutorial, tagRelease
+  scripts\         checkHomerApp, gitPush, tagRelease, homerTidy,
+                 buildTutorials, tagRelease
   buildHomerDev.cmd / .py     convert the documents, audit the kit
   checkHomerDev.cmd / .py     build all three samples and report
   newHomerApp.cmd / .py       write a new app folder
@@ -196,11 +196,11 @@ checkHomerDev                   environment, clean build of everything, the
                                 through its keys by uiCheck
 scripts\installTools              put the current tools on the PATH
 gitPush &quot;What changed.&quot;
-gitRelease</code></pre>
+tagRelease</code></pre>
 <p><code>installTools</code> matters more than it looks.
 <code>tagRelease</code>, <code>homerTidy</code>,
 <code>checkHomerApp</code>, <code>gitPush</code> and
-<code>gitRelease</code> all act on the current directory, so one copy on
+<code>tagRelease</code> all act on the current directory, so one copy on
 the PATH serves every project – and an OLD copy on the PATH also serves
 every project. A <code>tagRelease</code> from before source-only
 releases were supported refuses to release a project that has no
@@ -252,7 +252,7 @@ finished.</p>
 <p>Before removing or renaming a public member, grep the apps for it.
 The merge that produced this kit exists because two apps had diverged on
 exactly that.</p>
-<h1 id="the-five-scripts-and-the-order-they-run-in">The five scripts,
+<h1 id="the-four-scripts-and-the-order-they-run-in">The four scripts,
 and the order they run in</h1>
 <p>Every app carries these in <code>scripts</code>, refreshed from the
 kit by its build, and runs them from its project folder. They share one
@@ -273,12 +273,11 @@ untracked, commit. Same whitelist as gitPush; it too stages nothing
 without <code>RepoFiles.txt</code>.</li>
 <li><code>scripts\tagRelease</code> – tags the pushed commit with the
 version stamped in <code>&lt;App&gt;_setup.exe</code> and publishes the
-installer. <code>scripts\gitRelease</code> runs the checks first, then
-this.</li>
-<li><code>scripts\gitUnpushed</code> – when something was committed that
-should not have been and the push has not happened: undoes the local
-commits, keeps every file, and the next gitPush or tidy makes the commit
-properly.</li>
+installer. <code>scripts  agRelease</code> runs the checks first, then
+this. And <code>scripts\gitUnpushed</code> – when something was
+committed that should not have been and the push has not happened:
+undoes the local commits, keeps every file, and the next gitPush or tidy
+makes the commit properly.</li>
 </ol>
 <p><code>RepoFiles.txt</code> names what the repository carries;
 <code>LocalFiles.txt</code> names what stays on this disk and is never
