@@ -262,7 +262,9 @@ the project has named”.</p>
 <ol type="1">
 <li><code>build&lt;App&gt;</code> – steps <code>version.txt</code>,
 builds the program and the installer, speaks any tutorial without audio,
-refreshes these scripts from the kit.</li>
+puts the project’s own files into the Homer encoding
+(<code>scripts\fixEncoding</code>), refreshes these scripts from the
+kit.</li>
 <li><code>scripts\gitPush "message"</code> – rewrites the whitelist from
 <code>RepoFiles.txt</code>, adds what it names, refuses anything over 10
 MB, commits, pushes, shows the status. Without

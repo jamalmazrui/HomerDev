@@ -52,6 +52,7 @@ c_lsExpected = [
     "scripts/checkHomerApp.cmd", "scripts/checkHomerApp.py", "scripts/uiCheck.cmd", "scripts/uiCheck.py",
     "scripts/homerTidy.cmd", "scripts/homerTidy.py",
     "scripts/buildTutorials.cmd", "scripts/buildTutorials.ps1", "scripts/checkTutorial.cmd", "scripts/checkTutorial.py",
+    "scripts/fixEncoding.cmd", "scripts/fixEncoding.py",
     "scripts/makeTutorials.cmd", "scripts/makeTutorials.py",
     "Templates/Tutorial_00_Overview.inix", "Templates/skills/homer-tutorial/SKILL.md",
     "Templates/makeHotkeys.py",

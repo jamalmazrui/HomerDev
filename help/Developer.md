@@ -105,7 +105,8 @@ a whitelist written from `RepoFiles.txt`, so "add everything" means "add
 everything the project has named".
 
 1. `build<App>` -- steps `version.txt`, builds the program and the installer,
-   speaks any tutorial without audio, refreshes these scripts from the kit.
+   speaks any tutorial without audio, puts the project's own files into the
+   Homer encoding (`scripts\fixEncoding`), refreshes these scripts from the kit.
 2. `scripts\gitPush "message"` -- rewrites the whitelist from `RepoFiles.txt`,
    adds what it names, refuses anything over 10 MB, commits, pushes, shows
    the status. Without `RepoFiles.txt` it stages nothing and says so.

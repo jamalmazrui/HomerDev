@@ -5,6 +5,33 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.38.3 -- 25 September 2026
+
+HomerScribe's first release through tagRelease's built-in check was refused
+on three counts, two of them the check's own fault and one half mine. The
+check demanded FAQ.md, which the default document set never included;
+Announce and FAQ are welcome now, never required, and Tutorials is required
+only where tutorial scripts exist. It accepted only the kit's Log.start as
+evidence of logging; a program that opens its own file under a logs folder
+counts. And it judged the encoding of every text file in the folder, strays
+included; it judges the files RepoFiles.txt names, the project's own. The
+half mine: eighteen delivered .htm files had never been put into the Homer
+encoding. scripts\fixEncoding, new, puts every file RepoFiles.txt names into
+UTF-8 with a mark and CRLF (.cmd and .bat without the mark), logs to
+logs\<App>-encoding-<stamp>.log, and every app's build runs it before the
+compile, so the check that follows has nothing to find. tagRelease's probe
+for an existing release no longer logs "release not found" as an error.
+
+# 1.38.2 -- 25 September 2026
+
+The tutorial log is readable again: PowerShell's five-line wrapper around a
+native program's first standard-error line, and piper's "[info]" progress,
+are dropped -- a seven-walk run had logged 186 KB of them, and the "Error"
+in "FullyQualifiedErrorId" had slipped through the earlier filter. The
+loudness pass logs its setting once per walk and only a failure per piece.
+The build log records the tutorial tool's exit code and the time beside its
+outcome line.
+
 # 1.38.1 -- 25 September 2026
 
 One rule for where a tool is run: the project is the current folder, or its

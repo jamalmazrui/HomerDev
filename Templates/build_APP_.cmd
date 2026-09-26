@@ -413,12 +413,21 @@ rem installScreenReaderSupport, the tutorial tools, homerTidy, checkHomerApp,
 rem tagRelease, tagRelease, gitPush, gitUnpushed. installModels.cmd is the
 rem app's own, since it names the app's models.
 if not exist "scripts" mkdir "scripts"
-for %%F in (homerInstall.cmd installOllama.cmd installScreenReaderSupport.cmd buildTutorials.cmd buildTutorials.ps1 checkTutorial.cmd checkTutorial.py makeTutorials.py homerTidy.cmd homerTidy.py checkHomerApp.cmd checkHomerApp.py tagRelease.cmd tagRelease.ps1 gitPush.cmd gitUnpushed.cmd gitUnpushed.py) do (
+for %%F in (homerInstall.cmd installOllama.cmd installScreenReaderSupport.cmd buildTutorials.cmd buildTutorials.ps1 checkTutorial.cmd checkTutorial.py fixEncoding.cmd fixEncoding.py makeTutorials.py homerTidy.cmd homerTidy.py checkHomerApp.cmd checkHomerApp.py tagRelease.cmd tagRelease.ps1 gitPush.cmd gitUnpushed.cmd gitUnpushed.py) do (
   if exist "%homerDev%\scripts\%%F" copy /y "%homerDev%\scripts\%%F" scripts\ >nul
 )
 rem Retired kit scripts an app may still carry from an earlier refresh: gone.
 for %%F in (cleanDir.cmd cleanDir.py gitRelease.cmd homerPolicy.py installTools.cmd sayTutorial.cmd sayTutorial.py tidyRepo.cmd tidyRepo.py) do (
   if exist "scripts\%%F" del /q "scripts\%%F" && echo Removed retired scripts\%%F>> "%log%"
+)
+
+rem ---- the project's own files in the Homer encoding ---------------------
+rem UTF-8 with a byte order mark and CRLF, except .cmd and .bat without the
+rem mark. Pandoc and other tools write bare newlines with no mark; this puts
+rem every file RepoFiles.txt names right, so the release check finds nothing.
+if exist "scripts\fixEncoding.cmd" (
+  call "scripts\fixEncoding.cmd" >> "%log%" 2>&1
+  echo Encoding: fixEncoding exit code !errorlevel!>> "%log%"
 )
 
 rem ---- spoken tutorials, when the app has any ---------------------------
