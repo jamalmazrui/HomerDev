@@ -170,7 +170,76 @@
 <p class="author">Jamal Mazrui</p>
 </header>
 <h1 id="history">History</h1>
-<h1 id="september-2026">1.39.1 – 25 September 2026</h1>
+<h1 id="september-2026">1.40.1 – 26 September 2026</h1>
+<p>Two things 1.40.0 broke, found by building it.</p>
+<p><code>Lbc.cs</code> lost <code>handleListBoxCopyKeys</code> when the
+list-searching block was replaced: every list still wired Control+C and
+Alt+C to it, so nothing that made a list compiled. It is back.</p>
+<p><code>Util.cs</code> gained <code>looksLikeText</code> without
+<code>readSample</code>, the helper that reads the first few thousand
+bytes of a file for it. Both are there now.</p>
+<p>The sample programs are the reason both were caught in minutes rather
+than in an app: <code>buildHomerDev</code> compiles four of them against
+the kit, so a kit that does not compile cannot be released.</p>
+<h1 id="september-2026-1">1.40.0 – 26 September 2026</h1>
+<p>Lbc.cs takes in FileDir’s work on it, so that FileDir can stop
+carrying a copy and every app gets what FileDir paid for. The two files
+had drifted 40 per cent apart, in both directions: FileDir had
+thirty-eight methods the kit lacked and the kit had forty-nine FileDir
+lacked, so this is a merge rather than a replacement, and nothing the
+kit already did was given up.</p>
+<p><strong>No control names itself after its own caption or its
+label.</strong> Thirty-two AccessibleName assignments are gone. A screen
+reader reads the caption or the Label before the control AND the
+accessible name, so a name repeating either is heard twice; the property
+is only for a control with no visible text of its own. Four remain, all
+empty, and for the opposite reason: a layout panel with no name is
+reported under the WINDOW’s name, so focus arriving through two nested
+panels made a screen reader say the dialog’s title three times. They are
+marked as groupings with an empty name, which is the one place a name is
+right. Help and the F7 control list now work a control’s name out from
+its Label when they need it, through fieldName and nameFromLabel, rather
+than reading a property nothing sets.</p>
+<p><strong>Finding in a list, rebuilt.</strong> Control+J jumps by the
+line the list shows; Control+K searches everything known about each item
+with the keyword syntax – <code>red &amp; blue</code> for both,
+<code>red | blue</code> for either, <code>chap*</code> for anything
+starting that way; Control+F filters by the same syntax and
+Control+Shift+F clears it; F3 and Shift+F3 repeat whichever search was
+last. The same keys as a FileDir directory window, meaning the same
+things. Each prompt keeps its own last ten answers through the
+historyRead and historyWrite hooks, so an app can store them where it
+stores everything else. setListItems, listSourceIndex and listIsFiltered
+let an app rebuild a list and still know which item a visible row
+is.</p>
+<p><strong>Control+Home and Control+End belong to the control that has
+them.</strong> In a list they are the first and last item, in a
+multiline box the top and bottom of the text; only where the control has
+no use for them do they move between fields.</p>
+<p><strong>A multiline box starts at its beginning</strong>, and a
+read-only one keeps Enter for the default button, since nothing can be
+typed into it. Both were rules written for a box you write in and
+applied to one you cannot.</p>
+<p><strong>The status line carries status.</strong> setStatusExtra puts
+a standing note there – what is playing, how far in – which the person
+reads with their screen reader’s own key; it is not a live region and
+nothing announces it. Where a dialog has a note the note is the whole
+line, because the tip for the focused control is a sentence of
+instruction and not status. appendStatus keeps a transcript of what a
+command said, so speech that is gone can be read back at leisure.</p>
+<p><strong>New to the toolkit:</strong> LbcTrackBar and addSlider, a
+slider that reports its value in words (“100 percent”) rather than as a
+number a person must translate; commandKey and dialogKey on LbcForm,
+claimed in ProcessCmdKey so a dialog gets a key before any control and
+before the screen reader; focusedControl, which walks the container tree
+to the control the keyboard is really in; runPlain and close, for a
+dialog whose buttons are commands rather than ways out; and stackFields,
+which flattens bands so a control inside one is as reachable as one on
+the stack.</p>
+<p>Util.cs gains looksLikeText: whether a file is text at all. Reporting
+the encoding of a JPEG is meaningless and converting one is
+destructive.</p>
+<h1 id="september-2026-2">1.39.1 – 25 September 2026</h1>
 <p>help_update.md: the briefing for bringing another Homer app up to the
 current kit – what the kit is, the contract between an app and it
 (finding the kit, kitNeeded, compiling against its sources, refreshing
@@ -183,7 +252,7 @@ two-branch repository, copied classes with a per-project namespace,
 binaries in git, and earlier editions of the tools. The first release of
 HomerScribe through the whole chain – build, check, push, tag, installer
 asset – went through today.</p>
-<h1 id="september-2026-1">1.38.3 – 25 September 2026</h1>
+<h1 id="september-2026-3">1.38.3 – 25 September 2026</h1>
 <p>HomerScribe’s first release through tagRelease’s built-in check was
 refused on three counts, two of them the check’s own fault and one half
 mine. The check demanded FAQ.md, which the default document set never
@@ -200,7 +269,7 @@ logs&lt;App&gt;-encoding-<stamp>.log, and every app’s build runs it
 before the compile, so the check that follows has nothing to find.
 tagRelease’s probe for an existing release no longer logs “release not
 found” as an error.</p>
-<h1 id="september-2026-2">1.38.2 – 25 September 2026</h1>
+<h1 id="september-2026-4">1.38.2 – 25 September 2026</h1>
 <p>The tutorial log is readable again: PowerShell’s five-line wrapper
 around a native program’s first standard-error line, and piper’s
 “[info]” progress, are dropped – a seven-walk run had logged 186 KB of
@@ -208,7 +277,7 @@ them, and the “Error” in “FullyQualifiedErrorId” had slipped through the
 earlier filter. The loudness pass logs its setting once per walk and
 only a failure per piece. The build log records the tutorial tool’s exit
 code and the time beside its outcome line.</p>
-<h1 id="september-2026-3">1.38.1 – 25 September 2026</h1>
+<h1 id="september-2026-5">1.38.1 – 25 September 2026</h1>
 <p>One rule for where a tool is run: the project is the current folder,
 or its parent when the current folder is the project’s scripts or exec
 folder. homerTidy and checkTutorial already worked that way; gitPush,
@@ -222,7 +291,7 @@ from. Its log and its evidence report go in logs, named like the rest.
 And the kit’s build removes the copies of kit tools it finds in C:– only
 files bearing a kit tool’s name, each removal logged – since a push and
 a release ran from those stale copies today.</p>
-<h1 id="september-2026-4">1.38.0 – 25 September 2026</h1>
+<h1 id="september-2026-6">1.38.0 – 25 September 2026</h1>
 <p>One tool per job, and the names that sounded alike are gone. cleanDir
 and tidyRepo, with homerPolicy that only tidyRepo read, are homerTidy;
 gitRelease is tagRelease, which now runs the app’s checks itself before
@@ -238,7 +307,7 @@ pair that had once moved Scripts.cmd into Templates saw the newly
 delivered scripts.cmd as the old copy and deleted it. The pair is gone
 and the move list skips any pair whose two sides are the same file.
 LocalFiles.txt names the sample programs’ build products.</p>
-<h1 id="september-2026-5">1.37.0 – 25 September 2026</h1>
+<h1 id="september-2026-7">1.37.0 – 25 September 2026</h1>
 <p>Two folders that broke the first-letter rule, and the kit’s copies of
 shared scripts. Samples shared its letter with scripts: the four
 fruit-basket programs and their build scripts are under Templates, and
@@ -258,7 +327,7 @@ whole); Kokoro runs on two threads, measured faster than all of them;
 every piece is brought to one loudness, and ReaderGain scales the
 reader’s; and a “step N of M” line every four steps says the minutes are
 speaking.</p>
-<h1 id="september-2026-6">1.36.2 – 25 September 2026</h1>
+<h1 id="september-2026-8">1.36.2 – 25 September 2026</h1>
 <p>A build was stopped by hand because its screen said one sentence and
 then nothing for three minutes, and the silence read as a second
 download of the voices. It was Kokoro speaking walk 01. Now the tutorial
@@ -270,7 +339,7 @@ instead of capturing them into the build log. Kokoro runs on every
 processor core rather than two, and its configuration and progress
 chatter – which PowerShell had been logging as a “NativeCommandError” –
 is kept out of the log except for its timings.</p>
-<h1 id="september-2026-7">1.36.1 – 25 September 2026</h1>
+<h1 id="september-2026-9">1.36.1 – 25 September 2026</h1>
 <p>Three faults from the first full run of 1.35 and 1.36, and two more
 lines of reader grammar. Kokoro was fetched and unpacked and then not
 recognised: the int8 bundle names its model model.int8.onnx, and only
@@ -283,7 +352,7 @@ it was run in and logged beside itself, forwards to homerTidy with the
 same arguments. Tutorials.md and the skill gain the reader’s phrasing of
 a slider with a value, a numeric edit, a tabbed dialog, a list view
 item, and a program’s loading message.</p>
-<h1 id="september-2026-8">1.36.0 – 25 September 2026</h1>
+<h1 id="september-2026-10">1.36.0 – 25 September 2026</h1>
 <p>The screen reader’s speech in a tutorial is now checked by code and
 written by a skill. scriptsreads every Tutorial_*.inix against the
 format and the reader’s grammar and names the script and step for each
@@ -292,7 +361,7 @@ stands. It found twelve in HomerScribe’s seven walks on its first run
 and seven in the kit’s own. Templates-tutorial.md is a skill for an AI
 writing these: the four beats, the grammar of every control and of an
 edit box, where a Hear line’s truth comes from, and the commands.</p>
-<h1 id="september-2026-9">1.35.1 – 25 September 2026</h1>
+<h1 id="september-2026-11">1.35.1 – 25 September 2026</h1>
 <p>gitPush, in the form Jamal has used by hand – clear the screen, add
 everything, commit “Fix.” or the message given, push, show the status –
 with the guard the day taught: it stops when there is no RepoFiles.txt,
@@ -301,7 +370,7 @@ refuses a commit that stages anything over 10 MB, naming the file.
 Developer.md gains “The five scripts, and the order they run in”: build,
 gitPush, homerTidy, tagRelease, gitUnpushed, and what RepoFiles.txt and
 LocalFiles.txt each decide.</p>
-<h1 id="september-2026-10">1.35.0 – 25 September 2026</h1>
+<h1 id="september-2026-12">1.35.0 – 25 September 2026</h1>
 <p>Four things learnt from one afternoon’s logs.</p>
 <p>ONLY THE KIT FETCHES THE VOICES. buildHomerDev runs scripts with
 -fetch, which is the one way the tool downloads engines and models; an
@@ -329,7 +398,7 @@ every Homer app, and the copy in C:is retired.</p>
 <p>help.md gains the reader’s grammar inside an edit box, from a class
 on reading and editing text: typing echo, Backspace, Blank, Top and
 Bottom of file, the three ways of selecting and their words.</p>
-<h1 id="september-2026-11">1.34.0 – 25 September 2026</h1>
+<h1 id="september-2026-13">1.34.0 – 25 September 2026</h1>
 <p>The kit follows the layout it asks of every app. Tools is now
 scripts: every build script, every document and RepoFiles.txt say
 scripts, the build’s move list carries each of the 22 files over and
@@ -343,14 +412,14 @@ the model files beside it is exactly that. Piper’s models sit in
 execbeside piper.exe, so exec holds one folder per engine.
 LocalFiles.txt names exec as never pushed. (1.33.0’s voices folder was
 never released.)</p>
-<h1 id="september-2026-12">1.33.0 – 25 September 2026</h1>
+<h1 id="september-2026-14">1.33.0 – 25 September 2026</h1>
 <p>The tutorial voices live in one place, C:, fetched once and found by
 every app’s build; they are no longer fetched into each app’s scripts.
 Neither piper nor sherpa-onnx has an installer, so the kit names the
 place, as the one folder every Homer app already relies on. HOMER_VOICES
 overrides it. The kit gains LocalFiles.txt, naming voices and logs as
 local and never pushed, and its build skips the voices folder.</p>
-<h1 id="september-2026-13">1.32.0 – 25 September 2026</h1>
+<h1 id="september-2026-15">1.32.0 – 25 September 2026</h1>
 <p>The spoken tutorials change shape, and the tools that make them move
 with them. Tools.ps1 writes one .mp3 per walk into help with
 Tutorials.m3u beside them, and no Tutorials.mkv; makeTutorials.py looks
@@ -367,7 +436,7 @@ the kit for the project.</p>
 screen reader’s speech for every control, taken from two training
 classes and naming no reader; and the tutorial scripts are to name none
 either.</p>
-<h1 id="september-2026-14">1.31.1 – 25 September 2026</h1>
+<h1 id="september-2026-16">1.31.1 – 25 September 2026</h1>
 <p>Two build failures from 1.31.0, both fixed. homerNoteTicked was
 declared a function with no return type, which Pascal refuses (“colon
 expected”); it is a procedure. The two C# sample builds and
@@ -380,7 +449,7 @@ for word and then paraphrased; silence named; focus verified after every
 change; the repeat key taught first; counts used as orientation;
 controls named as the reader names them; a breath before each key.
 Templates_00_Overview.inix carries the short form.</p>
-<h1 id="september-2026-15">1.31.0 – 25 September 2026</h1>
+<h1 id="september-2026-17">1.31.0 – 25 September 2026</h1>
 <p>Two patterns every Homer app is to follow, asked for on this
 date.</p>
 <p>THE ORDER OF THE FINISH-PAGE BOXES: Install (screen reader scripts
@@ -417,7 +486,7 @@ so a Yes/No box can keep Yes-then-No order with No as the default. The
 first label is the default when the argument is absent – so list OK
 first: with Help first, Enter in HomerScribe’s source paths field opened
 Help.</p>
-<h1 id="september-2026-16">1.30.0 – 25 September 2026</h1>
+<h1 id="september-2026-18">1.30.0 – 25 September 2026</h1>
 <p>The Results box after an install reports only the boxes that were
 ticked, from a probe made after the scripts ran: homerNoteTicked records
 the ticked captions when Finish is pressed (from NextButtonClick at
@@ -429,7 +498,7 @@ said neither had happened, and it listed three components nobody had
 asked about.</p>
 <p>FinishPage.md gains the Results-box rule and the “Downloading” rule
 for install-script console messages.</p>
-<h1 id="september-2026-17">1.29.0 – 25 September 2026</h1>
+<h1 id="september-2026-19">1.29.0 – 25 September 2026</h1>
 <p>Four files delivered the day before had landed in folders the kit
 never had: Docs, Inno and Scripts. They now sit where RepoFiles.txt says
 kit files go – FinishPage.md and Logging.md in help; HomerComponents.iss
@@ -446,7 +515,7 @@ build<App>.log at the old places go the same way.</p>
 build scripts use to read it, cannot strip one, and a build refused a
 kit of exactly the version it asked for when one was present.
 normalizeHomer already knew this; the file had been saved wrongly.</p>
-<h1 id="september-2026-18">1.28.0 – 24 September 2026</h1>
+<h1 id="september-2026-20">1.28.0 – 24 September 2026</h1>
 <p>HomerComponents.iss gained a sixth homerAdd argument, the registry
 Uninstall key name, checked under HKLM, HKCU and WOW6432Node. An
 installer runs elevated, where winget is often unreachable and a
@@ -467,7 +536,7 @@ was.</p>
 <p>Two documents: FinishPage.md, the rule for what a finish-page
 checkbox says and whether it starts ticked; Logging.md, where logs go
 and what they open with.</p>
-<h1 id="september-2026-19">1.27.0 – 23 September 2026</h1>
+<h1 id="september-2026-21">1.27.0 – 23 September 2026</h1>
 <p><strong>Repeated speech is handled in the kit, not app by
 app.</strong> <code>Say.say</code> drops a line that repeats the last
 one within a second and a half, or that matches the title of the window
@@ -480,7 +549,7 @@ be fixed at run time and is now audited instead: every accessible name
 is compared against every caption in the same source, and a match fails
 the check. A new section in the guide, <strong>Not twice: speech that
 repeats</strong>, says which is which.</p>
-<h1 id="september-2026-20">1.26.0 – 22 September 2026</h1>
+<h1 id="september-2026-22">1.26.0 – 22 September 2026</h1>
 <p><strong>The published repository was missing most of itself.</strong>
 The whitelist in .gitignore still named the documents at the top level,
 where they were before they moved into <code>help</code>, and named
@@ -493,7 +562,7 @@ RepoFiles.txt again, and createHomerDevRepo is in RepoFiles.</p>
 working folder, so it passed while the thing people actually download
 was missing sixteen paths. Check the archive, not the folder it came
 from.</p>
-<h1 id="september-2026-21">1.25.0 – 21 September 2026</h1>
+<h1 id="september-2026-23">1.25.0 – 21 September 2026</h1>
 <p>Runtime logs record the conversation. <strong>Say.onSpoken</strong>
 sends every utterance to the app’s log, including those withheld because
 extra speech was off, so a runtime log holds what the program said
@@ -504,7 +573,7 @@ gather each.</p>
 <p><strong><em>APP</em>.cmd</strong>, a template: with programs built
 into exec, typing the program’s name at the top of the project would
 find nothing. This wrapper runs the fresh build from there.</p>
-<h1 id="september-2026-22">1.24.0 – 21 September 2026</h1>
+<h1 id="september-2026-24">1.24.0 – 21 September 2026</h1>
 <p><strong>LbcMenuItem</strong>, in Lbc.cs: a menu item that tells the
 screen reader both its shortcut and its access letter. A stock item’s
 name leaves out the shortcut; replacing the name to put it in hides the
@@ -516,7 +585,7 @@ in semitones, applied with ffmpeg after piper speaks so the length does
 not change. The default is -2 with NarratorScale 0.80: a beta tester
 with the high-frequency loss that comes with age found the narrator hard
 to follow at 0.72 and full pitch.</p>
-<h1 id="september-2026-23">1.23.0 – 21 September 2026</h1>
+<h1 id="september-2026-25">1.23.0 – 21 September 2026</h1>
 <p>homerTidy learns the Homer layout, and apps stop writing their own
 clean-up scripts. It moves a file the installer takes from exec or help
 into that folder, sends stray logs to logs, and never surveys exec or
@@ -527,13 +596,13 @@ separate cleanDir used to carry – and every line of it is written into
 <p>Also fixed: two identical files the project names, such as the same
 script in two sample folders, are no longer treated as duplicates to
 remove.</p>
-<h1 id="september-2026-24">1.22.1 – 21 September 2026</h1>
+<h1 id="september-2026-26">1.22.1 – 21 September 2026</h1>
 <p>tagRelease joins the logs folder: each run writes
 <code>logs\&lt;App&gt;-release-&lt;date&gt;-&lt;time&gt;.log</code>
 instead of overwriting <code>tagRelease.log</code> at the top of the
 project. Install it with <code>Tools\installTools</code>, which copies
 the kit’s tools to C:.</p>
-<h1 id="september-2026-25">1.22.0 – 21 September 2026</h1>
+<h1 id="september-2026-27">1.22.0 – 21 September 2026</h1>
 <p>Development logs join the tree. Every build, clean, tidy, tutorial
 and audit run writes its own file in the project’s <code>logs</code>
 folder, named as the program names its runtime logs:
@@ -541,7 +610,7 @@ folder, named as the program names its runtime logs:
 per file, an alphabetical sort is a chronological one, and one zip
 gathers them all. The build template, homerTidy, buildTutorials,
 makeTutorials and makeHotkeys all follow it.</p>
-<h1 id="september-2026-26">1.21.0 – 21 September 2026</h1>
+<h1 id="september-2026-28">1.21.0 – 21 September 2026</h1>
 <p>The development folder takes the installed shape. Sources and build
 files stay at the top with ReadMe and License; programs are built into
 <code>exec</code>, documents live in <code>help</code>, tooling in
@@ -551,7 +620,7 @@ Scripts and scripts as one name – the guide now says so.</p>
 <p>Also recorded: why Homer menus are long and flat, when a submenu
 earns its place, the function-key families, the two rules for letters
 with the X, Un- and Z exceptions, and the Hotkeys.md format.</p>
-<h1 id="september-2026-27">1.20.0 – 20 September 2026</h1>
+<h1 id="september-2026-29">1.20.0 – 20 September 2026</h1>
 <p>A demo script declares its own terms.</p>
 <p>The tutorial .inix gains a <code>[global]</code> first section: the
 voices, their speeds, the screen reader’s flatness, the silence before
@@ -562,7 +631,7 @@ script can override them for itself.</p>
 speech passages is a <strong>demo script</strong>, and it says so:
 <code>FileTask = demo</code>, the way report and accept files declare
 themselves.</p>
-<h1 id="september-2026-28">1.19.0 – 20 September 2026</h1>
+<h1 id="september-2026-30">1.19.0 – 20 September 2026</h1>
 <p>Spoken tutorials become a kit capability.</p>
 <p>DbDo grew a set of simulated walkthroughs – a narrator and a screen
 reader, built from text files – and the tooling was app-specific by
@@ -588,7 +657,7 @@ is Order and the key is O. The test is simple: if the heading were the
 only thing somebody remembered, which key would they press?</p>
 <p>sayTutorial, which spoke a single script in two SAPI voices, is
 replaced by buildTutorials, which does that and everything after it.</p>
-<h1 id="september-2026-29">1.18.0 – 19 September 2026</h1>
+<h1 id="september-2026-31">1.18.0 – 19 September 2026</h1>
 <p>A script that shells out to an installer says where the window
 went.</p>
 <p><code>buildTutorials</code> in DbDo appeared to hang while fetching a
@@ -603,7 +672,7 @@ Alt+Tab finds it. Where the wait can be watched –
 “Windows is asking for permission now” the moment it appears, and give
 the wait a time limit so an answer that never comes ends in a sentence
 rather than a hang. The guide says all three.</p>
-<h1 id="september-2026-30">1.17.0 – 19 September 2026</h1>
+<h1 id="september-2026-32">1.17.0 – 19 September 2026</h1>
 <p>Everything DbDo’s installer taught this week, folded back in.</p>
 <h2 id="the-destination-page">The destination page</h2>
 <p><code>DisableDirPage=auto</code> with
@@ -645,7 +714,7 @@ summary starts it once the box has been closed.</p>
 <h2 id="every-probe-is-logged">Every probe is logged</h2>
 <p>Command, exit code, output. Three rounds went into finding a fault
 that one logged probe would have shown at once.</p>
-<h1 id="september-2026-31">1.16.0 – 19 September 2026</h1>
+<h1 id="september-2026-33">1.16.0 – 19 September 2026</h1>
 <p>Finish-page checkboxes that look before they offer.</p>
 <p>DbDo’s installer offered to install Ollama on a machine that already
 had it. The guideline said what the finish page should contain and not
@@ -666,7 +735,7 @@ last puts its window over whatever the other entries were still saying.
 And it says what the Results box should hold: the program and where it
 is, one line per ticked checkbox, and the log’s location. Nothing about
 a step that did not run.</p>
-<h1 id="september-2026-32">1.15.0 – 19 September 2026</h1>
+<h1 id="september-2026-34">1.15.0 – 19 September 2026</h1>
 <p><code>jobs</code> became <code>scripts</code>, and
 <code>samples</code> folded into <code>templates</code>.</p>
 <p>The folder layout is now, in the installed tree:
@@ -692,7 +761,7 @@ is a sample with a purpose. The alternatives collided:
 template ships one folder now, with a comment saying why.</p>
 <p>DbDo needs no change for this: it already keeps its scripts in
 <code>Scripts\</code>.</p>
-<h1 id="september-2026-33">1.14.1 – 19 September 2026</h1>
+<h1 id="september-2026-35">1.14.1 – 19 September 2026</h1>
 <p>The build template fetches what it needs.</p>
 <p>Reviewing DbDo’s build against the kit’s own showed that the kit was
 not following its own rule in two places. A build script asks the web
@@ -704,7 +773,7 @@ fate.</p>
 Inno Setup after that attempt fails the build rather than quietly
 skipping the installer, because the installer is part of a release. And
 an ISCC that returns 0 without writing the .exe now fails too.</p>
-<h1 id="september-2026-34">1.14.0 – 19 September 2026</h1>
+<h1 id="september-2026-36">1.14.0 – 19 September 2026</h1>
 <p>A module can need an assembly, and now it says so.</p>
 <p>DbDo’s first build against the kit failed with four copies of</p>
 <pre><code>error CS0246: The type or namespace name &#39;ZipArchive&#39; could not be found</code></pre>
@@ -724,7 +793,7 @@ assembly reports a missing TYPE and points at the module.</p>
 carry ASSEMBLIES lines, and <code>checkHomerDev</code> reads every build
 script – the samples’, the templates’, and any other it is pointed at –
 for one that compiles a module without the references it names.</p>
-<h1 id="september-2026-35">1.13.5 – 19 September 2026</h1>
+<h1 id="september-2026-37">1.13.5 – 19 September 2026</h1>
 <p><code>Announce.md</code> carries the facts a reader asks for
 first.</p>
 <p>Jamal’s own explanation of the project, written after the first
@@ -739,7 +808,7 @@ build script and an Inno Setup installer.</p>
 <p>All of that is now in the announcement, in the places where a reader
 would look for it, and the piece is still one posting at about 2,800
 characters.</p>
-<h1 id="september-2026-36">1.13.4 – 19 September 2026</h1>
+<h1 id="september-2026-38">1.13.4 – 19 September 2026</h1>
 <p><code>Announce.md</code> leads with what somebody gets.</p>
 <p>The previous version listed what the kit contains and left the reader
 to work out why that mattered. It now opens with the benefit – building
@@ -750,7 +819,7 @@ by trial and error, what makes a program work well with a screen reader
 and subtitle, the date, the licence, the link, and plain paragraphs. One
 piece of content, 2,581 characters, which fits a LinkedIn post, a
 Facebook post, or an email as it stands.</p>
-<h1 id="september-2026-37">1.13.3 – 19 September 2026</h1>
+<h1 id="september-2026-39">1.13.3 – 19 September 2026</h1>
 <p><code>Announce.md</code> is one announcement.</p>
 <p>It held three versions and a page of notes about character limits and
 editorial intent. None of that belongs in a document whose job is to be
@@ -761,7 +830,7 @@ reads as an email.</p>
 the features, then the checks, then the samples, the licence and the
 link. No headings about where to paste it and no commentary about
 itself.</p>
-<h1 id="september-2026-38">1.13.2 – 19 September 2026</h1>
+<h1 id="september-2026-40">1.13.2 – 19 September 2026</h1>
 <p>The announcements say what this actually is.</p>
 <h2 id="all-four-programs-built-at-1.13.1">All four programs built at
 1.13.1</h2>
@@ -788,7 +857,7 @@ that cannot be checked.</p>
 <p>Lengths are measured rather than estimated: the short post is about
 1,600 characters, the standard post about 2,500, and the email version
 longer because email has no limit.</p>
-<h1 id="september-2026-39">1.13.1 – 19 September 2026</h1>
+<h1 id="september-2026-41">1.13.1 – 19 September 2026</h1>
 <p>One command for the whole release.</p>
 <h2 id="all-four-samples-built-at-1.13.0">All four samples built at
 1.13.0</h2>
@@ -811,7 +880,7 @@ uncertain – and that is the one thing to do before announcing.</p>
 <p><code>gitRelease</code> now prefers <code>checkHomerDev</code> when
 the folder has one, so releasing the kit runs the kit’s own check rather
 than the per-app one.</p>
-<h1 id="september-2026-40">1.13.0 – 19 September 2026</h1>
+<h1 id="september-2026-42">1.13.0 – 19 September 2026</h1>
 <p>The keys are now pressed by a script.</p>
 <h2 id="uicheck">uiCheck</h2>
 <pre><code>uiCheck                    every uiTest.inix beside the script
@@ -855,7 +924,7 @@ called, not what JAWS said. NVDA can log what it speaks at debug level,
 so a future check could run a scripted session and read that log back.
 It is written down as the next step rather than claimed as done, and
 every report says so.</p>
-<h1 id="september-2026-41">1.12.1 – 19 September 2026</h1>
+<h1 id="september-2026-43">1.12.1 – 19 September 2026</h1>
 <p>Everything builds; the release itself needed one more script.</p>
 <h2 id="all-four-samples-built-and-the-kit-audited-clean">All four
 samples built, and the kit audited clean</h2>
@@ -886,7 +955,7 @@ meant to have one copy, and one copy means one copy that can go stale.
 <li>The tutorial playlist no longer implies the two planned episodes are
 written. They are not.</li>
 </ul>
-<h1 id="september-2026-42">1.12.0 – 19 September 2026</h1>
+<h1 id="september-2026-44">1.12.0 – 19 September 2026</h1>
 <p>The MDI shape in both languages, two lists that matter, and an
 FAQ.</p>
 <h2 id="fruitbasketmdics-and-fruitbasketmdipy">FruitBasketMdiCs and
@@ -944,7 +1013,7 @@ welcome to it.</p>
 <code>&lt;App&gt;.md</code>, <code>Announce.md</code>,
 <code>Developer.md</code>, <code>FAQ.md</code>, <code>History.md</code>,
 <code>Hotkeys.md</code> and <code>Tutorials.md</code>.</p>
-<h1 id="september-2026-43">1.11.0 – 19 September 2026</h1>
+<h1 id="september-2026-45">1.11.0 – 19 September 2026</h1>
 <p>Ready for a first public release.</p>
 <h2 id="the-documents-now-say-what-the-kit-does">The documents now say
 what the kit does</h2>
@@ -991,7 +1060,7 @@ to carry their point in the first two sentences.</p>
 <p>The file also says what the announcements deliberately avoid: no
 claim to be the first anything, no promise about what somebody will be
 able to build, and no number that cannot be checked.</p>
-<h1 id="september-2026-44">1.10.1 – 19 September 2026</h1>
+<h1 id="september-2026-46">1.10.1 – 19 September 2026</h1>
 <p>The build now clears up after a move.</p>
 <h2 id="all-three-samples-built-at-1.10.0">All three samples built at
 1.10.0</h2>
@@ -1020,7 +1089,7 @@ one line on screen.</p>
 <p>Every move the kit has made is in that list, back to
 <code>Keys.cs</code> becoming <code>KeyName.cs</code>, so a machine
 carrying any earlier version tidies itself on the next build.</p>
-<h1 id="september-2026-45">1.10.0 – 19 September 2026</h1>
+<h1 id="september-2026-47">1.10.0 – 19 September 2026</h1>
 <p>A place for the documents, and two scripts for releasing.</p>
 <h2 id="help-the-tenth-folder">help, the tenth folder</h2>
 <p><code>help</code> joins the layout, at the same level as configs,
@@ -1072,7 +1141,7 @@ folder”.</p>
 <p><code>HomerDev.md</code> gained a manifest: every file in the kit
 with one line saying why it is there, grouped by folder. A file you have
 not seen before can now be looked up rather than guessed at.</p>
-<h1 id="september-2026-46">1.9.0 – 19 September 2026</h1>
+<h1 id="september-2026-48">1.9.0 – 19 September 2026</h1>
 <p>The kit can now check itself with a compiler.</p>
 <h2 id="all-three-samples-built-at-1.8.1">All three samples built at
 1.8.1</h2>
@@ -1113,7 +1182,7 @@ does not run the programs. All three samples are windowed, and a check
 that needs a person to close a window is not a check. What a screen
 reader says is still for a person to hear, and the report’s uncertain
 list names that first.</p>
-<h1 id="september-2026-47">1.8.1 – 19 September 2026</h1>
+<h1 id="september-2026-49">1.8.1 – 19 September 2026</h1>
 <p>Three faults from the first run of 1.8.0, and one of them is a new
 kind.</p>
 <h2 id="the-mdi-sample-would-not-compile">The MDI sample would not
@@ -1149,7 +1218,7 @@ audited files the build had written</h2>
 every build and are already in the never-pushed list, so their encoding
 says nothing about the kit. Both the kit check and
 <code>checkHomerApp</code> now skip them.</p>
-<h1 id="september-2026-48">1.8.0 – 19 September 2026</h1>
+<h1 id="september-2026-50">1.8.0 – 19 September 2026</h1>
 <p>MDI, and the three shapes named.</p>
 <h2 id="mdi.cs">Mdi.cs</h2>
 <p><code>MdiFrame</code> and <code>MdiChild</code> carry the frame of a
@@ -1192,7 +1261,7 @@ program. The consistent flags for the first are written down –
 <code>--log</code>, and an unknown switch refused rather than ignored –
 and so is the list of everything all three share, which is nearly all of
 it.</p>
-<h1 id="september-2026-49">1.7.0 – 19 September 2026</h1>
+<h1 id="september-2026-51">1.7.0 – 19 September 2026</h1>
 <p>The kit learnt to produce evidence.</p>
 <h2 id="checkhomerapp">checkHomerApp</h2>
 <pre><code>checkHomerApp
@@ -1235,7 +1304,7 @@ and produce their programs.</p>
 the three lists. The AI-assisted coding part gained “the method, in four
 moves” – specify, build in small recoverable steps, verify, package and
 defend – with what in the kit carries each.</p>
-<h1 id="september-2026-50">1.6.1 – 19 September 2026</h1>
+<h1 id="september-2026-52">1.6.1 – 19 September 2026</h1>
 <p>Two faults from the first run of 1.6.0, both mine.</p>
 <h2 id="a-missing-version.txt-stopped-the-build">A missing version.txt
 stopped the build</h2>
@@ -1269,7 +1338,7 @@ all.</p>
 <p>The Homer module list in the C# build template is now in lowercase
 alphabetical order, which it had drifted out of when KeyName was
 renamed.</p>
-<h1 id="september-2026-51">1.6.0 – 19 September 2026</h1>
+<h1 id="september-2026-53">1.6.0 – 19 September 2026</h1>
 <p>A folder layout whose initials are all different.</p>
 <h2 id="the-nine-folders">The nine folders</h2>
 <p><code>configs</code>, <code>data</code>, <code>exec</code>,
@@ -1313,7 +1382,7 @@ became <code>{app}\exec\&lt;App&gt;.exe</code>. Shortcuts, the uninstall
 icon and the finish helper were all updated, but an app adopting this
 layout should be reinstalled rather than updated in place the first
 time.</p>
-<h1 id="september-2026-52">1.5.0 – 18 September 2026</h1>
+<h1 id="september-2026-54">1.5.0 – 18 September 2026</h1>
 <p>A failed build, a flatter tree, and a tutorial.</p>
 <h2 id="the-c-build-failed-and-the-cause-was-a-name">The C# build
 failed, and the cause was a name</h2>
@@ -1362,7 +1431,7 @@ screen has no other way to tell the teacher from the machine. Windows’
 own voices do the speaking through System.Speech, so nothing is
 installed and nothing is uploaded. One .wav per line, kept, and one .mp3
 when ffmpeg is present.</p>
-<h1 id="september-2026-53">1.4.0 – 18 September 2026</h1>
+<h1 id="september-2026-55">1.4.0 – 18 September 2026</h1>
 <p>Logging, publishing, and a notebook.</p>
 <h2 id="every-program-and-every-installer-keeps-a-log">Every program and
 every installer keeps a log</h2>
@@ -1424,7 +1493,7 @@ missing.</li>
 build and run both fruit baskets, try the free keys, read the two side
 by side, look at the log, start an app, publish it.</li>
 </ul>
-<h1 id="september-2026-54">1.3.0 – 18 September 2026</h1>
+<h1 id="september-2026-56">1.3.0 – 18 September 2026</h1>
 <p>The two samples were rewritten to be read side by side.</p>
 <h2 id="twelve-blocks-the-same-in-both">Twelve blocks, the same in
 both</h2>
@@ -1459,7 +1528,7 @@ only the noun, “fruits”. Two functions, one name, two shapes. Neither
 was changed here, because the Python one has callers in HomerView, but
 both samples now say so where they use it, and the Python one should
 take the C# shape the next time that add-on is touched.</p>
-<h1 id="september-2026-55">1.2.0 – 18 September 2026</h1>
+<h1 id="september-2026-57">1.2.0 – 18 September 2026</h1>
 <p>The kit became a teaching kit.</p>
 <h2 id="the-fruit-basket-came-back">The fruit basket came back</h2>
 <p><code>Samples\FruitBasketCs.cs</code> and
@@ -1523,7 +1592,7 @@ Homer code and documentation, unless another order is clearly more
 logical. The module lists, the component switches and the option
 catalogues in this release all follow it.</li>
 </ul>
-<h1 id="september-2026-56">1.1.0 – 18 September 2026</h1>
+<h1 id="september-2026-58">1.1.0 – 18 September 2026</h1>
 <p>Everything in this release came from running 1.0.0 for a day and from
 the logs of apps the kit had not yet been tried on.</p>
 <h2 id="tagrelease-could-not-release-a-source-only-project">tagRelease
@@ -1594,7 +1663,7 @@ kit.</li>
 <li>homerTidy leaves a project’s own script logs where the scripts that
 write them expect to find them, rather than filing them into notes.</li>
 </ul>
-<h1 id="september-2026-57">1.0.0 – 18 September 2026</h1>
+<h1 id="september-2026-59">1.0.0 – 18 September 2026</h1>
 <p>First release. The kit was assembled by comparing every duplicated
 shared file across DbDo, EdSharp, FileDir, HomerScribe and HomerView,
 and taking the better version of each. What that comparison found is

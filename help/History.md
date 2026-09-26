@@ -5,6 +5,78 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.40.1 -- 26 September 2026
+
+Two things 1.40.0 broke, found by building it.
+
+`Lbc.cs` lost `handleListBoxCopyKeys` when the list-searching block was
+replaced: every list still wired Control+C and Alt+C to it, so nothing that
+made a list compiled. It is back.
+
+`Util.cs` gained `looksLikeText` without `readSample`, the helper that reads the
+first few thousand bytes of a file for it. Both are there now.
+
+The sample programs are the reason both were caught in minutes rather than in
+an app: `buildHomerDev` compiles four of them against the kit, so a kit that
+does not compile cannot be released.
+
+# 1.40.0 -- 26 September 2026
+
+Lbc.cs takes in FileDir's work on it, so that FileDir can stop carrying a copy
+and every app gets what FileDir paid for. The two files had drifted 40 per cent
+apart, in both directions: FileDir had thirty-eight methods the kit lacked and
+the kit had forty-nine FileDir lacked, so this is a merge rather than a
+replacement, and nothing the kit already did was given up.
+
+**No control names itself after its own caption or its label.** Thirty-two
+AccessibleName assignments are gone. A screen reader reads the caption or the
+Label before the control AND the accessible name, so a name repeating either is
+heard twice; the property is only for a control with no visible text of its own.
+Four remain, all empty, and for the opposite reason: a layout panel with no name
+is reported under the WINDOW's name, so focus arriving through two nested panels
+made a screen reader say the dialog's title three times. They are marked as
+groupings with an empty name, which is the one place a name is right. Help and
+the F7 control list now work a control's name out from its Label when they need
+it, through fieldName and nameFromLabel, rather than reading a property nothing
+sets.
+
+**Finding in a list, rebuilt.** Control+J jumps by the line the list shows;
+Control+K searches everything known about each item with the keyword syntax --
+`red & blue` for both, `red | blue` for either, `chap*` for anything starting
+that way; Control+F filters by the same syntax and Control+Shift+F clears it;
+F3 and Shift+F3 repeat whichever search was last. The same keys as a FileDir
+directory window, meaning the same things. Each prompt keeps its own last ten
+answers through the historyRead and historyWrite hooks, so an app can store them
+where it stores everything else. setListItems, listSourceIndex and listIsFiltered
+let an app rebuild a list and still know which item a visible row is.
+
+**Control+Home and Control+End belong to the control that has them.** In a list
+they are the first and last item, in a multiline box the top and bottom of the
+text; only where the control has no use for them do they move between fields.
+
+**A multiline box starts at its beginning**, and a read-only one keeps Enter for
+the default button, since nothing can be typed into it. Both were rules written
+for a box you write in and applied to one you cannot.
+
+**The status line carries status.** setStatusExtra puts a standing note there --
+what is playing, how far in -- which the person reads with their screen reader's
+own key; it is not a live region and nothing announces it. Where a dialog has a
+note the note is the whole line, because the tip for the focused control is a
+sentence of instruction and not status. appendStatus keeps a transcript of what
+a command said, so speech that is gone can be read back at leisure.
+
+**New to the toolkit:** LbcTrackBar and addSlider, a slider that reports its
+value in words ("100 percent") rather than as a number a person must translate;
+commandKey and dialogKey on LbcForm, claimed in ProcessCmdKey so a dialog gets a
+key before any control and before the screen reader; focusedControl, which walks
+the container tree to the control the keyboard is really in; runPlain and close,
+for a dialog whose buttons are commands rather than ways out; and stackFields,
+which flattens bands so a control inside one is as reachable as one on the
+stack.
+
+Util.cs gains looksLikeText: whether a file is text at all. Reporting the
+encoding of a JPEG is meaningless and converting one is destructive.
+
 # 1.39.1 -- 25 September 2026
 
 help\HomerDev_update.md: the briefing for bringing another Homer app up to

@@ -62,6 +62,51 @@ if (iMinutes == 0) return iHours.ToString() + (iHours == 1 ? " hour" : " hours")
 return iHours.ToString() + (iHours == 1 ? " hour" : " hours") + " and " + iMinutes.ToString() + (iMinutes == 1 ? " minute" : " minutes");
 } // spokenLength method
 
+public static byte[] readSample(string sFile, int iMost) {
+// The first bytes of a file, at most iMost of them.
+try {
+using (FileStream fs = new FileStream(sFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
+int iWanted = (int) Math.Min((long) iMost, fs.Length);
+byte[] aBytes = new byte[iWanted];
+int iRead = 0;
+while (iRead < iWanted) {
+int iThis = fs.Read(aBytes, iRead, iWanted - iRead);
+if (iThis <= 0) break;
+iRead += iThis;
+}
+if (iRead == iWanted) return aBytes;
+byte[] aShort = new byte[iRead];
+Array.Copy(aBytes, aShort, iRead);
+return aShort;
+}
+}
+catch (Exception) {
+return new byte[0];
+}
+} // readSample method
+
+public static bool looksLikeText(string sFile) {
+// Whether a file is text at all.
+//
+// NOTHING ASKED THIS BEFORE, and two commands needed it. Reporting the
+// "encoding" of a JPEG is meaningless, and CONVERTING one is destructive: the
+// converter reads the bytes as text and writes them back, which rewrites every
+// byte it could not decode. A picture would survive as a .bak and nothing else.
+//
+// A byte of zero is the test. Text in any encoding this deals with does not
+// contain one, and virtually every binary format does within its first few
+// hundred bytes. UTF-16 is the exception -- it is full of zero bytes -- so a
+// byte-order mark settles it before the question is asked.
+byte[] aBytes = readSample(sFile, 8192);
+if (aBytes.Length == 0) return true;          // an empty file is text enough
+if (aBytes.Length >= 2) {
+if (aBytes[0] == 0xFF && aBytes[1] == 0xFE) return true;
+if (aBytes[0] == 0xFE && aBytes[1] == 0xFF) return true;
+}
+foreach (byte b in aBytes) if (b == 0) return false;
+return true;
+}
+
 public static string stringPlural(string sItem, int iCount) {
 string sReturn = iCount.ToString() + " " + sItem;
 if (iCount != 1) sReturn += "s";
