@@ -170,7 +170,7 @@ c_lsStandingNames = [
     r"^install[a-z0-9_]*\.(cmd|ps1)$", r"^get[a-z0-9_]*\.(cmd|ps1)$",
     # A project's own script logs are rewritten on every run and are already
     # ignored by git, so they stay where the script that writes them expects.
-    r"^localfiles\.txt$", r"^self\.(md|htm)$",
+    r"^localfiles\.txt$", r"^keepencoding\.txt$", r"^self\.(md|htm)$",
     r"^(homertidy|tagrelease|summarizesetup)\.log$",
     r"^(build|create|new|clean|tidy)[a-z0-9_]*\.log$",
     r"^[a-z0-9_+-]+\.(cs|py|js|iss|ico|inix|manifest|config|lua)$",
@@ -294,6 +294,17 @@ def placementFor(sRelative, lsNamed):
     if sNorm.lower().endswith(".log") and not sNorm.lower().startswith("logs/"):
         return "logs"
     if "/" in sNorm: return ""
+    # WHERE THE PROJECT SAYS A FILE LIVES, IT STAYS (1.43.11). EdSharp keeps
+    # Tektosyne.dll and nvdaControllerClient.dll at the top, named there in
+    # RepoFiles.txt, and the libraries its build fetches there too, under a
+    # *.dll line in LocalFiles.txt; its installer ships them from exec, where
+    # the build copies them. Seeing the installer's exec\ names, tidy "put
+    # them in place" -- found exec already held the build's copy -- and moved
+    # every one into notes, and git recorded the two carried libraries as
+    # deleted. A file RepoFiles.txt or LocalFiles.txt names where it is is in
+    # its place.
+    if matchesAny(sNorm, exactNames(namedByRepoFiles())) or matchesAny(sNorm, namedByLocalFiles()):
+        return ""
     for sNamed in lsNamed:
         sNamedNorm = sNamed.replace("\\", "/")
         if "/" not in sNamedNorm or "*" in sNamedNorm: continue
@@ -440,7 +451,29 @@ def matchesAny(sRelative, lsNames):
 # 26 September found "0 files tracked that the project does not name" while
 # all four were tracked and RepoFiles.txt names none of them. A tracked file
 # now stays only when RepoFiles.txt names it and LocalFiles.txt does not.
-c_lsAlwaysTracked = [".gitattributes", ".gitignore", "LocalFiles.txt", "RepoFiles.txt"]
+c_lsAlwaysTracked = [".gitattributes", ".gitignore", "KeepEncoding.txt", "LocalFiles.txt", "RepoFiles.txt"]
+
+
+def exactNames(lsNames):
+    """The lines of a name list that name one file: no wildcard, no folder."""
+    return [s for s in lsNames if "*" not in s and not s.replace("\\", "/").endswith("/")]
+
+
+def staysTracked(sRelative, lsRepo, lsLocal):
+    """Does a tracked file belong in the repository?
+
+    A NAME IN RepoFiles.txt OUTRANKS A PATTERN IN LocalFiles.txt (1.43.10).
+    EdSharp's LocalFiles.txt says *.dll, because the build fetches its
+    libraries, and its RepoFiles.txt names Tektosyne.dll, which cannot be
+    fetched and so must be carried. Named exactly, it stays. Anything else
+    LocalFiles.txt matches, or the kit never pushes (c_lsNeverPushed: the
+    release scripts, Version.cs, any .exe), goes; so does anything
+    RepoFiles.txt does not name at all.
+    """
+    if matchesAny(sRelative, exactNames(lsRepo)): return True
+    if matchesAny(sRelative, c_lsNeverPushed): return False
+    if matchesAny(sRelative, lsLocal): return False
+    return matchesAny(sRelative, lsRepo)
 
 
 def surveyRepo(lsNamed):
@@ -449,8 +482,7 @@ def surveyRepo(lsNamed):
     lsTracked = [s.strip() for s in sOut.splitlines() if s.strip()]
     lsRepo = namedByRepoFiles() + c_lsAlwaysTracked
     lsLocal = namedByLocalFiles()
-    lsTrackedStrays = [s for s in lsTracked
-                       if matchesAny(s, lsLocal) or not matchesAny(s, lsRepo)]
+    lsTrackedStrays = [s for s in lsTracked if not staysTracked(s, lsRepo, lsLocal)]
 
     lsLarge = []
     iCode, sObjects = runGit(
@@ -548,12 +580,24 @@ def writeWhitelistGitignore():
         if not sClean: continue
         lsLines.append("!/" + sClean + ("/" if sName.endswith("/") else ""))
     lsLines.append("!/.gitignore")
+    # .gitattributes, which keeps the Homer CRLF line endings, is put back
+    # whether or not RepoFiles.txt names it, as .gitignore is.
+    lsLines.append("!/.gitattributes")
+    lsLines.append("!/KeepEncoding.txt")
     lsLines.append("")
     lsLocal = namedByLocalFiles()
     if lsLocal:
         lsLines.append("# On this disk only, from LocalFiles.txt.")
         lsLines.extend(s.replace("\\", "/") for s in lsLocal)
         lsLines.append("")
+        # A name in RepoFiles.txt outranks a pattern in LocalFiles.txt: a file
+        # named exactly there is put back after the LocalFiles.txt patterns,
+        # so *.dll there cannot take the one library the repository carries.
+        lsBack = [s for s in exactNames(lsNamed) if matchesAny(s, lsLocal)]
+        if lsBack:
+            lsLines.append("# Named in RepoFiles.txt, so put back after the patterns above.")
+            lsLines.extend("!/" + s.replace("\\", "/").strip("/") for s in lsBack)
+            lsLines.append("")
     lsLines.append("# Never pushed, whatever RepoFiles.txt says: private notes, maintainer")
     lsLines.append("# scripts, logs, and anything a build makes.")
     for sPattern in c_lsNeverPushed:

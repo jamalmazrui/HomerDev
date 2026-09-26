@@ -5,6 +5,46 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.43.11 -- 26 September 2026
+
+**tidy leaves a file where the project says it lives.** EdSharp keeps the two
+libraries its repository carries, and the ones its build fetches, at the top of
+the project, and its installer ships them from exec, where the build copies
+them. Seeing the installer's exec\ names, tidy "put them in place", found exec
+already held a copy, and moved every one into notes -- and git recorded
+Tektosyne.dll and nvdaControllerClient.dll as deleted. A file RepoFiles.txt or
+LocalFiles.txt names where it is now stays. Proved: with the installer naming
+exec\Tektosyne.dll, tidy moved neither Tektosyne.dll nor Markdig.dll.
+
+**KeepEncoding.txt: other people's files keep their encoding.** A project may
+carry third-party tools, dictionaries, or files that show another encoding; a
+byte order mark on a Lua filter or a tool's config is read as part of its first
+line. KeepEncoding.txt, beside RepoFiles.txt and in the same form, names what
+fixEncoding and check leave exactly as they are. tidy treats it as a project
+file, and the whitelist always keeps it. Proved: a .lua file under a kept
+folder stayed without a mark while the project's own .inix was fixed.
+
+**check looks only at the project's own sources**, the files RepoFiles.txt
+names, as its encoding test already did. EdSharp's release was refused over a
+fruitBasket.cs in its pre-kit Samples folder, still on disk but no longer part
+of the project.
+
+# 1.43.10 -- 26 September 2026
+
+**A name in RepoFiles.txt outranks a pattern in LocalFiles.txt**, in tidy's
+choice of what stays tracked and in the whitelist .gitignore. EdSharp carries
+Tektosyne.dll, which cannot be fetched, while its LocalFiles.txt says *.dll for
+the libraries the build fetches; 1.43.9 would have untracked it. A file named
+exactly in RepoFiles.txt now stays tracked and is put back after the
+LocalFiles.txt patterns. Anything the kit never pushes -- the release scripts,
+Version.cs, any .exe -- is untracked wherever it is. Proved on an
+EdSharp-shaped repository: Tektosyne.dll and nvdaControllerClient.dll stayed;
+Markdig.dll, the release script, Version.cs, version.txt and a stale Lbc.cs
+were untracked; a new .dll stayed ignored.
+
+**The whitelist puts back .gitattributes** as it does .gitignore, so the file
+that keeps the Homer CRLF line endings is never left out of a repository.
+
 # 1.43.9 -- 26 September 2026
 
 **tidy just does it.** It no longer prints a plan and waits for --do-it: one

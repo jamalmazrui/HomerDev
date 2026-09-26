@@ -36,6 +36,8 @@
 !/Templates/
 !/version.txt
 !/.gitignore
+!/.gitattributes
+!/KeepEncoding.txt
 
 # On this disk only, from LocalFiles.txt.
 exec/
