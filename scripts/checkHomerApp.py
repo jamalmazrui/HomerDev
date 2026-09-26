@@ -375,12 +375,32 @@ def checkKeys():
         sBase = os.path.basename(sPath)
         for sKey in re.findall(r"\b(?:Alt\+Control|Control\+Alt)\+\w+", sText):
             lsBad.append("%s: %s is reserved for Windows desktop shortcuts" % (sBase, sKey))
-        dLetters = {}
-        for sLabel in re.findall(r'"&([A-Za-z])', sText):
-            dLetters[sLabel.lower()] = dLetters.get(sLabel.lower(), 0) + 1
-        for sLetter, iCount in sorted(dLetters.items()):
-            if iCount > 1:
-                lsBad.append("%s: the access key %s is claimed %d times" % (sBase, sLetter, iCount))
+        # ACCESS LETTERS COMPETE ONLY WHERE THEY ARE PRESSED.
+        #
+        # A letter belongs to one menu or one dialog: File's O and Edit's O are
+        # two different keys in two different places, and both are right.
+        # Counting every "&X" in a source file works for an app with a single
+        # dialog and fails every app with a menu bar -- DbDo, 175 items in eight
+        # menus, produced 26 "problems", none of them real.
+        #
+        # So each label is counted against where it appears: the named container
+        # when the call has one -- addItem(miFile, "&Open...") -- and otherwise
+        # the method building that window. Labels in two different methods never
+        # compete, because a person never sees them at once.
+        dByOwner = {}
+        sMethod = "(file)"
+        for sLine in sText.splitlines():
+            oDef = re.match(r"\s{0,8}(?:public |private |internal |protected |static |override |virtual |async )+[\w<>\[\],\s\.]+?\s(\w+)\s*\(", sLine)
+            if oDef: sMethod = oDef.group(1)
+            for oHit in re.finditer(r'(?:\b\w+\(\s*(\w+)\s*,\s*)?"&([A-Za-z])', sLine):
+                sOwner = oHit.group(1) or sMethod
+                dByOwner.setdefault(sOwner, {})
+                dByOwner[sOwner][oHit.group(2).lower()] = dByOwner[sOwner].get(oHit.group(2).lower(), 0) + 1
+        for sOwner in sorted(dByOwner):
+            for sLetter, iCount in sorted(dByOwner[sOwner].items()):
+                if iCount > 1:
+                    lsBad.append("%s: the access key %s is claimed %d times in %s"
+                                 % (sBase, sLetter, iCount, sOwner))
     for sLine in lsBad: logLine("KEYS: " + sLine)
     if lsBad:
         return finding("keys", "fail", "%s; every one is in the log" %
