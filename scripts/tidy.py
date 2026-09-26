@@ -7,13 +7,19 @@ folder; tidy swept the git repository. They asked the same question --
 "does this file belong to the project?" -- of two places, and keeping them apart
 meant two surveys, two plans, and two chances to disagree.
 
-    tidy                   survey everything and print the plan. Changes
-                                nothing.
-    tidy --do-it           carry the plan out.
-    tidy --do-it --no-push  carry it out locally; do not push.
-    tidy --folder-only     survey or fix the folder, leaving git alone.
-    tidy --repo-only       survey or fix the repository only.
+    tidy                   tidy everything: the folder and the repository.
+    tidy --no-push         tidy, committing locally; do not push.
+    tidy --folder-only     tidy the folder, leaving git alone.
+    tidy --repo-only       tidy the repository only.
     tidy --gitignore       write the whitelist .gitignore and stop.
+
+IT JUST DOES IT (1.43.9). tidy used to print a plan and change nothing until
+it was run again with --do-it. Nothing it does is lost: a stray file is moved
+into notes, which is on this disk and never in git, so a file tidy took is
+found there; the only deletions are zero-byte files and things the build
+fetches again. So the plan and the doing are one run, and the log records every
+move. --do-it is still accepted, and changes nothing, so an old habit or an old
+script does no harm.
 
 WHAT BELONGS. Nothing is listed inside this script. A file belongs to the
 project when the installer script names it, when RepoFiles.txt names it, when
@@ -411,11 +417,40 @@ def surveyFolder(lsNamed):
     return (lsEmpty, ldDuplicates, lsStrays, ltPlace)
 
 
+def matchesAny(sRelative, lsNames):
+    """Does a path match any line of a name list: a path, a bare name, a
+    pattern with *, or a folder ending in /?"""
+    sLower = sRelative.replace("\\", "/").lower()
+    sName = os.path.basename(sLower)
+    for sNamed in lsNames:
+        sNamedLower = sNamed.replace("\\", "/").lower().lstrip("/")
+        if sNamedLower == sLower or sNamedLower == sName: return True
+        if "*" in sNamedLower:
+            sRegex = "^" + re.escape(sNamedLower).replace(r"\*", ".*") + "$"
+            if re.match(sRegex, sLower) or re.match(sRegex, sName): return True
+        if sNamedLower.endswith("/") and sLower.startswith(sNamedLower): return True
+    return False
+
+
+# THE REPOSITORY HOLDS WHAT RepoFiles.txt NAMES, AND NOTHING ELSE (1.43.9).
+# The folder test -- does a file belong to the project at all? -- also accepts
+# what the installer and LocalFiles.txt name and the standing names, such as
+# version.txt and any .cs. Used for the repository too, it called version.txt,
+# Version.cs and the release scripts "named by the project", so DbDo's tidy on
+# 26 September found "0 files tracked that the project does not name" while
+# all four were tracked and RepoFiles.txt names none of them. A tracked file
+# now stays only when RepoFiles.txt names it and LocalFiles.txt does not.
+c_lsAlwaysTracked = [".gitattributes", ".gitignore", "LocalFiles.txt", "RepoFiles.txt"]
+
+
 def surveyRepo(lsNamed):
     """Return (lsTrackedStrays, lsLargeInHistory, sStatus)."""
     iCode, sOut = runGit(["ls-files"], True)
     lsTracked = [s.strip() for s in sOut.splitlines() if s.strip()]
-    lsTrackedStrays = [s for s in lsTracked if not belongsTo(s, lsNamed)]
+    lsRepo = namedByRepoFiles() + c_lsAlwaysTracked
+    lsLocal = namedByLocalFiles()
+    lsTrackedStrays = [s for s in lsTracked
+                       if matchesAny(s, lsLocal) or not matchesAny(s, lsRepo)]
 
     lsLarge = []
     iCode, sObjects = runGit(
@@ -487,7 +522,28 @@ def writeWhitelistGitignore():
         "",
         "# Put back what the project names.",
     ]
-    for sName in sorted(set(s.replace("\\", "/") for s in lsNamed), key=lambda s: s.lower()):
+    # A FILE IN A SUBFOLDER NEEDS ITS FOLDER PUT BACK FIRST (1.43.0). "/*"
+    # ignores the folder help itself, and git never looks inside an ignored
+    # folder, so "!/help/Announce.md" alone put back nothing: every file named
+    # one by one in help\ or scripts\ -- as the rules for RepoFiles.txt ask --
+    # was silently left out of the repository. So each such folder is put back
+    # and its contents ignored again ("!/help/" then "/help/*"), and only then
+    # are the named files put back. A folder named whole ("help/") is simply
+    # put back, contents and all.
+    lsClean = sorted(set(s.replace("\\", "/") for s in lsNamed), key=lambda s: s.lower())
+    setWhole = set(s.strip("/").lower() for s in lsClean if s.endswith("/"))
+    lsFolders = []
+    for sName in lsClean:
+        lsParts = sName.strip("/").split("/")
+        for iDepth in range(1, len(lsParts)):
+            sFolder = "/".join(lsParts[:iDepth])
+            if sFolder not in lsFolders: lsFolders.append(sFolder)
+    for sFolder in sorted(lsFolders, key=lambda s: (s.count("/"), s.lower())):
+        bInsideWhole = any(sFolder.lower() == s or sFolder.lower().startswith(s + "/") for s in setWhole)
+        if bInsideWhole: continue
+        lsLines.append("!/" + sFolder + "/")
+        lsLines.append("/" + sFolder + "/*")
+    for sName in lsClean:
         sClean = sName.strip("/")
         if not sClean: continue
         lsLines.append("!/" + sClean + ("/" if sName.endswith("/") else ""))
@@ -541,7 +597,7 @@ def main():
     oParser = argparse.ArgumentParser(
         description="Tidy a Homer Tools project folder and its repository.")
     oParser.add_argument("--do-it", action="store_true",
-                         help="make the changes, rather than only describing them")
+                         help="accepted for old habits; tidy always carries its plan out")
     oParser.add_argument("--no-push", action="store_true",
                          help="commit locally but do not push")
     oParser.add_argument("--folder-only", action="store_true",
@@ -575,7 +631,7 @@ def main():
             (dArguments.do_it, dArguments.no_push, dArguments.folder_only,
              dArguments.repo_only))
 
-    bDoIt = dArguments.do_it
+    bDoIt = True
     sayLine("%s in %s" % (appName(), sRoot))
 
     if dArguments.gitignore:
@@ -583,7 +639,6 @@ def main():
         logLine("Finished %s" % datetime.datetime.now().isoformat(" ", "seconds"))
         return 0
 
-    if not bDoIt: sayLine("This is the plan only. Nothing will be changed.")
     sayLine()
 
     lsNamed = namedByInstaller() + namedByRepoFiles() + namedByLocalFiles()
@@ -663,7 +718,7 @@ def main():
                     countNoun(len(lsTrackedStrays), "file"))
             sayLine("  %s larger than 10 MB in the history" %
                     countNoun(len(lsLarge), "object"))
-            for sPath in lsTrackedStrays: logLine("TRACKED STRAY: " + sPath)
+            for sPath in lsTrackedStrays: logLine("TRACKED STRAY, to be untracked (the file stays on disk): " + sPath)
             for sPath, iSize in lsLarge:
                 logLine("LARGE IN HISTORY: %s, %.1f MB" % (sPath, iSize / 1048576.0))
 
@@ -703,10 +758,8 @@ def main():
                             sayLine("  The push failed. Nothing local was lost; see the log.")
             sayLine()
 
-    if not bDoIt:
-        sayLine("Run it again with --do-it to carry this out.")
-    else:
-        sayLine("%s made." % countNoun(iChanges, "change"))
+    sayLine("%s made. Anything moved is in notes, which git never takes; the log names each move." %
+            countNoun(iChanges, "change"))
     logLine("Finished %s" % datetime.datetime.now().isoformat(" ", "seconds"))
     return 0
 

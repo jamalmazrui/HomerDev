@@ -5,9 +5,16 @@
 #
 # Typical entries:
 #
+# exec/
 # help/tutorials/*.mp3
 # help/tutorials/Tutorials.m3u
 # logs/
+# scripts/release.cmd
+# scripts/release.ps1
+# version.txt
+#
+# A Python app adds what its build makes: .venv/ (the build environment),
+# version.py (written from version.txt) and work/ (PyInstaller's scratch).
 #
 # The tutorial voices are NOT listed here: they live in C:\HomerDev\exec,
 # one copy shared by every Homer app's build.

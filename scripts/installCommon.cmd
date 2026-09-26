@@ -1,7 +1,7 @@
 @echo off
 rem installCommon.cmd -- the common half of every Homer install<Component>.cmd.
 rem
-rem Called, not run: an install script does `call "%~dp0homerInstall.cmd" setup`
+rem Called, not run: an install script does `call "%~dp0installCommon.cmd" setup`
 rem and then uses what this sets. It exists because the same forty lines had
 rem been copied into a dozen scripts across four apps and had drifted in every
 rem one -- EdSharp logging to its own folder, HomerScribe logging beside itself

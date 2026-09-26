@@ -261,15 +261,24 @@ package, which the app’s own build script fetches.</li>
 </ul>
 <h2 id="python">Python</h2>
 <p><code>homer\</code> is the Python side of the same toolbox:
-<code>inix</code>, <code>lbc</code>, <code>log</code>, <code>say</code>,
-<code>util</code>, <code>web</code> and <code>version</code>. It was
-written for NVDA add-ons and follows three rules that make it portable.
-Nothing imports NVDA at the top of a module, so every module can be
-imported and tested in plain Python. Nothing depends on anything outside
-the standard library except wx, which NVDA already has. Nothing knows
-the name of the program using it.</p>
-<p>Copy the <code>homer</code> folder into an add-on, or put
-<code>C:\HomerDev\Python</code> on the path.</p>
+<code>elevate</code>, <code>inix</code>, <code>lbc</code>,
+<code>log</code>, <code>mdi</code>, <code>paths</code>,
+<code>say</code>, <code>util</code> and <code>web</code>. It follows
+three rules that make it portable. Nothing imports NVDA at the top of a
+module, so every module can be imported and tested in plain Python.
+Nothing depends on anything outside the standard library except wx,
+which NVDA already has (and <code>say</code> reaches JAWS through
+pywin32 or pythonnet only when one is already there). Nothing knows the
+name of the program using it.</p>
+<p>A standalone program does not copy the package: its build points
+PyInstaller at the kit with <code>--paths C:\HomerDev</code> and names
+each module it imports with <code>--hidden-import</code>, as
+<code>Templates\build_APP_Py.cmd</code> does. urlCheck is the worked
+example. An NVDA add-on copies the <code>homer</code> folder, because
+NVDA has no way to share one copy between add-ons.</p>
+<p>There is no <code>homer.version</code>: every build writes a
+<code>version.py</code> of its own, so the kit cannot use the name.
+Comparing versions is part of <code>homer.elevate</code>.</p>
 <h2 id="templates">Templates</h2>
 <p>The files a new app needs, with <code>_APP_</code> where its name
 goes. <code>newHomerApp</code> fills them in.</p>
@@ -757,11 +766,12 @@ tabular formats</li>
 Python</h2>
 <ul>
 <li><strong><strong>init</strong>.py</strong> – the package</li>
-<li><strong>inix.py, lbc.py, log.py, mdi.py, paths.py, say.py, util.py,
-web.py</strong> – the Python counterparts of Inix, Lbc, Log, Paths, Say,
-Util and Web, with the same names and the same behaviour</li>
-<li><strong>version.py</strong> – written by the build; not a source
-file</li>
+<li><strong>elevate.py, inix.py, lbc.py, log.py, mdi.py, paths.py,
+say.py, util.py, web.py</strong> – the Python counterparts of Elevate,
+Inix, Lbc, Log, Mdi, Paths, Say, Util and Web, with the same names and
+the same behaviour. lbc and mdi use wx; a program whose windows are
+WinForms through pythonnet uses the others and keeps its own dialog
+code.</li>
 </ul>
 <h2 id="templates-2">Templates</h2>
 <ul>
@@ -1842,7 +1852,7 @@ accident is always the one nobody thought of. Turning it around costs
 one line in <code>RepoFiles.txt</code> before a new file can be
 committed – which is also the line that records why the file is
 there.</p>
-<p><code>tidy --do-it</code> rewrites the whitelist on every pass, so
+<p><code>tidy</code> rewrites the whitelist on every pass, so
 <code>RepoFiles.txt</code> and <code>.gitignore</code> cannot drift
 apart.</p>
 <h2 id="what-is-public-and-what-stays-on-your-machine">What is public
@@ -1949,16 +1959,17 @@ compiles the installer if Inno Setup is present. It fetches what it
 needs from the web itself. Log:
 <code>build&lt;App&gt;.log</code>.</p></li>
 <li><p><strong>tidy</strong> – the folder and the repository, surveyed
-together and fixed in one pass. It prints the plan and stops;
-<code>--do-it</code> carries it out. In the folder: empty files deleted,
-duplicates and files the project does not name moved into
-<code>notes\logs</code>, <code>notes\drafts</code>,
-<code>notes\mail</code>, <code>notes\archives</code> or
-<code>notes\other</code>. In the repository: tracked files that do not
-belong untracked and added to <code>.gitignore</code> under a dated
-comment, then committed and pushed. Anything larger than 10 MB in the
-history is reported with the command that would remove it, and never
-rewritten automatically. What belongs is decided by the project’s own
+together and fixed in one pass. It carries its plan out in the same run:
+a stray goes into <code>notes</code>, which git never takes, and the log
+names every move. In the folder: empty files deleted, duplicates and
+files the project does not name moved into <code>notes\logs</code>,
+<code>notes\drafts</code>, <code>notes\mail</code>,
+<code>notes\archives</code> or <code>notes\other</code>. In the
+repository: tracked files that do not belong untracked and added to
+<code>.gitignore</code> under a dated comment, then committed and
+pushed. Anything larger than 10 MB in the history is reported with the
+command that would remove it, and never rewritten automatically. What
+belongs is decided by the project’s own
 <code>&lt;App&gt;_setup.iss</code> and <code>RepoFiles.txt</code>, so
 there is no list to maintain. <code>--folder-only</code> and
 <code>--repo-only</code> do one half. Log: <code>tidy.log</code>.</p>
@@ -2087,10 +2098,11 @@ gives you confidence that it works?</li>
 them at the start of a session and the difference is immediate:</p>
 <ol type="1">
 <li>“Use the Homer classes in <code>C:\HomerDev\CSharp</code> (or
-<code>\Python</code>); build the dialog with Lbc, in the order the user
+<code>\homer</code>); build the dialog with Lbc, in the order the user
 should tab.”</li>
 <li>“Write in Camel Type, as
-<code>C:\HomerDev\help\CamelType_CSharp.md</code> describes.”</li>
+<code>C:\HomerDev\help\CamelType_CSharp.md</code> (or
+<code>CamelType_Python.md</code>) describes.”</li>
 <li>“Follow <code>C:\HomerDev\HomerDev.md</code>: speak only what the
 screen reader cannot know, save each answer when it is given, match
 nouns to counts.”</li>

@@ -96,15 +96,22 @@ does.
 
 ## Python
 
-`homer\` is the Python side of the same toolbox: `inix`, `lbc`, `log`,
-`say`, `util`, `web` and `version`. It was written for NVDA add-ons and follows three
-rules that make it portable. Nothing imports NVDA at the top of a module, so
-every module can be imported and tested in plain Python. Nothing depends on
-anything outside the standard library except wx, which NVDA already has.
-Nothing knows the name of the program using it.
+`homer\` is the Python side of the same toolbox: `elevate`, `inix`, `lbc`,
+`log`, `mdi`, `paths`, `say`, `util` and `web`. It follows three rules that
+make it portable. Nothing imports NVDA at the top of a module, so every module
+can be imported and tested in plain Python. Nothing depends on anything outside
+the standard library except wx, which NVDA already has (and `say` reaches JAWS
+through pywin32 or pythonnet only when one is already there). Nothing knows the
+name of the program using it.
 
-Copy the `homer` folder into an add-on, or put `C:\HomerDev\Python` on the
-path.
+A standalone program does not copy the package: its build points PyInstaller
+at the kit with `--paths C:\HomerDev` and names each module it imports with
+`--hidden-import`, as `Templates\build_APP_Py.cmd` does. urlCheck is the worked
+example. An NVDA add-on copies the `homer` folder, because NVDA has no way to
+share one copy between add-ons.
+
+There is no `homer.version`: every build writes a `version.py` of its own, so
+the kit cannot use the name. Comparing versions is part of `homer.elevate`.
 
 ## Templates
 
@@ -571,8 +578,7 @@ than guessed at. Folders are in the order you meet them.
 ## homer -- the same toolbox in Python
 
 - **__init__.py** -- the package
-- **inix.py, lbc.py, log.py, mdi.py, paths.py, say.py, util.py, web.py** -- the Python counterparts of Inix, Lbc, Log, Paths, Say, Util and Web, with the same names and the same behaviour
-- **version.py** -- written by the build; not a source file
+- **elevate.py, inix.py, lbc.py, log.py, mdi.py, paths.py, say.py, util.py, web.py** -- the Python counterparts of Elevate, Inix, Lbc, Log, Mdi, Paths, Say, Util and Web, with the same names and the same behaviour. lbc and mdi use wx; a program whose windows are WinForms through pythonnet uses the others and keeps its own dialog code.
 
 ## Templates\samples
 
@@ -1588,7 +1594,7 @@ the one nobody thought of. Turning it around costs one line in `RepoFiles.txt`
 before a new file can be committed -- which is also the line that records why
 the file is there.
 
-`tidy --do-it` rewrites the whitelist on every pass, so `RepoFiles.txt` and
+`tidy` rewrites the whitelist on every pass, so `RepoFiles.txt` and
 `.gitignore` cannot drift apart.
 
 ## What is public and what stays on your machine
@@ -1684,7 +1690,7 @@ script, a repository tidy, and a release.
   installer if Inno Setup is present. It fetches what it needs from the web
   itself. Log: `build<App>.log`.
 - **tidy** -- the folder and the repository, surveyed together and fixed in
-  one pass. It prints the plan and stops; `--do-it` carries it out. In the
+  one pass. It carries its plan out in the same run: a stray goes into `notes`, which git never takes, and the log names every move. In the
   folder: empty files deleted, duplicates and files the project does not name
   moved into `notes\logs`, `notes\drafts`, `notes\mail`, `notes\archives` or
   `notes\other`. In the repository: tracked files that do not belong untracked
@@ -1807,9 +1813,10 @@ and each has something in the kit that carries it:
 Most of the value of this kit reaches an AI in three sentences. Say them at the
 start of a session and the difference is immediate:
 
-1. "Use the Homer classes in `C:\HomerDev\CSharp` (or `\Python`); build the
+1. "Use the Homer classes in `C:\HomerDev\CSharp` (or `\homer`); build the
    dialog with Lbc, in the order the user should tab."
-2. "Write in Camel Type, as `C:\HomerDev\help\CamelType_CSharp.md` describes."
+2. "Write in Camel Type, as `C:\HomerDev\help\CamelType_CSharp.md` (or
+   `CamelType_Python.md`) describes."
 3. "Follow `C:\HomerDev\HomerDev.md`: speak only what the screen reader cannot
    know, save each answer when it is given, match nouns to counts."
 

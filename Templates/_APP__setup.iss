@@ -45,6 +45,9 @@
 #define AppUrl        "https://github.com/JamalMazrui/_APP_"
 #define AppExeName    "_APP_.exe"
 #define AppCopyright  "Copyright (c) 2026 Jamal Mazrui. MIT License."
+; What the program is started with after the Results box, as the desktop
+; shortcut starts it: "-g -u" for urlCheck's dialog, empty for most apps.
+#define AppLaunchParams ""
 
 ; CHANGE ME. The desktop shortcut's hotkey. HotKey is the Inno Setup directive
 ; value, which requires Ctrl syntax; HotKeyDisplay is the same key in the
@@ -149,7 +152,15 @@ Name: "{app}\templates"
 
 [Files]
 ; THE PROGRAM AND WHAT RUNS WITH IT go in exec: .exe, .dll, .py, .vbs.
+; A build in the Homer layout leaves the program in the project's exec folder
+; (build_APP_Py.cmd does; so do HomerScribe's and HomerView's builds); an older
+; build leaves it at the top. The installer takes it from whichever is there
+; (1.43.1), so one template serves both while builds move over.
+#if FileExists(AddBackslash(SourcePath) + "exec\" + AppExeName)
+Source: "exec\{#AppExeName}"; DestDir: "{app}\exec"; Flags: ignoreversion
+#else
 Source: "{#AppExeName}"; DestDir: "{app}\exec"; Flags: ignoreversion
+#endif
 ; Every line below the program itself carries skipifsourcedoesntexist. Only the
 ; executable is genuinely required; a missing document must not abort a build,
 ; and a wildcard matching nothing is a fatal error in Inno unless the line says
@@ -169,6 +180,10 @@ Source: "Hotkeys.htm"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesnt
 Source: "History.htm"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "License.htm"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "Developer.htm"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
+; In the Homer layout every other document lives in help, and every one ships:
+; build_APP_Py.cmd stops when a file in help\ matches no Source: line here.
+Source: "help\*.md"; DestDir: "{app}\help"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "help\*.htm"; DestDir: "{app}\help"; Flags: ignoreversion skipifsourcedoesntexist
 ; The spoken tutorials, when the app has any: the written walks, the feed,
 ; and one .mp3 per walk in help\tutorials with a playlist beside them.
 Source: "help\Tutorials.md"; DestDir: "{app}\help"; Flags: ignoreversion skipifsourcedoesntexist
@@ -325,24 +340,18 @@ Type: files; Name: "{localappdata}\_APP_\*.inix"
 //
 //  The include goes INSIDE [Code], and HomerComponents.iss carries no [Code]
 //  header of its own. Comments inside [Code] use // or (* *), never ;.
-#include "C:\HomerDev\Templates\HomerComponents.iss"
+//  The kit's folder comes from the build, which passes /DHomerDev=<kit>, so an
+//  app built against a kit somewhere other than C:\HomerDev includes that
+//  kit's table (1.43.0; the line named C:\HomerDev outright before).
+#ifndef HomerDev
+#define HomerDev "C:\HomerDev"
+#endif
+#include HomerDev + "\Templates\HomerComponents.iss"
 
 var
   iOllama: Integer;
   sActions: String;
   sPriorVersion: String;
-
-//  AI NOTE FOR CUSTOMIZING: one homerAdd per component. Arguments: name,
-//  winget ids (semicolon separated, or ''), an exe that answers --version,
-//  a file that proves it (Inno constants allowed), three or four words of
-//  use, and the uninstall registry key name (or ''). Add a var above for each.
-function InitializeSetup(): Boolean;
-begin
-  iOllama := homerAdd('Ollama', 'Ollama.Ollama', 'ollama',
-    '{localappdata}\Programs\Ollama\ollama.exe', 'runs the local AI model', 'Ollama');
-  sPriorVersion := '';
-  Result := True;
-end;
 
 //  ---- the previous install, for the screen reader script entries ----------
 function priorVersion(): String;
@@ -355,9 +364,25 @@ begin
   else if RegQueryStringValue(HKCU, sKey, 'DisplayVersion', sFound) then Result := sFound;
 end;
 
+//  AI NOTE FOR CUSTOMIZING: one homerAdd per component. Arguments: name,
+//  winget ids (semicolon separated, or ''), an exe that answers --version,
+//  a file that proves it (Inno constants allowed), three or four words of
+//  use, and the uninstall registry key name (or ''). Add a var above for each.
+function InitializeSetup(): Boolean;
+begin
+  iOllama := homerAdd('Ollama', 'Ollama.Ollama', 'ollama',
+    '{localappdata}\Programs\Ollama\ollama.exe', 'runs the local AI model', 'Ollama');
+  //  THE PREVIOUS INSTALL IS READ ONCE, HERE, before anything is installed
+  //  (1.43.0). It used to be read lazily, and a fresh install has no version
+  //  to cache: the finish page's Check: functions then read the uninstall key
+  //  AFTER setup had written it, found this very install, and offered
+  //  "Update the JAWS scripts" where "Install" belonged.
+  sPriorVersion := priorVersion();
+  Result := True;
+end;
+
 function isFreshInstall(): Boolean;
 begin
-  if sPriorVersion = '' then sPriorVersion := priorVersion();
   Result := (sPriorVersion = '');
 end;
 
@@ -450,7 +475,7 @@ begin
   if not FileExists(sFlag) then exit;
   DeleteFile(sFlag);
   Exec(ExpandConstant('{cmd}'),
-       '/s /c ""' + ExpandConstant('{app}\exec\{#AppExeName}') + '""',
+       '/s /c ""' + ExpandConstant('{app}\exec\{#AppExeName}') + '" {#AppLaunchParams}"',
        ExpandConstant('{userdocs}'), SW_SHOW, ewNoWait, iResult);
 end;
 

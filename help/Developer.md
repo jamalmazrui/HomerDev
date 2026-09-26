@@ -110,7 +110,7 @@ everything the project has named".
 2. `scripts\push "message"` -- rewrites the whitelist from `RepoFiles.txt`,
    adds what it names, refuses anything over 10 MB, commits, pushes, shows
    the status. Without `RepoFiles.txt` it stages nothing and says so.
-3. `scripts\tidy --do-it` -- the periodic clean: strays into place,
+3. `scripts\tidy` -- the periodic clean: strays into place,
    fetched things deleted, the whitelist rewritten, strays untracked, commit.
    Same whitelist as push; it too stages nothing without `RepoFiles.txt`.
 4. `scripts\release` -- tags the pushed commit with the version stamped in

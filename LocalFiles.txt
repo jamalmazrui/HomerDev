@@ -18,3 +18,8 @@ Templates/samples/*.exe
 Templates/samples/*.log
 Templates/samples/build/
 Templates/samples/dist/
+
+# The release scripts come from a separate project of their own and, by
+# standing rule, stay out of every repository, the kit's included.
+scripts/release.cmd
+scripts/release.ps1

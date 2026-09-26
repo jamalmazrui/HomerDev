@@ -65,15 +65,15 @@ if errorlevel 1 (
 if not exist "%CD%\RepoFiles.txt" (
   echo No RepoFiles.txt here, so nothing was staged: without it, "git add -A" would
   echo take everything in the folder. RepoFiles.txt names what the repository
-  echo carries; add it and run push again. tidy --do-it makes the first commit.
+  echo carries; add it and run push again. tidy makes the first commit.
   echo NO RepoFiles.txt: stopped before staging>> "%log%"
   endlocal & exit /b 1
 )
 
 rem The whitelist is rewritten on every push, so RepoFiles.txt and .gitignore
 rem cannot drift apart, and a line just added to the list counts now.
-if exist "%~dp0homerTidy.cmd" (
-  call "%~dp0homerTidy.cmd" --gitignore >> "%log%" 2>&1
+if exist "%~dp0tidy.cmd" (
+  call "%~dp0tidy.cmd" --gitignore >> "%log%" 2>&1
   if errorlevel 1 echo WARN: the whitelist .gitignore could not be rewritten; see the log.
 )
 

@@ -423,12 +423,19 @@ def checkKeys():
         if not bCaptions: sText = ""
         for sLine in sText.splitlines():
             oDef = re.match(r"\s{0,8}(?:public |private |internal |protected |static |override |virtual |async )+[\w<>\[\],\s\.]+?\s(\w+)\s*\(", sLine)
+            # A PYTHON FUNCTION IS A WINDOW'S BUILDER TOO (1.43.0). Only a def at
+            # the left margin starts a new owner: a nested def is a handler
+            # inside the dialog being built, and its captions belong with it.
+            # Without this, all of urlCheck.py's 7,000 lines were one owner.
+            if not oDef: oDef = re.match(r"(?:async )?def (\w+)\s*\(", sLine)
             if oDef: sMethod = oDef.group(1)
             # A CAPTION IS SHORT. An ampersand inside a sentence of help text is
             # prose that happens to hold the character; a control's caption is
             # a few words. Only strings of forty characters or fewer are read
             # as captions, so prose stops being counted as trigger letters.
-            for oHit in re.finditer(r'(?:\b\w+\(\s*(\w+)\s*,\s*)?"(?=[^"]{0,40}")[^"&]*&([A-Za-z])', sLine):
+            # An HTML entity -- &amp; &lt; &nbsp; -- is not a trigger letter
+            # (1.43.0): a program that writes HTML reports is full of them.
+            for oHit in re.finditer(r'(?:\b\w+\(\s*(\w+)\s*,\s*)?"(?=[^"]{0,40}")[^"&]*&(?![A-Za-z]+;|#\d+;)([A-Za-z])', sLine):
                 # The first argument names a menu only when it looks like one --
                 # miFile, menuMain. A title or a prompt passed first, such as
                 # promptText(sTitle, "&Question"), is not a container, and two
@@ -467,14 +474,37 @@ def checkBuild(bBuild):
     return finding("build", "fail", "%s returned %d; its own log has the compiler output" % (sScript, iCode))
 
 
+def isWindowed(sPath):
+    """True when the executable's PE header names the Windows GUI subsystem."""
+    try:
+        binHead = open(sPath, "rb").read(4096)
+        iPe = int.from_bytes(binHead[0x3C:0x40], "little")
+        if binHead[iPe:iPe + 4] != b"PE\0\0": return False
+        # The optional header follows the 20-byte file header; Subsystem sits
+        # at the same offset, 68, in both the 32-bit and 64-bit forms.
+        iSubsystem = int.from_bytes(binHead[iPe + 24 + 68:iPe + 24 + 70], "little")
+        return iSubsystem == 2
+    except Exception:
+        return False
+
+
 def checkSmoke(bBuild):
     if not bBuild:
         return finding("smoke", "skip", "not asked for; comes with --build")
-    lsExe = [s for s in glob.glob(os.path.join(sRoot, "*.exe"))
+    # THE PROGRAM LIVES IN exec (the Homer layout, 21 Sep 2026); an app not yet
+    # moved keeps it at the top. exec is looked in first, so a stale top-level
+    # copy left from before the move is never the one tested.
+    lsExe = [s for s in glob.glob(os.path.join(sRoot, "exec", "*.exe")) + glob.glob(os.path.join(sRoot, "*.exe"))
              if not s.lower().endswith("_setup.exe")]
     if not lsExe:
         return finding("smoke", "skip", "no executable here to start")
-    sExe = os.path.basename(lsExe[0])
+    sExe = os.path.relpath(lsExe[0], sRoot)
+    # A WINDOWED PROGRAM IS NOT STARTED (1.43.4). It has no console to answer
+    # --help on; started here it opens its window and waits for a person, and
+    # the check sat for its full fifteen-minute timeout before calling that a
+    # failure. The PE header says which kind a program is.
+    if isWindowed(lsExe[0]):
+        return finding("smoke", "skip", "%s is a windowed program, so it is started by hand, not here" % sExe)
     iCode, sOut = runCommand([], sShell='"%s" --help' % sExe)
     if iCode == 0 and sOut.strip():
         return finding("smoke", "pass", "%s --help returned 0 and wrote %s" %

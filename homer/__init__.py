@@ -1,4 +1,4 @@
-﻿"""The Homer toolkit for NVDA add-ons.
+﻿r"""The Homer toolkit in Python: for standalone programs and for NVDA add-ons.
 
 This is the Python counterpart of the C# Homer namespace: a set of modules that
 several programs need, kept in one place so a fix reaches all of them.
@@ -12,10 +12,20 @@ is how the tests run and how the same code can serve a program that is not an
 add-on at all.
 
 Nothing here depends on anything outside the standard library, except wx, which
-NVDA's own interface is built on and so is always present.
+NVDA's own interface is built on and so is always present. Two modules reach
+further only when what they reach is already there: say uses pywin32 or
+pythonnet for JAWS if either is installed, and nothing is required of a
+program that has neither.
 
 Nothing here knows about the program using it. No module reads a HomerView path,
 a HomerView setting, or a HomerView constant.
+
+**How a standalone program uses this** (urlCheck is the worked example). The
+package is not copied. The build puts the kit on PyInstaller's search path,
+--paths C:\HomerDev, and names each module it uses with --hidden-import, so
+the program is one .exe carrying the kit's current code:
+
+    from homer import elevate, inix, log, paths
 
 **How another add-on uses this.** Copy the homer folder into your add-on and
 import from it relatively:
@@ -51,12 +61,21 @@ language without translating as you go.
 
 Modules:
 
+    elevate Is there a newer release, and would you like it? (F11)
     inix    Order preserving ini and inix configuration files.
-    lbc     Layout by Code: accessible dialogs built in code.
+    lbc     Layout by Code: accessible dialogs built in code (wx).
+    lbcnet  The C# LbcDialog itself, from exec\Homer.dll (WinForms).
+    log     One session, one log file, under %LOCALAPPDATA%\<App>\logs.
+    mdi     The frame and child of a multiple-document app (wx).
+    paths   Where a Homer app keeps its files.
     say     One way to announce text, whatever is listening.
     util    Strings, sizes, plurals and line operations.
-    version Comparing and checking versions against a GitHub release.
     web     Dependency free HTTP with browser-like behaviour.
+
+There is no version module. Every Homer build writes a version.py of its own
+beside the program, so the kit cannot use that name: .gitignore and the checks
+treat it as generated, and homer\version.py was never pushed. Comparing
+versions is part of elevate, as it is part of Elevate.cs.
 
 **What Lbc gives every dialog.** These are the same conveniences the C#
 Lbc provides, and they exist because a person who cannot see the dialog needs
@@ -99,7 +118,7 @@ field could use.
 
 toolkitVersion = "1.0.0"
 
-__all__ = ["inix", "lbc", "say", "util", "version", "web"]
+__all__ = ["elevate", "inix", "lbc", "lbcnet", "log", "mdi", "paths", "say", "util", "web"]
 
 # --- A shared Homer folder, when one exists -------------------------------
 #

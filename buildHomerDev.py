@@ -33,8 +33,8 @@ c_lsExpected = [
     "CSharp/Log.cs", "CSharp/Mdi.cs", "CSharp/Paths.cs",
     "CSharp/PdfRead.cs", "CSharp/Say.cs", "CSharp/Util.cs", "CSharp/Web.cs",
     "CSharp/inixVert.cs",
-    "homer/__init__.py", "homer/inix.py", "homer/lbc.py", "homer/log.py",
-    "homer/mdi.py", "homer/paths.py", "homer/say.py", "homer/util.py", "homer/version.py", "homer/web.py",
+    "homer/__init__.py", "homer/inix.py", "homer/lbc.py", "homer/lbcnet.py", "homer/log.py",
+    "homer/mdi.py", "homer/elevate.py", "homer/paths.py", "homer/say.py", "homer/util.py", "homer/web.py",
     "Templates/build_APP_.cmd", "Templates/build_APP_Py.cmd",
     "Templates/_APP__setup.iss", "Templates/_APP_.cs",
     "Templates/installModels.cmd",
@@ -60,7 +60,7 @@ c_lsExpected = [
     "Templates/LocalFiles.txt",
     "Templates/_APP_.cmd",
     "help/CamelType_CSharp.md", "help/CamelType_CSharp_Reference.md",
-    "help/CamelType_JAWSScript.md",
+    "help/CamelType_JAWSScript.md", "help/CamelType_Python.md",
     "ReadMe.md", "License.md",
     "help/Announce.md", "help/Developer.md", "help/History.md", "help/HomerDev.md",
     "help/FAQ.md", "help/FinishPage.md", "help/HomerDev_update.md", "help/Hotkeys.md", "help/Logging.md", "help/Tutorials.md",
@@ -148,6 +148,16 @@ c_lMoved = [
     ("Python/homer/say.py", "homer/say.py"),
     ("Python/homer/util.py", "homer/util.py"),
     ("Python/homer/web.py", "homer/web.py"),
+    # 1.43.0: the last two files of the old Python folder. __init__.py was
+    # already at homer\; version.py is retired below, its work now in
+    # homer\elevate.py.
+    ("Python/homer/__init__.py", "homer/__init__.py"),
+    # 1.43.0: the per-sample folders of the old Samples layout, which the
+    # 1.37.0 pairs did not reach, so Samples never emptied.
+    ("Samples/FruitBasketCs/buildFruitBasketCs.cmd", "Templates/samples/buildFruitBasketCs.cmd"),
+    ("Samples/FruitBasketCs/version.txt", "Templates/samples/version.txt"),
+    ("Samples/FruitBasketPy/buildFruitBasketPy.cmd", "Templates/samples/buildFruitBasketPy.cmd"),
+    ("Samples/FruitBasketPy/version.txt", "Templates/samples/version.txt"),
     ("CSharp/Keys.cs", "CSharp/KeyName.cs"),
     # 1.29.0: four files delivered on 24 Sep 2026 under folders the kit never
     # had (Docs, Inno, Scripts) now sit where RepoFiles.txt says kit files go.
@@ -215,11 +225,17 @@ c_lsRetired = [
     "Tools/cleanDir.cmd", "Tools/cleanDir.py", "Tools/gitRelease.cmd", "Tools/homerPolicy.py",
     "Tools/installTools.cmd", "Tools/sayTutorial.cmd", "Tools/sayTutorial.py",
     "Tools/tidyRepo.cmd", "Tools/tidyRepo.py",
+    # 1.43.0: homer\version.py could never be pushed -- every Homer build writes
+    # a version.py of its own, so .gitignore and the checks treat the name as
+    # generated -- and the kit's check reported it missing on every build. Its
+    # version comparison is now part of homer\elevate.py, as it is of Elevate.cs.
+    "Python/homer/version.py", "homer/version.py",
 ]
 
 # Folders that existed in an earlier layout and hold nothing the kit wants now.
 # Removed only when empty, which they are once the pairs above have been applied.
-c_lsOldFolders = ["Docs", "Inno", "Python/homer", "Python", "Templates/samples/FruitBasketCs",
+c_lsOldFolders = ["Docs", "Inno", "Python/homer", "Python", "Samples/FruitBasketCs", "Samples/FruitBasketPy",
+                  "Templates/samples/FruitBasketCs",
                   "Templates/samples/FruitBasketMdi", "Templates/samples/FruitBasketPy", "Samples", "Style", "Tools"]
 sScriptDir = os.path.dirname(os.path.abspath(__file__))
 sLogPath = os.path.join(sScriptDir, "logs", c_sLogName)
@@ -322,6 +338,76 @@ def buildSamples():
             sayLine("%s FAILED. Its own log, build%s.log, has the compiler output."
                     % (sName, sName))
     return iFailed
+
+
+# THE KIT'S C# CLASSES AS ONE LIBRARY, FOR PYTHON (1.43.6). A Python app with
+# a WinForms interface loads exec\Homer.dll through pythonnet (homer\lbcnet.py)
+# and builds its dialogs with the very LbcDialog the C# apps use, so a Python
+# dialog gets the same focus order, keys, Help box and F11 by construction
+# rather than by a second implementation kept in step by hand. The list is
+# what LbcDialog needs, the set every C# app with a dialog compiles.
+c_lsHomerDllClasses = ["Elevate", "Inix", "Lbc", "Log", "Paths", "Say", "Util", "Web"]
+
+
+def findRoslyn():
+    """The Roslyn csc.exe of any Visual Studio or Build Tools, via vswhere."""
+    sVsWhere = os.path.join(os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)"),
+                            "Microsoft Visual Studio", "Installer", "vswhere.exe")
+    if not os.path.isfile(sVsWhere):
+        logLine("No vswhere.exe at %s" % sVsWhere)
+        return ""
+    iCode, sOut = runCommand([sVsWhere, "-latest", "-products", "*", "-find",
+                              "MSBuild\\**\\Bin\\Roslyn\\csc.exe"])
+    for sLine in sOut.splitlines():
+        sLine = sLine.strip()
+        if sLine.lower().endswith("csc.exe") and os.path.isfile(sLine): return sLine
+    return ""
+
+
+def findReference(sName):
+    """A .NET Framework reference assembly by full path, as the C# template finds it."""
+    sRefBase = os.path.join(os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)"),
+                            "Reference Assemblies", "Microsoft", "Framework", ".NETFramework")
+    for sVersion in ("v4.8.1", "v4.8", "v4.7.2", "v4.7.1", "v4.7", "v4.6.2"):
+        sPath = os.path.join(sRefBase, sVersion, sName)
+        if os.path.isfile(sPath): return sPath
+    sWindows = os.environ.get("SystemRoot", r"C:\Windows")
+    for sPath in (os.path.join(sWindows, "Microsoft.NET", "assembly", "GAC_MSIL", "System.Speech",
+                               "v4.0_4.0.0.0__31bf3856ad364e35", sName),
+                  os.path.join(sWindows, "Microsoft.NET", "Framework64", "v4.0.30319", "WPF", sName)):
+        if os.path.isfile(sPath): return sPath
+    return ""
+
+
+def buildHomerDll():
+    """Compile exec\\Homer.dll from the kit's C# classes. Returns a problem or ""."""
+    if os.name != "nt": return ""
+    sCsc = findRoslyn()
+    if sCsc == "":
+        return ("exec\\Homer.dll was not built: no Roslyn C# compiler. The C# samples "
+                "install the Build Tools; build them, then buildHomerDev again.")
+    lsRefs = []
+    for sName in ("System.Speech.dll", "UIAutomationProvider.dll", "UIAutomationTypes.dll"):
+        sPath = findReference(sName)
+        if sPath == "": return "exec\\Homer.dll was not built: %s was not found" % sName
+        lsRefs.append("/reference:" + sPath)
+    for sName in ("System.dll", "System.Core.dll", "System.Data.dll", "System.Drawing.dll",
+                  "System.Windows.Forms.dll", "System.Web.dll", "System.Web.Extensions.dll",
+                  "System.Net.Http.dll", "System.Xml.dll", "System.IO.Compression.dll",
+                  "System.IO.Compression.FileSystem.dll", "Microsoft.VisualBasic.dll"):
+        lsRefs.append("/reference:" + sName)
+    sExec = os.path.join(sScriptDir, "exec")
+    if not os.path.isdir(sExec): os.makedirs(sExec)
+    sOut = os.path.join(sExec, "Homer.dll")
+    lsSources = [os.path.join(sScriptDir, "CSharp", sClass + ".cs") for sClass in c_lsHomerDllClasses]
+    for sSource in lsSources:
+        if not os.path.isfile(sSource): return "exec\\Homer.dll was not built: %s is missing" % sSource
+    iCode, sOutput = runCommand([sCsc, "/nologo", "/target:library", "/platform:x64", "/optimize+",
+                                 "/out:" + sOut] + lsRefs + lsSources)
+    if iCode != 0 or not os.path.isfile(sOut):
+        return "exec\\Homer.dll did not compile; the log has the compiler's messages"
+    sayLine("Built exec\\Homer.dll for Python apps (%s)." % ", ".join(c_lsHomerDllClasses))
+    return ""
 
 
 def removeStaleBinCopies():
@@ -466,7 +552,11 @@ def renameScripts():
                 except Exception as oError:
                     logLine("COULD NOT REMOVE scripts/%s: %s" % (sName, oError))
 
-    lPatterns = [(re.compile(r"(?<![A-Za-z0-9_])%s(?![A-Za-z0-9_])" % re.escape(sOld)), sNew)
+    # A digit may come before a name: %~dp0homerTidy.cmd is how a script calls
+    # its neighbour, and the 0 of %~dp0 kept every such call from being
+    # rewritten until 1.43.8 -- tidy.cmd went on running homerTidy.py, push
+    # skipped the whitelist, and check ran a file that was no longer there.
+    lPatterns = [(re.compile(r"(?<![A-Za-z_])%s(?![A-Za-z0-9_])" % re.escape(sOld)), sNew)
                  for sOld, sNew in c_lRenamedWords]
     for sRoot, lsDirs, lsFiles in os.walk(sScriptDir):
         lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders and s.lower() != "logs"]
@@ -490,6 +580,11 @@ def renameScripts():
             lsLines = sText.split("\n")
             for iLine, sLine in enumerate(lsLines):
                 if "for %%F in (cleanDir.cmd" in sLine: continue
+                # The Python template's retired list is a variable, not a loop
+                # (1.43.1): rewritten by 1.43.0's first run, it named check,
+                # push, tidy and release as retired, and an app built from it
+                # would have deleted the tools it had just refreshed.
+                if "retiredTools=" in sLine: continue
                 for oPattern, sNew in lPatterns:
                     sLine = oPattern.sub(sNew, sLine)
                 lsLines[iLine] = sLine
@@ -521,6 +616,11 @@ def renameScripts():
                 sText = sText[:iAt] + "for %%F in (" + " ".join(lsHave + lsAdd) + sText[iEnd:]
                 open(sTemplate, "wb").write(sText.encode("utf-8"))
                 logLine("ADDED to the template's retired list: %s" % " ".join(lsAdd))
+        elif "retiredTools=" in sText:
+            # 1.43.2: the C# template names its retired scripts in a
+            # retiredTools= variable, as the Python one does, and already
+            # lists every renamed name.
+            pass
         else:
             logLine("NOTE: the template's retired-scripts loop was not found, so the old names were not added to it")
 
@@ -762,6 +862,48 @@ def checkKit():
                 lsProblems.append("%s: %d of %d line endings are not CRLF" %
                                   (sShown, iLf - iCrLf, iLf))
 
+    # EVERY LABEL ONCE, AND EVERY JUMP TO A LABEL THAT EXISTS (1.43.3). The C#
+    # template of 1.43.2 was assembled with half of the Python template pasted
+    # after its own subroutines: two :seedVersion labels, two :failed, and a
+    # "call :seedVersion" that landed in the pasted copy, which found no
+    # version.txt and failed twice without a word. cmd takes the first label
+    # it meets, so a duplicate is never an error there -- only here.
+    for sFolder in ("Templates", os.path.join("Templates", "samples"), "scripts"):
+        sDir = os.path.join(sScriptDir, sFolder)
+        if not os.path.isdir(sDir): continue
+        for sName in sorted(os.listdir(sDir)):
+            if not sName.lower().endswith((".cmd", ".bat")): continue
+            sText = open(os.path.join(sDir, sName), "rb").read().decode("utf-8", errors="replace")
+            lsLabels = [m.lower() for m in re.findall(r"(?im)^:(\w+)", sText)]
+            for sLabel in sorted(set(lsLabels)):
+                if lsLabels.count(sLabel) > 1:
+                    lsProblems.append("%s/%s: the label :%s is defined %d times" %
+                                      (sFolder.replace(os.sep, "/"), sName, sLabel, lsLabels.count(sLabel)))
+            for sTarget in sorted(set(m.lower() for m in re.findall(r"(?i)\b(?:goto|call)\s+:(\w+)", sText))):
+                if sTarget != "eof" and sTarget not in lsLabels:
+                    lsProblems.append("%s/%s: jumps to :%s, which is not defined" %
+                                      (sFolder.replace(os.sep, "/"), sName, sTarget))
+
+    # EVERY SCRIPT CALLS NEIGHBOURS THAT EXIST (1.43.8). After the renames of
+    # 1.42, tidy.cmd still ran "%~dp0homerTidy.py", check.cmd
+    # "%~dp0checkHomerApp.py" and push.cmd tested for "%~dp0homerTidy.cmd"
+    # -- files no longer there -- so tidy and check failed and push skipped the
+    # whitelist without a word, in every app that refreshed them. A call to a
+    # neighbour is a problem unless the file is in scripts, or the same line
+    # first asks whether it exists.
+    sScriptsDir = os.path.join(sScriptDir, "scripts")
+    if os.path.isdir(sScriptsDir):
+        lsHere = [sName.lower() for sName in os.listdir(sScriptsDir)]
+        for sName in sorted(os.listdir(sScriptsDir)):
+            if not sName.lower().endswith(".cmd"): continue
+            sText = open(os.path.join(sScriptsDir, sName), "rb").read().decode("utf-8", errors="replace")
+            for sLine in sText.splitlines():
+                if sLine.lstrip().lower().startswith("rem"): continue
+                for sCalled in re.findall(r"%~dp0([\w.]+\.(?:cmd|py|ps1))", sLine, re.I):
+                    if sCalled.lower() in lsHere: continue
+                    if re.search(r"if\s+exist\s+\"?%~dp0" + re.escape(sCalled), sLine, re.I): continue
+                    lsProblems.append("scripts/%s calls %s, which is not in scripts" % (sName, sCalled))
+
     # A template that has lost its token would silently produce a broken app.
     for sName in ["build_APP_.cmd", "build_APP_Py.cmd", "_APP__setup.iss", "_APP_.cs",
                   "create_APP_Repo.cmd", "create_APP_Repo.ps1"]:
@@ -808,6 +950,11 @@ def main():
             iDone = convertDocs(sPandoc)
             sayLine("%d document%s converted to HTML." % (iDone, "" if iDone == 1 else "s"))
         iSamplesFailed = buildSamples()
+        # After the samples, whose C# build installs the Build Tools if needed.
+        sDllProblem = buildHomerDll()
+        if sDllProblem != "":
+            sayLine(sDllProblem)
+            iSamplesFailed += 1
         buildTutorials()
         removeStaleBinCopies()
 

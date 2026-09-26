@@ -1,12 +1,13 @@
 ﻿# HomerDev Update: bringing a Homer app up to the current kit
 
 *A briefing on the learnings, decisions and techniques of HomerDev as of
-26 September 2026 (kit 1.42.1), written so that another Homer app -- DbDo,
+26 September 2026 (kit 1.43.6), written so that another Homer app -- DbDo,
 part way there; FileDir, some of the way; EdSharp, not yet started -- can
 take up the kit's code, concepts and structure with less pain than
 HomerScribe and HomerView went through. It is a developer document:
 technical, dated, and specific about what went wrong. HomerScribe was the
-first app moved; HomerView, the second, is recorded below in its own section
+first app moved; urlCheck, the first Python app, has its own section below;
+HomerView, the second, is recorded below in its own section
 because it met a different set of traps -- an existing PowerShell build, an
 NVDA add-on, JAWS scripts, and a C# bridge -- and most of them will meet the
 next app too.*
@@ -25,8 +26,8 @@ builds rather than twenty.
   `Ollama.cs`, `Paths.cs`, `PdfRead.cs`, `Say.cs`, `Util.cs`, `Web.cs`,
   `inixVert.cs`. An app never carries a copy; it names the kit's file on the
   compiler line.
-- `homer\` -- the same for Python: `inix.py`, `lbc.py`, `log.py`, `mdi.py`,
-  `paths.py`, `say.py`, `util.py`, `web.py`.
+- `homer\` -- the same for Python: `elevate.py`, `inix.py`, `lbc.py`, `log.py`,
+  `mdi.py`, `paths.py`, `say.py`, `util.py`, `web.py`.
 - `scripts\` -- the tools every app inherits, refreshed into its own
   `scripts` folder on every build: `buildTutorials`, `check`,
   `checkTutorial`, `fixEncoding`, `push`, `unpushed`, `installCommon`,
@@ -216,7 +217,7 @@ Three rules from HomerView, 26 September:
    project's own files into the Homer encoding, refreshes the scripts.
 2. `scripts\push "message"` -- rewrites the whitelist, adds what it names,
    commits, pushes, shows the status.
-3. `scripts\tidy --do-it` -- the periodic clean: strays into `notes`,
+3. `scripts\tidy` -- the periodic clean: strays into `notes`,
    fetched things deleted, zero-byte files deleted, whitelist rewritten,
    strays untracked, commit. `--gitignore` alone rewrites the whitelist.
 4. `scripts\release` -- runs the app's checks (`check --build`),
@@ -655,6 +656,259 @@ with the capitalised name is corrected on its first push after kit 1.42.1.
   is older than the working copy, change the working copy in place (as the
   renaming does) rather than shipping files that would overwrite it.
 
+# C# apps: urlFido, and a template brought level
+
+urlFido, a C# console program with an Lbc dialog, moved to the kit on
+26 September, and the C# build template turned out to be behind the Python
+one written for urlCheck the day before. Kit 1.43.2 rewrote
+`Templates\build_APP_.cmd` clause for clause against `build_APP_Py.cmd`, so
+the two contexts stay separate but equal. What urlFido taught:
+
+- **Check the app's calls against the kit's classes before deleting its
+  copies.** urlFido called LbcDialog (two-argument constructor, addBand,
+  addInputBox, addButton, addCheckBox, addSeparator, endBand, runWithButtons,
+  form), InixCodec (read, writeValue, Section.Name, keys, get), Web, Util and
+  Say. Every one exists in the kit with the same signature, so the copies
+  could go. A mismatch would have been a compile error, which is the right
+  way to find it, but a grep first saves a round.
+- **The kit's classes need each other.** Lbc calls Elevate, Log and Say; Log
+  and Paths call each other; Log calls Say. An app that used to compile Lbc,
+  Say, Inix, Util and Web must add Elevate, Log and Paths. homerModules names
+  them; the template's comment says which needs which.
+- **Log.start comes after anything that must precede Say.** Log's header asks
+  Say which reader is running, and Say's DllImport of the NVDA client
+  resolves then. urlFido pre-loads its embedded client first, so Main runs
+  nvdaLoader.preload, then Log.start, then Elevate.configure.
+- **F11 goes through the dialog's commandKey**, which claims a key before any
+  control sees it. When Elevate.offer returns true the setup program is
+  running, and the dialog closes.
+- **A const version.** Version.cs holds `public const string Version`, so an
+  app can build constants from it: urlFido's user agent is
+  `" urlFido/" + BuildVersion.Version`.
+- **Fetch the NVDA client; never ask for it.** The old build said "put the
+  64-bit DLL here and rebuild". The template now fetches it from NV Access,
+  and takes a top-level copy the project already has.
+- **Two tools, one hotkey.** urlFido and urlCheck both claimed Alt+Control+U;
+  urlCheck moved to Alt+Control+Shift+U as urlFido's installer had long said
+  it would. Check a new desktop hotkey against every Homer app's installer.
+- **A build that says "Build FAILED" and nothing else jumped somewhere it
+  should not.** urlFido's first build wrote "Build FAILED" twice and no reason:
+  the C# template carried a pasted second copy of the Python template's
+  version code, and `call :seedVersion` landed in it. cmd takes the first
+  label it meets and never complains about a duplicate, so the kit build now
+  checks every script for a label defined twice and for a jump to a label
+  that does not exist. When a script is assembled from pieces of another,
+  cut at the label line itself (a line starting with `:`), never at the first
+  occurrence of the label's name, which is usually the `call` that uses it.
+- **Set seedVersion to the number the move should start at, and it holds.**
+  An app may already have a version.txt on the developer's machine, never in
+  any zip. Since 1.43.5 seedVersion is a floor: a lower version.txt is raised
+  to it. Before that, 2htm's 1.18.4 stepped to 1.18.5 under documents that
+  said 1.19.0.
+- **A Python app with WinForms dialogs uses the C# LbcDialog.** Set
+  homerDll=1 and add lbcnet to homerModules; build the dialog with
+  `Homer = lbcnet.load()` and `Homer.LbcDialog(...)` exactly as a C# app
+  would, passing button lists through `lbcnet.strings()` and a key handler
+  through `lbcnet.keyHandler()`. Keep pythonnet's own workarounds in the
+  app's handlers (the legacy file picker, SHBrowseForFolder). homer.lbc
+  (wx) stays for code that runs inside NVDA. urlCheck 1.12.3 is the worked
+  example.
+- **An app's standing choice outranks the template's default.** The template
+  deletes saved settings on uninstall; urlFido always kept them, "their
+  filesystem, their call", and still does.
+
+# bookFido: a C# app with its own libraries and its own data
+
+bookFido, the third app moved on 26 September, embeds a dozen NuGet libraries
+and keeps a database worth hours of gathering. What it taught:
+
+- **An app's special build steps stay in the app's build, as a section of
+  their own.** bookFido's pinned NuGet fetch (by lib folder for most packages,
+  by file-name search for the SQLite ones) was proven over many runs; it moved
+  into buildbookFido.cmd unchanged in substance, fetching into `work\nuget`,
+  rather than being squeezed into the template's simpler `nugetPackages`.
+- **Moving the program into exec moves everything that says "beside the
+  program".** bookFido kept its state and database beside its own exe. Built
+  into exec, it would have started with an empty database. Its data now lives
+  in `Paths.data()` whatever the exe's folder, and the first run MOVES the
+  newest existing copy there from the old places -- beside the exe, the folder
+  above exec, `%LOCALAPPDATA%\<App>`. Grep an app for BaseDirectory before
+  moving it.
+- **Keep the verified configuration where it matters.** bookFido's resolver
+  prefers a library file beside the exe over embedded bytes (the cure for its
+  assembly-instance trap), and every verified database run had the files
+  beside it. The build copies them into exec too, so the project copy behaves
+  exactly as before; the installer still ships the program alone.
+- **An uninstaller keeps what cannot be made again.** The template deletes
+  logs and settings; bookFido's uninstaller deletes logs and the engine it
+  wrote out, and keeps the database and the Edge profile holding sign-ins.
+- **A windowed program cannot be smoke-tested with --help.** check now reads
+  the PE header and skips a windowed program rather than waiting fifteen
+  minutes for it.
+
+# Python apps: what urlCheck taught, 26 September 2026
+
+urlCheck is one 7,000-line Python file: a console program with a WinForms
+dialog through pythonnet, driving Edge with Playwright, frozen by PyInstaller.
+It was the first Python app moved, and it found that the kit's Python side had
+fallen behind the C# side in ways no C# migration would notice. Kit 1.43.0
+fixed them; these are the rules that came out of it.
+
+## The contract is the same; the template now says so
+
+`Templates\build_APP_Py.cmd` keeps every clause of the contract above: kit
+detection by `homer\log.py` and a trimmed `kitNeeded`; `version.txt` stepped,
+seeded when missing and written into `version.py`; one log per run in `logs`;
+the kit tools refreshed by name and retired ones deleted; `fixEncoding -build`;
+`/DHomerDev=` to ISCC. A Python app's build is the template with its SETTINGS
+block filled in -- `kitNeeded`, `seedVersion`, `pyVersion`, `pyiMode`,
+`homerModules`, `pyiExtra`, `pipPackages`, `kitTools` -- and, during a move,
+one section of its own that carries over the old layout (see below).
+buildUrlCheck.cmd is the worked example.
+
+## The kit's modules are named, not copied
+
+A frozen program cannot import from `C:\HomerDev` at run time, and a copy in
+the app drifts. So the build passes `--paths C:\HomerDev` and one
+`--hidden-import homer.<module>` for each module in `homerModules`. The .exe
+then carries the kit's code as it was at build time. An NVDA add-on is the
+exception: NVDA gives add-ons no way to share one copy, so an add-on copies
+`homer`.
+
+## Never name a kit module version.py
+
+Every Homer build writes `version.py` beside the program. `.gitignore`
+ignores that name wherever it appears, and the checks skip it as generated.
+The kit's `homer\version.py` was therefore never pushed, sat stranded in an
+old `Python\homer` folder, and the kit's own check called it missing on every
+build. Its comparison is now in `homer\elevate.py`. The general rule: a kit
+file must not share a name with anything a build generates.
+
+## Where each Python program goes
+
+- The program: `exec\<App>.exe`, from `--distpath exec`.
+- PyInstaller's scratch and `.spec`: `work\pyinstaller`, from `--workpath` and
+  `--specpath`. **Pass the icon's full path**: PyInstaller resolves `--icon`
+  against the `.spec` file's folder.
+- The build environment: `.venv`, rebuilt when its Python is not `pyVersion`.
+- `.venv/`, `exec/`, `version.py`, `version.txt` and `work/` in
+  `LocalFiles.txt`.
+
+urlCheck had committed a 70 MB PyInstaller `build\` folder and both .exe
+files. The build now deletes those once the new program exists, and one
+`scripts\tidy` untracks the rest. `push` refuses anything over 10 MB,
+so a stray setup program cannot go up by accident.
+
+## A program that runs from exec finds its documents one level up
+
+`homer.paths.installedFolder()` answers the parent of `exec`, in the installed
+tree and in the project alike. urlCheck's Help had looked for `README.htm`
+beside the .exe; it now opens `help\<App>.htm` under that folder, then
+`ReadMe.htm`. A command-line wrapper at the top, `<App>.cmd`, runs
+`"%~dp0exec\<App>.exe" %*`.
+
+## Logging: the session log is not optional
+
+urlCheck wrote a log only when `-l` was given, into the output folder, in
+append mode. The kit's rule is a log of every session in
+`%LOCALAPPDATA%\<App>\logs`. The move kept the app's own `logger` class --
+three programs share its surface -- and made it write every line through
+`homer.log` as well, and its settings header as `log.keyValue` lines. `-l`
+keeps its old meaning as an extra copy beside the results. The entry point
+became `runLogged()`, which records any exception main() did not catch before
+the program ends, and names the log on the console.
+
+## Settings: .inix, and carry the old file over
+
+`configs\<App>.inix` through `homer.paths.configs()` and `homer.inix`. Read the
+old `.ini` when no `.inix` exists; delete it when the new one is first saved;
+map the old key names onto the new. Test the carry-over: urlCheck's was run
+against a real old file before delivery.
+
+## WinForms through pythonnet keeps its own dialog
+
+`homer.lbc` is wx. A program already on WinForms through pythonnet keeps its
+dialog and uses the kit's other modules, and follows Lbc's rules by hand:
+each label takes the tab stop just before its field -- WinForms names a text
+box from the label before it in tab order -- and no field sets an
+AccessibleName equal to its label. `check.py`'s naming check now reads Python
+functions as a window's builders, so it catches the second.
+
+## F11 in a Python program
+
+`elevate.configure(owner, repo, version)` at startup; in the dialog's KeyDown,
+F11 calls `elevate.offer(hwnd)` -- `frm.Handle.ToInt64()` in WinForms,
+`frame.GetHandle()` in wx. When it returns True the setup program is running,
+and the dialog closes.
+
+## The old layout on disk: renames Windows will not do for you
+
+Unzipping `ReadMe.md` over `README.md` replaces the content and keeps the old
+capitals. The build's carry-over section renames by exact case -- through
+`git mv -f` when git tracks the file, so the repository follows -- and deletes
+a moved document (`announce.md`, `CamelType_Python.md`) only once its
+replacement exists.
+
+## The whitelist left out every file named inside a folder
+
+Not a Python problem, but urlCheck found it. `tidy` wrote `/*` and then
+`!/help/Announce.md`; `/*` ignores the folder `help` itself, git never looks
+inside an ignored folder, and so every file named one by one in a subfolder
+was silently left out of the repository -- in `help\`, and in `scripts\`,
+which the rules above say must be named one by one. Tested with git: 15 of
+urlCheck's 34 named files were staged. Kit 1.43.0's `tidy` puts the folder back
+and re-ignores its contents first (`!/help/`, `/help/*`), then the files: all
+34 staged. **Every app whose RepoFiles.txt names files inside a folder should
+run `scripts\tidy --gitignore` and push**, and check GitHub for the files that
+never went up.
+
+## Checks that caught a Python app out
+
+- `check`'s smoke test looked only at the top of the project; it now looks in
+  `exec` first. This affected every app moved to the layout, C# included.
+- `check`'s key check read a whole Python file as one window and counted
+  `&amp;` as a trigger letter. It now starts a new owner at each top-level
+  `def` and skips HTML entities.
+
+# Installer template: the program from exec, the documents from help
+
+Found by urlCheck's first build on the kit. `Templates\_APP__setup.iss` named
+the program and the documents at the top of the project, while every build in
+the Homer layout -- the Python template included -- leaves the program in
+`exec\` and the documents in `help\`. Since 1.43.1 the template takes the
+program from `exec\` when it is there (an `#if FileExists` choice at compile
+time) and ships `help\*.md` and `help\*.htm`. `AppLaunchParams` says what the
+program is started with after the Results box, matching its shortcut.
+
+**The installer pattern is the template's, even with nothing to install.**
+urlCheck registers no component, and still includes `HomerComponents.iss` from
+the kit the build names, calls `homerNoteTicked` from `NextButtonClick`, shows
+the Results box and only then starts the program. The next component is one
+`homerAdd`, three `[Run]` entries and one `addAction`, not a new installer.
+
+# The kit renames only where it should
+
+buildHomerDev's renaming rewrites old script names in the kit's own files,
+skipping the lines whose job is to name the old scripts. It knew the C#
+template's retired loop and not the Python template's `retiredTools=` line,
+and on its first 1.43.0 run turned that list into the current tools' names --
+which an app would then have deleted after refreshing them. Any list whose
+job is to name old things must be recognised by the renaming, or it will be
+"corrected". Kit 1.43.1 skips both and ships the template whole again.
+
+# Installer template: read the previous version once
+
+Found while writing urlCheck's installer. The template read the previous
+install's version lazily, and a fresh install has none to cache, so every later
+call read the registry again. The finish page's `Check:` functions run after
+setup has written its own uninstall key, found it, and a fresh install was
+offered "Update the JAWS scripts" in place of "Install". Kit 1.43.0 reads it
+once in `InitializeSetup`. **An app whose installer was made from the template
+before 1.43.0 has the same fault** and needs the same two lines changed:
+`sPriorVersion := priorVersion();` in `InitializeSetup`, and `isFreshInstall`
+reduced to `Result := (sPriorVersion = '');`, with `priorVersion` moved above
+`InitializeSetup`.
+
 # The migration, step by step
 
 For an app that has not yet moved to the kit. Build green after every step;
@@ -701,7 +955,7 @@ contract first without moving files, then the layout one group at a time.
 10. **Write the first walk**, `help\Tutorial_00_Overview.inix`, if the app is
     to have tutorials, and add the tutorial tools to the refresh loop then.
 11. **Create the repository** with `create<App>Repo` if there is none;
-    otherwise `scripts\tidy`, then `scripts\tidy --do-it`.
+    otherwise `scripts\tidy`.
 12. **Build, check, push, release**: `build<App>`, `scripts\check --build`,
     `scripts\push "Move to the kit."`, `scripts\release`.
 
@@ -949,3 +1203,13 @@ are the fullest current examples of everything above, and its
 - Never run anything between a command and its `if errorlevel` check.
 - Probe with git or gh under `$ErrorActionPreference = 'SilentlyContinue'` in PowerShell 5.1.
 - When GitHub says a repository moved, point origin at the new location.
+- A Python app's build is `Templates\build_APP_Py.cmd` with its SETTINGS filled in.
+- Name the kit's Python modules with `--hidden-import`; never copy them into a standalone app.
+- No kit file shares a name with anything a build generates (`version.py`).
+- PyInstaller: program to `exec`, scratch and `.spec` to `work`, icon by full path.
+- A program in `exec` finds `help` through `homer.paths.installedFolder()`.
+- The session log is kept every run; an app's own log option is an extra copy.
+- Carry an old settings file over, and prove it on a real one.
+- A WinForms dialog through pythonnet keeps its code and follows Lbc's rules by hand.
+- Read an installer's previous version once, in `InitializeSetup`.
+- A whitelist that names a file in a subfolder must first put the subfolder back.

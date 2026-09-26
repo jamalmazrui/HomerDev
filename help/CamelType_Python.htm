@@ -1,0 +1,605 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>CamelType_Python</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">CamelType_Python</h1>
+</header>
+<h1 id="camel-type-python-coding-guidelines">Camel Type: Python Coding
+Guidelines</h1>
+<p>Camel Type is a coding style optimized for screen reader productivity
+and systematic readability. The following rules apply to Python 3.
+Equivalent documents in this folder cover C#
+(<code>CamelType_CSharp.md</code>) and JAWS scripting
+(<code>CamelType_JAWSScript.md</code>).</p>
+<p>This is the kit’s copy. An app does not carry one of its own;
+urlCheck’s copy moved here in HomerDev 1.43.0.</p>
+<hr />
+<h2 id="variable-and-argument-naming">1. Variable and Argument
+Naming</h2>
+<p>Use Hungarian prefix notation to indicate type. Prefix rules:</p>
+<ul>
+<li><code>a</code> — array (or tuple used as a fixed sequence)</li>
+<li><code>b</code> — boolean</li>
+<li><code>bin</code> — binary buffer (<code>bytes</code> or
+<code>bytearray</code>)</li>
+<li><code>dt</code> — date-time (<code>datetime</code> object)</li>
+<li><code>f</code> — file object</li>
+<li><code>h</code> — window or OS handle (an <code>int</code> from
+<code>ctypes</code>, or <code>frm.Handle.ToInt64()</code> under
+pythonnet)</li>
+<li><code>i</code> — integer</li>
+<li><code>l</code> — list</li>
+<li><code>n</code> — real number (float)</li>
+<li><code>s</code> — string</li>
+<li><code>d</code> — dictionary</li>
+<li><code>v</code> — variant (unknown or mixed type)</li>
+</ul>
+<p>For <strong>Python object instances</strong> (class instances,
+library objects), use the <strong>lowercase class name</strong> as the
+prefix, OR a common abbreviation if one is universally understood (e.g.,
+<code>pd</code> for pandas, <code>np</code> for numpy, <code>bs</code>
+for BeautifulSoup, <code>ex</code> for Exception, <code>df</code> for
+DataFrame).</p>
+<p>If there is only one instance of that class in scope, the class name
+prefix is the entire variable name — no additional suffix is added.</p>
+<p>Examples: - One <code>Path</code> instance: <code>path</code> - One
+<code>requests.Session</code> instance: <code>session</code> - One
+<code>BeautifulSoup</code> instance: <code>bs</code> - One
+<code>pandas.DataFrame</code>: <code>df</code> - A caught exception:
+<code>ex</code> (universal abbreviation; if multiple
+<code>Exception</code> variables coexist, use <code>exParse</code>,
+<code>exNetwork</code>, etc.)</p>
+<p>The <code>o</code> prefix is <strong>reserved for COM objects
+only</strong> (e.g., <code>oWord</code>, <code>oExcel</code>,
+<code>oWorkbook</code>, <code>oRange</code>). Do not use <code>o</code>
+as a generic “other object” prefix; use the class-name prefix
+instead.</p>
+<p>This convention extends naturally: a <code>pathlib.Path</code> is
+<code>path</code> or <code>pathInput</code>; a
+<code>urllib.request.Request</code> is <code>request</code>; a
+<code>playwright.sync_api.Page</code> is <code>page</code>; an
+<code>io.StringIO</code> for output capture is <code>capture</code> (the
+role) — but if multiple StringIO objects coexist, distinguish them with
+the class-name prefix: <code>stringIoOut</code>,
+<code>stringIoErr</code>.</p>
+<hr />
+<h2 id="constant-naming">2. Constant Naming</h2>
+<p>A constant is named like a variable, Hungarian type prefix included,
+with <strong><code>c_</code> in front</strong>: <code>c</code> for
+constant, then an underscore. The prefix is what tells a listener, at
+the point of use, that the value never changes.</p>
+<p>Examples: <code>c_sDefaultEncoding = "utf-8"</code>,
+<code>c_iTimeoutSec = 60</code></p>
+<p>Programs written before this rule (urlCheck among them) name their
+constants without <code>c_</code>. New constants in those programs take
+the prefix; the old ones are renamed only when a file is being reworked
+anyway.</p>
+<hr />
+<h2 id="capitalization">3. Capitalization</h2>
+<p>Use <strong>lower camel case</strong> for all custom names:
+variables, constants, function names, and parameters. Python
+conventionally uses snake case, but Camel Type overrides this with lower
+camel case everywhere except where a framework or external API requires
+otherwise.</p>
+<p>Class names, if defined, use upper camel case as Python convention
+requires.</p>
+<hr />
+<h2 id="variable-initialization">4. Variable Initialization</h2>
+<p>Python does not require explicit variable declarations. Assign
+zero-value initializations at the <strong>top of each function
+scope</strong>, grouped by type in alphabetical order of prefix letter,
+variables of the same type assigned alphabetically.</p>
+<p>Where a meaningful initial value is not yet known, assign a sensible
+zero-value: <code>0</code> for integers, <code>0.0</code> for floats,
+<code>""</code> for strings, <code>[]</code> for lists, <code>{}</code>
+for dicts, <code>None</code> for objects.</p>
+<p>Example:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>iCount <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>iMax <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>sDir <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>sTitle <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>sUrl <span class="op">=</span> <span class="st">&quot;&quot;</span></span></code></pre></div>
+<hr />
+<h2 id="constants">5. Constants</h2>
+<p>Define constants at the <strong>top of the module</strong>, before
+any function definitions, grouped by type, each group in alphabetical
+order, constants within each group in alphabetical order.</p>
+<p>Example:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>c_iTimeoutSec <span class="op">=</span> <span class="dv">60</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>c_sEncoding <span class="op">=</span> <span class="st">&quot;utf-8&quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>c_sFallbackTitle <span class="op">=</span> <span class="st">&quot;untitled-page&quot;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>c_sResultsDir <span class="op">=</span> <span class="st">&quot;results&quot;</span></span></code></pre></div>
+<hr />
+<h2 id="script-structure-and-entry-point">6. Script Structure and Entry
+Point</h2>
+<p>Prefer <strong>top-level script code with no indentation</strong>
+rather than wrapping everything in a <code>main</code> function. Write
+the main logic directly at the module’s top level so a screen reader
+user can navigate to the bottom of the file to find the most recently
+written code.</p>
+<p>When a <code>main</code> function is used (e.g., to enable the
+<code>if __name__</code> guard for reusable modules), place it
+<strong>last</strong> in the file, after all other functions. The
+<code>if __name__ == "__main__":</code> block appears at the very
+bottom, calling <code>main()</code> on a single line.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>: main()</span></code></pre></div>
+<hr />
+<h2 id="function-order">7. Function Order</h2>
+<p>All functions other than <code>main</code> are listed in
+<strong>strict alphabetical order</strong>. If a <code>main</code>
+function is used, it appears <strong>last</strong>. There are no
+organizational sections or divider comments grouping functions — strict
+alphabetical order is sufficient.</p>
+<hr />
+<h2 id="functions">8. Functions</h2>
+<ul>
+<li><p>Define all routines as <strong>functions</strong>. Every function
+should return a value, even if <code>None</code>.</p></li>
+<li><p>Use simple <strong>single-line conditionals</strong> for
+one-consequence cases:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> sUrl: <span class="cf">raise</span> <span class="pp">ValueError</span>(sUsage)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> bReady: <span class="cf">return</span> <span class="va">True</span></span></code></pre></div></li>
+</ul>
+<hr />
+<h2 id="loops">9. Loops</h2>
+<p>Prefer <strong>for-each</strong> style loops over index-based loops
+whenever iterating a collection.</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> sItem <span class="kw">in</span> lItems: process(sItem)</span></code></pre></div>
+<p>Use <code>enumerate()</code> only when the index itself is needed.
+Avoid <code>range(len(...))</code>.</p>
+<hr />
+<h2 id="imports">10. Imports</h2>
+<p>Use exactly <strong>two import statements</strong>: one for built-in
+standard library modules, one for third-party modules. Each statement
+lists module names in <strong>alphabetical order</strong> on a single
+line, separated by commas. Place the built-in import first, then the
+third-party import, separated by a blank line.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json, os, pathlib, re, sys</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> bs4, playwright, requests</span></code></pre></div>
+<p>If <code>from X import Y</code> syntax is needed for specific names,
+place those lines after the two main import statements,
+alphabetized.</p>
+<p>The Homer kit’s modules come last, in one line, alphabetized. They
+are not copied into the app: the build puts <code>C:\HomerDev</code> on
+PyInstaller’s search path and names each module with
+<code>--hidden-import</code>.</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> homer <span class="im">import</span> elevate, inix, log, paths</span></code></pre></div>
+<hr />
+<h2 id="string-delimiters">11. String Delimiters</h2>
+<p>Use <strong>double quotes</strong> for all strings. Use f-strings
+when embedding expressions.</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sPath <span class="op">=</span> <span class="ss">f&quot;</span><span class="sc">{</span>sResultsDir<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>sTitle<span class="sc">}</span><span class="ss">&quot;</span></span></code></pre></div>
+<hr />
+<h2 id="magic-numbers">12. Magic Numbers</h2>
+<p>Never use literal numeric or string values in logic. Assign them to
+named constants and reference the constant name.</p>
+<hr />
+<h2 id="object-and-array-literals">13. Object and Array Literals</h2>
+<p>Keep short dict and list literals on a <strong>single line</strong>
+where practical, to maximize information density per line for screen
+reader review.</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>dConfig <span class="op">=</span> {<span class="st">&quot;encoding&quot;</span>: sEncoding, <span class="st">&quot;timeout&quot;</span>: iTimeoutSec}</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>lEngines <span class="op">=</span> [<span class="st">&quot;axe&quot;</span>, <span class="st">&quot;ibm&quot;</span>, <span class="st">&quot;alfa&quot;</span>]</span></code></pre></div>
+<hr />
+<h2 id="error-handling">14. Error Handling</h2>
+<p>Use <code>try</code>/<code>except</code> with a named exception
+variable. Catch specific exception types where possible rather than a
+bare <code>except</code>. Use <code>ex</code> as the conventional
+abbreviation for caught exceptions (it is universally understood and
+avoids shadowing Python’s builtin <code>Exception</code> class
+name).</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> riskyOperation()</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">ValueError</span> <span class="im">as</span> ex:</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Validation error: </span><span class="sc">{</span>ex<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    sys.exit(<span class="dv">1</span>)</span></code></pre></div>
+<p>If the same <code>try</code> block has multiple <code>except</code>
+handlers and you want to keep them distinguishable in nested or
+multi-catch contexts, use a role suffix: <code>exParse</code>,
+<code>exNetwork</code>. But for the common single-handler case, plain
+<code>ex</code> is correct.</p>
+<hr />
+<h2 id="cross-program-naming-conventions">15. Cross-Program Naming
+Conventions</h2>
+<p>When the same concept appears across multiple programs in a related
+project (e.g., a family of companion tools that share a common
+command-line and GUI layout), use the <strong>same identifier
+name</strong> in each program for that concept. Consistency of naming
+across programs makes it easy for a reader who knows one program to
+understand another.</p>
+<p>The following shared names are conventional in the author’s project
+family:</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Concept</th>
+<th>Identifier</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Program’s display name</td>
+<td><code>sProgramName</code></td>
+</tr>
+<tr class="even">
+<td>Program’s version string</td>
+<td><code>sProgramVersion</code></td>
+</tr>
+<tr class="odd">
+<td>Config directory name</td>
+<td><code>sConfigDirName</code></td>
+</tr>
+<tr class="even">
+<td>Config file name</td>
+<td><code>sConfigFileName</code></td>
+</tr>
+<tr class="odd">
+<td>Log file name</td>
+<td><code>sLogFileName</code></td>
+</tr>
+<tr class="even">
+<td>Source-input variable (the user’s source files / URLs / etc.)</td>
+<td><code>sSource</code></td>
+</tr>
+<tr class="odd">
+<td>Output directory variable</td>
+<td><code>sOutputDir</code></td>
+</tr>
+<tr class="even">
+<td>GUI layout: left margin</td>
+<td><code>iLayoutLeft</code></td>
+</tr>
+<tr class="odd">
+<td>GUI layout: right margin</td>
+<td><code>iLayoutRight</code></td>
+</tr>
+<tr class="even">
+<td>GUI layout: top margin</td>
+<td><code>iLayoutTop</code></td>
+</tr>
+<tr class="odd">
+<td>GUI layout: gap between adjacent controls</td>
+<td><code>iLayoutGap</code></td>
+</tr>
+<tr class="even">
+<td>GUI layout: gap between rows</td>
+<td><code>iLayoutRowGap</code></td>
+</tr>
+<tr class="odd">
+<td>GUI layout: width of leading labels</td>
+<td><code>iLayoutLabelWidth</code></td>
+</tr>
+<tr class="even">
+<td>GUI layout: width of buttons</td>
+<td><code>iLayoutButtonWidth</code></td>
+</tr>
+<tr class="odd">
+<td>GUI layout: height of buttons</td>
+<td><code>iLayoutButtonHeight</code></td>
+</tr>
+<tr class="even">
+<td>GUI layout: height of text fields and rows</td>
+<td><code>iLayoutTextHeight</code></td>
+</tr>
+<tr class="odd">
+<td>GUI layout: form (dialog) width</td>
+<td><code>iLayoutFormWidth</code></td>
+</tr>
+</tbody>
+</table>
+<p>The following shared classes are conventional in the project family
+(using lowerCamelCase for class names per Camel Type):</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Class</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>program</code></td>
+<td>The top-level program class (entry point, argument parsing,
+dispatch)</td>
+</tr>
+<tr class="even">
+<td><code>logger</code></td>
+<td>Diagnostic logger with <code>open</code>, <code>close</code>,
+<code>info</code>, <code>warn</code>, <code>error</code>,
+<code>debug</code> methods, writing through <code>homer.log</code></td>
+</tr>
+<tr class="odd">
+<td><code>configManager</code></td>
+<td>Loads and saves
+<code>%LOCALAPPDATA%\&lt;program&gt;\configs\&lt;program&gt;.inix</code>
+through <code>homer.paths</code> and <code>homer.inix</code></td>
+</tr>
+<tr class="even">
+<td><code>guiDialog</code></td>
+<td>The parameter dialog with <code>show</code> / <code>run</code>
+methods</td>
+</tr>
+<tr class="odd">
+<td><code>comHelper</code></td>
+<td>COM lifecycle helper (creating apps, releasing references, retrying
+ops). Used only when the program drives Office or other COM
+servers.</td>
+</tr>
+</tbody>
+</table>
+<p>For the <code>logger</code> class, all six methods
+(<code>open</code>, <code>close</code>, <code>info</code>,
+<code>warn</code>, <code>error</code>, <code>debug</code>) should be
+present even if the program currently calls only some of them. This
+keeps the surface uniform across the family so future code (or a
+developer moving between programs) can use any level method without
+having to check whether it exists.</p>
+<h2 id="the-homer-kit">16. The Homer Kit</h2>
+<p>Prefer a kit module to new code. The more the shared modules are
+used, the better they get, and a fix in one reaches every program on its
+next build.</p>
+<ul>
+<li><code>homer.elevate</code> – F11: is there a newer release, and
+would you like it?</li>
+<li><code>homer.inix</code> – settings files that keep their comments
+and order</li>
+<li><code>homer.log</code> – one log per session in
+<code>%LOCALAPPDATA%\&lt;App&gt;\logs</code></li>
+<li><code>homer.paths</code> – where the program’s files are, installed
+and per user</li>
+<li><code>homer.say</code> – speech through JAWS or NVDA, one utterance
+per part</li>
+<li><code>homer.util</code>, <code>homer.web</code> – strings and
+plurals; browser-like HTTP</li>
+</ul>
+<p><code>homer.lbc</code> and <code>homer.mdi</code> build windows with
+wx. A program whose windows are WinForms through pythonnet, as
+urlCheck’s are, uses the other modules and keeps its own dialog
+code.</p>
+</body>
+</html>

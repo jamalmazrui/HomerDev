@@ -171,15 +171,16 @@
 id="homerdev-update-bringing-a-homer-app-up-to-the-current-kit">HomerDev
 Update: bringing a Homer app up to the current kit</h1>
 <p><em>A briefing on the learnings, decisions and techniques of HomerDev
-as of 26 September 2026 (kit 1.42.1), written so that another Homer app
+as of 26 September 2026 (kit 1.43.6), written so that another Homer app
 – DbDo, part way there; FileDir, some of the way; EdSharp, not yet
 started – can take up the kit’s code, concepts and structure with less
 pain than HomerScribe and HomerView went through. It is a developer
 document: technical, dated, and specific about what went wrong.
-HomerScribe was the first app moved; HomerView, the second, is recorded
-below in its own section because it met a different set of traps – an
-existing PowerShell build, an NVDA add-on, JAWS scripts, and a C# bridge
-– and most of them will meet the next app too.</em></p>
+HomerScribe was the first app moved; urlCheck, the first Python app, has
+its own section below; HomerView, the second, is recorded below in its
+own section because it met a different set of traps – an existing
+PowerShell build, an NVDA add-on, JAWS scripts, and a C# bridge – and
+most of them will meet the next app too.</em></p>
 <p><strong>Read “Lessons from HomerView” before starting.</strong>
 Nearly every debugging round in HomerView’s migration was one of those
 lessons being learned. Each is now a rule, and following the rules is
@@ -195,10 +196,10 @@ Homer apps share:</p>
 <code>PdfRead.cs</code>, <code>Say.cs</code>, <code>Util.cs</code>,
 <code>Web.cs</code>, <code>inixVert.cs</code>. An app never carries a
 copy; it names the kit’s file on the compiler line.</li>
-<li><code>homer\</code> – the same for Python: <code>inix.py</code>,
-<code>lbc.py</code>, <code>log.py</code>, <code>mdi.py</code>,
-<code>paths.py</code>, <code>say.py</code>, <code>util.py</code>,
-<code>web.py</code>.</li>
+<li><code>homer\</code> – the same for Python: <code>elevate.py</code>,
+<code>inix.py</code>, <code>lbc.py</code>, <code>log.py</code>,
+<code>mdi.py</code>, <code>paths.py</code>, <code>say.py</code>,
+<code>util.py</code>, <code>web.py</code>.</li>
 <li><code>scripts\</code> – the tools every app inherits, refreshed into
 its own <code>scripts</code> folder on every build:
 <code>buildTutorials</code>, <code>check</code>,
@@ -405,7 +406,7 @@ speaks any tutorial without audio, puts the project’s own files into the
 Homer encoding, refreshes the scripts.</li>
 <li><code>scripts\push "message"</code> – rewrites the whitelist, adds
 what it names, commits, pushes, shows the status.</li>
-<li><code>scripts\tidy --do-it</code> – the periodic clean: strays into
+<li><code>scripts\tidy</code> – the periodic clean: strays into
 <code>notes</code>, fetched things deleted, zero-byte files deleted,
 whitelist rewritten, strays untracked, commit. <code>--gitignore</code>
 alone rewrites the whitelist.</li>
@@ -915,6 +916,298 @@ GitHub.</strong> When an archive is older than the working copy, change
 the working copy in place (as the renaming does) rather than shipping
 files that would overwrite it.</li>
 </ul>
+<h1 id="c-apps-urlfido-and-a-template-brought-level">C# apps: urlFido,
+and a template brought level</h1>
+<p>urlFido, a C# console program with an Lbc dialog, moved to the kit on
+26 September, and the C# build template turned out to be behind the
+Python one written for urlCheck the day before. Kit 1.43.2 rewrote
+<code>Templates\build_APP_.cmd</code> clause for clause against
+<code>build_APP_Py.cmd</code>, so the two contexts stay separate but
+equal. What urlFido taught:</p>
+<ul>
+<li><strong>Check the app’s calls against the kit’s classes before
+deleting its copies.</strong> urlFido called LbcDialog (two-argument
+constructor, addBand, addInputBox, addButton, addCheckBox, addSeparator,
+endBand, runWithButtons, form), InixCodec (read, writeValue,
+Section.Name, keys, get), Web, Util and Say. Every one exists in the kit
+with the same signature, so the copies could go. A mismatch would have
+been a compile error, which is the right way to find it, but a grep
+first saves a round.</li>
+<li><strong>The kit’s classes need each other.</strong> Lbc calls
+Elevate, Log and Say; Log and Paths call each other; Log calls Say. An
+app that used to compile Lbc, Say, Inix, Util and Web must add Elevate,
+Log and Paths. homerModules names them; the template’s comment says
+which needs which.</li>
+<li><strong>Log.start comes after anything that must precede
+Say.</strong> Log’s header asks Say which reader is running, and Say’s
+DllImport of the NVDA client resolves then. urlFido pre-loads its
+embedded client first, so Main runs nvdaLoader.preload, then Log.start,
+then Elevate.configure.</li>
+<li><strong>F11 goes through the dialog’s commandKey</strong>, which
+claims a key before any control sees it. When Elevate.offer returns true
+the setup program is running, and the dialog closes.</li>
+<li><strong>A const version.</strong> Version.cs holds
+<code>public const string Version</code>, so an app can build constants
+from it: urlFido’s user agent is
+<code>" urlFido/" + BuildVersion.Version</code>.</li>
+<li><strong>Fetch the NVDA client; never ask for it.</strong> The old
+build said “put the 64-bit DLL here and rebuild”. The template now
+fetches it from NV Access, and takes a top-level copy the project
+already has.</li>
+<li><strong>Two tools, one hotkey.</strong> urlFido and urlCheck both
+claimed Alt+Control+U; urlCheck moved to Alt+Control+Shift+U as
+urlFido’s installer had long said it would. Check a new desktop hotkey
+against every Homer app’s installer.</li>
+<li><strong>A build that says “Build FAILED” and nothing else jumped
+somewhere it should not.</strong> urlFido’s first build wrote “Build
+FAILED” twice and no reason: the C# template carried a pasted second
+copy of the Python template’s version code, and
+<code>call :seedVersion</code> landed in it. cmd takes the first label
+it meets and never complains about a duplicate, so the kit build now
+checks every script for a label defined twice and for a jump to a label
+that does not exist. When a script is assembled from pieces of another,
+cut at the label line itself (a line starting with <code>:</code>),
+never at the first occurrence of the label’s name, which is usually the
+<code>call</code> that uses it.</li>
+<li><strong>Set seedVersion to the number the move should start at, and
+it holds.</strong> An app may already have a version.txt on the
+developer’s machine, never in any zip. Since 1.43.5 seedVersion is a
+floor: a lower version.txt is raised to it. Before that, 2htm’s 1.18.4
+stepped to 1.18.5 under documents that said 1.19.0.</li>
+<li><strong>A Python app with WinForms dialogs uses the C#
+LbcDialog.</strong> Set homerDll=1 and add lbcnet to homerModules; build
+the dialog with <code>Homer = lbcnet.load()</code> and
+<code>Homer.LbcDialog(...)</code> exactly as a C# app would, passing
+button lists through <code>lbcnet.strings()</code> and a key handler
+through <code>lbcnet.keyHandler()</code>. Keep pythonnet’s own
+workarounds in the app’s handlers (the legacy file picker,
+SHBrowseForFolder). homer.lbc (wx) stays for code that runs inside NVDA.
+urlCheck 1.12.3 is the worked example.</li>
+<li><strong>An app’s standing choice outranks the template’s
+default.</strong> The template deletes saved settings on uninstall;
+urlFido always kept them, “their filesystem, their call”, and still
+does.</li>
+</ul>
+<h1
+id="bookfido-a-c-app-with-its-own-libraries-and-its-own-data">bookFido:
+a C# app with its own libraries and its own data</h1>
+<p>bookFido, the third app moved on 26 September, embeds a dozen NuGet
+libraries and keeps a database worth hours of gathering. What it
+taught:</p>
+<ul>
+<li><strong>An app’s special build steps stay in the app’s build, as a
+section of their own.</strong> bookFido’s pinned NuGet fetch (by lib
+folder for most packages, by file-name search for the SQLite ones) was
+proven over many runs; it moved into buildbookFido.cmd unchanged in
+substance, fetching into <code>work\nuget</code>, rather than being
+squeezed into the template’s simpler <code>nugetPackages</code>.</li>
+<li><strong>Moving the program into exec moves everything that says
+“beside the program”.</strong> bookFido kept its state and database
+beside its own exe. Built into exec, it would have started with an empty
+database. Its data now lives in <code>Paths.data()</code> whatever the
+exe’s folder, and the first run MOVES the newest existing copy there
+from the old places – beside the exe, the folder above exec,
+<code>%LOCALAPPDATA%\&lt;App&gt;</code>. Grep an app for BaseDirectory
+before moving it.</li>
+<li><strong>Keep the verified configuration where it matters.</strong>
+bookFido’s resolver prefers a library file beside the exe over embedded
+bytes (the cure for its assembly-instance trap), and every verified
+database run had the files beside it. The build copies them into exec
+too, so the project copy behaves exactly as before; the installer still
+ships the program alone.</li>
+<li><strong>An uninstaller keeps what cannot be made again.</strong> The
+template deletes logs and settings; bookFido’s uninstaller deletes logs
+and the engine it wrote out, and keeps the database and the Edge profile
+holding sign-ins.</li>
+<li><strong>A windowed program cannot be smoke-tested with
+–help.</strong> check now reads the PE header and skips a windowed
+program rather than waiting fifteen minutes for it.</li>
+</ul>
+<h1 id="python-apps-what-urlcheck-taught-26-september-2026">Python apps:
+what urlCheck taught, 26 September 2026</h1>
+<p>urlCheck is one 7,000-line Python file: a console program with a
+WinForms dialog through pythonnet, driving Edge with Playwright, frozen
+by PyInstaller. It was the first Python app moved, and it found that the
+kit’s Python side had fallen behind the C# side in ways no C# migration
+would notice. Kit 1.43.0 fixed them; these are the rules that came out
+of it.</p>
+<h2 id="the-contract-is-the-same-the-template-now-says-so">The contract
+is the same; the template now says so</h2>
+<p><code>Templates\build_APP_Py.cmd</code> keeps every clause of the
+contract above: kit detection by <code>homer\log.py</code> and a trimmed
+<code>kitNeeded</code>; <code>version.txt</code> stepped, seeded when
+missing and written into <code>version.py</code>; one log per run in
+<code>logs</code>; the kit tools refreshed by name and retired ones
+deleted; <code>fixEncoding -build</code>; <code>/DHomerDev=</code> to
+ISCC. A Python app’s build is the template with its SETTINGS block
+filled in – <code>kitNeeded</code>, <code>seedVersion</code>,
+<code>pyVersion</code>, <code>pyiMode</code>, <code>homerModules</code>,
+<code>pyiExtra</code>, <code>pipPackages</code>, <code>kitTools</code> –
+and, during a move, one section of its own that carries over the old
+layout (see below). buildUrlCheck.cmd is the worked example.</p>
+<h2 id="the-kits-modules-are-named-not-copied">The kit’s modules are
+named, not copied</h2>
+<p>A frozen program cannot import from <code>C:\HomerDev</code> at run
+time, and a copy in the app drifts. So the build passes
+<code>--paths C:\HomerDev</code> and one
+<code>--hidden-import homer.&lt;module&gt;</code> for each module in
+<code>homerModules</code>. The .exe then carries the kit’s code as it
+was at build time. An NVDA add-on is the exception: NVDA gives add-ons
+no way to share one copy, so an add-on copies <code>homer</code>.</p>
+<h2 id="never-name-a-kit-module-version.py">Never name a kit module
+version.py</h2>
+<p>Every Homer build writes <code>version.py</code> beside the program.
+<code>.gitignore</code> ignores that name wherever it appears, and the
+checks skip it as generated. The kit’s <code>homer\version.py</code> was
+therefore never pushed, sat stranded in an old <code>Python\homer</code>
+folder, and the kit’s own check called it missing on every build. Its
+comparison is now in <code>homer\elevate.py</code>. The general rule: a
+kit file must not share a name with anything a build generates.</p>
+<h2 id="where-each-python-program-goes">Where each Python program
+goes</h2>
+<ul>
+<li>The program: <code>exec\&lt;App&gt;.exe</code>, from
+<code>--distpath exec</code>.</li>
+<li>PyInstaller’s scratch and <code>.spec</code>:
+<code>work\pyinstaller</code>, from <code>--workpath</code> and
+<code>--specpath</code>. <strong>Pass the icon’s full path</strong>:
+PyInstaller resolves <code>--icon</code> against the <code>.spec</code>
+file’s folder.</li>
+<li>The build environment: <code>.venv</code>, rebuilt when its Python
+is not <code>pyVersion</code>.</li>
+<li><code>.venv/</code>, <code>exec/</code>, <code>version.py</code>,
+<code>version.txt</code> and <code>work/</code> in
+<code>LocalFiles.txt</code>.</li>
+</ul>
+<p>urlCheck had committed a 70 MB PyInstaller <code>build\</code> folder
+and both .exe files. The build now deletes those once the new program
+exists, and one <code>scripts\tidy</code> untracks the rest.
+<code>push</code> refuses anything over 10 MB, so a stray setup program
+cannot go up by accident.</p>
+<h2
+id="a-program-that-runs-from-exec-finds-its-documents-one-level-up">A
+program that runs from exec finds its documents one level up</h2>
+<p><code>homer.paths.installedFolder()</code> answers the parent of
+<code>exec</code>, in the installed tree and in the project alike.
+urlCheck’s Help had looked for <code>README.htm</code> beside the .exe;
+it now opens <code>help\&lt;App&gt;.htm</code> under that folder, then
+<code>ReadMe.htm</code>. A command-line wrapper at the top,
+<code>&lt;App&gt;.cmd</code>, runs
+<code>"%~dp0exec\&lt;App&gt;.exe" %*</code>.</p>
+<h2 id="logging-the-session-log-is-not-optional">Logging: the session
+log is not optional</h2>
+<p>urlCheck wrote a log only when <code>-l</code> was given, into the
+output folder, in append mode. The kit’s rule is a log of every session
+in <code>%LOCALAPPDATA%\&lt;App&gt;\logs</code>. The move kept the app’s
+own <code>logger</code> class – three programs share its surface – and
+made it write every line through <code>homer.log</code> as well, and its
+settings header as <code>log.keyValue</code> lines. <code>-l</code>
+keeps its old meaning as an extra copy beside the results. The entry
+point became <code>runLogged()</code>, which records any exception
+main() did not catch before the program ends, and names the log on the
+console.</p>
+<h2 id="settings-.inix-and-carry-the-old-file-over">Settings: .inix, and
+carry the old file over</h2>
+<p><code>configs\&lt;App&gt;.inix</code> through
+<code>homer.paths.configs()</code> and <code>homer.inix</code>. Read the
+old <code>.ini</code> when no <code>.inix</code> exists; delete it when
+the new one is first saved; map the old key names onto the new. Test the
+carry-over: urlCheck’s was run against a real old file before
+delivery.</p>
+<h2 id="winforms-through-pythonnet-keeps-its-own-dialog">WinForms
+through pythonnet keeps its own dialog</h2>
+<p><code>homer.lbc</code> is wx. A program already on WinForms through
+pythonnet keeps its dialog and uses the kit’s other modules, and follows
+Lbc’s rules by hand: each label takes the tab stop just before its field
+– WinForms names a text box from the label before it in tab order – and
+no field sets an AccessibleName equal to its label.
+<code>check.py</code>’s naming check now reads Python functions as a
+window’s builders, so it catches the second.</p>
+<h2 id="f11-in-a-python-program">F11 in a Python program</h2>
+<p><code>elevate.configure(owner, repo, version)</code> at startup; in
+the dialog’s KeyDown, F11 calls <code>elevate.offer(hwnd)</code> –
+<code>frm.Handle.ToInt64()</code> in WinForms,
+<code>frame.GetHandle()</code> in wx. When it returns True the setup
+program is running, and the dialog closes.</p>
+<h2 id="the-old-layout-on-disk-renames-windows-will-not-do-for-you">The
+old layout on disk: renames Windows will not do for you</h2>
+<p>Unzipping <code>ReadMe.md</code> over <code>README.md</code> replaces
+the content and keeps the old capitals. The build’s carry-over section
+renames by exact case – through <code>git mv -f</code> when git tracks
+the file, so the repository follows – and deletes a moved document
+(<code>announce.md</code>, <code>CamelType_Python.md</code>) only once
+its replacement exists.</p>
+<h2 id="the-whitelist-left-out-every-file-named-inside-a-folder">The
+whitelist left out every file named inside a folder</h2>
+<p>Not a Python problem, but urlCheck found it. <code>tidy</code> wrote
+<code>/*</code> and then <code>!/help/Announce.md</code>;
+<code>/*</code> ignores the folder <code>help</code> itself, git never
+looks inside an ignored folder, and so every file named one by one in a
+subfolder was silently left out of the repository – in
+<code>help\</code>, and in <code>scripts\</code>, which the rules above
+say must be named one by one. Tested with git: 15 of urlCheck’s 34 named
+files were staged. Kit 1.43.0’s <code>tidy</code> puts the folder back
+and re-ignores its contents first (<code>!/help/</code>,
+<code>/help/*</code>), then the files: all 34 staged. <strong>Every app
+whose RepoFiles.txt names files inside a folder should run
+<code>scripts\tidy --gitignore</code> and push</strong>, and check
+GitHub for the files that never went up.</p>
+<h2 id="checks-that-caught-a-python-app-out">Checks that caught a Python
+app out</h2>
+<ul>
+<li><code>check</code>’s smoke test looked only at the top of the
+project; it now looks in <code>exec</code> first. This affected every
+app moved to the layout, C# included.</li>
+<li><code>check</code>’s key check read a whole Python file as one
+window and counted <code>&amp;amp;</code> as a trigger letter. It now
+starts a new owner at each top-level <code>def</code> and skips HTML
+entities.</li>
+</ul>
+<h1
+id="installer-template-the-program-from-exec-the-documents-from-help">Installer
+template: the program from exec, the documents from help</h1>
+<p>Found by urlCheck’s first build on the kit.
+<code>Templates\_APP__setup.iss</code> named the program and the
+documents at the top of the project, while every build in the Homer
+layout – the Python template included – leaves the program in
+<code>exec\</code> and the documents in <code>help\</code>. Since 1.43.1
+the template takes the program from <code>exec\</code> when it is there
+(an <code>#if FileExists</code> choice at compile time) and ships
+<code>help\*.md</code> and <code>help\*.htm</code>.
+<code>AppLaunchParams</code> says what the program is started with after
+the Results box, matching its shortcut.</p>
+<p><strong>The installer pattern is the template’s, even with nothing to
+install.</strong> urlCheck registers no component, and still includes
+<code>HomerComponents.iss</code> from the kit the build names, calls
+<code>homerNoteTicked</code> from <code>NextButtonClick</code>, shows
+the Results box and only then starts the program. The next component is
+one <code>homerAdd</code>, three <code>[Run]</code> entries and one
+<code>addAction</code>, not a new installer.</p>
+<h1 id="the-kit-renames-only-where-it-should">The kit renames only where
+it should</h1>
+<p>buildHomerDev’s renaming rewrites old script names in the kit’s own
+files, skipping the lines whose job is to name the old scripts. It knew
+the C# template’s retired loop and not the Python template’s
+<code>retiredTools=</code> line, and on its first 1.43.0 run turned that
+list into the current tools’ names – which an app would then have
+deleted after refreshing them. Any list whose job is to name old things
+must be recognised by the renaming, or it will be “corrected”. Kit
+1.43.1 skips both and ships the template whole again.</p>
+<h1 id="installer-template-read-the-previous-version-once">Installer
+template: read the previous version once</h1>
+<p>Found while writing urlCheck’s installer. The template read the
+previous install’s version lazily, and a fresh install has none to
+cache, so every later call read the registry again. The finish page’s
+<code>Check:</code> functions run after setup has written its own
+uninstall key, found it, and a fresh install was offered “Update the
+JAWS scripts” in place of “Install”. Kit 1.43.0 reads it once in
+<code>InitializeSetup</code>. <strong>An app whose installer was made
+from the template before 1.43.0 has the same fault</strong> and needs
+the same two lines changed:
+<code>sPriorVersion := priorVersion();</code> in
+<code>InitializeSetup</code>, and <code>isFreshInstall</code> reduced to
+<code>Result := (sPriorVersion = '');</code>, with
+<code>priorVersion</code> moved above <code>InitializeSetup</code>.</p>
 <h1 id="the-migration-step-by-step">The migration, step by step</h1>
 <p>For an app that has not yet moved to the kit. Build green after every
 step; each is checkable by <code>scripts\check</code> at the end. The
@@ -975,7 +1268,7 @@ build.</li>
 tutorials, and add the tutorial tools to the refresh loop then.</li>
 <li><strong>Create the repository</strong> with
 <code>create&lt;App&gt;Repo</code> if there is none; otherwise
-<code>scripts\tidy</code>, then <code>scripts\tidy --do-it</code>.</li>
+<code>scripts\tidy</code>.</li>
 <li><strong>Build, check, push, release</strong>:
 <code>build&lt;App&gt;</code>, <code>scripts\check --build</code>,
 <code>scripts\push "Move to the kit."</code>,
@@ -1351,6 +1644,25 @@ found; run twice.</li>
 5.1.</li>
 <li>When GitHub says a repository moved, point origin at the new
 location.</li>
+<li>A Python app’s build is <code>Templates\build_APP_Py.cmd</code> with
+its SETTINGS filled in.</li>
+<li>Name the kit’s Python modules with <code>--hidden-import</code>;
+never copy them into a standalone app.</li>
+<li>No kit file shares a name with anything a build generates
+(<code>version.py</code>).</li>
+<li>PyInstaller: program to <code>exec</code>, scratch and
+<code>.spec</code> to <code>work</code>, icon by full path.</li>
+<li>A program in <code>exec</code> finds <code>help</code> through
+<code>homer.paths.installedFolder()</code>.</li>
+<li>The session log is kept every run; an app’s own log option is an
+extra copy.</li>
+<li>Carry an old settings file over, and prove it on a real one.</li>
+<li>A WinForms dialog through pythonnet keeps its code and follows Lbc’s
+rules by hand.</li>
+<li>Read an installer’s previous version once, in
+<code>InitializeSetup</code>.</li>
+<li>A whitelist that names a file in a subfolder must first put the
+subfolder back.</li>
 </ul>
 </body>
 </html>

@@ -38,9 +38,11 @@ THREE TREES, AND WHAT EACH HOLDS.
       configs, data, logs, results, scripts, temp. No exec and no
       templates: those are shipped, not made.
 
-  The DEVELOPMENT folder, C:\<App>, stays flat. It is a git repository, and
-  every tool that reads one expects the source at the top. The structure is what
-  the build SHIPS INTO, not what the developer works in.
+  The DEVELOPMENT folder, C:\<App>, mirrors the installed tree (21 Sep 2026,
+  superseding "stays flat"): sources, build files, ReadMe and License at the
+  top, and configs, data, exec, help, logs, scripts and templates beneath, so
+  a program run from the project's exec folder finds its files exactly as the
+  installed copy does.
 
 Usage:
 
@@ -87,8 +89,11 @@ def appName():
 
 def installedFolder():
     """Where the program was installed: its own folder, or exec's parent."""
+    # A FROZEN PROGRAM ASKS sys.executable (1.43.0). sys.argv[0] is what was
+    # typed: "urlCheck" run through the PATH from another folder resolved
+    # against that folder, and the guide was looked for in the wrong place.
     try:
-        sHere = os.path.dirname(os.path.abspath(sys.argv[0]))
+        sHere = os.path.dirname(os.path.abspath(sys.executable if getattr(sys, "frozen", False) else sys.argv[0]))
     except Exception:
         sHere = os.getcwd()
     if os.path.basename(sHere).lower() == "exec":

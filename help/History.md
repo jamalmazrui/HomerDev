@@ -5,6 +5,247 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.43.9 -- 26 September 2026
+
+**tidy just does it.** It no longer prints a plan and waits for --do-it: one
+run carries the plan out. Nothing is lost -- a stray goes into notes, which is
+on this disk and never in git, and the log names every move; the only
+deletions are zero-byte files and things the build fetches again. --do-it is
+still accepted and changes nothing, so an old habit does no harm.
+
+**tidy untracks what RepoFiles.txt leaves out.** Its repository survey used
+the folder's test of belonging, which also accepts what LocalFiles.txt, the
+installer and the standing names allow -- version.txt and any .cs among them.
+So on DbDo it reported "0 files tracked that the project does not name" while
+version.txt, Version.cs, release.cmd and release.ps1 were all tracked. A
+tracked file now stays only when RepoFiles.txt names it and LocalFiles.txt does
+not; the files themselves stay on disk. Proved on a DbDo-shaped repository:
+those four and a stray temp.txt were untracked, the rest kept.
+
+**release parses again.** 1.43.8's message "version.txt says $sFileVersion: the
+last build" is a drive-qualified variable to PowerShell, and the whole script
+failed to parse; the launcher log caught it. Written ${sFileVersion} now, and
+no other string has the pattern.
+
+# 1.43.8 -- 26 September 2026
+
+**The renamed scripts called their neighbours by the old names.** After 1.42
+renamed homerTidy to tidy and the rest, tidy.cmd still ran "%~dp0homerTidy.py",
+check.cmd "%~dp0checkHomerApp.py", unpushed.cmd "%~dp0gitUnpushed.py",
+installOllama.cmd "%~dp0homerInstall.cmd", and push.cmd asked whether
+"%~dp0homerTidy.cmd" existed before rewriting the whitelist. The build's rename
+step was meant to fix such lines, but its pattern would not match a name with a
+digit before it, and every one of these follows the 0 of %~dp0. So in every
+app that refreshed them, tidy and check stopped at once, and push skipped the
+whitelist without a word -- DbDo's push that day committed version.txt,
+Version.cs and the release scripts, which its RepoFiles.txt leaves out.
+
+- The five scripts call tidy.py, check.py, unpushed.py and installCommon.cmd.
+- The rename pattern allows a digit before a name.
+- buildHomerDev reports any script in scripts that calls a neighbour which is
+  not there, unless the same line first asks whether it exists. Proved by
+  putting homerTidy.py back into a copy of tidy.cmd: the check named it.
+
+**release asks git and gh through System.Diagnostics.Process**, with both
+streams captured, instead of through cmd /c. The 1.43.7 edition built cmd
+lines that Windows PowerShell 5.1 quotes its own way, and the first release
+with it stopped on "The syntax of the command is incorrect".
+
+**release.cmd keeps a launcher log**, logs\<App>-release-launch-<stamp>.log,
+with the command line, PowerShell's error stream and the exit code, so a
+failure before release.ps1's own transcript starts still leaves a record.
+
+# 1.43.7 -- 26 September 2026
+
+**release, the script that used to be tagRelease, fixed from the day's logs.**
+It is not in the kit's repository -- by standing rule the release scripts never
+are -- but it lives in C:\HomerDev\scripts and every app's build refreshes it
+from there, so this zip carries it. Of six releases on 26 September, three
+stopped and the three that published looked as if they had failed:
+
+- **Where the installer is.** DbDo, EdSharp and FileDir stopped with "<App>_setup.exe
+  not found". It looks at the top of the project, where every Homer build
+  writes it, and now also in exec, where DbDo wrote it before 1.0.200, saying
+  so. The message names both places and the build to run.
+- **An older installer is not published.** HomerView was published as 1.48.53
+  while its version.txt said 1.48.63: its builds had stepped the number without
+  finishing a new installer, and the release tagged the old one with only a
+  note. It now stops and says to build; -Force publishes the older one anyway.
+- **No false alarms.** Every "is this tag here yet?" question printed red
+  NativeCommandError blocks, because Windows PowerShell 5.1 records each line a
+  native program writes to stderr as an error, even with 2>$null. Those
+  questions now go through cmd, which discards stderr first.
+- **The check runs first.** The documents said release runs scripts\check before
+  publishing; only HomerScribe's own copy did. Now every copy does, and stops
+  when the check fails. -NoCheck skips it.
+
+# 1.43.6 -- 26 September 2026
+
+**Python apps build their WinForms dialogs with the C# LbcDialog.** A Python
+app with a WinForms interface had to write its dialogs by hand, since the
+kit's homer\lbc.py is Lbc for wxPython, which NVDA code needs. Rather than a
+second Lbc written in Python and kept in step by hand, the C# one is now
+reachable from Python:
+
+- **buildHomerDev compiles exec\Homer.dll** from CSharp\Elevate, Inix, Lbc,
+  Log, Paths, Say, Util and Web, after the samples (whose C# build installs
+  the Build Tools where needed). A failure is reported with the samples'.
+- **homer\lbcnet.py** loads it through pythonnet from the program's bundle,
+  beside the program, or the kit's exec folder; sets the thread to a
+  single-threaded apartment; and returns the Homer namespace. strings() and
+  keyHandler() give runWithButtons its string[] and commandKey its
+  Func<Keys, bool>.
+- **build_APP_Py.cmd** has a homerDll setting: 1 bundles
+  C:\HomerDev\exec\Homer.dll into the program, and the build stops with a
+  plain message when buildHomerDev has not made it yet.
+
+The focus order, keys, Help box and version check are therefore the same in
+both languages by construction. urlCheck 1.12.3 is the first user.
+
+# 1.43.5 -- 26 September 2026
+
+**seedVersion is a floor in both build templates.** It was only a starting
+point, used when version.txt was missing, although its comment said "nothing
+lower than this". 2htm showed the gap: its machine already had a version.txt
+holding 1.18.4, so its first kit build stepped to 1.18.5 while its documents
+named 1.19.0. Now a version.txt below seedVersion is raised to it, logged,
+and taken as it is for that build, the same as a newly made one. A number
+already at or above the floor is stepped as before.
+
+# 1.43.4 -- 26 September 2026
+
+**check no longer starts a windowed program.** Its smoke test ran the program
+with --help, which a console program answers and exits; a windowed one --
+bookFido, and every MDI app -- opens its window and waits for a person, so the
+check sat for its whole fifteen-minute timeout and then called that a failure.
+The PE header now says which kind a program is, and a windowed one is reported
+as started by hand. Proved on the real executables: bookFido.exe reads as
+windowed, urlFido.exe as console.
+
+# 1.43.3 -- 26 September 2026
+
+**Templates\build_APP_.cmd lost half a Python template.** 1.43.2's C# template
+was assembled from the Python one, and the piece meant to be its version
+subroutines was cut from the first ":seedVersion" in the file -- the one in
+"call :seedVersion" -- so 278 lines of the Python template followed the C#
+subroutines: a second :seedVersion, a second :failed, and the Python build
+steps. cmd takes the first label it meets, so "call :seedVersion" landed in the
+pasted copy, found no version.txt, and the build stopped with "Build FAILED"
+written twice and nothing else. urlFido's first build did exactly that. The
+pasted copy is gone.
+
+**buildHomerDev checks every .cmd in Templates, Templates\samples and scripts
+for a label defined twice, and for a goto or call to a label that does not
+exist.** Neither is ever an error to cmd; both are now problems the kit build
+reports. Proved by adding a second :failed and a jump to a missing label to a
+copy of the template: the check named both.
+
+# 1.43.2 -- 26 September 2026
+
+**Templates\build_APP_.cmd keeps the same contract as the Python template,
+clause for clause.** It had fallen behind: the program went to the top of the
+project, no kit version was checked, a missing version.txt became 1.0.0, kit
+tools were refreshed only if present and without a word when not, and any
+running copy of the program -- the installed one included -- stopped the
+build. Now: kitNeeded with a trimmed comparison; version.txt seeded from the
+app's number or one past its newest release tag, written into Version.cs;
+Roslyn found with vswhere or installed with winget as the Build Tools, never
+the Framework's C# 5 csc; the kit classes named in homerModules compiled from
+the kit, and an app's stale copies of them deleted; NuGet packages and NVDA's
+controller client fetched (the client from NV Access's published
+controllerClient.zip, 2025.3, beside the program or embedded); the program
+built into exec\; only a copy running from the project's own exec reported,
+never closed; the kit tools refreshed by name and retired ones deleted; every
+.md given its .htm; fixEncoding; every help\ file checked against the
+installer; /DHomerDev= to ISCC; one log per run in logs\. urlFido's
+buildUrlFido.cmd is the worked example.
+
+buildHomerDev no longer notes a missing retired loop in the C# template: the
+list is a retiredTools= variable now, as in the Python template, and the
+renaming leaves that line alone.
+
+# 1.43.1 -- 26 September 2026
+
+**buildHomerDev no longer rewrites the Python template's retired list.** Its
+first 1.43.0 run did: "REWROTE old script names in Templates\build_APP_Py.cmd"
+turned checkHomerApp, gitPush, homerTidy and tagRelease into check, push, tidy
+and release, so an app made from the template would have deleted, on every
+build, the tools it had just refreshed. The renaming skipped only the C#
+template's retired loop; it now skips the retiredTools= line too, and this kit
+ships the template whole again.
+
+**The installer template takes the program from exec when it is there**, and
+ships every document in help\. A build in the Homer layout -- the Python
+template's, HomerScribe's, HomerView's -- leaves the program in exec\, and the
+template named it only at the top of the project. An older build that leaves
+it at the top still works. A new define, AppLaunchParams, is what the program
+is started with after the Results box, as its desktop shortcut starts it.
+
+**urlCheck's installer follows the template's pattern whole**: the component
+table included from the kit the build names, the ticked boxes noted when Finish
+is pressed, the Results box, then the launch -- with no components registered,
+since urlCheck needs none.
+
+# 1.43.0 -- 26 September 2026
+
+**The Python side brought level with the C# side**, from moving urlCheck, the
+first Python app, to the kit.
+
+**homer\elevate.py**, the Python Elevate: configure, check, isNewer, describe,
+update and offer, with the same outcome numbers as Elevate.cs. Its boxes are
+Windows message boxes through ctypes, so it serves a wx program, a WinForms
+program through pythonnet, or one with no window. It takes over the version
+comparison of **homer\version.py, which is retired**: every build writes a
+version.py of its own, so .gitignore and the checks treat the name as
+generated, the module was never pushed, and the kit's check reported it
+missing on every build.
+
+**homer\say.py speaks outside NVDA.** Inside NVDA it still uses ui.message;
+outside, it tries JAWS by COM (pywin32 or pythonnet, whichever is there), then
+the NVDA controller client DLL through ctypes. say("Column 3", "Row 12",
+"Paid") sends three utterances with nothing between them, as Say.cs does; a
+trailing True is still the interrupt flag.
+
+**Templates\build_APP_Py.cmd keeps the whole contract**: kitNeeded with a
+trimmed comparison; version.txt seeded from the app's own number or one past
+its newest release tag, never from 1.0.0 over a released app; version.py
+written every build; Python found or installed by winget and a .venv rebuilt
+when its Python differs; the program built into exec\ with PyInstaller's
+scratch in work\ and the kit's modules named by --hidden-import; a copy running
+from the project's own exec reported, never closed; the kit tools the app
+names refreshed and retired ones deleted; every .md given its .htm when newer;
+fixEncoding; every file in help\ and every scripts\install*.cmd checked
+against the installer's Source: lines; /DHomerDev= passed to ISCC; one log per
+run in logs\.
+
+**scripts\check.py**: the smoke test looks in exec\ first -- before, it looked
+only at the top of the project and found nothing for any app moved to the
+layout; the key check reads a Python function as a window's builder, and does
+not count an HTML entity such as &amp; as a trigger letter.
+
+**Templates\_APP__setup.iss**: the previous install is read once, in
+InitializeSetup. Read lazily, a fresh install cached nothing and the finish
+page's Check: functions then found the install that had just been made,
+offering "Update the JAWS scripts" where "Install" belonged. The component
+table is included from the kit named by /DHomerDev.
+
+**scripts\tidy.py puts back files named one by one in a subfolder.** The
+whitelist began "/*", which ignores the folder help itself, and git never
+looks inside an ignored folder, so "!/help/Announce.md" put back nothing:
+every file named individually in help\ or scripts\ -- as the rules for
+RepoFiles.txt ask -- was silently left out of the repository. The folder is
+now put back and its contents ignored again ("!/help/" then "/help/*") before
+the named files. Proved with git on urlCheck's list: before the fix 15 files
+were staged and 19 left out; after it, all 34. **Run scripts\tidy --gitignore
+in every app whose RepoFiles.txt names files inside a folder** (HomerView's
+scripts, for one) and push: those files may never have gone up.
+
+**help\CamelType_Python.md** joins the C# and JAWS script documents, moved
+from urlCheck and updated for the c_ constant prefix and the kit's imports.
+buildHomerDev now empties the old Python\ and Samples\ folders, whose last
+files no move pair reached. HomerDev.md and paths.py no longer say to put
+C:\HomerDev\Python on the path, or that a development folder stays flat.
+
 # 1.42.1 -- 26 September 2026
 
 release no longer shows two red error blocks on a release that
