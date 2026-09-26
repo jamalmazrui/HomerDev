@@ -5,6 +5,16 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.43.17 -- 26 September 2026
+
+**check never waits for a key.** Each acceptance command now runs with empty
+input, so a "pause" or a prompt in it returns at once. HomerView's quality
+check ended with "Press any key to close this window"; check captured its
+output, so nothing was shown, and the release sat silent until it was stopped
+by hand. The console now also names each acceptance command as it starts, so
+a long one -- HomerView's accept list rebuilds the whole program -- is seen to
+be running.
+
 # 1.43.16 -- 26 September 2026
 
 **version.py is kept out of git at the top of a project only.** tidy never
