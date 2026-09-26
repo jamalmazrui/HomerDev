@@ -677,15 +677,11 @@ def renameScripts():
 # JamalMazrui and the account is jamalmazrui. A redirect works until it does
 # not. push now reads that message from its own log and points origin at the
 # new location, once; after that GitHub has nothing to say.
+# The 1.42.1 QUIET PROBE patch to release.ps1 is gone (1.43.14): release.ps1
+# has asked its questions through System.Diagnostics.Process since 1.43.8, so
+# the line the patch looked for no longer exists, and every kit build logged
+# that it could not apply it.
 c_lPatches = [
-    ("scripts/release.ps1", "QUIET PROBE (1.42.1)",
-     "    & $sExe @aArgs 2>$null | Out-Null",
-     "    # QUIET PROBE (1.42.1): the expected \"no\" from git or gh is not an error.\r\n"
-     "    $sPriorPreference = $ErrorActionPreference\r\n"
-     "    $ErrorActionPreference = 'SilentlyContinue'\r\n"
-     "    & $sExe @aArgs 2>$null | Out-Null\r\n"
-     "    $ErrorActionPreference = $sPriorPreference",
-     "replace"),
     # AFTER THE FAILURE CHECK, NOT AFTER THE PUSH. The line after `git push`
     # is `if errorlevel 1`, and anything run between them resets errorlevel:
     # the first version of this patch sat there and would have reported every

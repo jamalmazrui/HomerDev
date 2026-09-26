@@ -5,6 +5,76 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.43.16 -- 26 September 2026
+
+**version.py is kept out of git at the top of a project only.** tidy never
+pushes the version.py a Python app's build generates beside its source, but a
+bare name matched anywhere: HomerView's NVDA add-on carries its own
+homer\version.py, which the add-on imports, and tidy would have untracked it.
+The name is now /version.py, and a leading / anchors any name in tidy's lists
+to the top of the project, as it does in .gitignore. Proved on HomerView's
+repository: the add-on's version.py stays tracked.
+
+# 1.43.15 -- 26 September 2026
+
+**release publishes a draft and proves the release is the latest.** EdSharp's
+v5.0.15 already existed on GitHub as a draft, left by an earlier run: invisible
+to the public, so the list of releases rightly said it was not released, while
+"gh release view" found it. release uploaded the installer to the draft and
+reported success, because the download link answers for any earlier release
+with an installer of the same name. Now an existing release is edited with
+--draft=false --latest, and a failure is shown; and before calling a release
+published, release asks GitHub which release it calls latest and stops unless
+it is this one.
+
+**check reads only the .inix files the project names**, as it does its
+sources. FileDir's pre-kit Hotkeys.inix at the top, superseded by
+configs\Hotkeys.inix, still named keys the program no longer has.
+
+# 1.43.14 -- 26 September 2026
+
+**check's key test no longer cries wolf on an app with a menu bar.** Run on
+FileDir it reported 47 key problems, 40 of them false, from three blind spots:
+
+- A method declared with no modifier -- FileDir's "void menuEditRename_Click(
+  object sender, EventArgs e) {" at the left margin -- did not start a new
+  owner, so every caption after it was counted as one earlier method's.
+- A caption tested again in code -- ButtonDialog(..., {"&No", "&Yes"}) and then
+  case "&No" -- counted as a second claim on its letter. Only two DIFFERENT
+  captions with one letter compete now.
+- A whole menu bar built in one constructor was one owner. A caption assigned
+  to menuEdit... or miEdit... now belongs to the Edit menu, and one assigned to
+  menuEdit itself to the menu bar.
+
+The app's own desktop shortcut letter, read from its installer's HotKey, is no
+longer reported as a reserved Alt+Control key: FileDir's Hotkeys.inix lists
+Alt+Control+F because that is how FileDir is opened. What remains for FileDir
+are its three real Alt+Control timer keys.
+
+**buildHomerDev stops trying the 1.42.1 patch to release.ps1**, which release
+no longer needs; every kit build logged that it could not apply it.
+
+# 1.43.13 -- 26 September 2026
+
+**release reads GitHub's list of releases rather than trusting an exit code.**
+Even asking GitHub alone (1.43.12), it said EdSharp 5.0.15 was already
+released minutes after the build, which steps over every tagged number, had
+chosen 5.0.15. On that machine gh is gh.cmd, and the exit code of a batch file
+passed back through cmd is not a reliable yes or no. release now asks gh for
+the tag names of the repository's releases as JSON and looks for the tag among
+them, ignoring drafts; only if that list cannot be read does it fall back to
+"gh release view".
+
+# 1.43.12 -- 26 September 2026
+
+**release asks GitHub whether a version is released, and no one else.** It
+also counted a tag on this machine as a release, so a tag left by an earlier run
+that stopped before publishing made EdSharp 5.0.14 "already released" when
+nothing was on GitHub -- its build, which steps over every number tagged on
+origin, had just used 5.0.14. Now a release exists only when gh finds it; a tag
+on this machine alone is pushed and published by the tag step. Without gh, a
+local tag is still the answer, as there is nothing else to ask.
+
 # 1.43.11 -- 26 September 2026
 
 **tidy leaves a file where the project says it lives.** EdSharp keeps the two

@@ -69,4 +69,4 @@ self.htm
 self.md
 release.cmd
 release.ps1
-version.py
+/version.py
