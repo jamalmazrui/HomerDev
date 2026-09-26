@@ -363,78 +363,10 @@ public class LbcTextBox : TextBox
 // focus sits on a listbox, so AcceptButton is not a reliable handle
 // for "OK". If no OK button is found, Control+Enter falls through
 // untouched.
-// LbcTrackBar: a slider that says what its value MEANS.
-//
-// A plain TrackBar reports its position to a screen reader as a percentage of
-// its own range, which is almost never the number on the label: a rate of 100
-// on a scale of 25 to 400 is announced as "20", and a volume of 70 out of 130
-// as "53". Both are true of the slider and useless to the listener.
-//
-// valueText turns the value into the words the label promised -- "100 percent",
-// "3 minutes" -- and the accessible object hands those to the reader instead.
-public class LbcTrackBar : TrackBar
-{
-    public Func<int, string> valueText;
-
-    protected override AccessibleObject CreateAccessibilityInstance()
-    {
-        return new LbcTrackBarAccessibleObject(this);
-    }
-
-    private class LbcTrackBarAccessibleObject : Control.ControlAccessibleObject
-    {
-        private LbcTrackBar bar;
-
-        public LbcTrackBarAccessibleObject(LbcTrackBar barOwner) : base(barOwner)
-        {
-            bar = barOwner;
-        }
-
-        public override AccessibleRole Role { get { return AccessibleRole.Slider; } }
-
-        public override string Value
-        {
-            get
-            {
-                try
-                {
-                    if (bar.valueText != null) return bar.valueText(bar.Value);
-                    return bar.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
-                }
-                catch (Exception) { return ""; }
-            }
-        }
-    }
-}
-
 public class LbcForm : Form
 {
-    // commandKey: a key the dialog claims before any control sees it. Set it to
-    // a function that returns true when it has dealt with the key.
-    //
-    // KeyPreview and a KeyDown handler are not always enough. A key a control
-    // considers its own -- and a key Windows treats as a system or toggle key,
-    // Scroll Lock among them -- can be swallowed before KeyDown is raised.
-    // ProcessCmdKey runs ahead of all of that. This is also what DbDo and
-    // EdSharp do with their own keys.
-    public Func<Keys, bool> commandKey;
-
-    // dialogKey: the dialog's own keys -- jump, keywords, filter -- claimed in
-    // the same place, and for the same reason.
-    public Func<Keys, bool> dialogKey;
-
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
     {
-        if (commandKey != null)
-        {
-            try { if (commandKey(keyData)) return true; }
-            catch (Exception) { }
-        }
-        if (dialogKey != null)
-        {
-            try { if (dialogKey(keyData)) return true; }
-            catch (Exception) { }
-        }
         if (keyData == (Keys.Control | Keys.Enter))
         {
             Button btnOk = findButton(this, true);   // by DialogResult.OK
@@ -492,6 +424,7 @@ public static class HelpDialog
             tb.WordWrap = true;
             tb.Font = new Font(FontFamily.GenericMonospace, 10f);
             tb.Text = sText;
+            tb.AccessibleName = "Help text";
             tb.TabIndex = 0;
             tb.SelectionStart = 0;
             tb.SelectionLength = 0;
@@ -501,7 +434,8 @@ public static class HelpDialog
 
             Button btnClose = new Button();
             btnClose.Text = "&OK";
-                        btnClose.DialogResult = DialogResult.OK;
+            btnClose.AccessibleName = "OK";
+            btnClose.DialogResult = DialogResult.OK;
             btnClose.Size = new Size(90, 28);
             btnClose.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnClose.Location = new Point(dlg.ClientSize.Width - 100, dlg.ClientSize.Height - 38);
@@ -547,14 +481,15 @@ public static class HelpDialog
             tb.Multiline = true; tb.ReadOnly = true;
             tb.ScrollBars = ScrollBars.Vertical; tb.WordWrap = true;
             tb.Font = new Font(FontFamily.GenericMonospace, 10f);
-            tb.Text = sText;
+            tb.Text = sText; tb.AccessibleName = "Record";
             tb.TabIndex = 0; tb.SelectionStart = 0; tb.SelectionLength = 0;
             tb.Size = new Size(dlg.ClientSize.Width - 20, dlg.ClientSize.Height - 50);
             tb.Location = new Point(10, 10);
             tb.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
 
             Button btnClose = new Button();
-            btnClose.Text = "&OK";             btnClose.DialogResult = DialogResult.OK;
+            btnClose.Text = "&OK"; btnClose.AccessibleName = "OK";
+            btnClose.DialogResult = DialogResult.OK;
             btnClose.Size = new Size(90, 28);
             btnClose.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnClose.Location = new Point(dlg.ClientSize.Width - 100, dlg.ClientSize.Height - 38);
@@ -759,8 +694,6 @@ public class LbcDialog : IDisposable
     private Form                        frm;
     private IWin32Window                owner;
     private Button                      btnSavedAccept;
-    private const int                   DefaultBandFieldWidth = 190;
-    private const int                   DefaultSliderHeight = 45;
     private FlowLayoutPanel             pnlStack;
 
     // The band currently open, or null when controls are being stacked one
@@ -772,8 +705,6 @@ public class LbcDialog : IDisposable
     //
     // It is null by default, so a dialog that never calls addBand behaves
     // exactly as before -- one control per row.
-    private string                      sStatusExtra = "";
-    private string                      sStatusTip = "";
     private FlowLayoutPanel             pnlBand = null;
     private Label                       lblStatusBar;
     private int                         iTabIndex;
@@ -781,6 +712,7 @@ public class LbcDialog : IDisposable
     // inside a pick-list. F3 / Shift+F3 advance / retreat through
     // matches. Shared across all list boxes in this dialog so the
     // user can chain searches across multiple lists.
+    private string                      sListSearchTerm = "";
 
     // True when this builder was handed an existing form -- an MDI child --
     // rather than making its own dialog. It changes two things and no more:
@@ -854,6 +786,7 @@ public class LbcDialog : IDisposable
         lblStatusBar = new Label();
         lblStatusBar.Text = "";
         lblStatusBar.AccessibleRole = AccessibleRole.StatusBar;
+        lblStatusBar.AccessibleName = "Status";
         lblStatusBar.Dock = DockStyle.Bottom;
         lblStatusBar.Height = DefaultStatusHeight;
         lblStatusBar.TextAlign = ContentAlignment.MiddleLeft;
@@ -865,8 +798,6 @@ public class LbcDialog : IDisposable
         // AutoScroll on so dialogs with many fields scroll instead
         // of overflowing the screen.
         pnlStack = new FlowLayoutPanel();
-        pnlStack.AccessibleRole = AccessibleRole.Grouping;
-        pnlStack.AccessibleName = "";
         pnlStack.FlowDirection = FlowDirection.TopDown;
         pnlStack.WrapContents = false;
         pnlStack.AutoScroll = true;
@@ -986,8 +917,9 @@ public class LbcDialog : IDisposable
         // Inherit the AccessibleName from the most recent Label,
         // if one was just added. Mirrors Homer LbC.
         Label lblLast = currentLabelOrNull();
+        if (lblLast != null) tb.AccessibleName = lblLast.AccessibleName;
         tb.GotFocus += handleGotFocus;
-        registerWidget(tb, "TextBox", nameFromLabel());
+        registerWidget(tb, "TextBox", tb.AccessibleName);
         if (!string.IsNullOrEmpty(sTip)) { dFocusTips[tb] = sTip; tb.Tip = sTip; }
         bandTarget().Controls.Add(tb);
         if (ctlFirstFocusable == null) ctlFirstFocusable = tb;
@@ -1015,8 +947,6 @@ public class LbcDialog : IDisposable
     public TextBox addInlineInputBox(string sLabel, string sValue, string sTip)
     {
         TableLayoutPanel pnlRow = new TableLayoutPanel();
-        pnlRow.AccessibleRole = AccessibleRole.Grouping;
-        pnlRow.AccessibleName = "";
         pnlRow.ColumnCount = 2;
         pnlRow.RowCount = 1;
         pnlRow.AutoSize = true;
@@ -1030,6 +960,7 @@ public class LbcDialog : IDisposable
         Label lbl = new Label();
         lbl.Text = (sLabel ?? "").TrimEnd();
         if (!lbl.Text.EndsWith(":")) lbl.Text = lbl.Text + ":";
+        lbl.AccessibleName = cleanLabel(sLabel);
         lbl.AutoSize = true;
         lbl.TextAlign = ContentAlignment.MiddleLeft;
         lbl.Margin = new Padding(0, 4, DefaultPadding, 0);
@@ -1040,8 +971,9 @@ public class LbcDialog : IDisposable
         tb.Dock = DockStyle.Fill;
         tb.TabIndex = iTabIndex++;
         tb.Margin = new Padding(0, 0, 0, 0);
+        tb.AccessibleName = cleanLabel(sLabel);
         tb.GotFocus += handleGotFocus;
-        registerWidget(tb, "TextBox", nameFromLabel());
+        registerWidget(tb, "TextBox", tb.AccessibleName);
         if (!string.IsNullOrEmpty(sTip)) { dFocusTips[tb] = sTip; tb.Tip = sTip; }
         pnlRow.Controls.Add(tb, 1, 0);
 
@@ -1065,6 +997,7 @@ public class LbcDialog : IDisposable
         // The label inheritance happened in addTextBox via
         // currentLabelOrNull. Set AccessibleName explicitly
         // here too as belt-and-suspenders.
+        tb.AccessibleName = cleanLabel(sLabel);
         return tb;
     }
 
@@ -1098,9 +1031,10 @@ public class LbcDialog : IDisposable
         tb.TabIndex = iTabIndex++;
         tb.Margin = new Padding(0, 0, 0, DefaultRowGap);
         Label lblLast = currentLabelOrNull();
+        if (lblLast != null) tb.AccessibleName = lblLast.AccessibleName;
         tb.GotFocus += handleMemoGotFocus;
         tb.LostFocus += handleMemoLostFocus;
-        registerWidget(tb, "Memo", nameFromLabel());
+        registerWidget(tb, "Memo", tb.AccessibleName);
         if (!string.IsNullOrEmpty(sTip)) { dFocusTips[tb] = sTip; tb.Tip = sTip; }
         bandTarget().Controls.Add(tb);
         if (ctlFirstFocusable == null) ctlFirstFocusable = tb;
@@ -1113,6 +1047,7 @@ public class LbcDialog : IDisposable
     {
         addFieldLabel(sLabel);
         TextBox tb = addMemo(sValue, sTip);
+        tb.AccessibleName = cleanLabel(sLabel);
         return tb;
     }
 
@@ -1129,6 +1064,7 @@ public class LbcDialog : IDisposable
     {
         CheckBox cb = new CheckBox();
         cb.Text = sLabel ?? "";
+        cb.AccessibleName = cleanLabel(sLabel);
         cb.Checked = bValue;
         cb.AutoSize = false;
         cb.Size = new Size(innerWidth(), DefaultLineHeight);
@@ -1157,6 +1093,7 @@ public class LbcDialog : IDisposable
         lb.Margin = new Padding(0, 0, 0, DefaultRowGap);
         populateListBox(lb, lsNames, sSelected);
         Label lblLast = currentLabelOrNull();
+        if (lblLast != null) lb.AccessibleName = lblLast.AccessibleName;
         lb.GotFocus += handleGotFocus;
         // Find-in-list keys. Ctrl+J prompts for a case-insensitive
         // substring; F3 advances to the next match; Shift+F3 the
@@ -1165,7 +1102,7 @@ public class LbcDialog : IDisposable
         // Menu, Choose Table on a large schema).
         lb.KeyDown += new KeyEventHandler(handleListBoxFindKeys);
         lb.KeyDown += new KeyEventHandler(handleListBoxCopyKeys);
-        registerWidget(lb, "ListBox", nameFromLabel());
+        registerWidget(lb, "ListBox", lb.AccessibleName);
         if (!string.IsNullOrEmpty(sTip)) dFocusTips[lb] = sTip;
         bandTarget().Controls.Add(lb);
         if (ctlFirstFocusable == null) ctlFirstFocusable = lb;
@@ -1184,6 +1121,7 @@ public class LbcDialog : IDisposable
     {
         addFieldLabel(sLabel);
         CheckedListBox clb = addCheckListBox(lsNames, lsChecked, sTip);
+        clb.AccessibleName = cleanLabel(sLabel);
         return clb;
     }
 
@@ -1198,14 +1136,19 @@ public class LbcDialog : IDisposable
         if (lsChecked != null) foreach (int iCheck in lsChecked) if (iCheck >= 0 && iCheck < clb.Items.Count) clb.SetItemChecked(iCheck, true);
         if (clb.Items.Count > 0) clb.SelectedIndex = 0;
         Label lblLast = currentLabelOrNull();
+        if (lblLast != null) clb.AccessibleName = lblLast.AccessibleName;
         clb.GotFocus += handleGotFocus;
-        registerWidget(clb, "CheckedListBox", nameFromLabel());
+        registerWidget(clb, "CheckedListBox", clb.AccessibleName);
         if (!string.IsNullOrEmpty(sTip)) dFocusTips[clb] = sTip;
         bandTarget().Controls.Add(clb);
         if (ctlFirstFocusable == null) ctlFirstFocusable = clb;
         return clb;
     }
 
+    // handleListBoxFindKeys: KeyDown handler attached to every
+    // ListBox added via addListBox / addPickBox. Intercepts the
+    // three find-in-list chords; defers everything else to the
+    // ListBox's normal handling.
     // handleListBoxCopyKeys: Control+C copies the current list
     // item's text to the clipboard; Alt+C appends it (clipboard,
     // CRLF, item), mirroring the text-control family so every
@@ -1226,276 +1169,33 @@ public class LbcDialog : IDisposable
         evArgs.SuppressKeyPress = true;
     }
 
-    // ------- Finding and filtering in a list -------
-    //
-    // A long list is unusable without these, and a screen reader user needs
-    // them more than anyone: reading sixty lines to find one is the difference
-    // between a list and a wall. The keys are the ones FileDir's own directory
-    // window uses, so one habit serves both:
-    //
-    //   Control+J          find a substring, forwards
-    //   Control+Shift+J    find a substring, backwards
-    //   F3, Shift+F3       the same substring again, on and back
-    //   Control+F          show only the items that match
-    //   Control+Shift+F    show everything again
-    //
-    // FILTERING CHANGES WHICH ROWS ARE SHOWN, so a caller that maps rows to
-    // anything of its own must ask listSourceIndex rather than trusting the
-    // row number. That is why the full list is kept here rather than left in
-    // the control.
-
-    private class ListState
-    {
-        public List<string> lsAll = new List<string>();
-        // WHAT A JUMP SEARCHES IS NOT ALWAYS WHAT THE LIST SHOWS. A track shows
-        // its title; the name of the person in it may be somewhere else
-        // entirely. A caller can supply a line of searchable text per item --
-        // everything it knows, as long as it likes -- and the list still shows
-        // the short version. Left unset, the two are the same.
-        public List<string> lsSearch = new List<string>();
-        public List<int> liRows = new List<int>();   // visible row -> place in lsAll
-        public string sFilter = "";
-    }
-
-    private Dictionary<ListBox, ListState> dListStates = new Dictionary<ListBox, ListState>();
-
-    // primaryList: the list the jump, find and filter keys act on, wherever the
-    // cursor happens to be.
-    //
-    // A dialog built around one list -- a player around its queue -- should
-    // answer Control+J with that list from any control in it. Left unset, the
-    // keys act on whichever list has focus, which is right for a dialog with
-    // several.
-    public ListBox primaryList;
-
-    private ListState stateFor(ListBox lb)
-    {
-        ListState state;
-        if (dListStates.TryGetValue(lb, out state)) return state;
-        state = new ListState();
-        foreach (object oItem in lb.Items) state.lsAll.Add((oItem ?? "").ToString());
-        state.lsSearch.AddRange(state.lsAll);
-        for (int i = 0; i < state.lsAll.Count; i++) state.liRows.Add(i);
-        dListStates[lb] = state;
-        return state;
-    }
-
-    // setListItems: replace what a list holds, and forget any filter on it.
-    // A caller that rebuilds a list -- because it sorted it, say -- should come
-    // through here so the find and filter machinery knows what is there now.
-    public void setListItems(ListBox lb, IList<string> lsItems)
-    {
-        setListItems(lb, lsItems, null);
-    }
-
-    // lsSearchText, when given, is what Jump and Filter look through: one line
-    // per item, holding whatever the caller thinks worth finding by.
-    public void setListItems(ListBox lb, IList<string> lsItems, IList<string> lsSearchText)
-    {
-        if (lb == null) return;
-        ListState state = new ListState();
-        foreach (string sItem in lsItems) state.lsAll.Add(sItem ?? "");
-        if (lsSearchText != null && lsSearchText.Count == state.lsAll.Count)
-            foreach (string sText in lsSearchText) state.lsSearch.Add(sText ?? "");
-        else state.lsSearch.AddRange(state.lsAll);
-        for (int i = 0; i < state.lsAll.Count; i++) state.liRows.Add(i);
-        dListStates[lb] = state;
-        lb.BeginUpdate();
-        try
-        {
-            lb.Items.Clear();
-            foreach (string sItem in state.lsAll) lb.Items.Add(sItem);
-            if (lb.Items.Count > 0) lb.SelectedIndex = 0;
-        }
-        finally { lb.EndUpdate(); }
-    }
-
-    // listSourceIndex: which item a visible row really is. With no filter the
-    // answer is the row itself; with one it is not.
-    public int listSourceIndex(ListBox lb, int iRow)
-    {
-        if (lb == null || iRow < 0) return -1;
-        ListState state = stateFor(lb);
-        if (iRow >= state.liRows.Count) return -1;
-        return state.liRows[iRow];
-    }
-
-    // listIsFiltered: whether a list is showing a subset.
-    public bool listIsFiltered(ListBox lb)
-    {
-        if (lb == null) return false;
-        return stateFor(lb).sFilter.Length > 0;
-    }
-
-    // applyFilter: show only the items that match.
-    //
-    // THE SAME SYNTAX AS KEYWORDS, AND FOR THE SAME REASON. Filter used a plain
-    // substring test, so "chap*" found nothing at all: no line contains a star.
-    // Meanwhile the directory window's own filter has taken wildcards for
-    // years, and Keywords here takes & and | and *. Three commands that narrow
-    // a list by text should not need three sets of rules, and the one anybody
-    // would guess is the one already written down.
-    //
-    // Jump is deliberately left out of that: it is the plain substring jump it
-    // is in FileDir, where the whole point is typing a few letters fast.
-    private void applyFilter(ListBox lb, string sFilter)
-    {
-        ListState state = stateFor(lb);
-        string sLower = (sFilter ?? "").ToLowerInvariant();
-        List<int> liRows = new List<int>();
-        for (int i = 0; i < state.lsAll.Count; i++)
-        {
-            if (sLower.Length == 0 || keywordsMatch(state.lsSearch[i].ToLowerInvariant(), sLower)) liRows.Add(i);
-        }
-        // A FILTER THAT MATCHES NOTHING IS NOT APPLIED. An empty list is a
-        // dead end with no way back that is obvious from inside it, and the
-        // count is a real answer on its own.
-        if (liRows.Count == 0)
-        {
-            Say.say("0 matches. The list is unchanged.");
-            return;
-        }
-        state.sFilter = sLower;
-        state.liRows = liRows;
-        lb.BeginUpdate();
-        try
-        {
-            lb.Items.Clear();
-            foreach (int iSource in liRows) lb.Items.Add(state.lsAll[iSource]);
-            lb.SelectedIndex = 0;
-        }
-        finally { lb.EndUpdate(); }
-        if (sLower.Length == 0) Say.say(Util.stringPlural("item", liRows.Count));
-        else Say.say(liRows.Count + " of " + Util.stringPlural("item", state.lsAll.Count));
-    }
-
-    // listKeyHandled: do the jump, find or filter this key asks for, and say
-    // whether it was one of them.
-    // TWO SEARCHES, NOT ONE.
-    //
-    // Jump looks at the line the list SHOWS -- the title of a track -- and is
-    // for going to something you can name. Find looks at everything the caller
-    // knows about the item, which for a track is its presenter, its episode
-    // number, its address and whatever the source document said about it. The
-    // two answer different questions and each keeps its own last ten answers.
-    //
-    // F3 repeats whichever was used last, which is the Homer convention: one
-    // key for "again", and it means the thing you just did.
-    private string sJumpTerm = "";
-    private string sFindTerm = "";
-    private bool bLastWasFind = false;
-
-    private bool listKeyHandled(ListBox lb, Keys k)
-    {
-        if (lb == null)
-        {
-            // Only worth a line when the key was one of ours and there was no
-            // list to use it on; anything else is every keystroke in the log.
-            if (k == Keys.F3 || k == (Keys.Shift | Keys.F3) || k == (Keys.Control | Keys.J)
-                || k == (Keys.Control | Keys.Shift | Keys.J) || k == (Keys.Control | Keys.F)
-                || k == (Keys.Control | Keys.Shift | Keys.F))
-                Log.info("Lbc: " + k.ToString() + " pressed, but the control with focus is not a list.");
-            return false;
-        }
-        // THE SAME KEYS AS FILEDIR'S DIRECTORY WINDOW, meaning the same things.
-        // Control+J jumps by name, Control+K searches content, Control+F filters
-        // and Control+Shift+F clears the filter. A person who knows one window
-        // knows the other.
-        if (k == (Keys.Control | Keys.J)) { promptAndSearch(lb, true, false); return true; }
-        if (k == (Keys.Control | Keys.Shift | Keys.J)) { promptAndSearch(lb, false, false); return true; }
-        if (k == (Keys.Control | Keys.K)) { promptAndSearch(lb, true, true); return true; }
-        if (k == (Keys.Control | Keys.Shift | Keys.K)) { promptAndSearch(lb, false, true); return true; }
-        if (k == Keys.F3) { searchAgain(lb, true); return true; }
-        if (k == (Keys.Shift | Keys.F3)) { searchAgain(lb, false); return true; }
-        if (k == (Keys.Control | Keys.F))
-        {
-            // The prompt says what it takes, because a syntax nobody is told
-            // about is a syntax nobody uses.
-            string sWanted = promptWithHistory("Filter", "Filter text, with & or | or *:",
-                "listFilter", stateFor(lb).sFilter);
-            if (sWanted != null) applyFilter(lb, sWanted);
-            return true;
-        }
-        if (k == (Keys.Control | Keys.Shift | Keys.F))
-        {
-            ListState stateNow = stateFor(lb);
-            if (stateNow.sFilter.Length == 0) Say.say("No filter to clear");
-            else { stateNow.sFilter = ""; applyFilter(lb, ""); }
-            return true;
-        }
-        return false;
-    }
-
     private void handleListBoxFindKeys(object sender, KeyEventArgs evArgs)
     {
         ListBox lb = sender as ListBox;
         if (lb == null) return;
         Keys k = evArgs.KeyData;
-        if (!listKeyHandled(lb, k)) return;
-        evArgs.Handled = true;
-        evArgs.SuppressKeyPress = true;
+        if (k == (Keys.Control | Keys.J))
+        { promptAndFindInListBox(lb); evArgs.Handled = true; evArgs.SuppressKeyPress = true; }
+        else if (k == Keys.F3)
+        { findNextInListBox(lb, true); evArgs.Handled = true; evArgs.SuppressKeyPress = true; }
+        else if (k == (Keys.Shift | Keys.F3))
+        { findNextInListBox(lb, false); evArgs.Handled = true; evArgs.SuppressKeyPress = true; }
     }
 
-    // ------- Remembering what was asked before -------
-    //
-    // Nobody wants to type the same substring twice. Each kind of prompt keeps
-    // its own short history, newest first, and the box that asks is a combo
-    // box, so the last ten answers are one Down Arrow away.
-    //
-    // WHERE THE HISTORY IS KEPT IS THE APPLICATION'S BUSINESS, not this
-    // class's. An application that wants it to survive the session sets these
-    // two, as FileDir does with its .inix; one that does not gets a history
-    // that lasts as long as the program runs.
-    public static Func<string, List<string>> historyRead;
-    public static Action<string, List<string>> historyWrite;
-
-    private const int c_iHistoryDepth = 10;
-    private static Dictionary<string, List<string>> dHistorySession = new Dictionary<string, List<string>>();
-
-    private static List<string> historyFor(string sKey)
+    // Ctrl+J: prompt for a case-insensitive substring, then jump
+    // to the first item containing it. The substring is stored
+    // in sListSearchTerm so subsequent F3 / Shift+F3 can advance.
+    private void promptAndFindInListBox(ListBox lb)
     {
-        if (historyRead != null)
-        {
-            try
-            {
-                List<string> lsFiled = historyRead(sKey);
-                if (lsFiled != null) return lsFiled;
-            }
-            catch (Exception) { }
-        }
-        List<string> lsHere;
-        if (!dHistorySession.TryGetValue(sKey, out lsHere)) { lsHere = new List<string>(); dHistorySession[sKey] = lsHere; }
-        return lsHere;
-    }
-
-    private static void historyAdd(string sKey, string sValue)
-    {
-        if (string.IsNullOrEmpty(sValue)) return;
-        List<string> lsNow = new List<string>(historyFor(sKey));
-        // Newest first, no repeats, and never more than ten: a history longer
-        // than that is a list to search rather than a shortcut.
-        for (int i = lsNow.Count - 1; i >= 0; i--)
-            if (string.Equals(lsNow[i], sValue, StringComparison.OrdinalIgnoreCase)) lsNow.RemoveAt(i);
-        lsNow.Insert(0, sValue);
-        while (lsNow.Count > c_iHistoryDepth) lsNow.RemoveAt(lsNow.Count - 1);
-        dHistorySession[sKey] = lsNow;
-        if (historyWrite != null)
-        {
-            try { historyWrite(sKey, lsNow); }
-            catch (Exception) { }
-        }
-    }
-
-    // promptWithHistory: ask for one line, with the last ten answers on hand.
-    // Returns null when the person changes their mind.
-    public string promptWithHistory(string sTitle, string sPrompt, string sHistoryKey, string sInitial)
-    {
-        string sAnswer = null;
+        string sPrompt = "Find substring (case-insensitive):";
+        string sInitial = sListSearchTerm ?? "";
+        // Simple inline input: a tiny modal dialog with one input
+        // box. We don't recurse into LbcDialog because nesting
+        // would complicate event routing; a vanilla Form is fine.
         using (Form prompt = new LbcForm())
         {
-            // The caption IS the accessible name of a Form; setting the
-            // property to the same text makes a reader announce it twice.
-            prompt.Text = sTitle;
+            prompt.Text = "Find in list";
+            prompt.AccessibleName = "Find in list";
             prompt.FormBorderStyle = FormBorderStyle.FixedDialog;
             prompt.StartPosition = FormStartPosition.CenterParent;
             prompt.MinimizeBox = false;
@@ -1506,13 +1206,12 @@ public class LbcDialog : IDisposable
             lbl.Text = sPrompt;
             lbl.AutoSize = true;
             lbl.Location = new Point(12, 12);
-            ComboBox cbo = new ComboBox();
-            cbo.DropDownStyle = ComboBoxStyle.DropDown;
-            cbo.Location = new Point(12, 36);
-            cbo.Size = new Size(376, 21);
-            foreach (string sPast in historyFor(sHistoryKey)) cbo.Items.Add(sPast);
-            cbo.Text = sInitial ?? "";
-            cbo.SelectAll();
+            TextBox tb = new TextBox();
+            tb.Text = sInitial;
+            tb.SelectAll();
+            tb.Location = new Point(12, 36);
+            tb.Size = new Size(376, 20);
+            tb.AccessibleName = "Find substring";
             Button btnOk = new Button();
             btnOk.Text = "&OK";
             btnOk.DialogResult = DialogResult.OK;
@@ -1522,157 +1221,59 @@ public class LbcDialog : IDisposable
             btnCancel.DialogResult = DialogResult.Cancel;
             btnCancel.Location = new Point(313, 70);
             prompt.Controls.Add(lbl);
-            prompt.Controls.Add(cbo);
+            prompt.Controls.Add(tb);
             prompt.Controls.Add(btnOk);
             prompt.Controls.Add(btnCancel);
             prompt.AcceptButton = btnOk;
             prompt.CancelButton = btnCancel;
-            if (prompt.ShowDialog(frm) != DialogResult.OK) return null;
-            sAnswer = cbo.Text ?? "";
+            if (prompt.ShowDialog(frm) != DialogResult.OK) return;
+            sListSearchTerm = tb.Text ?? "";
         }
-        historyAdd(sHistoryKey, sAnswer);
-        return sAnswer;
+        if (string.IsNullOrEmpty(sListSearchTerm)) return;
+        // Start search from item 0 (Ctrl+J is "find first match
+        // from the top," not "find next from current position").
+        int iFound = findInListBoxFrom(lb, 0, true, sListSearchTerm);
+        if (iFound < 0)
+            Say.say("No match for \"" + sListSearchTerm + "\"");
+        else
+        { lb.SelectedIndex = iFound; lb.Focus(); }
     }
 
-    // promptAndSearch: ask for a substring and go to it.
-    //
-    // bOverEverything says which of the two searches this is: false looks at
-    // the lines the list shows, true looks at everything the caller knows about
-    // each item. Each keeps its own history, so the box offers the words that
-    // belong to the question being asked.
-    private void promptAndSearch(ListBox lb, bool bForward, bool bOverEverything)
+    // F3 / Shift+F3: advance / retreat through matches of the
+    // stored search term. If no search term is set, silently say
+    // so (don't pop up a dialog -- F3 is a navigation key, not a
+    // configuration key).
+    private void findNextInListBox(ListBox lb, bool bForward)
     {
-        string sTitle = bOverEverything
-            ? (bForward ? "Keywords" : "Keywords back")
-            : (bForward ? "Jump" : "Jump back");
-        string sKey = bOverEverything ? "listKeywords" : "listJump";
-        string sWas = bOverEverything ? sFindTerm : sJumpTerm;
-        string sWanted = promptWithHistory(sTitle,
-            bOverEverything ? "Text, with & or | or *:" : "Text:", sKey, sWas);
-        if (sWanted == null) return;
-        if (sWanted.Length == 0) return;
-        if (bOverEverything) sFindTerm = sWanted; else sJumpTerm = sWanted;
-        bLastWasFind = bOverEverything;
-        Log.info("Lbc: " + sTitle + " for " + sWanted);
-        goToMatch(lb, bForward, bOverEverything, sWanted, true);
-    }
-
-    // searchAgain: F3 and Shift+F3, repeating whichever search was last used.
-    private void searchAgain(ListBox lb, bool bForward)
-    {
-        string sTerm = bLastWasFind ? sFindTerm : sJumpTerm;
-        Log.info("Lbc: again, " + (bLastWasFind ? "find" : "jump") + " for " + sTerm);
-        if (string.IsNullOrEmpty(sTerm))
-        {
-            // Nothing to repeat means the person wants to search and reached
-            // for the nearer key. Ask, rather than refuse.
-            promptAndSearch(lb, bForward, bLastWasFind);
-            return;
-        }
-        goToMatch(lb, bForward, bLastWasFind, sTerm, false);
-    }
-
-    private void goToMatch(ListBox lb, bool bForward, bool bOverEverything, string sTerm, bool bFirst)
-    {
-        // From where the cursor is, not from the top: the answer wanted is
-        // nearly always the next one, and wrapping means nothing is missed.
+        if (string.IsNullOrEmpty(sListSearchTerm))
+        { Say.say("No find substring set; press Control+J first"); return; }
         int iFrom = lb.SelectedIndex + (bForward ? 1 : -1);
         if (iFrom < 0) iFrom = lb.Items.Count - 1;
         if (iFrom >= lb.Items.Count) iFrom = 0;
-        int iFound = findInListBoxFrom(lb, iFrom, bForward, sTerm, bOverEverything);
-        if (iFound < 0) Say.say((bFirst ? "0 matches for " : "0 more matches for ") + sTerm);
-        else moveTo(lb, iFound);
+        int iFound = findInListBoxFrom(lb, iFrom, bForward, sListSearchTerm);
+        if (iFound < 0)
+            Say.say("No more matches for \"" + sListSearchTerm + "\"");
+        else
+            lb.SelectedIndex = iFound;
     }
 
-    // moveTo: put the cursor of a list on an item, and leave the keyboard where
-    // it was.
-    //
-    // FOCUS BELONGS TO THE PERSON. A search that drags focus into the list has
-    // also decided where they should be working, and getting back is their
-    // problem. So the list's own cursor moves and nothing else does -- and when
-    // the list is not the control with focus, the item is spoken, because a
-    // screen reader only announces a list line when the list is where the
-    // cursor is.
-    // keywordsMatch: FileDir's keyword syntax, which is deliberately not a
-    // regular expression.
-    //
-    //   red & blue    both words, anywhere, in any order
-    //   red | blue    either word
-    //   re*d          a word with anything in the middle
-    //
-    // & and | are not mixed: whichever appears first decides how the whole line
-    // is read, which keeps the rule to one sentence and needs no brackets. This
-    // is the syntax FileDir's own Keywords command uses on file contents, and
-    // the same one is used here on what is known about each item.
-    public static bool keywordsMatch(string sHaystack, string sPattern)
-    {
-        if (string.IsNullOrEmpty(sPattern)) return false;
-        if (sHaystack == null) sHaystack = "";
-        char chJoin = sPattern.Contains("|") ? '|' : '&';
-        bool bAny = (chJoin == '|');
-        bool bSawOne = false;
-        foreach (string sRaw in sPattern.Split(chJoin))
-        {
-            string sTerm = sRaw.Trim();
-            if (sTerm.Length == 0) continue;
-            bSawOne = true;
-            bool bMatch = wildcardWithin(sHaystack, sTerm);
-            if (bAny && bMatch) return true;
-            if (!bAny && !bMatch) return false;
-        }
-        return bSawOne && !bAny;
-    }
-
-    // wildcardWithin: one term, where * stands for anything. Without a star
-    // this is a plain substring test, which is what nearly every term is.
-    private static bool wildcardWithin(string sHaystack, string sTerm)
-    {
-        if (sTerm.IndexOf('*') < 0) return sHaystack.Contains(sTerm);
-        string[] asParts = sTerm.Split('*');
-        int iAt = 0;
-        for (int i = 0; i < asParts.Length; i++)
-        {
-            if (asParts[i].Length == 0) continue;
-            int iFound = sHaystack.IndexOf(asParts[i], iAt, StringComparison.Ordinal);
-            if (iFound < 0) return false;
-            iAt = iFound + asParts[i].Length;
-        }
-        return true;
-    }
-
-    private void moveTo(ListBox lb, int iRow)
-    {
-        if (lb == null || iRow < 0 || iRow >= lb.Items.Count) return;
-        bool bHasFocus = lb.Focused;
-        lb.SelectedIndex = iRow;
-        if (!bHasFocus) Say.say((lb.Items[iRow] ?? "").ToString());
-    }
-
-    private int findInListBoxFrom(ListBox lb, int iFrom, bool bForward, string sNeedle, bool bOverEverything)
+    // findInListBoxFrom: case-insensitive substring search through
+    // the ListBox starting at iFrom, wrapping at the boundary.
+    // Returns the index of the match or -1 if none.
+    private static int findInListBoxFrom(ListBox lb, int iFrom, bool bForward, string sNeedle)
     {
         int n = lb.Items.Count;
         if (n == 0 || string.IsNullOrEmpty(sNeedle)) return -1;
         if (iFrom < 0) iFrom = 0;
         if (iFrom >= n) iFrom = n - 1;
-        ListState state = stateFor(lb);
         string sLowerNeedle = sNeedle.ToLowerInvariant();
         for (int i = 0; i < n; i++)
         {
             int j = bForward
                 ? (iFrom + i) % n
                 : ((iFrom - i) % n + n) % n;
-            // Jump reads the line as shown; Keywords reads everything known
-            // about the item, which is a different string and usually a longer
-            // one, and reads it with the keyword syntax rather than as one
-            // substring.
-            string sItem = (lb.Items[j] ?? "").ToString();
-            if (bOverEverything && j < state.liRows.Count && state.liRows[j] < state.lsSearch.Count)
-                sItem = state.lsSearch[state.liRows[j]];
-            sItem = sItem.ToLowerInvariant();
-            bool bHit = bOverEverything
-                ? keywordsMatch(sItem, sLowerNeedle)
-                : sItem.Contains(sLowerNeedle);
-            if (bHit) return j;
+            string sItem = (lb.Items[j] ?? "").ToString().ToLowerInvariant();
+            if (sItem.Contains(sLowerNeedle)) return j;
         }
         return -1;
     }
@@ -1683,6 +1284,7 @@ public class LbcDialog : IDisposable
     {
         addFieldLabel(sLabel);
         ListBox lb = addListBox(lsNames, sSelected, sTip);
+        lb.AccessibleName = cleanLabel(sLabel);
         return lb;
     }
 
@@ -1704,8 +1306,9 @@ public class LbcDialog : IDisposable
         cb.Margin = new Padding(0, 0, 0, DefaultRowGap);
         populateComboBox(cb, lsNames, sSelected);
         Label lblLast = currentLabelOrNull();
+        if (lblLast != null) cb.AccessibleName = lblLast.AccessibleName;
         cb.GotFocus += handleGotFocus;
-        registerWidget(cb, "ComboBox", nameFromLabel());
+        registerWidget(cb, "ComboBox", cb.AccessibleName);
         if (!string.IsNullOrEmpty(sTip)) dFocusTips[cb] = sTip;
         bandTarget().Controls.Add(cb);
         if (ctlFirstFocusable == null) ctlFirstFocusable = cb;
@@ -1737,8 +1340,9 @@ public class LbcDialog : IDisposable
         cb.AutoCompleteSource = AutoCompleteSource.ListItems;
         foreach (string sOne in sortedIgnoringCase(lsNames)) cb.Items.Add(sOne);
         cb.Text = sValue ?? "";
+        cb.AccessibleName = cleanLabel(sLabel);
         cb.GotFocus += handleGotFocus;
-        registerWidget(cb, "ComboBox", nameFromLabel());
+        registerWidget(cb, "ComboBox", cb.AccessibleName);
         if (!string.IsNullOrEmpty(sTip)) dFocusTips[cb] = sTip;
         bandTarget().Controls.Add(cb);
         if (ctlFirstFocusable == null) ctlFirstFocusable = cb;
@@ -1762,6 +1366,7 @@ public class LbcDialog : IDisposable
     {
         addFieldLabel(sLabel);
         ComboBox cb = addComboBox(lsNames, sSelected, sTip);
+        cb.AccessibleName = cleanLabel(sLabel);
         return cb;
     }
 
@@ -1790,10 +1395,11 @@ public class LbcDialog : IDisposable
             foreach (string sOne in lsRecent)
                 if (!string.IsNullOrEmpty(sOne)) cb.Items.Add(sOne);
         cb.Text = sValue ?? "";
+        cb.AccessibleName = cleanLabel(sLabel);
         cb.AccessibleDescription = "Down arrow selects from recent entries";
         cb.GotFocus += delegate(object oSender, EventArgs evArgs) { cb.SelectAll(); };
         cb.GotFocus += handleGotFocus;
-        registerWidget(cb, "ComboBox", nameFromLabel());
+        registerWidget(cb, "ComboBox", cb.AccessibleName);
         if (!string.IsNullOrEmpty(sTip)) dFocusTips[cb] = sTip;
         bandTarget().Controls.Add(cb);
         if (ctlFirstFocusable == null) ctlFirstFocusable = cb;
@@ -1807,6 +1413,7 @@ public class LbcDialog : IDisposable
     {
         RadioButton rb = new RadioButton();
         rb.Text = sLabel ?? "";
+        rb.AccessibleName = cleanLabel(sLabel);
         rb.Checked = bChecked;
         rb.AutoSize = false;
         rb.Size = new Size(innerWidth(), DefaultLineHeight);
@@ -1839,6 +1446,7 @@ public class LbcDialog : IDisposable
         nud.Size = new Size(DefaultNumericWidth, DefaultLineHeight);
         nud.TabIndex = iTabIndex++;
         nud.Margin = new Padding(0, 0, 0, DefaultRowGap);
+        nud.AccessibleName = cleanLabel(sLabel);
         nud.GotFocus += handleGotFocus;
         registerWidget(nud, "NumericUpDown", sLabel);
         if (!string.IsNullOrEmpty(sTip)) dFocusTips[nud] = sTip;
@@ -1850,55 +1458,10 @@ public class LbcDialog : IDisposable
     // Start a new horizontal band. Controls added after this call sit side
     // by side on one row, until the next addBand or addSeparator. Returns
     // the band panel so a caller can adjust it if it wants to.
-    // addSlider: a track bar with a Label above it.
-    //
-    // A slider is the right control for a quantity with a range and no exact
-    // value worth typing -- how loud, how fast, how far a jump moves. Windows
-    // gives it arrow keys, Page Up and Page Down, Home and End, and announces
-    // the number as it changes, so nothing here speaks.
-    public TrackBar addSlider(string sLabel, int iValue, int iMinimum, int iMaximum, int iStep, string sTip)
-    {
-        return addSlider(sLabel, iValue, iMinimum, iMaximum, iStep, sTip, null);
-    }
-
-    // fnValueText turns the slider's number into what a person would say --
-    // "150 percent", "35 percent of the way through". Without it a reader
-    // announces the position as a percentage of the range, which is a different
-    // number and a misleading one.
-    public TrackBar addSlider(string sLabel, int iValue, int iMinimum, int iMaximum, int iStep, string sTip,
-        Func<int, string> fnValueText)
-    {
-        addFieldLabel(sLabel);
-        LbcTrackBar bar = new LbcTrackBar();
-        bar.valueText = fnValueText;
-        bar.Minimum = iMinimum;
-        bar.Maximum = iMaximum;
-        bar.SmallChange = (iStep > 0) ? iStep : 1;
-        bar.LargeChange = bar.SmallChange * 5;
-        bar.TickFrequency = bar.SmallChange * 5;
-        bar.TickStyle = TickStyle.None;
-        if (iValue < iMinimum) iValue = iMinimum;
-        if (iValue > iMaximum) iValue = iMaximum;
-        bar.Value = iValue;
-        bar.AutoSize = false;
-        bar.Width = (pnlBand != null) ? DefaultBandFieldWidth : innerWidth();
-        bar.Height = DefaultSliderHeight;
-        bar.Margin = new Padding(0, 0, DefaultRowGap, DefaultRowGap);
-        bar.TabIndex = iTabIndex++;
-        bar.GotFocus += handleGotFocus;
-        registerWidget(bar, "Slider", cleanLabel(sLabel));
-        if (!string.IsNullOrEmpty(sTip)) dFocusTips[bar] = sTip;
-        bandTarget().Controls.Add(bar);
-        if (ctlFirstFocusable == null) ctlFirstFocusable = bar;
-        return bar;
-    }
-
     public FlowLayoutPanel addBand()
     {
         endBand();
         pnlBand = new FlowLayoutPanel();
-        pnlBand.AccessibleRole = AccessibleRole.Grouping;
-        pnlBand.AccessibleName = "";
         pnlBand.FlowDirection = FlowDirection.LeftToRight;
         pnlBand.WrapContents = false;
         pnlBand.AutoSize = true;
@@ -1921,19 +1484,12 @@ public class LbcDialog : IDisposable
     // A push button on the current band -- the "..." button that fills in the
     // edit box beside it. Placed here rather than left to the caller so it
     // joins the tab order in the right place automatically.
-    // addButton: a button with no tip of its own.
-    //
-    // A button in a BAND is a command that does work and leaves the dialog
-    // standing -- Next track, Stop playback -- rather than a way out along the
-    // bottom. Most carry a tip; this overload is for the ones whose caption
-    // says the whole of it.
-    public Button addButton(string sLabel) { return addButton(sLabel, null); }
-
     public Button addButton(string sLabel, string sTip)
     {
         Button btn = new Button();
         string sPlain = (sLabel ?? "").Replace("&", "");
         btn.Text = sLabel;
+        btn.AccessibleName = sPlain;
         btn.AutoSize = true;
         btn.AutoSizeMode = AutoSizeMode.GrowAndShrink;
         btn.MinimumSize = new Size(DefaultButtonWidth, DefaultLineHeight);
@@ -2043,138 +1599,6 @@ public class LbcDialog : IDisposable
     private Control ctlInitialFocus;
     public void setInitialFocus(Control ctl) { ctlInitialFocus = ctl; }
 
-    // wireUniversalKeys: Control+Enter, F1, Control+Home, Control+End and F7,
-    // handled at form level. Every way of running a dialog wires these, so a
-    // dialog that builds its own buttons is no poorer for it.
-    // focusedControl: which control the keyboard is in, for a caller that needs
-    // to know before claiming a key. Space belongs to a button that has focus
-    // and to a box being typed in; anywhere else a dialog may take it.
-    public Control focusedControl()
-    {
-        return deepActiveControl();
-    }
-
-    // deepActiveControl: the control that actually has focus.
-    //
-    // Form.ActiveControl is NOT that. It gives the active child of the form,
-    // which for these dialogs is the panel holding everything, and asking it
-    // for a ListBox got null every time -- which is the other half of why the
-    // find keys did nothing. The chain has to be walked to the bottom.
-    private Control deepActiveControl()
-    {
-        Control ctl = frm.ActiveControl;
-        while (ctl is ContainerControl && ((ContainerControl) ctl).ActiveControl != null)
-            ctl = ((ContainerControl) ctl).ActiveControl;
-        // A band or the stack is a plain Panel rather than a ContainerControl,
-        // so the focused control is found by asking the form what has focus.
-        if (!(ctl is ListBox))
-        {
-            Control ctlFocused = findFocused(frm);
-            if (ctlFocused != null) ctl = ctlFocused;
-        }
-        return ctl;
-    }
-
-    private static Control findFocused(Control ctlParent)
-    {
-        foreach (Control ctl in ctlParent.Controls)
-        {
-            if (ctl.Focused) return ctl;
-            Control ctlInner = findFocused(ctl);
-            if (ctlInner != null) return ctlInner;
-        }
-        return null;
-    }
-
-    private void wireUniversalKeys(Button btnDefault, bool bHelpHere)
-    {
-        // The jump, find and filter keys go through ProcessCmdKey, where
-        // nothing can take them first.
-        LbcForm lbcFrm = frm as LbcForm;
-        if (lbcFrm != null)
-            lbcFrm.dialogKey = delegate(Keys keyData)
-            { return listKeyHandled(primaryList != null ? primaryList : deepActiveControl() as ListBox, keyData); };
-        frm.KeyPreview = true;
-        frm.KeyDown += delegate(object sender, KeyEventArgs evArgs)
-        {
-            // CONTROL+HOME AND CONTROL+END BELONG TO THE CONTROL THAT HAS
-            // THEM. In a list they mean the first and last item, in every
-            // Windows program and in FileDir, DbDo and EdSharp alike; in a
-            // multiline box they mean the top and bottom of the text. Only
-            // where the control has no use for them do they move between the
-            // dialog's fields.
-            Control ctlNow = deepActiveControl();
-            TextBox tbActive = ctlNow as TextBox;
-            bool bInMemo = (tbActive != null) && tbActive.Multiline;
-            bool bInList = (ctlNow is ListBox);
-            if (evArgs.KeyData == (Keys.Control | Keys.Enter) && btnDefault != null)
-            {
-                evArgs.Handled = true;
-                evArgs.SuppressKeyPress = true;
-                btnDefault.PerformClick();
-            }
-            else if (evArgs.KeyData == Keys.F1 && bHelpHere)
-            {
-                evArgs.Handled = true;
-                evArgs.SuppressKeyPress = true;
-                showHelp();
-            }
-            else if (evArgs.KeyData == (Keys.Control | Keys.Home) && !bInMemo && !bInList)
-            {
-                evArgs.Handled = true;
-                evArgs.SuppressKeyPress = true;
-                focusFieldEdge(true);
-            }
-            else if (evArgs.KeyData == (Keys.Control | Keys.End) && !bInMemo && !bInList)
-            {
-                evArgs.Handled = true;
-                evArgs.SuppressKeyPress = true;
-                focusFieldEdge(false);
-            }
-            else if (evArgs.KeyData == Keys.F7)
-            {
-                evArgs.Handled = true;
-                evArgs.SuppressKeyPress = true;
-                pickFocusControl();
-            }
-
-        };
-    }
-
-
-    // runPlain: show a dialog that builds its own buttons.
-    //
-    // runWithButtons puts a row along the bottom and closes the dialog on any
-    // of them, which is right for OK and Cancel and wrong for a dialog whose
-    // buttons are commands. Here the caller has already added its buttons with
-    // addButton; it says which one Enter should press and which one Escape
-    // should press, and the dialog does the rest.
-    public void runPlain(Button btnDefaultButton, Button btnCancelButton)
-    {
-        if (btnDefaultButton != null) frm.AcceptButton = btnDefaultButton;
-        if (btnCancelButton != null) frm.CancelButton = btnCancelButton;
-        wireUniversalKeys(btnDefaultButton, true);
-
-        // The band engine sizes and places everything; a dialog that builds its
-        // own buttons is laid out the same way as one that does not.
-        layoutIntoForm();
-
-        // ONE PLACE FOR FOCUS TO START. Setting ActiveControl and then focusing
-        // something again once the window is up gives a screen reader two
-        // arrivals to announce, and the dialog is read out twice -- which is
-        // what opening the player sounded like.
-        Control ctlStart = (ctlInitialFocus != null) ? ctlInitialFocus : ctlFirstFocusable;
-        if (ctlStart != null) frm.ActiveControl = ctlStart;
-        frm.ShowDialog(owner);
-    }
-
-    // close: shut the dialog from a button of the caller's own.
-    public void close()
-    {
-        try { frm.Close(); }
-        catch (Exception) { }
-    }
-
     public string runWithButtons(string[] aButtonLabels)
     {
         return runWithButtons(aButtonLabels, true);
@@ -2204,8 +1628,6 @@ public class LbcDialog : IDisposable
             aButtonLabels = lsAll.ToArray();
         }
         FlowLayoutPanel pnlButtonRow = new FlowLayoutPanel();
-        pnlButtonRow.AccessibleRole = AccessibleRole.Grouping;
-        pnlButtonRow.AccessibleName = "";
         pnlButtonRow.FlowDirection = FlowDirection.RightToLeft;
         pnlButtonRow.AutoSize = false;
         pnlButtonRow.Dock = DockStyle.Bottom;
@@ -2266,6 +1688,7 @@ public class LbcDialog : IDisposable
                     btn.Text = markTriggerLetter(btn.Text, sTaken);
                 }
             }
+            btn.AccessibleName = sPlain;
             btn.Size = new Size(DefaultButtonWidth, DefaultButtonHeight);
             btn.TabIndex = aTabIndexes[i];
             btn.Margin = new Padding(DefaultRowGap, 0, 0, 0);
@@ -2317,7 +1740,46 @@ public class LbcDialog : IDisposable
         //   F7             list every focusable control in
         //                  navigation order; OK moves focus to
         //                  the chosen one.
-        wireUniversalKeys(btnAccept, bAddHelp);
+        {
+            Button btnDefault = btnAccept;
+            bool bHelpHere = bAddHelp;
+            frm.KeyPreview = true;
+            frm.KeyDown += delegate(object sender, KeyEventArgs evArgs)
+            {
+                TextBox tbActive = frm.ActiveControl as TextBox;
+                bool bInMemo = (tbActive != null) && tbActive.Multiline;
+                if (evArgs.KeyData == (Keys.Control | Keys.Enter) && btnDefault != null)
+                {
+                    evArgs.Handled = true;
+                    evArgs.SuppressKeyPress = true;
+                    btnDefault.PerformClick();
+                }
+                else if (evArgs.KeyData == Keys.F1 && bHelpHere)
+                {
+                    evArgs.Handled = true;
+                    evArgs.SuppressKeyPress = true;
+                    showHelp();
+                }
+                else if (evArgs.KeyData == (Keys.Control | Keys.Home) && !bInMemo)
+                {
+                    evArgs.Handled = true;
+                    evArgs.SuppressKeyPress = true;
+                    focusFieldEdge(true);
+                }
+                else if (evArgs.KeyData == (Keys.Control | Keys.End) && !bInMemo)
+                {
+                    evArgs.Handled = true;
+                    evArgs.SuppressKeyPress = true;
+                    focusFieldEdge(false);
+                }
+                else if (evArgs.KeyData == Keys.F7)
+                {
+                    evArgs.Handled = true;
+                    evArgs.SuppressKeyPress = true;
+                    pickFocusControl();
+                }
+            };
+        }
         // Single-button confirmation dialogs (e.g., the read-only
         // memo dialog used by Invoke-Script and the speech-only
         // double-press) typically only carry an "OK" button. With
@@ -2419,7 +1881,8 @@ public class LbcDialog : IDisposable
         foreach (Control ctl in pnlStack.Controls)
         {
             if (ctl is Label) continue;
-            string sName = fieldName(ctl);
+            string sName = string.IsNullOrEmpty(ctl.AccessibleName)
+                ? ctl.GetType().Name : ctl.AccessibleName;
             sbHelp.Append("  ").Append(sName);
             if (dFocusTips.TryGetValue(ctl, out sTip) && !string.IsNullOrEmpty(sTip))
                 sbHelp.Append(" -- ").Append(sTip);
@@ -2453,6 +1916,7 @@ public class LbcDialog : IDisposable
         {
             TextBox tbHelp = dlgHelp.addMemo(sbHelp.ToString(), null);
             tbHelp.ReadOnly = true;
+            tbHelp.AccessibleName = "Help text";
             if (!bOfferUpdate)
             {
                 dlgHelp.runWithButtons(new string[] { "OK" }, false);
@@ -2542,7 +2006,8 @@ public class LbcDialog : IDisposable
     private void addFocusEntry(Control ctl, List<string> lsNames, Dictionary<string, Control> dByName)
     {
         if (ctl is Label || !ctl.CanSelect || !ctl.Visible) return;
-        string sBase = fieldName(ctl);
+        string sBase = !string.IsNullOrEmpty(ctl.AccessibleName) ? ctl.AccessibleName
+            : (!string.IsNullOrEmpty(ctl.Text) ? ctl.Text.Replace("&", "") : ctl.GetType().Name);
         string sName = sBase;
         int iSuffix = 2;
         while (dByName.ContainsKey(sName)) { sName = sBase + " " + iSuffix; iSuffix++; }
@@ -2572,68 +2037,16 @@ public class LbcDialog : IDisposable
     // say-status-bar hotkey).
     public void setStatusText(string sText)
     {
-        sStatusTip = sText ?? "";
-        paintStatus();
+        if (lblStatusBar != null) lblStatusBar.Text = sText ?? "";
     }
-
-    // appendStatus: add a message to the status line, after whatever is
-    // already there.
-    //
-    // Speech is gone the moment it is said. McTwit answered that years ago: a
-    // command clears the status line and writes its own name there, and every
-    // message it produces afterwards is both spoken and appended, so the line
-    // ends up holding the whole of what was said. A screen reader has a key for
-    // reading the status bar, so the person can go back over it at their own
-    // pace instead of asking the program to say it all again.
-    //
-    // The next control to take focus replaces the line with its own tip, which
-    // is right: the transcript belongs to the command that produced it.
-    // setStatusExtra: a standing note on the status line, kept beside whatever
-    // tip the control with focus put there.
-    //
-    // For a dialog that has something worth reporting continuously -- what is
-    // playing, and how far in. It is NOT a live region and nothing announces
-    // it: it sits there to be read with the screen reader's own key for the
-    // status line, when the person wants it and not before.
-    public void setStatusExtra(string sText)
-    {
-        sStatusExtra = sText ?? "";
-        paintStatus();
-    }
-
-    private void paintStatus()
-    {
-        // A STATUS LINE CARRIES STATUS, AND NOTHING ELSE.
-        //
-        // It held two things: the dialog's standing note, and the tip for the
-        // control with focus. Putting the note first was not enough -- the tip
-        // is a sentence of instruction, and somebody who presses the key for
-        // the status line wants to know where playback is, not to be told again
-        // what the queue does. Where a dialog has a note, the note is the whole
-        // line. Where it has none, the tip still has a place to be read, which
-        // is what tips were for in dialogs that report nothing.
-        if (lblStatusBar == null) return;
-        lblStatusBar.Text = (!string.IsNullOrEmpty(sStatusExtra)) ? sStatusExtra : (sStatusTip ?? "");
-    }
-
-
-    public void appendStatus(string sText)
-    {
-        if (lblStatusBar == null || string.IsNullOrEmpty(sText)) return;
-        sStatusTip = (sStatusTip.Length > 0) ? (sStatusTip + "   " + sText) : sText;
-        paintStatus();
-    }
-
 
     private void handleGotFocus(object sender, EventArgs evArgs)
     {
         Control ctl = sender as Control;
-        string sTip = "";
-        if (ctl != null) dFocusTips.TryGetValue(ctl, out sTip);
-        sStatusTip = sTip ?? "";
-        paintStatus();
+        if (ctl == null) { lblStatusBar.Text = ""; return; }
+        string sTip;
+        lblStatusBar.Text = dFocusTips.TryGetValue(ctl, out sTip) ? sTip : "";
     }
-
 
     // handleMemoGotFocus: while a memo has focus, Enter must
     // insert a newline instead of submitting. Clear the form's
@@ -2641,39 +2054,10 @@ public class LbcDialog : IDisposable
     // Also update the status bar.
     private void handleMemoGotFocus(object sender, EventArgs evArgs)
     {
-        // ENTER IS ONLY TAKEN AWAY FROM A BOX THAT CAN USE IT. The default
-        // button is cleared while a memo has focus so that Enter makes a new
-        // line instead of submitting -- which is right for a box being written
-        // in, and wrong for a read-only one, where Enter did nothing at all.
-        TextBox tbArriving = sender as TextBox;
-        bool bWritable = (tbArriving != null) && !tbArriving.ReadOnly;
-        if (bWritable)
-        {
-            if (frm.AcceptButton != null)
-                btnSavedAccept = frm.AcceptButton as Button;
-            frm.AcceptButton = null;
-        }
+        if (frm.AcceptButton != null)
+            btnSavedAccept = frm.AcceptButton as Button;
+        frm.AcceptButton = null;
         handleGotFocus(sender, evArgs);
-
-        // A MULTILINE BOX STARTS AT ITS BEGINNING.
-        //
-        // WinForms leaves the caret where the text ended, so arriving at a memo
-        // by Tab put the cursor at the bottom of it, and a screen reader user
-        // reading from there is reading the end of something they have not yet
-        // heard the start of. Set just after the control finishes arriving,
-        // because setting it during the focus event is undone by the control's
-        // own handling.
-        TextBox tb = sender as TextBox;
-        if (tb == null || !tb.Multiline) return;
-        try
-        {
-            tb.BeginInvoke((MethodInvoker) delegate
-            {
-                try { tb.SelectionStart = 0; tb.SelectionLength = 0; tb.ScrollToCaret(); }
-                catch (Exception) { }
-            });
-        }
-        catch (Exception) { }
     }
 
     // handleMemoLostFocus: restore the AcceptButton when the
@@ -3032,59 +2416,6 @@ public class LbcDialog : IDisposable
     // registerWidget: store the control under an auto-generated
     // name <Kind>_<CleanedLabel> in dWidgets. On collisions a
     // numeric suffix is appended (TextBox_Name, TextBox_Name_2).
-    // fieldName: what to call a control in Help and in the F7 list.
-    //
-    // Taken from the Label above it, or from its own caption, at the moment it
-    // is needed. NOT from AccessibleName, which is deliberately left alone: a
-    // control whose accessible name repeats its own caption or its label is a
-    // control some screen readers announce twice.
-    // stackFields: every control the person can reach, in keyboard order, with
-    // bands and inline rows flattened. Help, the F7 control list and
-    // Control+Home / Control+End all read the dialog through this, so a control
-    // inside a band is as reachable as one on the stack.
-    private List<Control> stackFields()
-    {
-        List<Control> lsAll = new List<Control>();
-        foreach (Control ctl in pnlStack.Controls)
-        {
-            // A container the person cannot focus -- a band, or the row an
-            // inline input box makes -- is opened up; anything they can focus
-            // is taken as it is, even though a spin box has children of its own.
-            if (!ctl.CanSelect && ctl.Controls.Count > 0)
-                foreach (Control ctlInner in ctl.Controls) lsAll.Add(ctlInner);
-            else lsAll.Add(ctl);
-        }
-        return lsAll;
-    }
-
-    private string fieldName(Control ctl)
-    {
-        if (ctl == null) return "";
-        if (!string.IsNullOrEmpty(ctl.AccessibleName)) return ctl.AccessibleName;
-        Label lblBefore = null;
-        foreach (Control ctlEach in stackFields())
-        {
-            if (ctlEach == ctl) break;
-            Label lbl = ctlEach as Label;
-            if (lbl != null) lblBefore = lbl;
-        }
-        if (!(ctl is Button) && !(ctl is CheckBox) && !(ctl is RadioButton)
-            && lblBefore != null && !string.IsNullOrEmpty(lblBefore.Text))
-            return cleanLabel(lblBefore.Text);
-        if (!string.IsNullOrEmpty(ctl.Text)) return cleanLabel(ctl.Text);
-        return ctl.GetType().Name;
-    }
-
-    // nameFromLabel: what to file a control under, taken from the Label added
-    // just before it. Used only for the programmer-facing name and the F7 list;
-    // nothing is written to AccessibleName, which stays empty so a screen
-    // reader reads the label itself and reads it once.
-    private string nameFromLabel()
-    {
-        Label lbl = currentLabelOrNull();
-        return (lbl != null && !string.IsNullOrEmpty(lbl.Text)) ? cleanLabel(lbl.Text) : "";
-    }
-
     private void registerWidget(Control ctl, string sKind, string sLabel)
     {
         string sClean = makeIdentifier(sLabel);
@@ -3142,6 +2473,7 @@ public class LbcDialog : IDisposable
         if (string.IsNullOrEmpty(sText)) return;
         Label lbl = new Label();
         lbl.Text = sText;
+        lbl.AccessibleName = cleanLabel(sText);
         lbl.AutoSize = false;
         lbl.Size = new Size(innerWidth(), DefaultLabelHeight);
         lbl.Margin = new Padding(0, 0, 0, 0);
@@ -3538,8 +2870,7 @@ public class LbcBandDialog : IDisposable
         lsControls.Add(ctl);
         if (ctl != null)
         {
-            // NO NAME OF ITS OWN. The caption is on the control or on the
-            // Label before it, and a name repeating either is read twice.
+            ctl.AccessibleName = item.sCaption;
             if (!string.IsNullOrEmpty(item.sTip)) dFocusTips[ctl] = item.sTip;
         }
         return item;
@@ -3592,6 +2923,7 @@ public class LbcBandDialog : IDisposable
                 bool bNoKey = string.Equals(sPlain, "OK", StringComparison.OrdinalIgnoreCase)
                            || string.Equals(sPlain, "Cancel", StringComparison.OrdinalIgnoreCase);
                 btn.Text = bNoKey ? sPlain : lsMarked[i];
+                btn.AccessibleName = sPlain;
                 btn.Tag = sPlain;
                 btn.Click += handleButtonClick;
                 lsButtons.Add(btn);
@@ -3615,6 +2947,7 @@ public class LbcBandDialog : IDisposable
             {
                 lblStatusBar = new Label();
                 lblStatusBar.AccessibleRole = AccessibleRole.StatusBar;
+                lblStatusBar.AccessibleName = "Status";
                 lblStatusBar.BorderStyle = BorderStyle.Fixed3D;
                 lblStatusBar.TextAlign = ContentAlignment.MiddleLeft;
                 lblStatusBar.Location = new Point(toPixelsX(item.iLeft), toPixelsY(item.iTop));
@@ -3989,9 +3322,7 @@ public class LbcInixForm
                     break;
             }
             if (ctl == null) continue;
-            // Only a control built with no Label needs a name of its own; one
-            // with a Label carries it already, and a name on top is read twice.
-            if (bNoLabel) ctl.AccessibleName = sName;
+            if (bNoLabel || string.IsNullOrEmpty(ctl.AccessibleName)) ctl.AccessibleName = sName;
             lsFieldNames.Add(sName);
             dFields[sName] = ctl;
             dKinds[sName] = (sKind == "password") ? "edit" : sKind;

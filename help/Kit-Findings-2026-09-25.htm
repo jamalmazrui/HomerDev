@@ -1,0 +1,263 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Kit-Findings-2026-09-25</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Kit-Findings-2026-09-25</h1>
+</header>
+<h1 id="where-the-kit-let-an-app-down-25-september-2026">Where the kit
+let an app down, 25 September 2026</h1>
+<p><em>From the build, check and release logs of DbDo, EdSharp, FileDir,
+HomerScribe and HomerView, read in the DbDo chat. Each item names the
+failure, what in the kit caused or permitted it, and the fix – made here
+where the kit’s tools are concerned, and recommended where the kit’s
+classes or templates are.</em></p>
+<h2 id="fixed-in-this-patch-scripts.py">Fixed in this patch
+(scripts.py)</h2>
+<ul>
+<li><strong>Every acceptance check written as
+<code>cmd /c if exist X (exit 0) else (exit 1)</code> failed, whatever
+was true.</strong> EdSharp: 7 of 7. DbDo: 9 of 12, until its tests were
+moved into a file. Cause: the checker runs each Run line with
+<code>shell=True</code>, which is itself <code>cmd /c</code>, so a line
+beginning <code>cmd /c</code> was parsed twice and its parentheses and
+else came apart. Fix: a line beginning <code>cmd /c</code> is now handed
+to cmd once, as <code>cmd /s /c "..."</code>, with no shell wrapper from
+Python. The template’s <code>accept.inix</code> lines can stay as
+written.</li>
+<li><strong>Access letters were counted across a whole file.</strong>
+DbDo, 175 items in eight menus, got 26 problems, none real. Now counted
+per menu (the container named in the call) or per dialog-building
+method.</li>
+<li><strong>Prose was read as captions.</strong> An ampersand in a long
+help string counted as a trigger letter. Only strings of forty
+characters or fewer are captions now.</li>
+<li><strong>Python files were read for WinForms access keys.</strong>
+HomerView’s eight add-on files produced letter clashes they cannot have.
+A .py file is scanned only if it names System.Windows.Forms.</li>
+<li><strong>Alt+Control with a navigation key</strong> (arrows, Home,
+End, Page Up, Page Down) is allowed, per the ruling of 25 September;
+letters and function keys remain reserved.</li>
+</ul>
+<h2 id="for-the-kits-classes-and-templates-not-changed-here">For the
+kit’s classes and templates (not changed here)</h2>
+<ul>
+<li><strong>version.txt gained a byte order mark</strong>, and every
+build that reads it with <code>set /p</code> then fails its own
+kit-version check: HomerView refused 1.40.1 as “older than 1.39.2”, DbDo
+refused it as older than 1.38.3. <code>Templates\build_APP_.cmd</code>
+should read the version through PowerShell and trim
+<code>[char]0xFEFF</code>, as DbDo’s build now does. And whatever wrote
+the mark – <code>fixEncoding</code> exempts version.txt, so it was
+something else – should be found.</li>
+<li><strong>“kit 1.40.1 is older than 1.40.1”</strong> – FileDir, 21:43.
+Equal versions refused, which means the two strings were not equal:
+something invisible rode along with the number. A trailing space is the
+usual culprit, and <code>echo !ver! &gt; version.txt</code> writes one
+(the space before the redirect goes into the file);
+<code>&gt; version.txt echo !ver!</code> does not. The byte order mark
+was the same fault in another coat. Two rules for the template and every
+app’s build: WRITE version.txt with the redirect first, and READ it
+through PowerShell, trimming <code>[char]0xFEFF</code>, spaces, carriage
+return and line feed, before any comparison. DbDo does both; the message
+should also show the value quoted, so a stray character is visible.</li>
+<li><strong>The kit’s own files arrive with bare line feeds.</strong>
+<code>buildHomerDev check</code> reports 96 line-ending problems, all of
+them files a GitHub checkout or archive delivers as LF. Options: store
+CRLF in the repository (core.autocrlf false, fixEncoding, commit) so the
+archive matches; and have buildHomerDev run
+<code>scripts\fixEncoding</code> on itself before its check, as every
+app’s build does.</li>
+<li><strong>PdfRead.cs needs Microsoft.Bcl.HashCode.dll</strong>, which
+HomerScribe’s build did not fetch (“[pdfpig] needs
+Microsoft.Bcl.HashCode.dll”). PdfPig’s transitive dependencies belong in
+PdfRead.cs’s ASSEMBLIES line so every build that compiles it knows to
+fetch them.</li>
+<li><strong>Inix renamed InixCodec</strong>, and HomerView still uses
+the old name; it also fails on <code>Web</code>, which means Web.cs is
+not on its compiler line or the file lacks <code>using Homer;</code>. A
+rename in a shared class should appear in the kit’s History with the old
+name, so an app’s compiler error can be looked up.</li>
+<li><strong>The Python samples fail to build</strong> (FruitBasketPy,
+FruitBasketMdiPy, exit code 1); their logs were not among those read.
+tagRelease refuses the kit until they pass.</li>
+</ul>
+<h2 id="seen-in-the-apps-for-their-own-chats">Seen in the apps, for
+their own chats</h2>
+<ul>
+<li><strong>EdSharp</strong>: four accessible names repeat captions;
+<code>auditEdSharp.py</code> is still present and claims a duplicate
+letter, though the briefing retired it.</li>
+<li><strong>HomerView</strong>: the setup script names
+<code>HomerView.htm</code> at the root, which moved to
+<code>help</code>; and it binds Alt+Control+Shift chords, which the rule
+reserves.</li>
+<li><strong>FileDir</strong>: “FileDir.exe is running” – close it and
+build.</li>
+<li><strong>HomerScribe</strong>: six assembly binding redirects in its
+.config do not match the DLLs on disk.</li>
+</ul>
+</body>
+</html>

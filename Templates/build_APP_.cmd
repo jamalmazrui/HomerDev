@@ -86,7 +86,13 @@ if not defined homerDev (
   goto :failed
 )
 set "homerVer=unknown"
-if exist "!homerDev!\version.txt" set /p homerVer=<"!homerDev!\version.txt"
+rem READ THE KIT'S VERSION WITHOUT ANYTHING INVISIBLE. A byte order mark or a
+rem trailing space in version.txt rides along with "set /p", and the comparison
+rem below then refuses a kit that is newer than required -- "kit 1.40.1 is older
+rem than 1.40.1" happened on 25 September 2026. PowerShell reads and trims.
+if exist "!homerDev!\version.txt" (
+  for /f "usebackq delims=" %%v in (`powershell -NoProfile -Command "(Get-Content -Raw -LiteralPath '!homerDev!\version.txt').Trim([char]0xFEFF, ' ', [char]13, [char]10)"`) do set "homerVer=%%v"
+)
 echo Kit: !homerDev! version !homerVer!
 echo Kit: !homerDev! version !homerVer!>> "%log%"
 
@@ -161,8 +167,8 @@ if not exist "version.txt" (
   echo Created version.txt holding 1.0.0>> "%log%"
 )
 set "ver="
-set /p ver=<version.txt
-set "ver=!ver: =!"
+rem The app's own version, read the same careful way: no mark, no space.
+for /f "usebackq delims=" %%v in (`powershell -NoProfile -Command "(Get-Content -Raw -LiteralPath 'version.txt').Trim([char]0xFEFF, ' ', [char]13, [char]10)"`) do set "ver=%%v"
 if "!ver!"=="" (
   echo ERROR: version.txt is empty.
   echo ERROR: version.txt is empty.>> "%log%"

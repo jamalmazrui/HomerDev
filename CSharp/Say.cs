@@ -278,6 +278,20 @@ public static class Say
     // doesn't leave a dead pause. This is the preferred way to
     // voice any announcement built of logical units -- a cell's
     // header / row / value, a list of columns, a column's values.
+    // ONE UTTERANCE PER STRING. A reader gives each string it is handed its
+    // own phrase, with its own start and end, and that is what makes three
+    // facts sound like three facts. say(a, b, c) speaks a, then b, then c,
+    // each through the reader separately; nothing is inserted between them,
+    // so it costs no time. A single string is still one utterance. Prefer
+    // this over joining the parts with commas: a comma is a pause the
+    // synthesizer decides on, and it is not always heard.
+    public static void say(params string[] aParts)
+    {
+        if (aParts == null) return;
+        foreach (string sPart in aParts)
+            if (!string.IsNullOrEmpty(sPart)) say(sPart);
+    }
+
     public static void sayParts(IEnumerable<string> parts)
     {
         if (parts == null) return;

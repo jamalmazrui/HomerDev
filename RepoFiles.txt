@@ -26,3 +26,4 @@ version.txt
 RepoFiles.txt
 LocalFiles.txt
 .gitignore
+.gitattributes

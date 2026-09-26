@@ -1539,6 +1539,18 @@ requires no acknowledgement.</p>
 larger than the rest of the project, and the scripts are working
 material. The transcript, <code>Tutorials.md</code>, ships like any
 other document.</p>
+<h2 id="three-more-documents">Three more documents</h2>
+<ul>
+<li><strong><a href="Rulings-2026-09-25.md">Rulings of 25
+September</a></strong> – one letter per menu, Alt+Control and its
+navigation-key exception, single-instance programs.</li>
+<li><strong><a href="ReaderVoices.md">The reader’s voices</a></strong> –
+how JAWS varies its voice by context, and how a spoken walk follows
+it.</li>
+<li><strong><a href="Kit-Findings-2026-09-25.md">Kit
+findings</a></strong> – where the kit let an app down in the logs of 25
+September, and what was done about each.</li>
+</ul>
 <h2 id="not-twice-speech-that-repeats">Not twice: speech that
 repeats</h2>
 <p>Homer programs have said the same thing twice for years, and there
@@ -1597,6 +1609,35 @@ not a failure.</p>
 <p>A speech history is not a strict sequence – a line heard twice may be
 a say line or an arrow up and back. And someone else’s history holds
 their whole session, so use it only as far as they agreed.</p>
+<h2 id="one-letter-per-menu">One letter per menu</h2>
+<p>A trigger letter is claimed by the first item in a menu whose word
+starts with it. A later item in the same menu that would take the same
+letter takes <strong>no letter at all</strong>: its caption carries no
+ampersand, and the letter goes to the first item. So History keeps H and
+Hotkeys, below it, has none. Two items sharing a letter would make the
+reader cycle between them, and a person pressing the letter expects one
+thing to happen. The same holds inside one dialog: the first control to
+claim a letter keeps it.</p>
+<p><code>checkHomerApp</code> counts letters per menu and per dialog,
+never across a file, and fails on a duplicate, since a duplicate is now
+always a mistake.</p>
+<h2 id="altcontrol-and-the-one-exception">Alt+Control, and the one
+exception</h2>
+<p>Alt+Control with a letter or a function key belongs to Windows
+desktop shortcuts, and a Homer app never binds one. The sanctioned use
+is the app’s own desktop shortcut: <strong>Alt+Control+D opens
+DbDo</strong>, and each single-instance app has a letter of its own.</p>
+<p>The exception is the <strong>navigation keys</strong>: Alt+Control
+with an arrow, Home, End, Page Up or Page Down moves a cursor inside a
+window, takes nothing from the desktop, and is allowed. DbDo’s virtual
+cell cursor uses them.</p>
+<h2 id="single-instance-or-several">Single instance, or several</h2>
+<p>The MDI programs – DbDo, EdSharp, FileDir – run as <strong>one
+instance</strong>: the desktop shortcut opens the program or brings it
+forward, and its own windows are the windows. A program built around a
+job, such as HomerScribe, may run several instances, one per job. There
+is no system-wide summon chord in any Homer program; the desktop
+shortcut is that chord.</p>
 <h2 id="why-homer-menus-are-long-and-flat">Why Homer menus are long and
 flat</h2>
 <p>Homer programs have large, flat command spaces on purpose. For a

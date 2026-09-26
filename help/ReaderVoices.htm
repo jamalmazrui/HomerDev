@@ -4,8 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="author" content="Jamal Mazrui" />
-  <title>Announce</title>
+  <title>ReaderVoices</title>
   <style>
     html {
       line-height: 1.5;
@@ -166,66 +165,70 @@
 </head>
 <body>
 <header id="title-block-header">
-<h1 class="title">Announce</h1>
-<p class="subtitle">Foundations for Windows programs that work by
-keyboard and speech</p>
-<p class="author">Jamal Mazrui</p>
+<h1 class="title">ReaderVoices</h1>
 </header>
-<h1 id="announcing-the-homer-development-kit">Announcing the Homer
-Development Kit</h1>
-<h3
-id="foundations-for-windows-programs-that-work-by-keyboard-and-speech">Foundations
-for Windows programs that work by keyboard and speech</h3>
-<p>September 2026 Copyright 2026 by Jamal Mazrui MIT License</p>
-<p>Building a small Windows tool of your own should not require first
-discovering, by trial and error, what makes a program work well with a
-screen reader. The Homer Development Kit is free and open source, and it
-exists so that you can skip that part.</p>
-<p>It consolidates decades of screen reader oriented development I have
-done under Windows – tools and techniques that I hope will help others
-get started and succeed, based on lessons I have learned and tried to
-write down. The knowledge is not new; gathering it into one place is,
-and AI is what made that practical.</p>
-<p>Start a new program and it already does the things that usually take
-years to learn. The tab order is right. The keys do not fight Windows,
-JAWS or NVDA. Nothing is announced twice, and nothing important goes
-unannounced. When something goes wrong there is a log that says what
-happened, in a place you can find. When it works, one command builds an
-installer and publishes a release.</p>
-<p>What makes that possible is that the decisions are in classes you
-call rather than rules you remember. The project holds equivalent
-versions in C#, for .NET Framework 4.8, which builds on any modern
-Windows, and in Python, for any recent version. They support layout by
-code, standard dialogs, and several components that help a screen reader
-user work either with AI assistance or by hand. The order you add a
-control is the order you tab through it. An ampersand in a label is the
-whole of an access key. Speech is used only for what a screen reader
-cannot work out for itself. Settings and logs land in the same folders
-in every program.</p>
-<p>You can also find out what your program does without looking at it.
-One command checks the things that can be checked – an accessible name
-that repeats a caption, two controls claiming one access key, the build,
-a smoke run, and the criteria you wrote before you began – then starts
-the program, presses the keys, and reads back the same accessibility
-tree a screen reader reads. The report says what was verified, what was
-not checked, and what remains uncertain. Knowing which is which is the
-difference between a program you hope works and one you can vouch
-for.</p>
-<p>The sample programs include fruit basket dialogs in C# and in Python,
-built with the shared classes, as a single dialog and as a
-multiple-document application. The pairs read side by side, so you can
-see one design in two languages and pick the one you want to work in.
-Template files help with the rest: a build script for an app that uses
-Homer components, and an installer built with Inno Setup.</p>
-<p>MIT licensed, for Windows 10 or later, with JAWS, NVDA or
-Narrator.</p>
+<h1 id="the-readers-voices-in-a-spoken-walk">The reader’s voices in a
+spoken walk</h1>
+<p><em>What was learned from the JAWS training and scripting
+documentation on 25 September 2026, and what the tutorial tool now does
+with it. For folding into the kit’s Tutorials.md.</em></p>
+<h2 id="how-jaws-actually-varies-its-voice">How JAWS actually varies its
+voice</h2>
+<p>JAWS speaks through <strong>voice contexts</strong>, each with its
+own rate, pitch and volume in Voice Adjustment: PC cursor, JAWS cursor,
+keyboard, tutor and message, menu and dialog, screen. Its scripts send
+each kind of speech to one context with <code>SayUsingVoice</code> and
+an output type – <code>OT_CONTROL_NAME</code>, <code>OT_HELP</code>
+(tutor), <code>OT_MESSAGE</code>, <code>OT_STATUS</code>,
+<code>OT_DIALOG_NAME</code>, <code>OT_POSITION</code> and so on. So a
+control’s name, role, value and state arrive through the PC cursor
+voice; a tutor message, a JAWS message and a program’s own
+<code>SayString</code> through the tutor-and-message voice; a menu item
+or a dialog title through the menu-and-dialog voice; an echoed keystroke
+through the keyboard voice.</p>
+<p>Two things vary in every JAWS, out of the box: a <strong>capital
+letter is spoken 20 percent higher</strong> in pitch, and
+<strong>spelling runs 20 percent slower</strong>. Beyond those, the six
+contexts sound the same until the listener changes one. The one
+listeners most often change is tutor and message, raised a little so
+that a hint or an announcement stands apart from the screen.</p>
+<p>What JAWS does <strong>not</strong> do, out of the box, is speak
+name, role, value, state and hint in five voices. The parts of a control
+are one utterance in one voice; the hint that follows is a second
+utterance in the message voice. A walk that gave each part its own pitch
+would be teaching something JAWS does not do.</p>
+<h2 id="what-the-tutorial-tool-does-now">What the tutorial tool does
+now</h2>
+<p>Each Hear line is placed in a context by its shape, as a listener
+places it by ear, and shifted by that context’s offset in semitones, set
+in <code>[global]</code>:</p>
 <ul>
-<li>HomerDev project page on GitHub:
-https://github.com/JamalMazrui/HomerDev</li>
+<li><strong>ReaderPitchMessage</strong> (default 2): tutor hints (“To
+activate press Spacebar”), JAWS messages (“Leaving menus”), and the
+program’s own announcements (“DbDo ready”, “Marked row 2”, “status:
+jobs, row 2 of 4”).</li>
+<li><strong>ReaderPitchMenu</strong> (default 0): menu items (“Open
+Database…, Control+O, O”) and dialog titles (“Filter Records
+dialog”).</li>
+<li><strong>ReaderPitchKeyboard</strong> (default 0): a single echoed
+character.</li>
+<li>The PC cursor voice is the reader’s own, unshifted: controls, rows,
+cells.</li>
 </ul>
-<p>If you use a screen reader and have wanted to build something of your
-own, start with the ReadMe and tell me where it loses you. If you
-already build Windows software, I would value your eyes on what is
-there.</p>
+<p>A Hear line can force a context with a leading <code>@cursor:</code>,
+<code>@message:</code>, <code>@menu:</code> or <code>@key:</code>, which
+is removed before speaking. The tutorial log names each line’s context,
+so a misplaced one is easy to find.</p>
+<p>The defaults follow the common practice rather than the factory
+setting: a listener who leaves every context alone hears one voice, and
+a walk that raised nothing would be right for them but would hide the
+distinction that the walks themselves rely on – which line is the
+screen, and which is the program talking to you.</p>
+<h2 id="the-say-routines">The say routines</h2>
+<p><code>Say.say(params string[])</code> in Say.cs speaks each string as
+its own utterance, in order, with nothing inserted between them. Three
+facts handed to it sound like three facts; the same three joined with
+commas sound like one line with pauses the synthesizer chooses. DbDo’s
+Say Cell and Say Select use it.</p>
 </body>
 </html>

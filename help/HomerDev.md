@@ -1289,6 +1289,15 @@ and the `.m3u` do not: the audio is rebuilt by one command and is far larger
 than the rest of the project, and the scripts are working material. The
 transcript, `Tutorials.md`, ships like any other document.
 
+## Three more documents
+
+- **[Rulings of 25 September](Rulings-2026-09-25.md)** -- one letter per menu,
+  Alt+Control and its navigation-key exception, single-instance programs.
+- **[The reader's voices](ReaderVoices.md)** -- how JAWS varies its voice by
+  context, and how a spoken walk follows it.
+- **[Kit findings](Kit-Findings-2026-09-25.md)** -- where the kit let an app
+  down in the logs of 25 September, and what was done about each.
+
 ## Not twice: speech that repeats
 
 Homer programs have said the same thing twice for years, and there are only two
@@ -1342,6 +1351,38 @@ look again. Multiple rounds of that are normal, not a failure.
 A speech history is not a strict sequence -- a line heard twice may be a say
 line or an arrow up and back. And someone else's history holds their whole
 session, so use it only as far as they agreed.
+
+## One letter per menu
+
+A trigger letter is claimed by the first item in a menu whose word starts with
+it. A later item in the same menu that would take the same letter takes **no
+letter at all**: its caption carries no ampersand, and the letter goes to the
+first item. So History keeps H and Hotkeys, below it, has none. Two items
+sharing a letter would make the reader cycle between them, and a person
+pressing the letter expects one thing to happen. The same holds inside one
+dialog: the first control to claim a letter keeps it.
+
+`checkHomerApp` counts letters per menu and per dialog, never across a file,
+and fails on a duplicate, since a duplicate is now always a mistake.
+
+## Alt+Control, and the one exception
+
+Alt+Control with a letter or a function key belongs to Windows desktop
+shortcuts, and a Homer app never binds one. The sanctioned use is the app's own
+desktop shortcut: **Alt+Control+D opens DbDo**, and each single-instance app
+has a letter of its own.
+
+The exception is the **navigation keys**: Alt+Control with an arrow, Home, End,
+Page Up or Page Down moves a cursor inside a window, takes nothing from the
+desktop, and is allowed. DbDo's virtual cell cursor uses them.
+
+## Single instance, or several
+
+The MDI programs -- DbDo, EdSharp, FileDir -- run as **one instance**: the
+desktop shortcut opens the program or brings it forward, and its own windows
+are the windows. A program built around a job, such as HomerScribe, may run
+several instances, one per job. There is no system-wide summon chord in any
+Homer program; the desktop shortcut is that chord.
 
 ## Why Homer menus are long and flat
 
