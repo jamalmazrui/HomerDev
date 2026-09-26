@@ -5,6 +5,20 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.43.18 -- 26 September 2026
+
+**check reads a key combination whole, and in Python reads the gestures.** It
+matched "Alt+Control" plus one more word, so Alt+Control+Shift+H was read as
+Alt+Control+Shift, with Shift taken for the key. It also counted every mention
+of a key in a Python file -- HomerView tells its user "Press
+Alt+Control+Shift+H" in eight places, and one docstring still named a key the
+add-on no longer binds -- 15 "reserved" findings, none of them a binding.
+Now a combination is read with its Shift and its key; in a .py file only the
+gestures NVDA binds ("kb:alt+control+shift+h") are keys; and the app's own
+desktop shortcut is compared whole, modifiers and all, with the HotKey its
+installer gives the desktop icon. Proved: HomerView and FileDir pass, and a
+C# Alt+Control+S and a Python kb:alt+control+t are still caught.
+
 # 1.43.17 -- 26 September 2026
 
 **check never waits for a key.** Each acceptance command now runs with empty
