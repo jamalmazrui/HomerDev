@@ -229,6 +229,9 @@ own notebook, is in the never-pushed list and stays on your machine.
   the kit with a line saying why it is there
 - `Tutorials.md` -- nine worked scenarios, and the audio tutorial playlist
 - `Developer.md` -- how to rebuild or change the kit
+- `HomerDev_update.md` -- the briefing for bringing another Homer app up to
+  the current kit: the contract, the lessons, the migration steps, and what
+  DbDo and EdSharp each still need
 - `History.md` -- what changed in each version, and why
 - `Hotkeys.md` -- every key three ways
 - `FAQ.md` -- the questions people ask, including why Windows only

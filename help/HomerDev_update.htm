@@ -1,0 +1,902 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>HomerDev_update</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">HomerDev_update</h1>
+</header>
+<h1
+id="homerdev-update-bringing-a-homer-app-up-to-the-current-kit">HomerDev
+Update: bringing a Homer app up to the current kit</h1>
+<p><em>A briefing on the learnings, decisions and techniques of HomerDev
+as of 25 September 2026 (kit 1.38.3), written so that another Homer app
+– DbDo, part way there; FileDir, some of the way; EdSharp, not yet
+started – can take up the kit’s code, concepts and structure with less
+pain than HomerScribe went through. It is a developer document:
+technical, dated, and specific about what went wrong.</em></p>
+<h1 id="what-the-kit-is">What the kit is</h1>
+<p><code>C:\HomerDev</code> is one repository holding everything the
+Homer apps share:</p>
+<ul>
+<li><code>CSharp\</code> – the shared classes an app compiles against:
+<code>Elevate.cs</code>, <code>Inix.cs</code>, <code>KeyMap.cs</code>,
+<code>KeyName.cs</code>, <code>Lbc.cs</code>, <code>Log.cs</code>,
+<code>Mdi.cs</code>, <code>Ollama.cs</code>, <code>Paths.cs</code>,
+<code>PdfRead.cs</code>, <code>Say.cs</code>, <code>Util.cs</code>,
+<code>Web.cs</code>, <code>inixVert.cs</code>. An app never carries a
+copy; it names the kit’s file on the compiler line.</li>
+<li><code>homer\</code> – the same for Python: <code>inix.py</code>,
+<code>lbc.py</code>, <code>log.py</code>, <code>mdi.py</code>,
+<code>paths.py</code>, <code>say.py</code>, <code>util.py</code>,
+<code>web.py</code>.</li>
+<li><code>scripts\</code> – the tools every app inherits, refreshed into
+its own <code>scripts</code> folder on every build:
+<code>buildTutorials</code>, <code>checkHomerApp</code>,
+<code>checkTutorial</code>, <code>fixEncoding</code>,
+<code>gitPush</code>, <code>gitUnpushed</code>,
+<code>homerInstall</code>, <code>homerTidy</code>,
+<code>installOllama</code>, <code>installScreenReaderSupport</code>,
+<code>makeTutorials</code>, <code>tagRelease</code>.</li>
+<li><code>Templates\</code> – what a new app starts from:
+<code>_APP_.cs</code>, <code>_APP_.cmd</code>,
+<code>_APP__setup.iss</code>, <code>build_APP_.cmd</code>,
+<code>build_APP_Py.cmd</code>, <code>create_APP_Repo.cmd</code>,
+<code>HomerComponents.iss</code>, <code>installModels.cmd</code>,
+<code>LocalFiles.txt</code>, <code>Tutorial_00_Overview.inix</code>,
+<code>accept.inix</code>, <code>makeHotkeys.py</code>,
+<code>gitignore.txt</code>; <code>samples\</code> (the four fruit-basket
+programs) and <code>skills\homer-tutorial\</code> (a skill for an AI
+writing walks).</li>
+<li><code>help\</code> – the kit’s own documents, among them
+<code>Developer.md</code>, <code>FinishPage.md</code>,
+<code>Logging.md</code>, <code>Tutorials.md</code>,
+<code>History.md</code>.</li>
+<li><code>exec\</code> – binaries the kit’s build fetches and never
+pushes: the tutorial voices (piper, sherpa-onnx, Kokoro).</li>
+<li><code>version.txt</code> – the kit’s version. An app states the
+version it needs.</li>
+</ul>
+<p><code>buildHomerDev</code> builds the kit: converts its documents,
+builds the four samples, fetches the voices, speaks its own walk, checks
+itself, and carries files over from any earlier layout (it has a move
+list and a retired list). <code>releaseHomerDev</code> checks, pushes
+and tags it.</p>
+<h1 id="the-contract-between-an-app-and-the-kit">The contract between an
+app and the kit</h1>
+<h2 id="find-the-kit-state-the-version-needed">1. Find the kit, state
+the version needed</h2>
+<p>Every build script begins the same way. From
+<code>buildHomerScribe.cmd</code>:</p>
+<pre><code>set &quot;homerDev=&quot;
+if defined HomerDev if exist &quot;%HomerDev%\CSharp\Lbc.cs&quot; set &quot;homerDev=%HomerDev%&quot;
+if not defined homerDev if exist &quot;C:\HomerDev\CSharp\Lbc.cs&quot; set &quot;homerDev=C:\HomerDev&quot;
+if not defined homerDev if exist &quot;%CD%\CSharp\Lbc.cs&quot; set &quot;homerDev=%CD%&quot;
+if not defined homerDev (
+  echo HomerScribe needs the Homer Development Kit and cannot find it.
+  echo Unzip HomerDev.zip into C:\HomerDev, or set the HomerDev environment variable.
+  exit /b 1
+)
+set &quot;homerVer=0.0.0&quot;
+if exist &quot;!homerDev!\version.txt&quot; set /p homerVer=&lt;&quot;!homerDev!\version.txt&quot;
+set &quot;kitNeeded=1.38.3&quot;
+powershell -NoProfile -Command &quot;if ([version]&#39;!homerVer!&#39; -lt [version]&#39;!kitNeeded!&#39;) { exit 1 } else { exit 0 }&quot; &gt;nul
+if errorlevel 1 (
+  echo HomerScribe needs HomerDev !kitNeeded! or later, and the kit is !homerVer!.
+  echo Unzip HomerDev.zip into C:\HomerDev, then build again.
+  exit /b 1
+)</code></pre>
+<p><code>kitNeeded</code> is raised whenever the app starts depending on
+something new in the kit. A build against an older kit stops with that
+message rather than failing somewhere inside the compiler.</p>
+<h2 id="compile-against-the-kits-sources-carry-no-copies">2. Compile
+against the kit’s sources; carry no copies</h2>
+<pre><code>set &quot;homerSources=&quot;
+set &quot;homerSources=!homerSources! &quot;!homerDev!\CSharp\Elevate.cs&quot;&quot;
+set &quot;homerSources=!homerSources! &quot;!homerDev!\CSharp\Inix.cs&quot;&quot;
+set &quot;homerSources=!homerSources! &quot;!homerDev!\CSharp\Lbc.cs&quot;&quot;
+...
+csc ... HomerScribe.cs !homerSources!</code></pre>
+<p><strong>Lbc needs Elevate.cs in every build</strong> (since kit
+1.31): its Help box carries the version section and the F11 update
+offer. Every build that lists <code>Lbc.cs</code> lists
+<code>Elevate.cs</code>.</p>
+<p>The copies of <code>Lbc.cs</code>, <code>Say.cs</code>,
+<code>Inix.cs</code>, <code>KeyMap.cs</code>, <code>Web.cs</code> that
+an app used to keep had all drifted from the kit’s by the time
+HomerScribe moved over. Delete them; the whitelist (below) keeps them
+from returning.</p>
+<h2 id="refresh-the-kits-scripts-into-the-app-on-every-build">3. Refresh
+the kit’s scripts into the app on every build</h2>
+<p>One source of truth. The app’s build copies them in; a fix in the kit
+reaches every app on its next build; nothing is edited in place.</p>
+<pre><code>if not exist &quot;scripts&quot; mkdir &quot;scripts&quot;
+for %%F in (buildTutorials.cmd buildTutorials.ps1 checkHomerApp.cmd checkHomerApp.py checkTutorial.cmd checkTutorial.py fixEncoding.cmd fixEncoding.py gitPush.cmd gitUnpushed.cmd gitUnpushed.py homerInstall.cmd homerTidy.cmd homerTidy.py installOllama.cmd makeTutorials.py tagRelease.cmd tagRelease.ps1) do (
+  if exist &quot;!homerDev!\scripts\%%F&quot; copy /y &quot;!homerDev!\scripts\%%F&quot; scripts\ &gt;nul
+)
+rem Retired kit scripts an app may still carry from an earlier refresh: gone.
+for %%F in (cleanDir.cmd cleanDir.py gitRelease.cmd homerPolicy.py installTools.cmd sayTutorial.cmd sayTutorial.py tidyRepo.cmd tidyRepo.py) do (
+  if exist &quot;scripts\%%F&quot; del /q &quot;scripts\%%F&quot;
+)</code></pre>
+<p><code>installModels.cmd</code> is the one install script an app keeps
+as its own, because it names the app’s models.
+<code>installScreenReaderSupport.cmd</code> is refreshed only by apps
+that ship reader scripts.</p>
+<h2 id="the-folder-layout-and-why-the-first-letters-differ">4. The
+folder layout, and why the first letters differ</h2>
+<p>The development folder <code>C:\&lt;App&gt;</code> mirrors the
+installed tree: sources, build files, ReadMe and License at the top, and
+these folders – <code>configs</code>, <code>data</code>,
+<code>exec</code>, <code>help</code>, <code>logs</code>,
+<code>results</code>, <code>scripts</code>, <code>templates</code>.
+<strong>Every standard folder starts with a different letter</strong>,
+so a screen reader user walks a folder list by initial letter. Two
+violations were found and fixed on 25 September: the kit’s
+<code>Samples</code> (s, like scripts) became
+<code>Templates\samples</code>; HomerScribe’s <code>context</code> (c,
+like configs) became <code>templates</code>. A subfolder under a
+standard folder is fine; a new top-level folder is not.</p>
+<p>What goes where:</p>
+<ul>
+<li><code>configs</code> – settings files the app reads;
+<code>.inix</code> for anything INI-shaped.</li>
+<li><code>data</code> – data the app ships or keeps: dictionaries,
+lookup databases.</li>
+<li><code>exec</code> – the built program and the binaries that sit
+beside it (the DLLs it links). Not in git. Fetched things go here or, if
+shared by every app, machine-wide (see 7).</li>
+<li><code>help</code> – every document but ReadMe and License: the
+guide, Developer, History, Hotkeys, Announce, Tutorials, the
+<code>Tutorial_NN_*.inix</code> walks and
+<code>tutorials\*.mp3</code>.</li>
+<li><code>logs</code> – one log per run of anything,
+<code>&lt;App&gt;-&lt;task&gt;-yyyyMMdd-HHmmss.log</code>.</li>
+<li><code>scripts</code> – the kit’s tools (refreshed) and the app’s own
+command scripts. Screen reader scripts an app ships go in a subfolder,
+<code>scripts\jaws</code>.</li>
+<li><code>templates</code> – what a person copies and edits: a worked
+example of a context file, a starter database, a sample document.</li>
+</ul>
+<h2 id="repofiles.txt-and-localfiles.txt">5. RepoFiles.txt and
+LocalFiles.txt</h2>
+<p>Two lists decide what git carries. <code>RepoFiles.txt</code> names
+the files and folders the repository holds (a trailing slash names a
+folder wholesale; a wildcard is allowed). <code>LocalFiles.txt</code>
+names what stays on this disk and is never pushed: <code>exec/</code>,
+<code>logs/</code>, <code>work/</code>, <code>notes/</code>,
+<code>packages/</code>, generated audio, anything fetched.
+<code>homerTidy</code> writes <code>.gitignore</code> as a
+<strong>whitelist</strong> from <code>RepoFiles.txt</code> – everything
+ignored, then exactly the named files allowed – and <code>gitPush</code>
+rewrites it before every push. So <code>git add -A</code> means “add
+everything the project has named”, never “everything in the folder”.</p>
+<p>The lesson behind this, 25 September: a project with no
+<code>RepoFiles.txt</code> swept 480 fetched voice files into a commit.
+<code>gitPush</code> now stages nothing without the list, and refuses
+any commit that stages a file over 10 MB.</p>
+<h2 id="the-four-scripts-and-the-order-they-run-in">6. The four scripts,
+and the order they run in</h2>
+<ol type="1">
+<li><code>build&lt;App&gt;</code> – steps <code>version.txt</code>,
+writes <code>Version.cs</code>, builds the program and the installer,
+speaks any tutorial without audio, puts the project’s own files into the
+Homer encoding, refreshes the scripts.</li>
+<li><code>scripts\gitPush "message"</code> – rewrites the whitelist,
+adds what it names, commits, pushes, shows the status.</li>
+<li><code>scripts\homerTidy --do-it</code> – the periodic clean: strays
+into <code>notes</code>, fetched things deleted, zero-byte files
+deleted, whitelist rewritten, strays untracked, commit.
+<code>--gitignore</code> alone rewrites the whitelist.</li>
+<li><code>scripts\tagRelease</code> – runs the app’s checks
+(<code>checkHomerApp --build</code>), then tags the pushed commit with
+the version stamped in <code>&lt;App&gt;_setup.exe</code> and publishes
+the installer as a GitHub release. <code>-SkipCheck</code> when the
+checks have just run.</li>
+</ol>
+<p>And <code>scripts\gitUnpushed</code> undoes a local commit that
+should not go up, keeping every file.</p>
+<p>Every tool takes the project to be the folder it is run in,
+<strong>or the parent when that folder is the project’s
+<code>scripts</code> or <code>exec</code></strong> – so
+<code>cd scripts</code> and <code>gitPush</code> is the same as running
+it at the top. Never keep copies of these tools in <code>C:\bin</code>
+or anywhere on the PATH: they go stale there and run instead of the
+app’s own. The kit’s build deletes such copies when it finds them.</p>
+<h2 id="versions">7. Versions</h2>
+<p><code>version.txt</code> holds the current number and lives only on
+the developer’s machine – never in a delivered zip, never in the
+repository (it is in <code>LocalFiles.txt</code>). The build steps it,
+writes <code>Version.cs</code> from it, and stamps the installer;
+<code>build&lt;App&gt; nobump</code> keeps the number.
+<code>tagRelease</code> reads the version from the installer’s own
+resource, so the tag can never disagree with what was built.</p>
+<h2 id="shared-components-install-machine-wide">8. Shared components
+install machine-wide</h2>
+<p>Whisper, Tesseract, Pandoc, ExifTool, ffmpeg, yt-dlp, Ollama and the
+like go to their own default machine-wide directories –
+<code>C:\Program Files\...</code> – so every Homer app finds and shares
+one copy, and an app upgrade (which replaces the app’s folder) cannot
+destroy them. Libraries the app links (its DLLs) belong beside the
+executable in <code>exec</code>. An installer is machine-wide and
+requires admin; there is no per-user fallback. Anyone wanting a portable
+copy uses the zip.</p>
+<h2 id="the-build-fetches-what-it-needs">9. The build fetches what it
+needs</h2>
+<p>winget, NuGet, a direct download – the build retrieves every
+component needed to compile and to run, in a sufficiently current
+version, and never leaves a manual fetch step. Two hard-won
+particulars:</p>
+<ul>
+<li><strong>whisper.cpp changed its release process on 20 August
+2026</strong>: version tags carry only source archives; compiled
+binaries hang off nightly build tags marked pre-release, so
+<code>/releases/latest</code> returns a release with no Windows build.
+<code>installWhisper.cmd</code> reads <code>/releases?per_page=30</code>
+and takes the first release with a Windows x64 CPU asset, with a pinned
+fallback. Any script that fetches from GitHub should expect this
+shape.</li>
+<li><strong>The tutorial voices are fetched only by the kit’s
+build</strong> into <code>C:\HomerDev\exec</code>. An app’s build never
+downloads them; if they are absent, the tutorial tool says “Run
+buildHomerDev” and speaks nothing.</li>
+</ul>
+<h2 id="logs-console-and-encoding">10. Logs, console and encoding</h2>
+<ul>
+<li>Every CLI script writes a detailed log aimed at debugging – script
+path, Python or PowerShell version, platform, working directory, command
+line, every effective setting, every command with its exit code, any
+error – in
+<code>logs\&lt;App&gt;-&lt;task&gt;-yyyyMMdd-HHmmss.log</code>. An
+installed program logs under
+<code>%LOCALAPPDATA%\&lt;App&gt;\logs</code>.</li>
+<li>The console is for a person: succinct, human-friendly, naming each
+thing as it is made (“Creating Tutorial_01_Transcribe.mp3, 12 steps”).
+Technical detail belongs in the log. A build was stopped by hand twice
+on 25 September because its screen said one sentence and then nothing
+for minutes.</li>
+<li>The Homer encoding is UTF-8 with a byte order mark and CRLF, except
+that <code>.cmd</code> and <code>.bat</code> take CRLF and no mark.
+Pandoc writes neither, so every build runs
+<code>scripts\fixEncoding</code> over the files
+<code>RepoFiles.txt</code> names before compiling. Zero-byte files are
+deleted, not kept.</li>
+<li><code>homerInstall.cmd</code> is the logging half of every install
+script: each <code>install&lt;Thing&gt;.cmd</code> calls it to open a
+log, run a command, record the exit code. Every install script says
+“Downloading” before a long step.</li>
+</ul>
+<h2 id="the-installer-and-its-finish-page">11. The installer and its
+finish page</h2>
+<p>The template <code>_APP__setup.iss</code> with
+<code>HomerComponents.iss</code> gives the finish page its shape
+(details in the kit’s <code>help\FinishPage.md</code>):</p>
+<ol type="1">
+<li>Install screen reader scripts (ticked,
+<code>isFreshInstall</code>).</li>
+<li>Install each component alphabetically (ticked,
+<code>homerIs(i,0)</code>).</li>
+<li>Update each component alphabetically (ticked,
+<code>homerIs(i,1)</code>).</li>
+<li>Reinstall each component alphabetically (unticked,
+<code>homerIs(i,2)</code>).</li>
+<li>Models: Install (ticked), Reinstall (unticked).</li>
+<li>Launch the program (ticked; deferred until after the Results
+box).</li>
+<li>Open the user guide (unticked).</li>
+</ol>
+<p>Script order plus <code>Check:</code> visibility does the grouping.
+The Results box reports only what actually ran that session, in the past
+tense, built from the boxes that were ticked
+(<code>homerNoteTicked</code>, <code>homerOutcomeLine</code>), never
+from a probe made when the wizard opened. Install scripts live in
+<code>scripts\</code> and are run from <code>{app}\scripts</code>.</p>
+<p><strong>List OK first</strong> in every
+<code>Lbc.runWithButtons</code> call: Lbc makes the first label the
+default button, and a wizard once opened Help on Enter because “Help”
+was listed first. A length is spoken in words (“Took 19 minutes”,
+<code>Util.spokenLength</code>); a clock reading is a position.</p>
+<h2 id="f11-and-the-version-box">12. F11 and the version box</h2>
+<p><code>Elevate.configure(owner, repo, version)</code> at startup.
+Lbc’s Help box then carries a Version section; when a newer release
+exists on GitHub, the box offers Yes (default) to fetch
+<code>&lt;App&gt;_setup.exe</code> and run it. F11 is the key (elevate
+sounds like eleven). This is how a user updates without visiting a web
+page.</p>
+<h2 id="tutorials-the-spoken-walks">13. Tutorials: the spoken walks</h2>
+<p>A walk is <code>help\Tutorial_NN_Name.inix</code>:
+<code>[about]</code> (Title, Intro, Setup, Homework), then one
+<code>[step]</code> per keystroke with <code>Say</code> (narrator),
+<code>Key</code>, <code>Hear</code> (the reader’s answer, one line per
+utterance), <code>Note</code> (written only), <code>Pause</code>. Four
+beats per key: say the key with the word it comes from; press it; hear
+the reader word for word; say what that meant. Name silence. Verify
+after every focus change with Insert plus T. Teach the repeat key in the
+first walk. <strong>Name no screen reader.</strong> The reader’s grammar
+per control is in the kit’s <code>help\Tutorials.md</code>, taken from
+real speech.</p>
+<p><code>scripts\checkTutorial</code> checks every script against the
+format and the grammar; <code>scripts\buildTutorials</code> runs it
+first and speaks nothing while a problem stands, then speaks each walk –
+Kokoro for the narrator, piper for the reader, every piece at one
+loudness – into <code>help\tutorials\*.mp3</code>, writes
+<code>help\Tutorials.md</code> and <code>TutorialFeed.xml</code>. The
+build calls it with an explicit <code>-build</code> argument (see the
+<code>%*</code> quirk below).
+<code>Templates\skills\homer-tutorial\SKILL.md</code> teaches an AI to
+write them.</p>
+<h2 id="the-check-and-what-done-means">14. The check, and what “done”
+means</h2>
+<p><code>scripts\checkHomerApp</code> (with <code>--build</code> to make
+the build itself evidence) checks: the documents present, each with its
+<code>.htm</code> (ReadMe, License, the app’s guide, Developer, History,
+Hotkeys; Tutorials where walks exist); <code>RepoFiles.txt</code>
+present and <code>.gitignore</code> the generated whitelist; the Homer
+encoding of the project’s own files; evidence of logging; the build
+script named after the folder returning 0; <code>accept.inix</code>
+stating what done means. <code>tagRelease</code> refuses to release when
+it fails. Its report goes in
+<code>logs\&lt;App&gt;-evidence-&lt;stamp&gt;.md</code>.</p>
+<h1 id="lessons-paid-for-with-dates">Lessons paid for, with dates</h1>
+<ul>
+<li><strong>25 Sep, <code>%*</code> is not reset by a bare
+<code>call</code>.</strong> A build run as
+<code>buildHomerScribe nobump</code> called the tutorial tool with no
+arguments, and “nobump” arrived there as a script name. Every call from
+a build passes an explicit argument (<code>-build</code>), and every
+tool ignores dash-arguments it does not know.</li>
+<li><strong>25 Sep, Windows does not tell <code>Scripts</code> from
+<code>scripts</code>.</strong> A move-pair from an earlier layout
+deleted the freshly delivered <code>scripts\homerInstall.cmd</code>,
+taking it for the stale copy. Any list that moves files must skip a pair
+whose two sides are the same file.</li>
+<li><strong>25 Sep, similar-sounding names cause wrong tools to
+run.</strong> <code>cleanDir</code> beside <code>homerTidy</code>,
+<code>gitRelease</code> beside <code>tagRelease</code>,
+<code>sayTutorial</code> beside <code>buildTutorials</code>,
+<code>makeTutorial</code> beside <code>makeTutorials</code>. One tool
+per job; the retired one is deleted by the build.</li>
+<li><strong>25 Sep, fetched things are deleted, never archived.</strong>
+A tidy once moved 486 voice files into <code>notes</code> and committed
+them.</li>
+<li><strong>25 Sep, Kokoro is slow on long unbroken text</strong> (71
+seconds for an 8-second spelled-out web address) and slower on many
+threads (two threads beat all cores). Text is cut at sentences and
+commas; the reader speaks through piper; Kokoro runs on two threads.
+Seven walks take 23 minutes.</li>
+<li><strong>25 Sep, PowerShell logs a native program’s first stderr line
+as a NativeCommandError</strong>, five lines per piece. Filter the
+wrapper, keep the program’s own words.</li>
+<li><strong>24-25 Sep, an installer’s “checking for a newer version” hid
+a 1 GB download</strong>; every long step now says “Downloading”
+first.</li>
+<li><strong>21 Sep, one log per run in <code>logs</code></strong>, never
+beside the script; alpha sort is chronological.</li>
+<li><strong>10 Sep, ship a build error rather than a quarantined
+feature.</strong> Implement fully; let the failure surface in the normal
+build.</li>
+</ul>
+<h1 id="the-migration-step-by-step">The migration, step by step</h1>
+<p>For an app that has not yet moved to the kit. Each step is checkable
+by <code>scripts\checkHomerApp</code> at the end.</p>
+<ol type="1">
+<li><strong>Install the kit</strong>: unzip <code>HomerDev.zip</code>
+into <code>C:\HomerDev</code>; run <code>buildHomerDev</code>. It
+fetches the voices and says “0 problems found”.</li>
+<li><strong>Lay out the folders</strong>: <code>configs</code>,
+<code>data</code>, <code>exec</code>, <code>help</code>,
+<code>logs</code>, <code>scripts</code>, <code>templates</code> as
+needed; move every document but ReadMe and License into
+<code>help</code>; the built program and its DLLs into
+<code>exec</code>; reader scripts into <code>scripts\jaws</code>;
+samples and starters into <code>templates</code>. Use
+<code>homerTidy</code> (plan first, then <code>--do-it</code>) to carry
+strays into <code>notes</code>.</li>
+<li><strong>Write <code>RepoFiles.txt</code> and
+<code>LocalFiles.txt</code></strong> (start from
+<code>Templates\LocalFiles.txt</code>). Name the sources, the documents,
+<code>help/</code>, <code>scripts/</code>, the lists, the installer
+script, <code>ReadMe</code>, <code>License</code>. Do not name the Homer
+classes, <code>version.txt</code>, <code>exec/</code>,
+<code>logs/</code>.</li>
+<li><strong>Delete the app’s copies of the Homer classes</strong> and
+compile against <code>C:\HomerDev\CSharp</code> (section 2). Add
+<code>Elevate.configure</code> at startup.</li>
+<li><strong>Rewrite the build script from
+<code>Templates\build_APP_.cmd</code></strong>: the kit detection and
+<code>kitNeeded</code>; <code>version.txt</code> stepped and
+<code>Version.cs</code> written; the refresh and retire loops;
+<code>fixEncoding</code>; the tutorial call with <code>-build</code>;
+compile; installer. Name it <code>build&lt;App&gt;.cmd</code>, lowercase
+b, and <code>.cmd</code> first – a <code>.ps1</code> needs a
+<code>.cmd</code> wrapper that forwards its arguments.</li>
+<li><strong>Rewrite the installer from
+<code>Templates\_APP__setup.iss</code></strong> with
+<code>HomerComponents.iss</code>: install scripts from
+<code>scripts\</code> to <code>{app}\scripts</code>, the three-group
+finish page, the Results box from ticked boxes, machine-wide and
+admin.</li>
+<li><strong>Write <code>accept.inix</code></strong> (from
+<code>Templates\accept.inix</code>): what done means.</li>
+<li><strong>Write the first walk</strong>,
+<code>help\Tutorial_00_Overview.inix</code>, from the template; run
+<code>scripts\checkTutorial</code>; let the build speak it.</li>
+<li><strong>Create the repository</strong> with
+<code>create&lt;App&gt;Repo</code> (from the template) if there is none;
+otherwise <code>homerTidy --do-it</code> to untrack strays and write the
+whitelist.</li>
+<li><strong>Build, check, push, release</strong>:
+<code>build&lt;App&gt;</code>,
+<code>scripts\checkHomerApp     --build</code>,
+<code>scripts\gitPush "Move to the kit."</code>,
+<code>scripts\tagRelease</code>.</li>
+</ol>
+<h1 id="dbdo-what-it-has-what-it-still-needs">DbDo: what it has, what it
+still needs</h1>
+<p>DbDo is part way there. It has <code>RepoFiles.txt</code> and
+<code>LocalFiles.txt</code>, <code>version.txt</code> and
+<code>Version.cs</code>, <code>accept.inix</code>,
+<code>uiTest.inix</code>, a <code>help</code> folder with the full
+document set, a <code>templates</code> folder of starter databases,
+<code>scripts\buildTutorials</code> and <code>TutorialFeed.xml</code>,
+and it compiles against <code>C:\HomerDev\CSharp</code> with
+<code>kitNeeded=1.25.0</code>. Thirteen kit versions have passed since.
+To bring it current:</p>
+<ul>
+<li><strong>Raise <code>kitNeeded</code> to 1.38.3</strong> and adopt
+the refresh and retire loops of section 3, so
+<code>checkHomerApp</code>, <code>checkTutorial</code>,
+<code>fixEncoding</code>, <code>gitPush</code>,
+<code>gitUnpushed</code>, <code>homerInstall</code>,
+<code>homerTidy</code>, <code>installOllama</code> and
+<code>tagRelease</code> arrive in <code>scripts</code> and stay current.
+Add <code>Elevate.cs</code> to the compiler line.</li>
+<li><strong>Pass <code>-build</code></strong> where the build calls
+<code>scripts\buildTutorials.cmd</code>, and let the tool’s console
+lines reach the screen (do not redirect its output into the build log);
+add <code>fixEncoding</code> before the compile.</li>
+<li><strong>Retire the near-duplicates</strong>:
+<code>scripts\makeTutorial.cmd</code> and <code>makeTutorial.py</code>
+(the kit’s <code>makeTutorials.py</code> does this);
+<code>bumpVersion</code> and <code>syncIssVersion</code> (the build’s
+version step does this); <code>summarizeSetup</code> unless still
+wanted, in which case it goes to <code>scripts</code>.</li>
+<li><strong>Clear the root</strong>: <code>build.py</code>,
+<code>build_convention.py</code>, <code>build_ios_tutorials.py</code>,
+<code>build_more.py</code>, <code>build_reads.py</code>,
+<code>build_recipes.py</code>, <code>build_tutorials.py</code>,
+<code>build_windows_tutorials.py</code>,
+<code>conform_samples.py</code>, <code>migratePrm.py</code> are one-off
+builders; those still used go to <code>scripts</code>, the rest to
+<code>notes</code>. The tutorial builders are superseded by
+<code>Tutorial_NN_*.inix</code> walks spoken by
+<code>buildTutorials</code>. The saved web pages (“RE DBDo did not
+import my Notes column.htm” and the like) go to <code>notes</code>.
+<code>DbDo_setup.exe</code> and <code>DbDo_JAWS.zip</code> are build
+products and belong in <code>exec</code> and in
+<code>LocalFiles.txt</code>, not in the root or the history.
+<code>installOllama.cmd</code> and <code>installModels.cmd</code> move
+to <code>scripts</code> (the first refreshed from the kit, the second
+DbDo’s own). <code>README.md</code> becomes <code>ReadMe.md</code>.</li>
+<li><strong>Installer</strong>: install scripts from
+<code>scripts\</code> to <code>{app}\scripts</code>; the three-group
+finish page and the Results box from ticked boxes; the reader scripts
+(<code>DbDo_JAWS.zip</code> unpacked into <code>scripts\jaws</code>)
+installed by <code>installScreenReaderSupport.cmd</code>.</li>
+<li><strong>Walks</strong>: keep <code>help\Tutorial_NN_*.inix</code> as
+the source of every tutorial; run <code>checkTutorial</code>; name no
+screen reader.</li>
+<li>Then <code>checkHomerApp --build</code> should pass and
+<code>tagRelease</code> will carry it.</li>
+</ul>
+<h1 id="edsharp-the-full-migration">EdSharp: the full migration</h1>
+<p>EdSharp has not moved yet: about eighty files at the root, its own
+copies of <code>Inix.cs</code>, <code>KeyMap.cs</code>,
+<code>Lbc.cs</code>, <code>Say.cs</code>, <code>Web.cs</code> and
+<code>inixVert.cs</code>, a <code>BuildEdSharp.ps1</code> driven by
+<code>BuildEdSharp.cmd</code>, the version living only as
+<code>AppVersion</code> in <code>EdSharp_Setup.iss</code>, and a
+<code>scripts</code> folder that holds the JAWS scripts rather than
+tools. Its <code>tidyRepo</code>, <code>repoPolicy</code>,
+<code>moveNotes</code>, <code>restoreMissing</code>,
+<code>prepareAuditFixes</code>, <code>applyConvertPolicy</code>,
+<code>dropLatexJawsKeys</code>, <code>auditEdSharp</code> and
+<code>summarizeSetup</code> are earlier editions of what the kit now
+does. Follow the ten steps above, with these particulars:</p>
+<ul>
+<li><strong>Folders</strong>: <code>EdSharp.md</code>,
+<code>Announce</code>, <code>Development</code> (rename to
+<code>Developer</code>), <code>FAQ</code>, <code>History</code>,
+<code>Hotkeys</code>, <code>Tutorial</code> and <code>Tutorials</code>
+(merge into one <code>Tutorials</code>) go to <code>help</code>, with
+their <code>.htm</code>; the <code>CamelType_*</code> documents are the
+kit’s now and the copies go. <code>Convert</code> becomes
+<code>configs\convert</code>; <code>Dictionaries</code> becomes
+<code>data\dictionaries</code>; <code>Samples</code> and
+<code>Snippets</code> become <code>templates\samples</code> and
+<code>templates\snippets</code>; the JAWS scripts (<code>.jss</code>,
+<code>.jsh</code>, <code>.jsd</code>, <code>.jkm</code>,
+<code>.JCF</code>, <code>EdSharp_Scripts_Setup.iss</code>) become
+<code>scripts\jaws</code>; the NVDA add-on goes to <code>exec</code> or
+<code>data</code>. <code>EdSharp.ini</code>, <code>EdSharp.inix</code>,
+<code>Tools.inix</code>, <code>Hotkeys.ini</code>,
+<code>Transform_Example.inix</code> go to <code>configs</code> (or
+<code>templates</code> for the example). <code>history.txt</code> and
+<code>lgpl.txt</code> are notes or licence text in
+<code>help</code>.</li>
+<li><strong>Binaries</strong>: <code>EdSharp.exe</code>,
+<code>EdSharp.dll</code>, <code>Tektosyne.dll</code>,
+<code>Ude.dll</code>, <code>WeCantSpell.Hunspell.dll</code>,
+<code>nvdaControllerClient.dll</code>, <code>sqlean.exe</code> go to
+<code>exec</code>, and the build fetches what it can
+(<code>FetchUde.ps1</code>, <code>FetchConvertTools.ps1</code> become
+steps in the build, not separate scripts). Nothing binary is in
+<code>RepoFiles.txt</code>.</li>
+<li><strong>The shared classes</strong>: EdSharp builds
+<code>EdSharp.dll</code> from the shared classes so its JScript.NET side
+can call them. Build that DLL from the kit’s <code>CSharp</code> files
+by path, and delete the copies. <code>inixVert.cs</code> is in the kit
+too.</li>
+<li><strong>Build script</strong>: <code>buildEdSharp.cmd</code>
+(lowercase b) wrapping the PowerShell, with the kit detection,
+<code>kitNeeded</code>, <code>version.txt</code> stepped and written to
+both <code>Version.cs</code> and the <code>.iss</code>, the refresh and
+retire loops, <code>fixEncoding</code>, the tutorial call with
+<code>-build</code>. The version-from- tags logic in
+<code>BuildEdSharp.ps1</code> gives way to
+<code>version.txt</code>.</li>
+<li><strong>Install scripts</strong> – <code>installCodeModel</code>,
+<code>installGitHub</code>, <code>installJawsScripts</code>,
+<code>installNode</code>, <code>installOllama</code>,
+<code>installPandoc</code>, <code>installPdfTools</code>,
+<code>installPython</code>, <code>installTranslateModel</code> – go to
+<code>scripts</code>, each calling <code>homerInstall.cmd</code> for its
+log, <code>installOllama</code> refreshed from the kit, and the
+installer ships them from <code>scripts\</code> to
+<code>{app}\scripts</code> with the three-group finish page.
+<code>installJawsScripts</code> is the kit’s
+<code>installScreenReaderSupport</code> pattern.</li>
+<li><strong>Retire</strong>: <code>tidyRepo</code>,
+<code>repoPolicy</code>, <code>moveNotes</code>,
+<code>restoreMissing</code>, <code>prepareAuditFixes</code>,
+<code>applyConvertPolicy</code>, <code>dropLatexJawsKeys</code>,
+<code>auditEdSharp</code>, <code>summarizeSetup</code>,
+<code>ModernizePandocConfig</code>, and the root
+<code>tagRelease.cmd</code>/<code>.ps1</code> (the kit’s replaces it) –
+into <code>notes</code> if any is still wanted for reference, otherwise
+gone.</li>
+<li><strong>Walks</strong>: EdSharp’s <code>Tutorials.md</code> is
+prose; write the first <code>help\Tutorial_00_Overview.inix</code> from
+the template and the skill, and let the build speak it.</li>
+</ul>
+<h1
+id="filedir-two-branches-copied-classes-binaries-in-the-repository">FileDir:
+two branches, copied classes, binaries in the repository</h1>
+<p>FileDir is some of the way there. Its working branch,
+<code>master</code>, has <code>version.txt</code> (5.0.88) stepped by
+the build and written to <code>Version.cs</code>, a
+<code>RepoFiles.txt</code>, two tutorial scripts
+(<code>Tutorial.inix</code>, <code>Tutorial_Tagging.inix</code>) with a
+<code>TutorialFeed.xml</code>, and <code>postPage</code>, which
+publishes the guide to the <code>main</code> branch as a GitHub Pages
+site. But it compiles against no kit: it carries copies of
+<code>Inix.cs</code>, <code>Log.cs</code>, <code>Say.cs</code>,
+<code>Util.cs</code>, <code>Web.cs</code>, <code>Ollama.cs</code> and a
+lowercase <code>lbc.cs</code> whose header says the namespace line is
+edited per project, and it copies <code>Ude.dll</code> from the EdSharp
+folder when the file is missing. Its repository holds binaries – 7-Zip
+(<code>7z.exe</code>, <code>7z.dll</code>, <code>7zFM.exe</code>,
+<code>7zG.exe</code>, three <code>.sfx</code>), <code>Burn2CD</code>,
+<code>AssocOn.exe</code> and <code>AssocOff.exe</code> with their
+<code>.bas</code>, <code>Tektosyne.dll</code>,
+<code>ICSharpCode.SharpZipLib.dll</code>, <code>Ude.dll</code>,
+<code>nvdaControllerClient.dll</code>, <code>FileDirScript.dll</code> –
+named in a <code>RepoFiles.txt</code> of an older format (a
+<code>Tracked:</code> line, which the current <code>homerTidy</code>
+would read as a file name). Its <code>cleanFileDir</code>,
+<code>homerPolicy</code>, <code>auditFileDir</code>,
+<code>buildTutorial</code>, <code>makeTutorial</code>,
+<code>summarizeSetup</code> and root <code>tagRelease</code> are earlier
+editions of the kit’s tools; the build is a capital-B
+<code>BuildFileDir.ps1</code>; everything sits at the root, with the
+JAWS scripts both there and in <code>scripts</code> (which holds only
+their installer inputs). Follow the ten steps, with these
+particulars:</p>
+<ul>
+<li><strong>The two branches.</strong> <code>main</code> is the
+published guide only; <code>master</code> is the project. Every kit tool
+acts on the branch checked out in the working folder, so make
+<code>master</code> the default branch on GitHub (so a download of the
+repository is the project, and <code>tagRelease</code> tags the right
+history), and keep <code>postPage</code> in <code>scripts</code> as the
+way <code>help\FileDir.md</code> reaches the Pages branch after a
+release. A branch whose only content is a copy of one document is a
+publishing target, not a project, and should never be what someone
+unzips to build from.</li>
+<li><strong>The shared classes.</strong> Delete the seven copies and
+compile against <code>C:\HomerDev\CSharp</code> with
+<code>using Homer;</code> – the kit’s classes live in the Homer
+namespace, so the per-project namespace edit ends.
+<code>Ollama.cs</code>, <code>Log.cs</code> and <code>Util.cs</code> are
+in the kit too. <code>Elevate.cs</code> beside <code>Lbc.cs</code>;
+<code>Elevate.configure</code> at startup, so F11 joins Alt+F1
+About.</li>
+<li><strong>Binaries out of git, fetched by the build, into
+<code>exec</code>.</strong> 7-Zip by winget (<code>7zip.7zip</code>) or
+its direct download; Ude by NuGet, as EdSharp’s
+<code>FetchUde.ps1</code> does, into <code>exec</code> – never copied
+from another project’s folder; Tektosyne, SharpZipLib and the NVDA
+controller client by their NuGet or release downloads;
+<code>FileDirScript.dll</code> and <code>FileDir.exe</code> are build
+products. <code>AssocOn</code>/<code>AssocOff</code> and
+<code>Burn2CD</code> are the app’s own small programs: their sources
+(<code>.bas</code>) stay in the repository and the built
+<code>.exe</code> goes to <code>exec</code> and
+<code>LocalFiles.txt</code>. Rewrite <code>RepoFiles.txt</code> in the
+current format, one path per line, and name no binary in it.</li>
+<li><strong>Folders.</strong> <code>help</code> takes
+<code>FileDir.md</code>, <code>Announce</code>, <code>Developer</code>,
+<code>FAQ</code>, <code>History</code>, <code>Hotkeys</code>,
+<code>Tutorials</code>, their <code>.htm</code>, the walks renamed
+<code>Tutorial_00_Overview.inix</code> and
+<code>Tutorial_01_Tagging.inix</code>, <code>TutorialFeed.xml</code>,
+and <code>tutorials\Tutorial_00_Overview.mp3</code> (the root
+<code>Tutorial.mp3</code>); the <code>CamelType_*</code> and
+<code>Camel_Type_C#</code> documents are the kit’s and the copies go.
+<code>scripts</code> takes the kit’s tools, the install scripts
+(<code>installImageTools</code>, <code>installMediaTools</code>,
+<code>installMpv</code>, <code>installOllama</code> refreshed from the
+kit, <code>installPandoc</code>, <code>installPdfTools</code>,
+<code>installTranslateModel</code>), <code>postPage</code>,
+<code>makeKeyMap.py</code>, <code>pdfRich.py</code>, and
+<code>jaws\</code> for <code>FileDir.jss/.jsd/.jsh/.jkm/.jcf</code>,
+<code>Homer.jss/.jsd/.jsh</code>, <code>MSAA.jsh</code>, the
+<code>mpv.*</code> scripts, the <code>.jsb</code> files and
+<code>FileDir_Scripts_setup.iss</code>. <code>configs</code> takes
+<code>Hotkeys.inix</code>, <code>Convert.txt</code> and
+<code>Quick.txt</code> (as <code>.inix</code> if they are INI-shaped)
+and <code>FileDir.ini</code>; <code>data</code> takes
+<code>chimes.wav</code>. <code>makeTutorial.log</code> goes; logs live
+in <code>logs</code>.</li>
+<li><strong>Retire</strong> <code>cleanFileDir.cmd/.py</code>,
+<code>homerPolicy.py</code>, <code>auditFileDir.py</code>,
+<code>buildTutorial.cmd/.ps1</code>, <code>makeTutorial.cmd/.py</code>,
+<code>summarizeSetup</code>, the root <code>tagRelease.cmd/.ps1</code>
+and <code>tagRelease_README.md</code>: <code>homerTidy</code>,
+<code>checkHomerApp</code>, <code>buildTutorials</code>,
+<code>makeTutorials</code> and the kit’s <code>tagRelease</code> do
+these jobs.</li>
+<li><strong>Build and installer.</strong> <code>buildFileDir.cmd</code>
+(lowercase b) with the kit detection, <code>kitNeeded</code>, the
+refresh and retire loops, <code>fixEncoding</code>, the tutorial call
+with <code>-build</code>, then the JScript.NET compile of
+<code>FileDirScript.dll</code> and the C# compile against the kit.
+<code>FileDir_setup.iss</code> ships install scripts from
+<code>scripts\</code> to <code>{app}\scripts</code>, with the
+three-group finish page and the Results box from ticked boxes; the JAWS
+scripts through <code>installScreenReaderSupport.cmd</code>. The guide’s
+“dirsetup.exe” is stale text: the installer is
+<code>FileDir_setup.exe</code>, which is what <code>tagRelease</code>
+reads the version from. The desktop shortcut’s Alt+Control+F is the
+sanctioned use of that key space and stays.</li>
+<li><strong>Walks.</strong> Run <code>checkTutorial</code> over the two
+scripts before the build speaks them: they must name no screen reader,
+and the guide names JAWS freely, so the walks were likely written the
+same way.</li>
+</ul>
+<h1 id="what-homerscribe-looks-like-now-as-the-worked-example">What
+HomerScribe looks like now, as the worked example</h1>
+<p><code>C:\HomerScribe</code>: <code>HomerScribe.cs</code>,
+<code>PdfRead.cs</code>, <code>buildHomerScribe.cmd</code>,
+<code>HomerScribe_setup.iss</code>, <code>ReadMe.md/.htm</code>,
+<code>License.md/.htm</code>, <code>RepoFiles.txt</code>,
+<code>LocalFiles.txt</code>, <code>accept.inix</code>;
+<code>help\</code> with the guide, Developer, History, Hotkeys,
+Announce, Tutorials, <code>Tutorial_00_Overview</code> through
+<code>Tutorial_06_NewerVersion.inix</code> and
+<code>tutorials\*.mp3</code>; <code>scripts\</code> with the kit’s tools
+plus <code>installExifTool</code>, <code>installModels</code>,
+<code>installPandoc</code>, <code>installTesseract</code>,
+<code>installWhisper</code>, <code>pdfPages</code>;
+<code>templates\</code> with the context examples; <code>exec\</code>
+with the program, its DLLs and the fetched tools; <code>logs\</code>.
+Its <code>buildHomerScribe.cmd</code> and
+<code>HomerScribe_setup.iss</code> are the fullest current examples of
+everything above, and its <code>help\Developer.md</code> names the four
+scripts and their order.</p>
+<h1 id="summary-of-the-rules-one-line-each">Summary of the rules, one
+line each</h1>
+<ul>
+<li>Compile against <code>C:\HomerDev\CSharp</code>; carry no copies;
+list <code>Elevate.cs</code> with <code>Lbc.cs</code>.</li>
+<li>State <code>kitNeeded</code>; stop with a message when the kit is
+older.</li>
+<li>Refresh the kit’s scripts into <code>scripts</code> on every build;
+delete retired ones.</li>
+<li>Standard folders with distinct first letters; subfolders are
+fine.</li>
+<li><code>RepoFiles.txt</code> names what git carries;
+<code>LocalFiles.txt</code> what stays local; <code>.gitignore</code> is
+generated.</li>
+<li><code>version.txt</code> only on the developer’s machine; the build
+steps it and writes <code>Version.cs</code>.</li>
+<li>The four scripts: build, gitPush, homerTidy, tagRelease; tools climb
+out of <code>scripts</code>.</li>
+<li>Shared components machine-wide; the app’s DLLs in <code>exec</code>;
+installers admin and machine-wide.</li>
+<li>The build fetches what it needs; only the kit’s build fetches the
+voices.</li>
+<li>One log per run in <code>logs</code>; a succinct console that names
+each thing as it is made.</li>
+<li>Homer encoding everywhere; <code>fixEncoding</code> before every
+compile; delete zero-byte files.</li>
+<li>Finish page in three groups; Results box from ticked boxes; OK
+listed first.</li>
+<li><code>Elevate.configure</code> for F11.</li>
+<li>Walks in <code>Tutorial_NN_*.inix</code>; four beats; name silence;
+name no screen reader; <code>checkTutorial</code> first.</li>
+<li><code>checkHomerApp</code> decides whether <code>tagRelease</code>
+may release.</li>
+</ul>
+</body>
+</html>

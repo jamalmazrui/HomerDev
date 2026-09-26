@@ -5,6 +5,20 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.39.1 -- 25 September 2026
+
+help\HomerDev_update.md: the briefing for bringing another Homer app up to
+the current kit -- what the kit is, the contract between an app and it
+(finding the kit, kitNeeded, compiling against its sources, refreshing its
+scripts, the folder layout and why the first letters differ, the two lists,
+the four scripts, versions, machine-wide components, the fetching build,
+logs and encoding, the finish page, F11, the walks, the check), the lessons
+paid for with their dates, the migration in ten steps, and what DbDo and
+EdSharp each still need -- and, from 1.39.1, FileDir: its two-branch
+repository, copied classes with a per-project namespace, binaries in git,
+and earlier editions of the tools. The first release of HomerScribe through the whole
+chain -- build, check, push, tag, installer asset -- went through today.
+
 # 1.38.3 -- 25 September 2026
 
 HomerScribe's first release through tagRelease's built-in check was refused

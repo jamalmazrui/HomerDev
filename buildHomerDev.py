@@ -62,7 +62,7 @@ c_lsExpected = [
     "help/CamelType_JAWSScript.md",
     "ReadMe.md", "License.md",
     "help/Announce.md", "help/Developer.md", "help/History.md", "help/HomerDev.md",
-    "help/FAQ.md", "help/FinishPage.md", "help/Hotkeys.md", "help/Logging.md", "help/Tutorials.md",
+    "help/FAQ.md", "help/FinishPage.md", "help/HomerDev_update.md", "help/Hotkeys.md", "help/Logging.md", "help/Tutorials.md",
     "help/Tutorial_HomerDev.inix",
     "License.md", "version.txt",
 ]
