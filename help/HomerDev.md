@@ -528,6 +528,22 @@ normalizes one.
 - **Aim for one key that works on both JAWS and NVDA.** Perfect agreement is not
   realistic; keeping the differences few is.
 
+### The grave accent key: speech
+
+The grave accent key, left of 1, carries the whole speech family, as EdSharp
+first arranged it:
+
+- **Alt+Grave**: voice louder.
+- **Alt+Shift+Grave**: voice softer.
+- **Control+Grave**: voice faster.
+- **Control+Shift+Grave**: voice slower.
+- **JAWS+Grave or NVDA+Grave**: toggle punctuation between all and none.
+
+Alt changes the volume and Control the rate, and Shift reverses the direction.
+Punctuation takes the screen reader key, apart from the four, so it never
+shares a key with one of them. An app with a command reporting these settings
+may give it Shift+Grave.
+
 ## KeyMap
 
 `KeyMap.cs` is the one table associating a context, a command name, a summary,

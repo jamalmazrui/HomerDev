@@ -5,6 +5,19 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.43.19 -- 26 September 2026
+
+**The grave accent family is a kit convention.** HomerDev.md's "Choosing a
+key" now sets out EdSharp's arrangement: Alt+Grave and Alt+Shift+Grave for
+volume, Control+Grave and Control+Shift+Grave for rate, and the screen reader
+key plus Grave for toggling punctuation, so punctuation never shares a key with
+the other four. HomerView had given Toggle Punctuation Control+Shift+Grave,
+Voice Slower's key.
+
+**The templates need this kit.** build_APP_.cmd and build_APP_Py.cmd name
+1.43.19 as kitNeeded, so a new app starts with every tidy, check and release
+fix of the day.
+
 # 1.43.18 -- 26 September 2026
 
 **check reads a key combination whole, and in Python reads the gestures.** It
