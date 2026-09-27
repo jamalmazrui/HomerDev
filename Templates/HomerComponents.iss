@@ -261,6 +261,18 @@ begin
 
   gHomer[iAt].iState := Result;
   gHomer[iAt].bKnown := True;
+  // EVERY VERDICT IS LOGGED (1.43.20). Reinstalling all ten apps on 27
+  // September left no record of why a box was ticked: only EdSharp and DbDo,
+  // with their own probes, said what they found. Now the setup log -- the one
+  // written with /LOG, copied to the app's logs folder -- names each
+  // component, what was found, and the verb its box was given.
+  case Result of
+    0: Log('Component ' + gHomer[iAt].sName + ': not found; offered as Install ' + gHomer[iAt].sRemote);
+    1: Log('Component ' + gHomer[iAt].sName + ': ' + gHomer[iAt].sLocal + ' found, '
+           + gHomer[iAt].sRemote + ' available; offered as Update');
+  else
+    Log('Component ' + gHomer[iAt].sName + ': ' + gHomer[iAt].sLocal + ' found, current; offered as Reinstall');
+  end;
 end;
 
 function homerIs(iAt, iState: Integer): Boolean;
@@ -283,6 +295,19 @@ function homerWanted(iAt: Integer): Boolean;
    where pressing Enter should act. *)
 begin
   Result := homerState(iAt) <> 2;
+end;
+
+function homerMessageBox(hWnd: Integer; sText, sCaption: String; iType: Cardinal): Integer;
+  external 'MessageBoxW@user32.dll stdcall';
+
+procedure homerResultsBox(sBody: String);
+(* THE RESULTS BOX HAS A TITLE (1.43.20): "<App> Setup Results". Inno's MsgBox
+   takes none -- its caption is the wizard's own, so the box a screen reader
+   announced was called "Setup", not "Results". Windows' own MessageBox takes a
+   caption, and is otherwise the same OK box: information icon, one button. *)
+begin
+  homerMessageBox(WizardForm.Handle, sBody,
+    '{#SetupSetting("AppName")} Setup Results', MB_OK or $40);  (* $40: the information icon *)
 end;
 
 function homerLabel(iAt: Integer): String;

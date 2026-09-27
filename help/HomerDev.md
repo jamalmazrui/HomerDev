@@ -528,6 +528,28 @@ normalizes one.
 - **Aim for one key that works on both JAWS and NVDA.** Perfect agreement is not
   realistic; keeping the differences few is.
 
+## Finish page wording
+
+A finish page is arrowed through, not studied, so each box says what it does
+in the fewest words, and alike in every Homer installer:
+
+- **The verb first**: Install, Update or Reinstall, then the name, then a
+  version where one is known.
+- **A use in parentheses**, three or four words, for a component or a model:
+  "Install Pandoc 3.11 (converts documents)". A size goes there too when it is
+  large: "(translates text, about 4.7 GB)".
+- **Screen readers get a box each, JAWS first**: "Install JAWS scripts",
+  "Install NVDA add-on" (or Update). A condition a box depends on may follow in
+  parentheses: "(NVDA must be running)".
+- **No word a checked box already says**: not "recommended", not "(current
+  version)" after Reinstall, not "for <App>" -- it is that app's installer.
+- **Launch and the guide**: "Launch <App> (desktop hotkey Alt+Control+X)" and
+  "Open the user guide (F1 in <App>)".
+
+The Results box that follows is titled "<App> Setup Results", and every
+component's check -- what was found, and the verb its box was given -- is
+written to the setup log.
+
 ### The grave accent key: speech
 
 The grave accent key, left of 1, carries the whole speech family, as EdSharp

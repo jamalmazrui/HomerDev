@@ -249,10 +249,18 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\exec\{#AppExeName}"; WorkingD
 ; wrapper with a "set X=1 &&" prefix, which cmd /s cannot quote correctly.
 
 ; ---- 1. Install ---------------------------------------------------------------
+; JAWS AND NVDA HAVE A BOX EACH, JAWS first, worded alike (1.43.20).
 FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause jaws"; \
   WorkingDir: "{app}\scripts"; \
-  Description: "Install the JAWS scripts and the NVDA add-on for {#AppName}"; \
+  Description: "Install JAWS scripts"; \
+  Check: isFreshInstall; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+
+FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
+  Parameters: "noPause nvda"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "Install NVDA add-on"; \
   Check: isFreshInstall; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
@@ -272,9 +280,16 @@ FileName: "{app}\scripts\installModels.cmd"; \
 
 ; ---- 2. Update ----------------------------------------------------------------
 FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause jaws"; \
   WorkingDir: "{app}\scripts"; \
-  Description: "Update the JAWS scripts and the NVDA add-on for {#AppName}"; \
+  Description: "Update JAWS scripts"; \
+  Check: isUpgradeOrSame; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+
+FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
+  Parameters: "noPause nvda"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "Update NVDA add-on"; \
   Check: isUpgradeOrSame; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
@@ -308,12 +323,12 @@ FileName: "{app}\scripts\installModels.cmd"; \
 ; one case where cmd /s strips the outer pair correctly.
 FileName: "{cmd}"; \
   Parameters: "/c echo launch > ""{localappdata}\{#AppName}\logs\{#AppName}_launch.flag"""; \
-  Description: "Launch {#AppName} now (desktop hotkey: {#HotKeyDisplay})"; \
+  Description: "Launch {#AppName} (desktop hotkey {#HotKeyDisplay})"; \
   Flags: postinstall skipifsilent runhidden runasoriginaluser
 
 ; ---- 5. Open the user guide, unticked -----------------------------------------
 FileName: "{app}\ReadMe.htm"; \
-  Description: "Open the user guide (F1 opens it inside {#AppName})"; \
+  Description: "Open the user guide (F1 in {#AppName})"; \
   Flags: postinstall shellexec nowait skipifsilent skipifdoesntexist runasoriginaluser unchecked
 
 [UninstallDelete]
@@ -491,7 +506,7 @@ begin
   if sActions <> '' then sBody := sBody + #13#10 + #13#10 + sActions;
   sBody := sBody + #13#10 + #13#10
          + 'Logs are kept in ' + ExpandConstant('{localappdata}\{#AppName}\logs') + '.';
-  MsgBox(sBody, mbInformation, MB_OK);
+  homerResultsBox(sBody);
   startIfAsked();
 end;
 

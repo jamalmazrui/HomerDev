@@ -5,6 +5,26 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.43.20 -- 27 September 2026
+
+From reinstalling all ten apps:
+
+- **installScreenReaderSupport named the app "scripts".** Installers put it in
+  scripts, and it climbed out of exec only, so FileDir's finish page looked for
+  scripts_JAWS.zip, logged to %LOCALAPPDATA%\scripts\logs, and installed no
+  JAWS scripts. It now climbs out of scripts too. It also takes "jaws" or
+  "nvda" to install one reader's support, so each has its own box.
+- **JAWS and NVDA have a box each, JAWS first**, in the template: "Install JAWS
+  scripts" and "Install NVDA add-on", and the same with Update.
+- **The Results box is titled "<App> Setup Results".** Inno's MsgBox has no
+  caption of its own, so the box was announced as the wizard's. homerResultsBox
+  shows the same OK box through Windows' MessageBox, with the title.
+- **Every component verdict is logged**: what was found and whether its box
+  offers Install, Update or Reinstall. Before, only EdSharp and DbDo, with
+  their own probes, recorded why a box was ticked.
+- **Finish page wording** is written down in HomerDev.md, and the template's
+  Launch and guide boxes follow it.
+
 # 1.43.19 -- 26 September 2026
 
 **The grave accent family is a kit convention.** HomerDev.md's "Choosing a
