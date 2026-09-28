@@ -343,7 +343,7 @@ public static class Say
         try { nvdaController_testIfRunning(); bNvdaDll = true; }
         catch (DllNotFoundException) { bNvdaDll = false; }
         catch { bNvdaDll = true; }
-        sb.AppendLine("nvdaControllerClient.dll loadable: " + (bNvdaDll ? "yes" : "no (drop the DLL next to EdSharp.exe to enable NVDA support)"));
+        sb.AppendLine("nvdaControllerClient.dll loadable: " + (bNvdaDll ? "yes" : "no (place nvdaControllerClient.dll beside the program to speak through NVDA)"));
         sb.AppendLine("NVDA running (controller client says so): " + (isNvdaRunning() ? "yes" : "no"));
         sb.AppendLine();
         // SystemParametersInfo SPI_GETSCREENREADER: a generic
@@ -353,6 +353,23 @@ public static class Say
         sb.AppendLine();
         sb.AppendLine("Most recent say() used path: " + sLastPath);
         return sb.ToString();
+    }
+
+    // speechFacts: the same checks as key and value pairs, for the log header.
+    // The diagnostic above is text for a person; these are facts for a log,
+    // named alike in every Homer program (1.43.21).
+    public static List<KeyValuePair<string, string>> speechFacts()
+    {
+        List<KeyValuePair<string, string>> loFacts = new List<KeyValuePair<string, string>>();
+        bool bNvdaDll = false;
+        try { nvdaController_testIfRunning(); bNvdaDll = true; }
+        catch (DllNotFoundException) { bNvdaDll = false; }
+        catch { bNvdaDll = true; }
+        loFacts.Add(new KeyValuePair<string, string>("jawsRunning", isJawsRunning() ? "yes" : "no"));
+        loFacts.Add(new KeyValuePair<string, string>("nvdaClient", bNvdaDll ? "loaded" : "missing"));
+        loFacts.Add(new KeyValuePair<string, string>("nvdaRunning", isNvdaRunning() ? "yes" : "no"));
+        loFacts.Add(new KeyValuePair<string, string>("screenReaderFlag", isAnyScreenReaderActive() ? "yes" : "no"));
+        return loFacts;
     }
 
     // SystemParametersInfo SPI_GETSCREENREADER (action 70).

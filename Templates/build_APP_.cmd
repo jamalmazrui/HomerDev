@@ -58,7 +58,7 @@ set "progFiles=%ProgramFiles%"
 
 rem ---- SETTINGS: the part an app edits -------------------------------
 rem The oldest kit with everything this build uses.
-set "kitNeeded=1.43.20"
+set "kitNeeded=1.43.21"
 rem The number to start from when version.txt is missing. A newer release
 rem tag, if the repository has one, wins. It is also a floor: a version.txt
 rem holding less is raised to it.
@@ -107,7 +107,13 @@ rem 11, so the stamp comes from PowerShell.
 for /f %%i in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd-HHmmss"') do set "sStamp=%%i"
 if not exist "logs" mkdir "logs"
 set "log=%CD%\logs\%app%-build-%sStamp%.log"
-> "%log%" echo %app% build started %DATE% %TIME%
+rem THE START AND END LINES CARRY AN ISO 8601 TIME (1.43.21), with its UTC
+rem offset, from PowerShell rather than %DATE% %TIME%, whose form depends on
+rem the regional settings -- "Sun 09/27/2026 16:18:38.77" here -- and which no
+rem program can read reliably. They name the event and its result as the other
+rem Homer logs do: "build start app=2htm", "build end result=succeeded".
+for /f "usebackq delims=" %%i in (`powershell -NoProfile -Command "Get-Date -Format 'yyyy-MM-ddTHH:mm:ss.fffzzz'"`) do set "sIso=%%i"
+> "%log%" echo %sIso% INFO  build start app=%app%
 >> "%log%" echo Script: %~f0
 >> "%log%" echo Folder: %CD%
 >> "%log%" echo Command line: %0 %*
@@ -480,13 +486,15 @@ echo Built %app%_setup.exe version !ver!
 >> "%log%" echo Built %app%_setup.exe version !ver!
 
 :done
->> "%log%" echo Build succeeded %DATE% %TIME%
+for /f "usebackq delims=" %%i in (`powershell -NoProfile -Command "Get-Date -Format 'yyyy-MM-ddTHH:mm:ss.fffzzz'"`) do set "sIso=%%i"
+>> "%log%" echo %sIso% INFO  build end result=succeeded
 echo Build succeeded. Next: exec\%app%.exe to try it, then scripts\push "message" and scripts\release.
 endlocal
 exit /b 0
 
 :failed
->> "%log%" echo Build FAILED %DATE% %TIME%
+for /f "usebackq delims=" %%i in (`powershell -NoProfile -Command "Get-Date -Format 'yyyy-MM-ddTHH:mm:ss.fffzzz'"`) do set "sIso=%%i"
+>> "%log%" echo %sIso% ERROR build end result=failed
 echo Build failed. The log is %log%
 endlocal
 exit /b 1

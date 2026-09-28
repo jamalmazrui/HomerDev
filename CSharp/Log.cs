@@ -44,6 +44,21 @@
 //     Log.exception(oError);                      // message and stack
 //     Log.warn("Pandoc was not found, so no HTML was written");
 //
+// THE LINE FORMAT (1.43.21), one event per line, every line stamped:
+//     2026-09-27T16:16:40.123-07:00 INFO  session start app=2htm version=1.19.4 pid=4312
+//     2026-09-27T16:16:40.125-07:00 INFO  env windows="Windows 11 25H2 (10.0.26200.7462)"
+//     2026-09-27T16:16:41.002-07:00 ERROR run exit=1 ms=812 cmd="pandoc ReadMe.md"
+//     2026-09-27T16:16:41.003-07:00 ERROR | at Homer.Web.get(...)
+// An ISO 8601 time to the millisecond with its UTC offset, so logs from two
+// machines or two programs sort and merge; the level in a five-character
+// field; then the message. Facts are key=value (logfmt): a key is lower camel
+// case; a value is written bare, or in double quotes when it holds a space, a
+// quote or an equals sign, with an inner quote as \" and a final backslash
+// doubled. A line that continues the one above -- a stack frame, a command's
+// output -- starts its message with "| ". No line is left unstamped and no
+// blank line is written, so every line can be read, filtered and sorted on
+// its own. Log.py writes exactly the same.
+//
 // Nothing here throws. A program whose logging fails should still run, so every
 // method swallows its own errors and sets Log.bWorking to false.
 
@@ -53,6 +68,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using Microsoft.Win32;
 
 namespace Homer {
 
@@ -69,6 +85,10 @@ public static class Log
     private static string sFolder = "";
     private static string sPath = "";
     private static StreamWriter fLog = null;
+    // Facts already written, so a program that repeats one of the header's
+    // facts after start() -- FileDir writes Version and Program again -- does
+    // not write it twice.
+    private static HashSet<string> hsFacts = new HashSet<string>();
 
     // The log this session is writing to, for an About box or a "show the log"
     // command. Blank before start is called.
@@ -79,12 +99,9 @@ public static class Log
 
     // ------- starting and stopping -------
 
-    // start: open this session's log and write the header block.
-    //
-    // sAppNameGiven is the program's name, and it decides the folder, so pass
-    // the same name the installer uses. Called once, as early as possible: a
-    // failure before the log opens is the one failure that cannot be explained
-    // afterwards.
+    // start: open this session's log and write the header facts. Called once,
+    // as early as possible: a failure before the log opens is the one failure
+    // that cannot be explained afterwards.
     public static bool start(string sAppNameGiven)
     {
         try
@@ -92,8 +109,6 @@ public static class Log
             sAppName = (sAppNameGiven ?? "").Trim();
             if (sAppName == "") sAppName = "Homer";
             dtStarted = DateTime.Now;
-            // Paths owns the layout, so the log lands where the convention
-            // says and nothing here has to know the folder names.
             Paths.start(sAppName);
             sFolder = Paths.logs();
             sPath = Path.Combine(sFolder, sAppName + "-" +
@@ -112,16 +127,16 @@ public static class Log
         }
     }
 
-    // close: write the footer and let the file go. Safe to call twice, and safe
-    // not to call at all -- AutoFlush means nothing written is ever lost.
+    // close: the last line, with how long the session ran. Safe to call twice,
+    // and safe not to call at all -- AutoFlush means nothing written is lost.
     public static bool close()
     {
         try
         {
             if (fLog == null) return false;
-            line("");
-            line("Session ended " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") +
-                 " after " + (int) (DateTime.Now - dtStarted).TotalSeconds + " seconds");
+            level("INFO", "session end seconds=" +
+                  (DateTime.Now - dtStarted).TotalSeconds.ToString("0.000",
+                  System.Globalization.CultureInfo.InvariantCulture));
             fLog.Close();
             fLog = null;
             return true;
@@ -134,14 +149,45 @@ public static class Log
 
     // ------- writing -------
 
-    // line: one line, exactly as given, with no timestamp and no level. For a
-    // banner, a blank line, or a block of text that is easier to read plain.
+    // line: a line of plain text, stamped INFO. A blank line is not written:
+    // every line in a Homer log is an event a program can read on its own.
     public static bool line(string sText)
+    {
+        if (String.IsNullOrEmpty(sText)) return true;
+        return level("INFO", sText);
+    }
+
+    // The ordinary three. A log can be scanned for ERROR without reading it.
+    public static bool info(string sText) { return level("INFO", sText); }
+    public static bool warn(string sText) { return level("WARN", sText); }
+    public static bool error(string sText) { return level("ERROR", sText); }
+
+    // stamp: the time as every Homer log writes it -- ISO 8601, milliseconds,
+    // UTC offset. Public so a program writing its own file can match it.
+    public static string stamp()
+    {
+        return DateTimeOffset.Now.ToString("yyyy-MM-dd'T'HH:mm:ss.fffzzz",
+            System.Globalization.CultureInfo.InvariantCulture);
+    }
+
+    // Each line of the text becomes its own stamped line; lines after the
+    // first begin "| ", so a reader knows they continue the event above.
+    private static bool level(string sLevel, string sText)
     {
         try
         {
             if (fLog == null) return false;
-            lock (oGate) { fLog.WriteLine(sText ?? ""); }
+            string sPrefix = stamp() + " " + sLevel.PadRight(5) + " ";
+            string[] aLines = (sText ?? "").Replace("\r\n", "\n").Split('\n');
+            StringBuilder oOut = new StringBuilder();
+            bool bFirst = true;
+            foreach (string sOne in aLines)
+            {
+                if (!bFirst && sOne.Trim() == "") continue;
+                oOut.Append(sPrefix).Append(bFirst ? "" : "| ").Append(sOne.TrimEnd()).Append("\r\n");
+                bFirst = false;
+            }
+            lock (oGate) { fLog.Write(oOut.ToString()); }
             return true;
         }
         catch (Exception)
@@ -151,61 +197,87 @@ public static class Log
         }
     }
 
-    // The ordinary three. Each stamps the time and the level, so a log can be
-    // scanned for ERROR without reading it.
-    public static bool info(string sText) { return level("INFO", sText); }
-    public static bool warn(string sText) { return level("WARN", sText); }
-    public static bool error(string sText) { return level("ERROR", sText); }
-
-    private static bool level(string sLevel, string sText)
-    {
-        return line(DateTime.Now.ToString("HH:mm:ss") + "  " +
-                    sLevel.PadRight(5) + "  " + (sText ?? ""));
-    }
-
-    // section: a heading, so a long log can be read by its parts.
+    // section: a marker, so a long log can be read by its parts.
     public static bool section(string sTitle)
     {
-        line("");
-        line("---- " + (sTitle ?? "") + " ----");
-        return true;
+        return level("INFO", "---- " + (sTitle ?? "") + " ----");
     }
 
-    // keyValue: a setting and its value, one per line, which is what makes a
-    // log answer "what was it actually set to" without anybody guessing.
+    // keyValue: a setting and its value as one fact, key=value. The key is
+    // made lower camel case -- "Sort order" is written sortOrder -- so the
+    // same fact has the same name in every Homer log.
     public static bool keyValue(string sKey, string sValue)
     {
-        return line("    " + (sKey ?? "").PadRight(24) + " = " + (sValue ?? ""));
+        string sFact = key(sKey) + "=" + value(sValue);
+        if (hsFacts.Contains(sFact)) return true;
+        hsFacts.Add(sFact);
+        return level("INFO", "env " + sFact);
     }
 
-    // command: an external program that was run, and what it answered. Every
-    // Homer script logs this, and so should every program that starts a process.
+    // command: an external program that was run, and what it answered.
     public static bool command(string sCommand, int iExitCode)
     {
         return level(iExitCode == 0 ? "INFO" : "ERROR",
-                     "Ran: " + sCommand + "   exit code " + iExitCode);
+                     "run exit=" + iExitCode + " cmd=" + value(sCommand));
     }
 
-    // exception: the message AND the stack. The stack is the part that saves
-    // the evening, so it is never left out.
+    // command, timed: the same, with how long it took.
+    public static bool command(string sCommand, int iExitCode, long iMilliseconds)
+    {
+        return level(iExitCode == 0 ? "INFO" : "ERROR",
+                     "run exit=" + iExitCode + " ms=" + iMilliseconds + " cmd=" + value(sCommand));
+    }
+
+    // exception: the type, the message AND the stack -- every frame on its own
+    // continued line -- and each inner exception the same way.
     public static bool exception(Exception oError)
     {
         if (oError == null) return false;
-        level("ERROR", oError.GetType().Name + ": " + oError.Message);
-        line(oError.StackTrace ?? "    (no stack trace)");
-        if (oError.InnerException != null)
+        Exception oAt = oError;
+        string sLead = "exception";
+        while (oAt != null)
         {
-            line("    Inner: " + oError.InnerException.GetType().Name + ": " +
-                 oError.InnerException.Message);
+            level("ERROR", sLead + " type=" + oAt.GetType().FullName + " message=" + value(oAt.Message)
+                  + "\n" + (oAt.StackTrace ?? "(no stack trace)"));
+            oAt = oAt.InnerException;
+            sLead = "inner";
         }
         return true;
     }
 
-    // ------- the header block -------
+    // ------- the pieces of a fact -------
+
+    // key: lower camel case from any label -- "Log file" -> logFile,
+    // "Process 64-bit" -> process64Bit.
+    public static string key(string sLabel)
+    {
+        StringBuilder oOut = new StringBuilder();
+        bool bUpper = false;
+        foreach (char c in (sLabel ?? "").Trim())
+        {
+            if (!Char.IsLetterOrDigit(c)) { bUpper = oOut.Length > 0; continue; }
+            if (oOut.Length == 0) oOut.Append(Char.ToLowerInvariant(c));
+            else oOut.Append(bUpper ? Char.ToUpperInvariant(c) : c);
+            bUpper = false;
+        }
+        return oOut.Length == 0 ? "value" : oOut.ToString();
+    }
+
+    // value: bare when it can be, quoted when it must be.
+    public static string value(string sValue)
+    {
+        string s = sValue ?? "";
+        if (s != "" && s.IndexOfAny(new char[] { ' ', '"', '=', '\t' }) < 0) return s;
+        s = s.Replace("\"", "\\\"");
+        if (s.EndsWith("\\")) s += "\\";
+        return "\"" + s + "\"";
+    }
+
+    // ------- the header -------
     //
     // Everything that will be wanted later and cannot be worked out afterwards:
     // which build this was, on which Windows, as whom, from where, with what on
-    // the command line.
+    // the command line, and which screen reader was listening.
     private static bool writeHeader()
     {
         string sVersion = "unknown";
@@ -224,23 +296,23 @@ public static class Log
         {
         }
 
-        line(sAppName + " session log");
-        line("Started " + dtStarted.ToString("yyyy-MM-dd HH:mm:ss"));
-        section("Environment");
-        keyValue("Version", sVersion);
+        level("INFO", "session start app=" + value(sAppName) + " version=" + value(sVersion)
+              + " pid=" + Process.GetCurrentProcess().Id);
         keyValue("Log file", sPath);
         try
         {
             keyValue("Program", Assembly.GetEntryAssembly() == null ? "(unknown)"
                      : Assembly.GetEntryAssembly().Location);
             keyValue("Working directory", Environment.CurrentDirectory);
-            keyValue("Command line", Environment.CommandLine);
-            keyValue("Windows", Environment.OSVersion.VersionString);
-            keyValue("64-bit process", "" + Environment.Is64BitProcess);
+            keyValue("Arguments", String.Join(" ", Environment.GetCommandLineArgs(), 1,
+                     Math.Max(0, Environment.GetCommandLineArgs().Length - 1)));
+            keyValue("Windows", windowsVersion());
+            keyValue("Process 64-bit", "" + Environment.Is64BitProcess);
             keyValue("CLR", Environment.Version.ToString());
             keyValue("User", Environment.UserName);
             keyValue("Machine", Environment.MachineName);
-            keyValue("Screen reader", Say.speechDiagnostic());
+            foreach (KeyValuePair<string, string> oFact in Say.speechFacts())
+                keyValue(oFact.Key, oFact.Value);
         }
         catch (Exception)
         {
@@ -248,10 +320,32 @@ public static class Log
         return true;
     }
 
+    // windowsVersion: the Windows actually running. Environment.OSVersion
+    // answers 6.2.9200 -- Windows 8 -- to any program whose manifest does not
+    // declare Windows 10, which 2htm's and urlFido's logs showed on Windows 11.
+    // The registry does not lie.
+    public static string windowsVersion()
+    {
+        try
+        {
+            string sKey = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion";
+            string sBuild = "" + Registry.GetValue(sKey, "CurrentBuild", "");
+            string sUbr = "" + Registry.GetValue(sKey, "UBR", "");
+            string sDisplay = "" + Registry.GetValue(sKey, "DisplayVersion", "");
+            int iBuild;
+            Int32.TryParse(sBuild, out iBuild);
+            string sName = iBuild >= 22000 ? "Windows 11" : "Windows 10";
+            return (sName + " " + sDisplay).Trim() + " (10.0." + sBuild + (sUbr != "" ? "." + sUbr : "") + ")";
+        }
+        catch (Exception)
+        {
+            return Environment.OSVersion.VersionString;
+        }
+    }
+
     // ------- housekeeping -------
 
-    // prune: keep the most recent logs and remove the rest, so the folder stays
-    // readable. Silent: a log that cannot be deleted is not worth a message.
+    // prune: keep the most recent logs and remove the rest.
     public static int prune()
     {
         int iRemoved = 0;
@@ -265,8 +359,7 @@ public static class Log
             {
                 try { loLogs[i].Delete(); iRemoved++; } catch (Exception) { }
             }
-            if (iRemoved > 0) info("Removed " + iRemoved + " old session log" +
-                                   (iRemoved == 1 ? "" : "s") + ", keeping the most recent " + c_iKeepLogs);
+            if (iRemoved > 0) info("prune removed=" + iRemoved + " kept=" + c_iKeepLogs);
         }
         catch (Exception)
         {
@@ -274,8 +367,7 @@ public static class Log
         return iRemoved;
     }
 
-    // show: open this session's log in whatever reads a text file, for a
-    // program that offers a "show the log" command. EdSharp, when it is there.
+    // show: open this session's log in whatever reads a text file.
     public static bool show()
     {
         try

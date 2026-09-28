@@ -1872,6 +1872,42 @@ file it chose, which fallback it took, what it skipped and why.</li>
 <p>And the rule that governs all of it: <strong>the console is for a
 person; the log is for debugging</strong>. Short plain sentences on
 screen, everything else in the file. A log line is never spoken.</p>
+<h2 id="how-a-log-line-is-written">How a log line is written</h2>
+<p>Every Homer log – a program’s session log from <code>Log.cs</code> or
+<code>log.py</code>, and the log of every kit Python script – writes
+each line the same way:</p>
+<pre><code>2026-09-27T16:16:40.123-07:00 INFO  session start app=2htm version=1.19.4 pid=4312
+2026-09-27T16:16:40.125-07:00 INFO  env windows=&quot;Windows 11 25H2 (10.0.26200.7462)&quot;
+2026-09-27T16:16:41.002-07:00 ERROR run exit=1 ms=812 cmd=&quot;pandoc ReadMe.md&quot;
+2026-09-27T16:16:41.003-07:00 ERROR | at Homer.Web.get(...)</code></pre>
+<ul>
+<li><strong>Every line is stamped</strong> with the time in ISO 8601, to
+the millisecond, with its UTC offset, so lines from two programs or two
+machines sort and merge. No blank lines and no unstamped lines: each
+line can be filtered on its own.</li>
+<li><strong>The level</strong> is INFO, WARN or ERROR, in a
+five-character field. A kit script’s line is ERROR when it says ERROR,
+FAIL or FAILED, and WARN when it says WARN.</li>
+<li><strong>Facts are key=value</strong> (the logfmt convention), keys
+in lower camel case, named alike everywhere: <code>app</code>,
+<code>version</code>, <code>pid</code>, <code>logFile</code>,
+<code>program</code>, <code>workingDirectory</code>,
+<code>arguments</code>, <code>windows</code>, <code>user</code>,
+<code>machine</code>, <code>jawsRunning</code>, <code>nvdaClient</code>,
+<code>nvdaRunning</code>, <code>screenReaderFlag</code>,
+<code>exit</code>, <code>ms</code>, <code>cmd</code>. A value is bare,
+or quoted when it holds a space, a quote or an equals sign.</li>
+<li><strong>Events have names</strong> at the front of the message:
+<code>session start</code>, <code>session end</code>, <code>env</code>,
+<code>run</code>, <code>exception</code>, <code>prune</code>.</li>
+<li><strong>A continued line</strong> – a stack frame, a command’s
+output – starts “|”.</li>
+<li><strong>Each fact is written once.</strong> A program repeating a
+header fact after <code>start</code> is not written twice.</li>
+</ul>
+<p>Why this and not JSON: it is as easy for a program to parse – one
+regular expression takes a line apart – and it stays readable line by
+line with a screen reader, which a line of JSON is not.</p>
 <h2 id="what-gets-published">What gets published</h2>
 <h2 id="a-whitelist-not-a-list-of-exclusions">A whitelist, not a list of
 exclusions</h2>

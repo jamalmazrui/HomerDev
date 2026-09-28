@@ -54,6 +54,7 @@ function swallows its own errors and sets log.bWorking to False.
 import datetime
 import os
 import platform
+import re
 import subprocess
 import sys
 import traceback
@@ -100,14 +101,11 @@ def start(sAppNameGiven):
 
 
 def close():
-    """Write the footer and let the file go. Safe to call twice."""
+    """The last line, with how long the session ran. Safe to call twice."""
     global fileLog
     try:
         if fileLog is None: return False
-        line("")
-        iSeconds = int((datetime.datetime.now() - dtStarted).total_seconds())
-        line("Session ended %s after %d seconds"
-             % (datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), iSeconds))
+        _level("INFO", "session end seconds=%.3f" % (datetime.datetime.now() - dtStarted).total_seconds())
         fileLog.close()
         fileLog = None
         return True
@@ -116,18 +114,65 @@ def close():
 
 
 # --- writing ----------------------------------------------------------------
+#
+# THE LINE FORMAT (1.43.21), the same as Log.cs writes, one event per line and
+# every line stamped:
+#
+#     2026-09-27T16:30:06.412-07:00 INFO  session start app=urlCheck version=1.12.6 pid=9120
+#     2026-09-27T16:30:06.413-07:00 INFO  env python=3.13.15
+#     2026-09-27T16:30:07.020-07:00 ERROR run exit=1 ms=607 cmd="npx axe ..."
+#     2026-09-27T16:30:07.021-07:00 ERROR | File "urlCheck.py", line 88, in main
+#
+# ISO 8601 to the millisecond with the UTC offset; the level in five
+# characters; the message. Facts are key=value, keys in lower camel case,
+# values quoted when they hold a space, a quote or an equals sign (an inner
+# quote as \", a final backslash doubled). A line continuing the one above
+# starts "| ". No blank lines, no unstamped lines.
 
-def line(sText=""):
-    """One line, exactly as given, with no timestamp and no level."""
+def stamp():
+    """The time as every Homer log writes it."""
+    return datetime.datetime.now().astimezone().isoformat(timespec="milliseconds")
+
+
+def key(sLabel):
+    """Lower camel case from any label: "Log file" -> logFile."""
+    lsWords = re.findall(r"[A-Za-z0-9]+", sLabel or "")
+    if not lsWords: return "value"
+    return lsWords[0][:1].lower() + lsWords[0][1:] + "".join(s[:1].upper() + s[1:] for s in lsWords[1:])
+
+
+def value(sValue):
+    """Bare when it can be, quoted when it must be."""
+    s = "" if sValue is None else str(sValue)
+    if s and not re.search(r'[\s"=]', s): return s
+    s = s.replace('"', '\\"')
+    if s.endswith("\\"): s += "\\"
+    return '"' + s + '"'
+
+
+def _level(sLevel, sText):
+    """Each line of the text becomes its own stamped line; the ones after the
+    first start "| ", so a reader knows they continue the event above."""
     global bWorking
     try:
         if fileLog is None: return False
-        fileLog.write((sText or "") + "\n")
+        sPrefix = "%s %-5s " % (stamp(), sLevel)
+        lsOut = []
+        for iAt, sOne in enumerate((sText or "").replace("\r\n", "\n").split("\n")):
+            if iAt and not sOne.strip(): continue
+            lsOut.append(sPrefix + ("| " if iAt else "") + sOne.rstrip())
+        fileLog.write("\n".join(lsOut) + "\n")
         fileLog.flush()
         return True
     except Exception:
         bWorking = False
         return False
+
+
+def line(sText=""):
+    """A line of plain text, stamped INFO. A blank line is not written."""
+    if not sText: return True
+    return _level("INFO", sText)
 
 
 def info(sText):
@@ -142,62 +187,92 @@ def error(sText):
     return _level("ERROR", sText)
 
 
-def _level(sLevel, sText):
-    """Stamp the time and the level, so a log can be scanned for ERROR."""
-    return line("%s  %-5s  %s" % (datetime.datetime.now().strftime("%H:%M:%S"),
-                                  sLevel, sText or ""))
-
-
 def section(sTitle):
-    """A heading, so a long log can be read by its parts."""
-    line("")
-    line("---- %s ----" % (sTitle or ""))
-    return True
+    """A marker, so a long log can be read by its parts."""
+    return _level("INFO", "---- %s ----" % (sTitle or ""))
+
+
+_setFacts = set()
 
 
 def keyValue(sKey, sValue):
-    """A setting and its value, which is what answers "what was it set to"."""
-    return line("    %-24s = %s" % (sKey or "", sValue or ""))
+    """A setting and its value as one fact, key=value, written once."""
+    sFact = key(sKey) + "=" + value(sValue)
+    if sFact in _setFacts: return True
+    _setFacts.add(sFact)
+    return _level("INFO", "env " + sFact)
 
 
-def command(sCommand, iExitCode):
-    """An external program that was run, and what it answered."""
+def command(sCommand, iExitCode, iMilliseconds=None):
+    """An external program that was run, what it answered, and how long it took."""
+    sTime = "" if iMilliseconds is None else " ms=%d" % iMilliseconds
     return _level("INFO" if iExitCode == 0 else "ERROR",
-                  "Ran: %s   exit code %d" % (sCommand, iExitCode))
+                  "run exit=%d%s cmd=%s" % (iExitCode, sTime, value(sCommand)))
 
 
 def exception(oError=None):
-    """The message AND the traceback, which is the part that saves the evening."""
+    """The type, the message AND the traceback, every frame on its own line."""
     try:
+        sTrace = traceback.format_exc().rstrip()
         if oError is not None:
-            _level("ERROR", "%s: %s" % (type(oError).__name__, oError))
-        line(traceback.format_exc().rstrip())
-        return True
+            return _level("ERROR", "exception type=%s message=%s\n%s"
+                          % (type(oError).__name__, value(str(oError)), sTrace))
+        return _level("ERROR", "exception\n" + sTrace)
     except Exception:
         return False
 
 
-# --- the header block -------------------------------------------------------
+# --- the header -------------------------------------------------------------
 
 def _writeHeader():
     """Everything wanted later that cannot be worked out afterwards."""
-    line("%s session log" % sAppName)
-    line("Started %s" % dtStarted.strftime("%Y-%m-%d %H:%M:%S"))
-    section("Environment")
-    keyValue("Version", _appVersion())
+    _level("INFO", "session start app=%s version=%s pid=%d" % (value(sAppName), value(_appVersion()), os.getpid()))
     keyValue("Log file", sPath)
     try:
         keyValue("Program", os.path.abspath(sys.argv[0]))
         keyValue("Frozen", str(getattr(sys, "frozen", False)))
-        keyValue("Python", sys.version.replace("\n", " "))
-        keyValue("Platform", platform.platform())
+        keyValue("Python", platform.python_version())
         keyValue("Working directory", os.getcwd())
-        keyValue("Command line", " ".join(sys.argv))
+        keyValue("Arguments", " ".join(sys.argv[1:]))
+        keyValue("Windows", windowsVersion())
+        keyValue("Process 64-bit", str(sys.maxsize > 2 ** 32))
         keyValue("User", os.environ.get("USERNAME", ""))
-        keyValue("Machine", platform.node())
+        keyValue("Machine", os.environ.get("COMPUTERNAME", platform.node()))
+        for sKey, sValue in speechFacts():
+            keyValue(sKey, sValue)
     except Exception:
         pass
     return True
+
+
+def windowsVersion():
+    """The Windows actually running, from the registry, worded as Log.cs words it."""
+    try:
+        import winreg
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows NT\CurrentVersion") as oKey:
+            def read(sName):
+                try: return str(winreg.QueryValueEx(oKey, sName)[0])
+                except OSError: return ""
+            sBuild, sUbr, sDisplay = read("CurrentBuild"), read("UBR"), read("DisplayVersion")
+        sName = "Windows 11" if sBuild.isdigit() and int(sBuild) >= 22000 else "Windows 10"
+        return ("%s %s" % (sName, sDisplay)).strip() + " (10.0.%s%s)" % (sBuild, "." + sUbr if sUbr else "")
+    except Exception:
+        return platform.platform()
+
+
+def speechFacts():
+    """The screen reader facts Log.cs writes, from the same Windows calls."""
+    lFacts = []
+    try:
+        import ctypes
+        bJaws = bool(ctypes.windll.user32.FindWindowW("JFWUI2", None))
+        lFacts.append(("jawsRunning", "yes" if bJaws else "no"))
+        bFlag = ctypes.c_int(0)
+        ctypes.windll.user32.SystemParametersInfoW(70, 0, ctypes.byref(bFlag), 0)
+        lFacts.append(("screenReaderFlag", "yes" if bFlag.value else "no"))
+    except Exception:
+        pass
+    return lFacts
 
 
 def _appVersion():
@@ -225,8 +300,7 @@ def prune(iKeep=c_iKeepLogs):
             except OSError:
                 pass
         if iRemoved:
-            info("Removed %d old session log%s, keeping the most recent %d"
-                 % (iRemoved, "" if iRemoved == 1 else "s", iKeep))
+            info("prune removed=%d kept=%d" % (iRemoved, iKeep))
     except Exception:
         pass
     return iRemoved

@@ -1613,6 +1613,37 @@ And the rule that governs all of it: **the console is for a person; the log is
 for debugging**. Short plain sentences on screen, everything else in the file. A
 log line is never spoken.
 
+## How a log line is written
+
+Every Homer log -- a program's session log from `Log.cs` or `log.py`, and the
+log of every kit Python script -- writes each line the same way:
+
+    2026-09-27T16:16:40.123-07:00 INFO  session start app=2htm version=1.19.4 pid=4312
+    2026-09-27T16:16:40.125-07:00 INFO  env windows="Windows 11 25H2 (10.0.26200.7462)"
+    2026-09-27T16:16:41.002-07:00 ERROR run exit=1 ms=812 cmd="pandoc ReadMe.md"
+    2026-09-27T16:16:41.003-07:00 ERROR | at Homer.Web.get(...)
+
+- **Every line is stamped** with the time in ISO 8601, to the millisecond, with
+  its UTC offset, so lines from two programs or two machines sort and merge.
+  No blank lines and no unstamped lines: each line can be filtered on its own.
+- **The level** is INFO, WARN or ERROR, in a five-character field. A kit
+  script's line is ERROR when it says ERROR, FAIL or FAILED, and WARN when it
+  says WARN.
+- **Facts are key=value** (the logfmt convention), keys in lower camel case,
+  named alike everywhere: `app`, `version`, `pid`, `logFile`, `program`,
+  `workingDirectory`, `arguments`, `windows`, `user`, `machine`, `jawsRunning`,
+  `nvdaClient`, `nvdaRunning`, `screenReaderFlag`, `exit`, `ms`, `cmd`. A value
+  is bare, or quoted when it holds a space, a quote or an equals sign.
+- **Events have names** at the front of the message: `session start`,
+  `session end`, `env`, `run`, `exception`, `prune`.
+- **A continued line** -- a stack frame, a command's output -- starts "| ".
+- **Each fact is written once.** A program repeating a header fact after
+  `start` is not written twice.
+
+Why this and not JSON: it is as easy for a program to parse -- one regular
+expression takes a line apart -- and it stays readable line by line with a
+screen reader, which a line of JSON is not.
+
 ## What gets published
 
 ## A whitelist, not a list of exclusions

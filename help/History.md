@@ -5,6 +5,55 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.43.21 -- 27 September 2026
+
+**One log line format, for machines and for people.** From the session logs
+of 2htm, EdSharp, FileDir, urlCheck and urlFido, run on 27 September:
+
+- **Every line is stamped** with an ISO 8601 time, milliseconds and UTC offset.
+  Before, the header said "Started 2026-09-27 16:16:40" and each line after it
+  only "16:16:40", with no date and no offset, and blank lines, headings and
+  settings carried no stamp at all.
+- **Facts are key=value.** "    Log file                 = C:\..." is now
+  `env logFile=C:\...`; "Ran: pandoc   exit code 1" is `run exit=1 cmd=pandoc`,
+  with `ms=` when timed; "Session ended ... after 0 seconds" is
+  `session end seconds=0.214`.
+- **Windows is reported truly.** 2htm and urlFido logged "Microsoft Windows NT
+  6.2.9200.0" -- Windows 8 -- on Windows 11: Environment.OSVersion answers that
+  to any program whose manifest does not name Windows 10. The version now comes
+  from the registry: "Windows 11 25H2 (10.0.26200.7462)".
+- **The screen reader facts are facts.** The header's "Screen reader = Speech
+  pipeline diagnostic" line, followed by the diagnostic's lines unindented and
+  unstamped, is four facts: jawsRunning, nvdaClient, nvdaRunning,
+  screenReaderFlag. Say.speechDiagnostic, the text shown to a person, no longer
+  tells 2htm's and urlFido's users to put a DLL beside EdSharp.exe.
+- **Python programs log what C# programs do**: the same keys, the true Windows
+  version, and the screen reader facts, where urlCheck's header had none.
+- **A fact is written once**: FileDir's header repeated Version and Program,
+  and DbDo's the command line.
+- **The kit's Python scripts** -- check, tidy, fixEncoding, unpushed,
+  checkTutorial, uiCheck, buildHomerDev, checkHomerDev and newHomerApp --
+  stamp every line the same way, with ERROR on a line that says ERROR, FAIL or
+  FAILED, and WARN on one that says WARN.
+
+And from the build, tidy, push, check and release logs of the same day:
+
+- **Each kit script opens and closes the same way.** "tidy started 2026-09-27
+  16:20:06", "Script: ...", "Python: 3.14.3 (tags/v3.14.3:323c59a, Feb ...)",
+  "Platform: ...", "Command line: ..." and "Finished ..." are now
+  `tidy start pid=...`, `env script=...`, `env python=3.14.3`,
+  `env windows=...`, `env project=...`, `env arguments=...`, `settings ...`
+  and `tidy end`, in every script. tidy no longer logs do-it, which it has not
+  had since 1.43.9.
+- **The build templates, push and the release launcher** start and end with
+  an ISO 8601 line -- `build start app=2htm`, `build end result=succeeded` or
+  `result=failed`, `release launch end exit=0` -- instead of "%DATE% %TIME%",
+  which Windows writes as "Sun 09/27/2026 16:18:38.77" and whose form changes
+  with the regional settings. The lines between still carry no stamp: a
+  command's own output, from csc or Inno Setup, is appended as it comes.
+
+The format is set out in HomerDev.md, "How a log line is written".
+
 # 1.43.20 -- 27 September 2026
 
 From reinstalling all ten apps:
