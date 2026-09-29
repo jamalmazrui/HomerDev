@@ -77,6 +77,11 @@ Each entry: the symptom in the log, the cause, the fix.
 
 ## Installer
 
+- **"File not found: C:\HomerDev\exec\Templates\HomerComponents.iss".** A
+  build that works out the kit's folder by counting levels above a C# source
+  counts wrong since the sources moved into `exec\CSharp`. Find the kit as the
+  nearest folder above that holds `Templates\HomerComponents.iss`.
+
 - **A component offered for install that is present.** Check the setup log's
   `Component <name>:` lines, which record what was found and the verb offered.
 - **JAWS scripts never installed.** The finish page ran a script the installer

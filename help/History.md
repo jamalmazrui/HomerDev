@@ -5,6 +5,22 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.43.36 -- 28 September 2026
+
+From the builds and releases of 28 September at 21:40, when nine apps were
+built on the kit's new layout and eight released:
+
+- **HomerView's installer could not find the kit.** Its build took the kit's
+  folder to be two levels above a C# source, true until the sources moved into
+  exec\\CSharp; it told Inno Setup the kit was C:\\HomerDev\\exec, and the
+  include of HomerComponents.iss failed. It now climbs to the nearest folder
+  holding Templates\\HomerComponents.iss. The release that followed stopped, as
+  it should, on the failed build. The failures reference gains the case.
+- **HomerView's build log is in the Homer line format**, as EdSharp's became in
+  1.43.22.
+- **summarizeLogs reads more version lines**: "Version: 1.0.261 -> 1.0.262"
+  and EdSharp's "Version: 5.0.18 (from version.txt ...)".
+
 # 1.43.35 -- 28 September 2026
 
 **homer-new-app asks first whether it should be a program at all.** When the

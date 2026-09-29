@@ -55,6 +55,8 @@ def summarizeBuild(sText):
         else: sResult = "unfinished"
     sVersion = (firstMatch(sText, r"Homer Development Kit ([\d.]+)") or
                 firstMatch(sText, r"Built \S+ version ([\d.]+)") or
+                firstMatch(sText, r"Version:? [\d.]+ (?:->|to) ([\d.]+)") or
+                firstMatch(sText, r"Version: ([\d.]+) \(from version\.txt") or
                 firstMatch(sText, r"version\.txt is now ([\d.]+)"))
     lsOut = ["result=" + sResult]
     if sVersion: lsOut.append("version=" + sVersion)
