@@ -144,3 +144,12 @@ real answer.
     scripts\buildTutorials Tutorial_01 speak one again
 
 The voices live in `C:\HomerDev\exec`, fetched by `buildHomerDev` only.
+
+## The kit's tutorial guide
+
+[references/Tutorials.md](references/Tutorials.md) is the kit's own guide,
+copied from its help folder at each build. Read its "Audio tutorials" part --
+the playlist, making the audio, the voices, checking one, writing one, how a
+screen reader trainer narrates, and how a reader phrases a control -- before
+writing or reviewing a walk; it holds the conventions refined over many
+tutorials. Its scenarios are the kit's own walks, useful as worked examples.

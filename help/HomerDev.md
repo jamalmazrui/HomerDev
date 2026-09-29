@@ -533,75 +533,6 @@ normalizes one.
 - **Aim for one key that works on both JAWS and NVDA.** Perfect agreement is not
   realistic; keeping the differences few is.
 
-## Claude skills
-
-A skill teaches Claude one kind of Homer work: a SKILL.md, with notes and
-scripts beside it. The kit's skills, and any an app adds, follow Anthropic's
-guidance for skills and the Homer rules together:
-
-- **Where**: `.claude\skills\<name>\SKILL.md`, one folder deep. Claude Code
-  finds a project's skills there and nowhere else, and the folder's leading dot
-  gives it a first letter no other folder at the top of a project has.
-- **Name**: lower case, digits and hyphens, at most 64 characters, and not
-  containing "claude" or "anthropic". A Homer development skill starts
-  "homer-"; a collection skill is named for its collection.
-- **Description**: third person ("Builds ...", "Maintains ..."), saying what
-  the skill does and when to use it, in words a request would contain; at most
-  1,024 characters. It is all Claude sees when choosing among skills.
-- **SKILL.md** stays under 500 lines and holds what Claude does not already
-  know. Detail goes in `references`, each file linked directly from SKILL.md,
-  never from another reference; a reference over 100 lines opens with a
-  contents list.
-- **Scripts** do the fragile, repeatable work and handle their own errors;
-  SKILL.md says whether to run a script or read it. Each has a .cmd wrapper
-  for Windows.
-- **Paths inside a skill use forward slashes**, since Claude may run it on
-  Linux. A command for the Windows console keeps its backslash
-  (`scripts\release`), because cmd reads a forward slash as a switch.
-- **Encoding**: SKILL.md is UTF-8 without a byte order mark, since its first
-  characters must be the `---` of its front matter (KeepEncoding.txt says so);
-  every other file follows the Homer encoding.
-- **Packing**: `buildHomerDev` zips each skill into `exec\skills\<name>.zip`
-  for claude.ai.
-
-## Finish page wording
-
-A finish page is arrowed through, not studied, so each box says what it does
-in the fewest words, and alike in every Homer installer:
-
-- **The verb first**: Install, Update or Reinstall, then the name, then a
-  version where one is known.
-- **A use in parentheses**, three or four words, for a component or a model:
-  "Install Pandoc 3.11 (converts documents)". A size goes there too when it is
-  large: "(translates text, about 4.7 GB)".
-- **Screen readers get a box each, JAWS first**: "Install JAWS scripts",
-  "Install NVDA add-on" (or Update). A condition a box depends on may follow in
-  parentheses: "(NVDA must be running)".
-- **No word a checked box already says**: not "recommended", not "(current
-  version)" after Reinstall, not "for <App>" -- it is that app's installer.
-- **Launch and the guide**: "Launch <App> (desktop hotkey Alt+Control+X)" and
-  "Open the user guide (F1 in <App>)".
-
-The Results box that follows is titled "<App> Setup Results", and every
-component's check -- what was found, and the verb its box was given -- is
-written to the setup log.
-
-### The grave accent key: speech
-
-The grave accent key, left of 1, carries the whole speech family, as EdSharp
-first arranged it:
-
-- **Alt+Grave**: voice louder.
-- **Alt+Shift+Grave**: voice softer.
-- **Control+Grave**: voice faster.
-- **Control+Shift+Grave**: voice slower.
-- **JAWS+Grave or NVDA+Grave**: toggle punctuation between all and none.
-
-Alt changes the volume and Control the rate, and Shift reverses the direction.
-Punctuation takes the screen reader key, apart from the four, so it never
-shares a key with one of them. An app with a command reporting these settings
-may give it Shift+Grave.
-
 ## KeyMap
 
 `KeyMap.cs` is the one table associating a context, a command name, a summary,
@@ -1773,6 +1704,14 @@ Logging is not optional today, on purpose. When it becomes optional, the switch
 belongs inside the `Log` class -- one setting, read once -- and not as an `if`
 in every caller.
 
+## Finish page wording
+
+What each finish-page box says, whether it starts ticked, and the order of the
+boxes are set out in `help\FinishPage.md`: the verb first, a short use in
+parentheses, a box each for JAWS and NVDA, no word the tick already says, the
+ticked boxes before the unticked ones, and a Results box titled "<App> Setup
+Results".
+
 # Scripts, logs, and the release routine
 
 ## Every script writes a log
@@ -2105,3 +2044,34 @@ version to hold in mind:
 - Do not police the user's language. Readability and plain-language help are
   welcome; rules about which words are acceptable are not, and any word-policing
   package in a prose checker should be left out or switched off by name.
+
+# Claude skills
+
+A skill teaches Claude one kind of Homer work: a SKILL.md, with notes and
+scripts beside it. The kit's skills, and any an app adds, follow Anthropic's
+guidance for skills and the Homer rules together:
+
+- **Where**: `.claude\skills\<name>\SKILL.md`, one folder deep. Claude Code
+  finds a project's skills there and nowhere else, and the folder's leading dot
+  gives it a first letter no other folder at the top of a project has.
+- **Name**: lower case, digits and hyphens, at most 64 characters, and not
+  containing "claude" or "anthropic". A Homer development skill starts
+  "homer-"; a collection skill is named for its collection.
+- **Description**: third person ("Builds ...", "Maintains ..."), saying what
+  the skill does and when to use it, in words a request would contain; at most
+  1,024 characters. It is all Claude sees when choosing among skills.
+- **SKILL.md** stays under 500 lines and holds what Claude does not already
+  know. Detail goes in `references`, each file linked directly from SKILL.md,
+  never from another reference; a reference over 100 lines opens with a
+  contents list.
+- **Scripts** do the fragile, repeatable work and handle their own errors;
+  SKILL.md says whether to run a script or read it. Each has a .cmd wrapper
+  for Windows.
+- **Paths inside a skill use forward slashes**, since Claude may run it on
+  Linux. A command for the Windows console keeps its backslash
+  (`scripts\release`), because cmd reads a forward slash as a switch.
+- **Encoding**: SKILL.md is UTF-8 without a byte order mark, since its first
+  characters must be the `---` of its front matter (KeepEncoding.txt says so);
+  every other file follows the Homer encoding.
+- **Packing**: `buildHomerDev` zips each skill into `exec\skills\<name>.zip`
+  for claude.ai.

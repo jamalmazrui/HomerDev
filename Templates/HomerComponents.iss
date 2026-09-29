@@ -355,14 +355,16 @@ begin
 end;
 
 function homerGroup(iAt: Integer): Integer;
-(* 1 Install, 2 Reinstall, 3 Update -- the order the finish page shows them. A
-   number rather than a sort of the verbs, so rewording a label later cannot
-   quietly change the order. *)
+(* 1 Install, 2 Update, 3 Reinstall -- the order the finish page shows them:
+   the ticked boxes first, then the unticked ones (FinishPage.md; 1.43.25, when
+   this said Install, Reinstall, Update against that document). A number rather
+   than a sort of the verbs, so rewording a label later cannot quietly change
+   the order. *)
 begin
   case homerState(iAt) of
     0: Result := 1;
-    1: Result := 3;
-  else Result := 2;
+    1: Result := 2;
+  else Result := 3;
   end;
 end;
 

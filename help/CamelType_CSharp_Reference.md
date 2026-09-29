@@ -4,6 +4,27 @@ Camel Type is a coding style designed for systematic readability, optimized for 
 
 ---
 
+## Contents
+
+- 1\. Why Camel Type
+- 2\. Variable and Argument Naming
+- 3\. Constant Naming
+- 4\. Capitalization
+- 5\. Variable and Constant Declarations
+- 6\. `var` versus Explicit Types
+- 7\. Methods
+- 8\. Loops
+- 9\. Using Declarations
+- 10\. Imports (`using` Directives)
+- 11\. String Delimiters
+- 12\. Magic Numbers and Strings
+- 13\. Object and Collection Initializers
+- 14\. Error Handling
+- 15\. File Organization
+- 16\. Comments
+- 17\. Cross-Program Naming Conventions
+- 18\. Summary
+
 ## 1. Why Camel Type
 
 Camel Type carries type information in the variable name itself rather than in separate annotations. A reader sees `sPath`, `bFound`, `iCount`, `lsFiles` and knows at a glance what kind of data each one holds, without cross-referencing a declaration, hovering for an IDE tooltip, or memorizing the shape of the surrounding code. This has several benefits:

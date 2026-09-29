@@ -10,7 +10,7 @@ right thing without reading the list.
 - **Update** a component whose newer version exists — **ticked**
 - **Reinstall** something already current — **unticked**
 - **Launch** the app — **ticked**
-- **Install JAWS or NVDA scripts** — **ticked**
+- **Install JAWS scripts**, **Install NVDA add-on** — **ticked**, a box each
 - **Open documentation** (the guide, the ReadMe) — **unticked**
 
 So Enter installs everything missing, updates everything stale, puts the
@@ -29,8 +29,8 @@ trusting the page.
 
 The finish page lists its boxes in this order, always:
 
-1. **Install** boxes, ticked. Screen reader scripts and add-ons come first;
-   then the components, in alphabetical order.
+1. **Install** boxes, ticked. The screen reader boxes come first, JAWS then
+   NVDA; then the components, in alphabetical order.
 2. **Update** boxes, ticked, in alphabetical order.
 3. **Reinstall** boxes, unticked, in alphabetical order.
 4. **Launch the app**, ticked.
@@ -51,6 +51,29 @@ Reinstall box.
 
 ## How the wording is decided
 
+A finish page is arrowed through, not studied, so each box says what it does in
+the fewest words, and alike in every Homer installer:
+
+- **The verb first** -- Install, Update or Reinstall -- then the name, then a
+  version where one is known: "Update Ollama from 0.34.3 to 0.34.4".
+- **A use in parentheses**, three or four words, for a component or a model:
+  "Install Pandoc 3.11 (converts documents)". A size goes there too when it is
+  large: "(translates text, about 4.7 GB)".
+- **Screen readers get a box each, JAWS first, worded alike**: "Install JAWS
+  scripts", "Install NVDA add-on" (or Update). A condition the box depends on
+  may follow in parentheses: "(NVDA must be running)".
+- **No word the tick already says**: not "recommended", not "(current version)"
+  after Reinstall, not "for <App>" -- it is that app's installer.
+- **Launch and the guide**: "Launch <App> (desktop hotkey Alt+Control+X)" and
+  "Open the user guide (F1 in <App>)".
+- **Only this app's components.** Offer what the app itself uses, and check
+  its install scripts from before HomerDev to be sure: the spell checker
+  belongs to EdSharp, Whisper to HomerScribe.
+- **Shared components install machine-wide**, to their own default folders
+  (Pandoc, Tesseract, ffmpeg, Ollama and the like), never inside the app's
+  folder, where an upgrade would remove them.
+
+
 The verb comes from what the machine actually has, worked out once per
 component by `HomerComponents.iss`:
 
@@ -65,11 +88,11 @@ Detection tries every winget id, then the file, then the executable's own
 elevated, where winget is often unreachable and per-user tools are not on the
 PATH. Missing any one of these makes an installed component read as absent.
 
-## Order
+## Order in code
 
-Install first, then Reinstall, then Update, alphabetical within each. Launch
-and documentation come last. `homerOrder()` returns the component indices in
-that order.
+`homerOrder()` returns the component indices in the order above -- Install,
+Update, Reinstall, alphabetical within each -- for anything that lists the
+components itself, such as the Results box.
 
 ## The launch comes after the Results box
 
@@ -80,7 +103,9 @@ summary of what just happened. See `startIfAsked` in any Homer installer.
 
 ## The Results box afterwards
 
-The box that appears after the finish-page scripts have run reports **one line
+It is titled "<App> Setup Results": `homerResultsBox(sBody)` shows it through
+Windows' own MessageBox, since Inno's MsgBox takes no title of its own. The box
+that appears after the finish-page scripts have run reports **one line
 per box that was ticked, and nothing else**. A component nobody asked about
 is not an action taken this session, so it is not mentioned; when nothing was
 ticked, the box says only that the app is installed and where the logs are.
@@ -97,6 +122,13 @@ NextButtonClick when the page is wpFinished, records the ticked captions
 before any script runs; homerOutcomeLine(i) and homerModelOutcomeLine(model,
 use, size) each return a line when that box was ticked and an empty string
 when it was not. The app adds each result to the box and skips the empty ones.
+
+## Every verdict is logged
+
+`homerState` writes one line per component to the setup log: what was found,
+what is available, and whether its box offers Install, Update or Reinstall.
+So a box that was ticked when it should not have been can be explained from
+the log alone.
 
 ## Say "Downloading" before a long step
 

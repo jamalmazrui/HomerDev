@@ -12,6 +12,23 @@ JAWS Script differs from VBScript, the JAWS-specific rule is called out below.
 
 ---
 
+## Contents
+
+- 1\. File Family
+- 2\. Variable and Argument Naming
+- 3\. Constant Naming
+- 4\. Capitalization
+- 5\. Variable and Constant Declarations
+- 6\. Script Structure and Entry Point
+- 7\. Routine Order
+- 8\. Scripts vs Functions
+- 9\. Loops
+- 10\. String Delimiters
+- 11\. Magic Numbers
+- 12\. Object Creation
+- 13\. Error Handling
+- 14\. Comments
+
 ## 1. File Family
 
 A JAWS application script set is a family of files that share a base name (for

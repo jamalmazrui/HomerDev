@@ -1,0 +1,247 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>lists-and-git</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">lists-and-git</h1>
+</header>
+<h1 id="lists-whitelist-and-git-rules">Lists, whitelist and git
+rules</h1>
+<h2 id="contents">Contents</h2>
+<ul>
+<li>The three lists</li>
+<li>What stays tracked</li>
+<li>The whitelist .gitignore</li>
+<li>Folder layout</li>
+</ul>
+<h2 id="the-three-lists">The three lists</h2>
+<p>Each project root holds up to three plain lists, one entry per line:
+a file path, a bare name, a pattern with <code>*</code>, or a folder
+ending in <code>/</code>. Lines starting <code>#</code> or
+<code>;</code> are comments.</p>
+<ul>
+<li><strong>RepoFiles.txt</strong>: everything the repository carries.
+It is the whole list; an installer’s Source lines do not add to it.</li>
+<li><strong>LocalFiles.txt</strong>: what belongs on this disk but never
+in git (built files, the installer, <code>version.txt</code> in apps,
+the release scripts, fetched DLLs).</li>
+<li><strong>KeepEncoding.txt</strong>: files fixEncoding and check leave
+exactly as they are (third-party tools, dictionaries, each skill’s
+SKILL.md).</li>
+</ul>
+<h2 id="what-stays-tracked">What stays tracked</h2>
+<p>tidy decides, for every tracked file, in this order:</p>
+<ol type="1">
+<li>Named <strong>exactly</strong> in RepoFiles.txt (a path, no
+wildcard): stays. This is how EdSharp keeps <code>Tektosyne.dll</code>
+despite <code>*.dll</code> in LocalFiles.txt.</li>
+<li>Inside a <strong>folder kept off the repository</strong> but named
+more specifically in RepoFiles.txt (a carve-out, such as the kit’s
+<code>exec/CSharp/</code> inside <code>exec/</code>): stays.</li>
+<li>Matches the never-pushed list (<code>*.exe</code>,
+<code>*.log</code>, <code>Version.cs</code>, <code>/version.py</code>,
+<code>exec/</code>, <code>logs/</code>, <code>notes/</code>,
+<code>release.cmd</code>, <code>release.ps1</code>,
+<code>create*Repo.*</code> and others): untracked.</li>
+<li>Matches LocalFiles.txt: untracked.</li>
+<li>Named by RepoFiles.txt any other way: stays. Otherwise:
+untracked.</li>
+</ol>
+<p>Untracking never deletes; the file stays on disk. A leading
+<code>/</code> anchors a name to the project root, as in .gitignore.</p>
+<h2 id="the-whitelist-.gitignore">The whitelist .gitignore</h2>
+<p>tidy rewrites <code>.gitignore</code> on every run and push: ignore
+everything (<code>/*</code>), put back what RepoFiles.txt names (a
+subfolder’s parent first, since git never looks inside an ignored
+folder), then the LocalFiles.txt and never-pushed patterns, then exact
+RepoFiles names a pattern would hide, then carve-outs (their outer
+folder written as <code>/exec/*</code>, so it is not ignored whole).
+<code>.gitignore</code>, <code>.gitattributes</code> and
+<code>KeepEncoding.txt</code> are always put back.
+<code>.gitattributes</code> is <code>* -text</code>: git stores the
+Homer CRLF files as they are, so a project switched to it commits every
+text file once.</p>
+<h2 id="folder-layout">Folder layout</h2>
+<ul>
+<li>Top of the project: sources, build scripts,
+<code>&lt;App&gt;_setup.iss</code>, ReadMe, License, the three lists,
+<code>accept.inix</code>, and <code>&lt;App&gt;_setup.exe</code> once
+built.</li>
+<li><code>exec</code>: the code the app’s core runs on, in any form (the
+built program and its DLLs; in the kit, the libraries
+<code>exec/CSharp</code> and <code>exec/Python</code>).</li>
+<li><code>scripts</code>: tools that maintain the code base or extend
+the app beyond its core; the kit’s tools are refreshed here by each
+build.</li>
+<li><code>help</code>: every document but ReadMe and License, each
+<code>.md</code> with a <code>.htm</code>.</li>
+<li><code>configs</code>, <code>data</code>, <code>templates</code>,
+<code>logs</code>, and <code>notes</code> (strays; never in git).</li>
+<li><code>.claude/skills</code>: Claude skills, one folder each.</li>
+</ul>
+<p>Folders at the top start with different letters, for first-letter
+navigation.</p>
+</body>
+</html>

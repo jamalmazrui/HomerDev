@@ -1,0 +1,885 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Jamal Mazrui" />
+  <title>Tutorials</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Tutorials</h1>
+<p class="author">Jamal Mazrui</p>
+</header>
+<h1 id="homerdev-tutorials">HomerDev Tutorials</h1>
+<p>Short walkthroughs of the things you will actually do with the kit.
+Each one is a scenario, start to finish, with the commands you type and
+what comes back.</p>
+<p>Read <code>ReadMe.md</code> first if you have not installed the kit.
+Read <code>HomerDev.md</code> for the reference: what each class does
+and why the conventions are what they are.</p>
+<h2 id="contents">Contents</h2>
+<ul>
+<li>Audio tutorials — the spoken walkthroughs and how to make more</li>
+<li>Scenario 1: start a new app from nothing</li>
+<li>Scenario 2: add a field to a dialog</li>
+<li>Scenario 3: work out what a key already does</li>
+<li>Scenario 4: turn a one-window app into a multiple-document app</li>
+<li>Scenario 5: find out why something failed</li>
+<li>Scenario 6: write down what “done” means, then prove it</li>
+<li>Scenario 7: change a shared class without breaking four apps</li>
+<li>Scenario 8: release it</li>
+<li>Scenario 9: ask an AI for a Homer app and get one</li>
+</ul>
+<h2 id="audio-tutorials">Audio tutorials</h2>
+<p>The spoken tutorials live in <code>help</code>, beside this file, as
+<code>Tutorial_*.inix</code>. Each is a script: what the narrator says,
+the key to press, and what the screen reader answers in a different
+voice.</p>
+<h3 id="the-playlist">The playlist</h3>
+<ol type="1">
+<li><strong>Tutorial_HomerDev</strong> — the kit in twelve minutes: what
+it is, unarchiving it into <code>C:\HomerDev</code>, running
+<code>buildHomerDev</code>, building and running both fruit baskets, and
+hearing that the two behave the same. Start here.</li>
+</ol>
+<p>Two more are planned. Neither is written yet, and they are listed so
+the shape of the series is clear rather than to promise a date:</p>
+<ol start="2" type="1">
+<li><strong>Tutorial_Verify</strong> — the session that becomes the
+conference demonstration: specify a small change, generate it, reveal a
+plausible failure, show the check that catches it, fix it, and run the
+evidence again.</li>
+<li><strong>Tutorial_Mdi</strong> — the third shape, and why a window
+beats a tab for somebody using a screen reader.</li>
+</ol>
+<h3 id="making-the-audio">Making the audio</h3>
+<pre><code>scripts\buildTutorials</code></pre>
+<p>An app’s build script runs this itself whenever a walk has no audio
+yet, after refreshing the three tools from the kit into
+<code>scripts\</code>: <code>buildTutorials.cmd</code>,
+<code>buildTutorials.ps1</code> and <code>makeTutorials.py</code>. The
+kit’s copies are the source of truth; the app carries copies because the
+tool works out the project from its own location. Calling the kit’s copy
+in place builds the kit’s tutorials, not the app’s.</p>
+<p>What it writes, all under the app’s <code>help</code> folder:</p>
+<ul>
+<li><code>tutorials\&lt;name&gt;.mp3</code> – one file per walk, named
+as the script is named. A folder of audio files is found by anybody who
+looks, each is recognised as audio by its extension, and a person plays
+the one they want. There is no longer a single chaptered
+<code>Tutorials.mkv</code>; players treated it as one track.</li>
+<li><code>tutorials\Tutorials.m3u</code> – a playlist of the same files
+in order, which the Homer Player in FileDir opens as one track per
+walk.</li>
+<li><code>Tutorials.md</code> – the written walks, spliced between two
+markers the tool maintains, so the hand-written head of the file stays
+yours.</li>
+<li><code>TutorialFeed.xml</code> – a podcast feed of the audio.</li>
+</ul>
+<p>A walk whose <code>.mp3</code> exists is not spoken again. Delete the
+file to have it spoken again; name one script on the command line to
+speak just that one.</p>
+<h3 id="where-the-voices-live-and-who-fetches-them">Where the voices
+live, and who fetches them</h3>
+<p>One copy, in <code>C:\HomerDev\exec</code>, and <strong>only
+<code>buildHomerDev</code> fetches it</strong>. The kit’s build passes
+<code>-fetch</code> to the tutorial tool; an app’s build never does. So
+an app’s build finds the voices in the kit, or, when they are not there,
+says “Run buildHomerDev” and speaks nothing – it never downloads a copy
+of its own. Neither piper nor sherpa-onnx has an installer, so there is
+no default location the way there is for Whisper or Pandoc; the kit is
+the one place every Homer app already relies on, and <code>exec</code>
+is the Homer folder for binaries that are not in git.
+<code>LocalFiles.txt</code> names it as never pushed, and the kit’s own
+build skips it. To keep the voices somewhere else, set the
+<code>HOMER_VOICES</code> environment variable; a <code>Piper</code> or
+<code>sherpa-onnx</code> folder under Program Files is found too.</p>
+<p>The sherpa-onnx package taken is the <strong>shared</strong> one,
+<code>win-x64-shared</code>, which carries
+<code>bin\sherpa-onnx-offline-tts.exe</code>. The “static … lib”
+packages are libraries for linking, hundreds of megabytes and no
+executable; one was fetched by mistake on 25 September 2026, and the
+tool now removes such a folder when it finds one.</p>
+<h3 id="the-voices-and-why-these">The voices, and why these</h3>
+<p>Two voices, told apart three ways: who is speaking, how fast, and how
+flat. The narrator is a woman at a rate just brisker than natural; the
+reader a man, faster and even, the way a screen reader sounds to
+somebody who listens all day. A beta tester asked for the reader to be a
+bit slower, so its speed is 0.64 on piper’s scale (it was 0.56), still
+ahead of the narrator’s 0.80. <code>ReaderScale</code> in a script’s
+<code>[global]</code> section changes it for a series.</p>
+<p><strong>Two engines, one each.</strong> Kokoro speaks the narrator;
+piper’s john speaks the reader. Half the lines in a walk are the
+reader’s, and piper speaks a line in a second where Kokoro takes twenty
+– on a laptop Kokoro runs at two to three times real time, and a long
+unbroken line, such as a web address spelled out as words, far slower,
+which is what made a build look hung on 25 September 2026. Kokoro’s
+naturalness goes where it is heard, and a flattened piper voice is what
+a reader sounds like anyway. The tool cuts long text at sentences and
+commas before handing it to Kokoro, and runs it on two threads, which
+measured faster than all of them. <code>ReaderOnKokoro=1</code> in
+<code>[global]</code> puts the reader on Kokoro too, at the cost in
+minutes.</p>
+<p><strong>One loudness.</strong> Every piece is brought to the same
+measured loudness before the join, so the narrator is no longer louder
+than the reader; <code>ReaderGain</code> in <code>[global]</code> scales
+the reader’s pieces on top of that, 1.0 unless set.</p>
+<p><strong>Kokoro, when it can be fetched.</strong> Re-investigated on
+25 September 2026. Kokoro-82M is an open-weight neural voice model
+released under Apache 2.0, trained on public-domain audio, audio under
+permissive licences, and synthetic audio – no share-alike clause and no
+non-commercial clause anywhere in its lineage, so audio made with it can
+be published under MIT beside the program. It is markedly more natural
+than piper’s medium voices. The tool runs it through sherpa-onnx, also
+Apache 2.0, as a single Windows executable with the phoneme data inside
+the model bundle: nothing to install. Narrator af_sarah, reader
+am_michael; <code>KokoroNarrator</code> and <code>KokoroReader</code> in
+<code>[global]</code> take other speaker numbers, and
+<code>Engine=piper</code> forces piper.</p>
+<p><strong>Piper, otherwise.</strong> kristin (LJ Speech, public domain)
+and john (LibriVox, public domain), chosen for licence before sound.
+Most of piper’s better-known English voices cannot be used this way:
+lessac’s corpus is research-only, ryan and the hfc voices are CC
+BY-NC-SA, and libritts_r is fine-tuned from lessac.</p>
+<p><strong>Ruled out again, on the evidence available.</strong> The
+voices built into Windows, and the neural voices behind Edge’s Read
+Aloud, come with terms written for reading on that computer; nothing in
+them clearly permits publishing recordings made with them, and the safe
+reading is that they do not. Among the open models: those trained on the
+Emilia corpus, such as F5-TTS, publish under a non-commercial licence;
+Fish Speech is CC BY-NC-SA; XTTS is under Coqui’s non-commercial model
+licence. Chatterbox (MIT) and Parler-TTS (Apache 2.0) are clean on
+licence but need Python and, in practice, a graphics card; Kokoro gives
+the same permission at a size that runs on any processor. Licences
+change; the tool’s log names the voice used for every file, so a later
+check knows what to look at.</p>
+<h3 id="checking-one">Checking one</h3>
+<pre><code>scripts\checkTutorial              every help\Tutorial_*.inix
+scripts\checkTutorial Tutorial_01  one of them</code></pre>
+<p>The check reads each script against the format and the reader’s
+grammar and names the script and step for every problem: a key with no
+<code>Hear</code> line and nothing naming the silence;
+<code>Alt+T</code> in a <code>Hear</code> line, where the reader says
+the words; a screen reader named anywhere; a check box line out of the
+reader’s order; a file name written rather than said; a first walk that
+does not teach the repeat key. <code>buildTutorials</code> runs it first
+and speaks nothing while it reports a problem. Zero problems is a real
+answer.</p>
+<h3 id="the-skill-for-an-ai-writing-these">The skill, for an AI writing
+these</h3>
+<p><code>.claude\skills\homer-tutorial\SKILL.md</code> is a skill for
+Claude, or any assistant that reads one: the format, the four beats, the
+reader’s grammar, where the truth of a <code>Hear</code> line comes from
+(the dialog’s code, the program’s own announcements, a speech history, a
+transcript), and the check-then-build commands. Give it to the assistant
+along with the app’s dialog code and it writes walks that pass the
+check. Name no screen reader is in there too.</p>
+<h3 id="writing-one">Writing one</h3>
+<p>One <code>[step]</code> per keystroke. <code>Say</code> is the
+narration, <code>Key</code> is what to press, <code>Hear</code> is what
+the screen reader answers – repeat it for several lines – and
+<code>Note</code> is for the written version only and is never
+spoken.</p>
+<p>Write every <code>Hear</code> line the way the reader actually says
+it, not the way the screen looks. “1 fruit in the basket”, not “Count:
+1”.</p>
+<h3 id="how-a-screen-reader-trainer-narrates">How a screen reader
+trainer narrates</h3>
+<p>These come from a professional JAWS training recording, “Introduction
+to Windows”, read back through HomerScribe on 25 September 2026. A
+tutorial script follows the same beats, because they are the ones a
+listener who cannot see the screen has come to expect.</p>
+<ul>
+<li><strong>Say the key, then press it, then let the reader speak, then
+translate.</strong> Four beats, every time. “I’ll press Insert T, Tango,
+to read the title of the current window.” – key – “Title is Excel
+Backstage View.” – “JAWS confirmed that focus is in the Excel window.”
+In a script that is <code>Say</code>, <code>Key</code>,
+<code>Hear</code>, then a second <code>Say</code> that turns what was
+heard into what it means.</li>
+<li><strong>Spell a letter key with its phonetic word.</strong> “Insert
+T, Tango.” “Windows key D, Delta.” A single letter is the easiest thing
+to mishear in speech, and the phonetic word costs half a second.</li>
+<li><strong>Quote the reader word for word, then paraphrase.</strong>
+“Start list box, toggle start navigation menu items, collapsed, 1 of 6”
+is what JAWS said; “JAWS reads it as toggle start navigation menu items”
+is what it meant. The <code>Hear</code> line is the quotation, exact and
+unimproved; the <code>Say</code> after it is the translation. Never tidy
+the quotation: the learner will hear the untidy version on their own
+machine and must recognise it.</li>
+<li><strong>Say when the reader says nothing.</strong> “When I pressed
+Alt F4, JAWS didn’t say anything.” Silence after a key is information
+the learner cannot see, so a script names it: a <code>Hear</code> line
+reading exactly “(nothing)”.</li>
+<li><strong>Verify after every change of focus.</strong> The trainer
+presses Insert T to read the window title after every switch, and says
+he is doing it and why. A script does the same after Alt+Tab, after
+opening a dialog, after closing one – and says the word: “to
+verify”.</li>
+<li><strong>Teach the recovery key early.</strong> “If you type too
+quickly and miss what is spoken, press Insert Up Arrow to repeat it.”
+The first tutorial says this before the first thing worth missing.</li>
+<li><strong>Use the count as orientation.</strong> “1 of 14” and “1 of
+6” are how the listener knows the size of the place they have landed in.
+When the reader gives a count, the <code>Say</code> line uses it: “the
+first of 14 icons on the desktop”.</li>
+<li><strong>Name the control as the reader names it.</strong> “Search
+edit box”, “list box”, “split button”, “up down slider”. A tutorial that
+says “the search field” when the reader will say “edit box” makes the
+listener translate twice.</li>
+<li><strong>Pause before the next key.</strong> The trainer leaves a
+breath between the reader’s answer and his next instruction.
+<code>Pause=1</code> before each <code>[step]</code> is the script’s
+breath.</li>
+</ul>
+<h3 id="how-a-reader-phrases-a-control">How a reader phrases a
+control</h3>
+<p>Taken from two screen reader training classes read back through
+HomerScribe on 25 September 2026: one at the reader’s beginner
+verbosity, which speaks the whole grammar, and one at intermediate,
+which drops the tutor phrase at the end. <code>Hear</code> lines are
+written at intermediate. Nothing here names a reader; the grammar is
+common to the readers people use.</p>
+<ul>
+<li><strong>A window appears:</strong> its title alone first, then the
+title again with the word dialog, then the text, then the control that
+has focus. “HomerScribe results” / “HomerScribe results dialog” / “One
+source done. Took 14 minutes.” / “OK button”.</li>
+<li><strong>Check box:</strong> label, “check box”, state, access key.
+“Transcribe audio check box, checked, Alt plus T”. Toggled by its access
+key, the reader says the whole line again with the new state.</li>
+<li><strong>Button:</strong> label, “button”, access key. “OK button”. A
+label with a symbol is read as the symbol’s name: “Next greater button,
+Alt plus N”.</li>
+<li><strong>Radio button:</strong> label, “radio button”, state,
+position, access key. “Words radio button, checked, 2 of 4, Alt plus
+T”.</li>
+<li><strong>Combo box:</strong> label with its colon, “combo box”, the
+value, position, access key. “Use keyboard layout: combo box, Desktop, 1
+of 3, Alt plus L”.</li>
+<li><strong>Edit box:</strong> label with its colon, “edit”, then the
+contents. “Source paths: edit, https colon slash slash …”. Select All
+answers “selected” and the text; a paste answers nothing.</li>
+<li><strong>Slider:</strong> label, direction, value. “Rate: left right
+slider, 50 percent”.</li>
+<li><strong>Menus:</strong> “Menu bar” on entry; each menu as “Options
+menu”; each item with its letter after it; a submenu as “Voices submenu,
+V”; “Leaving menu bar” on exit. Opening a dialog from a menu says
+“Leaving menus” first.</li>
+<li><strong>Access keys are words:</strong> the reader says “Alt plus
+T”, never a plus sign, so a <code>Hear</code> line writes the
+words.</li>
+<li><strong>Names are read as the synthesizer reads them:</strong>
+“Introduction to Windows dot m p 3” for Introduction_to_Windows.mp3 at
+the default punctuation level; a web address is spelled through – “https
+colon slash slash www dot” – and a path is “C colon backslash Users
+backslash”.</li>
+<li><strong>The reader also confirms actions the program did not ask it
+to:</strong> “Copied selection to clipboard”, “Select All”, “376
+characters”. A tutorial that copies text should expect them.</li>
+<li><strong>A slider with a value:</strong> label with colon, the value,
+the direction, the position as a percentage.
+<code>Voice rate: 68, left right slider, 25 percent</code>. An edit box
+holding a number reads the number:
+<code>Voice pitch change   percent: edit, 20</code>.</li>
+<li><strong>A tabbed dialog:</strong> the title with “dialog”, then the
+tab with “page”: <code>Properties dialog, Shortcut page</code>.</li>
+<li><strong>A list view item:</strong> name, “object” or the item’s
+kind, position; typing a letter jumps and reads the item that letter
+reached:
+<code>Folder view   list view, not selected, Recycle Bin object, 1 of 12</code>
+then, after J, <code>JAWS object, 5 of 12</code> – the name of whatever
+program it is.</li>
+<li><strong>A program’s own loading message is read before its
+title:</strong> <code>Please   wait</code> and then the window title,
+then the focused control.</li>
+<li><strong>In an edit box, the reader echoes what the keys do.</strong>
+Typing speaks each character as it lands – “T”, “H”, “E”, “space” – and
+“Enter” for a new line, “Period” for the punctuation. Right Arrow speaks
+the character it moves onto; Control plus Right Arrow speaks the word it
+lands at the start of. Backspace speaks the character it erased. An
+empty line is “Blank”. Control plus Home says “Top of file” and then the
+first line; Control plus End says “Bottom of file” and then the last
+line, which is often “Blank”. Home and End say nothing on their
+own.</li>
+<li><strong>Selecting has its own words.</strong> Shift plus Right
+Arrow: the character, then “selected”; moving back off it: “unselected”.
+Control plus Shift plus Right Arrow: the word, then “selected”. Shift
+plus Down Arrow: “Selected” and the whole line. The reader’s own
+read-selection key answers “Selection is” and the text. Control plus C
+answers “Copied selection to clipboard”.</li>
+<li><strong>Reading without moving.</strong> The reader’s say-line key
+reads the current line and the cursor stays; say-word reads the word,
+twice for a spelling; say-all reads on from the cursor until Control
+stops it. A tutorial that types into a field uses say-line to verify the
+line, the way the trainer does.</li>
+<li><strong>A direct announcement from the program is a sentence of its
+own:</strong> “Done. Introduction to Windows dot m p 3” – the kind, a
+full stop, the detail – and it arrives before the results box.</li>
+</ul>
+<h2 id="scenario-1-start-a-new-app-from-nothing">Scenario 1: start a new
+app from nothing</h2>
+<p>You want a tool that renames files from a pattern. Call it
+PatternRename.</p>
+<pre><code>cd \HomerDev
+newHomerApp PatternRename
+cd \PatternRename
+buildPatternRename
+PatternRename</code></pre>
+<p><code>newHomerApp</code> writes a working one-dialog program, the
+build script, the installer script, the GitHub bootstrap,
+<code>accept.inix</code>, <code>RepoFiles.txt</code>,
+<code>.gitignore</code>, <code>self.md</code> and
+<code>version.txt</code>. Nothing already there is overwritten. Add
+<code>--python</code> for a Python app instead.</p>
+<p>Two things need your hand, both marked CHANGE ME in the installer
+script: a fresh AppId, and the desktop hotkey.</p>
+<p>Then open <code>self.md</code> and write the first entry: what this
+is for in two sentences, which Homer components it uses, and what is
+still undecided. Two minutes now saves an hour in a month.</p>
+<h2 id="scenario-2-add-a-field-to-a-dialog">Scenario 2: add a field to a
+dialog</h2>
+<p>You want a “Prefix” box between the pattern and the folder.</p>
+<p>Find the <code>add</code> calls in your source and put one line where
+the field belongs:</p>
+<pre><code>txtPrefix = dlg.addInputBox(&quot;&amp;Prefix:&quot;, &quot;&quot;, &quot;Text to put in front of each name.&quot;);</code></pre>
+<p>That is the whole change. <strong>Add order is focus order</strong>,
+so where you put the line is where the field lands in the tab order. The
+ampersand is the whole of the access key. The tip appears in the status
+line when focus arrives and again in the Help window on F1.</p>
+<p>Then check what you just did:</p>
+<pre><code>cd \HomerDev\Tools
+check --path \PatternRename</code></pre>
+<p>If <code>&amp;P</code> was already taken, the keys check says so.
+That is the check earning its place: two controls claiming one letter is
+invisible when you read the code and obvious when a script counts.</p>
+<h2 id="scenario-3-work-out-what-a-key-already-does">Scenario 3: work
+out what a key already does</h2>
+<p>Before you bind Alt+Shift+R to something, find out what has it.</p>
+<p>In an MDI app, press <strong>Control+F1</strong>. That is the key
+describer: every key now says what it would do instead of doing it.
+Press the key you are wondering about, listen, and press Control+F1
+again to turn it off.</p>
+<p>Outside a running program, <code>Hotkeys.md</code> in
+<code>help</code> lists every key three ways – by key, by description,
+and by binding – and <code>KeyMap</code> reports a key claimed twice
+into the session log when the menus are built.</p>
+<p>The rules that decide what you may use are in
+<code>HomerDev.md</code>: never Alt+Control (Windows desktop shortcuts
+own it), never a key whose Windows meaning is selection or navigation,
+and prefer Alt+Shift plus a letter that means something in the command’s
+name.</p>
+<h2
+id="scenario-4-turn-a-one-window-app-into-a-multiple-document-app">Scenario
+4: turn a one-window app into a multiple-document app</h2>
+<p>Your tool now opens one file at a time and you want several.</p>
+<ol type="1">
+<li>In the build script, uncomment the KeyMap and Mdi pair. They go on
+together: <code>Mdi.cs</code> registers every command with KeyMap, and
+turning on one without the other does not compile.</li>
+<li>Make your form a <code>MdiFrame</code> subclass, declare the menus
+with <code>addMenu</code> and <code>addItem</code>, and call
+<code>finishMenus</code>.</li>
+<li>Make your window a <code>MdiChild</code> subclass. Build its
+controls through <code>child.lbc</code>, which is the same builder a
+dialog uses, and finish with <code>finishLayout</code> instead of
+<code>run</code>.</li>
+<li>Title it with <code>setTitle(subject, view)</code> and never include
+the app name – the frame already carries it, and Windows merges the
+two.</li>
+</ol>
+<p>What you get without writing it: the window picker on F4, the spoken
+window list on Shift+F4, next and previous, close and close-others, the
+alternate menu on Alt+F10, the key describer on Control+F1, about on
+Alt+F1, the guide on F1.</p>
+<p><code>Templates\samples\FruitBasketMdiCs.cs</code> and
+<code>Templates\samples\FruitBasketMdiPy.py</code> are the worked
+examples, and its five marked blocks are exactly the five things that
+change.</p>
+<h2
+id="scenario-4b-let-people-extend-your-app-without-your-help">Scenario
+4b: let people extend your app without your help</h2>
+<p>Drop a script into the scripts folder and it is in the program’s
+script list, at once, with nothing to register.</p>
+<pre><code>%LOCALAPPDATA%\PatternRename\jobs\Weekly report.cmd</code></pre>
+<p>Press Alt+Shift+S in the app, arrow or type the first letter, press
+Enter. The shipped jobs come with the program; the user’s own live in
+the per-user tree where an update cannot overwrite them, and both appear
+in one list with the user’s first.</p>
+<p>For settings, declare what may change:</p>
+<pre><code>addSetting(&quot;folder&quot;, &quot;&quot;, &quot;Where renamed files go.&quot;);</code></pre>
+<p>and the frame gives you Alt+Shift+C: a list of what is settable, one
+field for the new value, saved at once and handed back to your code
+through <code>onSettingChanged</code>. No settings file to edit by hand,
+no preferences dialog to build, and no restart.</p>
+<h2 id="scenario-5-find-out-why-something-failed">Scenario 5: find out
+why something failed</h2>
+<p>Something went wrong and the screen said one short sentence, as it
+should.</p>
+<pre><code>%LOCALAPPDATA%\PatternRename\logs</code></pre>
+<p>Open the newest file. It is named for the moment the session began,
+and it holds the version, the program path, the working directory, the
+command line, the Windows build, every setting, every external command
+with its exit code, and every error with its stack.</p>
+<p>If the failure was in a build rather than a run, the log is
+<code>buildPatternRename.log</code> beside the build script, because
+that is a developer’s file and the developer is standing in that
+folder.</p>
+<p>If the failure was in an install, the setup log is in the same
+<code>logs</code> folder, named
+<code>PatternRename-setup-&lt;date&gt;.log</code>.</p>
+<p>The rule behind all three: the console is for a person, the log is
+for debugging. Never add a print statement where a log line belongs.</p>
+<h2 id="scenario-6-write-down-what-done-means-then-prove-it">Scenario 6:
+write down what “done” means, then prove it</h2>
+<p>Before you ask an AI for anything, write
+<code>accept.inix</code>:</p>
+<pre><code>[check]
+Name   = the help text names every switch
+Run    = PatternRename.exe --help
+Expect = 0
+Wants  = --pattern
+
+[check]
+Name   = a bad switch is refused rather than ignored
+Run    = PatternRename.exe --nonsense
+Expect = 1</code></pre>
+<p>Four fields and no more. Then:</p>
+<pre><code>check --path \PatternRename --build</code></pre>
+<p>It builds, smoke-runs <code>--help</code>, runs every acceptance
+check, and writes <code>evidence-&lt;date&gt;.md</code> saying what was
+verified, what was not checked, and what remains uncertain.</p>
+<p>Read the third list. It names what no script can settle – whether the
+program does the right thing, what a screen reader actually says,
+whether the code is secure – so you know exactly where your own
+judgement is still required.</p>
+<h2
+id="scenario-7-change-a-shared-class-without-breaking-four-apps">Scenario
+7: change a shared class without breaking four apps</h2>
+<p>You fixed something in <code>Lbc.cs</code>. Four programs compile
+against it.</p>
+<pre><code>cd \HomerDev
+checkHomerDev</code></pre>
+<p>It audits the kit, checks that every module’s REQUIRES line is
+satisfied by every build script, deletes what previous builds wrote, and
+builds all three samples from clean. Exit code 1 if anything failed.</p>
+<p>Then build the real apps, because <code>checkHomerDev</code> does
+not: EdSharp, FileDir, DbDo and HomerScribe all carry these modules, and
+a kit change that compiles against three samples can still break one of
+them. The evidence report says so in its uncertain list, every time.</p>
+<p>Finally, write what you changed and why in <code>self.md</code>.
+<code>History.md</code> is public and is about releases;
+<code>self.md</code> is where the rejected alternative goes.</p>
+<h2 id="scenario-8-release-it">Scenario 8: release it</h2>
+<pre><code>cd \PatternRename
+check --build
+push &quot;Add the prefix field.&quot;
+release</code></pre>
+<p><code>push</code> stages everything the whitelist allows, commits
+with your message, and pushes. <code>release</code> runs
+<code>release</code>, which reads <code>version.txt</code>, tags, and
+publishes the installer as a release asset.</p>
+<p>What gets pushed is decided by <code>RepoFiles.txt</code>, not by
+habit: <code>tidy --gitignore</code> turns that list into a
+<code>.gitignore</code> that ignores everything else, so a file you
+dropped in the folder cannot go up by accident.</p>
+<h2 id="scenario-9-ask-an-ai-for-a-homer-app-and-get-one">Scenario 9:
+ask an AI for a Homer app and get one</h2>
+<p>Three sentences carry the kit into an AI session:</p>
+<blockquote>
+<p>This is a Windows program for screen reader users, built on the Homer
+Development Kit at <code>C:\HomerDev</code>. Use <code>Lbc</code> for
+every dialog, <code>Inix</code> for settings, <code>Log</code> for the
+session log, <code>Paths</code> for folders, and <code>Say</code> only
+for what a screen reader cannot work out for itself. Follow the nine
+decisions marked in <code>Templates\samples\FruitBasketCs.cs</code>.</p>
+</blockquote>
+<p>Then work in this order, which is the method the whole kit is shaped
+around:</p>
+<ol type="1">
+<li><strong>Specify before you generate.</strong> Write
+<code>accept.inix</code> first. An AI asked for “a tool that does X”
+gives you its idea of done; an AI asked to satisfy five named checks
+gives you yours.</li>
+<li><strong>Build in small, recoverable steps.</strong> One change, one
+build, one <code>check</code>, one commit.</li>
+<li><strong>Verify without sight.</strong> The checks for what a script
+can settle, the log for what happened, your own ears for the rest.</li>
+<li><strong>Package, document and defend.</strong> The build makes the
+installer; the evidence report answers “what gives you confidence that
+it works?”</li>
+</ol>
+<p>Paste the sample into the session when the answers drift. A model
+that has read FruitBasketCs writes Homer code; a model that has not
+writes pixel coordinates and a tab order that is an accident.</p>
+<!-- walkthrough: written by makeTutorials.py, do not edit between the markers -->
+<h2 id="the-homer-development-kit-and-two-fruit-baskets">0. The Homer
+Development Kit, and two fruit baskets</h2>
+<p>This is a first look at HomerDev: what it is, how to install it, and
+how to build and run the two sample programs. It takes about twelve
+minutes. You can follow along, or just listen.</p>
+<p><strong>Before you start:</strong> You need Windows 10 or later,
+64-bit, and a screen reader running. Everything else the kit fetches for
+itself. Nothing in this tutorial costs anything.</p>
+<h3 id="step-1">Step 1</h3>
+<p>HomerDev is a kit of parts for building Windows programs that work
+well by keyboard and screen reader. Nine C sharp classes, seven Python
+modules, the build and release scripts, and two sample programs that do
+the same job in both languages. It is free and open source. If you miss
+a line the reader says, Insert plus Up Arrow says it again.</p>
+<p>The kit is at https://github.com/JamalMazrui/HomerDev</p>
+<h3 id="step-2">Step 2</h3>
+<p>The idea behind it is simple. Every decision that makes a program
+pleasant to use without sight – where the focus goes, what gets spoken,
+what the keys do – has already been made, tested, and put in a class.
+You get them by calling the class rather than by remembering them.</p>
+<p>The guide calls these the nine decisions, and both samples mark them
+where they occur.</p>
+<h3 id="step-3-controlv">Step 3: Control+V</h3>
+<p>Start by unarchiving HomerDev dot zip into a folder called C colon
+backslash HomerDev. That is the whole install. Open the archive, choose
+Extract All, and type the folder name.</p>
+<p>Screen reader:</p>
+<ul>
+<li>Destination, edit, C colon backslash HomerDev</li>
+</ul>
+<p>Any folder works. If you put it somewhere else, set an environment
+variable called HomerDev to that path, and every build script will find
+it.</p>
+<h3 id="step-4-buildhomerdev">Step 4: buildHomerDev</h3>
+<p>Now open a command prompt in that folder and run the kit’s own
+build.</p>
+<p>Screen reader:</p>
+<ul>
+<li>Homer Development Kit 1.4.0 in C colon backslash HomerDev</li>
+<li>10 documents converted to HTML</li>
+<li>0 problems found. The kit is complete.</li>
+</ul>
+<p>buildHomerDev converts every document to HTML with pandoc, fetching
+pandoc if this machine has none, then checks the kit over: every
+component present, every file in the right encoding, no empty files.</p>
+<h3 id="step-5">Step 5</h3>
+<p>Notice the last line. Zero problems is a real answer, said plainly.
+That is a rule in this kit: a count always matches its noun, and nothing
+reports zero as though it were an error.</p>
+<p>“1 match”, never “1 matches”; “0 matches” rather than silence.</p>
+<h3 id="step-6-cd-templates">Step 6: cd Templates</h3>
+<p>Next, the samples. Change into the samples folder under Templates.
+There are four files: a C sharp program, a Python program, and a build
+script for each. Both programs are the fruit basket – a window with a
+fruit field and an Add button, a basket list and a Delete button. Blind
+programmers have taught with that specification since 2005.</p>
+<p>Typed at the prompt: the reader echoes the letters, and says nothing
+else until the next command answers. The legacy FruitBasket collection
+has thirty-six of these, one per language. These two are different: they
+are parallel to each other.</p>
+<h3 id="step-7-buildfruitbasketcs">Step 7: buildFruitBasketCs</h3>
+<p>Build the C sharp one.</p>
+<p>Screen reader:</p>
+<ul>
+<li>Kit, C colon backslash HomerDev version 1.4.0</li>
+<li>Compiler, Microsoft Visual Studio Build Tools</li>
+<li>Built FruitBasketCs dot exe version 1.0.0</li>
+</ul>
+<p>The script finds the compiler, finds the three reference assemblies
+that are not on the default path, compiles the program together with the
+Homer classes straight out of the kit, and writes buildFruitBasketCs.log
+beside itself.</p>
+<h3 id="step-8-fruitbasketcs">Step 8: FruitBasketCs</h3>
+<p>Now run it.</p>
+<p>Screen reader:</p>
+<ul>
+<li>Fruit Basket, the basket is empty</li>
+<li>Fruit, edit</li>
+</ul>
+<p>The window title carries the state and the focus starts in the field,
+because typing a fruit is the first thing anybody does.</p>
+<h3 id="step-9-apple-enter">Step 9: apple, Enter</h3>
+<p>Type a fruit and press Enter.</p>
+<p>Screen reader:</p>
+<ul>
+<li>apple added, 1 fruit in the basket</li>
+</ul>
+<p>One fruit, not one fruits. The screen reader announced nothing about
+the field or the button, because it had nothing new to say; what you
+heard is the program telling you what it did.</p>
+<h3 id="step-10-tab-downarrow">Step 10: Tab, DownArrow</h3>
+<p>Add two more, then tab to the basket and arrow through it.</p>
+<p>Screen reader:</p>
+<ul>
+<li>Basket, list box, apple, 1 of 3</li>
+</ul>
+<p>An ordinary Windows list box. No custom control, no special mode,
+nothing to learn.</p>
+<h3 id="step-11-controlj">Step 11: Control+J</h3>
+<p>Press Control plus J to search inside the list.</p>
+<p>Screen reader:</p>
+<ul>
+<li>Find in list, edit</li>
+</ul>
+<p>That search, and F3 to repeat it, arrived with the list box. The
+program contains no code for either.</p>
+<h3 id="step-12-delete">Step 12: Delete</h3>
+<p>Press Delete on a fruit you no longer want.</p>
+<p>Screen reader:</p>
+<ul>
+<li>banana deleted, 2 fruits in the basket</li>
+</ul>
+<p>The selection moves to the neighbour, so the list still has somewhere
+to speak from. A list with nothing selected says nothing, and a person
+who hears nothing assumes the program has stopped.</p>
+<h3 id="step-13-altr">Step 13: Alt+R</h3>
+<p>Press Alt plus R for the report.</p>
+<p>Screen reader:</p>
+<ul>
+<li>Fruit basket report, read only edit</li>
+</ul>
+<p>A plain read-only window you arrow through line by line and close
+with Escape. The same window the Help button uses.</p>
+<h3 id="step-14-f1">Step 14: F1</h3>
+<p>Press F1 for help.</p>
+<p>Screen reader:</p>
+<ul>
+<li>Help, Fields in this dialog, Fruit, type the name of a fruit</li>
+</ul>
+<p>That help was written once, as a tip beside each field, and it
+reaches the reader twice: in the status line when focus arrives, and in
+this window on demand.</p>
+<h3 id="step-15-altf4">Step 15: Alt+F4</h3>
+<p>Close the program, then run it again.</p>
+<p>Screen reader:</p>
+<ul>
+<li>Fruit Basket, 2 fruits in the basket</li>
+</ul>
+<p>The basket was saved the moment each fruit went in, not on the way
+out. A program that saves at exit loses everything when it is
+killed.</p>
+<h3 id="step-16-buildfruitbasketpy">Step 16: buildFruitBasketPy</h3>
+<p>Now the same program in Python. Build it.</p>
+<p>Screen reader:</p>
+<ul>
+<li>Creating the build environment</li>
+<li>Installing what the build needs</li>
+<li>Built FruitBasketPy dot exe version 1.0.0</li>
+</ul>
+<p>The first build makes a virtual environment beside the script and
+installs PyInstaller and wxPython into it, which takes a few minutes
+once. What comes out is one file with Python and every dependency inside
+it, so whoever you give it to needs no Python of their own.</p>
+<h3 id="step-17-fruitbasketpy">Step 17: FruitBasketPy</h3>
+<p>Run the Python one.</p>
+<p>Screen reader:</p>
+<ul>
+<li>Fruit Basket, the basket is empty</li>
+<li>Fruit, edit</li>
+</ul>
+<p>The same title, the same first control, the same starting focus.</p>
+<h3 id="step-18-cherry-enter">Step 18: cherry, Enter</h3>
+<p>Type a fruit and press Enter, exactly as before.</p>
+<p>Screen reader:</p>
+<ul>
+<li>cherry added, 1 fruit in the basket</li>
+</ul>
+<p>The same sentence, from a different language, because both programs
+call the same Say class through the same kit.</p>
+<h3 id="step-19-controlj">Step 19: Control+J</h3>
+<p>Tab to the basket, press Control plus J, press Delete, press Alt plus
+R. Every key does what it did in the C sharp version.</p>
+<p>Screen reader:</p>
+<ul>
+<li>Find in list, edit</li>
+</ul>
+<p>Two differences, and only two. The C sharp dialog has a status line
+at the foot; a wx dialog has none, so the Python one puts the same
+sentence in the window title. And the tips are on Shift plus F1 in
+Python rather than in the status line.</p>
+<h3 id="step-20">Step 20</h3>
+<p>That is the claim this kit makes, and you have just heard it tested.
+Two languages, one behaviour, because the behaviour lives in the
+components rather than in either program.</p>
+<p>Both source files carry twelve markers – BLOCK 1 to BLOCK 12 – with
+the same numbers, the same titles and the same function names, so they
+can be read side by side in two windows.</p>
+<h3 id="step-21">Step 21</h3>
+<p>One last thing. Look in your local application data folder, under
+FruitBasketCs, then logs.</p>
+<p>Screen reader:</p>
+<ul>
+<li>FruitBasketCs dash 2026 09 18 dash 1 3 0 5 2 2 dot log</li>
+</ul>
+<p>One log per session, named for when the session began, holding the
+environment, every setting and every error with its stack. Every Homer
+program writes one, from the same class, in the same place. So does
+every installer.</p>
+<h3 id="step-22">Step 22</h3>
+<p>That is HomerDev. The guide, HomerDev dot md, has the rest: the Lbc
+dialogs, the inix settings format, the coding style, the release
+scripts, and a part on AI-assisted coding which is what the kit is
+really for. Thank you for listening.</p>
+<p>Questions and corrections are welcome. The kit is early, and it
+improves by being used.</p>
+<p><strong>Something to try:</strong> Build the Python fruit basket the
+same way, and notice that it answers every key exactly as the C sharp
+one did.</p>
+<!-- walkthrough ends -->
+</body>
+</html>

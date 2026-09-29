@@ -1,0 +1,399 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>conversions</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">conversions</h1>
+</header>
+<h1 id="conversions-by-format-pair">Conversions by format pair</h1>
+<p>EdSharp’s Import and Export tables, which have been used for years,
+hold a tested command for each pair. The Pandoc ones are below, with the
+source as <code>in</code> and the target as <code>out</code>;
+<code>-s</code> makes a standalone document. Pairs that run a helper
+(any2htm, pdf2md, sheet2md, mdx2htm, mdx2docx) are EdSharp scripts in
+its configs/convert folder; 2htm or inixVert does the same work outside
+EdSharp.</p>
+<p>Two differences from a Homer document: these pairs read and write
+GitHub’s Markdown (<code>gfm</code>), where a Homer document uses
+Pandoc’s own (<code>-f markdown</code>); and they accept
+<code>.html</code> as well as <code>.htm</code>, where a Homer program
+writes <code>.htm</code>.</p>
+<h2 id="contents">Contents</h2>
+<ul>
+<li>Pandoc pairs</li>
+<li>Other tools</li>
+</ul>
+<h2 id="pandoc-pairs">Pandoc pairs</h2>
+<ul>
+<li><strong>adoc2htm</strong>:
+<code>pandoc in -f asciidoc -t html -s -o out</code></li>
+<li><strong>adoc2md</strong>:
+<code>pandoc in -f asciidoc -t gfm -o out</code></li>
+<li><strong>adoc2txt</strong>:
+<code>pandoc in -f asciidoc -t plain -o out</code></li>
+<li><strong>docx2htm</strong>:
+<code>pandoc in -f docx -t html -s -o out</code></li>
+<li><strong>docx2html</strong>:
+<code>pandoc in -f docx -t html -s -o out</code></li>
+<li><strong>docx2md</strong>:
+<code>pandoc in -f docx -t gfm -o out</code></li>
+<li><strong>docx2mw</strong>:
+<code>pandoc in -f docx -t mediawiki -o out</code></li>
+<li><strong>docx2rst</strong>:
+<code>pandoc in -f docx -t rst -o out</code></li>
+<li><strong>docx2tex</strong>:
+<code>pandoc in -f docx -t latex -s -o out</code></li>
+<li><strong>docx2txt</strong>:
+<code>pandoc in -f docx -t plain -o out</code></li>
+<li><strong>epub2htm</strong>:
+<code>pandoc in -f epub -t html -s -o out</code></li>
+<li><strong>epub2html</strong>:
+<code>pandoc in -f epub -t html -s -o out</code></li>
+<li><strong>epub2md</strong>:
+<code>pandoc in -f epub -t gfm -o out</code></li>
+<li><strong>epub2mw</strong>:
+<code>pandoc in -f epub -t mediawiki -o out</code></li>
+<li><strong>epub2tex</strong>:
+<code>pandoc in -f epub -t latex -s -o out</code></li>
+<li><strong>epub2txt</strong>:
+<code>pandoc in -f epub -t plain -o out</code></li>
+<li><strong>htm2md</strong>:
+<code>pandoc in -f html -t gfm -o out</code></li>
+<li><strong>htm2mw</strong>:
+<code>pandoc in -f html -t mediawiki -o out</code></li>
+<li><strong>htm2rst</strong>:
+<code>pandoc in -f html -t rst -o out</code></li>
+<li><strong>htm2tex</strong>:
+<code>pandoc in -f html -t latex -s -o out</code></li>
+<li><strong>htm2txt</strong>:
+<code>pandoc in -f html -t plain -o out</code></li>
+<li><strong>html2md</strong>:
+<code>pandoc in -f html -t gfm -o out</code></li>
+<li><strong>html2mw</strong>:
+<code>pandoc in -f html -t mediawiki -o out</code></li>
+<li><strong>html2rst</strong>:
+<code>pandoc in -f html -t rst -o out</code></li>
+<li><strong>html2tex</strong>:
+<code>pandoc in -f html -t latex -s -o out</code></li>
+<li><strong>html2txt</strong>:
+<code>pandoc in -f html -t plain -o out</code></li>
+<li><strong>md2docx</strong>:
+<code>pandoc in -f gfm -t docx -o out</code></li>
+<li><strong>md2docxrefs</strong>:
+<code>pandoc in -f markdown -t docx -o out</code></li>
+<li><strong>md2epub</strong>:
+<code>pandoc in -f gfm -t epub -o out</code></li>
+<li><strong>md2epub3</strong>:
+<code>pandoc in -f gfm -t epub3 -o out</code></li>
+<li><strong>md2htm</strong>:
+<code>pandoc in -f gfm -t html -s -o out</code></li>
+<li><strong>md2html</strong>:
+<code>pandoc in -f gfm -t html -s -o out</code></li>
+<li><strong>md2mw</strong>:
+<code>pandoc in -f gfm -t mediawiki -o out</code></li>
+<li><strong>md2pptx</strong>:
+<code>pandoc in -f markdown -t pptx -o out</code></li>
+<li><strong>md2rst</strong>:
+<code>pandoc in -f gfm -t rst -o out</code></li>
+<li><strong>md2rtf</strong>:
+<code>pandoc in -f gfm -t rtf -s -o out</code></li>
+<li><strong>md2tex</strong>:
+<code>pandoc in -f gfm -t latex -s -o out</code></li>
+<li><strong>md2txt</strong>:
+<code>pandoc in -f gfm -t plain -o out</code></li>
+<li><strong>odt2htm</strong>:
+<code>pandoc in -f odt -t html -s -o out</code></li>
+<li><strong>odt2html</strong>:
+<code>pandoc in -f odt -t html -s -o out</code></li>
+<li><strong>odt2md</strong>:
+<code>pandoc in -f odt -t gfm -o out</code></li>
+<li><strong>odt2txt</strong>:
+<code>pandoc in -f odt -t plain -o out</code></li>
+<li><strong>pptx2htm</strong>:
+<code>pandoc in -f pptx -t html -s -o out</code></li>
+<li><strong>pptx2md</strong>:
+<code>pandoc in -f pptx -t gfm -o out</code></li>
+<li><strong>pptx2txt</strong>:
+<code>pandoc in -f pptx -t plain -o out</code></li>
+<li><strong>rst2docx</strong>:
+<code>pandoc in -f rst -t docx -o out</code></li>
+<li><strong>rst2epub</strong>:
+<code>pandoc in -f rst -t epub -o out</code></li>
+<li><strong>rst2epub3</strong>:
+<code>pandoc in -f rst -t epub3 -o out</code></li>
+<li><strong>rst2htm</strong>:
+<code>pandoc in -f rst -t html -s -o out</code></li>
+<li><strong>rst2html</strong>:
+<code>pandoc in -f rst -t html -s -o out</code></li>
+<li><strong>rst2md</strong>:
+<code>pandoc in -f rst -t gfm -o out</code></li>
+<li><strong>rst2mw</strong>:
+<code>pandoc in -f rst -t mediawiki -o out</code></li>
+<li><strong>rst2rtf</strong>:
+<code>pandoc in -f rst -t rtf -s -o out</code></li>
+<li><strong>rst2tex</strong>:
+<code>pandoc in -f rst -t latex -s -o out</code></li>
+<li><strong>rst2txt</strong>:
+<code>pandoc in -f rst -t plain -o out</code></li>
+<li><strong>rtf2docx</strong>:
+<code>pandoc in -f rtf -t docx -o out</code></li>
+<li><strong>rtf2htm</strong>:
+<code>pandoc in -f rtf -t html -s -o out</code></li>
+<li><strong>rtf2html</strong>:
+<code>pandoc in -f rtf -t html -s -o out</code></li>
+<li><strong>rtf2md</strong>:
+<code>pandoc in -f rtf -t gfm -o out</code></li>
+<li><strong>rtf2txt</strong>:
+<code>pandoc in -f rtf -t plain -o out</code></li>
+<li><strong>tex2docx</strong>:
+<code>pandoc in -f latex -t docx -o out</code></li>
+<li><strong>tex2epub</strong>:
+<code>pandoc in -f latex -t epub -o out</code></li>
+<li><strong>tex2epub3</strong>:
+<code>pandoc in -f latex -t epub3 -o out</code></li>
+<li><strong>tex2htm</strong>:
+<code>pandoc in -f latex -t html -s -o out</code></li>
+<li><strong>tex2html</strong>:
+<code>pandoc in -f latex -t html -s -o out</code></li>
+<li><strong>tex2md</strong>:
+<code>pandoc in -f latex -t gfm -o out</code></li>
+<li><strong>tex2mw</strong>:
+<code>pandoc in -f latex -t mediawiki -o out</code></li>
+<li><strong>tex2rst</strong>:
+<code>pandoc in -f latex -t rst -o out</code></li>
+<li><strong>tex2rtf</strong>:
+<code>pandoc in -f latex -t rtf -s -o out</code></li>
+<li><strong>tex2txt</strong>:
+<code>pandoc in -f latex -t plain -o out</code></li>
+<li><strong>tt2htm</strong>:
+<code>pandoc in -f t2t -t html -s -o out</code></li>
+<li><strong>tt2html</strong>:
+<code>pandoc in -f t2t -t html -s -o out</code></li>
+<li><strong>tt2md</strong>:
+<code>pandoc in -f t2t -t gfm -o out</code></li>
+<li><strong>tt2mw</strong>:
+<code>pandoc in -f t2t -t mediawiki -o out</code></li>
+<li><strong>tt2rst</strong>:
+<code>pandoc in -f t2t -t rst -o out</code></li>
+<li><strong>tt2rtf</strong>:
+<code>pandoc in -f t2t -t rtf -s -o out</code></li>
+<li><strong>tt2txt</strong>:
+<code>pandoc in -f t2t -t plain -o out</code></li>
+<li><strong>typ2htm</strong>:
+<code>pandoc in -f typst -t html -s -o out</code></li>
+<li><strong>typ2md</strong>:
+<code>pandoc in -f typst -t gfm -o out</code></li>
+<li><strong>typ2txt</strong>:
+<code>pandoc in -f typst -t plain -o out</code></li>
+<li><strong>xlsx2htm</strong>:
+<code>pandoc in -f xlsx -t html -s -o out</code></li>
+<li><strong>xlsx2md</strong>:
+<code>pandoc in -f xlsx -t gfm -o out</code></li>
+<li><strong>xlsx2txt</strong>:
+<code>pandoc in -f xlsx -t plain -o out</code></li>
+</ul>
+<h2 id="other-tools">Other tools</h2>
+<ul>
+<li><strong>brf2txt</strong>: built into EdSharp</li>
+<li><strong>brl2txt</strong>: built into EdSharp</li>
+<li><strong>csv2inix</strong>: inixVert in out</li>
+<li><strong>doc2htm</strong>: EdSharp helper any2htm.cmd</li>
+<li><strong>doc2html</strong>: EdSharp helper any2htm.cmd</li>
+<li><strong>doc2md</strong>: EdSharp helper any2htm.cmd</li>
+<li><strong>doc2txt</strong>: EdSharp helper any2txt.cmd</li>
+<li><strong>epub32htm</strong>: built into EdSharp</li>
+<li><strong>epub32html</strong>: built into EdSharp</li>
+<li><strong>epub32md</strong>: built into EdSharp</li>
+<li><strong>epub32mw</strong>: built into EdSharp</li>
+<li><strong>epub32tex</strong>: built into EdSharp</li>
+<li><strong>epub32txt</strong>: built into EdSharp</li>
+<li><strong>hlp2txt</strong>: built into EdSharp</li>
+<li><strong>htm2tidy</strong>: built into EdSharp</li>
+<li><strong>html2tidy</strong>: built into EdSharp</li>
+<li><strong>inix2csv</strong>: inixVert in out</li>
+<li><strong>inix2md</strong>: inixVert in out</li>
+<li><strong>inix2xlsx</strong>: inixVert in out</li>
+<li><strong>md2inix</strong>: inixVert in out</li>
+<li><strong>mdx2docx</strong>: EdSharp helper mdx2docx.cmd</li>
+<li><strong>mdx2htm</strong>: EdSharp helper mdx2htm.cmd</li>
+<li><strong>mdx2md</strong>: inixVert in out</li>
+<li><strong>pdf2htm</strong>: EdSharp helper pdf2md.cmd</li>
+<li><strong>pdf2html</strong>: EdSharp helper pdf2md.cmd</li>
+<li><strong>pdf2md</strong>: EdSharp helper pdf2md.cmd</li>
+<li><strong>pdf2txt</strong>: EdSharp helper pdf2md.cmd</li>
+<li><strong>ppt2htm</strong>: EdSharp helper any2htm.cmd</li>
+<li><strong>ppt2md</strong>: EdSharp helper any2htm.cmd</li>
+<li><strong>ppt2txt</strong>: EdSharp helper any2txt.cmd</li>
+<li><strong>wpd2txt</strong>: built into EdSharp</li>
+<li><strong>xls2csv</strong>: %ProgDir%<br />
+</li>
+<li><strong>xls2htm</strong>: EdSharp helper any2htm.cmd</li>
+<li><strong>xls2md</strong>: EdSharp helper sheet2md.cmd</li>
+<li><strong>xls2txt</strong>: EdSharp helper any2txt.cmd</li>
+<li><strong>xlsx2csv</strong>: inixVert in out</li>
+<li><strong>xlsx2inix</strong>: inixVert in out</li>
+</ul>
+</body>
+</html>

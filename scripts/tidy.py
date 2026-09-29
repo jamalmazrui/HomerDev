@@ -445,6 +445,16 @@ def surveyFolder(lsNamed):
     ltPlace = []
     dByHash = {}
 
+    # AN EMPTY LOG IS DELETED TOO (1.43.22). logs is not surveyed -- every file
+    # there is a run's record -- but a zero-byte one records nothing, and the
+    # kit's release refused to publish over three of them in C:\\HomerDev\\logs.
+    sLogs = os.path.join(sRoot, "logs")
+    if os.path.isdir(sLogs):
+        for sName in sorted(os.listdir(sLogs)):
+            sFull = os.path.join(sLogs, sName)
+            if os.path.isfile(sFull) and os.path.getsize(sFull) == 0:
+                lsEmpty.append(os.path.relpath(sFull, sRoot))
+
     for sDirPath, lsDirs, lsFiles in os.walk(sRoot):
         lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders]
         for sName in sorted(lsFiles):

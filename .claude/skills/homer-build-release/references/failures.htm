@@ -1,0 +1,257 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>failures</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">failures</h1>
+</header>
+<h1 id="failures-that-have-cost-a-run">Failures that have cost a
+run</h1>
+<h2 id="contents">Contents</h2>
+<ul>
+<li>Release</li>
+<li>Check</li>
+<li>Tidy and push</li>
+<li>Build</li>
+<li>Installer</li>
+</ul>
+<p>Each entry: the symptom in the log, the cause, the fix.</p>
+<h2 id="release">Release</h2>
+<ul>
+<li><strong>“ALREADY RELEASED” for a version never published.</strong> A
+draft release or a local tag from an interrupted run. release reads
+GitHub’s list as JSON and publishes a draft
+(<code>--draft=false --latest</code>). If it persists, the version truly
+exists: build without <code>nobump</code>.</li>
+<li><strong>Published, but an old installer.</strong> An old
+<code>&lt;App&gt;_setup.exe</code> at the top was found first.
+Installers are built at the top (<code>OutputDir=.</code>); a build
+removes any copy left in <code>exec</code>.</li>
+<li><strong>“latest release is vX, not vY”.</strong> The new release is
+a draft or pre-release; the release page says which.</li>
+<li><strong>Release hangs with no output.</strong> An acceptance command
+waited for a key; check gives commands empty input and names each as it
+starts.</li>
+<li><strong>PowerShell parse error.</strong> <code>"$var: text"</code>
+reads as a drive; write <code>${var}:</code>.</li>
+</ul>
+<h2 id="check">Check</h2>
+<ul>
+<li><strong>accept: a <code>findstr</code> check fails</strong> though
+the text is there. findstr reads a backslash as an escape even in
+<code>/c:</code> text: write
+<code>findstr /l /c:"help\\*.htm"</code>.</li>
+<li><strong>keys: an Alt+Control combination</strong> is reserved for
+desktop shortcuts except the app’s own shortcut (read from the
+installer’s HotKey) and navigation keys. Only NVDA <code>kb:</code>
+gestures count in Python.</li>
+<li><strong>naming: an accessible name repeating a label</strong> (read
+twice). Put the label before its field in tab order instead.</li>
+<li><strong>encoding: a generated file lacks the BOM.</strong> The
+generator must write UTF-8 with BOM and CRLF
+(<code>encoding="utf-8-sig", newline="\r\n"</code>).</li>
+<li><strong>documents: no .htm for License.</strong> Every
+<code>.md</code> needs its Pandoc <code>.htm</code>.</li>
+<li><strong>empty: zero-byte files.</strong> tidy deletes them,
+including empty logs.</li>
+</ul>
+<h2 id="tidy-and-push">Tidy and push</h2>
+<ul>
+<li><strong>Push commits files that belong off GitHub.</strong> The
+whitelist was not rewritten (an old tidy, or a script calling an old
+name); run the build to refresh <code>scripts</code>, then tidy.</li>
+<li><strong>A needed file untracked.</strong> RepoFiles.txt does not
+name it (an installer’s Source lines do not count), or a LocalFiles.txt
+pattern catches it and RepoFiles.txt names it only by folder. Name it
+exactly.</li>
+<li><strong>Capital-letter renames do not reach git.</strong> Windows
+git treats a case-only change as none:
+<code>git rm --cached &lt;Old&gt;</code> then
+<code>git add &lt;new&gt;</code>, never renaming a running script.</li>
+</ul>
+<h2 id="build">Build</h2>
+<ul>
+<li><strong>“kit not found” or “Update HomerDev”</strong>: build the kit
+first; the app’s <code>kitNeeded</code> is newer than the kit on
+disk.</li>
+<li><strong>A script calls an old kit name</strong> (check, push, tidy,
+release, installCommon): the build retires old copies; rebuild.</li>
+<li><strong>Version in the installer one behind.</strong> The installer
+read version.txt before the build wrote it; pass the build’s number to
+Inno (<code>/DBuildVersion=</code>).</li>
+</ul>
+<h2 id="installer">Installer</h2>
+<ul>
+<li><strong>A component offered for install that is present.</strong>
+Check the setup log’s <code>Component &lt;name&gt;:</code> lines, which
+record what was found and the verb offered.</li>
+<li><strong>JAWS scripts never installed.</strong> The finish page ran a
+script the installer put elsewhere; paths in [Files] and [Run] must
+agree.</li>
+<li><strong>Inno Setup: “BEGIN expected”.</strong> A <code>;</code>
+comment inside [Code]; Pascal comments are <code>//</code>.</li>
+</ul>
+</body>
+</html>

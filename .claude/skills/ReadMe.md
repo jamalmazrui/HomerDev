@@ -35,5 +35,28 @@ HomerDev.md, under "Claude skills".
 
 ## Skills for Homer development
 
+- **homer-build-release**: run and troubleshoot the build, check, tidy, push
+  and release cycle, and read the logs those steps leave. Its
+  summarizeLogs script turns an uploaded zip of logs into one report: each
+  app's build result, check counts, and release outcome.
+- **homer-code**: write and review Homer code in Camel Type, in C#, Python,
+  JavaScript, VBScript or JAWS script, on the kit's shared classes and
+  modules. Carries the kit's style guides, copied from help at each build.
+- **homer-convert**: convert files the Homer way -- Markdown to .htm with
+  Pandoc, Office, PDF and other documents to accessible .htm or .txt with 2htm,
+  tables with inixVert -- and put the output in the Homer encoding with its
+  toHomerEncoding script.
+- **homer-elevate**: the Elevate Version feature -- F11 checks GitHub for a
+  newer release and offers its installer -- on an MDI app's Help menu or in a
+  single-dialog app's Help box.
+- **homer-installer**: the Inno Setup installer -- machine-wide installs, which
+  components to offer, the finish page's wording, defaults and order, the
+  Results box, and component logging. Carries FinishPage.md from help.
 - **homer-tutorial**: write, check and build the spoken walkthroughs of a
-  Homer app, where a narrator works and a screen reader answers.
+  Homer app, where a narrator works and a screen reader answers. Carries the
+  kit's tutorial guide, Tutorials.md, from help.
+- **homer-ui**: the interface for screen reader users -- Lbc dialogs and
+  focus order, labels and accessible names, access and trigger letters, flat
+  menus, hotkeys and key names, the function-key families, and what to speak.
+  Carries the kit's own chapters on Lbc, keys, speech and the shapes of app,
+  taken from HomerDev.md at each build.

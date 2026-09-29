@@ -23,3 +23,11 @@ Templates/samples/dist/
 # standing rule, stay out of every repository, the kit's included.
 scripts/release.cmd
 scripts/release.ps1
+
+# Copies of the kit's own documents a skill carries, made by buildHomerDev from
+# help at every build; git carries the originals.
+.claude/skills/homer-code/references/CamelType_*.md
+.claude/skills/homer-code/references/Logging.md
+.claude/skills/homer-installer/references/FinishPage.md
+.claude/skills/homer-tutorial/references/Tutorials.md
+.claude/skills/homer-ui/references/ui-guide.md

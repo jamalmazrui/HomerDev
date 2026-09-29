@@ -1,0 +1,71 @@
+﻿# Failures that have cost a run
+
+## Contents
+- Release
+- Check
+- Tidy and push
+- Build
+- Installer
+
+Each entry: the symptom in the log, the cause, the fix.
+
+## Release
+
+- **"ALREADY RELEASED" for a version never published.** A draft release or a
+  local tag from an interrupted run. release reads GitHub's list as JSON and
+  publishes a draft (`--draft=false --latest`). If it persists, the version
+  truly exists: build without `nobump`.
+- **Published, but an old installer.** An old `<App>_setup.exe` at the top was
+  found first. Installers are built at the top (`OutputDir=.`); a build removes
+  any copy left in `exec`.
+- **"latest release is vX, not vY".** The new release is a draft or
+  pre-release; the release page says which.
+- **Release hangs with no output.** An acceptance command waited for a key;
+  check gives commands empty input and names each as it starts.
+- **PowerShell parse error.** `"$var: text"` reads as a drive; write
+  `${var}:`.
+
+## Check
+
+- **accept: a `findstr` check fails** though the text is there. findstr reads
+  a backslash as an escape even in `/c:` text: write `findstr /l /c:"help\\*.htm"`.
+- **keys: an Alt+Control combination** is reserved for desktop shortcuts
+  except the app's own shortcut (read from the installer's HotKey) and
+  navigation keys. Only NVDA `kb:` gestures count in Python.
+- **naming: an accessible name repeating a label** (read twice). Put the label
+  before its field in tab order instead.
+- **encoding: a generated file lacks the BOM.** The generator must write
+  UTF-8 with BOM and CRLF (`encoding="utf-8-sig", newline="\r\n"`).
+- **documents: no .htm for License.** Every `.md` needs its Pandoc `.htm`.
+- **empty: zero-byte files.** tidy deletes them, including empty logs.
+
+## Tidy and push
+
+- **Push commits files that belong off GitHub.** The whitelist was not
+  rewritten (an old tidy, or a script calling an old name); run the build to
+  refresh `scripts`, then tidy.
+- **A needed file untracked.** RepoFiles.txt does not name it (an installer's
+  Source lines do not count), or a LocalFiles.txt pattern catches it and
+  RepoFiles.txt names it only by folder. Name it exactly.
+- **Capital-letter renames do not reach git.** Windows git treats a case-only
+  change as none: `git rm --cached <Old>` then `git add <new>`, never renaming
+  a running script.
+
+## Build
+
+- **"kit not found" or "Update HomerDev"**: build the kit first; the app's
+  `kitNeeded` is newer than the kit on disk.
+- **A script calls an old kit name** (check, push, tidy,
+  release, installCommon): the build retires old copies; rebuild.
+- **Version in the installer one behind.** The installer read version.txt
+  before the build wrote it; pass the build's number to Inno
+  (`/DBuildVersion=`).
+
+## Installer
+
+- **A component offered for install that is present.** Check the setup log's
+  `Component <name>:` lines, which record what was found and the verb offered.
+- **JAWS scripts never installed.** The finish page ran a script the installer
+  put elsewhere; paths in [Files] and [Run] must agree.
+- **Inno Setup: "BEGIN expected".** A `;` comment inside [Code]; Pascal
+  comments are `//`.

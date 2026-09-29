@@ -6,6 +6,25 @@ This is the kit's copy. An app does not carry one of its own; urlCheck's copy mo
 
 ---
 
+## Contents
+
+- 1\. Variable and Argument Naming
+- 2\. Constant Naming
+- 3\. Capitalization
+- 4\. Variable Initialization
+- 5\. Constants
+- 6\. Script Structure and Entry Point
+- 7\. Function Order
+- 8\. Functions
+- 9\. Loops
+- 10\. Imports
+- 11\. String Delimiters
+- 12\. Magic Numbers
+- 13\. Object and Array Literals
+- 14\. Error Handling
+- 15\. Cross-Program Naming Conventions
+- 16\. The Homer Kit
+
 ## 1. Variable and Argument Naming
 
 Use Hungarian prefix notation to indicate type. Prefix rules:

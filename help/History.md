@@ -5,6 +5,103 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.43.27 -- 28 September 2026
+
+**A skill for the interface: homer-ui.** Lbc dialogs and their focus order,
+labels and accessible names, access and trigger letters, flat menus, hotkeys
+and their exceptions, the Alt+Control rule, the selection and navigation keys,
+the function-key families, the grave accent, key names, the command table,
+speech, and the three shapes of app -- the rules a screen reader user relies
+on, in one place.
+
+**A skill can carry chapters of a kit document.** homer-ui's reference,
+ui-guide.md, is made at each build from four chapters of HomerDev.md -- Lbc,
+keys and key names, direct speech, and the three kinds of app -- with a
+contents list, so the skill never holds a second copy that drifts.
+
+**HomerDev.md: two sections back where they belong.** "Claude skills" and
+"Finish page wording" had been added inside the chapter on keys; the first is
+now a chapter of its own, and the second sits with the installer's log.
+
+# 1.43.26 -- 28 September 2026
+
+**A skill for converting files: homer-convert.** It picks the tool by what is
+converted: Pandoc for a Homer document's Markdown to .htm, with a title, a
+contents list for a long document, and the pagebreak filter; 2htm for Word,
+Excel, PowerPoint, PDF, CSV, JSON, HTML, Markdown and text to accessible .htm
+or .txt, with its options; inixVert for tables among .inix, .csv, .tsv,
+Markdown and .xlsx; and Pandoc for the rest. Its reference, conversions.md,
+lists the 120 format pairs in EdSharp's Import and Export tables with the
+command for each, noting that EdSharp reads GitHub's Markdown where a Homer
+document uses Pandoc's. Its script, toHomerEncoding, puts converted files into
+the Homer encoding -- UTF-8 with a byte order mark and CRLF, none for .cmd,
+.bat and SKILL.md -- since Pandoc and most converters write neither.
+
+# 1.43.25 -- 28 September 2026
+
+**Two more skills, and the tutorial skill carries the kit's guide.**
+
+- **homer-elevate**: the Elevate Version feature. F11 checks GitHub for a newer
+  release and offers to fetch and run its installer: an item on a multiple-
+  document app's Help menu, or the version section and Yes/No buttons of a
+  single-dialog app's Help box, through the kit's Elevate class in C# or
+  Python.
+- **homer-installer**: the Inno Setup installer -- machine-wide installs, the
+  folders things go to, which optional components to offer, install scripts,
+  and the finish page. Its references are FinishPage.md, copied from help, and
+  components.md, the kit's calls for declaring a component, its three [Run]
+  entries, labels, outcomes, Ollama models and detection.
+- **homer-tutorial** now carries the kit's Tutorials.md, copied from help at
+  each build: the conventions for spoken walks refined over many tutorials.
+
+**FinishPage.md is the one account of the finish page.** It now holds the
+wording rules that were in HomerDev.md -- the verb first, a short use in
+parentheses, a box each for JAWS and NVDA, JAWS first, no word the tick
+already says -- with two more: offer only the app's own components, and
+install shared ones machine-wide. HomerDev.md points to it. It also names the
+Results box's title and the logged verdicts.
+
+**One order for the boxes: Install, Update, Reinstall.** FinishPage.md said so
+in one section and "Install, Reinstall, Update" in another, and homerGroup
+followed the second. The ticked boxes now come first everywhere, then the
+unticked ones, so homerOrder, which the Results box lists by, matches the page.
+
+# 1.43.24 -- 28 September 2026
+
+**A skill for writing Homer code: homer-code.** The second development skill.
+Its SKILL.md holds the Camel Type rules that matter most -- Hungarian
+prefixes, c_ constants, lower camel case, functions rather than subroutines,
+one-line ifs, for-each loops, sorted declarations and imports, a detailed log
+from every script -- with the encoding rule and the instruction to build on
+the kit's classes. Its references are kit-libraries.md, what each C# class
+and Python module offers and how an app compiles or imports it, and the kit's
+own style guides.
+
+**A skill carries the kit's documents, copied at each build.** A skill
+uploaded to claude.ai cannot read C:\\HomerDev, so homer-code carries the style
+guides for C#, Python and JAWS script and the logging convention. buildHomerDev
+copies them from help into the skill's references before packing, so they are
+always the kit's current rules; LocalFiles.txt keeps the copies out of git,
+which carries the originals. Anthropic's guidance asks a reference longer than
+100 lines to open with a contents list, so the three long style guides now
+have one.
+
+# 1.43.23 -- 28 September 2026
+
+**A skill for the build and release cycle: homer-build-release.** The first of
+the Homer development skills. It teaches Claude the cycle -- buildHomerDev,
+build, a quick test, tidy, push, release -- and how to read what the steps
+leave. Its three references hold what is not obvious from the logs: the
+lists and git rules (RepoFiles.txt, LocalFiles.txt, KeepEncoding.txt, what
+stays tracked, the whitelist, the folder layout), the Homer log line, and the
+failures that have each cost a run, with symptom, cause and fix. Its script,
+summarizeLogs, turns a folder or zip of uploaded logs into one report: per app,
+the newest build's result and version, the check's counts and failures, the
+release's outcome with its version and whether GitHub confirmed it as latest,
+tidy's changes and push's outcome. It reads the kit's own build as well as an
+app's, and skips files that are not Homer logs. Tested on the uploads of 26 to
+28 September, where it found each failure this chat found by hand.
+
 # 1.43.22 -- 27 September 2026
 
 From the first run of all ten apps on 1.43.21, whose program and script logs
@@ -23,6 +120,11 @@ came out in the new format:
   result=...`, EdSharp's build engine stamps every line in the Homer format,
   and DbDo's no longer writes "(Pacific time, Seattle)" after a time with no
   offset.
+
+**An empty log no longer stops a release.** The kit's release on 28 September
+was refused over three zero-byte files in logs. check now passes over logs --
+a run's record is not part of the project -- and tidy deletes a zero-byte log
+as it does any other empty file.
 
 **The libraries live in exec, each named for its platform.** exec holds the
 code an app's core work runs on, in any form -- native, .NET, or source for an

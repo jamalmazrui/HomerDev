@@ -389,9 +389,12 @@ def checkEncoding():
 
 
 def checkEmpty():
+    """Zero-byte files among the project's own. logs is passed over (1.43.22):
+    a run's record is not part of the project, and the kit's release was
+    refused over three empty logs; tidy deletes those."""
     lsEmpty = []
     for sDirPath, lsDirs, lsNames in os.walk(sRoot):
-        lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders]
+        lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders and s.lower() != "logs"]
         for sName in sorted(lsNames):
             sPath = os.path.join(sDirPath, sName)
             try:

@@ -57,6 +57,10 @@ c_lsExpected = [
     "scripts/makeTutorials.cmd", "scripts/makeTutorials.py",
     "Templates/Tutorial_00_Overview.inix",
     ".claude/skills/ReadMe.md", ".claude/skills/app-help-guide/SKILL.md", ".claude/skills/blind-creators/SKILL.md",
+    ".claude/skills/homer-build-release/SKILL.md", ".claude/skills/homer-code/SKILL.md",
+    ".claude/skills/homer-convert/SKILL.md", ".claude/skills/homer-ui/SKILL.md",
+    ".claude/skills/homer-elevate/SKILL.md", ".claude/skills/homer-installer/SKILL.md",
+    ".claude/skills/homer-installer/references/components.md",
     ".claude/skills/homer-tutorial/SKILL.md", ".claude/skills/podcast-directory/SKILL.md",
     "Templates/makeHotkeys.py",
     "Templates/LocalFiles.txt",
@@ -533,6 +537,86 @@ def buildHomerDll():
         return "exec\\Homer.dll did not compile; the log has the compiler's messages"
     sayLine("Built exec\\Homer.dll for Python apps (%s)." % ", ".join(c_lsHomerDllClasses))
     return ""
+
+
+# THE KIT'S DOCUMENTS A SKILL CARRIES (1.43.24). A skill uploaded to claude.ai
+# cannot read C:\\HomerDev, so it carries its own references; copying these from
+# help at every build keeps one source of truth -- the kit's own documents --
+# instead of hand copies that drift. The copies are named in LocalFiles.txt:
+# git carries the originals, and a build makes the copies again.
+c_dSkillDocuments = {
+    "homer-installer": ["help/FinishPage.md"],
+    "homer-tutorial": ["help/Tutorials.md"],
+    "homer-code": ["help/CamelType_CSharp.md", "help/CamelType_CSharp_Reference.md",
+                   "help/CamelType_JAWSScript.md", "help/CamelType_Python.md", "help/Logging.md"],
+}
+
+
+# PARTS OF A KIT DOCUMENT A SKILL CARRIES (1.43.27). HomerDev.md is two
+# thousand lines; a skill needs a few of its chapters. Each entry names the
+# document, its top-level (#) chapters to take, in the order given, and the
+# reference file they make, which opens with a contents list, as Anthropic's
+# guidance asks of any reference over a hundred lines.
+c_lSkillSections = [
+    ("homer-ui", "help/HomerDev.md",
+     ["Lbc: building a dialog", "Keys and key names", "Direct speech across screen readers",
+      "Three kinds of Homer app"],
+     "ui-guide.md", "The Homer interface, from HomerDev.md"),
+]
+
+
+def extractSkillSections():
+    """Write each skill's reference made of chapters of a kit document. Returns
+    the number written."""
+    import re
+    iWritten = 0
+    for sSkill, sDocument, lsChapters, sTarget, sTitle in c_lSkillSections:
+        sSkillDir = os.path.join(sScriptDir, ".claude", "skills", sSkill)
+        sSource = os.path.join(sScriptDir, sDocument.replace("/", os.sep))
+        if not (os.path.isdir(sSkillDir) and os.path.isfile(sSource)):
+            logLine("ERROR skill section source missing skill=%s document=%s" % (sSkill, sDocument))
+            continue
+        sText = open(sSource, "rb").read().decode("utf-8-sig").replace("\r\n", "\n")
+        dChapters = {}
+        for oMatch in re.finditer(r"(?ms)^# (.+?)\n(.*?)(?=^# |\Z)", sText):
+            dChapters[oMatch.group(1).strip()] = oMatch.group(2)
+        lsOut = ["# " + sTitle, "", "Copied by buildHomerDev from %s; edit that, not this." % sDocument, "",
+                 "## Contents", ""]
+        lsOut += ["- " + s for s in lsChapters if s in dChapters]
+        lsOut.append("")
+        for sChapter in lsChapters:
+            if sChapter not in dChapters:
+                logLine("ERROR skill section missing skill=%s chapter=%s" % (sSkill, logValue(sChapter)))
+                continue
+            # A chapter becomes a ## section; its own ## and ### move down one.
+            sBody = re.sub(r"(?m)^(#{2,5}) ", lambda o: "#" + o.group(1) + " ", dChapters[sChapter])
+            lsOut += ["## " + sChapter, sBody.rstrip("\n"), ""]
+        sPath = os.path.join(sSkillDir, "references", sTarget)
+        os.makedirs(os.path.dirname(sPath), exist_ok=True)
+        open(sPath, "wb").write(("\ufeff" + "\r\n".join("\n".join(lsOut).split("\n")) + "\r\n").encode("utf-8"))
+        logLine("skill sections written skill=%s file=%s chapters=%d" % (sSkill, sTarget, len(lsChapters)))
+        iWritten += 1
+    return iWritten
+
+
+def copySkillDocuments():
+    """Copy each skill's kit documents into its references folder. Returns
+    the number copied."""
+    import shutil
+    iCopied = 0
+    for sSkill, lsDocuments in sorted(c_dSkillDocuments.items()):
+        sReferences = os.path.join(sScriptDir, ".claude", "skills", sSkill, "references")
+        if not os.path.isdir(os.path.dirname(sReferences)): continue
+        os.makedirs(sReferences, exist_ok=True)
+        for sDocument in lsDocuments:
+            sSource = os.path.join(sScriptDir, sDocument.replace("/", os.sep))
+            if not os.path.isfile(sSource):
+                logLine("ERROR skill document missing skill=%s document=%s" % (sSkill, sDocument))
+                continue
+            shutil.copyfile(sSource, os.path.join(sReferences, os.path.basename(sSource)))
+            logLine("skill document copied skill=%s document=%s" % (sSkill, sDocument))
+            iCopied += 1
+    return iCopied
 
 
 def packSkills():
@@ -1124,6 +1208,8 @@ def main():
             sayLine(sDllProblem)
             iSamplesFailed += 1
         buildTutorials()
+        copySkillDocuments()
+        extractSkillSections()
         iSkills = packSkills()
         sayLine("%d skill%s packed into exec\\skills, ready to upload to claude.ai." % (iSkills, "" if iSkills == 1 else "s"))
         removeStaleBinCopies()

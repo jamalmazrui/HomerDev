@@ -52,6 +52,11 @@ Templates/samples/build/
 Templates/samples/dist/
 scripts/release.cmd
 scripts/release.ps1
+.claude/skills/homer-code/references/CamelType_*.md
+.claude/skills/homer-code/references/Logging.md
+.claude/skills/homer-installer/references/FinishPage.md
+.claude/skills/homer-tutorial/references/Tutorials.md
+.claude/skills/homer-ui/references/ui-guide.md
 
 # Never pushed, whatever RepoFiles.txt says: private notes, maintainer
 # scripts, logs, and anything a build makes.

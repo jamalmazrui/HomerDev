@@ -1,0 +1,267 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="description" content="Designs and reviews the user interface of a Homer Tools app for screen reader users: Lbc dialogs and their focus order, labels, accessible names and access letters, menus and trigger letters, hotkeys and key names, function-key families, speech through JAWS and NVDA, and the choice between a single dialog, a command line and a multiple-document (MDI) app. Use when building or changing a dialog, menu or key binding, choosing a hotkey, deciding what the app should speak, or reviewing a Homer app’s interface for accessibility." />
+  <title>SKILL</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">SKILL</h1>
+</header>
+<h1 id="homer-user-interface">Homer user interface</h1>
+<p>A Homer app is used with a keyboard and a screen reader. Every rule
+below serves one aim: the person hears each thing once, in the order
+they meet it, and can reach any command by a key they can guess.</p>
+<h2 id="dialogs-lbc">Dialogs (Lbc)</h2>
+<ul>
+<li><strong>Build every dialog from Lbc</strong>, never a designer.
+<strong>Add order is focus order</strong>: the order of the
+<code>add</code> calls is the tab order and the reading order. When it
+is wrong, fix the calls or Lbc, never with TabIndex in the app.</li>
+<li><strong>A label comes just before its field</strong>; that names the
+field. Never set an accessible name equal to a control’s caption or the
+label before it (the reader would say it twice). Only a control with no
+visible text gets one.</li>
+<li><strong>Access letters</strong> come from <code>&amp;</code> in a
+caption or the preceding label, first letter of a word, no extra code.
+<strong>One trigger letter per menu or dialog</strong>: the first item
+to claim a letter keeps it; a later one gets none.</li>
+<li><strong>Initial focus in a multi-line text box is at its
+start.</strong></li>
+<li><strong>Save a setting as soon as the person answers</strong>, not
+at exit.</li>
+<li><strong>A field earns its line</strong>: leave out empty values, a
+program’s word for empty, and facts about a file rather than its
+content.</li>
+<li>Dialog-wide keys come with Lbc: Control+Enter accepts from anywhere,
+Escape cancels, F1 is Help (ending with the version, see homer-elevate),
+F7 lists the controls.</li>
+</ul>
+<h2 id="menus">Menus</h2>
+<p>Long, flat menus: arrowing is cheaper for a screen reader user than
+opening a submenu. A submenu is at most one level deep, only to gather
+rarely used items or to open a fresh set of trigger letters. A menu
+item’s trigger letter is its hotkey’s letter when it has one.</p>
+<h2 id="keys">Keys</h2>
+<ul>
+<li><strong>A hotkey’s letter is the first letter of a word of its
+command name</strong>, never mid-word; better no key than a mid-word
+one. Rare exceptions with a strong association: X for Export, Z for
+toggles (sleep), Shift+Z for Say Status (Z at the bottom, like the
+status bar). Explain an exception in the docs.</li>
+<li><strong>Alt+Control is for Windows desktop shortcuts</strong>, never
+an app binding, function keys included. Two exceptions: the app’s own
+desktop shortcut (Alt+Control+D opens DbDo), and Alt+Control with
+navigation keys to move within a window.</li>
+<li><strong>Drop the screen reader modifier</strong> where nothing
+conflicts (Windows, Chromium, JAWS, NVDA), preferring Alt+Shift+letter
+to Alt+letter, since Chromium fires a page’s access keys on Alt+letter.
+Keep one key on JAWS and NVDA where possible.</li>
+<li><strong>Do not fight Windows’ selection and navigation
+keys.</strong> In Homer apps: Shift+Home/End mark to the top or bottom,
+Alt+Shift+Home/End reverse that, Control+Home/End go to the first or
+last item, Control+Up/Down step through marked items,
+Control+PageUp/PageDown move between tables or windows, Backspace goes
+up a level, Alt+Left/Right go back and forward.</li>
+<li><strong>Function-key families</strong>: F1 help (F1 guide, Shift+F1
+history, Alt+F1 About, Control+F1 key describer); F2 edit or rename; F3
+search and repeat; F4 pick, say or close windows; F5 refresh; F6 panel
+focus (Control+Tab and Control+Shift+Tab move among the app’s windows,
+called “<App> windows”); F7 spell check or review; F8 selection, copy
+all, say all; F9 readable view; F10 menus (Shift+F10 context, Alt+F10
+alternate); F11 version and elevation; F12 open or close files, or
+AI.</li>
+<li><strong>The grave accent key is speech</strong>, where an app has
+speech commands: Alt and Alt+Shift for louder and softer, Control and
+Control+Shift for faster and slower, the screen reader key plus Grave
+for punctuation.</li>
+<li><strong>Key names</strong> are written as JAWS writes them:
+modifiers in alphabetical order (Alt, Control, Shift, Windows),
+“Control” spelled out, the reader key as “JAWS” or “NVDA”. Convert with
+KeyName, never a table of one’s own.</li>
+<li><strong>One command table (KeyMap)</strong> feeds the menus, the key
+describer and the hotkey list, so they cannot disagree.</li>
+</ul>
+<h2 id="speech">Speech</h2>
+<ul>
+<li><strong>Do not repeat what the screen reader says</strong>: no
+speech for a dialog’s title or a focused control’s name. Speak only what
+the reader cannot know.</li>
+<li><strong>Report only what happened this session</strong>, and match
+the noun to the count (“1 file”); zero is an answer, not an error.</li>
+<li><strong>Speak the parts of a grouped announcement as separate
+utterances</strong> (<code>Say.sayParts</code>), with no added pauses:
+column, row position and value as three.</li>
+</ul>
+<h2 id="shapes-of-app">Shapes of app</h2>
+<p>A single tool (a command line and one dialog, the same settings in
+both), a multiple-document app (DbDo, EdSharp, FileDir: one instance,
+opened or brought forward by its desktop shortcut), or an NVDA add-on.
+The kit’s guide explains each in <a
+href="references/ui-guide.md">references/ui-guide.md</a>, with Lbc’s
+calls, Say’s routes to each screen reader, and KeyName’s conversions; it
+is taken from the kit’s HomerDev.md at each build.</p>
+<p>Lists in the interface and in documents are in lowercase alphabetical
+order unless another order is clearly more logical.</p>
+</body>
+</html>

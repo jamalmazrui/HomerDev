@@ -1,0 +1,251 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>kit-libraries</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">kit-libraries</h1>
+</header>
+<h1 id="the-kits-shared-code">The kit’s shared code</h1>
+<h2 id="contents">Contents</h2>
+<ul>
+<li>Where it lives and how an app gets it</li>
+<li>C# classes</li>
+<li>Python modules</li>
+<li>Rules for using them</li>
+</ul>
+<h2 id="where-it-lives-and-how-an-app-gets-it">Where it lives and how an
+app gets it</h2>
+<p>The kit (C:) keeps its libraries in <code>exec</code>, the folder for
+code an app’s core runs on:</p>
+<ul>
+<li><code>exec/CSharp</code>: the C# classes, all in the
+<code>Homer</code> namespace. An app’s build names the files it uses on
+the compiler line, straight from the kit
+(<code>!homerDev!\exec\CSharp\Lbc.cs</code>); an app never carries a
+copy.</li>
+<li><code>exec/Python</code>: the Python modules, each imported by its
+own name (<code>import log</code>, <code>import inix, paths</code>),
+with no package around them. A Python app’s build puts the folder on
+PyInstaller’s path (<code>--paths "!homerDev!\exec\Python"</code>) and
+names each module with <code>--hidden-import</code>.</li>
+<li><code>exec/Homer.dll</code>: the C# classes compiled for a Python
+app whose dialogs use WinForms through pythonnet
+(<code>lbcnet</code>).</li>
+</ul>
+<p>The kit is needed only to build. A built program carries what it
+uses; an installed app never needs C:. An NVDA add-on copies the modules
+it uses into its own folder and puts that folder on the import path
+first.</p>
+<h2 id="c-classes">C# classes</h2>
+<ul>
+<li><code>Elevate</code>: version check against the latest GitHub
+release, and the F11 update and elevation.</li>
+<li><code>Inix</code>: the <code>.inix</code> settings format, plus
+conversion of tables among <code>.inix</code>, <code>.csv</code>,
+<code>.tsv</code>, Markdown and <code>.xlsx</code>.</li>
+<li><code>KeyMap</code>: one table of commands, their summaries and
+keys, read by the menus, the key describer and the hotkey list.</li>
+<li><code>KeyName</code>: one spelling for every key
+(<code>Alt+Control+Shift+H</code>, the reader key as <code>JAWS</code>
+or <code>NVDA</code>) and conversion to what each API wants.</li>
+<li><code>Lbc</code>: Layout By Code, the dialogs: labelled standard
+controls added in focus order, Alt-letter access from the
+<code>&amp;</code> in a caption or preceding label.</li>
+<li><code>Log</code>: the session log in the Homer line format.</li>
+<li><code>Mdi</code>: the frame and child of a multiple-document
+app.</li>
+<li><code>Ollama</code>: talking to a local Ollama model.</li>
+<li><code>Paths</code>: the folder layout, installed and per-user.</li>
+<li><code>PdfRead</code>: reading a PDF with positions and font sizes
+(needs PdfPig, which the app’s build fetches).</li>
+<li><code>Say</code>: speech straight to JAWS or NVDA, each part of a
+grouped announcement a separate utterance.</li>
+<li><code>Util</code>: string and file helpers.</li>
+<li><code>Web</code>: fetch a page, pull its links, download with a
+sensible name.</li>
+<li><code>inixVert</code>: the command-line wrapper over Inix’s table
+conversion.</li>
+</ul>
+<h2 id="python-modules">Python modules</h2>
+<p><code>elevate</code>, <code>inix</code>, <code>lbc</code> (wxPython
+dialogs), <code>lbcnet</code> (WinForms dialogs through Homer.dll),
+<code>log</code>, <code>mdi</code>, <code>paths</code>,
+<code>say</code>, <code>util</code> and <code>web</code>: the same names
+and behaviour as the C# classes, a module where C# has a static class
+and a class where C# keeps state (<code>lbc.Dialog</code>).</p>
+<h2 id="rules-for-using-them">Rules for using them</h2>
+<ul>
+<li>Start the log first, before anything can fail:
+<code>Log.start("&lt;App&gt;")</code> or
+<code>log.start("&lt;App&gt;")</code>.</li>
+<li>Take every folder from <code>Paths</code> or <code>paths</code>;
+never build one by hand.</li>
+<li>Save a setting as soon as the user answers, not at exit.</li>
+<li>Speak only what the screen reader cannot know; never repeat a
+dialog’s title or a control’s name.</li>
+<li>A fix to shared behaviour goes in the kit, not in one app.</li>
+</ul>
+</body>
+</html>

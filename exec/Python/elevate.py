@@ -2,7 +2,7 @@
 
 IS THERE A NEWER VERSION ON THE WEB, AND WOULD YOU LIKE IT?
 
-THIS MODULE AND CSharp\Elevate.cs ARE THE SAME CLASS IN TWO LANGUAGES. Same
+THIS MODULE AND exec\CSharp\Elevate.cs ARE THE SAME CLASS IN TWO LANGUAGES. Same
 function names, same outcome numbers, same sentences: configure, check,
 isNewer, describe, update and offer. "Elevate" is the Homer word for updating a
 program to its newest release, and F11 is its key (elevate sounds like eleven).
@@ -34,7 +34,7 @@ release, and the setup program is then looked for at the usual download path.
 
 VERSIONS ARE COMPARED AS NUMBERS. Compared as text, 1.11.0 sorts before 1.9.2,
 and upgrades silently stop being offered. This module took over the version
-comparison that lived in Python\homer\version.py, a name the kit could not
+comparison that lived in version.py, a name the kit could not
 keep: every Homer build writes a version.py of its own, so .gitignore and the
 checks treat that name as generated, and the module was never pushed.
 
