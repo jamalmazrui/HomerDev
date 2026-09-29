@@ -76,11 +76,17 @@ building, installing and reading a setup log takes minutes.
   the shipped add-on's manifest.ini to the app's version, so the installer's
   comparison with the installed add-on says Update after a release and
   Reinstall otherwise.
-- **Start nvda.exe through the shell** (Inno's `shellexec`, or cmd's `start`):
-  it is marked for UI Access, and CreateProcess refuses it with code 740.
-  `nvda.exe --install-add-on=<file>` starts NVDA if it is not running and asks
-  the person to confirm; opening the `.nvda-addon` file does nothing unless
-  NVDA is already running.
+- **Install the add-on without starting NVDA.** NVDA's own installer
+  (`addonHandler.installAddonBundle`) unpacks the `.nvda-addon` zip into
+  `%APPDATA%\nvda\addons\<name>.pendingInstall` and, at its next start, moves
+  it to `addons\<name>`; an add-on already there under its own name is simply
+  loaded. A Homer installer puts it there directly: unpacked to a temporary
+  folder, any old copy moved aside to `<name>.delete` (a suffix NVDA skips),
+  the new one moved into place, the old one put back if that fails. No second
+  screen reader starts talking over JAWS. An add-on's `installTasks.py` does
+  not run this way, so its presence is logged. (Starting `nvda.exe
+  --install-add-on` did start NVDA, which talked over JAWS; it must be started
+  through the shell, as CreateProcess refuses it with code 740.)
 - **An accepted add-on waits as `<name>.pendingInstall`** under
   `%APPDATA%\nvda\addons` until NVDA restarts; count it as installed.
 - **NVDA's own log** is `%TEMP%\nvda.log` for an installed copy (the folder of a
