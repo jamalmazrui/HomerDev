@@ -77,6 +77,11 @@ Each entry: the symptom in the log, the cause, the fix.
 
 ## Installer
 
+- **JAWS scripts that work on one machine and not another.** A compiled `.jsb`
+  was shipped, built by another JAWS version. Ship `.jss` sources only; the
+  installer compiles them with each installed version's `scompile.exe`, and
+  `.jsb` is never pushed.
+
 - **"File not found: C:\HomerDev\exec\Templates\HomerComponents.iss".** A
   build that works out the kit's folder by counting levels above a C# source
   counts wrong since the sources moved into `exec\CSharp`. Find the kit as the

@@ -62,6 +62,9 @@ HomerDev.md, under "Claude skills".
 - **homer-new-app**: start a new app -- choose its shape and language, run
   newHomerApp, fill in the starters, and take it through its first build,
   repository and release.
+- **homer-screen-reader**: JAWS scripts and NVDA add-ons -- the same commands
+  and keys on both readers, where the files live, how they ship and install,
+  compiling for each JAWS version, and diagnosing scripts that do not load.
 - **homer-tutorial**: write, check and build the spoken walkthroughs of a
   Homer app, where a narrator works and a screen reader answers. Carries the
   kit's tutorial guide, Tutorials.md, from help.

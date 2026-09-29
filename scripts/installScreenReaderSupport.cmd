@@ -65,9 +65,19 @@ for /d %%v in ("%sJawsRoot%\*") do (
   if exist "%%v\Settings\enu" (
     echo Installing the JAWS scripts for %%~nxv.
     call :logLine "Unpacking into %%v\Settings\enu"
+    rem COMPILED WHERE UNPACKED, BY THAT VERSION'S OWN COMPILER (HomerDev 1.43.37).
+    rem A .jsb built by one year's scompile is not reliably loaded by another
+    rem year's JAWS, and a .jss that nobody compiles is never run; EdSharp and
+    rem HomerView learned both. Each .jss in the zip is compiled in place with
+    rem %ProgramFiles%\Freedom Scientific\JAWS\<version>\scompile.exe, and each
+    rem exit code logged.
     powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-      "Expand-Archive -LiteralPath '%~dp0%sApp%_JAWS.zip' -DestinationPath '%%v\Settings\enu' -Force" >> "%sLog%" 2>&1
-    call :logLine "Expand-Archive exit code: !ERRORLEVEL!"
+      "$z='%~dp0%sApp%_JAWS.zip'; $d='%%v\Settings\enu'; Expand-Archive -LiteralPath $z -DestinationPath $d -Force; 'Expand-Archive done';" ^
+      "$c=Join-Path $env:ProgramFiles 'Freedom Scientific\JAWS\%%~nxv\scompile.exe';" ^
+      "if (Test-Path -LiteralPath $c) { Add-Type -AssemblyName System.IO.Compression.FileSystem; $o=[IO.Compression.ZipFile]::OpenRead($z);" ^
+      "foreach ($e in $o.Entries) { if ($e.Name -like '*.jss') { & $c (Join-Path $d $e.Name) | Out-Null; 'compiled ' + $e.Name + ' exit ' + $LASTEXITCODE } }; $o.Dispose() }" ^
+      "else { 'no compiler at ' + $c + '; the scripts are unpacked but not compiled' }" >> "%sLog%" 2>&1
+    call :logLine "Unpack and compile exit code: !ERRORLEVEL!"
     set /a iInstalled=iInstalled+1
   )
 )

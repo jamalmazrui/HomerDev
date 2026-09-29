@@ -5,6 +5,48 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.43.38 -- 29 September 2026
+
+**Compiled JAWS scripts are never shipped or pushed.** A .jsb runs on the JAWS
+version that built it and on later ones, so one built on the developer's
+machine may not suit the user's. The installer compiles each .jss with every
+installed version's own scompile.exe (1.43.37); now nothing else supplies a
+.jsb. tidy's never-pushed list gains *.jsb, and FileDir's build, which packed
+filedir.jsb and homer.jsb into FileDir_JAWS.zip, packs the sources only.
+
+**homer-screen-reader carries the publishers' own guides.** Freedom
+Scientific's JAWS scripting documentation and NV Access's and the add-on
+team's NVDA guides, as gathered on 30 and 31 August, go into the skill's
+references, to be searched for a function or API rather than read whole. What
+they taught is in jaws-and-nvda.md: how JAWS resolves a call and what
+"unknown function call" means, scripts against functions, overriding with
+Default:: and why a user default.jss must Use default.jsb, AutoStartEvent and
+AutoFinishEvent, the standard includes, scompile, the byte order mark as
+JAWS's sign of UTF-8, JAWS 2026's new syntax that older versions cannot
+compile; and for NVDA, which script wins a key (a global plugin over every app
+module), never blocking NVDA, relative imports against sys.path, ui.message,
+and testing.
+
+# 1.43.37 -- 29 September 2026
+
+**A skill for screen reader scripting: homer-screen-reader.** When a script is
+needed at all (most speech goes through Say from the app), the rules on both
+readers -- one set of commands, measured for parity; the keys of homer-ui;
+keys scoped to their program, never default.jkm or MyExtensions; speech -- and
+where JAWS scripts and NVDA add-ons live, ship and install. Its reference,
+jaws-and-nvda.md, holds what HomerView's and EdSharp's scripts taught: which
+files JAWS loads, layering over the factory scripts, key-map sections,
+compiling for each JAWS version and why the compilers disagree, an add-on's
+structure and gestures, carrying the kit's modules inside an add-on, and how
+to diagnose a script that does not load or answers "Unknown script call". It
+carries the JAWS script style guide from help.
+
+**installScreenReaderSupport compiles the JAWS scripts it unpacks.** It
+unpacked <App>_JAWS.zip into each JAWS version's settings folder and stopped
+there, so a .jss shipped without its .jsb was never run. Each .jss in the zip
+is now compiled in place by that version's own scompile.exe, as EdSharp's and
+HomerView's installers do, with each exit code in the setup log.
+
 # 1.43.36 -- 28 September 2026
 
 From the builds and releases of 28 September at 21:40, when nine apps were

@@ -61,6 +61,7 @@ c_lsExpected = [
     ".claude/skills/homer-build-release/SKILL.md", ".claude/skills/homer-code/SKILL.md",
     ".claude/skills/homer-convert/SKILL.md", ".claude/skills/homer-docs/SKILL.md", ".claude/skills/homer-ui/SKILL.md",
     ".claude/skills/homer-elevate/SKILL.md", ".claude/skills/homer-installer/SKILL.md", ".claude/skills/homer-migrate/SKILL.md", ".claude/skills/homer-new-app/SKILL.md",
+    ".claude/skills/homer-screen-reader/SKILL.md",
     ".claude/skills/homer-installer/references/components.md",
     ".claude/skills/homer-tutorial/SKILL.md", ".claude/skills/podcast-directory/SKILL.md",
     "Templates/makeHotkeys.py",
@@ -553,6 +554,7 @@ def buildHomerDll():
 # git carries the originals, and a build makes the copies again.
 c_dSkillDocuments = {
     "homer-installer": ["help/FinishPage.md"],
+    "homer-screen-reader": ["help/CamelType_JAWSScript.md"],
     "homer-tutorial": ["help/Tutorials.md"],
     "homer-code": ["help/CamelType_CSharp.md", "help/CamelType_CSharp_Reference.md",
                    "help/CamelType_JAWSScript.md", "help/CamelType_Python.md", "help/Logging.md"],
