@@ -1,0 +1,301 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="description" content="Writes and reviews the documentation of a Homer Tools app or of the Homer Development Kit: the standard document set (ReadMe, the app’s guide, Announce, Developer, History, Hotkeys, License), each Markdown file with its Pandoc .htm, at a ninth-grade reading level, with the Homer heading, list, link and key-naming conventions. Use when writing or revising any Homer document, a History entry, a Hotkeys list, release notes or a ReadMe, or when checking documents before a release." />
+  <title>SKILL</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">SKILL</h1>
+</header>
+<h1 id="homer-documents">Homer documents</h1>
+<p>A Homer document is read with a screen reader, usually by heading. It
+says things plainly, in the order a reader needs them, with nothing to
+decode.</p>
+<h2 id="the-set">The set</h2>
+<p>Every app ships these, each as <code>.md</code> with a
+<code>.htm</code> made from it by Pandoc (never edited by hand):
+<strong>ReadMe</strong> (a quick start), <strong>Announce</strong> (what
+is new), <strong>the app’s own guide</strong>
+<code>&lt;App&gt;.md</code> (the full reference),
+<strong>Developer</strong> (how it is built), <strong>History</strong>
+(the changes, readably), <strong>Hotkeys</strong> (every key, sorted
+several ways) and <strong>License</strong> (the MIT license verbatim,
+naming the app and Jamal Mazrui). ReadMe and License sit at the top of
+the project; the rest in <code>help</code>. What each holds is in <a
+href="references/document-set.md">references/document-set.md</a>.</p>
+<h2 id="writing">Writing</h2>
+<ul>
+<li><strong>Ninth-grade reading level</strong>, plain language, never at
+the cost of technical accuracy. Developer and History may go further
+into detail.</li>
+<li><strong>Say the word a key comes from</strong> wherever a key is
+introduced: “Shift+C is Say Cell”. Headings use the command’s own word,
+not a synonym (“Order and Where Filter”, not “Sorting and
+Filtering”).</li>
+<li><strong>Key names</strong> as JAWS writes them: Alt, Control, Shift,
+Windows in that order, “Control” spelled out, the reader key as “JAWS”
+or “NVDA”.</li>
+<li><strong>Match the noun to the count</strong> (“1 match”); zero is an
+answer.</li>
+<li><strong>Lists rather than tables</strong>, except in reports for
+sighted managers or developers. Lists in lowercase alphabetical order
+unless another order is clearly more logical. “In order by title”
+ignores a leading A, An or The, case-insensitively; “by author” is by
+surname.</li>
+<li><strong>Links</strong>: a URL only when verified; link text that
+reads well, never a bare URL.</li>
+<li><strong>A page break</strong> is a paragraph holding only
+<code>\pagebreak</code>, rendered with the pagebreak Lua filter.</li>
+<li>Report what a program does, not what it could do; no promotional
+words.</li>
+</ul>
+<h2 id="headings">Headings</h2>
+<p>A document has one H1, its title. A guide’s H2s are topic categories
+in alphabetical order, with “Miscellaneous” last; a category needs two
+or more articles or folds into Miscellaneous. H3s are the articles,
+alphabetical within their category; H4 and below sit inside an article.
+No level is skipped. A long document opens with a contents list.</p>
+<h2 id="history">History</h2>
+<p>Newest first. Each entry is headed with the version and date. It says
+what changed for the person using the app, and why, in sentences rather
+than commit messages; a fix names the symptom a user saw. A kit or build
+change the user never sees goes in Developer or the kit’s own History,
+not the app’s.</p>
+<h2 id="check-before-release">Check before release</h2>
+<p>Run the document check on the project; fix what it reports, then
+rebuild the <code>.htm</code> files (the build does this) and run it
+again:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> scripts/checkDocs.py C:/<span class="op">&lt;</span>App<span class="op">&gt;</span></span></code></pre></div>
+<p>It reports documents missing from the set, a <code>.md</code> without
+its <code>.htm</code> or an <code>.htm</code> older than its
+<code>.md</code>, heading problems (not one H1, a skipped level), bare
+URLs, a long document with no contents list, and each document’s reading
+grade, flagging a user document above grade 9. Zero findings is a real
+answer.</p>
+</body>
+</html>

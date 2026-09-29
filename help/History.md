@@ -5,6 +5,24 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.43.28 -- 28 September 2026
+
+**A skill for documents: homer-docs.** The document set every app ships and
+what each holds (document-set.md), the ninth-grade reading level, saying the
+word a key comes from, key names, counts, lists rather than tables, verified
+links with readable text, page breaks, the heading structure of a guide, and
+how a History entry is written. Its script, checkDocs, reports documents
+missing from the set, a .md without its .htm or with an older one, a document
+without exactly one H1, a skipped heading level, bare URLs, a long document
+with no contents list, and each document's reading grade, flagging one a user
+reads that is above grade 9.
+
+Run on the kit itself, it found two bare URLs, now links, in Announce.md and
+Tutorials.md. It also finds that the kit's longest documents -- HomerDev.md,
+History.md, Developer.md and the migration briefing -- use H1 for their
+chapters and have no contents list, which the Homer heading rule asks of a
+guide.
+
 # 1.43.27 -- 28 September 2026
 
 **A skill for the interface: homer-ui.** Lbc dialogs and their focus order,

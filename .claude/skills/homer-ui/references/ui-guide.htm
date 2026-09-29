@@ -1,0 +1,484 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>ui-guide</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">ui-guide</h1>
+</header>
+<h1 id="the-homer-interface-from-homerdev.md">The Homer interface, from
+HomerDev.md</h1>
+<p>Copied by buildHomerDev from help/HomerDev.md; edit that, not
+this.</p>
+<h2 id="contents">Contents</h2>
+<ul>
+<li>Lbc: building a dialog</li>
+<li>Keys and key names</li>
+<li>Direct speech across screen readers</li>
+<li>Three kinds of Homer app</li>
+</ul>
+<h2 id="lbc-building-a-dialog">Lbc: building a dialog</h2>
+<p>Lbc stands for Layout By Code. A Homer dialog is never drawn in a
+designer. It is assembled in code out of ordinary Windows controls, each
+created with its label, its accessible name and its tab position already
+correct.</p>
+<p>The reason is simple. A designer places controls by pixel, and the
+tab order ends up being whatever the mouse happened to do. Lbc has one
+rule instead:</p>
+<blockquote>
+<p><strong>Add order is focus order.</strong></p>
+</blockquote>
+<p>The order the <code>add</code> calls appear in is the order the user
+tabs through, which is the order the dialog is read in, and the layout
+follows from that rather than the other way round. When the order is
+wrong, the fix belongs in Lbc or in the order of the calls, never in a
+pile of <code>TabIndex</code> assignments in the app.</p>
+<h3 id="the-shape-of-a-dialog">The shape of a dialog</h3>
+<pre><code>using (LbcDialog dlg = new LbcDialog(&quot;Find&quot;, frm))
+{
+    TextBox tbFind = dlg.addInputBox(&quot;&amp;Find what:&quot;, sLast,
+        &quot;The text to look for. The last ten searches are remembered.&quot;);
+    CheckBox cbCase = dlg.addCheckBox(&quot;Match &amp;case&quot;, bCase,
+        &quot;Off means a and A are the same.&quot;);
+    if (!dlg.runOkCancel()) return false;
+    sFind = tbFind.Text;
+    bCase = cbCase.Checked;
+}</code></pre>
+<p>That is the whole pattern. The dialog is disposable, every
+<code>add</code> returns the real control so you can read it afterwards,
+and <code>runOkCancel</code> returns true when the user accepted.</p>
+<h3 id="what-you-can-add">What you can add</h3>
+<p>Every one of these takes a label with an <code>&amp;</code> before
+its access-key letter, and most take a tip that appears in the dialog’s
+status bar when focus arrives and in the Help box.</p>
+<ul>
+<li><code>addLabel</code> – a line of text.</li>
+<li><code>addInputBox</code>, <code>addTextLine</code>,
+<code>addInlineInputBox</code> – a single-line box. The inline form puts
+the label and box on one row.</li>
+<li><code>addMemoBox</code>, <code>addTextMemo</code>,
+<code>addMemo</code> – a multi-line box. A memo eats a bare Enter, which
+is why Control+Enter also accepts the dialog.</li>
+<li><code>addCheckBox</code> – a true or false answer.</li>
+<li><code>addRadioButton</code> – one of several.</li>
+<li><code>addListBox</code>, <code>addPickBox</code> – a list to choose
+one item from.</li>
+<li><code>addCheckListBox</code> – a list to tick several items in.</li>
+<li><code>addComboBox</code>, <code>addComboPickBox</code>,
+<code>addComboEditBox</code>, <code>addComboHistoryBox</code> – a combo
+box; the history form is prefilled with recent answers.</li>
+<li><code>addNumericUpDown</code> – a number with arrows.</li>
+<li><code>addButton</code> – a push button on the current band.</li>
+<li><code>addSeparator</code> – a divider, which also closes an open
+band.</li>
+</ul>
+<h3 id="bands">Bands</h3>
+<p>By default each control sits on its own row. A band puts several on
+one row, which is what you want for a field and the button that fills it
+in:</p>
+<pre><code>dlg.addBand();
+TextBox tbSource = dlg.addInputBox(&quot;&amp;Source:&quot;, sSource, &quot;The file to work on.&quot;);
+Button btnBrowse = dlg.addButton(&quot;&amp;Browse source...&quot;, &quot;Pick it from a dialog.&quot;);
+dlg.endBand();</code></pre>
+<p>A band changes only the arrangement. The tab order is still the order
+of the calls.</p>
+<h3 id="showing-it">Showing it</h3>
+<ul>
+<li><code>runOkCancel()</code> – OK and Cancel; returns true on OK.</li>
+<li><code>runWithButtons(new string[] { "Default settings", "OK", "Cancel" })</code>
+– returns the label of the button pressed, or an empty string if the
+user pressed Escape or closed the window.</li>
+<li>A <strong>Help</strong> button is added for you and placed
+rightmost, per Windows layout. It lists every field with its tip, then
+the universal dialog keys. F1 does the same.</li>
+<li><strong>Enter</strong> presses the button that means accept,
+wherever it sits in the row, and <strong>Control+Enter</strong> does it
+from any control including a memo. <strong>Escape</strong> cancels.</li>
+<li>OK and Cancel deliberately get no access key: their keys are Enter
+and Escape, and an unnecessary Alt+O would take a letter another button
+may want.</li>
+</ul>
+<h3 id="other-pieces">Other pieces</h3>
+<ul>
+<li><code>LbcTextBox</code> is the text box the boxes above are made of.
+It carries the convenience keys: copy or cut the current line with no
+selection, mark a selection in two keystrokes with F8 and Shift+F8, copy
+all with Control+F8, read all with Alt+F8, delete the line with
+Control+D, and open what is under the cursor with Shift+F5.</li>
+<li><code>HelpDialog.show(owner, sTitle, sText)</code> is the plain
+read-only box: help text, results, a query answer. The user arrows
+through it line by line.</li>
+<li><code>HelpDialog.showRecordView</code> is the same box with record
+navigation, for stepping through one record at a time.</li>
+<li><code>LbcInixForm</code> builds a whole dialog from an
+<code>.inix</code> file describing the fields, and writes the answers
+back to one. It is how a form can be defined as data instead of
+code.</li>
+<li><code>setStatusText</code> writes to the dialog’s status line;
+<code>setInitialFocus</code> says which control opens with the
+focus.</li>
+</ul>
+<h3 id="opening-focus">Opening focus</h3>
+<p>The field that opens with the focus has its value selected, so typing
+or pasting replaces it and Tab leaves it alone. A
+<strong>multi-line</strong> box is the exception: its caret opens on the
+first line, because its value is a document rather than a field.</p>
+<h2 id="keys-and-key-names">Keys and key names</h2>
+<h3 id="one-spelling">One spelling</h3>
+<p><code>KeyName.cs</code> holds the one spelling for every key, taken
+from how Freedom Scientific writes key names in the JAWS key map files,
+with three Homer rules on top:</p>
+<ul>
+<li><strong>Modifiers in alphabetical order</strong>: Alt, Control,
+Shift, Windows. So <code>Alt+Control+Shift+F</code> and never
+<code>Shift+Control+Alt+F</code>.</li>
+<li><strong>“Control” spelled out</strong>, never “Ctrl”.</li>
+<li><strong>The screen reader key is “JAWS” or “NVDA”</strong>, not
+“JAWSKey”. On both readers it is usually Insert or CapsLock.</li>
+</ul>
+<p>Then convert to whatever an API wants, rather than writing that table
+again:</p>
+<pre><code>KeyName.toJawsKeyMap(&quot;Alt+Shift+H&quot;)    // for a .jkm file
+KeyName.toNvdaGesture(&quot;Alt+Shift+H&quot;)   // for an NVDA gesture
+KeyName.toWinFormsText(&quot;Alt+Shift+H&quot;)  // for a menu item&#39;s shortcut text
+KeyName.toWinFormsKeys(&quot;Alt+Shift+H&quot;)  // the .NET Keys value
+KeyName.toWx(&quot;Alt+Shift+H&quot;)            // for wxPython
+KeyName.toInnoHotKey(&quot;Alt+Shift+H&quot;)    // for an installer shortcut
+KeyName.toSpoken(&quot;Alt+Shift+H&quot;)        // for speech and documentation</code></pre>
+<p><code>KeyName.same()</code> compares two spellings of the same key,
+and <code>KeyName.parse()</code> normalizes one.</p>
+<h3 id="choosing-a-key">Choosing a key</h3>
+<ul>
+<li><strong>Give it a mnemonic</strong>: the first letter of a word in
+the command’s name.</li>
+<li><strong>Do not take a key Windows has already given a
+meaning</strong>, especially one about selection or navigation.</li>
+<li><strong>Never use Alt+Control combinations.</strong> That space
+belongs to Windows desktop shortcuts, function keys included. A desktop
+shortcut’s own hotkey is the one sanctioned use of it.</li>
+<li><strong>Prefer Alt+Shift plus a letter</strong> when dropping the
+screen reader modifier. Chromium fires a web page’s access key on
+Alt+letter, and does not on Alt+Shift+letter.</li>
+<li><strong>Aim for one key that works on both JAWS and NVDA.</strong>
+Perfect agreement is not realistic; keeping the differences few is.</li>
+</ul>
+<h3 id="keymap">KeyMap</h3>
+<p><code>KeyMap.cs</code> is the one table associating a context, a
+command name, a summary, a longer description and a key. The menus, the
+alternate menu, the key describer and the hotkey document all read from
+it, so a command is described once and every surface agrees.</p>
+<pre><code>KeyMap.register(&quot;Find Record&quot;, Keys.Control | Keys.F, mnuFind, &quot;Grid&quot;);
+KeyMap.setSummary(&quot;Find Record&quot;, &quot;Search every column for text.&quot;);</code></pre>
+<p><code>KeyMap.lsConflicts</code> lists any key claimed twice, which is
+worth showing in a developer command rather than discovering in use.</p>
+<h2 id="direct-speech-across-screen-readers">Direct speech across screen
+readers</h2>
+<p>A Windows program cannot count on a screen reader noticing
+everything. Focus changes and window titles it will announce by itself.
+A result, a count, a status, a thing that happened in the background –
+those it cannot know about.</p>
+<p><code>Say.cs</code> is the one way a Homer app says such a thing, and
+it works the same whichever reader is running.</p>
+<pre><code>using Homer;
+
+Say.attach(frm);              // once, at startup, on the main form
+Say.say(&quot;12 rows marked&quot;);    // spoken if speech is interrupted anyway
+Say.sayForced(&quot;Backup finished&quot;);   // spoken even mid-sentence
+Say.sayParts(&quot;Row 4&quot;, &quot;Title&quot;, &quot;The Sea Around Us&quot;);</code></pre>
+<h3 id="how-it-reaches-the-reader">How it reaches the reader</h3>
+<p><code>sayForced</code> tries each route in turn and stops at the
+first that works.</p>
+<ol type="1">
+<li><strong>JAWS</strong>, through its COM interface. This is the most
+reliable route when JAWS is running, and it respects the user’s own
+speech settings.</li>
+<li><strong>NVDA</strong>, through
+<code>nvdaControllerClient.dll</code>, the controller client NV Access
+publishes for exactly this.</li>
+<li><strong>A UI Automation notification event</strong>, raised from a
+hidden provider control. This is what reaches Narrator, and it also
+reaches any other assistive technology that listens for
+notifications.</li>
+<li><strong>SAPI</strong>, the Windows voices, and only if the app turns
+it on with <code>Say.bUseSapiAsBackup</code>. It is off by default,
+because a second voice talking over the user’s screen reader is worse
+than silence.</li>
+</ol>
+<p><code>Say.speechDiagnostic()</code> reports which routes are
+available on this machine and <code>Say.lastSpeechPath()</code> reports
+which one the last message actually took. Both belong in an app’s Help
+or About, so a user can say what happened.</p>
+<h3 id="what-to-speak-and-what-not-to">What to speak, and what not
+to</h3>
+<ul>
+<li><strong>Do not repeat what the reader already says.</strong> It
+announces a dialog’s title when the dialog opens and a control’s name
+when focus lands on it. An app that says these too makes the user hear
+everything twice.</li>
+<li><strong>Do not set a control’s accessible-name property to its own
+caption or to the label before it.</strong> Same fault, same cause. That
+property is for a control with no visible text.</li>
+<li><strong>Report only what happened this session.</strong> A summary
+that lists what the program can do, rather than what it just did,
+teaches a user to ignore summaries.</li>
+<li><strong>Match the noun to the count.</strong> “1 file”, not “1
+files”. A count of zero is a real answer: “0 matches” is information,
+not an error.</li>
+</ul>
+<h2 id="three-kinds-of-homer-app">Three kinds of Homer app</h2>
+<p>Every Homer program is one of three shapes. They share far more than
+they differ, and what they share is the whole of this kit: the same
+classes, the same folder layout, the same session log, the same settings
+format, the same key conventions, the same document set, the same build,
+installer and release scripts, and the same evidence checks. What
+differs is only how the program meets the person.</p>
+<h3 id="one-a-single-tool-with-a-command-line-and-a-dialog">One: a
+single tool, with a command line and a dialog</h3>
+<p>One independent 64-bit executable that does one job. It answers
+<code>--help</code>, it can be scripted from a batch file or a scheduled
+task, and with no arguments – or with <code>--gui</code> – it opens one
+Lbc dialog instead.</p>
+<p>Both modes take the same settings and write the same log, so a person
+can learn the dialog and then automate what they learned.
+<code>FruitBasketCs.cs</code> and <code>FruitBasketPy.py</code> are this
+shape.</p>
+<p>The flags are the same in every Homer tool of this kind:</p>
+<ul>
+<li><code>--help</code> – what it does and every switch, to standard
+output, exit code 0</li>
+<li><code>--gui</code> – open the dialog even when arguments were
+given</li>
+<li><code>--version</code> – the version and nothing else</li>
+<li><code>--log</code> – say where this session’s log is</li>
+<li>an unknown switch is refused with exit code 1 rather than
+ignored</li>
+</ul>
+<h3 id="two-a-desktop-program-that-could-not-be-a-command-line">Two: a
+desktop program that could not be a command line</h3>
+<p>The same single-window shape, but graphical only, because of what it
+carries: a local AI model, a browser engine, a media pipeline, a speech
+stack. HomerScribe is this. The dependencies decide the shape, not the
+interface.</p>
+<p>It should still answer <code>--help</code> and still take arguments
+where that is meaningful, but it does not promise that every feature
+works without the desktop. Say so in its guide rather than leaving
+somebody to discover it.</p>
+<h3 id="three-a-multiple-document-program">Three: a multiple-document
+program</h3>
+<p>One frame holding many windows, each showing one thing: a file in
+EdSharp, a folder in FileDir, a table in DbDo, a basket in
+<code>FruitBasketMdi.cs</code>.</p>
+<p>Use this shape when a person genuinely works on several things at
+once, and not otherwise. A window is a first-class object to a screen
+reader – Alt+Tab reaches it, the window list names it, its title is
+announced when it activates, and it keeps its own state. A tabbed
+interface has to reimplement all of that, usually badly. That is the
+argument for MDI, and it is the only one needed.</p>
+<p><code>MdiFrame</code> and <code>MdiChild</code> in
+<code>Mdi.cs</code> carry the frame, so an app writes its own commands
+and nothing else. Free with the frame:</p>
+<ul>
+<li>F4 – current windows, as a pick list</li>
+<li>Shift+F4 – say how many windows are open, and their titles</li>
+<li>Control+Tab and Control+Shift+Tab – next and previous window</li>
+<li>Control+F4 and Control+Shift+F4 – close this window, close all but
+this one</li>
+<li>Alt+F10 – alternate menu: every command in one list you can
+filter</li>
+<li>Control+F1 – key describer: a key says what it would do instead of
+doing it</li>
+<li>Alt+F1 – about; F1 – the guide</li>
+</ul>
+<p>The design is not new. It comes from the Homer.NET MDI fruit basket
+of 2010, which already had the menu declared by name and key, a focus
+tip on every control, a window picker, an alternate menu and a key
+describer. What is new is that the three current apps can share one
+implementation instead of three that drift.</p>
+<p><strong>The title rule, which cost DbDo a bug.</strong> The frame
+carries the app name and nothing else; a child carries what it is
+showing and nothing else. Windows merges a maximized child into the
+frame caption, so JAWS+T reads
+<code>DbDo - [contacts.db - contacts]</code>. A child that repeated the
+app name made the reader say it twice. <code>MdiChild.setTitle</code> is
+the only way to set a child title, so the rule cannot be broken by
+accident.</p>
+<p><strong>One builder for both.</strong> <code>LbcDialog</code> can
+adopt an existing form instead of making one, so an MDI child is laid
+out by exactly the same code as a dialog – add order as focus order, the
+status line, the list search, the line chords, the access keys.
+<code>MdiChild.lbc</code> is that builder; finish with
+<code>finishLayout</code> rather than <code>run</code>, because the
+frame shows the window.</p>
+<h3 id="what-all-three-share">What all three share</h3>
+<p>Everything else, which is the point of the kit: <code>Inix</code> for
+settings, <code>Log</code> for the session log, <code>Paths</code> for
+the folder layout, <code>Say</code> for what the screen reader cannot
+know, <code>KeyName</code> and <code>KeyMap</code> for keys,
+<code>Lbc</code> for every control, the document set,
+<code>build&lt;App&gt;.cmd</code>, <code>&lt;App&gt;_setup.iss</code>,
+<code>RepoFiles.txt</code>, <code>accept.inix</code> and
+<code>check</code>. A person who learns one shape has learnt most of the
+other two.</p>
+</body>
+</html>

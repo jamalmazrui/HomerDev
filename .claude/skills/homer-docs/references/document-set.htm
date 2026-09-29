@@ -4,8 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="author" content="Jamal Mazrui" />
-  <title>Announce</title>
+  <title>document-set</title>
   <style>
     html {
       line-height: 1.5;
@@ -166,66 +165,64 @@
 </head>
 <body>
 <header id="title-block-header">
-<h1 class="title">Announce</h1>
-<p class="subtitle">Foundations for Windows programs that work by
-keyboard and speech</p>
-<p class="author">Jamal Mazrui</p>
+<h1 class="title">document-set</h1>
 </header>
-<h1 id="announcing-the-homer-development-kit">Announcing the Homer
-Development Kit</h1>
-<h3
-id="foundations-for-windows-programs-that-work-by-keyboard-and-speech">Foundations
-for Windows programs that work by keyboard and speech</h3>
-<p>September 2026 Copyright 2026 by Jamal Mazrui MIT License</p>
-<p>Building a small Windows tool of your own should not require first
-discovering, by trial and error, what makes a program work well with a
-screen reader. The Homer Development Kit is free and open source, and it
-exists so that you can skip that part.</p>
-<p>It consolidates decades of screen reader oriented development I have
-done under Windows – tools and techniques that I hope will help others
-get started and succeed, based on lessons I have learned and tried to
-write down. The knowledge is not new; gathering it into one place is,
-and AI is what made that practical.</p>
-<p>Start a new program and it already does the things that usually take
-years to learn. The tab order is right. The keys do not fight Windows,
-JAWS or NVDA. Nothing is announced twice, and nothing important goes
-unannounced. When something goes wrong there is a log that says what
-happened, in a place you can find. When it works, one command builds an
-installer and publishes a release.</p>
-<p>What makes that possible is that the decisions are in classes you
-call rather than rules you remember. The project holds equivalent
-versions in C#, for .NET Framework 4.8, which builds on any modern
-Windows, and in Python, for any recent version. They support layout by
-code, standard dialogs, and several components that help a screen reader
-user work either with AI assistance or by hand. The order you add a
-control is the order you tab through it. An ampersand in a label is the
-whole of an access key. Speech is used only for what a screen reader
-cannot work out for itself. Settings and logs land in the same folders
-in every program.</p>
-<p>You can also find out what your program does without looking at it.
-One command checks the things that can be checked – an accessible name
-that repeats a caption, two controls claiming one access key, the build,
-a smoke run, and the criteria you wrote before you began – then starts
-the program, presses the keys, and reads back the same accessibility
-tree a screen reader reads. The report says what was verified, what was
-not checked, and what remains uncertain. Knowing which is which is the
-difference between a program you hope works and one you can vouch
-for.</p>
-<p>The sample programs include fruit basket dialogs in C# and in Python,
-built with the shared classes, as a single dialog and as a
-multiple-document application. The pairs read side by side, so you can
-see one design in two languages and pick the one you want to work in.
-Template files help with the rest: a build script for an app that uses
-Homer components, and an installer built with Inno Setup.</p>
-<p>MIT licensed, for Windows 10 or later, with JAWS, NVDA or
-Narrator.</p>
+<h1 id="the-document-set">The document set</h1>
+<h2 id="contents">Contents</h2>
 <ul>
-<li><a href="https://github.com/JamalMazrui/HomerDev">The HomerDev
-project page on GitHub</a></li>
+<li>ReadMe</li>
+<li>The app’s guide</li>
+<li>Announce</li>
+<li>Developer</li>
+<li>History</li>
+<li>Hotkeys</li>
+<li>License</li>
+<li>The kit’s own documents</li>
 </ul>
-<p>If you use a screen reader and have wanted to build something of your
-own, start with the ReadMe and tell me where it loses you. If you
-already build Windows software, I would value your eyes on what is
-there.</p>
+<h2 id="readme">ReadMe</h2>
+<p><code>ReadMe.md</code> at the top of the project, where GitHub and a
+person opening the folder find it. A quick start: what the app does in
+two or three sentences, how to install it (the direct link to
+<code>&lt;App&gt;_setup.exe</code> on the latest release), how to start
+it (its desktop hotkey), the three or four things to do first, and where
+the full guide is. No history, no build detail.</p>
+<h2 id="the-apps-guide">The app’s guide</h2>
+<p><code>help/&lt;App&gt;.md</code>, the full reference, organized for
+navigation by heading: H2 topic categories alphabetically
+(“Miscellaneous” last), H3 articles alphabetically within each, H4 and
+below inside an article. Each command is described with its key, its
+menu, and the word the key comes from. The program opens it with F1.</p>
+<h2 id="announce">Announce</h2>
+<p><code>help/Announce.md</code>: what is new in this release, for
+someone deciding whether to update, in a few short paragraphs. Suitable
+for an email or a list post.</p>
+<h2 id="developer">Developer</h2>
+<p><code>help/Developer.md</code>: how the app is built and released –
+its layout, the build and its steps, what it fetches, the kit classes it
+uses, the release routine, and anything a maintainer must know that a
+user need not. May be more technical than the other documents.</p>
+<h2 id="history">History</h2>
+<p><code>help/History.md</code>, opened by Shift+F1. Newest first; each
+entry headed with the version and date; changes described for the user,
+with the reason.</p>
+<h2 id="hotkeys">Hotkeys</h2>
+<p><code>help/Hotkeys.md</code>, generated from the program’s own
+command table by <code>makeHotkeys.py</code> during the build, never
+kept by hand. Three H2 sections, each with H3 groups: <strong>by
+menu</strong>, <strong>by key</strong> (grouped by modifier family,
+function keys together) and <strong>by command</strong>. Every entry is
+one list item whose lines are joined with a backslash hard break: the
+sorted-on thing, what it does, then the other half of the pair. The
+memory association for each key is written once, in the by-menu section;
+the rules behind the associations open the document.</p>
+<h2 id="license">License</h2>
+<p><code>License.md</code> at the top: the MIT license verbatim, naming
+the app and Jamal Mazrui as the copyright holder.</p>
+<h2 id="the-kits-own-documents">The kit’s own documents</h2>
+<p>The kit keeps the same set plus its guides:
+<code>help/HomerDev.md</code> (the kit’s full guide), the Camel Type
+style guides, <code>FinishPage.md</code>, <code>Logging.md</code>,
+<code>Tutorials.md</code> and the migration briefing
+<code>HomerDev_update.md</code>.</p>
 </body>
 </html>

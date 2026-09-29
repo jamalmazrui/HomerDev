@@ -55,7 +55,7 @@ for an app that uses Homer components, and an installer built with Inno Setup.
 
 MIT licensed, for Windows 10 or later, with JAWS, NVDA or Narrator.
 
-- HomerDev project page on GitHub: https://github.com/JamalMazrui/HomerDev
+- [The HomerDev project page on GitHub](https://github.com/JamalMazrui/HomerDev)
 
 If you use a screen reader and have wanted to build something of your own, start
 with the ReadMe and tell me where it loses you. If you already build Windows

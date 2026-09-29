@@ -46,6 +46,10 @@ HomerDev.md, under "Claude skills".
   Pandoc, Office, PDF and other documents to accessible .htm or .txt with 2htm,
   tables with inixVert -- and put the output in the Homer encoding with its
   toHomerEncoding script.
+- **homer-docs**: the documentation set, reading level, headings, lists,
+  links, key naming, History and Hotkeys, with a checkDocs script that reports
+  missing documents, stale .htm files, heading problems, bare URLs and each
+  document's reading grade.
 - **homer-elevate**: the Elevate Version feature -- F11 checks GitHub for a
   newer release and offers its installer -- on an MDI app's Help menu or in a
   single-dialog app's Help box.
