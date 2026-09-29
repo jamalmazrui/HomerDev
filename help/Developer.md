@@ -8,7 +8,21 @@ author: "Jamal Mazrui"
 This is for changing the kit itself. For building an app with it, read
 HomerDev.md.
 
-# Layout
+## Contents
+
+- [Layout](#layout)
+- [Releasing the kit](#releasing-the-kit)
+- [Building the kit](#building-the-kit)
+- [How a change reaches the apps](#how-a-change-reaches-the-apps)
+- [The four scripts, and the order they run in](#the-four-scripts-and-the-order-they-run-in)
+- [Adding a module](#adding-a-module)
+- [Encodings](#encodings)
+- [Templates](#templates)
+- [Versioning and release](#versioning-and-release)
+- [Publishing the kit](#publishing-the-kit)
+- [Conventions worth not rediscovering](#conventions-worth-not-rediscovering)
+
+## Layout
 
     C:\HomerDev\
       .claude\skills\   the Claude skills, one folder each
@@ -26,7 +40,7 @@ HomerDev.md.
       newHomerApp.cmd / .py       write a new app folder
       ReadMe, License, RepoFiles.txt, version.txt, .gitignore
 
-# Releasing the kit
+## Releasing the kit
 
     releaseHomerDev "What changed."   all four steps below, stopping at the first failure
 
@@ -52,7 +66,7 @@ error names a file that was never meant to exist:
 That is the old copy talking. Run `installTools` after updating the kit and it
 goes away.
 
-# Building the kit
+## Building the kit
 
     buildHomerDev          convert the documents, build every sample, check the kit
     buildHomerDev check    check only
@@ -82,7 +96,7 @@ The kit's modules are not compiled here, so a C# mistake in one of them
 surfaces the first time an app builds. That is deliberate and matches the house
 preference: a build error you can see beats a component quietly left out.
 
-# How a change reaches the apps
+## How a change reaches the apps
 
 An app's build script compiles the Homer modules straight out of
 `%HOMERDEV%\CSharp`, defaulting to `C:\HomerDev`. There is no copy in the app
@@ -98,7 +112,7 @@ HomerScribe does not is a change that is not finished.
 Before removing or renaming a public member, grep the apps for it. The merge
 that produced this kit exists because two apps had diverged on exactly that.
 
-# The four scripts, and the order they run in
+## The four scripts, and the order they run in
 
 Every app carries these in `scripts`, refreshed from the kit by its build,
 and runs them from its project folder. They share one fact: `.gitignore` is
@@ -126,7 +140,7 @@ what stays on this disk and is never pushed -- fetched voices, built output,
 logs, generated audio. A file that does not go up needs one line in the
 first; a large file that must not go up needs one line in the second.
 
-# Adding a module
+## Adding a module
 
 1. Write it in Camel Type, in `namespace Homer`, with a header comment saying
    what it is for and what it depends on.
@@ -139,7 +153,7 @@ first; a large file that must not go up needs one line in the second.
    switch it on by uncommenting.
 5. Describe it in HomerDev.md.
 
-# Encodings
+## Encodings
 
 UTF-8 with a byte order mark and CRLF line endings, everywhere except `.cmd`
 and `.bat`, which take CRLF and no BOM. The check enforces this, and
@@ -147,7 +161,7 @@ and `.bat`, which take CRLF and no BOM. The check enforces this, and
 encoding rather than assume, using the Ude package an app's build script
 fetches.
 
-# Templates
+## Templates
 
 A template is an ordinary working file with `_APP_` wherever the app name
 belongs, in the content and in the file name. `newHomerApp.py` replaces the
@@ -160,7 +174,7 @@ token and renames. Two rules:
   `CHANGE ME` with a comment saying what to put there. Today that is the AppId
   and the hotkey in the installer.
 
-# Versioning and release
+## Versioning and release
 
 `version.txt` holds one line and is the only place the kit's version is
 written. `release` reads a version from the installer's version resource,
@@ -173,7 +187,7 @@ An app is different: its `build<App>.cmd` increments `version.txt`, generates
 `Version.cs` from it, and the `.iss` reads the same file, so the program, the
 installer and the tag cannot disagree. `release` then does the rest.
 
-# Publishing the kit
+## Publishing the kit
 
     createHomerDevRepo            create the repository and push
     createHomerDevRepo -DryRun    report what would happen, change nothing
@@ -181,7 +195,7 @@ installer and the tag cannot disagree. `release` then does the rest.
 It needs git and an authenticated `gh`. It is a maintainer script and is named
 in `.gitignore`, so it does not appear in the public source browser.
 
-# Conventions worth not rediscovering
+## Conventions worth not rediscovering
 
 - **Add order is focus order** in Lbc. Fix the order of the calls, or fix Lbc.
   Never sprinkle `TabIndex` assignments through an app.

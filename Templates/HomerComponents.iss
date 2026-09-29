@@ -415,6 +415,14 @@ var
   gOllamaListAfter: String;
   gOllamaListAfterKnown: Boolean;
 
+function homerScreenReaderFile(): String;
+(* Where installScreenReaderSupport.cmd reports: beside the setup log. The
+   script runs as the same account as the installer (runascurrentuser), so
+   {localappdata} is the same folder for both. *)
+begin
+  Result := ExpandConstant('{localappdata}\{#SetupSetting("AppName")}\logs\{#SetupSetting("AppName")}_screenReaders.txt');
+end;
+
 procedure homerNoteTicked();
 (* Call from NextButtonClick when CurPageID = wpFinished: that is the moment
    the finish page's boxes are settled and the scripts have not yet run. The
@@ -427,6 +435,28 @@ begin
   for i := 0 to WizardForm.RunList.Items.Count - 1 do
     if WizardForm.RunList.Checked[i] then
       gHomerTicked := gHomerTicked + WizardForm.RunList.ItemCaption[i] + #10;
+  //  A report left by an earlier install must not be read as this one's.
+  DeleteFile(homerScreenReaderFile());
+end;
+
+function homerScreenReaderOutcome(): String;
+(* The lines installScreenReaderSupport.cmd wrote this session -- one per JAWS
+   version, and one for NVDA -- for the Results box: installed and compiled,
+   or NOT installed with the reason (1.43.39). Empty when neither box was
+   ticked. The file is removed once read. *)
+var
+  aLines: TArrayOfString;
+  i: Integer;
+begin
+  Result := '';
+  if not LoadStringsFromFile(homerScreenReaderFile(), aLines) then exit;
+  for i := 0 to GetArrayLength(aLines) - 1 do
+    if Trim(aLines[i]) <> '' then
+    begin
+      if Result <> '' then Result := Result + #13#10 + '  ';
+      Result := Result + Trim(aLines[i]);
+    end;
+  DeleteFile(homerScreenReaderFile());
 end;
 
 function homerTicked(sCaption: String): Boolean;

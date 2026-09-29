@@ -13,6 +13,14 @@ It is aimed at two readers. A developer who wants to build or change a Homer
 app, and an AI asked to write one, which can be told: "use the Homer namespace
 in `C:\HomerDev\exec\CSharp` and follow HomerDev.md."
 
+## Contents
+
+- [Install](#install)
+- [Quick start](#quick-start)
+- [What is in the kit](#what-is-in-the-kit)
+- [Where the documents are](#where-the-documents-are)
+- [The other documents](#the-other-documents)
+
 ## Install
 
 Unzip `HomerDev.zip` into `C:\HomerDev`. That is the install.

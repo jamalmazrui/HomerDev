@@ -17,7 +17,28 @@ round in HomerView's migration was one of those lessons being learned. Each
 is now a rule, and following the rules is what makes a migration a few
 builds rather than twenty.
 
-# What the kit is
+## Contents
+
+- [What the kit is](#what-the-kit-is)
+- [The contract between an app and the kit](#the-contract-between-an-app-and-the-kit)
+- [Lessons paid for, with dates](#lessons-paid-for-with-dates)
+- [The renaming of 26 September 2026](#the-renaming-of-26-september-2026)
+- [Lessons from HomerView, 25-26 September 2026](#lessons-from-homerview-25-26-september-2026)
+- [C# apps: urlFido, and a template brought level](#c-apps-urlfido-and-a-template-brought-level)
+- [bookFido: a C# app with its own libraries and its own data](#bookfido-a-c-app-with-its-own-libraries-and-its-own-data)
+- [Python apps: what urlCheck taught, 26 September 2026](#python-apps-what-urlcheck-taught-26-september-2026)
+- [Installer template: the program from exec, the documents from help](#installer-template-the-program-from-exec-the-documents-from-help)
+- [The kit renames only where it should](#the-kit-renames-only-where-it-should)
+- [Installer template: read the previous version once](#installer-template-read-the-previous-version-once)
+- [The migration, step by step](#the-migration-step-by-step)
+- [DbDo: what it has, what it still needs](#dbdo-what-it-has-what-it-still-needs)
+- [EdSharp: the full migration](#edsharp-the-full-migration)
+- [FileDir: two branches, copied classes, binaries in the repository](#filedir-two-branches-copied-classes-binaries-in-the-repository)
+- [What HomerView looks like now, as the second worked example](#what-homerview-looks-like-now-as-the-second-worked-example)
+- [What HomerScribe looks like now, as the worked example](#what-homerscribe-looks-like-now-as-the-worked-example)
+- [Summary of the rules, one line each](#summary-of-the-rules-one-line-each)
+
+## What the kit is
 
 `C:\HomerDev` is one repository holding everything the Homer apps share:
 
@@ -50,9 +71,9 @@ samples, fetches the voices, speaks its own walk, checks itself, and
 carries files over from any earlier layout (it has a move list and a
 retired list). `releaseHomerDev` checks, pushes and tags it.
 
-# The contract between an app and the kit
+## The contract between an app and the kit
 
-## 1. Find the kit, state the version needed
+### 1. Find the kit, state the version needed
 
 Every build script begins the same way. From `buildHomerScribe.cmd`:
 
@@ -90,7 +111,7 @@ if errorlevel 1 (
 the kit. A build against an older kit stops with that message rather than
 failing somewhere inside the compiler.
 
-## 2. Compile against the kit's sources; carry no copies
+### 2. Compile against the kit's sources; carry no copies
 
 ```
 set "homerSources="
@@ -109,7 +130,7 @@ The copies of `Lbc.cs`, `Say.cs`, `Inix.cs`, `KeyMap.cs`, `Web.cs` that an
 app used to keep had all drifted from the kit's by the time HomerScribe
 moved over. Delete them; the whitelist (below) keeps them from returning.
 
-## 3. Refresh the kit's scripts into the app on every build
+### 3. Refresh the kit's scripts into the app on every build
 
 One source of truth. The app's build copies them in; a fix in the kit
 reaches every app on its next build; nothing is edited in place.
@@ -150,7 +171,7 @@ has no reader installer of its own), `finish.cmd`, and the tutorial tools
 `buildTutorials`, `checkTutorial`, `makeTutorials` once a walk exists.
 `installModels.cmd` stays the app's own, because it names the app's models.
 
-## 4. The folder layout, and why the first letters differ
+### 4. The folder layout, and why the first letters differ
 
 The development folder `C:\<App>` mirrors the installed tree: sources,
 build files, ReadMe and License at the top, and these folders --
@@ -178,7 +199,7 @@ What goes where:
 - `templates` -- what a person copies and edits: a worked example of a
   context file, a starter database, a sample document.
 
-## 5. RepoFiles.txt and LocalFiles.txt
+### 5. RepoFiles.txt and LocalFiles.txt
 
 Two lists decide what git carries. `RepoFiles.txt` names the files and
 folders the repository holds (a trailing slash names a folder wholesale; a
@@ -210,7 +231,7 @@ Three rules from HomerView, 26 September:
   next build then stops because the installer names a file that is gone.
   Both the `.md` and its `.htm` go in the list.
 
-## 6. The four scripts, and the order they run in
+### 6. The four scripts, and the order they run in
 
 1. `build<App>` -- steps `version.txt`, writes `Version.cs`, builds the
    program and the installer, speaks any tutorial without audio, puts the
@@ -235,7 +256,7 @@ copies of these tools in `C:\bin` or anywhere on the PATH: they go stale
 there and run instead of the app's own. The kit's build deletes such
 copies when it finds them.
 
-## 7. Versions
+### 7. Versions
 
 `version.txt` holds the current number and lives only on the developer's
 machine -- never in a delivered zip, never in the repository (it is in
@@ -251,7 +272,7 @@ missing `version.txt` from the app's existing number, never from 1.0.0**: a
 fresh clone that reset HomerView to 1.0.0 would publish a release older than
 every installed copy.
 
-## 8. Shared components install machine-wide
+### 8. Shared components install machine-wide
 
 Whisper, Tesseract, Pandoc, ExifTool, ffmpeg, yt-dlp, Ollama and the like
 go to their own default machine-wide directories -- `C:\Program Files\...`
@@ -261,7 +282,7 @@ replaces the app's folder) cannot destroy them. Libraries the app links
 machine-wide and requires admin; there is no per-user fallback. Anyone
 wanting a portable copy uses the zip.
 
-## 9. The build fetches what it needs
+### 9. The build fetches what it needs
 
 winget, NuGet, a direct download -- the build retrieves every component
 needed to compile and to run, in a sufficiently current version, and never
@@ -277,7 +298,7 @@ leaves a manual fetch step. Two hard-won particulars:
   `C:\HomerDev\exec`. An app's build never downloads them; if they are
   absent, the tutorial tool says "Run buildHomerDev" and speaks nothing.
 
-## 10. Logs, console and encoding
+### 10. Logs, console and encoding
 
 - Every CLI script writes a detailed log aimed at debugging -- script path,
   Python or PowerShell version, platform, working directory, command line,
@@ -297,7 +318,7 @@ leaves a manual fetch step. Two hard-won particulars:
   `install<Thing>.cmd` calls it to open a log, run a command, record the
   exit code. Every install script says "Downloading" before a long step.
 
-## 11. The installer and its finish page
+### 11. The installer and its finish page
 
 The template `_APP__setup.iss` with `HomerComponents.iss` gives the finish
 page its shape (details in the kit's `help\FinishPage.md`):
@@ -356,7 +377,7 @@ label the default button, and a wizard once opened Help on Enter because
 "Help" was listed first. A length is spoken in words ("Took 19 minutes",
 `Util.spokenLength`); a clock reading is a position.
 
-## 12. F11 and the version box
+### 12. F11 and the version box
 
 `Elevate.configure(owner, repo, version)` at startup. Lbc's Help box then
 carries a Version section; when a newer release exists on GitHub, the box
@@ -364,7 +385,7 @@ offers Yes (default) to fetch `<App>_setup.exe` and run it. F11 is the key
 (elevate sounds like eleven). This is how a user updates without visiting
 a web page.
 
-## 13. Tutorials: the spoken walks
+### 13. Tutorials: the spoken walks
 
 A walk is `help\Tutorial_NN_Name.inix`: `[about]` (Title, Intro, Setup,
 Homework), then one `[step]` per keystroke with `Say` (narrator), `Key`,
@@ -383,7 +404,7 @@ writes `help\Tutorials.md` and `TutorialFeed.xml`. The build calls it with
 an explicit `-build` argument (see the `%*` quirk below).
 `.claude\skills\homer-tutorial\SKILL.md` teaches an AI to write them.
 
-## 14. The check, and what "done" means
+### 14. The check, and what "done" means
 
 `scripts\check` (with `--build` to make the build itself evidence)
 checks: the documents present, each with its `.htm` (ReadMe, License, the
@@ -394,7 +415,7 @@ named after the folder returning 0; `accept.inix` stating what done means.
 `release` refuses to release when it fails. Its report goes in
 `logs\<App>-evidence-<stamp>.md`.
 
-# Lessons paid for, with dates
+## Lessons paid for, with dates
 
 - **25 Sep, `%*` is not reset by a bare `call`.** A build run as
   `buildHomerScribe nobump` called the tutorial tool with no arguments, and
@@ -425,7 +446,7 @@ named after the folder returning 0; `accept.inix` stating what done means.
 - **10 Sep, ship a build error rather than a quarantined feature.**
   Implement fully; let the failure surface in the normal build.
 
-# The renaming of 26 September 2026
+## The renaming of 26 September 2026
 
 The kit's scripts lost the prefixes that said nothing a folder name did not.
 Old logs, old briefings and other chats use the old names, so here is the map:
@@ -457,7 +478,7 @@ cannot reach it. Until that is done the app's build will say "NOT IN THE
 KIT" for each tool -- if it uses the loop in section 3 -- or, with the old
 `if exist` loop, keep its stale copies without a word.
 
-# Lessons from HomerView, 25-26 September 2026
+## Lessons from HomerView, 25-26 September 2026
 
 HomerView was the second app moved to the kit. It had a working PowerShell
 build, an NVDA add-on, a JAWS script set compiled against three JAWS
@@ -465,7 +486,7 @@ versions, and a C# bridge -- none of which the template knows about. Every
 lesson below cost at least one build round; each is written as the rule
 that would have saved it.
 
-## Plan the move in passes, and build green between them
+### Plan the move in passes, and build green between them
 
 What worked, in order:
 
@@ -489,7 +510,7 @@ PowerShell and the installer, and turned up a file the installer had never
 shipped (`chainJawsScripts.cmd`, which Choose Browser runs). A move is done
 when a grep for the old path finds nothing live.
 
-## Passing data from cmd to PowerShell
+### Passing data from cmd to PowerShell
 
 - **Nested quotes do not survive.** A list of quoted paths passed as one
   quoted argument arrived with the quotes stripped; the engine found nothing
@@ -499,7 +520,7 @@ when a grep for the old path finds nothing live.
 - **`%*` is not reset by a bare `call`** (the HomerScribe lesson, confirmed
   again): pass every tool an explicit argument such as `-build`.
 
-## The compiler
+### The compiler
 
 - **`Framework64\v4.0.30319\csc.exe` is the legacy compiler and stops at
   C# 5.** The kit's classes use newer C#, so an app compiling them needs
@@ -511,7 +532,7 @@ when a grep for the old path finds nothing live.
   used the old compiler and became wrong the moment it compiled the kit's
   sources. Retire such a check with the reason recorded.
 
-## Reading the kit's version
+### Reading the kit's version
 
 The kit's `version.txt` carried a trailing space, `[version]` would not parse
 `"1.40.1 "`, PowerShell threw, and the non-zero exit was read as "older":
@@ -519,7 +540,7 @@ FileDir's build said "kit 1.40.1 is older than 1.40.1". **Trim both numbers,
 and tell a parse failure from an old kit** (`exit 2` for the first). The
 template does this since 1.41.0.
 
-## Unzipping never deletes and never moves
+### Unzipping never deletes and never moves
 
 This one caused more rounds than any other.
 
@@ -535,7 +556,7 @@ This one caused more rounds than any other.
 - A warning that an old folder is still there, **repeated on four builds in a
   row, was not acted on.** Where the build can safely act, it should.
 
-## A script that finds the project by its own location
+### A script that finds the project by its own location
 
 Every HomerView tool took **its own folder** as the project root. Moving one
 into `scripts\` silently moved the root with it, so every path it joined
@@ -553,7 +574,7 @@ HomerView's bridge gained one `AppFolder()` helper -- the parent of `exec`,
 or its own folder on an older install -- and every place that joined a name
 to the exe's folder goes through it, so only one place knows about `exec`.
 
-## Generated files: one source, and regenerate rather than mourn
+### Generated files: one source, and regenerate rather than mourn
 
 - **Two copies drift.** HomerView had two start pages (the add-on's and the
   installer's), a stale `docs\` copy of every document, and a checked-in
@@ -571,7 +592,7 @@ to the exe's folder goes through it, so only one place knows about `exec`.
   from the key tables. The start page had been describing keys retired weeks
   earlier.
 
-## A check that only prints is ignored
+### A check that only prints is ignored
 
 HomerView's documentation check printed "does not mention 1 command: Page
 Folder" on every build for weeks. Its guide also named four NVDA keys that
@@ -581,7 +602,7 @@ build**. A guide that names the wrong key is a program that does not do what
 it says -- the standing preference is a build error over that. Prove a check
 by putting a known error back and watching it fail.
 
-## Reader scripts and the browser
+### Reader scripts and the browser
 
 - **An application script file extends the factory set by `Use`-ing it, and
   there is no factory set for Edge.** Kelly at Vispero's advice -- a user
@@ -598,7 +619,7 @@ by putting a known error back and watching it fail.
   The `hV` prefix prevents it; a build check compares every routine against
   the factory `default.jss`.
 
-## Changing the kit in place
+### Changing the kit in place
 
 The kit on a working machine is often ahead of any archive of it, and
 `release.*` is never in an archive at all. So a change to a kit script is
@@ -616,14 +637,14 @@ made **in place** by `buildHomerDev`, never by shipping a replacement:
 - **History is updated the same way**, an entry inserted once under a marker
   heading, because shipping `History.md` could overwrite a newer one.
 
-## Never run anything between a command and its errorlevel check
+### Never run anything between a command and its errorlevel check
 
 The first version of the origin patch for `push` inserted a PowerShell line
 straight after `git push`, and the next line was `if errorlevel 1`. Anything
 run in between resets errorlevel, so every failed push would have been
 reported as a success. Insert after the check, never between.
 
-## Probing with git and gh from PowerShell 5.1
+### Probing with git and gh from PowerShell 5.1
 
 `release` asks git whether a tag exists and gh whether a release exists, and
 the normal answer is no, printed on stderr. Windows PowerShell 5.1 records
@@ -633,7 +654,7 @@ so a clean release showed two error blocks. Set `$ErrorActionPreference` to
 which is what the script reads, is unaffected. The standalone tagRelease
 project needs the same change.
 
-## A remote that has moved
+### A remote that has moved
 
 Every push and release answered "This repository moved. Please use the new
 location" -- the remotes say `JamalMazrui` and the account is `jamalmazrui`.
@@ -642,7 +663,7 @@ own log and runs `git remote set-url origin <new location>` once, after its
 failure check; the notice then stops. Every repository whose remote was made
 with the capitalised name is corrected on its first push after kit 1.42.1.
 
-## Everything else
+### Everything else
 
 - **A running program cannot be overwritten**, and csc says so as a
   file-in-use error buried in its output. The build says "HomerView.exe is
@@ -656,7 +677,7 @@ with the capitalised name is corrected on its first push after kit 1.42.1.
   is older than the working copy, change the working copy in place (as the
   renaming does) rather than shipping files that would overwrite it.
 
-# C# apps: urlFido, and a template brought level
+## C# apps: urlFido, and a template brought level
 
 urlFido, a C# console program with an Lbc dialog, moved to the kit on
 26 September, and the C# build template turned out to be behind the Python
@@ -717,7 +738,7 @@ the two contexts stay separate but equal. What urlFido taught:
   deletes saved settings on uninstall; urlFido always kept them, "their
   filesystem, their call", and still does.
 
-# bookFido: a C# app with its own libraries and its own data
+## bookFido: a C# app with its own libraries and its own data
 
 bookFido, the third app moved on 26 September, embeds a dozen NuGet libraries
 and keeps a database worth hours of gathering. What it taught:
@@ -746,7 +767,7 @@ and keeps a database worth hours of gathering. What it taught:
   the PE header and skips a windowed program rather than waiting fifteen
   minutes for it.
 
-# Python apps: what urlCheck taught, 26 September 2026
+## Python apps: what urlCheck taught, 26 September 2026
 
 urlCheck is one 7,000-line Python file: a console program with a WinForms
 dialog through pythonnet, driving Edge with Playwright, frozen by PyInstaller.
@@ -754,7 +775,7 @@ It was the first Python app moved, and it found that the kit's Python side had
 fallen behind the C# side in ways no C# migration would notice. Kit 1.43.0
 fixed them; these are the rules that came out of it.
 
-## The contract is the same; the template now says so
+### The contract is the same; the template now says so
 
 `Templates\build_APP_Py.cmd` keeps every clause of the contract above: kit
 detection by `exec\homer\log.py` and a trimmed `kitNeeded`; `version.txt` stepped,
@@ -766,7 +787,7 @@ block filled in -- `kitNeeded`, `seedVersion`, `pyVersion`, `pyiMode`,
 one section of its own that carries over the old layout (see below).
 buildUrlCheck.cmd is the worked example.
 
-## The kit's modules are named, not copied
+### The kit's modules are named, not copied
 
 A frozen program cannot import from `C:\HomerDev` at run time, and a copy in
 the app drifts. So the build passes `--paths C:\HomerDev\exec` and one
@@ -775,7 +796,7 @@ then carries the kit's code as it was at build time. An NVDA add-on is the
 exception: NVDA gives add-ons no way to share one copy, so an add-on copies
 `homer`.
 
-## Never name a kit module version.py
+### Never name a kit module version.py
 
 Every Homer build writes `version.py` beside the program. `.gitignore`
 ignores that name wherever it appears, and the checks skip it as generated.
@@ -784,7 +805,7 @@ old `Python\homer` folder, and the kit's own check called it missing on every
 build. Its comparison is now in `exec\homer\elevate.py`. The general rule: a kit
 file must not share a name with anything a build generates.
 
-## Where each Python program goes
+### Where each Python program goes
 
 - The program: `exec\<App>.exe`, from `--distpath exec`.
 - PyInstaller's scratch and `.spec`: `work\pyinstaller`, from `--workpath` and
@@ -799,7 +820,7 @@ files. The build now deletes those once the new program exists, and one
 `scripts\tidy` untracks the rest. `push` refuses anything over 10 MB,
 so a stray setup program cannot go up by accident.
 
-## A program that runs from exec finds its documents one level up
+### A program that runs from exec finds its documents one level up
 
 `homer.paths.installedFolder()` answers the parent of `exec`, in the installed
 tree and in the project alike. urlCheck's Help had looked for `README.htm`
@@ -807,7 +828,7 @@ beside the .exe; it now opens `help\<App>.htm` under that folder, then
 `ReadMe.htm`. A command-line wrapper at the top, `<App>.cmd`, runs
 `"%~dp0exec\<App>.exe" %*`.
 
-## Logging: the session log is not optional
+### Logging: the session log is not optional
 
 urlCheck wrote a log only when `-l` was given, into the output folder, in
 append mode. The kit's rule is a log of every session in
@@ -818,14 +839,14 @@ keeps its old meaning as an extra copy beside the results. The entry point
 became `runLogged()`, which records any exception main() did not catch before
 the program ends, and names the log on the console.
 
-## Settings: .inix, and carry the old file over
+### Settings: .inix, and carry the old file over
 
 `configs\<App>.inix` through `homer.paths.configs()` and `homer.inix`. Read the
 old `.ini` when no `.inix` exists; delete it when the new one is first saved;
 map the old key names onto the new. Test the carry-over: urlCheck's was run
 against a real old file before delivery.
 
-## WinForms through pythonnet keeps its own dialog
+### WinForms through pythonnet keeps its own dialog
 
 `homer.lbc` is wx. A program already on WinForms through pythonnet keeps its
 dialog and uses the kit's other modules, and follows Lbc's rules by hand:
@@ -834,14 +855,14 @@ box from the label before it in tab order -- and no field sets an
 AccessibleName equal to its label. `check.py`'s naming check now reads Python
 functions as a window's builders, so it catches the second.
 
-## F11 in a Python program
+### F11 in a Python program
 
 `elevate.configure(owner, repo, version)` at startup; in the dialog's KeyDown,
 F11 calls `elevate.offer(hwnd)` -- `frm.Handle.ToInt64()` in WinForms,
 `frame.GetHandle()` in wx. When it returns True the setup program is running,
 and the dialog closes.
 
-## The old layout on disk: renames Windows will not do for you
+### The old layout on disk: renames Windows will not do for you
 
 Unzipping `ReadMe.md` over `README.md` replaces the content and keeps the old
 capitals. The build's carry-over section renames by exact case -- through
@@ -849,7 +870,7 @@ capitals. The build's carry-over section renames by exact case -- through
 a moved document (`announce.md`, `CamelType_Python.md`) only once its
 replacement exists.
 
-## The whitelist left out every file named inside a folder
+### The whitelist left out every file named inside a folder
 
 Not a Python problem, but urlCheck found it. `tidy` wrote `/*` and then
 `!/help/Announce.md`; `/*` ignores the folder `help` itself, git never looks
@@ -862,7 +883,7 @@ and re-ignores its contents first (`!/help/`, `/help/*`), then the files: all
 run `scripts\tidy --gitignore` and push**, and check GitHub for the files that
 never went up.
 
-## Checks that caught a Python app out
+### Checks that caught a Python app out
 
 - `check`'s smoke test looked only at the top of the project; it now looks in
   `exec` first. This affected every app moved to the layout, C# included.
@@ -870,7 +891,7 @@ never went up.
   `&amp;` as a trigger letter. It now starts a new owner at each top-level
   `def` and skips HTML entities.
 
-# Installer template: the program from exec, the documents from help
+## Installer template: the program from exec, the documents from help
 
 Found by urlCheck's first build on the kit. `Templates\_APP__setup.iss` named
 the program and the documents at the top of the project, while every build in
@@ -886,7 +907,7 @@ the kit the build names, calls `homerNoteTicked` from `NextButtonClick`, shows
 the Results box and only then starts the program. The next component is one
 `homerAdd`, three `[Run]` entries and one `addAction`, not a new installer.
 
-# The kit renames only where it should
+## The kit renames only where it should
 
 buildHomerDev's renaming rewrites old script names in the kit's own files,
 skipping the lines whose job is to name the old scripts. It knew the C#
@@ -896,7 +917,7 @@ which an app would then have deleted after refreshing them. Any list whose
 job is to name old things must be recognised by the renaming, or it will be
 "corrected". Kit 1.43.1 skips both and ships the template whole again.
 
-# Installer template: read the previous version once
+## Installer template: read the previous version once
 
 Found while writing urlCheck's installer. The template read the previous
 install's version lazily, and a fresh install has none to cache, so every later
@@ -909,7 +930,7 @@ before 1.43.0 has the same fault** and needs the same two lines changed:
 reduced to `Result := (sPriorVersion = '');`, with `priorVersion` moved above
 `InitializeSetup`.
 
-# The migration, step by step
+## The migration, step by step
 
 For an app that has not yet moved to the kit. Build green after every step;
 each is checkable by `scripts\check` at the end. The order matters: the
@@ -959,7 +980,7 @@ contract first without moving files, then the layout one group at a time.
 12. **Build, check, push, release**: `build<App>`, `scripts\check --build`,
     `scripts\push "Move to the kit."`, `scripts\release`.
 
-# DbDo: what it has, what it still needs
+## DbDo: what it has, what it still needs
 
 DbDo is part way there. It has `RepoFiles.txt` and `LocalFiles.txt`,
 `version.txt` and `Version.cs`, `accept.inix`, `uiTest.inix`, a `help`
@@ -1000,7 +1021,7 @@ have passed since. To bring it current:
   tutorial; run `checkTutorial`; name no screen reader.
 - Then `check --build` should pass and `release` will carry it.
 
-# EdSharp: the full migration
+## EdSharp: the full migration
 
 EdSharp has not moved yet: about eighty files at the root, its own copies
 of `Inix.cs`, `KeyMap.cs`, `Lbc.cs`, `Say.cs`, `Web.cs` and `inixVert.cs`, a
@@ -1054,7 +1075,7 @@ particulars:
   `help\Tutorial_00_Overview.inix` from the template and the skill, and let
   the build speak it.
 
-# FileDir: two branches, copied classes, binaries in the repository
+## FileDir: two branches, copied classes, binaries in the repository
 
 FileDir is some of the way there. Its working branch, `master`, has
 `version.txt` (5.0.88) stepped by the build and written to `Version.cs`, a
@@ -1133,7 +1154,7 @@ inputs). Follow the ten steps, with these particulars:
   speaks them: they must name no screen reader, and the guide names JAWS
   freely, so the walks were likely written the same way.
 
-# What HomerView looks like now, as the second worked example
+## What HomerView looks like now, as the second worked example
 
 `buildHomerView.cmd` carries the contract and wraps the proven PowerShell
 engine, handing it the Roslyn compiler, the kit sources (semicolon-joined)
@@ -1150,7 +1171,7 @@ NVDA add-on where NVDA is, the JAWS scripts where JAWS is, and pandoc in the
 kit's install/update/reinstall shapes. 1.48.62 built with no errors and no
 warnings.
 
-# What HomerScribe looks like now, as the worked example
+## What HomerScribe looks like now, as the worked example
 
 `C:\HomerScribe`: `HomerScribe.cs`, `PdfRead.cs`, `buildHomerScribe.cmd`,
 `HomerScribe_setup.iss`, `ReadMe.md/.htm`, `License.md/.htm`,
@@ -1164,7 +1185,7 @@ fetched tools; `logs\`. Its `buildHomerScribe.cmd` and `HomerScribe_setup.iss`
 are the fullest current examples of everything above, and its
 `help\Developer.md` names the four scripts and their order.
 
-# Summary of the rules, one line each
+## Summary of the rules, one line each
 
 - Compile against `C:\HomerDev\exec\CSharp`; carry no copies; list `Elevate.cs` with `Lbc.cs`.
 - State `kitNeeded`; stop with a message when the kit is older.

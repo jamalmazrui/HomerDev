@@ -172,7 +172,24 @@
 <h1 id="developer-guide">Developer Guide</h1>
 <p>This is for changing the kit itself. For building an app with it,
 read HomerDev.md.</p>
-<h1 id="layout">Layout</h1>
+<h2 id="contents">Contents</h2>
+<ul>
+<li><a href="#layout">Layout</a></li>
+<li><a href="#releasing-the-kit">Releasing the kit</a></li>
+<li><a href="#building-the-kit">Building the kit</a></li>
+<li><a href="#how-a-change-reaches-the-apps">How a change reaches the
+apps</a></li>
+<li><a href="#the-four-scripts-and-the-order-they-run-in">The four
+scripts, and the order they run in</a></li>
+<li><a href="#adding-a-module">Adding a module</a></li>
+<li><a href="#encodings">Encodings</a></li>
+<li><a href="#templates">Templates</a></li>
+<li><a href="#versioning-and-release">Versioning and release</a></li>
+<li><a href="#publishing-the-kit">Publishing the kit</a></li>
+<li><a href="#conventions-worth-not-rediscovering">Conventions worth not
+rediscovering</a></li>
+</ul>
+<h2 id="layout">Layout</h2>
 <pre><code>C:\HomerDev\
   .claude\skills\   the Claude skills, one folder each
   exec\CSharp\    the Homer namespace: Inix, KeyMap, KeyName, Lbc, Log, Mdi,
@@ -188,7 +205,7 @@ read HomerDev.md.</p>
   checkHomerDev.cmd / .py     build all three samples and report
   newHomerApp.cmd / .py       write a new app folder
   ReadMe, License, RepoFiles.txt, version.txt, .gitignore</code></pre>
-<h1 id="releasing-the-kit">Releasing the kit</h1>
+<h2 id="releasing-the-kit">Releasing the kit</h2>
 <pre><code>releaseHomerDev &quot;What changed.&quot;   all four steps below, stopping at the first failure</code></pre>
 <p>or one step at a time:</p>
 <pre><code>buildHomerDev                   documents, all four samples, the audit
@@ -209,7 +226,7 @@ meant to exist:</p>
 <pre><code>Could not find HomerDev_setup.iss in C:\HomerDev</code></pre>
 <p>That is the old copy talking. Run <code>installTools</code> after
 updating the kit and it goes away.</p>
-<h1 id="building-the-kit">Building the kit</h1>
+<h2 id="building-the-kit">Building the kit</h2>
 <pre><code>buildHomerDev          convert the documents, build every sample, check the kit
 buildHomerDev check    check only
 checkHomerDev          build all three samples from clean and report</code></pre>
@@ -236,8 +253,8 @@ would have caught.</p>
 them surfaces the first time an app builds. That is deliberate and
 matches the house preference: a build error you can see beats a
 component quietly left out.</p>
-<h1 id="how-a-change-reaches-the-apps">How a change reaches the
-apps</h1>
+<h2 id="how-a-change-reaches-the-apps">How a change reaches the
+apps</h2>
 <p>An app’s build script compiles the Homer modules straight out of
 <code>%HOMERDEV%\CSharp</code>, defaulting to <code>C:\HomerDev</code>.
 There is no copy in the app folder. So:</p>
@@ -252,8 +269,8 @@ finished.</p>
 <p>Before removing or renaming a public member, grep the apps for it.
 The merge that produced this kit exists because two apps had diverged on
 exactly that.</p>
-<h1 id="the-four-scripts-and-the-order-they-run-in">The four scripts,
-and the order they run in</h1>
+<h2 id="the-four-scripts-and-the-order-they-run-in">The four scripts,
+and the order they run in</h2>
 <p>Every app carries these in <code>scripts</code>, refreshed from the
 kit by its build, and runs them from its project folder. They share one
 fact: <code>.gitignore</code> is a whitelist written from
@@ -286,7 +303,7 @@ commit properly.</li>
 pushed – fetched voices, built output, logs, generated audio. A file
 that does not go up needs one line in the first; a large file that must
 not go up needs one line in the second.</p>
-<h1 id="adding-a-module">Adding a module</h1>
+<h2 id="adding-a-module">Adding a module</h2>
 <ol type="1">
 <li>Write it in Camel Type, in <code>namespace Homer</code>, with a
 header comment saying what it is for and what it depends on.</li>
@@ -302,13 +319,13 @@ carrying it.</li>
 uncommenting.</li>
 <li>Describe it in HomerDev.md.</li>
 </ol>
-<h1 id="encodings">Encodings</h1>
+<h2 id="encodings">Encodings</h2>
 <p>UTF-8 with a byte order mark and CRLF line endings, everywhere except
 <code>.cmd</code> and <code>.bat</code>, which take CRLF and no BOM. The
 check enforces this, and <code>newHomerApp</code> writes files this way.
 A file that reads text should detect its encoding rather than assume,
 using the Ude package an app’s build script fetches.</p>
-<h1 id="templates">Templates</h1>
+<h2 id="templates">Templates</h2>
 <p>A template is an ordinary working file with <code>_APP_</code>
 wherever the app name belongs, in the content and in the file name.
 <code>newHomerApp.py</code> replaces the token and renames. Two
@@ -321,7 +338,7 @@ silently produces broken copies.</li>
 <code>CHANGE ME</code> with a comment saying what to put there. Today
 that is the AppId and the hotkey in the installer.</li>
 </ul>
-<h1 id="versioning-and-release">Versioning and release</h1>
+<h2 id="versioning-and-release">Versioning and release</h2>
 <p><code>version.txt</code> holds one line and is the only place the
 kit’s version is written. <code>release</code> reads a version from the
 installer’s version resource, which the kit does not have, so the kit is
@@ -333,14 +350,14 @@ git push origin v1.0.0</code></pre>
 the <code>.iss</code> reads the same file, so the program, the installer
 and the tag cannot disagree. <code>release</code> then does the
 rest.</p>
-<h1 id="publishing-the-kit">Publishing the kit</h1>
+<h2 id="publishing-the-kit">Publishing the kit</h2>
 <pre><code>createHomerDevRepo            create the repository and push
 createHomerDevRepo -DryRun    report what would happen, change nothing</code></pre>
 <p>It needs git and an authenticated <code>gh</code>. It is a maintainer
 script and is named in <code>.gitignore</code>, so it does not appear in
 the public source browser.</p>
-<h1 id="conventions-worth-not-rediscovering">Conventions worth not
-rediscovering</h1>
+<h2 id="conventions-worth-not-rediscovering">Conventions worth not
+rediscovering</h2>
 <ul>
 <li><strong>Add order is focus order</strong> in Lbc. Fix the order of
 the calls, or fix Lbc. Never sprinkle <code>TabIndex</code> assignments

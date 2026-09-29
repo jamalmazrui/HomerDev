@@ -113,7 +113,14 @@ public static class Log
             sFolder = Paths.logs();
             sPath = Path.Combine(sFolder, sAppName + "-" +
                 dtStarted.ToString("yyyyMMdd-HHmmss") + ".log");
-            fLog = new StreamWriter(sPath, false, new UTF8Encoding(true));
+            // SHARED FOR READING, WRITING AND DELETING (1.43.40). A plain
+            // StreamWriter lets other programs only read the live log, and not
+            // at all if they ask for write sharing; on 29 September FileDir's
+            // "Zip then delete" of its own logs folder met "File In Use" on the
+            // log of the FileDir that was running. Now a zipper, an editor or
+            // the recycle bin can open, copy or remove it while it is written.
+            fLog = new StreamWriter(new FileStream(sPath, FileMode.Create, FileAccess.Write,
+                FileShare.ReadWrite | FileShare.Delete), new UTF8Encoding(true));
             fLog.AutoFlush = true;
             bWorking = true;
             writeHeader();

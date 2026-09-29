@@ -5,7 +5,158 @@ author: "Jamal Mazrui"
 
 # History
 
-# 1.43.38 -- 29 September 2026
+## Contents
+
+- [1.43.40 -- 29 September 2026](#september-2026)
+- [1.43.39 -- 29 September 2026](#september-2026-1)
+- [1.43.38 -- 29 September 2026](#september-2026-2)
+- [1.43.37 -- 29 September 2026](#september-2026-3)
+- [1.43.36 -- 28 September 2026](#september-2026-4)
+- [1.43.35 -- 28 September 2026](#september-2026-5)
+- [1.43.34 -- 28 September 2026](#september-2026-6)
+- [1.43.33 -- 28 September 2026](#september-2026-7)
+- [1.43.32 -- 28 September 2026](#september-2026-8)
+- [1.43.31 -- 28 September 2026](#september-2026-9)
+- [1.43.30 -- 28 September 2026](#september-2026-10)
+- [1.43.29 -- 28 September 2026](#september-2026-11)
+- [1.43.28 -- 28 September 2026](#september-2026-12)
+- [1.43.27 -- 28 September 2026](#september-2026-13)
+- [1.43.26 -- 28 September 2026](#september-2026-14)
+- [1.43.25 -- 28 September 2026](#september-2026-15)
+- [1.43.24 -- 28 September 2026](#september-2026-16)
+- [1.43.23 -- 28 September 2026](#september-2026-17)
+- [1.43.22 -- 27 September 2026](#september-2026-18)
+- [1.43.21 -- 27 September 2026](#september-2026-19)
+- [1.43.20 -- 27 September 2026](#september-2026-20)
+- [1.43.19 -- 26 September 2026](#september-2026-21)
+- [1.43.18 -- 26 September 2026](#september-2026-22)
+- [1.43.17 -- 26 September 2026](#september-2026-23)
+- [1.43.16 -- 26 September 2026](#september-2026-24)
+- [1.43.15 -- 26 September 2026](#september-2026-25)
+- [1.43.14 -- 26 September 2026](#september-2026-26)
+- [1.43.13 -- 26 September 2026](#september-2026-27)
+- [1.43.12 -- 26 September 2026](#september-2026-28)
+- [1.43.11 -- 26 September 2026](#september-2026-29)
+- [1.43.10 -- 26 September 2026](#september-2026-30)
+- [1.43.9 -- 26 September 2026](#september-2026-31)
+- [1.43.8 -- 26 September 2026](#september-2026-32)
+- [1.43.7 -- 26 September 2026](#september-2026-33)
+- [1.43.6 -- 26 September 2026](#september-2026-34)
+- [1.43.5 -- 26 September 2026](#september-2026-35)
+- [1.43.4 -- 26 September 2026](#september-2026-36)
+- [1.43.3 -- 26 September 2026](#september-2026-37)
+- [1.43.2 -- 26 September 2026](#september-2026-38)
+- [1.43.1 -- 26 September 2026](#september-2026-39)
+- [1.43.0 -- 26 September 2026](#september-2026-40)
+- [1.42.1 -- 26 September 2026](#september-2026-41)
+- [1.42.0 -- 26 September 2026](#september-2026-42)
+- [1.41.3 -- 26 September 2026](#september-2026-43)
+- [1.41.2 -- 26 September 2026](#september-2026-44)
+- [1.41.1 -- 26 September 2026](#september-2026-45)
+- [1.39.1 -- 25 September 2026](#september-2026-46)
+- [1.38.3 -- 25 September 2026](#september-2026-47)
+- [1.38.2 -- 25 September 2026](#september-2026-48)
+- [1.38.1 -- 25 September 2026](#september-2026-49)
+- [1.38.0 -- 25 September 2026](#september-2026-50)
+- [1.37.0 -- 25 September 2026](#september-2026-51)
+- [1.36.2 -- 25 September 2026](#september-2026-52)
+- [1.36.1 -- 25 September 2026](#september-2026-53)
+- [1.36.0 -- 25 September 2026](#september-2026-54)
+- [1.35.1 -- 25 September 2026](#september-2026-55)
+- [1.35.0 -- 25 September 2026](#september-2026-56)
+- [1.34.0 -- 25 September 2026](#september-2026-57)
+- [1.33.0 -- 25 September 2026](#september-2026-58)
+- [1.32.0 -- 25 September 2026](#september-2026-59)
+- [1.31.1 -- 25 September 2026](#september-2026-60)
+- [1.31.0 -- 25 September 2026](#september-2026-61)
+- [1.30.0 -- 25 September 2026](#september-2026-62)
+- [1.29.0 -- 25 September 2026](#september-2026-63)
+- [1.28.0 -- 24 September 2026](#september-2026-64)
+- [1.27.0 -- 23 September 2026](#september-2026-65)
+- [1.26.0 -- 22 September 2026](#september-2026-66)
+- [1.25.0 -- 21 September 2026](#september-2026-67)
+- [1.24.0 -- 21 September 2026](#september-2026-68)
+- [1.23.0 -- 21 September 2026](#september-2026-69)
+- [1.22.1 -- 21 September 2026](#september-2026-70)
+- [1.22.0 -- 21 September 2026](#september-2026-71)
+- [1.21.0 -- 21 September 2026](#september-2026-72)
+- [1.20.0 -- 20 September 2026](#september-2026-73)
+- [1.19.0 -- 20 September 2026](#september-2026-74)
+- [1.18.0 -- 19 September 2026](#september-2026-75)
+- [1.17.0 -- 19 September 2026](#september-2026-76)
+- [1.16.0 -- 19 September 2026](#september-2026-77)
+- [1.15.0 -- 19 September 2026](#september-2026-78)
+- [1.14.1 -- 19 September 2026](#september-2026-79)
+- [1.14.0 -- 19 September 2026](#september-2026-80)
+- [1.13.5 -- 19 September 2026](#september-2026-81)
+- [1.13.4 -- 19 September 2026](#september-2026-82)
+- [1.13.3 -- 19 September 2026](#september-2026-83)
+- [1.13.2 -- 19 September 2026](#september-2026-84)
+- [1.13.1 -- 19 September 2026](#september-2026-85)
+- [1.13.0 -- 19 September 2026](#september-2026-86)
+- [1.12.1 -- 19 September 2026](#september-2026-87)
+- [1.12.0 -- 19 September 2026](#september-2026-88)
+- [1.11.0 -- 19 September 2026](#september-2026-89)
+- [1.10.1 -- 19 September 2026](#september-2026-90)
+- [1.10.0 -- 19 September 2026](#september-2026-91)
+- [1.9.0 -- 19 September 2026](#september-2026-92)
+- [1.8.1 -- 19 September 2026](#september-2026-93)
+- [1.8.0 -- 19 September 2026](#september-2026-94)
+- [1.7.0 -- 19 September 2026](#september-2026-95)
+- [1.6.1 -- 19 September 2026](#september-2026-96)
+- [1.6.0 -- 19 September 2026](#september-2026-97)
+- [1.5.0 -- 18 September 2026](#september-2026-98)
+- [1.4.0 -- 18 September 2026](#september-2026-99)
+- [1.3.0 -- 18 September 2026](#september-2026-100)
+- [1.2.0 -- 18 September 2026](#september-2026-101)
+- [1.1.0 -- 18 September 2026](#september-2026-102)
+- [1.0.0 -- 18 September 2026](#september-2026-103)
+
+## 1.43.40 -- 29 September 2026
+
+**A program's live log can be read, copied or deleted while it is written.**
+Log.cs opened the session log with a plain StreamWriter, which lets another
+program read it only if that program does not also ask to write, and never
+delete it. On 29 September FileDir's Zip then delete, run on its own logs
+folder, met "File In Use" on the log of the FileDir that was running. The log
+is now opened with read, write and delete sharing, so a zipper, an editor or
+the recycle bin can work with it; the running program keeps writing.
+
+## 1.43.39 -- 29 September 2026
+
+**JAWS scripts are compiled on the user's machine or not installed at all.**
+No compiled .jsb is shipped any more: one built by another JAWS version may
+not suit the user's.
+
+- The kit's installScreenReaderSupport, for each JAWS version, unpacks the
+  sources, compiles each with that version's own scompile.exe, and checks for
+  the .jsb. If a version has no compiler, or any source fails, every file the
+  run put in that settings folder is removed and any file it replaced is put
+  back; the compiler's words go to the setup log. It reports each version, and
+  NVDA, in <App>_screenReaders.txt beside the setup log.
+- HomerComponents gains homerScreenReaderOutcome, which the Results box reads
+  for those lines -- "JAWS 2026 scripts: installed and compiled", or "NOT
+  installed -- they did not compile (FileDir.jss); nothing was left behind" --
+  and clears the file when Finish is pressed. The template's Results box and
+  FileDir's call it.
+- HomerView's installer no longer ships a prebuilt HomerView.jsb or falls back
+  to one; when any version does not compile, its own removal takes out
+  everything the run placed, and its Results box says the scripts are not
+  installed and why. EdSharp's does the same, and treats a missing compiler as
+  a failure rather than leaving uncompiled scripts. Both installers exclude
+  any .jsb from what they carry.
+
+**Every kit document has one H1, its title, and a contents list.** HomerDev.md,
+History.md, Developer.md, HomerDev_update.md, License.md and Hotkeys.md used H1
+for their chapters, versions or parts; each chapter is now an H2 and every
+heading below it one level down, with a linked contents list after the title.
+ReadMe.md gains a contents list and Announce.md's first section its proper
+level. A heading in HomerDev.md that followed a list with no blank line was
+not a heading at all to Pandoc; every heading now has a blank line before it.
+homer-ui's reference is taken from HomerDev.md's H2 chapters accordingly.
+The kit's documents check reports 0 findings.
+
+## 1.43.38 -- 29 September 2026
 
 **Compiled JAWS scripts are never shipped or pushed.** A .jsb runs on the JAWS
 version that built it and on later ones, so one built on the developer's
@@ -27,7 +178,7 @@ compile; and for NVDA, which script wins a key (a global plugin over every app
 module), never blocking NVDA, relative imports against sys.path, ui.message,
 and testing.
 
-# 1.43.37 -- 29 September 2026
+## 1.43.37 -- 29 September 2026
 
 **A skill for screen reader scripting: homer-screen-reader.** When a script is
 needed at all (most speech goes through Say from the app), the rules on both
@@ -47,7 +198,7 @@ there, so a .jss shipped without its .jsb was never run. Each .jss in the zip
 is now compiled in place by that version's own scompile.exe, as EdSharp's and
 HomerView's installers do, with each exit code in the setup log.
 
-# 1.43.36 -- 28 September 2026
+## 1.43.36 -- 28 September 2026
 
 From the builds and releases of 28 September at 21:40, when nine apps were
 built on the kit's new layout and eight released:
@@ -63,7 +214,7 @@ built on the kit's new layout and eight released:
 - **summarizeLogs reads more version lines**: "Version: 1.0.261 -> 1.0.262"
   and EdSharp's "Version: 5.0.18 (from version.txt ...)".
 
-# 1.43.35 -- 28 September 2026
+## 1.43.35 -- 28 September 2026
 
 **homer-new-app asks first whether it should be a program at all.** When the
 need is keeping and reporting on records, a DbDo database is usually the better
@@ -79,14 +230,14 @@ warning, and updateAppBuilds when no app is named, now pass over a folder with
 no .git: the kit's build notes it as a possible leftover, and updateAppBuilds
 changes it only when it is named.
 
-# 1.43.34 -- 28 September 2026
+## 1.43.34 -- 28 September 2026
 
 **summarizeLogs shows a build's warnings.** The kit's build of 21:26 succeeded
 and warned that Jobrise's build script still looks for the kit's old layout,
 but the summary said only "result=succeeded". A build's WARN lines now follow
 its result, even when it succeeded.
 
-# 1.43.33 -- 28 September 2026
+## 1.43.33 -- 28 September 2026
 
 From the logs of 28 September at 21:03, when the kit's new warning named nine
 apps and every app build but urlCheck's stopped with "no kit found":
@@ -106,7 +257,7 @@ apps and every app build but urlCheck's stopped with "no kit found":
 - **A leading level word is the level.** "WARN: ..." was written as
   "WARN  WARN: ..."; the word now sets the level and is not repeated.
 
-# 1.43.32 -- 28 September 2026
+## 1.43.32 -- 28 September 2026
 
 **The last planned skill: homer-migrate.** Bringing an existing app onto the
 kit, or auditing one that has drifted: read the current files before changing
@@ -123,7 +274,7 @@ had not been unzipped. The kit's build now looks at each app folder beside
 it and warns, by name, of any build script that still names the old CSharp or
 homer paths.
 
-# 1.43.31 -- 28 September 2026
+## 1.43.31 -- 28 September 2026
 
 **A skill for starting an app: homer-new-app.** Choosing the shape (a single
 tool, a multiple-document app, an NVDA add-on) and the language, the fruit
@@ -152,7 +303,7 @@ is built into exec.
 **The kit check no longer asks for Templates\\self.md**, which git never
 carries, so a fresh clone of the kit checks clean.
 
-# 1.43.30 -- 28 September 2026
+## 1.43.30 -- 28 September 2026
 
 From the kit build of 28 September at 20:17:
 
@@ -171,7 +322,7 @@ From the kit build of 28 September at 20:17:
   and how long it took; a command that cannot start is an ERROR line naming
   both. In check, tidy, unpushed and buildHomerDev.
 
-# 1.43.29 -- 28 September 2026
+## 1.43.29 -- 28 September 2026
 
 From the logs of 28 September, when HomerScribe's and urlFido's builds failed
 and urlFido was released anyway:
@@ -195,7 +346,7 @@ and urlFido was released anyway:
   go through :failed. And its yt-dlp update ran twice; it runs once.
 - **homer-build-release's failures reference** gains all four.
 
-# 1.43.28 -- 28 September 2026
+## 1.43.28 -- 28 September 2026
 
 **A skill for documents: homer-docs.** The document set every app ships and
 what each holds (document-set.md), the ninth-grade reading level, saying the
@@ -213,7 +364,7 @@ History.md, Developer.md and the migration briefing -- use H1 for their
 chapters and have no contents list, which the Homer heading rule asks of a
 guide.
 
-# 1.43.27 -- 28 September 2026
+## 1.43.27 -- 28 September 2026
 
 **A skill for the interface: homer-ui.** Lbc dialogs and their focus order,
 labels and accessible names, access and trigger letters, flat menus, hotkeys
@@ -231,7 +382,7 @@ contents list, so the skill never holds a second copy that drifts.
 "Finish page wording" had been added inside the chapter on keys; the first is
 now a chapter of its own, and the second sits with the installer's log.
 
-# 1.43.26 -- 28 September 2026
+## 1.43.26 -- 28 September 2026
 
 **A skill for converting files: homer-convert.** It picks the tool by what is
 converted: Pandoc for a Homer document's Markdown to .htm, with a title, a
@@ -245,7 +396,7 @@ document uses Pandoc's. Its script, toHomerEncoding, puts converted files into
 the Homer encoding -- UTF-8 with a byte order mark and CRLF, none for .cmd,
 .bat and SKILL.md -- since Pandoc and most converters write neither.
 
-# 1.43.25 -- 28 September 2026
+## 1.43.25 -- 28 September 2026
 
 **Two more skills, and the tutorial skill carries the kit's guide.**
 
@@ -274,7 +425,7 @@ in one section and "Install, Reinstall, Update" in another, and homerGroup
 followed the second. The ticked boxes now come first everywhere, then the
 unticked ones, so homerOrder, which the Results box lists by, matches the page.
 
-# 1.43.24 -- 28 September 2026
+## 1.43.24 -- 28 September 2026
 
 **A skill for writing Homer code: homer-code.** The second development skill.
 Its SKILL.md holds the Camel Type rules that matter most -- Hungarian
@@ -294,7 +445,7 @@ which carries the originals. Anthropic's guidance asks a reference longer than
 100 lines to open with a contents list, so the three long style guides now
 have one.
 
-# 1.43.23 -- 28 September 2026
+## 1.43.23 -- 28 September 2026
 
 **A skill for the build and release cycle: homer-build-release.** The first of
 the Homer development skills. It teaches Claude the cycle -- buildHomerDev,
@@ -310,7 +461,7 @@ tidy's changes and push's outcome. It reads the kit's own build as well as an
 app's, and skips files that are not Homer logs. Tested on the uploads of 26 to
 28 September, where it found each failure this chat found by hand.
 
-# 1.43.22 -- 27 September 2026
+## 1.43.22 -- 27 September 2026
 
 From the first run of all ten apps on 1.43.21, whose program and script logs
 came out in the new format:
@@ -365,7 +516,7 @@ buildHomerDev packs each into exec\\skills\\<name>.zip for claude.ai. A new
 KeepEncoding.txt keeps SKILL.md free of a byte order mark, which would hide its
 front matter, and HomerDev.md gains "Claude skills", the rules for writing one.
 
-# 1.43.21 -- 27 September 2026
+## 1.43.21 -- 27 September 2026
 
 **One log line format, for machines and for people.** From the session logs
 of 2htm, EdSharp, FileDir, urlCheck and urlFido, run on 27 September:
@@ -414,7 +565,7 @@ And from the build, tidy, push, check and release logs of the same day:
 
 The format is set out in HomerDev.md, "How a log line is written".
 
-# 1.43.20 -- 27 September 2026
+## 1.43.20 -- 27 September 2026
 
 From reinstalling all ten apps:
 
@@ -434,7 +585,7 @@ From reinstalling all ten apps:
 - **Finish page wording** is written down in HomerDev.md, and the template's
   Launch and guide boxes follow it.
 
-# 1.43.19 -- 26 September 2026
+## 1.43.19 -- 26 September 2026
 
 **The grave accent family is a kit convention.** HomerDev.md's "Choosing a
 key" now sets out EdSharp's arrangement: Alt+Grave and Alt+Shift+Grave for
@@ -447,7 +598,7 @@ Voice Slower's key.
 1.43.19 as kitNeeded, so a new app starts with every tidy, check and release
 fix of the day.
 
-# 1.43.18 -- 26 September 2026
+## 1.43.18 -- 26 September 2026
 
 **check reads a key combination whole, and in Python reads the gestures.** It
 matched "Alt+Control" plus one more word, so Alt+Control+Shift+H was read as
@@ -461,7 +612,7 @@ desktop shortcut is compared whole, modifiers and all, with the HotKey its
 installer gives the desktop icon. Proved: HomerView and FileDir pass, and a
 C# Alt+Control+S and a Python kb:alt+control+t are still caught.
 
-# 1.43.17 -- 26 September 2026
+## 1.43.17 -- 26 September 2026
 
 **check never waits for a key.** Each acceptance command now runs with empty
 input, so a "pause" or a prompt in it returns at once. HomerView's quality
@@ -471,7 +622,7 @@ by hand. The console now also names each acceptance command as it starts, so
 a long one -- HomerView's accept list rebuilds the whole program -- is seen to
 be running.
 
-# 1.43.16 -- 26 September 2026
+## 1.43.16 -- 26 September 2026
 
 **version.py is kept out of git at the top of a project only.** tidy never
 pushes the version.py a Python app's build generates beside its source, but a
@@ -481,7 +632,7 @@ The name is now /version.py, and a leading / anchors any name in tidy's lists
 to the top of the project, as it does in .gitignore. Proved on HomerView's
 repository: the add-on's version.py stays tracked.
 
-# 1.43.15 -- 26 September 2026
+## 1.43.15 -- 26 September 2026
 
 **release publishes a draft and proves the release is the latest.** EdSharp's
 v5.0.15 already existed on GitHub as a draft, left by an earlier run: invisible
@@ -497,7 +648,7 @@ it is this one.
 sources. FileDir's pre-kit Hotkeys.inix at the top, superseded by
 configs\Hotkeys.inix, still named keys the program no longer has.
 
-# 1.43.14 -- 26 September 2026
+## 1.43.14 -- 26 September 2026
 
 **check's key test no longer cries wolf on an app with a menu bar.** Run on
 FileDir it reported 47 key problems, 40 of them false, from three blind spots:
@@ -520,7 +671,7 @@ are its three real Alt+Control timer keys.
 **buildHomerDev stops trying the 1.42.1 patch to release.ps1**, which release
 no longer needs; every kit build logged that it could not apply it.
 
-# 1.43.13 -- 26 September 2026
+## 1.43.13 -- 26 September 2026
 
 **release reads GitHub's list of releases rather than trusting an exit code.**
 Even asking GitHub alone (1.43.12), it said EdSharp 5.0.15 was already
@@ -531,7 +682,7 @@ the tag names of the repository's releases as JSON and looks for the tag among
 them, ignoring drafts; only if that list cannot be read does it fall back to
 "gh release view".
 
-# 1.43.12 -- 26 September 2026
+## 1.43.12 -- 26 September 2026
 
 **release asks GitHub whether a version is released, and no one else.** It
 also counted a tag on this machine as a release, so a tag left by an earlier run
@@ -541,7 +692,7 @@ origin, had just used 5.0.14. Now a release exists only when gh finds it; a tag
 on this machine alone is pushed and published by the tag step. Without gh, a
 local tag is still the answer, as there is nothing else to ask.
 
-# 1.43.11 -- 26 September 2026
+## 1.43.11 -- 26 September 2026
 
 **tidy leaves a file where the project says it lives.** EdSharp keeps the two
 libraries its repository carries, and the ones its build fetches, at the top of
@@ -565,7 +716,7 @@ names, as its encoding test already did. EdSharp's release was refused over a
 fruitBasket.cs in its pre-kit Samples folder, still on disk but no longer part
 of the project.
 
-# 1.43.10 -- 26 September 2026
+## 1.43.10 -- 26 September 2026
 
 **A name in RepoFiles.txt outranks a pattern in LocalFiles.txt**, in tidy's
 choice of what stays tracked and in the whitelist .gitignore. EdSharp carries
@@ -581,7 +732,7 @@ were untracked; a new .dll stayed ignored.
 **The whitelist puts back .gitattributes** as it does .gitignore, so the file
 that keeps the Homer CRLF line endings is never left out of a repository.
 
-# 1.43.9 -- 26 September 2026
+## 1.43.9 -- 26 September 2026
 
 **tidy just does it.** It no longer prints a plan and waits for --do-it: one
 run carries the plan out. Nothing is lost -- a stray goes into notes, which is
@@ -603,7 +754,7 @@ last build" is a drive-qualified variable to PowerShell, and the whole script
 failed to parse; the launcher log caught it. Written ${sFileVersion} now, and
 no other string has the pattern.
 
-# 1.43.8 -- 26 September 2026
+## 1.43.8 -- 26 September 2026
 
 **The renamed scripts called their neighbours by the old names.** After 1.42
 renamed homerTidy to tidy and the rest, tidy.cmd still ran "%~dp0homerTidy.py",
@@ -631,7 +782,7 @@ with it stopped on "The syntax of the command is incorrect".
 with the command line, PowerShell's error stream and the exit code, so a
 failure before release.ps1's own transcript starts still leaves a record.
 
-# 1.43.7 -- 26 September 2026
+## 1.43.7 -- 26 September 2026
 
 **release, the script that used to be tagRelease, fixed from the day's logs.**
 It is not in the kit's repository -- by standing rule the release scripts never
@@ -655,7 +806,7 @@ stopped and the three that published looked as if they had failed:
   publishing; only HomerScribe's own copy did. Now every copy does, and stops
   when the check fails. -NoCheck skips it.
 
-# 1.43.6 -- 26 September 2026
+## 1.43.6 -- 26 September 2026
 
 **Python apps build their WinForms dialogs with the C# LbcDialog.** A Python
 app with a WinForms interface had to write its dialogs by hand, since the
@@ -678,7 +829,7 @@ reachable from Python:
 The focus order, keys, Help box and version check are therefore the same in
 both languages by construction. urlCheck 1.12.3 is the first user.
 
-# 1.43.5 -- 26 September 2026
+## 1.43.5 -- 26 September 2026
 
 **seedVersion is a floor in both build templates.** It was only a starting
 point, used when version.txt was missing, although its comment said "nothing
@@ -688,7 +839,7 @@ named 1.19.0. Now a version.txt below seedVersion is raised to it, logged,
 and taken as it is for that build, the same as a newly made one. A number
 already at or above the floor is stepped as before.
 
-# 1.43.4 -- 26 September 2026
+## 1.43.4 -- 26 September 2026
 
 **check no longer starts a windowed program.** Its smoke test ran the program
 with --help, which a console program answers and exits; a windowed one --
@@ -698,7 +849,7 @@ The PE header now says which kind a program is, and a windowed one is reported
 as started by hand. Proved on the real executables: bookFido.exe reads as
 windowed, urlFido.exe as console.
 
-# 1.43.3 -- 26 September 2026
+## 1.43.3 -- 26 September 2026
 
 **Templates\build_APP_.cmd lost half a Python template.** 1.43.2's C# template
 was assembled from the Python one, and the piece meant to be its version
@@ -716,7 +867,7 @@ exist.** Neither is ever an error to cmd; both are now problems the kit build
 reports. Proved by adding a second :failed and a jump to a missing label to a
 copy of the template: the check named both.
 
-# 1.43.2 -- 26 September 2026
+## 1.43.2 -- 26 September 2026
 
 **Templates\build_APP_.cmd keeps the same contract as the Python template,
 clause for clause.** It had fallen behind: the program went to the top of the
@@ -740,7 +891,7 @@ buildHomerDev no longer notes a missing retired loop in the C# template: the
 list is a retiredTools= variable now, as in the Python template, and the
 renaming leaves that line alone.
 
-# 1.43.1 -- 26 September 2026
+## 1.43.1 -- 26 September 2026
 
 **buildHomerDev no longer rewrites the Python template's retired list.** Its
 first 1.43.0 run did: "REWROTE old script names in Templates\build_APP_Py.cmd"
@@ -762,7 +913,7 @@ table included from the kit the build names, the ticked boxes noted when Finish
 is pressed, the Results box, then the launch -- with no components registered,
 since urlCheck needs none.
 
-# 1.43.0 -- 26 September 2026
+## 1.43.0 -- 26 September 2026
 
 **The Python side brought level with the C# side**, from moving urlCheck, the
 first Python app, to the kit.
@@ -822,7 +973,7 @@ buildHomerDev now empties the old Python\ and Samples\ folders, whose last
 files no move pair reached. HomerDev.md and paths.py no longer say to put
 C:\HomerDev\Python on the path, or that a development folder stays flat.
 
-# 1.42.1 -- 26 September 2026
+## 1.42.1 -- 26 September 2026
 
 release no longer shows two red error blocks on a release that
 succeeded: asking git whether a tag exists, and gh whether a release
@@ -832,7 +983,7 @@ has moved, and points origin at the new address once, so the notice
 stops. Both are patched into the scripts in place by buildHomerDev,
 keeping everything else in them.
 
-# 1.42.0 -- 26 September 2026
+## 1.42.0 -- 26 September 2026
 
 The scripts have shorter names: tidy (was homerTidy), push (gitPush),
 unpushed (gitUnpushed), release (tagRelease), check (checkHomerApp),
@@ -844,7 +995,7 @@ the new ones and needs kit 1.42.0. The renaming and retiring now run
 whether or not pandoc is present. help\HomerDev_update.md now holds
 everything HomerView's migration taught, as rules.
 
-# 1.41.3 -- 26 September 2026
+## 1.41.3 -- 26 September 2026
 
 Three fixes to the installer template, all found by building FileDir's
 installer from it -- the first app to do so on this machine.
@@ -863,7 +1014,7 @@ marker to the profile of whoever answered the elevation prompt, on purpose and
 with a comment saying so. A warning read past on every build teaches people to
 read past warnings.
 
-# 1.41.2 -- 26 September 2026
+## 1.41.2 -- 26 September 2026
 
 `commandKey` is settable on the dialog, not only on its form. 1.41.1 put the
 hook on LbcForm, where ProcessCmdKey runs, and forgot the property on
@@ -871,7 +1022,7 @@ LbcDialog that hands it through -- so an app holding a dialog had no way to
 reach it. The dialog wraps its form; the app sets `dlg.commandKey` and never has
 to know which class holds the override.
 
-# 1.41.1 -- 26 September 2026
+## 1.41.1 -- 26 September 2026
 
 **Lbc.cs takes in FileDir's work on it**, so that FileDir can stop carrying a
 copy and every app gets what FileDir paid for. The two files had drifted 40 per
@@ -924,7 +1075,7 @@ what an app does not define.
 Util.cs gains looksLikeText and readSample: whether a file is text at all, and
 the sample of bytes that decides it.
 
-# 1.39.1 -- 25 September 2026
+## 1.39.1 -- 25 September 2026
 
 help\HomerDev_update.md: the briefing for bringing another Homer app up to
 the current kit -- what the kit is, the contract between an app and it
@@ -938,7 +1089,7 @@ repository, copied classes with a per-project namespace, binaries in git,
 and earlier editions of the tools. The first release of HomerScribe through the whole
 chain -- build, check, push, tag, installer asset -- went through today.
 
-# 1.38.3 -- 25 September 2026
+## 1.38.3 -- 25 September 2026
 
 HomerScribe's first release through tagRelease's built-in check was refused
 on three counts, two of them the check's own fault and one half mine. The
@@ -955,7 +1106,7 @@ logs\<App>-encoding-<stamp>.log, and every app's build runs it before the
 compile, so the check that follows has nothing to find. tagRelease's probe
 for an existing release no longer logs "release not found" as an error.
 
-# 1.38.2 -- 25 September 2026
+## 1.38.2 -- 25 September 2026
 
 The tutorial log is readable again: PowerShell's five-line wrapper around a
 native program's first standard-error line, and piper's "[info]" progress,
@@ -965,7 +1116,7 @@ loudness pass logs its setting once per walk and only a failure per piece.
 The build log records the tutorial tool's exit code and the time beside its
 outcome line.
 
-# 1.38.1 -- 25 September 2026
+## 1.38.1 -- 25 September 2026
 
 One rule for where a tool is run: the project is the current folder, or its
 parent when the current folder is the project's scripts or exec folder.
@@ -981,7 +1132,7 @@ removes the copies of kit tools it finds in C:\bin -- only files bearing a
 kit tool's name, each removal logged -- since a push and a release ran from
 those stale copies today.
 
-# 1.38.0 -- 25 September 2026
+## 1.38.0 -- 25 September 2026
 
 One tool per job, and the names that sounded alike are gone. cleanDir and
 tidyRepo, with homerPolicy that only tidyRepo read, are homerTidy; gitRelease
@@ -999,7 +1150,7 @@ delivered scripts\homerInstall.cmd as the old copy and deleted it. The pair
 is gone and the move list skips any pair whose two sides are the same file.
 LocalFiles.txt names the sample programs' build products.
 
-# 1.37.0 -- 25 September 2026
+## 1.37.0 -- 25 September 2026
 
 Two folders that broke the first-letter rule, and the kit's copies of shared
 scripts. Samples shared its letter with scripts: the four fruit-basket
@@ -1021,7 +1172,7 @@ Kokoro runs on two threads, measured faster than all of them; every piece
 is brought to one loudness, and ReaderGain scales the reader's; and a
 "step N of M" line every four steps says the minutes are speaking.
 
-# 1.36.2 -- 25 September 2026
+## 1.36.2 -- 25 September 2026
 
 A build was stopped by hand because its screen said one sentence and then
 nothing for three minutes, and the silence read as a second download of
@@ -1035,7 +1186,7 @@ rather than two, and its configuration and progress chatter -- which
 PowerShell had been logging as a "NativeCommandError" -- is kept out of
 the log except for its timings.
 
-# 1.36.1 -- 25 September 2026
+## 1.36.1 -- 25 September 2026
 
 Three faults from the first full run of 1.35 and 1.36, and two more lines
 of reader grammar. Kokoro was fetched and unpacked and then not recognised:
@@ -1049,7 +1200,7 @@ beside itself, forwards to homerTidy with the same arguments. Tutorials.md
 and the skill gain the reader's phrasing of a slider with a value, a numeric
 edit, a tabbed dialog, a list view item, and a program's loading message.
 
-# 1.36.0 -- 25 September 2026
+## 1.36.0 -- 25 September 2026
 
 The screen reader's speech in a tutorial is now checked by code and written
 by a skill. scripts\checkTutorial reads every Tutorial_*.inix against the
@@ -1060,7 +1211,7 @@ seven in the kit's own. Templates\skills\homer-tutorial\SKILL.md is a
 skill for an AI writing these: the four beats, the grammar of every control
 and of an edit box, where a Hear line's truth comes from, and the commands.
 
-# 1.35.1 -- 25 September 2026
+## 1.35.1 -- 25 September 2026
 
 gitPush, in the form Jamal has used by hand -- clear the screen, add
 everything, commit "Fix." or the message given, push, show the status --
@@ -1071,7 +1222,7 @@ gains "The five scripts, and the order they run in": build, gitPush,
 homerTidy, tagRelease, gitUnpushed, and what RepoFiles.txt and
 LocalFiles.txt each decide.
 
-# 1.35.0 -- 25 September 2026
+## 1.35.0 -- 25 September 2026
 
 Four things learnt from one afternoon's logs.
 
@@ -1104,7 +1255,7 @@ help\Tutorials.md gains the reader's grammar inside an edit box, from a
 class on reading and editing text: typing echo, Backspace, Blank, Top and
 Bottom of file, the three ways of selecting and their words.
 
-# 1.34.0 -- 25 September 2026
+## 1.34.0 -- 25 September 2026
 
 The kit follows the layout it asks of every app. Tools is now scripts:
 every build script, every document and RepoFiles.txt say scripts, the
@@ -1121,7 +1272,7 @@ exec\piper beside piper.exe, so exec holds one folder per engine.
 LocalFiles.txt names exec as never pushed. (1.33.0's voices folder was
 never released.)
 
-# 1.33.0 -- 25 September 2026
+## 1.33.0 -- 25 September 2026
 
 The tutorial voices live in one place, C:\HomerDev\voices, fetched once and
 found by every app's build; they are no longer fetched into each app's
@@ -1130,7 +1281,7 @@ names the place, as the one folder every Homer app already relies on.
 HOMER_VOICES overrides it. The kit gains LocalFiles.txt, naming voices\ and
 logs\ as local and never pushed, and its build skips the voices folder.
 
-# 1.32.0 -- 25 September 2026
+## 1.32.0 -- 25 September 2026
 
 The spoken tutorials change shape, and the tools that make them move with
 them. Tools\buildTutorials.ps1 writes one .mp3 per walk into help\tutorials
@@ -1148,7 +1299,7 @@ help\Tutorials.md gains "How a reader phrases a control", the grammar of a
 screen reader's speech for every control, taken from two training classes and
 naming no reader; and the tutorial scripts are to name none either.
 
-# 1.31.1 -- 25 September 2026
+## 1.31.1 -- 25 September 2026
 
 Two build failures from 1.31.0, both fixed. homerNoteTicked was declared a
 function with no return type, which Pascal refuses ("colon expected"); it is
@@ -1163,7 +1314,7 @@ repeat key taught first; counts used as orientation; controls named as the
 reader names them; a breath before each key. Templates\Tutorial_00_Overview.inix
 carries the short form.
 
-# 1.31.0 -- 25 September 2026
+## 1.31.0 -- 25 September 2026
 
 Two patterns every Homer app is to follow, asked for on this date.
 
@@ -1202,7 +1353,7 @@ Yes/No box can keep Yes-then-No order with No as the default. The first
 label is the default when the argument is absent -- so list OK first: with
 Help first, Enter in HomerScribe's source paths field opened Help.
 
-# 1.30.0 -- 25 September 2026
+## 1.30.0 -- 25 September 2026
 
 The Results box after an install reports only the boxes that were ticked,
 from a probe made after the scripts ran: homerNoteTicked records the ticked
@@ -1216,7 +1367,7 @@ happened, and it listed three components nobody had asked about.
 FinishPage.md gains the Results-box rule and the "Downloading" rule for
 install-script console messages.
 
-# 1.29.0 -- 25 September 2026
+## 1.29.0 -- 25 September 2026
 
 Four files delivered the day before had landed in folders the kit never had:
 Docs, Inno and Scripts. They now sit where RepoFiles.txt says kit files go --
@@ -1235,7 +1386,7 @@ scripts use to read it, cannot strip one, and a build refused a kit of
 exactly the version it asked for when one was present. normalizeHomer
 already knew this; the file had been saved wrongly.
 
-# 1.28.0 -- 24 September 2026
+## 1.28.0 -- 24 September 2026
 
 HomerComponents.iss gained a sixth homerAdd argument, the registry Uninstall
 key name, checked under HKLM, HKCU and WOW6432Node. An installer runs
@@ -1259,7 +1410,7 @@ Two documents: FinishPage.md, the rule for what a finish-page checkbox says
 and whether it starts ticked; Logging.md, where logs go and what they open
 with.
 
-# 1.27.0 -- 23 September 2026
+## 1.27.0 -- 23 September 2026
 
 **Repeated speech is handled in the kit, not app by app.** `Say.say` drops a
 line that repeats the last one within a second and a half, or that matches the
@@ -1273,7 +1424,7 @@ run time and is now audited instead: every accessible name is compared against
 every caption in the same source, and a match fails the check. A new section in
 the guide, **Not twice: speech that repeats**, says which is which.
 
-# 1.26.0 -- 22 September 2026
+## 1.26.0 -- 22 September 2026
 
 **The published repository was missing most of itself.** The whitelist in
 .gitignore still named the documents at the top level, where they were before
@@ -1287,7 +1438,7 @@ and createHomerDevRepo is in RepoFiles.
 passed while the thing people actually download was missing sixteen paths. Check
 the archive, not the folder it came from.
 
-# 1.25.0 -- 21 September 2026
+## 1.25.0 -- 21 September 2026
 
 Runtime logs record the conversation. **Say.onSpoken** sends every utterance to
 the app's log, including those withheld because extra speech was off, so a
@@ -1300,7 +1451,7 @@ how to gather each.
 name at the top of the project would find nothing. This wrapper runs the fresh
 build from there.
 
-# 1.24.0 -- 21 September 2026
+## 1.24.0 -- 21 September 2026
 
 **LbcMenuItem**, in Lbc.cs: a menu item that tells the screen reader both its
 shortcut and its access letter. A stock item's name leaves out the shortcut;
@@ -1313,7 +1464,7 @@ with ffmpeg after piper speaks so the length does not change. The default is -2
 with NarratorScale 0.80: a beta tester with the high-frequency loss that comes
 with age found the narrator hard to follow at 0.72 and full pitch.
 
-# 1.23.0 -- 21 September 2026
+## 1.23.0 -- 21 September 2026
 
 homerTidy learns the Homer layout, and apps stop writing their own clean-up
 scripts. It moves a file the installer takes from exec or help into that folder,
@@ -1325,14 +1476,14 @@ line of it is written into .gitignore as never pushed.
 Also fixed: two identical files the project names, such as the same script in
 two sample folders, are no longer treated as duplicates to remove.
 
-# 1.22.1 -- 21 September 2026
+## 1.22.1 -- 21 September 2026
 
 tagRelease joins the logs folder: each run writes
 `logs\<App>-release-<date>-<time>.log` instead of overwriting `tagRelease.log` at
 the top of the project. Install it with `Tools\installTools`, which copies the
 kit's tools to C:\bin.
 
-# 1.22.0 -- 21 September 2026
+## 1.22.0 -- 21 September 2026
 
 Development logs join the tree. Every build, clean, tidy, tutorial and audit run
 writes its own file in the project's `logs` folder, named as the program names
@@ -1340,7 +1491,7 @@ its runtime logs: `<App>-<task>-yyyyMMdd-HHmmss.log`. One session per file, an
 alphabetical sort is a chronological one, and one zip gathers them all. The build
 template, homerTidy, buildTutorials, makeTutorials and makeHotkeys all follow it.
 
-# 1.21.0 -- 21 September 2026
+## 1.21.0 -- 21 September 2026
 
 The development folder takes the installed shape. Sources and build files stay at
 the top with ReadMe and License; programs are built into `exec`, documents live
@@ -1352,7 +1503,7 @@ Also recorded: why Homer menus are long and flat, when a submenu earns its place
 the function-key families, the two rules for letters with the X, Un- and Z
 exceptions, and the Hotkeys.md format.
 
-# 1.20.0 -- 20 September 2026
+## 1.20.0 -- 20 September 2026
 
 A demo script declares its own terms.
 
@@ -1365,7 +1516,7 @@ That also gives the file kind a name. An .inix whose sections are speech
 passages is a **demo script**, and it says so: `FileTask = demo`, the way report
 and accept files declare themselves.
 
-# 1.19.0 -- 20 September 2026
+## 1.19.0 -- 20 September 2026
 
 Spoken tutorials become a kit capability.
 
@@ -1397,7 +1548,7 @@ sayTutorial, which spoke a single script in two SAPI voices, is replaced by
 buildTutorials, which does that and everything after it.
 
 
-# 1.18.0 -- 19 September 2026
+## 1.18.0 -- 19 September 2026
 
 A script that shells out to an installer says where the window went.
 
@@ -1414,17 +1565,17 @@ a time limit so an answer that never comes ends in a sentence rather than a
 hang. The guide says all three.
 
 
-# 1.17.0 -- 19 September 2026
+## 1.17.0 -- 19 September 2026
 
 Everything DbDo's installer taught this week, folded back in.
 
-## The destination page
+### The destination page
 
 `DisableDirPage=auto` with `UsePreviousAppDir=yes`. A reinstall or an update now
 asks nothing and goes where the last one went; a first install still chooses.
 HomerScribe already did this and the template did not.
 
-## Probe quoting, which cost three releases
+### Probe quoting, which cost three releases
 
 `cmd /c` strips the first and last quote of what follows it, so a probe
 beginning with a quoted path -- `"C:\...\ollama.exe" --version` -- lost its
@@ -1432,7 +1583,7 @@ opening quote and ran nothing. Empty output read as "not installed", and an
 installer kept offering to install a tool that was already there. The whole
 command is now wrapped in one more pair of quotes.
 
-## Detect by looking, not by running
+### Detect by looking, not by running
 
 The file and the uninstall registry key are checked first: no process, no
 quoting, no PATH, and an elevated installer still sees them. The tool is run
@@ -1440,7 +1591,7 @@ only to learn its version, never to learn whether it exists. Ollama installs per
 user, into a profile an elevated installer's PATH cannot reach, which is what
 made this the failure it was.
 
-## Three entries per component, with versions in the label
+### Three entries per component, with versions in the label
 
 One entry per state -- install, update, already current -- grouped so the ones
 that do something come first, only one ever shown. The label carries the
@@ -1454,20 +1605,20 @@ A purpose clause belongs only in the fallback, where no version is known. The
 launch and guide entries keep the words the other apps use, name and key
 substituted and nothing more.
 
-## The Results box is not a checkbox
+### The Results box is not a checkbox
 
 It always runs and it must run last, so it is started from code in
 `DeinitializeSetup` rather than listed on the finish page. A launch checkbox
 leaves a marker instead of starting the program, and the summary starts it once
 the box has been closed.
 
-## Every probe is logged
+### Every probe is logged
 
 Command, exit code, output. Three rounds went into finding a fault that one
 logged probe would have shown at once.
 
 
-# 1.16.0 -- 19 September 2026
+## 1.16.0 -- 19 September 2026
 
 Finish-page checkboxes that look before they offer.
 
@@ -1490,7 +1641,7 @@ the program and where it is, one line per ticked checkbox, and the log's
 location. Nothing about a step that did not run.
 
 
-# 1.15.0 -- 19 September 2026
+## 1.15.0 -- 19 September 2026
 
 `jobs` became `scripts`, and `samples` folded into `templates`.
 
@@ -1513,7 +1664,7 @@ folder now, with a comment saying why.
 DbDo needs no change for this: it already keeps its scripts in `Scripts\`.
 
 
-# 1.14.1 -- 19 September 2026
+## 1.14.1 -- 19 September 2026
 
 The build template fetches what it needs.
 
@@ -1529,7 +1680,7 @@ because the installer is part of a release. And an ISCC that returns 0 without
 writing the .exe now fails too.
 
 
-# 1.14.0 -- 19 September 2026
+## 1.14.0 -- 19 September 2026
 
 A module can need an assembly, and now it says so.
 
@@ -1557,7 +1708,7 @@ reads every build script -- the samples', the templates', and any other it is
 pointed at -- for one that compiles a module without the references it names.
 
 
-# 1.13.5 -- 19 September 2026
+## 1.13.5 -- 19 September 2026
 
 `Announce.md` carries the facts a reader asks for first.
 
@@ -1574,7 +1725,7 @@ All of that is now in the announcement, in the places where a reader would look
 for it, and the piece is still one posting at about 2,800 characters.
 
 
-# 1.13.4 -- 19 September 2026
+## 1.13.4 -- 19 September 2026
 
 `Announce.md` leads with what somebody gets.
 
@@ -1590,7 +1741,7 @@ characters, which fits a LinkedIn post, a Facebook post, or an email as it
 stands.
 
 
-# 1.13.3 -- 19 September 2026
+## 1.13.3 -- 19 September 2026
 
 `Announce.md` is one announcement.
 
@@ -1604,16 +1755,16 @@ then the checks, then the samples, the licence and the link. No headings about
 where to paste it and no commentary about itself.
 
 
-# 1.13.2 -- 19 September 2026
+## 1.13.2 -- 19 September 2026
 
 The announcements say what this actually is.
 
-## All four programs built at 1.13.1
+### All four programs built at 1.13.1
 
 FruitBasketCs, FruitBasketMdiCs, FruitBasketMdiPy and FruitBasketPy each
 produced their executable, and the kit audit found 0 problems.
 
-## Announce.md, rewritten around the honest claim
+### Announce.md, rewritten around the honest claim
 
 The three posts now say the true thing rather than the impressive one: this is
 about twenty years of learning consolidated into one place, with AI making the
@@ -1638,16 +1789,16 @@ characters, the standard post about 2,500, and the email version longer because
 email has no limit.
 
 
-# 1.13.1 -- 19 September 2026
+## 1.13.1 -- 19 September 2026
 
 One command for the whole release.
 
-## All four samples built at 1.13.0
+### All four samples built at 1.13.0
 
 `buildHomerDev` converted the documents, built FruitBasketCs, FruitBasketMdiCs,
 FruitBasketMdiPy and FruitBasketPy, and found 0 problems.
 
-## releaseHomerDev
+### releaseHomerDev
 
     releaseHomerDev "What changed."
 
@@ -1666,11 +1817,11 @@ the one thing to do before announcing.
 the kit runs the kit's own check rather than the per-app one.
 
 
-# 1.13.0 -- 19 September 2026
+## 1.13.0 -- 19 September 2026
 
 The keys are now pressed by a script.
 
-## uiCheck
+### uiCheck
 
     uiCheck                    every uiTest.inix beside the script
     uiCheck --path C:\JobDo    an app's own tests
@@ -1693,7 +1844,7 @@ This replaces the last instruction in this project that said "open it and press
 the keys". A check a person has to remember is a check that stops happening in
 the week it matters.
 
-## checkHomerDev checks the machine too
+### checkHomerDev checks the machine too
 
 Two additions, both from faults that actually happened:
 
@@ -1707,7 +1858,7 @@ Two additions, both from faults that actually happened:
 `checkHomerDev` now runs uiCheck as its last step, so one command builds
 everything from clean and then drives it.
 
-## What is still not automated
+### What is still not automated
 
 Speech. UI Automation reports that a control exists and what it is called, not
 what JAWS said. NVDA can log what it speaks at debug level, so a future check
@@ -1715,18 +1866,18 @@ could run a scripted session and read that log back. It is written down as the
 next step rather than claimed as done, and every report says so.
 
 
-# 1.12.1 -- 19 September 2026
+## 1.12.1 -- 19 September 2026
 
 Everything builds; the release itself needed one more script.
 
-## All four samples built, and the kit audited clean
+### All four samples built, and the kit audited clean
 
 `buildHomerDev` converted the documents, built FruitBasketCs, FruitBasketMdiCs,
 FruitBasketMdiPy and FruitBasketPy, and found 0 problems. That is the first run
 where the whole kit -- three shapes, two languages, one command -- came through
 in one pass.
 
-## tagRelease failed, and it was not tagRelease
+### tagRelease failed, and it was not tagRelease
 
     Could not find HomerDev_setup.iss in C:\HomerDev
 
@@ -1743,7 +1894,7 @@ The lesson generalizes: a tool that acts on the current directory is meant to
 have one copy, and one copy means one copy that can go stale. `Developer.md` now
 opens with the release sequence, `installTools` included.
 
-## Smaller things
+### Smaller things
 
 - The migration list covers the MDI sample's rename, so the old
   `FruitBasketMdi.exe` and its log go on the next build.
@@ -1751,11 +1902,11 @@ opens with the release sequence, `installTools` included.
   They are not.
 
 
-# 1.12.0 -- 19 September 2026
+## 1.12.0 -- 19 September 2026
 
 The MDI shape in both languages, two lists that matter, and an FAQ.
 
-## FruitBasketMdiCs and FruitBasketMdiPy
+### FruitBasketMdiCs and FruitBasketMdiPy
 
 The MDI sample is now a pair, like the single-dialog one. `homer\mdi.py` is the
 Python side of `Mdi.cs`: same command names, same keys, same title rule, same
@@ -1768,7 +1919,7 @@ again rather than reused. Everything that makes a control accessible IS reused.
 Lifting lbc's building methods into a mixin that a dialog and a panel can share
 is the next refactor, and it has not been done.
 
-## One command builds everything
+### One command builds everything
 
 `buildHomerDev` now converts the documents, **builds all four samples**, and
 audits the kit. Somebody who changes a shared class should not have to remember
@@ -1779,7 +1930,7 @@ on screen with the log that holds the compiler output.
 `checkHomerDev` is unchanged in purpose and now covers all four: it cleans
 first, checks the module dependency rule, and writes the evidence report.
 
-## Run a Job, and Change a Setting
+### Run a Job, and Change a Setting
 
 Every MDI app now gets two more commands free:
 
@@ -1798,7 +1949,7 @@ saved the moment they are answered, and handed back to the app through
 `onSettingChanged` so they take effect at once. No file to edit by hand, no
 twenty-control preferences dialog, no restart.
 
-## FAQ.md
+### FAQ.md
 
 A new standard document, in `help` with the others. It answers the question that
 comes first from outside the Windows world -- why not Mac -- plainly: this kit
@@ -1813,11 +1964,11 @@ The full document set is now `ReadMe.md` and `License.md` at the top, and in
 `Hotkeys.md` and `Tutorials.md`.
 
 
-# 1.11.0 -- 19 September 2026
+## 1.11.0 -- 19 September 2026
 
 Ready for a first public release.
 
-## The documents now say what the kit does
+### The documents now say what the kit does
 
 A full pass over every document against the actual contents of the folder. What
 had drifted:
@@ -1833,7 +1984,7 @@ had drifted:
 - `Hotkeys.md` had no section for the MDI frame's keys, which every
   multiple-document app gets for free.
 
-## Announce.md is now three announcements, each already the right length
+### Announce.md is now three announcements, each already the right length
 
 The Word document made from `Announce.md` was always far too long to paste into
 a post, which is the wrong way round: the document should hold posts that are
@@ -1857,16 +2008,16 @@ first anything, no promise about what somebody will be able to build, and no
 number that cannot be checked.
 
 
-# 1.10.1 -- 19 September 2026
+## 1.10.1 -- 19 September 2026
 
 The build now clears up after a move.
 
-## All three samples built at 1.10.0
+### All three samples built at 1.10.0
 
 FruitBasketCs, FruitBasketMdi and FruitBasketPy each produced their program
 again, so moving the documents disturbed nothing that compiles.
 
-## Twenty documents, when there are twelve
+### Twenty documents, when there are twelve
 
 The 1.10.0 run converted 20 documents instead of 12. Unarchiving over an
 existing folder adds and replaces; it never deletes. So every document that
@@ -1891,11 +2042,11 @@ Every move the kit has made is in that list, back to `Keys.cs` becoming
 next build.
 
 
-# 1.10.0 -- 19 September 2026
+## 1.10.0 -- 19 September 2026
 
 A place for the documents, and two scripts for releasing.
 
-## help, the tenth folder
+### help, the tenth folder
 
 `help` joins the layout, at the same level as configs, data, exec, jobs, logs,
 results, samples, temp and templates. Its letter, h, was free, and it holds every
@@ -1915,7 +2066,7 @@ recognition is unaffected, since the ReadMe stays at the root. Community health
 files, if a project ever wants them, go in `.github`, which GitHub also
 recognizes and which leaves the letters alone.
 
-## Tutorials.md and Announce.md join the standard set
+### Tutorials.md and Announce.md join the standard set
 
 The full documentation set is now: `ReadMe.md` and `License.md` at the top, and
 in `help`: `<App>.md`, `Announce.md`, `Developer.md`, `History.md`,
@@ -1927,7 +2078,7 @@ finding out what a key does, turning one window into many, reading a log,
 writing acceptance criteria, changing a shared class, releasing, and asking an
 AI for a Homer app -- plus the audio tutorial playlist and how to record more.
 
-## gitPush and gitRelease
+### gitPush and gitRelease
 
 Both from the versions in daily use, with three changes. `gitPush` takes the
 commit message as an argument instead of always saying "Fix.", refuses to run
@@ -1939,25 +2090,25 @@ rather than you. `--skip-check` is there for when you already know.
 Both stage only what the whitelist allows, so `git add -A` means "everything the
 project has named" rather than "everything in the folder".
 
-## Every file, listed
+### Every file, listed
 
 `HomerDev.md` gained a manifest: every file in the kit with one line saying why
 it is there, grouped by folder. A file you have not seen before can now be
 looked up rather than guessed at.
 
 
-# 1.9.0 -- 19 September 2026
+## 1.9.0 -- 19 September 2026
 
 The kit can now check itself with a compiler.
 
-## All three samples built at 1.8.1
+### All three samples built at 1.8.1
 
 FruitBasketCs, FruitBasketMdi and FruitBasketPy each produced their program.
 The MDI one is the news: it is the first real exercise of the adopting
 constructor added to `LbcDialog`, so an MDI child laid out by the same builder
 as a dialog now has a compiler's word for it.
 
-## checkHomerDev
+### checkHomerDev
 
     checkHomerDev
     checkHomerDev --deep
@@ -1992,11 +2143,11 @@ close a window is not a check. What a screen reader says is still for a person
 to hear, and the report's uncertain list names that first.
 
 
-# 1.8.1 -- 19 September 2026
+## 1.8.1 -- 19 September 2026
 
 Three faults from the first run of 1.8.0, and one of them is a new kind.
 
-## The MDI sample would not compile
+### The MDI sample would not compile
 
     Mdi.cs(137,13): error CS0103: The name 'KeyMap' does not exist in the current context
 
@@ -2017,24 +2168,24 @@ independent, and until MDI arrived every file was. Three changes:
 independent, and the comment in the template says so, so nobody hunts for
 dependencies that are not there.
 
-## The C# and Python samples both built and ran
+### The C# and Python samples both built and ran
 
 FruitBasketCs and FruitBasketPy each produced their program on the first try at
 1.8.0, which means the adopting-constructor change to `LbcDialog` did not disturb
 ordinary dialogs. The MDI sample is still the real test of that seam.
 
-## The kit check audited files the build had written
+### The kit check audited files the build had written
 
 `Version.cs` and `version.py` are generated on every build and are already in the
 never-pushed list, so their encoding says nothing about the kit. Both the kit
 check and `checkHomerApp` now skip them.
 
 
-# 1.8.0 -- 19 September 2026
+## 1.8.0 -- 19 September 2026
 
 MDI, and the three shapes named.
 
-## Mdi.cs
+### Mdi.cs
 
 `MdiFrame` and `MdiChild` carry the frame of a multiple-document app, so
 EdSharp, FileDir and DbDo can share one implementation instead of three that
@@ -2053,7 +2204,7 @@ the same shape with today's classes under it.
 The title rule is enforced rather than documented: the frame carries the app
 name, a child carries its subject, and `setTitle` is the only way to set one.
 
-## LbcDialog can adopt a form
+### LbcDialog can adopt a form
 
 A dialog and an MDI child differ in how they are shown, not in how they are laid
 out. `LbcDialog` now takes an optional existing form and builds into it, so a
@@ -2062,14 +2213,14 @@ and the access keys from the same code a dialog uses. An adopted form is
 finished with `layoutIntoForm`, which sizes it and sets the opening focus
 without showing anything, because the frame shows the child.
 
-## FruitBasketMdi.cs
+### FruitBasketMdi.cs
 
 The third sample. It does not repeat the nine decisions -- FruitBasketCs still
 carries those -- and marks only what changes when a program holds several things
 at once: the title rule, commands as sentences, what the frame gives free, state
 per window, and closing the last window closing the program.
 
-## The guide names the three shapes
+### The guide names the three shapes
 
 A single tool with a command line and a dialog; a desktop-only program whose
 dependencies decided that; and a multiple-document program. The consistent flags
@@ -2078,11 +2229,11 @@ unknown switch refused rather than ignored -- and so is the list of everything
 all three share, which is nearly all of it.
 
 
-# 1.7.0 -- 19 September 2026
+## 1.7.0 -- 19 September 2026
 
 The kit learnt to produce evidence.
 
-## checkHomerApp
+### checkHomerApp
 
     checkHomerApp
     checkHomerApp --build
@@ -2111,7 +2262,7 @@ On that first run it found a real fault: both fruit basket samples had given the
 access key S to two controls at once. Fixed -- the speaking check is now
 "Spea&k each change".
 
-## accept.inix
+### accept.inix
 
 What "done" means, written before the code is:
 
@@ -2125,7 +2276,7 @@ Four fields and no more, because the point is that criteria get written.
 `Templates\accept.inix` starts a new app off; `Samples\accept.inix` checks that
 both fruit baskets build and produce their programs.
 
-## The guide gained two parts
+### The guide gained two parts
 
 "Evidence, and checking without sight" explains the instrument and the three
 lists. The AI-assisted coding part gained "the method, in four moves" --
@@ -2133,11 +2284,11 @@ specify, build in small recoverable steps, verify, package and defend -- with
 what in the kit carries each.
 
 
-# 1.6.1 -- 19 September 2026
+## 1.6.1 -- 19 September 2026
 
 Two faults from the first run of 1.6.0, both mine.
 
-## A missing version.txt stopped the build
+### A missing version.txt stopped the build
 
 Flattening the samples in 1.5.0 removed their `version.txt` files, on the
 grounds that a sample is never released and so has no number to step. The build
@@ -2151,7 +2302,7 @@ installer carries it, the release tag is it. So a missing `version.txt` is now
 created holding 1.0.0 and the build carries on, in both templates and both
 samples. Stopping there left a manual step, which no Homer build does.
 
-## The kit check walked into a virtual environment
+### The kit check walked into a virtual environment
 
 `buildHomerDev` audits every text file in the kit. The Python sample's build had
 left a `.venv` beside it holding the whole of PyInstaller, so the check dutifully
@@ -2164,17 +2315,17 @@ folders join the never-pushed list. And the console now shows the first twenty
 problems and says how many more there are, with every one of them in the log. A
 console that scrolls for a minute tells a screen reader user nothing at all.
 
-## Also
+### Also
 
 The Homer module list in the C# build template is now in lowercase alphabetical
 order, which it had drifted out of when KeyName was renamed.
 
 
-# 1.6.0 -- 19 September 2026
+## 1.6.0 -- 19 September 2026
 
 A folder layout whose initials are all different.
 
-## The nine folders
+### The nine folders
 
 `configs`, `data`, `exec`, `jobs`, `logs`, `results`, `samples`, `temp`,
 `templates`. Nine folders, nine different first letters, because a screen reader
@@ -2188,7 +2339,7 @@ written to, and templates are shipped and read-only -- so no folder needed an
 unobvious name, and the rule that makes it hold is simply that temp always lives
 in the per-user tree, portable copies included.
 
-## Paths.cs and homer/paths.py
+### Paths.cs and homer/paths.py
 
 New, and parallel: the two trees, the nine folders, and three things every app
 was writing for itself.
@@ -2202,7 +2353,7 @@ was writing for itself.
 
 `Log` now asks `Paths` for its folder, so one class decides the layout.
 
-## The installer lays the tree down
+### The installer lays the tree down
 
 `[Dirs]` creates the six shipped folders, and the files go where they belong:
 the executable and the DLLs in `exec`, the shipped `.inix` in `configs`, seed
@@ -2216,11 +2367,11 @@ adopting this layout should be reinstalled rather than updated in place the
 first time.
 
 
-# 1.5.0 -- 18 September 2026
+## 1.5.0 -- 18 September 2026
 
 A failed build, a flatter tree, and a tutorial.
 
-## The C# build failed, and the cause was a name
+### The C# build failed, and the cause was a name
 
 The first real build of FruitBasketCs against the kit stopped with
 
@@ -2237,7 +2388,7 @@ nothing else breaks.
 
 The Python build succeeded on the first try and produced FruitBasketPy.exe.
 
-## A flatter tree
+### A flatter tree
 
 Two folder levels went, because navigating them by screen reader is slower than
 reading a longer list:
@@ -2251,7 +2402,7 @@ reading a longer list:
 Nothing is deeper than two levels now. Every build script, document and check
 was repointed.
 
-## The tutorial
+### The tutorial
 
 `Tutorial_HomerDev.inix` is a spoken walkthrough in the step format the existing
 makeTutorial.py already reads: `Say` for the narration, `Key` for the keystroke,
@@ -2269,11 +2420,11 @@ installed and nothing is uploaded. One .wav per line, kept, and one .mp3 when
 ffmpeg is present.
 
 
-# 1.4.0 -- 18 September 2026
+## 1.4.0 -- 18 September 2026
 
 Logging, publishing, and a notebook.
 
-## Every program and every installer keeps a log
+### Every program and every installer keeps a log
 
 `CSharp\Log.cs` and `homer\log.py` are the same class in two languages:
 same file name, same folder, same header block, same method names -- start,
@@ -2298,7 +2449,7 @@ is documented where it happens rather than left to be discovered.
 Logging is deliberately not optional. When it becomes so, the switch goes inside
 the class rather than into every caller.
 
-## .gitignore became a whitelist
+### .gitignore became a whitelist
 
 `RepoFiles.txt` names what the repository carries, and `homerTidy --gitignore`
 turns it into a `.gitignore` that ignores everything and puts back exactly what
@@ -2314,7 +2465,7 @@ A never-pushed list overrides the whitelist for private and generated files:
 self.md, self.htm, tagRelease, create<App>Repo, every .log, notes\, Version.cs,
 version.py, __pycache__\ and the build products.
 
-## self.md
+### self.md
 
 A new Homer convention: a dated, headed notebook in every project, never
 published. It holds decisions with their rejected alternatives, findings, and
@@ -2327,7 +2478,7 @@ what the apps had already converged on, what they disagreed about, what they got
 wrong, and a review of every one of the kit's inclusion decisions against that
 evidence. `newHomerApp` writes a starter into each new app.
 
-## Smaller things
+### Smaller things
 
 - Both samples now open a log first and record what they do, and their headers
   list the keys that arrive free with an Lbc text box and list box: Control+C
@@ -2339,11 +2490,11 @@ evidence. `newHomerApp` writes a starter into each new app.
   the log, start an app, publish it.
 
 
-# 1.3.0 -- 18 September 2026
+## 1.3.0 -- 18 September 2026
 
 The two samples were rewritten to be read side by side.
 
-## Twelve blocks, the same in both
+### Twelve blocks, the same in both
 
 Each sample now carries twelve markers of the form `---- BLOCK n: <title> ----`,
 with the same numbers and the same titles in each file, and the same function
@@ -2360,7 +2511,7 @@ Three places where the two genuinely differ are commented where they happen: how
 each library keeps a dialog open while a button does work, the different shapes
 of stringPlural, and the status line that C# has and wx does not.
 
-## More of Lbc, on purpose
+### More of Lbc, on purpose
 
 The samples now use a combo pick box for the sort order, a check box to turn the
 speaking off, a read-only report window, a status line in C# and the window
@@ -2369,7 +2520,7 @@ chords that come free with a list box and a field. More than a fruit basket
 needs, which is the point of a sample; the guide now says so plainly, so nobody
 reads the sample as a minimum.
 
-## A wart found by making them parallel
+### A wart found by making them parallel
 
 `Util.stringPlural` in C# returns the count and the noun together, "3 fruits";
 `util.stringPlural` in Python returns only the noun, "fruits". Two functions,
@@ -2378,11 +2529,11 @@ callers in HomerView, but both samples now say so where they use it, and the
 Python one should take the C# shape the next time that add-on is touched.
 
 
-# 1.2.0 -- 18 September 2026
+## 1.2.0 -- 18 September 2026
 
 The kit became a teaching kit.
 
-## The fruit basket came back
+### The fruit basket came back
 
 `Samples\FruitBasketCs.cs` and `Samples\FruitBasketPy.py` hold the same program twice:
 once on the C# classes, once on the Python package, with `buildFruitBasketCs.cmd`
@@ -2404,7 +2555,7 @@ where the focus goes, counts that match their nouns, saving as the answer is
 given, and the escape hatch. The two files number them identically so they can
 be read side by side.
 
-## AI-assisted coding, written down
+### AI-assisted coding, written down
 
 A new part of HomerDev.md explains why the kit prefers that name to vibe coding,
 gives the three sentences that carry most of the kit into an AI session, and
@@ -2412,14 +2563,14 @@ sets out a five-step teaching sequence around the samples: ask for the program
 cold, read the sample, ask again with the conventions, read the other language,
 then change one thing and watch which decisions it touches.
 
-## The build scripts look in three places
+### The build scripts look in three places
 
 Both build templates now find the kit in this order, first hit wins: the
 `HomerDev` environment variable, then `C:\HomerDev`, then the current directory.
 The third is what lets a sample, a demonstration, or a machine with no kit
 installed still build, by carrying its own copy of the folder.
 
-## The templates became opinionated
+### The templates became opinionated
 
 Every component any Homer app has ever needed is now listed in both build
 templates as a switch. The ones used by more than one app are switched on --
@@ -2434,7 +2585,7 @@ A single `:getNuGet` subroutine now does every package fetch, so Markdig, NPOI,
 PdfPig, SQLite and Ude are one line each rather than five variations on the same
 PowerShell.
 
-## Smaller things
+### Smaller things
 
 - `newHomerApp <App> --python` writes a Python app: the Python build script in
   place of the C# one, with the rest of the set unchanged.
@@ -2443,12 +2594,12 @@ PowerShell.
   the component switches and the option catalogues in this release all follow it.
 
 
-# 1.1.0 -- 18 September 2026
+## 1.1.0 -- 18 September 2026
 
 Everything in this release came from running 1.0.0 for a day and from the logs
 of apps the kit had not yet been tried on.
 
-## tagRelease could not release a source-only project
+### tagRelease could not release a source-only project
 
 The log said it plainly: "Could not find HomerDev_setup.iss in C:\HomerDev".
 The kit ships source and has no installer, and the script treated a missing
@@ -2468,7 +2619,7 @@ The version of tagRelease that the kit shipped in 1.0.0 was the older copy from
 the EdSharp folder. The base is now the newer one, the copy actually in daily
 use.
 
-## cleanDir and tidyRepo became homerTidy
+### cleanDir and tidyRepo became homerTidy
 
 They asked the same question -- does this file belong to the project? -- of two
 places, the folder and the repository, which meant two surveys, two plans, and
@@ -2483,7 +2634,7 @@ What belongs is still decided by the project's own <App>_setup.iss and
 RepoFiles.txt, so the script needs no editing. homerPolicy.py is gone: it is
 inside homerTidy now.
 
-## The installer template learnt what is already installed
+### The installer template learnt what is already installed
 
 The [Code] section reads the version of any previous install from the app's own
 uninstall key. The welcome page says "Install", "Update from X to Y" or
@@ -2507,7 +2658,7 @@ installScreenReaderSupport.cmd is new and generic: it unpacks <App>_JAWS.zip
 into every JAWS settings folder it finds and hands <App>.nvda-addon to NVDA,
 skipping without complaint whichever is absent.
 
-## Smaller things
+### Smaller things
 
 - version.txt is written without a byte order mark. A batch file's "set /p" and
   Inno's FileRead both take a mark as part of the number, which would have made
@@ -2517,14 +2668,14 @@ skipping without complaint whichever is absent.
   expect to find them, rather than filing them into notes\logs.
 
 
-# 1.0.0 -- 18 September 2026
+## 1.0.0 -- 18 September 2026
 
 First release. The kit was assembled by comparing every duplicated shared file
 across DbDo, EdSharp, FileDir, HomerScribe and HomerView, and taking the better
 version of each. What that comparison found is recorded here, because the
 differences explain why the kit exists.
 
-## Which version won, and why
+### Which version won, and why
 
 - **Say.cs** -- byte for byte identical in DbDo, EdSharp and HomerScribe once
   line endings are normalized. The CRLF copy was taken.
@@ -2564,7 +2715,7 @@ differences explain why the kit exists.
 - **The build script and the installer script** -- HomerScribe's are the newest
   and most refined of each, and became the templates.
 
-## One behavior deliberately changed in the merge
+### One behavior deliberately changed in the merge
 
 HomerScribe's Lbc selects the text of the field that opens with the focus, and
 extends that to the first focusable control rather than only an explicitly set
@@ -2574,7 +2725,7 @@ than a field and the Homer rule is that the caret opens on the first line. This
 is the only place in the kit where the merged file is not simply the union of
 what already existed.
 
-## What is new rather than merged
+### What is new rather than merged
 
 - `buildHomerDev.cmd` and `.py` -- convert the documents and audit the kit:
   components present, encodings right, templates still holding their

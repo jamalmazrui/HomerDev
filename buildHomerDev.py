@@ -563,7 +563,7 @@ c_dSkillDocuments = {
 
 # PARTS OF A KIT DOCUMENT A SKILL CARRIES (1.43.27). HomerDev.md is two
 # thousand lines; a skill needs a few of its chapters. Each entry names the
-# document, its top-level (#) chapters to take, in the order given, and the
+# document, its chapters (## headings) to take, in the order given, and the
 # reference file they make, which opens with a contents list, as Anthropic's
 # guidance asks of any reference over a hundred lines.
 c_lSkillSections = [
@@ -587,7 +587,9 @@ def extractSkillSections():
             continue
         sText = open(sSource, "rb").read().decode("utf-8-sig").replace("\r\n", "\n")
         dChapters = {}
-        for oMatch in re.finditer(r"(?ms)^# (.+?)\n(.*?)(?=^# |\Z)", sText):
+        # A chapter is an H2 (1.43.39): the kit's documents have one H1, their
+        # title, as every Homer document does.
+        for oMatch in re.finditer(r"(?ms)^## (.+?)\n(.*?)(?=^## |\Z)", sText):
             dChapters[oMatch.group(1).strip()] = oMatch.group(2)
         lsOut = ["# " + sTitle, "", "Copied by buildHomerDev from %s; edit that, not this." % sDocument, "",
                  "## Contents", ""]
@@ -597,8 +599,8 @@ def extractSkillSections():
             if sChapter not in dChapters:
                 logLine("ERROR skill section missing skill=%s chapter=%s" % (sSkill, logValue(sChapter)))
                 continue
-            # A chapter becomes a ## section; its own ## and ### move down one.
-            sBody = re.sub(r"(?m)^(#{2,5}) ", lambda o: "#" + o.group(1) + " ", dChapters[sChapter])
+            # A chapter stays a ## section, its own headings as they are.
+            sBody = dChapters[sChapter]
             lsOut += ["## " + sChapter, sBody.rstrip("\n"), ""]
         sPath = os.path.join(sSkillDir, "references", sTarget)
         os.makedirs(os.path.dirname(sPath), exist_ok=True)

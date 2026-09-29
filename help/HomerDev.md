@@ -23,9 +23,35 @@ below: **AI-assisted coding**, which is the name this kit uses for what other
 people call vibe coding. The difference is not the AI. It is that the person
 holding the keyboard knows what a good program is before the AI writes one.
 
-# Getting started
+## Contents
 
-## What you need
+- [Getting started](#getting-started)
+- [What is in the kit](#what-is-in-the-kit)
+- [Camel Type](#camel-type)
+- [The .inix format](#the-.inix-format)
+- [Direct speech across screen readers](#direct-speech-across-screen-readers)
+- [Lbc: building a dialog](#lbc-building-a-dialog)
+- [The launchpad app](#the-launchpad-app)
+- [Keys and key names](#keys-and-key-names)
+- [Every file in the kit, and why it is here](#every-file-in-the-kit-and-why-it-is-here)
+- [Three kinds of Homer app](#three-kinds-of-homer-app)
+- [Scripts and settings: the two lists every MDI app gets](#scripts-and-settings-the-two-lists-every-mdi-app-gets)
+- [Where an app puts its files](#where-an-app-puts-its-files)
+- [Evidence, and checking without sight](#evidence-and-checking-without-sight)
+- [Automated checks, and the one thing still done by hand](#automated-checks-and-the-one-thing-still-done-by-hand)
+- [Spoken tutorials](#spoken-tutorials)
+- [Logging](#logging)
+- [self.md, the project's notebook](#self.md-the-projects-notebook)
+- [The installer's log](#the-installers-log)
+- [Scripts, logs, and the release routine](#scripts-logs-and-the-release-routine)
+- [The installer](#the-installer)
+- [AI-assisted coding](#ai-assisted-coding)
+- [For an AI writing a Homer app](#for-an-ai-writing-a-homer-app)
+- [Claude skills](#claude-skills)
+
+## Getting started
+
+### What you need
 
 - Windows 10 or later, 64-bit.
 - The .NET Framework 4.8 Developer Pack, which supplies the reference
@@ -35,7 +61,7 @@ holding the keyboard knows what a good program is before the AI writes one.
 - Inno Setup 6, if you want an installer.
 - Git and the GitHub CLI (`gh`), if you want to publish.
 
-## Install the kit
+### Install the kit
 
 Unzip `HomerDev.zip` into `C:\HomerDev`. That is the whole install. Then run:
 
@@ -50,7 +76,7 @@ and no empty files. It reports problems plainly and writes the detail to
 If you keep the kit somewhere else, set the `HOMERDEV` environment variable to
 that folder. Every build script looks there first.
 
-## Start a new app
+### Start a new app
 
     newHomerApp JobDo
 
@@ -67,9 +93,9 @@ Then:
     cd \JobDo
     buildJobDo
 
-# What is in the kit
+## What is in the kit
 
-## CSharp
+### CSharp
 
 Twelve modules, all in the `Homer` namespace. Add `using Homer;` and compile the
 ones you use straight from `C:\HomerDev\exec\CSharp`; the build template already
@@ -96,7 +122,7 @@ does.
   be worked out. Optional: it needs the PdfPig package, which the app's own
   build script fetches.
 
-## Python
+### Python
 
 `exec\Python\` is the Python side of the same toolbox, named for its platform as
 `exec\CSharp\` is: `elevate`, `inix`, `lbc`,
@@ -120,12 +146,12 @@ There is no `version` module in the kit: every build writes a `version.py` of
 its own, so the kit cannot use the name. Comparing versions is part of
 `elevate`.
 
-## Templates
+### Templates
 
 The files a new app needs, with `_APP_` where its name goes. `newHomerApp`
 fills them in.
 
-## Tools
+### Tools
 
 Scripts that need no editing at all. They work out the app name from the folder
 they are run in.
@@ -142,7 +168,7 @@ they are run in.
 
 Copy the pair you want into the app folder and run it there.
 
-## Templates\samples
+### Templates\samples
 
 Two fruit basket programs, the same design in two languages, each with the build
 script that produces it:
@@ -159,12 +185,12 @@ numbers and titles in each, and the same function names throughout.
 Both are read alongside the AI-assisted coding part below, which is what they
 are for.
 
-## Style
+### Style
 
 The Camel Type documents: the short rules, the long reference, and the JAWS
 scripting version.
 
-# Camel Type
+## Camel Type
 
 Camel Type is the house coding style. It exists for one reason: code is read by
 listening, and a name that carries its own type saves a trip back to the
@@ -192,13 +218,13 @@ declaration.
 `help\CamelType_CSharp.md` has the rules with examples; the Reference file has
 the long form; the JAWS Script version covers that language's differences.
 
-# The .inix format
+## The .inix format
 
 `.inix` is the settings and small-table format every Homer app uses. It is
 classic `.ini` with four additions, and any plain `.ini` file is already valid
 `.inix`.
 
-## The basics
+### The basics
 
     ; a comment. # also starts one.
     [Section]
@@ -210,7 +236,7 @@ keys before any section header; those belong to an implicit `[Global]` section.
 Reading a file and writing it back preserves the order of everything, so a
 program editing one setting does not reshuffle the file.
 
-## Multi-line values are verbatim
+### Multi-line values are verbatim
 
 A value may be fenced, and what is inside is taken exactly as it stands:
 
@@ -225,7 +251,7 @@ backtick, use a triple-quote fence instead. Nothing is trimmed and nothing is
 transformed on the way in or out. If a program wants the value trimmed, that is
 the program's decision after reading it, not the format's.
 
-## Arrays
+### Arrays
 
 A key may hold several values. A few short items with no spaces or commas can
 sit on one line:
@@ -236,7 +262,7 @@ Anything longer goes one item per line inside a fence, most recent first. Both
 shapes read back as the same ordered list, which is how the recent-file and
 recent-search lists in Homer apps are stored.
 
-## As a table
+### As a table
 
 This is the part people are surprised by. A table in `.inix` is one section per
 record:
@@ -262,7 +288,7 @@ involved.
     inixVert data.xlsx data.inix
     inixVert data.inix data.md
 
-## In code
+### In code
 
     using Homer;
 
@@ -281,7 +307,7 @@ wants a usable answer rather than four ways of saying no.
 The `.inix` extension belongs to files a Homer tool creates. Reading a `.ini`
 file somebody else wrote is fine.
 
-# Direct speech across screen readers
+## Direct speech across screen readers
 
 A Windows program cannot count on a screen reader noticing everything. Focus
 changes and window titles it will announce by itself. A result, a count, a
@@ -297,7 +323,7 @@ whichever reader is running.
     Say.sayForced("Backup finished");   // spoken even mid-sentence
     Say.sayParts("Row 4", "Title", "The Sea Around Us");
 
-## How it reaches the reader
+### How it reaches the reader
 
 `sayForced` tries each route in turn and stops at the first that works.
 
@@ -316,7 +342,7 @@ whichever reader is running.
 `Say.lastSpeechPath()` reports which one the last message actually took. Both
 belong in an app's Help or About, so a user can say what happened.
 
-## What to speak, and what not to
+### What to speak, and what not to
 
 - **Do not repeat what the reader already says.** It announces a dialog's title
   when the dialog opens and a control's name when focus lands on it. An app
@@ -330,7 +356,7 @@ belong in an app's Help or About, so a user can say what happened.
 - **Match the noun to the count.** "1 file", not "1 files". A count of zero is a
   real answer: "0 matches" is information, not an error.
 
-# Lbc: building a dialog
+## Lbc: building a dialog
 
 Lbc stands for Layout By Code. A Homer dialog is never drawn in a designer. It
 is assembled in code out of ordinary Windows controls, each created with its
@@ -346,7 +372,7 @@ the order the dialog is read in, and the layout follows from that rather than
 the other way round. When the order is wrong, the fix belongs in Lbc or in the
 order of the calls, never in a pile of `TabIndex` assignments in the app.
 
-## The shape of a dialog
+### The shape of a dialog
 
     using (LbcDialog dlg = new LbcDialog("Find", frm))
     {
@@ -363,7 +389,7 @@ That is the whole pattern. The dialog is disposable, every `add` returns the
 real control so you can read it afterwards, and `runOkCancel` returns true when
 the user accepted.
 
-## What you can add
+### What you can add
 
 Every one of these takes a label with an `&` before its access-key letter, and
 most take a tip that appears in the dialog's status bar when focus arrives and
@@ -384,7 +410,7 @@ in the Help box.
 - `addButton` -- a push button on the current band.
 - `addSeparator` -- a divider, which also closes an open band.
 
-## Bands
+### Bands
 
 By default each control sits on its own row. A band puts several on one row,
 which is what you want for a field and the button that fills it in:
@@ -397,7 +423,7 @@ which is what you want for a field and the button that fills it in:
 A band changes only the arrangement. The tab order is still the order of the
 calls.
 
-## Showing it
+### Showing it
 
 - `runOkCancel()` -- OK and Cancel; returns true on OK.
 - `runWithButtons(new string[] { "Default settings", "OK", "Cancel" })` --
@@ -412,7 +438,7 @@ calls.
 - OK and Cancel deliberately get no access key: their keys are Enter and
   Escape, and an unnecessary Alt+O would take a letter another button may want.
 
-## Other pieces
+### Other pieces
 
 - `LbcTextBox` is the text box the boxes above are made of. It carries the
   convenience keys: copy or cut the current line with no selection, mark a
@@ -429,20 +455,20 @@ calls.
 - `setStatusText` writes to the dialog's status line; `setInitialFocus` says
   which control opens with the focus.
 
-## Opening focus
+### Opening focus
 
 The field that opens with the focus has its value selected, so typing or
 pasting replaces it and Tab leaves it alone. A **multi-line** box is the
 exception: its caret opens on the first line, because its value is a document
 rather than a field.
 
-# The launchpad app
+## The launchpad app
 
 Most Homer tools are one dialog with one job: 2htm, extCheck, urlCheck,
 bookFido, urlFido, HomerScribe. They share a shape, and a user who learns one
 has learnt them all. `Templates\_APP_.cs` is that shape, ready to fill in.
 
-## The controls, in order
+### The controls, in order
 
 The order below is the order they are added, which is the order they are
 tabbed through and read.
@@ -466,7 +492,7 @@ tabbed through and read.
 11. **Help** -- shows the help box. F1 does the same. Lbc adds it and places it
     rightmost.
 
-## The two boxes
+### The two boxes
 
 - The **help box** says what the program does, what each field means, what each
   button does, and the command line that matches. It is the same text the
@@ -474,7 +500,7 @@ tabbed through and read.
 - The **results box** says what this run actually did, one short line per fact.
   Only actions actually taken are listed. Counts match their nouns.
 
-## The command line does everything the dialog does
+### The command line does everything the dialog does
 
 Each field has a switch, and the switch is named after the field:
 
@@ -487,16 +513,16 @@ driven from a batch file, a scheduled task, or another program. A bare path
 with no switch is taken as the source, because that is what dropping a file on
 the program means.
 
-## Settings are saved as they are answered
+### Settings are saved as they are answered
 
 Every answer is written to `<App>.inix` the moment it is given, not at exit, so
 a crash or a kill loses nothing. The file sits beside the executable when that
 folder is writable, which is the portable case, and under
 `%LOCALAPPDATA%\<App>` otherwise, which is the installed case.
 
-# Keys and key names
+## Keys and key names
 
-## One spelling
+### One spelling
 
 `KeyName.cs` holds the one spelling for every key, taken from how Freedom
 Scientific writes key names in the JAWS key map files, with three Homer rules
@@ -521,7 +547,7 @@ Then convert to whatever an API wants, rather than writing that table again:
 `KeyName.same()` compares two spellings of the same key, and `KeyName.parse()`
 normalizes one.
 
-## Choosing a key
+### Choosing a key
 
 - **Give it a mnemonic**: the first letter of a word in the command's name.
 - **Do not take a key Windows has already given a meaning**, especially one
@@ -535,7 +561,7 @@ normalizes one.
 - **Aim for one key that works on both JAWS and NVDA.** Perfect agreement is not
   realistic; keeping the differences few is.
 
-## KeyMap
+### KeyMap
 
 `KeyMap.cs` is the one table associating a context, a command name, a summary,
 a longer description and a key. The menus, the alternate menu, the key
@@ -548,12 +574,12 @@ once and every surface agrees.
 `KeyMap.lsConflicts` lists any key claimed twice, which is worth showing in a
 developer command rather than discovering in use.
 
-# Every file in the kit, and why it is here
+## Every file in the kit, and why it is here
 
 One line each, so a file you have not seen before can be looked up rather
 than guessed at. Folders are in the order you meet them.
 
-## Top level
+### Top level
 
 - **ReadMe.md, ReadMe.htm** -- the introduction and the quick start; stays at the root because GitHub surfaces it and because it is the first thing anybody opens
 - **License.md, License.htm** -- the MIT license, naming the kit and its author
@@ -567,7 +593,7 @@ than guessed at. Folders are in the order you meet them.
 - **version.txt** -- the kit's version, one line, no byte order mark, read by every script
 - **.gitignore** -- generated from RepoFiles.txt; ignores everything and puts back only what is named
 
-## CSharp -- the shared C# classes
+### CSharp -- the shared C# classes
 
 - **Inix.cs** -- the .inix settings format: read and write one value, or whole tables, with multiline values kept verbatim
 - **KeyMap.cs** -- the command-to-key registry behind the alternate menu, the key describer and the hotkey document
@@ -582,12 +608,12 @@ than guessed at. Folders are in the order you meet them.
 - **Web.cs** -- fetching a page, a file, or an API answer
 - **inixVert.cs** -- converting .inix to and from other tabular formats
 
-## homer -- the same toolbox in Python
+### homer -- the same toolbox in Python
 
 - **__init__.py** -- the package
 - **elevate.py, inix.py, lbc.py, log.py, mdi.py, paths.py, say.py, util.py, web.py** -- the Python counterparts of Elevate, Inix, Lbc, Log, Mdi, Paths, Say, Util and Web, with the same names and the same behaviour. lbc and mdi use wx; a program whose windows are WinForms through pythonnet uses the others and keeps its own dialog code.
 
-## Templates\samples
+### Templates\samples
 
 - **FruitBasketCs.cs** -- the single-dialog shape, with twelve marked blocks and the nine decisions
 - **FruitBasketMdiCs.cs, FruitBasketMdiPy.py** -- the multiple-document shape in both languages, marking only what changes when there are several windows
@@ -596,7 +622,7 @@ than guessed at. Folders are in the order you meet them.
 - **uiTest.inix** -- what the samples must do when driven, run by uiCheck
 - **buildFruitBasketCs.cmd, buildFruitBasketMdiCs.cmd, buildFruitBasketMdiPy.cmd, buildFruitBasketPy.cmd** -- one build script each; `buildHomerDev` runs all four
 
-## Templates -- what newHomerApp copies
+### Templates -- what newHomerApp copies
 
 - **_APP_.cs** -- a working one-dialog program to start from
 - **_APP__setup.iss** -- the Inno installer: the structured tree, the component checkboxes, the setup log kept with the program's own
@@ -610,7 +636,7 @@ than guessed at. Folders are in the order you meet them.
 - **self.md** -- the private notebook a new app starts with
 - **version.txt** -- 1.0.0, with no byte order mark
 
-## Tools -- scripts that act on a project
+### Tools -- scripts that act on a project
 
 - **check.cmd, check.py** -- gathers evidence about an app: encodings, names, keys, build, smoke run, acceptance criteria, and a report saying what it did not check
 - **push.cmd** -- stage, commit and push what the whitelist allows
@@ -622,7 +648,7 @@ than guessed at. Folders are in the order you meet them.
 - **makeTutorials.cmd, makeTutorials.py** -- writes the tutorial scripts into Tutorials.md and the feed, speaking nothing
 - **release.cmd, release.ps1** -- reads version.txt, tags, and publishes the installer as a release asset
 
-## help -- the documents
+### help -- the documents
 
 - **HomerDev.md** -- this guide: the classes, the conventions, the three shapes, the layout, the evidence
 - **Announce.md** -- three ready-to-post announcements, at measured lengths
@@ -634,7 +660,8 @@ than guessed at. Folders are in the order you meet them.
 - **Tutorial_HomerDev.inix** -- the spoken walkthrough, narration and screen reader in two voices
 - **CamelType_CSharp.md, CamelType_CSharp_Reference.md, CamelType_JAWSScript.md** -- the coding style
 - **self.md** -- the private notebook: decisions, findings and open items. Never pushed
-# Three kinds of Homer app
+
+## Three kinds of Homer app
 
 Every Homer program is one of three shapes. They share far more than they
 differ, and what they share is the whole of this kit: the same classes, the same
@@ -643,7 +670,7 @@ conventions, the same document set, the same build, installer and release
 scripts, and the same evidence checks. What differs is only how the program
 meets the person.
 
-## One: a single tool, with a command line and a dialog
+### One: a single tool, with a command line and a dialog
 
 One independent 64-bit executable that does one job. It answers `--help`, it can
 be scripted from a batch file or a scheduled task, and with no arguments -- or
@@ -661,7 +688,7 @@ The flags are the same in every Homer tool of this kind:
 - `--log` -- say where this session's log is
 - an unknown switch is refused with exit code 1 rather than ignored
 
-## Two: a desktop program that could not be a command line
+### Two: a desktop program that could not be a command line
 
 The same single-window shape, but graphical only, because of what it carries: a
 local AI model, a browser engine, a media pipeline, a speech stack. HomerScribe
@@ -671,7 +698,7 @@ It should still answer `--help` and still take arguments where that is
 meaningful, but it does not promise that every feature works without the
 desktop. Say so in its guide rather than leaving somebody to discover it.
 
-## Three: a multiple-document program
+### Three: a multiple-document program
 
 One frame holding many windows, each showing one thing: a file in EdSharp, a
 folder in FileDir, a table in DbDo, a basket in `FruitBasketMdi.cs`.
@@ -712,7 +739,7 @@ add order as focus order, the status line, the list search, the line chords, the
 access keys. `MdiChild.lbc` is that builder; finish with `finishLayout` rather
 than `run`, because the frame shows the window.
 
-## What all three share
+### What all three share
 
 Everything else, which is the point of the kit: `Inix` for settings, `Log` for
 the session log, `Paths` for the folder layout, `Say` for what the screen reader
@@ -721,7 +748,7 @@ document set, `build<App>.cmd`, `<App>_setup.iss`, `RepoFiles.txt`, `accept.inix
 and `check`. A person who learns one shape has learnt most of the other
 two.
 
-# Scripts and settings: the two lists every MDI app gets
+## Scripts and settings: the two lists every MDI app gets
 
 An MDI frame comes with two commands that look small and are not:
 
@@ -732,7 +759,7 @@ Both are lists. Neither is a folder browser, a command line, a text file to
 edit, or a page of check boxes. That is the design, and it comes from decades of
 doing this work by ear.
 
-## Why a list, rather than a path to type
+### Why a list, rather than a path to type
 
 A sighted user glances at a folder and picks. Without sight, the same folder is
 a sequence: you arrow through it, each name is spoken, and the wrong ones have to
@@ -751,7 +778,7 @@ caching a menu. The list is always what is there now, so dropping a new script
 into the folder makes it available immediately, with nothing to register and no
 restart.
 
-## Why the jobs live in a folder, not in the program
+### Why the jobs live in a folder, not in the program
 
 A script is the part of the program the user gets to write. The program ships the
 jobs it knows about; the user's own go in the per-user tree, where an update
@@ -763,7 +790,7 @@ program's job is to make that easy rather than to anticipate every need. A
 program with a job folder can be extended by the person using it, at three in
 the morning, without asking anybody.
 
-## Why settings change without a restart
+### Why settings change without a restart
 
 `Change a Setting` lists what the app declared with `addSetting`, asks for the
 new value in one field, writes it, and calls the app back so it acts at once.
@@ -781,7 +808,7 @@ Three things follow from that, all of them learned the hard way:
 And the value is saved the moment it is answered, not at exit, so a crash never
 costs somebody the answers they already gave.
 
-## What this means for a console program
+### What this means for a console program
 
 The same reasoning shapes the command-line shape of a Homer tool:
 
@@ -795,9 +822,9 @@ The same reasoning shapes the command-line shape of a Homer tool:
 - With no arguments -- or with `--gui` -- the same program opens one dialog, so
   the thing you learned in the dialog is the thing you can automate.
 
-# Where an app puts its files
+## Where an app puts its files
 
-## The letters are the design
+### The letters are the design
 
 A screen reader user moves through a folder listing by first letter. Nine
 folders whose names all begin with the same letter cost nine keystrokes each
@@ -827,7 +854,7 @@ sample with a purpose, so the two folded into one. The alternatives all collided
 `examples` wants **e**, which is `exec`, and `demos` wants **d**, which is
 `data`.
 
-## Two names begin with t, and they never meet
+### Two names begin with t, and they never meet
 
 `temp` exists only in the per-user tree. `templates` exists only in the
 installed tree. No listing ever holds both, so first-letter navigation stays
@@ -843,7 +870,7 @@ dies inside one run. `<App>\temp` is for the other kind: what a crash left
 behind, somewhere the program knows to look at its next start rather than
 somewhere shared with every other program on the machine.
 
-## Where the documents live, and what GitHub thinks
+### Where the documents live, and what GitHub thinks
 
 `help` holds every document -- the guide, `Tutorials.md`, `History.md`,
 `Hotkeys.md`, `Announce.md`, `Developer.md`, the style guides and the tutorial
@@ -871,7 +898,7 @@ So: **`ReadMe.md` and `License.md` at the root for GitHub and for a person
 opening the folder; everything else in `help` for the letter that reaches it in
 one keystroke.**
 
-## Three trees
+### Three trees
 
 **The installed tree**, `C:\Program Files\<App>`, read-only to the user:
 
@@ -924,7 +951,7 @@ A clean-up script must know the layout. One written before it -- moving a
 `Scripts` folder as obsolete -- will move `scripts`, which Windows treats as the
 same name, and take the tooling with it.
 
-## Asking for a folder
+### Asking for a folder
 
 `Paths` in C# and `paths` in Python are the same class in two languages,
 and no app should work out a path for itself:
@@ -944,7 +971,7 @@ know which case it is in.
 `clearTemp` belongs at startup, once. Whatever it finds is what a previous run
 could not clean up after itself, which is exactly what that folder is for.
 
-# Evidence, and checking without sight
+## Evidence, and checking without sight
 
 A sighted developer checks by looking: skim the diff, glance at the window,
 notice that a control landed in the wrong place. A blind developer checks by
@@ -954,7 +981,7 @@ to trust it by reading.
 
 The kit's answer is one script and one file.
 
-## checkHomerDev, for the kit itself
+### checkHomerDev, for the kit itself
 
     checkHomerDev             audit, clean, build all three samples, report
     checkHomerDev --deep      delete the Python virtual environment too
@@ -993,7 +1020,7 @@ and it does not build EdSharp, FileDir, DbDo or HomerScribe, which compile
 against these same modules. After changing a shared class, build those four.
 Both limits are printed in every report.
 
-## check
+### check
 
     cd \JobDo
     check
@@ -1010,7 +1037,7 @@ build, a smoke run of `--help`, and the app's own acceptance criteria.
 It exits 0 when nothing failed and 1 when something did, so a build script or a
 scheduled task can act on it.
 
-## The report says three things
+### The report says three things
 
 - **What was verified** -- a check ran and passed, and here is the command.
 - **What was not checked** -- a check was skipped, and here is why. A skip is
@@ -1024,7 +1051,7 @@ claiming everything is fine is worth nothing; one that says what it did not look
 at is worth a great deal, because it tells a person exactly where their own
 judgement is still required.
 
-## accept.inix: what "done" means, written before the code
+### accept.inix: what "done" means, written before the code
 
 Acceptance criteria belong to the app, not to the checker:
 
@@ -1043,7 +1070,7 @@ A criterion that cannot be written this way is still worth writing. Put it in
 `self.md` under what a person has to check by hand, so it is not quietly
 forgotten.
 
-## A checker that cries wolf is worse than none
+### A checker that cries wolf is worse than none
 
 Two rules were learned on its first run and are built in. It ignores the kit's
 own modules, because a shared class sets accessible names and names key
@@ -1053,7 +1080,7 @@ explaining that Alt+Control is reserved is the rule rather than a breach of it.
 On that same first run it found a real fault: both fruit basket samples had
 given `&S` to two controls at once. That is what the tool is for.
 
-# Automated checks, and the one thing still done by hand
+## Automated checks, and the one thing still done by hand
 
 Four commands, each answering a different question, and between them almost
 nothing is left for a person to remember:
@@ -1070,7 +1097,7 @@ remember is a check that stops happening in the week it matters.** So every
 check that can be automated is, and the ones that cannot are named in the report
 rather than left to be inferred.
 
-## uiCheck: pressing the keys without a person
+### uiCheck: pressing the keys without a person
 
 `uiCheck` starts a real program, sends keystrokes to it, and asks the Windows UI
 Automation tree what is there afterwards -- the same interface a screen reader
@@ -1105,7 +1132,7 @@ what the step opened. pywinauto installs itself on first run.
 gets free: Control+N for a second window, F4 for the window list, Alt+Shift+S
 for the jobs, Alt+Shift+C for the settings, Alt+F1 for about.
 
-## Checking the machine, not just the kit
+### Checking the machine, not just the kit
 
 `checkHomerDev` also records what the build actually ran with -- the Python and
 pandoc it found -- and compares every tool on your PATH against the kit's copy.
@@ -1114,7 +1141,7 @@ before source-only releases were supported, with an error naming a file that was
 never meant to exist. One shared copy is the point of those tools, and one
 shared copy is what can go stale. `scripts\installTools` fixes what it reports.
 
-## What is still not automated
+### What is still not automated
 
 **Speech.** UI Automation reports that a control exists and what it is called.
 It does not report what JAWS said. That is the one gap that matters, and it is
@@ -1125,7 +1152,7 @@ next step rather than claimed as done.
 Until then, one thing is worth doing by hand before a release, once: open a
 program, tab through it, and listen. Everything else the scripts now do.
 
-## The installer's own pages
+### The installer's own pages
 
 `DisableDirPage=auto` with `UsePreviousAppDir=yes`: when a previous install of
 the same AppId is found, the destination page is skipped and the update goes
@@ -1133,7 +1160,7 @@ where the last one went. A first install still chooses the folder.
 `DisableProgramGroupPage=yes`, because a Homer app creates a desktop shortcut
 with a hotkey rather than a Start Menu folder.
 
-## Anything that shells out to an installer says so first
+### Anything that shells out to an installer says so first
 
 A script that runs winget, an MSI or any other installer has to tell the person
 that **Windows may ask for permission in a window behind this one**, and name
@@ -1146,7 +1173,7 @@ script polling for that process can say "Windows is asking for permission now"
 the moment it appears. And give the wait a time limit with a way out, so an
 answer that never comes ends in a sentence rather than a hang.
 
-## Finish-page checkboxes
+### Finish-page checkboxes
 
 **Every component appears three times** -- one entry per state, install, update
 and already current -- grouped so the ones that do something come first. Only
@@ -1191,13 +1218,13 @@ of each checkbox that was ticked, one line each; and where the log is. Nothing
 about a step that did not run, nothing the wizard already said, and every count
 matching its noun.
 
-# Spoken tutorials
+## Spoken tutorials
 
 Every Homer app can carry a short set of spoken walkthroughs, built from text
 files and produced by two tools in the kit. Nothing is recorded: one synthetic
 voice works through a task and a second answers as a screen reader would.
 
-## The format: a demo script
+### The format: a demo script
 
 A tutorial is a **demo script** -- an `.inix` whose sections are speech
 passages. It lives in `help`, named `Tutorial_NN_Topic.inix`, with two digits so
@@ -1244,7 +1271,7 @@ into flags. The settings that SSML would carry -- which voice, how fast, how fla
 instead, in one place. If a passage ever needs its own voice, add `Voice=` and
 borrow SSML's names: rate, pitch, volume.
 
-## Writing from a speech history
+### Writing from a speech history
 
 The best Hear lines are copied from a real screen reader's speech history, not
 imagined. Record one while doing the task, then keep only what belongs to the
@@ -1280,7 +1307,7 @@ what a command does, rather than from the menu that defines it, is wrong often
 enough to matter: DbDo's tutorials once taught Control+O for Order, which is
 Open, and Control+S for Select Columns, which is Save.
 
-## The tools
+### The tools
 
 - **`buildTutorials`** fetches the voices if they are missing, speaks each
   script into its own `.mp3`, joins them into `Tutorials.mkv` with a chapter per
@@ -1291,7 +1318,7 @@ Open, and Control+S for Select Columns, which is Save.
 Both are in `Tools`, both look for the scripts in `help`, and both work in any
 app that follows the layout.
 
-## The voices, and what may be published
+### The voices, and what may be published
 
 Choose by licence first. Most of piper's best-known English voices cannot be
 redistributed: **lessac** comes from the Blizzard 2013 corpus, research use
@@ -1305,14 +1332,14 @@ anywhere:
 Credit them in the app's guide even though public domain material requires no
 acknowledgement.
 
-## What ships
+### What ships
 
 `Tutorials.mkv` goes in the repository. The `.inix` scripts, the `.mp3` files
 and the `.m3u` do not: the audio is rebuilt by one command and is far larger
 than the rest of the project, and the scripts are working material. The
 transcript, `Tutorials.md`, ships like any other document.
 
-## Three more documents
+### Three more documents
 
 - **[Rulings of 25 September](Rulings-2026-09-25.md)** -- one letter per menu,
   Alt+Control and its navigation-key exception, single-instance programs.
@@ -1321,7 +1348,7 @@ transcript, `Tutorials.md`, ships like any other document.
 - **[Kit findings](Kit-Findings-2026-09-25.md)** -- where the kit let an app
   down in the logs of 25 September, and what was done about each.
 
-## Not twice: speech that repeats
+### Not twice: speech that repeats
 
 Homer programs have said the same thing twice for years, and there are only two
 mechanisms behind it.
@@ -1347,7 +1374,7 @@ The guard is a safety net, not a licence. Speech that duplicates the reader is
 still a fault to fix where it is written; the net keeps it from reaching the
 person while it is still there.
 
-## Evidence for the AI
+### Evidence for the AI
 
 Building with an AI goes as fast as the evidence it is given. Four records make
 up a session, and between them they say what happened without anybody having to
@@ -1375,7 +1402,7 @@ A speech history is not a strict sequence -- a line heard twice may be a say
 line or an arrow up and back. And someone else's history holds their whole
 session, so use it only as far as they agreed.
 
-## One letter per menu
+### One letter per menu
 
 A trigger letter is claimed by the first item in a menu whose word starts with
 it. A later item in the same menu that would take the same letter takes **no
@@ -1388,7 +1415,7 @@ dialog: the first control to claim a letter keeps it.
 `check` counts letters per menu and per dialog, never across a file,
 and fails on a duplicate, since a duplicate is now always a mistake.
 
-## Alt+Control, and the one exception
+### Alt+Control, and the one exception
 
 Alt+Control with a letter or a function key belongs to Windows desktop
 shortcuts, and a Homer app never binds one. The sanctioned use is the app's own
@@ -1399,7 +1426,7 @@ The exception is the **navigation keys**: Alt+Control with an arrow, Home, End,
 Page Up or Page Down moves a cursor inside a window, takes nothing from the
 desktop, and is allowed. DbDo's virtual cell cursor uses them.
 
-## Single instance, or several
+### Single instance, or several
 
 The MDI programs -- DbDo, EdSharp, FileDir -- run as **one instance**: the
 desktop shortcut opens the program or brings it forward, and its own windows
@@ -1407,7 +1434,7 @@ are the windows. A program built around a job, such as HomerScribe, may run
 several instances, one per job. There is no system-wide summon chord in any
 Homer program; the desktop shortcut is that chord.
 
-## Why Homer menus are long and flat
+### Why Homer menus are long and flat
 
 Homer programs have large, flat command spaces on purpose. For a screen reader
 user, pressing Down Arrow again is cheaper than entering a submenu: Enter or
@@ -1434,7 +1461,7 @@ The published guidance agrees on the depth: Windows' own guidelines recommend a
 single level of cascading menus and warn against putting frequently used
 commands in one, and Visual Studio's say never to cascade past one level.
 
-## Function-key families
+### Function-key families
 
 Each function key is a family of related commands, drawn from Windows and Office
 habits and extended. A command that belongs to a family takes a key from it; a
@@ -1457,7 +1484,7 @@ key that belongs to one family is not spent on another.
 - **F11, the version.** Elevate sounds like eleven.
 - **F12, opening or closing files, or AI.**
 
-## Two rules for letters
+### Two rules for letters
 
 **Universal, for every key and every menu in every Homer app.**
 
@@ -1485,7 +1512,7 @@ key at all.
 screen reader. If a reader then announces a letter that does not work, that is
 the reader's fault -- but the program must not give it cause.
 
-## Hotkeys.md
+### Hotkeys.md
 
 Generate it from the source rather than keep it by hand: every key lives in one
 place in the code, and a list kept by hand drifts the first time a key changes.
@@ -1502,7 +1529,7 @@ in the by-menu section, beside its description; a group whose keys share a reaso
 gets one line above them instead. The rules behind every association open the
 document.
 
-## Say the word the key comes from
+### Say the word the key comes from
 
 **Universal, and not only in tutorials.** Wherever a key is introduced -- a
 tutorial, a guide, a status line, a message box -- name the word its letter
@@ -1530,14 +1557,14 @@ would they press?** Titles that fail it:
 - "Adding a record" for New, on N
 - "Searching" for Find and Jump, on F and J
 
-# Logging
+## Logging
 
 Every Homer program writes a log, and so does every Homer installer. This is not
 a debugging aid switched on when something goes wrong; it is on always, because
 the thing that goes wrong is never reproducible on demand. Writing a line costs
 microseconds. Not having the line costs an evening.
 
-## Where a log goes, and what it is called
+### Where a log goes, and what it is called
 
     %LOCALAPPDATA%\<App>\logs\<App>-<yyyymmdd-hhmmss>.log        one per run
     %LOCALAPPDATA%\<App>\logs\<App>-setup-<yyyymmdd-hhmmss>.log  one per install
@@ -1556,7 +1583,7 @@ A build script is the exception, and it stays one: `build<App>.log` sits beside
 the build script, because that is a developer's file and the developer is
 standing in that folder.
 
-## Writing to it
+### Writing to it
 
 `Log` in C# and `log` in Python are the same class in two languages, with
 the same method names, so a log written by either reads the same:
@@ -1579,7 +1606,7 @@ what somebody will want later and cannot work out afterwards.
 
 Nothing in either throws. A program whose logging fails should still run.
 
-## What to log
+### What to log
 
 - The environment and every effective setting, at startup.
 - Every external command, with its exit code. `Log.command` exists for this.
@@ -1592,7 +1619,7 @@ And the rule that governs all of it: **the console is for a person; the log is
 for debugging**. Short plain sentences on screen, everything else in the file. A
 log line is never spoken.
 
-## How a log line is written
+### How a log line is written
 
 Every Homer log -- a program's session log from `Log.cs` or `log.py`, and the
 log of every kit Python script -- writes each line the same way:
@@ -1623,9 +1650,9 @@ Why this and not JSON: it is as easy for a program to parse -- one regular
 expression takes a line apart -- and it stays readable line by line with a
 screen reader, which a line of JSON is not.
 
-## What gets published
+### What gets published
 
-## A whitelist, not a list of exclusions
+### A whitelist, not a list of exclusions
 
 `RepoFiles.txt` names what the repository carries. `tidy --gitignore` turns
 that into a `.gitignore` that ignores everything and then puts back exactly what
@@ -1645,7 +1672,7 @@ the file is there.
 `tidy` rewrites the whitelist on every pass, so `RepoFiles.txt` and
 `.gitignore` cannot drift apart.
 
-## What is public and what stays on your machine
+### What is public and what stays on your machine
 
 Public, because somebody rebuilding the program needs it:
 
@@ -1667,7 +1694,7 @@ The build products are release assets rather than repository content. A
 repository that carries its own binaries is slow to clone and wrong by the
 second commit.
 
-# self.md, the project's notebook
+## self.md, the project's notebook
 
 Every Homer project carries a `self.md`, and it is never published.
 
@@ -1687,7 +1714,7 @@ with a report on what a full reading of the Homer apps found, and a review of
 each of the kit's inclusion decisions against it -- which is the shape a first
 entry should take.
 
-# The installer's log
+## The installer's log
 
 `SetupLogging=yes` makes Inno write a detailed log of every file, registry key
 and run entry. The template's `[Code]` section copies it into the program's own
@@ -1700,13 +1727,13 @@ that is a different account from the one that will use the program, the setup
 log lands in the administrator's folder. The program's own logs always land in
 the user's.
 
-## Later
+### Later
 
 Logging is not optional today, on purpose. When it becomes optional, the switch
 belongs inside the `Log` class -- one setting, read once -- and not as an `if`
 in every caller.
 
-## Finish page wording
+### Finish page wording
 
 What each finish-page box says, whether it starts ticked, and the order of the
 boxes are set out in `help\FinishPage.md`: the verb first, a short use in
@@ -1714,9 +1741,9 @@ parentheses, a box each for JAWS and NVDA, no word the tick already says, the
 ticked boxes before the unticked ones, and a Results box titled "<App> Setup
 Results".
 
-# Scripts, logs, and the release routine
+## Scripts, logs, and the release routine
 
-## Every script writes a log
+### Every script writes a log
 
 This is not optional, and the rules are the same for a build script, a clean-up
 script, a repository tidy, and a release.
@@ -1737,7 +1764,7 @@ script, a repository tidy, and a release.
   arguments, so nobody has to type the execution-policy incantation. The same
   courtesy applies to a `.py`.
 
-## The four scripts
+### The four scripts
 
 - **build&lt;App&gt;.cmd** -- increments `version.txt`, generates `Version.cs`
   from it, finds the compiler and the three reference assemblies that are not
@@ -1764,7 +1791,7 @@ script, a repository tidy, and a release.
   released, writes it back, tags, pushes, and publishes the GitHub release with
   the installer attached. Log: `release.log`.
 
-## The release routine
+### The release routine
 
 1. Unzip the app archive into `C:\<App>`.
 2. `build<App>` from that folder.
@@ -1772,7 +1799,7 @@ script, a repository tidy, and a release.
 4. Commit, then `release`.
 5. Install from the published `<App>_setup.exe`, or update in place with F11.
 
-# The installer
+## The installer
 
 `Templates\_APP__setup.iss` is the Inno Setup script every app starts from.
 What it settles, so no app has to decide again:
@@ -1817,9 +1844,9 @@ What it settles, so no app has to decide again:
 - **The uninstall removes the settings too**, and never touches what the user
   made with the program.
 
-# AI-assisted coding
+## AI-assisted coding
 
-## Why the name
+### Why the name
 
 An AI can write the fruit basket program in a minute. It can write a passable
 one in any of a dozen languages, and it will not stop to ask a single question
@@ -1844,7 +1871,7 @@ This kit is what makes the decisions transmissible. Every convention in it was
 paid for by somebody's afternoon, and each is written down here so it can be
 handed to an AI in one sentence instead of discovered again.
 
-## The method, in four moves
+### The method, in four moves
 
 The kit is built around the same four moves a careful builder makes with an AI,
 and each has something in the kit that carries it:
@@ -1864,7 +1891,7 @@ and each has something in the kit that carries it:
    only question that matters at the end: what gives you confidence that it
    works?
 
-## The three sentences
+### The three sentences
 
 Most of the value of this kit reaches an AI in three sentences. Say them at the
 start of a session and the difference is immediate:
@@ -1879,7 +1906,7 @@ start of a session and the difference is immediate:
 Everything after that is ordinary review: read what came back, run it, and ask
 for the one thing that is wrong.
 
-## How to teach with it
+### How to teach with it
 
 The fruit basket is the exercise, and it has been since 2005, because it is
 small enough to hold in your head and big enough to get wrong in every
@@ -1901,7 +1928,7 @@ interesting way. A good session runs in this order:
 5. **Change one thing.** Add a Clear button, or sort the basket, or keep a
    count. Watch which of the nine decisions the change touches.
 
-## Twelve blocks, two languages
+### Twelve blocks, two languages
 
 `FruitBasketCs.cs` and `FruitBasketPy.py` are the same program in two languages,
 written to be read side by side in two windows. `FruitBasketMdi.cs` is the third
@@ -1941,7 +1968,7 @@ There are three such places, and each is worth the minute it takes to read:
   a wx dialog has none, so the Python file puts the same sentence in the window
   title.
 
-## What the samples borrow rather than write
+### What the samples borrow rather than write
 
 Everything the dialog does for a screen reader comes from the kit and costs one
 call. None of it is in either sample, which is the point:
@@ -1957,7 +1984,7 @@ call. None of it is in either sample, which is the point:
 - speech that reaches JAWS, NVDA and Narrator without the program knowing which
   is running
 
-## The nine decisions
+### The nine decisions
 
 They are marked DECISION 1 to DECISION 9 at the place each occurs, the same nine
 in both samples, so the two can be read side by side:
@@ -1985,7 +2012,7 @@ there. Your own program should use what it needs and nothing more. The kit is
 meant to be the easy path, not a set of boxes to tick, and a dialog with three
 controls in it is a perfectly good Homer dialog.
 
-## The legacy FruitBasket collection
+### The legacy FruitBasket collection
 
 The original collection holds thirty-six fruit baskets in thirty-six languages
 and toolkits, written between 2005 and 2015, from AutoIt and Boo through
@@ -1996,7 +2023,7 @@ These two answer a newer one: what does a program look like when it is built out
 of components that already know the conventions. The old collection is still
 worth reading for the breadth; these two are what to copy.
 
-## Tutorials that can be heard
+### Tutorials that can be heard
 
 `Tutorial_HomerDev.inix` is the kit's own walkthrough, written in the step
 format the tutorial tooling reads:
@@ -2020,7 +2047,7 @@ Write a tutorial the same way: one `[step]` per keystroke, the narration short
 enough to say in a breath, and every screen-reader answer written as the reader
 actually says it rather than as the screen shows it.
 
-# For an AI writing a Homer app
+## For an AI writing a Homer app
 
 Everything above is the answer to "how should this be written". The short
 version to hold in mind:
@@ -2047,7 +2074,7 @@ version to hold in mind:
   welcome; rules about which words are acceptable are not, and any word-policing
   package in a prose checker should be left out or switched off by name.
 
-# Claude skills
+## Claude skills
 
 A skill teaches Claude one kind of Homer work: a SKILL.md, with notes and
 scripts beside it. The kit's skills, and any an app adds, follow Anthropic's

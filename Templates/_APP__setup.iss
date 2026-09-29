@@ -500,6 +500,7 @@ var
 begin
   //  AI NOTE FOR CUSTOMIZING: one addAction per component and per model, in
   //  the same alphabetical order as the [Run] section.
+  addAction(homerScreenReaderOutcome());
   addAction(homerOutcomeLine(iOllama));
   addAction(homerModelOutcomeLine('qwen2.5:7b', 'works on your text', 'about 4.7 GB'));
   sBody := '{#AppName} {#AppVersion} is installed.';

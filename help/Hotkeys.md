@@ -13,7 +13,14 @@ they work.
 Key names follow the Homer conventions: modifiers in alphabetical order,
 "Control" spelled out, and the screen reader key called JAWS or NVDA.
 
-# By key
+## Contents
+
+- [By key](#by-key)
+- [By description](#by-description)
+- [By where it works](#by-where-it-works)
+- [Choosing keys for your own app](#choosing-keys-for-your-own-app)
+
+## By key
 
 - Alt+C -- append the current line or selection to the clipboard, in a text box
 - Alt+F8 -- read the whole field aloud, in a text box
@@ -34,7 +41,7 @@ Key names follow the Homer conventions: modifiers in alphabetical order,
 - Shift+F8 -- complete the marked selection, in a text box
 - Tab and Shift+Tab -- move through the controls in the order they were added
 
-# By description
+## By description
 
 - Accept the dialog: Enter, or Control+Enter from anywhere
 - Append to the clipboard rather than replacing it: Alt+C to copy, Alt+X to cut
@@ -50,9 +57,9 @@ Key names follow the Homer conventions: modifiers in alphabetical order,
 - Read the whole field aloud: Alt+F8
 - Search inside a list: Control+J, repeated with F3 and Shift+F3
 
-# By where it works
+## By where it works
 
-## In any Homer MDI app
+### In any Homer MDI app
 
 These come with the frame. An app that uses `Mdi.cs` has all of them without
 writing any.
@@ -70,7 +77,7 @@ writing any.
 - F4 -- current windows, as a pick list
 - Shift+F4 -- say how many windows are open, and their titles
 
-## In any Lbc dialog
+### In any Lbc dialog
 
 - Control+Enter -- accept, from any control
 - Enter -- accept
@@ -79,14 +86,14 @@ writing any.
 - Tab, Shift+Tab -- move through the controls in add order
 - Alt plus the underlined letter -- jump to that control
 
-## In any Lbc list box
+### In any Lbc list box
 
 - Control+C -- copy the item under the cursor
 - Control+J -- search inside the list
 - F3, Shift+F3 -- repeat the search forwards and back
 - Arrow keys, Home, End -- move through it as any Windows list
 
-## In any Lbc text box
+### In any Lbc text box
 
 - Alt+C, Alt+X -- append a copy or cut to the clipboard
 - Alt+F8 -- read all
@@ -96,14 +103,14 @@ writing any.
 - F8, Shift+F8 -- start and complete a selection
 - Shift+F5 -- open what is under the cursor, after a confirmation
 
-## In the help and results box
+### In the help and results box
 
 - Arrow keys -- read line by line
 - Control+PageDown, Control+PageUp -- next and previous record, in the record
   view only
 - Escape -- close
 
-# Choosing keys for your own app
+## Choosing keys for your own app
 
 - Give every command a mnemonic: the first letter of one of its words.
 - Never use Alt+Control combinations. That space belongs to Windows desktop
