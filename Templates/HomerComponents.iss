@@ -415,6 +415,61 @@ var
   gOllamaListAfter: String;
   gOllamaListAfterKnown: Boolean;
 
+(* ---- JAWS scripts and NVDA add-on as components (1.43.43) ----------------
+   Each is worded and ticked like any other component: Install when nothing of
+   this app's is there, Update when what is there differs from what ships,
+   Reinstall (unticked) when it is the same. installScreenReaderSupport.cmd
+   decides, since only it can read a JAWS settings folder or an NVDA add-on;
+   the answer is asked once per reader and kept. -1 means the reader is not on
+   this computer, or the app ships nothing for it, and every box is hidden. *)
+var
+  gHomerJawsState, gHomerNvdaState: Integer;
+  gHomerJawsRead, gHomerNvdaRead: Boolean;
+
+function homerReaderState(sReader: String): Integer;
+var
+  sFile, sScript: String;
+  sAnswer: AnsiString;
+  iCode: Integer;
+begin
+  if (sReader = 'jaws') and gHomerJawsRead then begin Result := gHomerJawsState; exit; end;
+  if (sReader = 'nvda') and gHomerNvdaRead then begin Result := gHomerNvdaState; exit; end;
+  Result := -1;
+  sScript := ExpandConstant('{app}\scripts\installScreenReaderSupport.cmd');
+  sFile := ExpandConstant('{tmp}\homerReader_') + sReader + '.txt';
+  if FileExists(sScript) then
+    if Exec(ExpandConstant('{cmd}'), '/c ""' + sScript + '" state ' + sReader + ' "' + sFile + '""',
+            ExpandConstant('{app}\scripts'), SW_HIDE, ewWaitUntilTerminated, iCode) then
+      if LoadStringFromFile(sFile, sAnswer) then
+      begin
+        sAnswer := Trim(sAnswer);
+        if sAnswer = 'install' then Result := 0
+        else if sAnswer = 'update' then Result := 1
+        else if sAnswer = 'reinstall' then Result := 2;
+      end;
+  Log('Component ' + sReader + ' scripts: state ' + IntToStr(Result) + ' (-1 not offered, 0 Install, 1 Update, 2 Reinstall)');
+  if sReader = 'jaws' then begin gHomerJawsState := Result; gHomerJawsRead := True; end
+  else begin gHomerNvdaState := Result; gHomerNvdaRead := True; end;
+end;
+
+function homerReaderIs(sReader: String; iWanted: Integer): Boolean;
+begin
+  Result := homerReaderState(sReader) = iWanted;
+end;
+
+function homerReaderLabel(sReader: String): String;
+var
+  sVerb, sWhat: String;
+begin
+  case homerReaderState(sReader) of
+    1: sVerb := 'Update';
+    2: sVerb := 'Reinstall';
+  else sVerb := 'Install';
+  end;
+  if sReader = 'jaws' then sWhat := 'JAWS scripts' else sWhat := 'NVDA add-on';
+  Result := sVerb + ' ' + sWhat;
+end;
+
 function homerScreenReaderFile(): String;
 (* Where installScreenReaderSupport.cmd reports: beside the setup log. The
    script runs as the same account as the installer (runascurrentuser), so

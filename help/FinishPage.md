@@ -10,7 +10,8 @@ right thing without reading the list.
 - **Update** a component whose newer version exists — **ticked**
 - **Reinstall** something already current — **unticked**
 - **Launch** the app — **ticked**
-- **Install JAWS scripts**, **Install NVDA add-on** — **ticked**, a box each
+- **JAWS scripts** and the **NVDA add-on** are components like any other,
+  with a box each: Install or Update **ticked**, Reinstall **unticked**
 - **Open documentation** (the guide, the ReadMe) — **unticked**
 
 So Enter installs everything missing, updates everything stale, puts the
@@ -29,12 +30,37 @@ trusting the page.
 
 The finish page lists its boxes in this order, always:
 
-1. **Install** boxes, ticked. The screen reader boxes come first, JAWS then
-   NVDA; then the components, in alphabetical order.
+1. **Install** boxes, ticked, in alphabetical order.
 2. **Update** boxes, ticked, in alphabetical order.
 3. **Reinstall** boxes, unticked, in alphabetical order.
 4. **Launch the app**, ticked.
 5. **Open the user guide**, unticked.
+
+Alphabetical order is by the component's name, ignoring case, and the JAWS
+scripts and the NVDA add-on take their places among the others: "ExifTool,
+ffmpeg, ImageMagick, JAWS scripts, mpv, NVDA add-on, Ollama". Launch and the
+guide always come last.
+
+## Whether the screen reader support is current
+
+The JAWS scripts and the NVDA add-on are judged as every component is, so the
+box says Install, Update or Reinstall, and a person pressing Enter updates
+only what is stale. `installScreenReaderSupport.cmd state jaws` and `state
+nvda` answer for the installer:
+
+- **JAWS**: a fingerprint of the script sources in `<App>_JAWS.zip` (their
+  names and contents, not the zip's own bytes, which change with every build)
+  is compared with the one written into each JAWS version's settings folder
+  when the scripts last compiled there. None there: Install. Every version
+  current: Reinstall. Otherwise, including a JAWS version installed since:
+  Update. Scripts from before fingerprints were kept count as Update.
+- **NVDA**: the version in the add-on's own `manifest.ini` is compared with
+  the installed add-on's. Not installed: Install. Different: Update. The same:
+  Reinstall.
+- A reader not on the computer, or one the app ships nothing for, gets no box.
+
+`homerReaderLabel`, `homerReaderIs` and `homerReaderState` in
+HomerComponents.iss word and tick the boxes from that answer.
 
 Inno shows `[Run]` entries in the order they are written, and `Check:` hides
 the ones that do not apply. So each component gets three entries -- one per
@@ -59,9 +85,9 @@ the fewest words, and alike in every Homer installer:
 - **A use in parentheses**, three or four words, for a component or a model:
   "Install Pandoc 3.11 (converts documents)". A size goes there too when it is
   large: "(translates text, about 4.7 GB)".
-- **Screen readers get a box each, JAWS first, worded alike**: "Install JAWS
-  scripts", "Install NVDA add-on" (or Update). A condition the box depends on
-  may follow in parentheses: "(NVDA must be running)".
+- **Screen readers get a box each, worded like any component**: "Install JAWS
+  scripts", "Update NVDA add-on", "Reinstall JAWS scripts". A condition the box
+  depends on may follow in parentheses: "(NVDA must be running)".
 - **No word the tick already says**: not "recommended", not "(current version)"
   after Reinstall, not "for <App>" -- it is that app's installer.
 - **Launch and the guide**: "Launch <App> (desktop hotkey Alt+Control+X)" and

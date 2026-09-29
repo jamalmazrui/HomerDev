@@ -5,8 +5,8 @@ Usage:
     python toHomerEncoding.py <file-folder-or-wildcard> [...]
 
 The Homer encoding is UTF-8 with a byte order mark and CRLF line endings,
-except .cmd and .bat files and a skill's SKILL.md, which take CRLF and no
-mark. Pandoc and most converters write UTF-8 with no mark and bare line
+except .cmd and .bat files, version.txt and a skill's SKILL.md, which take
+CRLF and no mark. Pandoc and most converters write UTF-8 with no mark and bare line
 feeds, so run this on what they write. A file is read in the first encoding
 that decodes it cleanly (UTF-8 with or without a mark, UTF-16 with a mark,
 then Windows-1252); binary files are left alone. A folder is walked
@@ -43,7 +43,8 @@ def convert(sPath):
     if sText is None: return "not text"
     sText = sText.replace("\r\n", "\n").replace("\r", "\n").replace("\n", "\r\n")
     sName = os.path.basename(sPath)
-    bMark = not (sName.lower().endswith(c_lsNoMark) or sName == "SKILL.md")
+    # version.txt is read by build scripts and Inno, which want the number alone.
+    bMark = not (sName.lower().endswith(c_lsNoMark) or sName in ("SKILL.md", "version.txt"))
     binNew = (b"\xef\xbb\xbf" if bMark else b"") + sText.encode("utf-8")
     if binNew == binData: return "same"
     open(sPath, "wb").write(binNew)

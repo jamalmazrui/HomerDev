@@ -227,41 +227,28 @@ Name: "{group}\Uninstall {#AppName}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\exec\{#AppExeName}"; WorkingDir: "{userdocs}"; HotKey: "{#HotKey}"
 
 [Run]
-; FINISH-PAGE ORDER, a HomerDev rule (25 September 2026):
-;   1. Install entries, ticked -- screen reader scripts first, then components
-;      in alphabetical order.
-;   2. Update entries, ticked, alphabetical.
-;   3. Reinstall entries, UNTICKED, alphabetical.
-;   4. Launch, ticked.
-;   5. Open the user guide, unticked.
-; Inno shows [Run] entries in script order and Check: hides the ones that do not
-; apply, so three entries per component -- one per verb, each with its own
-; Check: from Templates\HomerComponents.iss -- group the page by themselves.
-; The label function words each one: "Install X 1.2 (what it is for)",
-; "Update X from 1.1 to 1.2 (...)", "Reinstall X 1.2 (...)".
-;
-; AI NOTE FOR CUSTOMIZING: register each component once in InitializeSetup
-; (see homerAdd below), then copy its three entries here into the three groups,
-; keeping each group in alphabetical order. A model has Install and Reinstall
-; only: ollama pull always fetches the current one.
-;
-; Scripts run DIRECTLY, with "noPause" as their argument -- never through a cmd
-; wrapper with a "set X=1 &&" prefix, which cmd /s cannot quote correctly.
+; THE FINISH PAGE (help\FinishPage.md; 1.43.43). Three groups, in this order:
+; Install (ticked), Update (ticked), Reinstall (unticked); within each group,
+; the components in alphabetical order by name, case-insensitive, the JAWS
+; scripts and the NVDA add-on among them like any other. Then Launch
+; (ticked) and the user guide (unticked). Inno shows the entries in the order
+; written and hides those whose Check is false, so each component has one
+; entry per group. AI NOTE FOR CUSTOMIZING: add a component's three entries in
+; its alphabetical place in each group.
 
-; ---- 1. Install ---------------------------------------------------------------
-; JAWS AND NVDA HAVE A BOX EACH, JAWS first, worded alike (1.43.20).
+; ---- 1. Install, ticked --------------------------------------------------------
 FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
   Parameters: "noPause jaws"; \
   WorkingDir: "{app}\scripts"; \
-  Description: "Install JAWS scripts"; \
-  Check: isFreshInstall; \
+  Description: "{code:labelJaws}"; \
+  Check: isInstallJaws; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
   Parameters: "noPause nvda"; \
   WorkingDir: "{app}\scripts"; \
-  Description: "Install NVDA add-on"; \
-  Check: isFreshInstall; \
+  Description: "{code:labelNvda}"; \
+  Check: isInstallNvda; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installOllama.cmd"; \
@@ -278,19 +265,19 @@ FileName: "{app}\scripts\installModels.cmd"; \
   Check: isModelInstall; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
-; ---- 2. Update ----------------------------------------------------------------
+; ---- 2. Update, ticked ---------------------------------------------------------
 FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
   Parameters: "noPause jaws"; \
   WorkingDir: "{app}\scripts"; \
-  Description: "Update JAWS scripts"; \
-  Check: isUpgradeOrSame; \
+  Description: "{code:labelJaws}"; \
+  Check: isUpdateJaws; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
   Parameters: "noPause nvda"; \
   WorkingDir: "{app}\scripts"; \
-  Description: "Update NVDA add-on"; \
-  Check: isUpgradeOrSame; \
+  Description: "{code:labelNvda}"; \
+  Check: isUpdateNvda; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installOllama.cmd"; \
@@ -300,7 +287,21 @@ FileName: "{app}\scripts\installOllama.cmd"; \
   Check: isUpdateOllama; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
-; ---- 3. Reinstall, unticked ---------------------------------------------------
+; ---- 3. Reinstall, unticked ----------------------------------------------------
+FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
+  Parameters: "noPause jaws"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelJaws}"; \
+  Check: isReinstallJaws; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated unchecked skipifdoesntexist
+
+FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
+  Parameters: "noPause nvda"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelNvda}"; \
+  Check: isReinstallNvda; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated unchecked skipifdoesntexist
+
 FileName: "{app}\scripts\installOllama.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
@@ -456,6 +457,14 @@ end;
 //  ---- checkbox wording and visibility, one line each ----------------------
 //  AI NOTE FOR CUSTOMIZING: three functions per component, one per verb, and
 //  a label function; two per model. Name the model as installModels.cmd does.
+function labelJaws(sParam: String): String;    begin Result := homerReaderLabel('jaws'); end;
+function isInstallJaws(): Boolean;             begin Result := homerReaderIs('jaws', 0); end;
+function isUpdateJaws(): Boolean;              begin Result := homerReaderIs('jaws', 1); end;
+function isReinstallJaws(): Boolean;           begin Result := homerReaderIs('jaws', 2); end;
+function labelNvda(sParam: String): String;    begin Result := homerReaderLabel('nvda'); end;
+function isInstallNvda(): Boolean;             begin Result := homerReaderIs('nvda', 0); end;
+function isUpdateNvda(): Boolean;              begin Result := homerReaderIs('nvda', 1); end;
+function isReinstallNvda(): Boolean;           begin Result := homerReaderIs('nvda', 2); end;
 function labelOllama(sParam: String): String;  begin Result := homerLabel(iOllama); end;
 function isInstallOllama(): Boolean;           begin Result := homerIs(iOllama, 0); end;
 function isUpdateOllama(): Boolean;            begin Result := homerIs(iOllama, 1); end;

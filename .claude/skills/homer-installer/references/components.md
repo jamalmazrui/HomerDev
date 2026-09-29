@@ -5,6 +5,7 @@
 - The three entries per component
 - Labels and outcomes
 - Ollama models
+- JAWS scripts and the NVDA add-on
 - Detection
 
 ## Declaring a component
@@ -71,6 +72,25 @@ Install and `homerModelIs(model, True)` for Reinstall,
 `homerModelOutcomeLine(model, use, size)` for the Results box. The size goes
 in the label when it is large: "Install qwen2.5:7b (translates text, about
 4.7 GB, needs Ollama)".
+
+## JAWS scripts and the NVDA add-on
+
+They are components too, sorted among the others by name ("JAWS scripts",
+"NVDA add-on"), with three entries each like any component, calling
+`installScreenReaderSupport.cmd` with `noPause jaws` or `noPause nvda`:
+
+```pascal
+function labelJaws(sParam: String): String; begin Result := homerReaderLabel('jaws'); end;
+function isInstallJaws(): Boolean;          begin Result := homerReaderIs('jaws', 0); end;
+function isUpdateJaws(): Boolean;           begin Result := homerReaderIs('jaws', 1); end;
+function isReinstallJaws(): Boolean;        begin Result := homerReaderIs('jaws', 2); end;
+```
+
+and the same with `Nvda` and `'nvda'`. `homerReaderState` asks the script's
+`state` mode once: a fingerprint of the JAWS sources against the one kept in
+each JAWS version's settings folder, and the NVDA add-on's manifest version
+against the installed one. A reader not on the computer gets no box. The
+Results box reports each ticked reader through `homerScreenReaderOutcome`.
 
 ## Detection
 

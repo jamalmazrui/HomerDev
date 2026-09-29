@@ -181,8 +181,9 @@ pressing Enter does the right thing without reading the list.</p>
 <li><strong>Reinstall</strong> something already current —
 <strong>unticked</strong></li>
 <li><strong>Launch</strong> the app — <strong>ticked</strong></li>
-<li><strong>Install JAWS scripts</strong>, <strong>Install NVDA
-add-on</strong> — <strong>ticked</strong>, a box each</li>
+<li><strong>JAWS scripts</strong> and the <strong>NVDA add-on</strong>
+are components like any other, with a box each: Install or Update
+<strong>ticked</strong>, Reinstall <strong>unticked</strong></li>
 <li><strong>Open documentation</strong> (the guide, the ReadMe) —
 <strong>unticked</strong></li>
 </ul>
@@ -199,14 +200,41 @@ teaches the reader to stop trusting the page.</p>
 <h2 id="the-order-of-the-boxes">The order of the boxes</h2>
 <p>The finish page lists its boxes in this order, always:</p>
 <ol type="1">
-<li><strong>Install</strong> boxes, ticked. The screen reader boxes come
-first, JAWS then NVDA; then the components, in alphabetical order.</li>
+<li><strong>Install</strong> boxes, ticked, in alphabetical order.</li>
 <li><strong>Update</strong> boxes, ticked, in alphabetical order.</li>
 <li><strong>Reinstall</strong> boxes, unticked, in alphabetical
 order.</li>
 <li><strong>Launch the app</strong>, ticked.</li>
 <li><strong>Open the user guide</strong>, unticked.</li>
 </ol>
+<p>Alphabetical order is by the component’s name, ignoring case, and the
+JAWS scripts and the NVDA add-on take their places among the others:
+“ExifTool, ffmpeg, ImageMagick, JAWS scripts, mpv, NVDA add-on, Ollama”.
+Launch and the guide always come last.</p>
+<h2 id="whether-the-screen-reader-support-is-current">Whether the screen
+reader support is current</h2>
+<p>The JAWS scripts and the NVDA add-on are judged as every component
+is, so the box says Install, Update or Reinstall, and a person pressing
+Enter updates only what is stale.
+<code>installScreenReaderSupport.cmd state jaws</code> and
+<code>state nvda</code> answer for the installer:</p>
+<ul>
+<li><strong>JAWS</strong>: a fingerprint of the script sources in
+<code>&lt;App&gt;_JAWS.zip</code> (their names and contents, not the
+zip’s own bytes, which change with every build) is compared with the one
+written into each JAWS version’s settings folder when the scripts last
+compiled there. None there: Install. Every version current: Reinstall.
+Otherwise, including a JAWS version installed since: Update. Scripts
+from before fingerprints were kept count as Update.</li>
+<li><strong>NVDA</strong>: the version in the add-on’s own
+<code>manifest.ini</code> is compared with the installed add-on’s. Not
+installed: Install. Different: Update. The same: Reinstall.</li>
+<li>A reader not on the computer, or one the app ships nothing for, gets
+no box.</li>
+</ul>
+<p><code>homerReaderLabel</code>, <code>homerReaderIs</code> and
+<code>homerReaderState</code> in HomerComponents.iss word and tick the
+boxes from that answer.</p>
 <p>Inno shows <code>[Run]</code> entries in the order they are written,
 and <code>Check:</code> hides the ones that do not apply. So each
 component gets three entries – one per verb, each with its own
@@ -231,10 +259,10 @@ then the name, then a version where one is known: “Update Ollama from
 <li><strong>A use in parentheses</strong>, three or four words, for a
 component or a model: “Install Pandoc 3.11 (converts documents)”. A size
 goes there too when it is large: “(translates text, about 4.7 GB)”.</li>
-<li><strong>Screen readers get a box each, JAWS first, worded
-alike</strong>: “Install JAWS scripts”, “Install NVDA add-on” (or
-Update). A condition the box depends on may follow in parentheses:
-“(NVDA must be running)”.</li>
+<li><strong>Screen readers get a box each, worded like any
+component</strong>: “Install JAWS scripts”, “Update NVDA add-on”,
+“Reinstall JAWS scripts”. A condition the box depends on may follow in
+parentheses: “(NVDA must be running)”.</li>
 <li><strong>No word the tick already says</strong>: not “recommended”,
 not “(current version)” after Reinstall, not “for <App>” – it is that
 app’s installer.</li>
