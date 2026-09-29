@@ -72,6 +72,23 @@ building, installing and reading a setup log takes minutes.
 - Packed as `<App>.nvda-addon` (a zip of the folder); installed with
   `nvda --install-add-on=<file>`, and NVDA asks the user to confirm.
 
+- **The add-on's version is the app's.** The build sets the `version` line of
+  the shipped add-on's manifest.ini to the app's version, so the installer's
+  comparison with the installed add-on says Update after a release and
+  Reinstall otherwise.
+- **Start nvda.exe through the shell** (Inno's `shellexec`, or cmd's `start`):
+  it is marked for UI Access, and CreateProcess refuses it with code 740.
+  `nvda.exe --install-add-on=<file>` starts NVDA if it is not running and asks
+  the person to confirm; opening the `.nvda-addon` file does nothing unless
+  NVDA is already running.
+- **An accepted add-on waits as `<name>.pendingInstall`** under
+  `%APPDATA%\nvda\addons` until NVDA restarts; count it as installed.
+- **NVDA's own log** is `%TEMP%\nvda.log` for an installed copy (the folder of a
+  portable copy), with the previous session's kept as `nvda-old.log`. Its
+  add-on handler writes there when it installs, loads or refuses an add-on;
+  read it with read-write sharing, since NVDA holds it open, and copy the lines
+  naming the add-on into the installer's log.
+
 ## Kit modules inside an add-on
 
 NVDA cannot share one copy of a module between add-ons, so an add-on carries
