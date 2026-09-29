@@ -5,6 +5,49 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.43.35 -- 28 September 2026
+
+**homer-new-app asks first whether it should be a program at all.** When the
+need is keeping and reporting on records, a DbDo database is usually the better
+answer, and JobTrail -- JobTrail.db with its .inix, reports and scripts under
+DbDo's templates -- is the example the skill now describes, with DbDo's other
+Trails. Taken from DbDo as it is on GitHub, 28 September.
+
+**Only a project under git counts as an app.** The kit build's stale-script
+warning named C:\\Jobrise, and it was then treated as an app. There is no such
+app: Jobrise was a name considered and rejected for what became JobTrail, a
+DbDo database rather than a program, and the folder is left from that. The
+warning, and updateAppBuilds when no app is named, now pass over a folder with
+no .git: the kit's build notes it as a possible leftover, and updateAppBuilds
+changes it only when it is named.
+
+# 1.43.34 -- 28 September 2026
+
+**summarizeLogs shows a build's warnings.** The kit's build of 21:26 succeeded
+and warned that Jobrise's build script still looks for the kit's old layout,
+but the summary said only "result=succeeded". A build's WARN lines now follow
+its result, even when it succeeded.
+
+# 1.43.33 -- 28 September 2026
+
+From the logs of 28 September at 21:03, when the kit's new warning named nine
+apps and every app build but urlCheck's stopped with "no kit found":
+
+- **updateAppBuilds, a kit tool that brings app build scripts to the kit's
+  layout.** Run from C:\\HomerDev, it finds each app beside the kit whose build
+  script still names the old CSharp or homer paths and changes only those:
+  \\CSharp\\ to \\exec\\CSharp\\, homer\\log.py to exec\\Python\\log.py, PyInstaller's
+  --paths to exec\\Python and its hidden imports to plain names, and in a Python
+  app's own source "from homer import" to "import". Each changed file is copied
+  first into the app's notes folder. It serves an app with no current zip --
+  Jobrise, which the warning named -- and anyone who would rather not unzip
+  ten.
+- **The warning finds HomerView too.** It looked for CSharp\\Lbc.cs, and
+  HomerView's build asks for CSharp\\Inix.cs; any kit path not under exec now
+  counts. Its message names updateAppBuilds.
+- **A leading level word is the level.** "WARN: ..." was written as
+  "WARN  WARN: ..."; the word now sets the level and is not repeated.
+
 # 1.43.32 -- 28 September 2026
 
 **The last planned skill: homer-migrate.** Bringing an existing app onto the

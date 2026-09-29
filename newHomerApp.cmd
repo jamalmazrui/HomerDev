@@ -5,12 +5,11 @@ rem   newHomerApp                  ask for the name, write into C:\<App>
 rem   newHomerApp JobDo            write C:\JobDo
 rem   newHomerApp JobDo D:\Work    write somewhere else
 rem
-rem It writes build<App>.cmd, <App>_setup.iss, create<App>Repo.cmd and .ps1,
-rem version.txt and .gitignore, with the app name filled in and in the Homer
-rem encoding. Nothing already in the folder is overwritten.
+rem It writes a complete starting project -- source, build, installer, lists,
+rem acceptance checks and document starters -- with the app name filled in and
+rem in the Homer encoding. Nothing already in the folder is overwritten.
 rem
-rem The work is in newHomerApp.py beside this script, which writes a detailed
-rem newHomerApp.log there.
+rem The work is in newHomerApp.py beside this script; its log is in logs.
 setlocal
 pushd "%~dp0"
 where python >nul 2>&1

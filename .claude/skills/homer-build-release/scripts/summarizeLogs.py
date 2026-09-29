@@ -58,6 +58,11 @@ def summarizeBuild(sText):
                 firstMatch(sText, r"version\.txt is now ([\d.]+)"))
     lsOut = ["result=" + sResult]
     if sVersion: lsOut.append("version=" + sVersion)
+    # A warning is worth seeing even in a build that succeeded: the kit's
+    # build names the apps whose build script is stale this way.
+    lsWarn = [re.sub(r"^\S+ WARN\s+", "", s.strip()) for s in sText.splitlines()
+              if re.match(r"^\S+ WARN ", s) and "CONSOLE:" not in s]
+    lsOut += ["WARN " + s[:120] for s in lsWarn[:c_iMaxErrors]]
     return lsOut, sResult != "succeeded"
 
 

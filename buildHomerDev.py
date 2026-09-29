@@ -336,6 +336,10 @@ def logLine(sText):
     import re as _re
     sLevel = ("ERROR" if _re.search(r"\b(ERROR|FAIL|FAILED)\b", sText)
               else "WARN" if _re.search(r"\bWARN(ING)?\b", sText) else "INFO")
+    # A LEADING LEVEL WORD IS THE LEVEL (1.43.33): "WARN: x" is written
+    # "WARN  x", not "WARN  WARN: x".
+    oLead = _re.match(r"(ERROR|WARN|WARNING)\b:?\s*", sText)
+    if oLead: sText = sText[oLead.end():] or sText
     sPrefix = "%s %-5s " % (_datetime.datetime.now().astimezone().isoformat(timespec="milliseconds"), sLevel)
     lsOut = []
     for iAt, sOne in enumerate(sText.split("\n")):
@@ -644,14 +648,26 @@ def findStaleAppBuilds():
             sText = open(sBuild, "rb").read().decode("utf-8", "replace")
         except Exception:
             continue
-        bOld = ("\\CSharp\\Lbc.cs" in sText and "\\exec\\CSharp\\" not in sText) or \
-               ("\\homer\\log.py" in sText and "\\exec\\Python\\" not in sText)
+        # Any kit path not under exec: HomerView's looked for CSharp\\Inix.cs,
+        # not Lbc.cs, and the first version of this test missed it.
+        bOld = bool(re.search(r"(?<!exec)\\CSharp\\\w+\.cs", sText) or
+                    re.search(r"(?<!exec)\\homer\\\w+\.py", sText))
+        # ONLY A PROJECT UNDER GIT IS AN APP (1.43.35). On 28 September the scan
+        # named C:\\Jobrise, a folder left from a name considered and rejected
+        # for what became JobTrail -- not an app at all -- and it was reported
+        # as one. A folder without .git is named as a possible leftover instead.
+        if bOld and not os.path.isdir(os.path.join(os.path.dirname(sBuild), ".git")):
+            logLine("WARN: folder with a stale build script is not a git repository, possibly a leftover folder=%s"
+                    % logValue(os.path.dirname(sBuild)))
+            sayLine("NOTE: %s holds a build script but is not a git repository, so it is not counted as an app. "
+                    "If it is left over, delete it." % os.path.dirname(sBuild))
+            continue
         if bOld:
             lsStale.append(sFolder)
-            logLine("WARN app build script looks for the old kit layout app=%s script=%s" % (sFolder, logValue(sBuild)))
+            logLine("WARN: app build script looks for the old kit layout app=%s script=%s" % (sFolder, logValue(sBuild)))
     if lsStale:
         sayLine("WARNING: %s still look%s for the kit's old layout and will stop with \"no kit found\". "
-                "Unzip each app's newest zip into its folder before building it."
+                "Unzip each app's newest zip into its folder, or run updateAppBuilds here to update the paths."
                 % (", ".join(lsStale), "s" if len(lsStale) == 1 else ""))
     return lsStale
 

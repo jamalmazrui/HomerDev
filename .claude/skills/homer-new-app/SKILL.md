@@ -6,8 +6,10 @@ description: >-
   tool with a command line and a dialog, a multiple-document app, or an NVDA
   add-on), fills in the starter files -- source, installer, lists, acceptance
   checks and documents -- and takes it through its first build, repository and
-  release. Use when asked to create, scaffold or begin a new Homer app, tool or
-  program, or to turn an idea into a working Homer project.
+  release -- or, when the need is records rather than a program, makes it a
+  DbDo database like JobTrail. Use when asked to create, scaffold or begin a
+  new Homer app, tool or program, or to turn an idea into a working Homer
+  project.
 ---
 
 # A new Homer app
@@ -16,6 +18,18 @@ Every Homer app is made the same way, so a new one starts with everything the
 others have: the same build, installer, logs, lists, documents and checks.
 
 ## 1. Decide the shape and the language
+
+**First ask whether it needs to be a program at all.** When the job is keeping
+and reporting on records -- leads, contacts, collections, a log -- it is
+usually better as a DbDo database than as a new program: JobTrail is the
+example. It is a folder under DbDo's `templates` (JobTrail.db with
+JobTrail.inix beside it, which sets the table it opens on and how each table
+is heard; report.inix for its reports; and `.dbdo` and `.sql` scripts such as
+Today.dbdo), documented in DbDo's help as JobTrail.md, and it inherits
+everything DbDo does by keyboard and screen reader. DbDo carries eleven such
+Trails (BookTrail, RecipeTrail and others). Such a database is added to DbDo's
+repository and installer rather than made with newHomerApp; the rest of this
+skill is for a program.
 
 - **A single tool**: one job, a command line that can be scripted, and one Lbc
   dialog when run with no arguments or `--gui` -- the same settings in both.

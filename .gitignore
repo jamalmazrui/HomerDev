@@ -38,6 +38,8 @@
 !/RepoFiles.txt
 !/scripts/
 !/Templates/
+!/updateAppBuilds.cmd
+!/updateAppBuilds.py
 !/version.txt
 !/.gitignore
 !/.gitattributes

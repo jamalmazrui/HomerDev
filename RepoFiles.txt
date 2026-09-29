@@ -28,6 +28,8 @@ createHomerDevRepo.ps1
 newHomerApp.cmd
 releaseHomerDev.cmd
 newHomerApp.py
+updateAppBuilds.cmd
+updateAppBuilds.py
 version.txt
 RepoFiles.txt
 LocalFiles.txt

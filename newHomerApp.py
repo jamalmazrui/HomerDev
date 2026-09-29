@@ -61,6 +61,10 @@ def logLine(sText):
     import re as _re
     sLevel = ("ERROR" if _re.search(r"\b(ERROR|FAIL|FAILED)\b", sText)
               else "WARN" if _re.search(r"\bWARN(ING)?\b", sText) else "INFO")
+    # A LEADING LEVEL WORD IS THE LEVEL (1.43.33): "WARN: x" is written
+    # "WARN  x", not "WARN  WARN: x".
+    oLead = _re.match(r"(ERROR|WARN|WARNING)\b:?\s*", sText)
+    if oLead: sText = sText[oLead.end():] or sText
     sPrefix = "%s %-5s " % (_datetime.datetime.now().astimezone().isoformat(timespec="milliseconds"), sLevel)
     lsOut = []
     for iAt, sOne in enumerate(sText.split("\n")):
