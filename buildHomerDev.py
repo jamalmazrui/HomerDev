@@ -26,6 +26,7 @@ import platform
 import re
 import subprocess
 import sys
+import time
 import traceback
 
 c_lsExpected = [
@@ -386,13 +387,15 @@ def sayLine(sText):
 
 def runCommand(lsArgs):
     """Run a command, log its exit code and output, return (iCode, sOutput)."""
-    logLine("RUN: %s" % " ".join(lsArgs))
+    sCmd = " ".join(lsArgs)
+    nStarted = time.time()
+    logLine("run start cmd=" + logValue(sCmd))
     try:
         oResult = subprocess.run(lsArgs, capture_output=True, text=True)
     except Exception as oError:
-        logLine("RUN FAILED: %s" % oError)
+        logLine("ERROR run failed message=%s cmd=%s" % (logValue(str(oError)), logValue(sCmd)))
         return (1, str(oError))
-    logLine("EXIT: %d" % oResult.returncode)
+    logLine("run exit=%d ms=%d cmd=%s" % (oResult.returncode, (time.time() - nStarted) * 1000, logValue(sCmd)))
     if oResult.stdout: logLine("STDOUT:\n" + oResult.stdout.rstrip())
     if oResult.stderr: logLine("STDERR:\n" + oResult.stderr.rstrip())
     return (oResult.returncode, (oResult.stdout or "") + (oResult.stderr or ""))
@@ -619,6 +622,27 @@ def copySkillDocuments():
     return iCopied
 
 
+def removeSkillHtm():
+    """Delete the .htm copies earlier builds wrote beside skill files (1.43.30).
+    Returns the number removed."""
+    iRemoved = 0
+    sSkills = os.path.join(sScriptDir, ".claude", "skills")
+    if not os.path.isdir(sSkills): return 0
+    for sName in os.listdir(sSkills):
+        sFolder = os.path.join(sSkills, sName)
+        if not os.path.isdir(sFolder): continue
+        for sDir, lsDirs, lsFiles in os.walk(sFolder):
+            for sFile in lsFiles:
+                if not sFile.lower().endswith(".htm"): continue
+                try:
+                    os.remove(os.path.join(sDir, sFile))
+                    logLine("removed generated skill htm file=%s" % logValue(os.path.join(sDir, sFile)))
+                    iRemoved += 1
+                except Exception as oError:
+                    logLine("ERROR could not remove file=%s message=%s" % (logValue(os.path.join(sDir, sFile)), logValue(str(oError))))
+    return iRemoved
+
+
 def packSkills():
     """Pack each skill into exec\\skills\\<name>.zip, ready to upload.
 
@@ -644,6 +668,7 @@ def packSkills():
             for sDir, lsDirs, lsFiles in os.walk(sFolder):
                 lsDirs[:] = [s for s in lsDirs if s != "__pycache__"]
                 for sFile in sorted(lsFiles):
+                    if sFile.lower().endswith(".htm"): continue
                     sPath = os.path.join(sDir, sFile)
                     oZip.write(sPath, os.path.relpath(sPath, sSkills))
         logLine("skill packed name=%s zip=%s" % (sName, logValue(sZip)))
@@ -800,7 +825,11 @@ def renameScripts():
     lPatterns = [(re.compile(r"(?<![A-Za-z_])%s(?![A-Za-z0-9_])" % re.escape(sOld)), sNew)
                  for sOld, sNew in c_lRenamedWords]
     for sRoot, lsDirs, lsFiles in os.walk(sScriptDir):
-        lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders and s.lower() != "logs"]
+        # NOT .claude (1.43.30): a skill that names the old script names does
+        # so on purpose -- homer-build-release's failures.md lists them as what
+        # an old build script calls -- and rewriting them there emptied the
+        # sentence of its meaning.
+        lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders and s.lower() not in ("logs", ".claude")]
         for sName in lsFiles:
             if sName in c_lsKeepOldNames or sName.startswith(c_sKeepOldPrefixes): continue
             if not sName.lower().endswith(c_lsRewriteExtensions) and sName != ".gitignore": continue
@@ -1053,8 +1082,16 @@ def convertDocs(sPandoc):
         # Templates are not documents: Templates\self.md is a starter for a new
         # app, and converting it would leave a stray .htm in the kit.
         if os.path.basename(sRoot).lower() == "templates": continue
+        # A SKILL IS NOT A DOCUMENT SET (1.43.30). Its SKILL.md and references
+        # are read by Claude as Markdown; an .htm beside each was noise in the
+        # folder, in git and in every packed zip. Only the index,
+        # .claude\\skills\\ReadMe.md, is a document a person reads.
+        sRelRoot = os.path.relpath(sRoot, sScriptDir).replace(os.sep, "/").lower()
+        bSkillsIndex = sRelRoot == ".claude/skills"
+        if sRelRoot.startswith(".claude") and not bSkillsIndex: continue
         for sName in sorted(lsFiles):
             if not sName.lower().endswith(".md"): continue
+            if bSkillsIndex and sName.lower() != "readme.md": continue
             sMd = os.path.join(sRoot, sName)
             sHtm = os.path.join(sRoot, sName[:-3] + ".htm")
             iCode, sOut = runCommand([sPandoc, "-f", "markdown", "-t", "html5",
@@ -1208,6 +1245,7 @@ def main():
             sayLine(sDllProblem)
             iSamplesFailed += 1
         buildTutorials()
+        removeSkillHtm()
         copySkillDocuments()
         extractSkillSections()
         iSkills = packSkills()

@@ -14,7 +14,7 @@ nothing to undo, and it says so. It never rewrites what has been pushed.
 Run it in the project folder. It logs to logs\\<App>-unpushed-yyyyMMdd-HHmmss.log.
 """
 
-import datetime, os, platform, subprocess, sys
+import datetime, os, platform, subprocess, sys, time
 
 oLog = None
 
@@ -94,9 +94,11 @@ def say(sText):
 
 
 def runGit(lsArgs):
-    logLine("RUN: git " + " ".join(lsArgs))
+    sCmd = "git " + " ".join(lsArgs)
+    nStarted = time.time()
+    logLine("run start cmd=" + logValue(sCmd))
     oResult = subprocess.run(["git"] + lsArgs, cwd=sRoot, capture_output=True, text=True)
-    logLine("EXIT: %d" % oResult.returncode)
+    logLine("run exit=%d ms=%d cmd=%s" % (oResult.returncode, (time.time() - nStarted) * 1000, logValue(sCmd)))
     if oResult.stdout.strip(): logLine("STDOUT:\n" + oResult.stdout.rstrip())
     if oResult.stderr.strip(): logLine("STDERR:\n" + oResult.stderr.rstrip())
     return oResult.returncode, oResult.stdout.strip()

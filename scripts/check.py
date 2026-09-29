@@ -68,6 +68,7 @@ import platform
 import re
 import subprocess
 import sys
+import time
 import traceback
 
 # The standard document set. ReadMe and License sit at the top of the project;
@@ -206,7 +207,9 @@ def runCommand(lsArgs, sShell=""):
     by hand. The console names each command as it starts, so a long one is
     seen to be running.
     """
-    logLine("RUN: " + (sShell or " ".join(lsArgs)))
+    sCmd = sShell or " ".join(lsArgs)
+    nStarted = time.time()
+    logLine("run start cmd=" + logValue(sCmd))
     sayConsoleRunning(sShell or " ".join(lsArgs))
     try:
         if sShell:
@@ -237,9 +240,9 @@ def runCommand(lsArgs, sShell=""):
                                      capture_output=True, text=True, timeout=900,
                                          stdin=subprocess.DEVNULL)
     except Exception as oError:
-        logLine("RUN FAILED: %s" % oError)
+        logLine("ERROR run failed message=%s cmd=%s" % (logValue(str(oError)), logValue(sCmd)))
         return (1, str(oError))
-    logLine("EXIT: %d" % oResult.returncode)
+    logLine("run exit=%d ms=%d cmd=%s" % (oResult.returncode, (time.time() - nStarted) * 1000, logValue(sCmd)))
     sOut = (oResult.stdout or "") + (oResult.stderr or "")
     if sOut: logLine("OUTPUT:\n" + sOut[-4000:])
     return (oResult.returncode, sOut)

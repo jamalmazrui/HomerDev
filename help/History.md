@@ -5,6 +5,25 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.43.30 -- 28 September 2026
+
+From the kit build of 28 September at 20:17:
+
+- **buildHomerDev no longer rewrites old names inside a skill.** Its rename
+  pass, which turns checkHomerApp into check and gitPush into push across the
+  kit, rewrote homer-build-release's failures.md, whose point was to list the
+  old names an old build script calls. It now passes over .claude.
+- **No .htm beside a skill's files.** The document conversion made an .htm
+  for every SKILL.md and reference -- 30 of them -- which then sat in git and
+  in every packed skill. It now converts only the skills index,
+  .claude\\skills\\ReadMe.md; the build deletes the ones earlier builds wrote,
+  and the packer leaves any .htm out.
+- **One line per command in the scripts' logs.** "RUN: ..." and then
+  "EXIT: 0" on a separate line become `run start cmd="..."` and
+  `run exit=0 ms=304 cmd="..."`, so a single line says what ran, how it ended
+  and how long it took; a command that cannot start is an ERROR line naming
+  both. In check, tidy, unpushed and buildHomerDev.
+
 # 1.43.29 -- 28 September 2026
 
 From the logs of 28 September, when HomerScribe's and urlFido's builds failed

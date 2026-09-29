@@ -69,8 +69,8 @@ Each entry: the symptom in the log, the cause, the fix.
 
 - **"kit not found" or "Update HomerDev"**: build the kit first; the app's
   `kitNeeded` is newer than the kit on disk.
-- **A script calls an old kit name** (check, push, tidy,
-  release, installCommon): the build retires old copies; rebuild.
+- **A script calls an old kit name** (checkHomerApp, gitPush, homerTidy,
+  tagRelease, homerInstall): the build retires old copies; rebuild.
 - **Version in the installer one behind.** The installer read version.txt
   before the build wrote it; pass the build's number to Inno
   (`/DBuildVersion=`).

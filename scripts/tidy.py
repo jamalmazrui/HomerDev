@@ -103,6 +103,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 import traceback
 
 def homerProjectRoot(sScriptDir):
@@ -270,13 +271,15 @@ def countNoun(iCount, sSingular, sPlural=None):
 def runGit(lsArgs, bQuiet=False):
     """Run git and return (iCode, sOutput). Never raises."""
     lsFull = ["git"] + lsArgs
-    logLine("RUN: " + " ".join(lsFull))
+    sCmd = " ".join(lsFull)
+    nStarted = time.time()
+    logLine("run start cmd=" + logValue(sCmd))
     try:
         oResult = subprocess.run(lsFull, capture_output=True, text=True, cwd=sRoot)
     except Exception as oError:
-        logLine("RUN FAILED: %s" % oError)
+        logLine("ERROR run failed message=%s cmd=%s" % (logValue(str(oError)), logValue(sCmd)))
         return (1, "")
-    logLine("EXIT: %d" % oResult.returncode)
+    logLine("run exit=%d ms=%d cmd=%s" % (oResult.returncode, (time.time() - nStarted) * 1000, logValue(sCmd)))
     if oResult.stdout and not bQuiet: logLine("STDOUT:\n" + oResult.stdout.rstrip())
     if oResult.stderr: logLine("STDERR:\n" + oResult.stderr.rstrip())
     return (oResult.returncode, oResult.stdout or "")
