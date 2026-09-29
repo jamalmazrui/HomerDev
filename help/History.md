@@ -5,6 +5,52 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.43.32 -- 28 September 2026
+
+**The last planned skill: homer-migrate.** Bringing an existing app onto the
+kit, or auditing one that has drifted: read the current files before changing
+anything, work through a checklist by area -- the build script's kit contract,
+layout, lists, installer, checks, version, Elevate, documents and logging --
+each item with what it looked like when it was wrong in the migrations of 25
+to 28 September, then deliver only the files that change and prove the result
+through a build, a check and a confirmed release.
+
+**buildHomerDev names apps whose build script is stale.** On 28 September
+urlFido's build stopped twice with "no kit found": its build script was still
+the copy that looked for the kit's old layout, since its newest urlFido.zip
+had not been unzipped. The kit's build now looks at each app folder beside
+it and warns, by name, of any build script that still names the old CSharp or
+homer paths.
+
+# 1.43.31 -- 28 September 2026
+
+**A skill for starting an app: homer-new-app.** Choosing the shape (a single
+tool, a multiple-document app, an NVDA add-on) and the language, the fruit
+basket to start from, newHomerApp, the starters to fill in -- source,
+installer, build settings, acceptance checks, lists and documents -- and the
+first build, repository and release, with a checklist.
+
+**newHomerApp brought up to the kit.** Writing the skill showed it was behind:
+
+- On a kit cloned from GitHub it stopped at once with "Template missing:
+  self.md" -- git never carries a file named self.md -- and after that it
+  would have wanted installOllama.cmd, installScreenReaderSupport.cmd and
+  finish.cmd from Templates, where they no longer are. It no longer copies
+  them: the first build puts the kit's scripts in scripts, where the Homer
+  layout keeps them.
+- It now writes RepoFiles.txt, LocalFiles.txt, .gitattributes, ReadMe.md,
+  License.md (the MIT license) and starters in help for the guide, Announce,
+  Developer and History, with the notebook self.md written from its own text.
+- Its log goes to the kit's logs folder as
+  HomerDev-newHomerApp-<stamp>.log, not beside the script.
+
+**The template's acceptance checks run exec\\<App>.exe.** They ran a bare
+<App>.exe, which is not found from the project folder, where the program
+is built into exec.
+
+**The kit check no longer asks for Templates\\self.md**, which git never
+carries, so a fresh clone of the kit checks clean.
+
 # 1.43.30 -- 28 September 2026
 
 From the kit build of 28 September at 20:17:

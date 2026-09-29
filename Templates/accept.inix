@@ -20,18 +20,21 @@
 
 FileTask = accept
 
+; The program is built into exec, so each command names exec\_APP_.exe; run
+; from the project folder, a bare _APP_.exe is not found (1.43.31).
+
 [check]
 Name = the program starts and answers for itself
-Run = _APP_.exe --help
+Run = exec\_APP_.exe --help
 Expect = 0
 Wants = --source
 
 [check]
 Name = a bad switch is refused rather than ignored
-Run = _APP_.exe --nonsense
+Run = exec\_APP_.exe --nonsense
 Expect = 1
 
 [check]
 Name = a missing source is reported, not crashed on
-Run = _APP_.exe --source nothing-here.txt
+Run = exec\_APP_.exe --source nothing-here.txt
 Expect = 1

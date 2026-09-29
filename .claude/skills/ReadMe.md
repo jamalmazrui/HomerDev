@@ -56,6 +56,12 @@ HomerDev.md, under "Claude skills".
 - **homer-installer**: the Inno Setup installer -- machine-wide installs, which
   components to offer, the finish page's wording, defaults and order, the
   Results box, and component logging. Carries FinishPage.md from help.
+- **homer-migrate**: bring an existing app onto the kit, or audit one that
+  has drifted, one app at a time, with a checklist of every area and what each
+  looked like when it was wrong.
+- **homer-new-app**: start a new app -- choose its shape and language, run
+  newHomerApp, fill in the starters, and take it through its first build,
+  repository and release.
 - **homer-tutorial**: write, check and build the spoken walkthroughs of a
   Homer app, where a narrator works and a screen reader answers. Carries the
   kit's tutorial guide, Tutorials.md, from help.

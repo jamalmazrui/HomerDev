@@ -42,7 +42,7 @@ c_lsExpected = [
     "scripts/installOllama.cmd", "scripts/installScreenReaderSupport.cmd", "scripts/finish.cmd",
     "Templates/HomerComponents.iss", "scripts/installCommon.cmd",
     "Templates/create_APP_Repo.cmd", "Templates/create_APP_Repo.ps1",
-    "Templates/accept.inix", "Templates/gitignore.txt", "Templates/self.md", "Templates/version.txt",
+    "Templates/accept.inix", "Templates/gitignore.txt", "Templates/version.txt",
     "scripts/release.cmd", "scripts/release.ps1", "RepoFiles.txt", "LocalFiles.txt",
     "Templates/samples/FruitBasketCs.cs", "Templates/samples/FruitBasketMdiCs.cs",
     "Templates/samples/FruitBasketMdiPy.py", "Templates/samples/FruitBasketPy.py",
@@ -60,7 +60,7 @@ c_lsExpected = [
     ".claude/skills/ReadMe.md", ".claude/skills/app-help-guide/SKILL.md", ".claude/skills/blind-creators/SKILL.md",
     ".claude/skills/homer-build-release/SKILL.md", ".claude/skills/homer-code/SKILL.md",
     ".claude/skills/homer-convert/SKILL.md", ".claude/skills/homer-docs/SKILL.md", ".claude/skills/homer-ui/SKILL.md",
-    ".claude/skills/homer-elevate/SKILL.md", ".claude/skills/homer-installer/SKILL.md",
+    ".claude/skills/homer-elevate/SKILL.md", ".claude/skills/homer-installer/SKILL.md", ".claude/skills/homer-migrate/SKILL.md", ".claude/skills/homer-new-app/SKILL.md",
     ".claude/skills/homer-installer/references/components.md",
     ".claude/skills/homer-tutorial/SKILL.md", ".claude/skills/podcast-directory/SKILL.md",
     "Templates/makeHotkeys.py",
@@ -622,6 +622,40 @@ def copySkillDocuments():
     return iCopied
 
 
+def findStaleAppBuilds():
+    """Name the apps beside the kit whose build script still looks for the
+    kit's old layout (1.43.32).
+
+    The kit's libraries moved into exec\\CSharp and exec\\Python on 28 September
+    2026. An app's build script is its own copy, updated only when its newest
+    <App>.zip is unzipped; until then it stops with "no kit found", and on 28
+    September urlFido's did so twice after its new build script had been
+    delivered. So the kit's build looks at each folder beside it for a
+    build<App>.cmd that still names the old paths, and says which to unzip.
+    Returns the names found."""
+    import glob
+    lsStale = []
+    sParent = os.path.dirname(sScriptDir)
+    for sBuild in sorted(glob.glob(os.path.join(sParent, "*", "build*.cmd")), key=str.lower):
+        sFolder = os.path.basename(os.path.dirname(sBuild))
+        if os.path.normcase(os.path.dirname(sBuild)) == os.path.normcase(sScriptDir): continue
+        if os.path.basename(sBuild).lower() != ("build" + sFolder + ".cmd").lower(): continue
+        try:
+            sText = open(sBuild, "rb").read().decode("utf-8", "replace")
+        except Exception:
+            continue
+        bOld = ("\\CSharp\\Lbc.cs" in sText and "\\exec\\CSharp\\" not in sText) or \
+               ("\\homer\\log.py" in sText and "\\exec\\Python\\" not in sText)
+        if bOld:
+            lsStale.append(sFolder)
+            logLine("WARN app build script looks for the old kit layout app=%s script=%s" % (sFolder, logValue(sBuild)))
+    if lsStale:
+        sayLine("WARNING: %s still look%s for the kit's old layout and will stop with \"no kit found\". "
+                "Unzip each app's newest zip into its folder before building it."
+                % (", ".join(lsStale), "s" if len(lsStale) == 1 else ""))
+    return lsStale
+
+
 def removeSkillHtm():
     """Delete the .htm copies earlier builds wrote beside skill files (1.43.30).
     Returns the number removed."""
@@ -1079,7 +1113,7 @@ def convertDocs(sPandoc):
     iDone = 0
     for sRoot, lsDirs, lsFiles in os.walk(sScriptDir):
         lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders]
-        # Templates are not documents: Templates\self.md is a starter for a new
+        # Templates are not documents: a template is a starter for a new
         # app, and converting it would leave a stray .htm in the kit.
         if os.path.basename(sRoot).lower() == "templates": continue
         # A SKILL IS NOT A DOCUMENT SET (1.43.30). Its SKILL.md and references
@@ -1246,6 +1280,7 @@ def main():
             iSamplesFailed += 1
         buildTutorials()
         removeSkillHtm()
+        findStaleAppBuilds()
         copySkillDocuments()
         extractSkillSections()
         iSkills = packSkills()

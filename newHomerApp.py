@@ -1,29 +1,36 @@
 ﻿#!/usr/bin/env python3
-"""newHomerApp.py -- start a new Homer Tools app from the HomerDev templates.
+r"""newHomerApp.py -- start a new Homer Tools app from the HomerDev templates.
 
 Usage (through the wrapper, which is how it is meant to be run):
 
-    newHomerApp                     ask for the app name, write into C:\\<App>
-    newHomerApp JobDo               write C:\\JobDo, a C# app
-    newHomerApp JobDo --python      write C:\\JobDo, a Python app
-    newHomerApp JobDo D:\\Work\\JobDo  write somewhere else
+    newHomerApp                     ask for the app name, write into C:\<App>
+    newHomerApp JobDo               write C:\JobDo, a C# app
+    newHomerApp JobDo --python      write C:\JobDo, a Python app
+    newHomerApp JobDo D:\Work\JobDo  write somewhere else
 
-What it writes into the app folder, from Templates\\:
-
-    build<App>.cmd          the build script, compiling from C:\\HomerDev
-    help\self.md            the project's private notebook, never pushed
-    help\                   where every document goes; ReadMe stays at the top
+What it writes into the app folder (1.43.31):
+    <App>.cs                the C# starter (a Python app writes its own .py)
+    build<App>.cmd          the build script, compiling from C:\HomerDev
     <App>_setup.iss         the installer script
-    create<App>Repo.cmd     the one-time GitHub bootstrap
-    create<App>Repo.ps1
+    create<App>Repo.cmd     the one-time GitHub bootstrap, and its .ps1
     version.txt             1.0.0
-    .gitignore
-
+    accept.inix             what "done" means, for scripts\check
+    RepoFiles.txt           what the repository carries
+    LocalFiles.txt          what stays on this disk only
+    .gitattributes          "* -text": git keeps the CRLF files as they are
+    ReadMe.md, License.md   at the top; License is the MIT license
+    help\<App>.md, Announce.md, Developer.md, History.md
+                            starters for the document set
+    help\self.md            the project's private notebook, never pushed
+The kit's scripts (check, tidy, push, release, the installers' shared half)
+are not written here: the first build copies them into scripts\. An app that
+uses Ollama models copies Templates\installModels.cmd into scripts\ itself.
 Nothing already in the folder is overwritten. Every file is written in the
 Homer encoding: UTF-8 with a BOM and CRLF line endings, except .cmd and .bat,
 which take CRLF and no BOM.
 
-A detailed log is written beside THIS SCRIPT as newHomerApp.log: the
+A detailed log is written in the kit's logs folder as
+HomerDev-newHomerApp-<stamp>.log, as every tool in a project logs: the
 environment, every effective setting, every file written or skipped, and any
 traceback. Camel Type throughout.
 """
@@ -38,7 +45,7 @@ c_sToken = "_APP_"
 c_sLogName = "newHomerApp.log"
 
 sScriptDir = os.path.dirname(os.path.abspath(__file__))
-sLogPath = os.path.join(sScriptDir, c_sLogName)
+sLogPath = os.path.join(sScriptDir, "logs", "HomerDev-newHomerApp-%s.log" % datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
 oLog = None
 
 
@@ -124,9 +131,70 @@ def writeHomer(sPath, sText):
     return True
 
 
+c_sMitLicense = """# License
+
+MIT License
+
+Copyright (c) {year} Jamal Mazrui
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+{app} is released under this license.
+"""
+
+
+def newProjectFiles(sApp, bPython):
+    """The lists and document starters of a new project, as (path, text)."""
+    sToday = datetime.date.today().strftime("%d %B %Y").lstrip("0")
+    sSource = sApp + (".py" if bPython else ".cs")
+    lsRepo = ["# RepoFiles.txt -- what the %s repository carries. tidy writes the" % sApp,
+              "# .gitignore whitelist from this list alone.", "",
+              ".gitattributes", "LocalFiles.txt", "License.htm", "License.md", "ReadMe.htm", "ReadMe.md",
+              "RepoFiles.txt", "accept.inix", "build%s.cmd" % sApp, "help/", sApp + "_setup.iss", sSource,
+              "scripts/", ""]
+    lsLocal = ["# LocalFiles.txt -- what belongs to %s on this disk, but never in the repository." % sApp, "",
+               "exec/", "logs/", "notes/", sApp + "_setup.exe", "scripts/release.cmd", "scripts/release.ps1",
+               "version.txt"]
+    if bPython: lsLocal += [".venv/", "version.py", "work/"]
+    else: lsLocal += ["Version.cs"]
+    return [
+        (".gitattributes", "* -text\n"),
+        ("RepoFiles.txt", "\n".join(lsRepo)),
+        ("LocalFiles.txt", "\n".join(lsLocal) + "\n"),
+        ("License.md", c_sMitLicense.replace("{year}", str(datetime.date.today().year)).replace("{app}", sApp)),
+        ("ReadMe.md", "# %s\n\n%s is a Homer Tools app. This ReadMe is its quick start; the full guide\n"
+                      "is help\\%s.htm.\n" % (sApp, sApp, sApp)),
+        ("help/%s.md" % sApp, "# %s\n\nThe full guide to %s, in topics by heading.\n" % (sApp, sApp)),
+        ("help/Announce.md", "# %s: what is new\n\n%s 1.0.0 is the first release.\n" % (sApp, sApp)),
+        ("help/Developer.md", "# %s: how it is built\n\n%s is built with the Homer Development Kit in\n"
+                              "C:\\HomerDev: build%s makes exec\\%s.exe and %s_setup.exe.\n"
+                              % (sApp, sApp, sApp, sApp, sApp)),
+        ("help/History.md", "# %s History\n\n## 1.0.0, %s\n\nThe first release.\n" % (sApp, sToday)),
+        ("help/self.md", "# %s notebook\n\nThe project's private notebook: plans, decisions and notes to\n"
+                         "self. It is never pushed.\n" % sApp),
+    ]
+
+
 def main():
     global oLog
-    oLog = open(sLogPath, "w", encoding="utf-8")
+    os.makedirs(os.path.dirname(sLogPath), exist_ok=True)
+    oLog = open(sLogPath, "w", encoding="utf-8-sig")
     logLine("newHomerApp start pid=%d" % os.getpid())
     logFact("script", os.path.abspath(__file__))
     logFact("python", platform.python_version())
@@ -172,12 +240,6 @@ def main():
         ("create_APP_Repo.ps1",  "create" + sApp + "Repo.ps1"),
         ("version.txt",          "version.txt"),
         ("accept.inix",          "accept.inix"),
-        ("gitignore.txt",        ".gitignore"),
-        ("self.md",              "help/self.md"),
-        ("installOllama.cmd",    "installOllama.cmd"),
-        ("installModels.cmd",    "installModels.cmd"),
-        ("installScreenReaderSupport.cmd", "installScreenReaderSupport.cmd"),
-        ("finish.cmd",      "finish.cmd"),
     ]
 
     if bPython:
@@ -201,6 +263,23 @@ def main():
             logLine("SKIPPED, already there: %s" % sToPath)
             continue
         writeHomer(sToPath, readTemplate(sFromPath).replace(c_sToken, sApp))
+        iWritten += 1
+
+    # THE REST OF A NEW PROJECT (1.43.31). newHomerApp used to copy install
+    # scripts to the top of the app, which the Homer layout keeps in scripts
+    # and the first build refreshes there anyway, and it asked for a
+    # Templates\\self.md that git never carries -- so on a kit cloned from
+    # GitHub it stopped at "Template missing: self.md". It now writes the lists
+    # and document starters every Homer project has, and the notebook from text
+    # of its own.
+    for sTo, sText in newProjectFiles(sApp, bPython):
+        sToPath = os.path.join(sTarget, sTo.replace("/", os.sep))
+        if os.path.exists(sToPath):
+            iSkipped += 1
+            logLine("SKIPPED, already there: %s" % sToPath)
+            continue
+        os.makedirs(os.path.dirname(sToPath), exist_ok=True)
+        writeHomer(sToPath, sText)
         iWritten += 1
 
     sayLine("%d file%s written in %s." % (iWritten, "" if iWritten == 1 else "s", sTarget))

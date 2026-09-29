@@ -55,9 +55,11 @@ that folder. Every build script looks there first.
     newHomerApp JobDo
 
 That writes `C:\JobDo` holding a starter `JobDo.cs`, `buildJobDo.cmd`,
-`JobDo_setup.iss`, `createJobDoRepo.cmd` and `.ps1`, the local AI install
-scripts, `version.txt`, and `.gitignore`. Nothing already in the folder is
-touched. Two things need your hand afterwards, and both are marked CHANGE ME
+`JobDo_setup.iss`, `createJobDoRepo.cmd` and `.ps1`, `version.txt`,
+`accept.inix`, `RepoFiles.txt`, `LocalFiles.txt`, `.gitattributes`, `ReadMe.md`
+and `License.md`, and in `help` starters for the guide, Announce, Developer and
+History with the private notebook `self.md`. The kit's scripts arrive in
+`scripts` with the first build. Nothing already in the folder is touched. Two things need your hand afterwards, and both are marked CHANGE ME
 in the installer script: a fresh AppId, and the desktop hotkey.
 
 Then:
