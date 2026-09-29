@@ -81,6 +81,10 @@ Each entry: the symptom in the log, the cause, the fix.
   was shipped, built by another JAWS version. Ship `.jss` sources only; the
   installer compiles them with each installed version's `scompile.exe`, and
   `.jsb` is never pushed.
+- **A `.jsb` still in the installer** after the JAWS zip left it out. An
+  installer's `Source: "scripts\jaws\*"` takes every file there, compiled
+  ones included (FileDir 5.0.122): add `Excludes: "*.jsb"`, and have the build
+  delete any `.jsb` left in `scripts\jaws`.
 
 - **"File not found: C:\HomerDev\exec\Templates\HomerComponents.iss".** A
   build that works out the kit's folder by counting levels above a C# source
