@@ -67,6 +67,10 @@ Each item, then in brackets what it looked like when wrong.
   script run from `scripts` was installed at the top.]
 - Offers only this app's components, worded and ordered by FinishPage.md,
   with a Results box titled "<App> Setup Results".
+- The Launch box is ticked, leaves a marker, and the program starts after the
+  Results box is closed, with `ExecAsOriginalUser`. [EdSharp's was unticked,
+  so Enter installed it and never opened it; the template's used Exec, which
+  starts the program elevated.]
 - Passes the version it is building to Inno, or reads version.txt only after
   the build has written it.
 

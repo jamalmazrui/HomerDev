@@ -481,7 +481,9 @@ end;
 
 procedure startIfAsked();
 //  Starts the program if the Launch box left its marker, and removes the marker.
-//  Started from cmd so it runs as the person, not as the elevated installer.
+//  ExecAsOriginalUser (1.43.42): Exec, even through cmd, runs the program with
+//  the installer's elevated rights; the program should run as the person, as
+//  it will every other time they start it.
 var
   sFlag: String;
   iResult: Integer;
@@ -489,7 +491,7 @@ begin
   sFlag := ExpandConstant('{localappdata}\{#AppName}\logs\{#AppName}_launch.flag');
   if not FileExists(sFlag) then exit;
   DeleteFile(sFlag);
-  Exec(ExpandConstant('{cmd}'),
+  ExecAsOriginalUser(ExpandConstant('{cmd}'),
        '/s /c ""' + ExpandConstant('{app}\exec\{#AppExeName}') + '" {#AppLaunchParams}"',
        ExpandConstant('{userdocs}'), SW_SHOW, ewNoWait, iResult);
 end;
