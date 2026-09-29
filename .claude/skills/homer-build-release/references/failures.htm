@@ -194,6 +194,14 @@ a draft or pre-release; the release page says which.</li>
 <li><strong>Release hangs with no output.</strong> An acceptance command
 waited for a key; check gives commands empty input and names each as it
 starts.</li>
+<li><strong>A release republishes yesterday’s installer.</strong> The
+last build failed, so the installer at the top is the old one, and
+version.txt matches it. release now reads the newest build log and stops
+unless it says the build succeeded; <code>-Force</code> overrides.</li>
+<li><strong>Every tag reads as unreleased</strong> in Windows PowerShell
+5.1: <code>ConvertFrom-Json</code> writes a JSON array as one object, so
+<code>@(... | ConvertFrom-Json)</code> holds one element. Assign, then
+<code>foreach</code>.</li>
 <li><strong>PowerShell parse error.</strong> <code>"$var: text"</code>
 reads as a drive; write <code>${var}:</code>.</li>
 </ul>
@@ -233,14 +241,23 @@ git treats a case-only change as none:
 </ul>
 <h2 id="build">Build</h2>
 <ul>
-<li><strong>“kit not found” or “Update HomerDev”</strong>: build the kit
-first; the app’s <code>kitNeeded</code> is newer than the kit on
-disk.</li>
-<li><strong>A script calls an old kit name</strong> (check, push, tidy,
-release, installCommon): the build retires old copies; rebuild.</li>
-<li><strong>Version in the installer one behind.</strong> The installer
-read version.txt before the build wrote it; pass the build’s number to
-Inno (<code>/DBuildVersion=</code>).</li>
+<li><p><strong>“kit not found” right after the kit moved.</strong> The
+app’s build script is its own copy and still looks for the kit’s old
+layout: unzip the app’s latest <code>&lt;App&gt;.zip</code>, which
+carries the build script that knows the new one.</p></li>
+<li><p><strong>A failed build left version.txt one ahead.</strong>
+Builds now put the number back when they fail; an old build script does
+not, so the release refuses (installer older than version.txt). Build
+again with the current script.</p></li>
+<li><p><strong>“kit not found” or “Update HomerDev”</strong>: build the
+kit first; the app’s <code>kitNeeded</code> is newer than the kit on
+disk.</p></li>
+<li><p><strong>A script calls an old kit name</strong> (check, push,
+tidy, release, installCommon): the build retires old copies;
+rebuild.</p></li>
+<li><p><strong>Version in the installer one behind.</strong> The
+installer read version.txt before the build wrote it; pass the build’s
+number to Inno (<code>/DBuildVersion=</code>).</p></li>
 </ul>
 <h2 id="installer">Installer</h2>
 <ul>

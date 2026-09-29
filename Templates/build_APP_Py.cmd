@@ -55,7 +55,7 @@ set "app=_APP_"
 
 rem ---- SETTINGS: the part an app edits -------------------------------
 rem The oldest kit with everything this build uses.
-set "kitNeeded=1.43.22"
+set "kitNeeded=1.43.29"
 rem The number to start from when version.txt is missing. A newer release
 rem tag, if the repository has one, wins. It is also a floor: a version.txt
 rem holding less is raised to it.
@@ -450,6 +450,15 @@ endlocal
 exit /b 0
 
 :failed
+rem A FAILED BUILD TAKES NO NUMBER (HomerDev 1.43.29). version.txt is stepped
+rem when a build begins; when it fails, the number goes back, so the next build
+rem takes it again and the release never finds an installer one version behind
+rem version.txt (HomerScribe, 28 September 2026: 1.0.260 stepped, the kit not
+rem found, the release refused).
+if defined verOld if not "!ver!"=="!verOld!" (
+  > version.txt echo !verOld!
+  >> "%log%" echo Version: restored to !verOld!; a failed build takes no number
+)
 for /f "usebackq delims=" %%i in (`powershell -NoProfile -Command "Get-Date -Format 'yyyy-MM-ddTHH:mm:ss.fffzzz'"`) do set "sIso=%%i"
 >> "%log%" echo %sIso% ERROR build end result=failed
 echo Build failed. The log is %log%

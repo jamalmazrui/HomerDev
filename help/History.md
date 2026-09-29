@@ -5,6 +5,30 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.43.29 -- 28 September 2026
+
+From the logs of 28 September, when HomerScribe's and urlFido's builds failed
+and urlFido was released anyway:
+
+- **release stops after a failed build.** urlFido's build stopped at once --
+  its build script was still the copy that looked for the kit's old layout --
+  and the release that followed republished the day-before installer as if new,
+  since version.txt still matched it. release now reads the newest build log
+  and goes on only when it says the build succeeded; -Force overrides.
+- **release could not tell a published version from a new one** in Windows
+  PowerShell 5.1, whose ConvertFrom-Json writes a JSON array as a single
+  object: the check asked -not of the whole array, which is false, so every
+  tag read as unreleased. The list is now assigned and then enumerated.
+- **A failed build takes no number.** The templates' builds step version.txt
+  when they begin; now, when one fails, the number goes back. HomerScribe's
+  failed build had left 1.0.260 in version.txt beside a 1.0.259 installer, and
+  its release refused. All eight app build scripts made from the templates
+  carry the same, and require this kit.
+- **HomerScribe's build ends its log on every failure.** Its "kit not found"
+  and "kit too old" paths left with exit /b and wrote no build end line; they
+  go through :failed. And its yt-dlp update ran twice; it runs once.
+- **homer-build-release's failures reference** gains all four.
+
 # 1.43.28 -- 28 September 2026
 
 **A skill for documents: homer-docs.** The document set every app ships and

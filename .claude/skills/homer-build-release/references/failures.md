@@ -22,6 +22,13 @@ Each entry: the symptom in the log, the cause, the fix.
   pre-release; the release page says which.
 - **Release hangs with no output.** An acceptance command waited for a key;
   check gives commands empty input and names each as it starts.
+- **A release republishes yesterday's installer.** The last build failed, so
+  the installer at the top is the old one, and version.txt matches it. release
+  now reads the newest build log and stops unless it says the build succeeded;
+  `-Force` overrides.
+- **Every tag reads as unreleased** in Windows PowerShell 5.1:
+  `ConvertFrom-Json` writes a JSON array as one object, so
+  `@(... | ConvertFrom-Json)` holds one element. Assign, then `foreach`.
 - **PowerShell parse error.** `"$var: text"` reads as a drive; write
   `${var}:`.
 
@@ -52,6 +59,13 @@ Each entry: the symptom in the log, the cause, the fix.
   a running script.
 
 ## Build
+
+- **"kit not found" right after the kit moved.** The app's build script is
+  its own copy and still looks for the kit's old layout: unzip the app's
+  latest `<App>.zip`, which carries the build script that knows the new one.
+- **A failed build left version.txt one ahead.** Builds now put the number
+  back when they fail; an old build script does not, so the release refuses
+  (installer older than version.txt). Build again with the current script.
 
 - **"kit not found" or "Update HomerDev"**: build the kit first; the app's
   `kitNeeded` is newer than the kit on disk.
