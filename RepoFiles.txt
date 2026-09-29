@@ -4,9 +4,15 @@
 # One name per line. A trailing slash names a whole folder. Blank lines and
 # lines beginning with # or ; are ignored.
 
-CSharp/
-homer/
+exec/CSharp/
+exec/Python/
 Templates/
+
+# The Claude skills, where Claude Code finds them: one folder each, SKILL.md at the top
+.claude/
+
+# What fixEncoding and check leave as it is
+KeepEncoding.txt
 scripts/
 ReadMe.md
 ReadMe.htm

@@ -3,10 +3,10 @@
 
 a = Analysis(
     ['FruitBasketPy.py'],
-    pathex=['C:/HomerDev'],
+    pathex=['C:/HomerDev/exec/Python'],
     binaries=[],
     datas=[],
-    hiddenimports=['homer', 'homer.inix', 'homer.lbc', 'homer.log', 'homer.paths', 'homer.say', 'homer.util', 'homer.web'],
+    hiddenimports=['inix', 'lbc', 'log', 'paths', 'say', 'util', 'web'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

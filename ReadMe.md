@@ -11,7 +11,7 @@ One copy, in one place, so a fix reaches every app.
 
 It is aimed at two readers. A developer who wants to build or change a Homer
 app, and an AI asked to write one, which can be told: "use the Homer namespace
-in `C:\HomerDev\CSharp` and follow HomerDev.md."
+in `C:\HomerDev\exec\CSharp` and follow HomerDev.md."
 
 ## Install
 
@@ -137,7 +137,7 @@ differs.
 
 It audits the kit, deletes what previous builds wrote, builds all three samples
 from clean, and writes an evidence report. Run it after changing anything in
-`CSharp` or `homer`, and before a release. It exists because three releases in a
+`exec\CSharp` or `exec\Python`, and before a release. It exists because three releases in a
 row shipped a fault that only a compiler could see.
 
 ### 9. Gather evidence
@@ -202,12 +202,13 @@ own notebook, is in the never-pushed list and stays on your machine.
 
 ## What is in the kit
 
-- `CSharp\` -- twelve modules in the `Homer` namespace: Inix (settings and
+- `exec\CSharp\` -- twelve modules in the `Homer` namespace: Inix (settings and
   tables), KeyMap, KeyName, Lbc (dialogs), Log (the session log), Mdi
   (multiple-document frames), Paths (the folder layout), PdfRead, Say (speech),
   Util, Web, inixVert.
-- `homer\` -- the same toolbox for Python and NVDA add-ons: inix, lbc, log,
-  paths, say, util and web, with the same names and the same behaviour.
+- `exec\Python\` -- the same toolbox for Python and NVDA add-ons: inix, lbc, log,
+  paths, say, util and web, each a module imported by its own name, with the
+  same names and the same behaviour.
 - `Templates\` -- the files a new app starts from.
 - `scripts\` -- check, push, release, tidy, buildTutorials and
   release. No editing needed; they work out the app name from the folder, and

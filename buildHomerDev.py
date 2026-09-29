@@ -29,12 +29,12 @@ import sys
 import traceback
 
 c_lsExpected = [
-    "CSharp/Elevate.cs", "CSharp/Inix.cs", "CSharp/KeyName.cs", "CSharp/KeyMap.cs", "CSharp/Lbc.cs",
-    "CSharp/Log.cs", "CSharp/Mdi.cs", "CSharp/Paths.cs",
-    "CSharp/PdfRead.cs", "CSharp/Say.cs", "CSharp/Util.cs", "CSharp/Web.cs",
-    "CSharp/inixVert.cs",
-    "homer/__init__.py", "homer/inix.py", "homer/lbc.py", "homer/lbcnet.py", "homer/log.py",
-    "homer/mdi.py", "homer/elevate.py", "homer/paths.py", "homer/say.py", "homer/util.py", "homer/web.py",
+    "exec/CSharp/Elevate.cs", "exec/CSharp/Inix.cs", "exec/CSharp/KeyName.cs", "exec/CSharp/KeyMap.cs", "exec/CSharp/Lbc.cs",
+    "exec/CSharp/Log.cs", "exec/CSharp/Mdi.cs", "exec/CSharp/Paths.cs",
+    "exec/CSharp/PdfRead.cs", "exec/CSharp/Say.cs", "exec/CSharp/Util.cs", "exec/CSharp/Web.cs",
+    "exec/CSharp/inixVert.cs",
+    "exec/Python/inix.py", "exec/Python/lbc.py", "exec/Python/lbcnet.py", "exec/Python/log.py",
+    "exec/Python/mdi.py", "exec/Python/elevate.py", "exec/Python/paths.py", "exec/Python/say.py", "exec/Python/util.py", "exec/Python/web.py",
     "Templates/build_APP_.cmd", "Templates/build_APP_Py.cmd",
     "Templates/_APP__setup.iss", "Templates/_APP_.cs",
     "Templates/installModels.cmd",
@@ -55,7 +55,9 @@ c_lsExpected = [
     "scripts/buildTutorials.cmd", "scripts/buildTutorials.ps1", "scripts/checkTutorial.cmd", "scripts/checkTutorial.py",
     "scripts/fixEncoding.cmd", "scripts/fixEncoding.py",
     "scripts/makeTutorials.cmd", "scripts/makeTutorials.py",
-    "Templates/Tutorial_00_Overview.inix", "Templates/skills/homer-tutorial/SKILL.md",
+    "Templates/Tutorial_00_Overview.inix",
+    ".claude/skills/ReadMe.md", ".claude/skills/app-help-guide/SKILL.md", ".claude/skills/blind-creators/SKILL.md",
+    ".claude/skills/homer-tutorial/SKILL.md", ".claude/skills/podcast-directory/SKILL.md",
     "Templates/makeHotkeys.py",
     "Templates/LocalFiles.txt",
     "Templates/_APP_.cmd",
@@ -115,6 +117,76 @@ c_lsSampleScripts = [
 # Add a pair here whenever a file moves. Old entries can be dropped once nobody
 # could still be carrying that version.
 c_lMoved = [
+    # PYTHON IS NAMED FOR ITS PLATFORM, AS C# IS (1.43.22): exec\\Python beside
+    # exec\\CSharp, its modules imported by their own names ("import log"), not
+    # through a homer package.
+    ("exec/homer/__pycache__", "exec/Python/__pycache__"),
+    ("exec/homer/elevate.py", "exec/Python/elevate.py"),
+    ("exec/homer/inix.py", "exec/Python/inix.py"),
+    ("exec/homer/lbc.py", "exec/Python/lbc.py"),
+    ("exec/homer/lbcnet.py", "exec/Python/lbcnet.py"),
+    ("exec/homer/log.py", "exec/Python/log.py"),
+    ("exec/homer/mdi.py", "exec/Python/mdi.py"),
+    ("exec/homer/paths.py", "exec/Python/paths.py"),
+    ("exec/homer/say.py", "exec/Python/say.py"),
+    ("exec/homer/util.py", "exec/Python/util.py"),
+    ("exec/homer/web.py", "exec/Python/web.py"),
+    # THE LIBRARIES ARE CODE THAT RUNS, SO THEY LIVE IN exec (1.43.22): the C#
+    # classes in exec\\CSharp and the Python package in exec\\homer, beside the
+    # Homer.dll compiled from them. At the top, homer shared its first letter
+    # with help. And the skills moved from a skills folder, which shared its
+    # first letter with scripts, to .claude\\skills, where Claude Code looks.
+    ("CSharp/Elevate.cs", "exec/CSharp/Elevate.cs"),
+    ("CSharp/Inix.cs", "exec/CSharp/Inix.cs"),
+    ("CSharp/KeyMap.cs", "exec/CSharp/KeyMap.cs"),
+    ("CSharp/KeyName.cs", "exec/CSharp/KeyName.cs"),
+    ("CSharp/Lbc.cs", "exec/CSharp/Lbc.cs"),
+    ("CSharp/Log.cs", "exec/CSharp/Log.cs"),
+    ("CSharp/Mdi.cs", "exec/CSharp/Mdi.cs"),
+    ("CSharp/Ollama.cs", "exec/CSharp/Ollama.cs"),
+    ("CSharp/Paths.cs", "exec/CSharp/Paths.cs"),
+    ("CSharp/PdfRead.cs", "exec/CSharp/PdfRead.cs"),
+    ("CSharp/Say.cs", "exec/CSharp/Say.cs"),
+    ("CSharp/Util.cs", "exec/CSharp/Util.cs"),
+    ("CSharp/Web.cs", "exec/CSharp/Web.cs"),
+    ("CSharp/inixVert.cs", "exec/CSharp/inixVert.cs"),
+    ("homer/__init__.py", "exec/Python/__init__.py"),
+    ("homer/elevate.py", "exec/Python/elevate.py"),
+    ("homer/inix.py", "exec/Python/inix.py"),
+    ("homer/lbc.py", "exec/Python/lbc.py"),
+    ("homer/lbcnet.py", "exec/Python/lbcnet.py"),
+    ("homer/log.py", "exec/Python/log.py"),
+    ("homer/mdi.py", "exec/Python/mdi.py"),
+    ("homer/paths.py", "exec/Python/paths.py"),
+    ("homer/say.py", "exec/Python/say.py"),
+    ("homer/util.py", "exec/Python/util.py"),
+    ("homer/web.py", "exec/Python/web.py"),
+    ("skills/ReadMe.htm", ".claude/skills/ReadMe.htm"),
+    ("skills/ReadMe.md", ".claude/skills/ReadMe.md"),
+    ("skills/app-help-guide/SKILL.md", ".claude/skills/app-help-guide/SKILL.md"),
+    ("skills/app-help-guide/references/fence-faults.md", ".claude/skills/app-help-guide/references/fence-faults.md"),
+    ("skills/app-help-guide/references/guide-format.md", ".claude/skills/app-help-guide/references/guide-format.md"),
+    ("skills/app-help-guide/references/refusal-rules.md", ".claude/skills/app-help-guide/references/refusal-rules.md"),
+    ("skills/app-help-guide/scripts/buildGuide.cmd", ".claude/skills/app-help-guide/scripts/buildGuide.cmd"),
+    ("skills/app-help-guide/scripts/buildGuide.py", ".claude/skills/app-help-guide/scripts/buildGuide.py"),
+    ("skills/app-help-guide/scripts/cleanFeedback.cmd", ".claude/skills/app-help-guide/scripts/cleanFeedback.cmd"),
+    ("skills/app-help-guide/scripts/cleanFeedback.py", ".claude/skills/app-help-guide/scripts/cleanFeedback.py"),
+    ("skills/app-help-guide/scripts/makeHarvester.cmd", ".claude/skills/app-help-guide/scripts/makeHarvester.cmd"),
+    ("skills/app-help-guide/scripts/makeHarvester.py", ".claude/skills/app-help-guide/scripts/makeHarvester.py"),
+    ("skills/blind-creators/SKILL.md", ".claude/skills/blind-creators/SKILL.md"),
+    ("skills/blind-creators/references/entry-formats.md", ".claude/skills/blind-creators/references/entry-formats.md"),
+    ("skills/blind-creators/references/inclusion-rules.md", ".claude/skills/blind-creators/references/inclusion-rules.md"),
+    ("skills/blind-creators/scripts/buildCreators.cmd", ".claude/skills/blind-creators/scripts/buildCreators.cmd"),
+    ("skills/blind-creators/scripts/buildCreators.py", ".claude/skills/blind-creators/scripts/buildCreators.py"),
+    ("skills/blind-creators/scripts/checkDirectory.cmd", ".claude/skills/blind-creators/scripts/checkDirectory.cmd"),
+    ("skills/blind-creators/scripts/checkDirectory.py", ".claude/skills/blind-creators/scripts/checkDirectory.py"),
+    ("skills/homer-tutorial/SKILL.md", ".claude/skills/homer-tutorial/SKILL.md"),
+    ("skills/podcast-directory/SKILL.md", ".claude/skills/podcast-directory/SKILL.md"),
+    ("skills/podcast-directory/scripts/buildDirectory.cmd", ".claude/skills/podcast-directory/scripts/buildDirectory.cmd"),
+    ("skills/podcast-directory/scripts/buildDirectory.py", ".claude/skills/podcast-directory/scripts/buildDirectory.py"),
+    ("skills/podcast-directory/scripts/harvestShows.cmd", ".claude/skills/podcast-directory/scripts/harvestShows.cmd"),
+    ("skills/podcast-directory/scripts/harvestShows.py", ".claude/skills/podcast-directory/scripts/harvestShows.py"),
+    ("Templates/skills/homer-tutorial/SKILL.md", ".claude/skills/homer-tutorial/SKILL.md"),
     ("Announce.md", "help/Announce.md"),
     ("Announce.htm", "help/Announce.htm"),
     ("Developer.md", "help/Developer.md"),
@@ -143,22 +215,22 @@ c_lMoved = [
     ("Samples/FruitBasketCs/FruitBasketCs.cs", "Templates/samples/FruitBasketCs.cs"),
     ("Samples/FruitBasketMdi/FruitBasketMdi.cs", "Templates/samples/FruitBasketMdi.cs"),
     ("Samples/FruitBasketPy/FruitBasketPy.py", "Templates/samples/FruitBasketPy.py"),
-    ("Python/homer/inix.py", "homer/inix.py"),
-    ("Python/homer/lbc.py", "homer/lbc.py"),
-    ("Python/homer/say.py", "homer/say.py"),
-    ("Python/homer/util.py", "homer/util.py"),
-    ("Python/homer/web.py", "homer/web.py"),
+    ("Python/homer/inix.py", "exec/Python/inix.py"),
+    ("Python/homer/lbc.py", "exec/Python/lbc.py"),
+    ("Python/homer/say.py", "exec/Python/say.py"),
+    ("Python/homer/util.py", "exec/Python/util.py"),
+    ("Python/homer/web.py", "exec/Python/web.py"),
     # 1.43.0: the last two files of the old Python folder. __init__.py was
     # already at homer\; version.py is retired below, its work now in
     # homer\elevate.py.
-    ("Python/homer/__init__.py", "homer/__init__.py"),
+    ("Python/homer/__init__.py", "exec/Python/__init__.py"),
     # 1.43.0: the per-sample folders of the old Samples layout, which the
     # 1.37.0 pairs did not reach, so Samples never emptied.
     ("Samples/FruitBasketCs/buildFruitBasketCs.cmd", "Templates/samples/buildFruitBasketCs.cmd"),
     ("Samples/FruitBasketCs/version.txt", "Templates/samples/version.txt"),
     ("Samples/FruitBasketPy/buildFruitBasketPy.cmd", "Templates/samples/buildFruitBasketPy.cmd"),
     ("Samples/FruitBasketPy/version.txt", "Templates/samples/version.txt"),
-    ("CSharp/Keys.cs", "CSharp/KeyName.cs"),
+    ("exec/CSharp/Keys.cs", "exec/CSharp/KeyName.cs"),
     # 1.29.0: four files delivered on 24 Sep 2026 under folders the kit never
     # had (Docs, Inno, Scripts) now sit where RepoFiles.txt says kit files go.
     ("Docs/FinishPage.md", "help/FinishPage.md"),
@@ -216,6 +288,8 @@ c_lMoved = [
 # kit on each build instead. A retired file is deleted when the build finds
 # it, and the log says so. One tool per job.
 c_lsRetired = [
+    "homer/__init__.py", "exec/homer/__init__.py",
+    "Templates/skills/homer-tutorial/SKILL.htm", "skills/homer-tutorial/SKILL.htm", "skills/ReadMe.md", "skills/ReadMe.htm",
     "scripts/cleanDir.cmd", "scripts/cleanDir.py", "scripts/gitRelease.cmd", "scripts/homerPolicy.py",
     "scripts/installTools.cmd", "scripts/sayTutorial.cmd", "scripts/sayTutorial.py",
     "scripts/tidyRepo.cmd", "scripts/tidyRepo.py",
@@ -229,12 +303,15 @@ c_lsRetired = [
     # a version.py of its own, so .gitignore and the checks treat the name as
     # generated -- and the kit's check reported it missing on every build. Its
     # version comparison is now part of homer\elevate.py, as it is of Elevate.cs.
-    "Python/homer/version.py", "homer/version.py",
+    "Python/homer/version.py", "exec/Python/version.py",
 ]
 
 # Folders that existed in an earlier layout and hold nothing the kit wants now.
 # Removed only when empty, which they are once the pairs above have been applied.
-c_lsOldFolders = ["Docs", "Inno", "Python/homer", "Python", "Samples/FruitBasketCs", "Samples/FruitBasketPy",
+c_lsOldFolders = ["skills/app-help-guide/references", "skills/app-help-guide/scripts", "skills/app-help-guide",
+                  "skills/blind-creators/references", "skills/blind-creators/scripts", "skills/blind-creators",
+                  "skills/homer-tutorial", "skills/podcast-directory/scripts", "skills/podcast-directory", "skills",
+                  "Templates/skills/homer-tutorial", "Templates/skills", "CSharp", "exec/homer", "homer", "Docs", "Inno", "Python/homer", "Python", "Samples/FruitBasketCs", "Samples/FruitBasketPy",
                   "Templates/samples/FruitBasketCs",
                   "Templates/samples/FruitBasketMdi", "Templates/samples/FruitBasketPy", "Samples", "Style", "Tools"]
 sScriptDir = os.path.dirname(os.path.abspath(__file__))
@@ -277,6 +354,23 @@ def logValue(sValue):
 def logFact(sKey, sValue):
     """One environment fact: env key=value."""
     return logLine("env %s=%s" % (sKey, logValue(sValue)))
+
+def logWindows():
+    """The Windows actually running, worded as Log.cs and log.py word it:
+    "Windows 11 25H2 (10.0.26200.9550)"."""
+    try:
+        import winreg as _winreg
+        with _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows NT\CurrentVersion") as oKey:
+            def read(sName):
+                try: return str(_winreg.QueryValueEx(oKey, sName)[0])
+                except OSError: return ""
+            sBuild, sUbr, sDisplay = read("CurrentBuild"), read("UBR"), read("DisplayVersion")
+        sName = "Windows 11" if sBuild.isdigit() and int(sBuild) >= 22000 else "Windows 10"
+        return ("%s %s" % (sName, sDisplay)).strip() + " (10.0.%s%s)" % (sBuild, "." + sUbr if sUbr else "")
+    except Exception:
+        import platform as _platform
+        return _platform.platform()
+
 
 
 
@@ -372,7 +466,7 @@ def buildSamples():
 
 
 # THE KIT'S C# CLASSES AS ONE LIBRARY, FOR PYTHON (1.43.6). A Python app with
-# a WinForms interface loads exec\Homer.dll through pythonnet (homer\lbcnet.py)
+# a WinForms interface loads exec\Homer.dll through pythonnet (exec\Python\lbcnet.py)
 # and builds its dialogs with the very LbcDialog the C# apps use, so a Python
 # dialog gets the same focus order, keys, Help box and F11 by construction
 # rather than by a second implementation kept in step by hand. The list is
@@ -430,7 +524,7 @@ def buildHomerDll():
     sExec = os.path.join(sScriptDir, "exec")
     if not os.path.isdir(sExec): os.makedirs(sExec)
     sOut = os.path.join(sExec, "Homer.dll")
-    lsSources = [os.path.join(sScriptDir, "CSharp", sClass + ".cs") for sClass in c_lsHomerDllClasses]
+    lsSources = [os.path.join(sScriptDir, "exec", "CSharp", sClass + ".cs") for sClass in c_lsHomerDllClasses]
     for sSource in lsSources:
         if not os.path.isfile(sSource): return "exec\\Homer.dll was not built: %s is missing" % sSource
     iCode, sOutput = runCommand([sCsc, "/nologo", "/target:library", "/platform:x64", "/optimize+",
@@ -439,6 +533,38 @@ def buildHomerDll():
         return "exec\\Homer.dll did not compile; the log has the compiler's messages"
     sayLine("Built exec\\Homer.dll for Python apps (%s)." % ", ".join(c_lsHomerDllClasses))
     return ""
+
+
+def packSkills():
+    """Pack each skill into exec\\skills\\<name>.zip, ready to upload.
+
+    THE SKILLS LIVE IN .claude\\skills\\<name>\\ (1.43.22), where Claude Code
+    finds a project's skills by itself when it works in C:\\HomerDev -- only
+    there, one folder deep -- and where the folder name, starting with a dot,
+    shares its first letter with no other folder at the top of the kit. Each is
+    in the shape Claude reads: SKILL.md at the top, references\\ to read before
+    acting, scripts\\ with a .cmd beside every script. claude.ai takes a skill
+    as a zip holding that one folder, so the build makes one per skill.
+    Returns the number packed."""
+    import zipfile
+    sSkills = os.path.join(sScriptDir, ".claude", "skills")
+    sOut = os.path.join(sScriptDir, "exec", "skills")
+    if not os.path.isdir(sSkills): return 0
+    os.makedirs(sOut, exist_ok=True)
+    iPacked = 0
+    for sName in sorted(os.listdir(sSkills)):
+        sFolder = os.path.join(sSkills, sName)
+        if not os.path.isfile(os.path.join(sFolder, "SKILL.md")): continue
+        sZip = os.path.join(sOut, sName + ".zip")
+        with zipfile.ZipFile(sZip, "w", zipfile.ZIP_DEFLATED) as oZip:
+            for sDir, lsDirs, lsFiles in os.walk(sFolder):
+                lsDirs[:] = [s for s in lsDirs if s != "__pycache__"]
+                for sFile in sorted(lsFiles):
+                    sPath = os.path.join(sDir, sFile)
+                    oZip.write(sPath, os.path.relpath(sPath, sSkills))
+        logLine("skill packed name=%s zip=%s" % (sName, logValue(sZip)))
+        iPacked += 1
+    return iPacked
 
 
 def removeStaleBinCopies():
@@ -816,6 +942,12 @@ def removeMoved():
     for sFolder in c_lsOldFolders:
         sPath = os.path.join(sScriptDir, sFolder.replace("/", os.sep))
         try:
+            # A folder Python ran from keeps __pycache__, which would keep it
+            # from ever being empty; its compiled copies go with it.
+            sCache = os.path.join(sPath, "__pycache__")
+            if os.path.isdir(sCache):
+                import shutil
+                shutil.rmtree(sCache, ignore_errors=True)
             if os.path.isdir(sPath) and not os.listdir(sPath):
                 os.rmdir(sPath)
                 iRemoved += 1
@@ -866,8 +998,15 @@ def checkKit():
     # Encoding: every text file UTF-8 with a BOM and CRLF, except .cmd and .bat,
     # which take CRLF and no BOM.
     lsTextExt = (".cs", ".py", ".ps1", ".md", ".htm", ".inix", ".txt", ".iss", ".cmd")
+    sExecDir = os.path.join(sScriptDir, "exec")
     for sRoot, lsDirs, lsFiles in os.walk(sScriptDir):
-        lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders]
+        # exec holds built files too, but its CSharp and Python folders are the
+        # kit's own source, and are checked like any other.
+        if os.path.normcase(sRoot) == os.path.normcase(sExecDir):
+            lsDirs[:] = [s for s in lsDirs if s in ("CSharp", "Python")]
+            continue
+        lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders or
+                     (os.path.normcase(sRoot) == os.path.normcase(sScriptDir) and s.lower() == "exec")]
         for sName in sorted(lsFiles):
             if sName.lower() in c_lsGeneratedFiles: continue
             if sName.lower().startswith(c_sEvidencePrefix): continue
@@ -879,7 +1018,9 @@ def checkKit():
                 continue
             binData = open(sPath, "rb").read()
             bBom = binData.startswith(b"\xef\xbb\xbf")
-            bWantBom = not sName.lower().endswith((".cmd", ".bat", "version.txt"))
+            # A skill's SKILL.md opens with front matter, which a byte order
+            # mark would hide; KeepEncoding.txt says so, and the check agrees.
+            bWantBom = not (sName.lower().endswith((".cmd", ".bat", "version.txt")) or sName == "SKILL.md")
             if bBom != bWantBom:
                 lsProblems.append("%s: %s a byte order mark" %
                                   (sShown, "should not have" if bBom else "needs"))
@@ -949,7 +1090,7 @@ def main():
     logLine("buildHomerDev start pid=%d" % os.getpid())
     logFact("script", os.path.abspath(__file__))
     logFact("python", platform.python_version())
-    logFact("windows", platform.platform())
+    logFact("windows", logWindows())
     logLine("Working directory: %s" % os.getcwd())
     logFact("arguments", " ".join(sys.argv[1:]))
 
@@ -983,6 +1124,8 @@ def main():
             sayLine(sDllProblem)
             iSamplesFailed += 1
         buildTutorials()
+        iSkills = packSkills()
+        sayLine("%d skill%s packed into exec\\skills, ready to upload to claude.ai." % (iSkills, "" if iSkills == 1 else "s"))
         removeStaleBinCopies()
 
     lsProblems = checkKit()

@@ -42,9 +42,7 @@ import sys
 
 import wx
 
-from . import inix, lbc, log, paths, say, util
-
-
+import inix, lbc, log, paths, say, util
 # --- the frame --------------------------------------------------------------
 
 class MdiFrame(wx.MDIParentFrame):
@@ -321,7 +319,7 @@ class MdiFrame(wx.MDIParentFrame):
 
     def _version(self):
         try:
-            from . import version
+            import version
             return getattr(version, "sVersion", "unknown")
         except Exception:
             return "unknown"

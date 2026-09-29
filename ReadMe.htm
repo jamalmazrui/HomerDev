@@ -176,7 +176,7 @@ program is built on. One copy, in one place, so a fix reaches every
 app.</p>
 <p>It is aimed at two readers. A developer who wants to build or change
 a Homer app, and an AI asked to write one, which can be told: “use the
-Homer namespace in <code>C:\HomerDev\CSharp</code> and follow
+Homer namespace in <code>C:\HomerDev\exec\CSharp</code> and follow
 HomerDev.md.”</p>
 <h2 id="install">Install</h2>
 <p>Unzip <code>HomerDev.zip</code> into <code>C:\HomerDev</code>. That
@@ -290,9 +290,9 @@ a compiler</h3>
 <pre><code>checkHomerDev</code></pre>
 <p>It audits the kit, deletes what previous builds wrote, builds all
 three samples from clean, and writes an evidence report. Run it after
-changing anything in <code>CSharp</code> or <code>homer</code>, and
-before a release. It exists because three releases in a row shipped a
-fault that only a compiler could see.</p>
+changing anything in <code>exec\CSharp</code> or
+<code>exec\Python</code>, and before a release. It exists because three
+releases in a row shipped a fault that only a compiler could see.</p>
 <h3 id="gather-evidence">9. Gather evidence</h3>
 <pre><code>cd Tools
 check --path ..\Templates\samples</code></pre>
@@ -347,13 +347,14 @@ project’s own notebook, is in the never-pushed list and stays on your
 machine.</p>
 <h2 id="what-is-in-the-kit">What is in the kit</h2>
 <ul>
-<li><code>CSharp\</code> – twelve modules in the <code>Homer</code>
+<li><code>exec\CSharp\</code> – twelve modules in the <code>Homer</code>
 namespace: Inix (settings and tables), KeyMap, KeyName, Lbc (dialogs),
 Log (the session log), Mdi (multiple-document frames), Paths (the folder
 layout), PdfRead, Say (speech), Util, Web, inixVert.</li>
-<li><code>homer\</code> – the same toolbox for Python and NVDA add-ons:
-inix, lbc, log, paths, say, util and web, with the same names and the
-same behaviour.</li>
+<li><code>exec\Python\</code> – the same toolbox for Python and NVDA
+add-ons: inix, lbc, log, paths, say, util and web, each a module
+imported by its own name, with the same names and the same
+behaviour.</li>
 <li><code>Templates\</code> – the files a new app starts from.</li>
 <li><code>scripts\</code> – check, push, release, tidy, buildTutorials
 and release. No editing needed; they work out the app name from the

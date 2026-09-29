@@ -53,9 +53,9 @@ echo Build log: %log%
 
 rem ---- the Homer Development Kit -------------------------------------
 set "homerDev="
-if defined HomerDev if exist "%HomerDev%\homer\lbc.py" set "homerDev=%HomerDev%"
-if not defined homerDev if exist "C:\HomerDev\homer\lbc.py" set "homerDev=C:\HomerDev"
-if not defined homerDev if exist "%CD%\homer\lbc.py" set "homerDev=%CD%"
+if defined HomerDev if exist "%HomerDev%\exec\Python\lbc.py" set "homerDev=%HomerDev%"
+if not defined homerDev if exist "C:\HomerDev\exec\Python\lbc.py" set "homerDev=C:\HomerDev"
+if not defined homerDev if exist "%CD%\exec\Python\lbc.py" set "homerDev=%CD%"
 if not defined homerDev (
   echo ERROR: the Homer Development Kit was not found.
   echo         Looked in %%HomerDev%%, C:\HomerDev, and this folder.
@@ -175,7 +175,7 @@ if not errorlevel 1 (
 
 rem ---- build one file -------------------------------------------------
 rem --paths puts the kit's Python folder on the import path, so
-rem "from homer import lbc" resolves to the kit rather than to a copy.
+rem "import lbc" resolves to the kit rather than to a copy.
 rem --windowed keeps a console from appearing behind the window; drop it
 rem for a program that writes to the console.
 set "icon="
@@ -183,15 +183,14 @@ if exist "%app%.ico" set "icon=--icon %app%.ico"
 echo Building %app%.exe>> "%log%"
 "!venvPy!" -m PyInstaller --noconfirm --clean --onefile --windowed ^
   --name %app% ^
-  --paths "!homerDev!" ^
-  --hidden-import homer ^
-  --hidden-import homer.inix ^
-  --hidden-import homer.lbc ^
-  --hidden-import homer.log ^
-  --hidden-import homer.paths ^
-  --hidden-import homer.say ^
-  --hidden-import homer.util ^
-  --hidden-import homer.web ^
+  --paths "!homerDev!\exec\Python" ^
+  --hidden-import inix ^
+  --hidden-import lbc ^
+  --hidden-import log ^
+  --hidden-import paths ^
+  --hidden-import say ^
+  --hidden-import util ^
+  --hidden-import web ^
   !icon! ^
   %app%.py >> "%log%" 2>&1
 if not exist "dist\%app%.exe" (

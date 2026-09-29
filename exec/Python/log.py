@@ -34,7 +34,7 @@ gets everything else. A log line is never spoken.
 
 Usage, which is three calls in the ordinary case:
 
-    from homer import log
+    import log
     log.start("FruitBasketPy")              # once, at startup
     log.info("Basket loaded, 4 fruits")     # whenever something happens
     log.close()                             # once, on the way out
@@ -59,8 +59,7 @@ import subprocess
 import sys
 import traceback
 
-from . import paths
-
+import paths
 # How many session logs to keep. Thirty reaches back through a few weeks.
 c_iKeepLogs = 30
 
@@ -136,7 +135,8 @@ def stamp():
 
 def key(sLabel):
     """Lower camel case from any label: "Log file" -> logFile."""
-    lsWords = re.findall(r"[A-Za-z0-9]+", sLabel or "")
+    # A word in capitals throughout is an abbreviation: "CLR" -> clr.
+    lsWords = [s.lower() if s.upper() == s else s for s in re.findall(r"[A-Za-z0-9]+", sLabel or "")]
     if not lsWords: return "value"
     return lsWords[0][:1].lower() + lsWords[0][1:] + "".join(s[:1].upper() + s[1:] for s in lsWords[1:])
 

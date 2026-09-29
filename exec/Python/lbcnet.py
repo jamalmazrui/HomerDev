@@ -5,17 +5,17 @@ THE C# LBC, FROM PYTHON, THROUGH PYTHONNET.
 Every Homer dialog is built from Lbc primitives on the 64-bit WinForms API.
 A Python app with a WinForms interface (urlCheck, helpFido) does not get a
 second Lbc written in Python: it loads exec\Homer.dll, which buildHomerDev
-compiles from the kit's own CSharp\Elevate, Inix, Lbc, Log, Paths, Say, Util
+compiles from the kit's own exec\CSharp\Elevate, Inix, Lbc, Log, Paths, Say, Util
 and Web, and builds its dialogs with the very LbcDialog the C# apps use. The
 focus order, the access keys, Control+Enter, Shift+F1, F7, the editing keys
 and the Help box with its version check are therefore the same in both
 languages by construction, and every fix to Lbc.cs reaches the Python apps on
 their next build.
 
-homer\lbc.py stays what it is: Lbc for wxPython, for code that must run
+lbc.py stays what it is: Lbc for wxPython, for code that must run
 inside NVDA, where WinForms is not available.
 
-    from homer import lbcnet
+    import lbcnet
     Homer = lbcnet.load()                  # the Homer namespace, or None
     Homer.Elevate.configure("JamalMazrui", "urlCheck", sVersion)
     dlg = Homer.LbcDialog("urlCheck", None)
@@ -40,8 +40,7 @@ in the log, if COM was already started in the other mode.
 import os
 import sys
 
-from homer import log
-
+import log
 c_sDllName = "Homer.dll"
 
 oHomer = None
@@ -56,8 +55,9 @@ def candidates():
     sProgram = os.path.dirname(os.path.abspath(sys.executable if getattr(sys, "frozen", False) else sys.argv[0]))
     lsFolders.append(sProgram)
     lsFolders.append(os.path.join(sProgram, "exec"))
-    sKit = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    lsFolders.append(os.path.join(sKit, "exec"))
+    # The kit's exec folder, which holds this package (exec\\homer) and the
+    # Homer.dll compiled beside it (1.43.22).
+    lsFolders.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     return [os.path.join(sFolder, c_sDllName) for sFolder in lsFolders]
 
 

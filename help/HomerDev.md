@@ -16,7 +16,7 @@ it.
 
 This guide explains what is in the kit and how to use it. It is written for a
 person, and for an AI asked to write a Homer app. An AI can be told: "use the
-Homer namespace in `C:\HomerDev\CSharp` and follow HomerDev.md."
+Homer namespace in `C:\HomerDev\exec\CSharp` and follow HomerDev.md."
 
 It is also a teaching kit, and the teaching is the subject of its own part
 below: **AI-assisted coding**, which is the name this kit uses for what other
@@ -70,7 +70,7 @@ Then:
 ## CSharp
 
 Twelve modules, all in the `Homer` namespace. Add `using Homer;` and compile the
-ones you use straight from `C:\HomerDev\CSharp`; the build template already
+ones you use straight from `C:\HomerDev\exec\CSharp`; the build template already
 does.
 
 - **Mdi.cs** -- the frame and child of a multiple-document app.
@@ -96,7 +96,8 @@ does.
 
 ## Python
 
-`homer\` is the Python side of the same toolbox: `elevate`, `inix`, `lbc`,
+`exec\Python\` is the Python side of the same toolbox, named for its platform as
+`exec\CSharp\` is: `elevate`, `inix`, `lbc`,
 `log`, `mdi`, `paths`, `say`, `util` and `web`. It follows three rules that
 make it portable. Nothing imports NVDA at the top of a module, so every module
 can be imported and tested in plain Python. Nothing depends on anything outside
@@ -104,14 +105,18 @@ the standard library except wx, which NVDA already has (and `say` reaches JAWS
 through pywin32 or pythonnet only when one is already there). Nothing knows the
 name of the program using it.
 
-A standalone program does not copy the package: its build points PyInstaller
-at the kit with `--paths C:\HomerDev` and names each module it imports with
-`--hidden-import`, as `Templates\build_APP_Py.cmd` does. urlCheck is the worked
-example. An NVDA add-on copies the `homer` folder, because NVDA has no way to
-share one copy between add-ons.
+Each is a module imported by its own name -- `import log`, `import inix, paths`
+-- as each C# class is a class of its own, with no package between. A
+standalone program does not copy them: its build points PyInstaller at the
+folder with `--paths C:\HomerDev\exec\Python` and names each module it imports
+with `--hidden-import`, as `Templates\build_APP_Py.cmd` does. urlCheck is the
+worked example. An NVDA add-on copies the modules it uses into its own folder,
+because NVDA has no way to share one copy between add-ons, and puts that folder
+on the import path before importing them.
 
-There is no `homer.version`: every build writes a `version.py` of its own, so
-the kit cannot use the name. Comparing versions is part of `homer.elevate`.
+There is no `version` module in the kit: every build writes a `version.py` of
+its own, so the kit cannot use the name. Comparing versions is part of
+`elevate`.
 
 ## Templates
 
@@ -528,6 +533,37 @@ normalizes one.
 - **Aim for one key that works on both JAWS and NVDA.** Perfect agreement is not
   realistic; keeping the differences few is.
 
+## Claude skills
+
+A skill teaches Claude one kind of Homer work: a SKILL.md, with notes and
+scripts beside it. The kit's skills, and any an app adds, follow Anthropic's
+guidance for skills and the Homer rules together:
+
+- **Where**: `.claude\skills\<name>\SKILL.md`, one folder deep. Claude Code
+  finds a project's skills there and nowhere else, and the folder's leading dot
+  gives it a first letter no other folder at the top of a project has.
+- **Name**: lower case, digits and hyphens, at most 64 characters, and not
+  containing "claude" or "anthropic". A Homer development skill starts
+  "homer-"; a collection skill is named for its collection.
+- **Description**: third person ("Builds ...", "Maintains ..."), saying what
+  the skill does and when to use it, in words a request would contain; at most
+  1,024 characters. It is all Claude sees when choosing among skills.
+- **SKILL.md** stays under 500 lines and holds what Claude does not already
+  know. Detail goes in `references`, each file linked directly from SKILL.md,
+  never from another reference; a reference over 100 lines opens with a
+  contents list.
+- **Scripts** do the fragile, repeatable work and handle their own errors;
+  SKILL.md says whether to run a script or read it. Each has a .cmd wrapper
+  for Windows.
+- **Paths inside a skill use forward slashes**, since Claude may run it on
+  Linux. A command for the Windows console keeps its backslash
+  (`scripts\release`), because cmd reads a forward slash as a switch.
+- **Encoding**: SKILL.md is UTF-8 without a byte order mark, since its first
+  characters must be the `---` of its front matter (KeepEncoding.txt says so);
+  every other file follows the Homer encoding.
+- **Packing**: `buildHomerDev` zips each skill into `exec\skills\<name>.zip`
+  for claude.ai.
+
 ## Finish page wording
 
 A finish page is arrowed through, not studied, so each box says what it does
@@ -918,6 +954,16 @@ one keystroke.**
 
 No `exec` and no `templates` there: those are shipped, not made.
 
+**exec and scripts divide the code by what it is for.** `exec` holds the code
+an app's core work runs on, in whatever form it runs: a native executable, a
+.NET assembly or a library's source compiled in, or source a Python or other
+interpreter runs. `scripts` holds the code that stands beside that: tools that
+maintain the code base (build, check, tidy, release) and scripts that extend
+an app beyond its core, such as the installers of optional components. The kit
+follows the same rule for itself: its C# classes are `exec\CSharp`, its Python
+modules are `exec\Python`, and `exec\Homer.dll` is compiled from the one for the
+other; its maintenance tools are in `scripts`.
+
 **The development folder**, `C:\<App>`, has the same shape as the installed
 tree. Sources and build files stay at the top, with ReadMe and License, because
 the compiler, the installer script and the release script expect them there.
@@ -947,10 +993,10 @@ same name, and take the tooling with it.
 
 ## Asking for a folder
 
-`Paths` in C# and `homer.paths` in Python are the same class in two languages,
+`Paths` in C# and `paths` in Python are the same class in two languages,
 and no app should work out a path for itself:
 
-    using Homer;                              from homer import paths
+    using Homer;                              import paths
     Paths.start("JobDo");                     paths.start("JobDo")
     Paths.configFile("JobDo.inix");           paths.configFile("JobDo.inix")
     Paths.results();                          paths.results()
@@ -986,7 +1032,7 @@ that settles the question: with a compiler. It runs the kit audit, checks the
 module dependency rule, removes what previous builds wrote, builds all three
 samples with their own scripts, and writes `evidence-kit-<date>.md`.
 
-Run it after changing anything in `CSharp` or `homer`, and before `release`.
+Run it after changing anything in `exec\CSharp` or `exec\Python`, and before `release`.
 
 **The dependency rule.** A module may declare what it needs, in two forms:
 
@@ -1579,10 +1625,10 @@ standing in that folder.
 
 ## Writing to it
 
-`Log` in C# and `homer.log` in Python are the same class in two languages, with
+`Log` in C# and `log` in Python are the same class in two languages, with
 the same method names, so a log written by either reads the same:
 
-    using Homer;                           from homer import log
+    using Homer;                           import log
     Log.start("JobDo");                    log.start("JobDo")
     Log.section("Reading the database");   log.section("Reading the database")
     Log.keyValue("Path", sPath);           log.keyValue("Path", sPath)
@@ -1755,7 +1801,7 @@ script, a repository tidy, and a release.
 - **build&lt;App&gt;.cmd** -- increments `version.txt`, generates `Version.cs`
   from it, finds the compiler and the three reference assemblies that are not
   on the default path, compiles the app with the Homer modules from
-  `C:\HomerDev\CSharp`, converts the documents with pandoc, and compiles the
+  `C:\HomerDev\exec\CSharp`, converts the documents with pandoc, and compiles the
   installer if Inno Setup is present. It fetches what it needs from the web
   itself. Log: `build<App>.log`.
 - **tidy** -- the folder and the repository, surveyed together and fixed in
@@ -1882,7 +1928,7 @@ and each has something in the kit that carries it:
 Most of the value of this kit reaches an AI in three sentences. Say them at the
 start of a session and the difference is immediate:
 
-1. "Use the Homer classes in `C:\HomerDev\CSharp` (or `\homer`); build the
+1. "Use the Homer classes in `C:\HomerDev\exec\CSharp` (or `\homer`); build the
    dialog with Lbc, in the order the user should tab."
 2. "Write in Camel Type, as `C:\HomerDev\help\CamelType_CSharp.md` (or
    `CamelType_Python.md`) describes."

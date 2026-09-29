@@ -251,14 +251,17 @@ public static class Log
     // "Process 64-bit" -> process64Bit.
     public static string key(string sLabel)
     {
+        // Words are runs of letters and digits. The first is lower case; each
+        // one after starts with a capital. A word in capitals throughout is an
+        // abbreviation and is treated as a word: "CLR" -> clr, "NVDA client"
+        // -> nvdaClient, not cLR.
         StringBuilder oOut = new StringBuilder();
-        bool bUpper = false;
-        foreach (char c in (sLabel ?? "").Trim())
+        foreach (string sWord in System.Text.RegularExpressions.Regex.Split(sLabel ?? "", "[^A-Za-z0-9]+"))
         {
-            if (!Char.IsLetterOrDigit(c)) { bUpper = oOut.Length > 0; continue; }
-            if (oOut.Length == 0) oOut.Append(Char.ToLowerInvariant(c));
-            else oOut.Append(bUpper ? Char.ToUpperInvariant(c) : c);
-            bUpper = false;
+            if (sWord == "") continue;
+            string sPart = sWord.ToUpperInvariant() == sWord ? sWord.ToLowerInvariant() : sWord;
+            if (oOut.Length == 0) oOut.Append(Char.ToLowerInvariant(sPart[0])).Append(sPart.Substring(1));
+            else oOut.Append(Char.ToUpperInvariant(sPart[0])).Append(sPart.Substring(1));
         }
         return oOut.Length == 0 ? "value" : oOut.ToString();
     }

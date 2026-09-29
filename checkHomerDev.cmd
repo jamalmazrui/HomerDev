@@ -12,7 +12,7 @@ rem     checkHomerDev --deep      also delete the Python virtual environment, so
 rem                               the next build proves it can build that too
 rem     checkHomerDev --no-clean  build over what is there (fast, weaker)
 rem
-rem Run it after changing anything in CSharp or homer, and before release.
+rem Run it after changing anything in exec\CSharp or exec\Python, and before release.
 rem
 rem Writes evidence-kit-<yyyymmdd-hhmmss>.md and checkHomerDev.log beside this
 rem script. Exit code 0 when nothing failed, 1 when something did.

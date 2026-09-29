@@ -48,7 +48,7 @@ kit, and all of it is in the C# file too:
     Escape                cancel
     Shift+F1              speak the tip of whatever has focus
 
-AND A LOG, from homer.log: one file per session in
+AND A LOG, from log: one file per session in
 %LOCALAPPDATA%\\FruitBasketPy\\logs, holding the environment, every setting, and
 every error with its traceback.
 
@@ -65,7 +65,7 @@ import sys
 
 import wx
 
-from homer import inix, lbc, log, paths, say, util
+import inix, lbc, log, paths, say, util
 
 # ---- BLOCK 2: names ----
 #
@@ -109,7 +109,7 @@ class fruitDialog(lbc.Dialog):
 
     # ---- BLOCK 4: the dialog, built in the order it is read ----
     def __init__(self):
-        # DECISION 1: WHICH LIBRARY. homer.lbc builds the window out of ordinary
+        # DECISION 1: WHICH LIBRARY. lbc builds the window out of ordinary
         # wxPython controls, which are the native Windows controls underneath,
         # which is why every screen reader already knows them. What it adds is
         # the arrangement: each control arrives with its label, its accessible
@@ -117,7 +117,7 @@ class fruitDialog(lbc.Dialog):
         #
         # Ask an AI for "a fruit basket window in Python" and you get wx with
         # sizers. It works, and its tab order is an accident. Asking for it "on
-        # homer.lbc" is the whole difference.
+        # lbc" is the whole difference.
         lbc.Dialog.__init__(self, None, "Fruit Basket")
 
         # DECISION 2: ADD ORDER IS FOCUS ORDER. The order of the calls below is

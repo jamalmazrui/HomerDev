@@ -29,7 +29,7 @@ import sys
 
 import wx
 
-from homer import inix, log, mdi, paths, say, util
+import inix, log, mdi, paths, say, util
 
 c_sAppName = "FruitBasketMdiPy"
 

@@ -223,14 +223,12 @@ class ListSearch:
             pass
         # A selection changed in code does not raise the event a screen reader
         # listens for, so the item is announced here.
-        from . import say as sayModule
-
+        import say as sayModule
         sayModule.say(listBox.GetString(iIndex))
 
     @staticmethod
     def prompt(listBox, bForward=True):
-        from . import say as sayModule
-
+        import say as sayModule
         sTerm = dialogInput(
             "Find backwards" if not bForward else "Find",
             "Find substring, not case sensitive:",
@@ -249,8 +247,7 @@ class ListSearch:
 
     @staticmethod
     def again(listBox, bForward=True):
-        from . import say as sayModule
-
+        import say as sayModule
         if not ListSearch.sTerm:
             sayModule.say("Press Control+J first to search")
             return
@@ -269,8 +266,7 @@ class ListSearch:
         Every Lbc control answers the same chords, so a user does not have to
         remember which kind of control they are in.
         """
-        from . import say as sayModule
-
+        import say as sayModule
         iIndex = listBox.GetSelection()
         if iIndex < 0:
             sayModule.say("No item")
@@ -407,9 +403,8 @@ class Dialog(wx.Dialog):
         thing anyone wants, and offering it would take the key from something
         that is.
         """
-        from . import say as sayModule
-        from . import util
-
+        import say as sayModule
+        import util
         if not textCtrl.IsMultiLine():
             sayModule.say("Not a multi-line field")
             return
@@ -443,9 +438,8 @@ class Dialog(wx.Dialog):
             return sText[iStart:iEnd if iEnd >= 0 else len(sText)].rstrip("\r")
 
         def onKey(event):
-            from . import say as sayModule
-            from . import util
-
+            import say as sayModule
+            import util
             iKey = event.GetKeyCode()
             bControl, bShift, bAlt = event.ControlDown(), event.ShiftDown(), event.AltDown()
 
@@ -849,8 +843,7 @@ class Dialog(wx.Dialog):
         iTipId = wx.NewIdRef()
 
         def onTip(event):
-            from . import say as sayModule
-
+            import say as sayModule
             control = self.FindFocus()
             sayModule.say(self.dTips.get(control) or "No tip for this control")
 

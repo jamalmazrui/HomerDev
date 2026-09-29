@@ -21,12 +21,12 @@ builds rather than twenty.
 
 `C:\HomerDev` is one repository holding everything the Homer apps share:
 
-- `CSharp\` -- the shared classes an app compiles against: `Elevate.cs`,
+- `exec\CSharp\` -- the shared classes an app compiles against: `Elevate.cs`,
   `Inix.cs`, `KeyMap.cs`, `KeyName.cs`, `Lbc.cs`, `Log.cs`, `Mdi.cs`,
   `Ollama.cs`, `Paths.cs`, `PdfRead.cs`, `Say.cs`, `Util.cs`, `Web.cs`,
   `inixVert.cs`. An app never carries a copy; it names the kit's file on the
   compiler line.
-- `homer\` -- the same for Python: `elevate.py`, `inix.py`, `lbc.py`, `log.py`,
+- `exec\Python\` -- the same for Python, each a module imported by its own name: `elevate.py`, `inix.py`, `lbc.py`, `log.py`,
   `mdi.py`, `paths.py`, `say.py`, `util.py`, `web.py`.
 - `scripts\` -- the tools every app inherits, refreshed into its own
   `scripts` folder on every build: `buildTutorials`, `check`,
@@ -59,7 +59,7 @@ Every build script begins the same way. From `buildHomerScribe.cmd`:
 ```
 set "homerDev="
 if defined HomerDev if exist "%HomerDev%\CSharp\Lbc.cs" set "homerDev=%HomerDev%"
-if not defined homerDev if exist "C:\HomerDev\CSharp\Lbc.cs" set "homerDev=C:\HomerDev"
+if not defined homerDev if exist "C:\HomerDev\exec\CSharp\Lbc.cs" set "homerDev=C:\HomerDev"
 if not defined homerDev if exist "%CD%\CSharp\Lbc.cs" set "homerDev=%CD%"
 if not defined homerDev (
   echo HomerScribe needs the Homer Development Kit and cannot find it.
@@ -381,7 +381,7 @@ problem stands, then speaks each walk -- Kokoro for the narrator, piper for
 the reader, every piece at one loudness -- into `help\tutorials\*.mp3`,
 writes `help\Tutorials.md` and `TutorialFeed.xml`. The build calls it with
 an explicit `-build` argument (see the `%*` quirk below).
-`Templates\skills\homer-tutorial\SKILL.md` teaches an AI to write them.
+`.claude\skills\homer-tutorial\SKILL.md` teaches an AI to write them.
 
 ## 14. The check, and what "done" means
 
@@ -757,7 +757,7 @@ fixed them; these are the rules that came out of it.
 ## The contract is the same; the template now says so
 
 `Templates\build_APP_Py.cmd` keeps every clause of the contract above: kit
-detection by `homer\log.py` and a trimmed `kitNeeded`; `version.txt` stepped,
+detection by `exec\homer\log.py` and a trimmed `kitNeeded`; `version.txt` stepped,
 seeded when missing and written into `version.py`; one log per run in `logs`;
 the kit tools refreshed by name and retired ones deleted; `fixEncoding -build`;
 `/DHomerDev=` to ISCC. A Python app's build is the template with its SETTINGS
@@ -769,7 +769,7 @@ buildUrlCheck.cmd is the worked example.
 ## The kit's modules are named, not copied
 
 A frozen program cannot import from `C:\HomerDev` at run time, and a copy in
-the app drifts. So the build passes `--paths C:\HomerDev` and one
+the app drifts. So the build passes `--paths C:\HomerDev\exec` and one
 `--hidden-import homer.<module>` for each module in `homerModules`. The .exe
 then carries the kit's code as it was at build time. An NVDA add-on is the
 exception: NVDA gives add-ons no way to share one copy, so an add-on copies
@@ -779,9 +779,9 @@ exception: NVDA gives add-ons no way to share one copy, so an add-on copies
 
 Every Homer build writes `version.py` beside the program. `.gitignore`
 ignores that name wherever it appears, and the checks skip it as generated.
-The kit's `homer\version.py` was therefore never pushed, sat stranded in an
+The kit's `exec\homer\version.py` was therefore never pushed, sat stranded in an
 old `Python\homer` folder, and the kit's own check called it missing on every
-build. Its comparison is now in `homer\elevate.py`. The general rule: a kit
+build. Its comparison is now in `exec\homer\elevate.py`. The general rule: a kit
 file must not share a name with anything a build generates.
 
 ## Where each Python program goes
@@ -965,7 +965,7 @@ DbDo is part way there. It has `RepoFiles.txt` and `LocalFiles.txt`,
 `version.txt` and `Version.cs`, `accept.inix`, `uiTest.inix`, a `help`
 folder with the full document set, a `templates` folder of starter
 databases, `scripts\buildTutorials` and `TutorialFeed.xml`, and it compiles
-against `C:\HomerDev\CSharp` with `kitNeeded=1.25.0`. Thirteen kit versions
+against `C:\HomerDev\exec\CSharp` with `kitNeeded=1.25.0`. Thirteen kit versions
 have passed since. To bring it current:
 
 - **Raise `kitNeeded` to 1.38.3** and adopt the refresh and retire loops of
@@ -1031,7 +1031,7 @@ particulars:
   Nothing binary is in `RepoFiles.txt`.
 - **The shared classes**: EdSharp builds `EdSharp.dll` from the shared
   classes so its JScript.NET side can call them. Build that DLL from the
-  kit's `CSharp` files by path, and delete the copies. `inixVert.cs` is in
+  kit's `exec\CSharp` files by path, and delete the copies. `inixVert.cs` is in
   the kit too.
 - **Build script**: `buildEdSharp.cmd` (lowercase b) wrapping the
   PowerShell, with the kit detection, `kitNeeded`, `version.txt` stepped
@@ -1086,7 +1086,7 @@ inputs). Follow the ten steps, with these particulars:
   whose only content is a copy of one document is a publishing target,
   not a project, and should never be what someone unzips to build from.
 - **The shared classes.** Delete the seven copies and compile against
-  `C:\HomerDev\CSharp` with `using Homer;` -- the kit's classes live in the
+  `C:\HomerDev\exec\CSharp` with `using Homer;` -- the kit's classes live in the
   Homer namespace, so the per-project namespace edit ends. `Ollama.cs`,
   `Log.cs` and `Util.cs` are in the kit too. `Elevate.cs` beside `Lbc.cs`;
   `Elevate.configure` at startup, so F11 joins Alt+F1 About.
@@ -1166,7 +1166,7 @@ are the fullest current examples of everything above, and its
 
 # Summary of the rules, one line each
 
-- Compile against `C:\HomerDev\CSharp`; carry no copies; list `Elevate.cs` with `Lbc.cs`.
+- Compile against `C:\HomerDev\exec\CSharp`; carry no copies; list `Elevate.cs` with `Lbc.cs`.
 - State `kitNeeded`; stop with a message when the kit is older.
 - Refresh the kit's scripts into `scripts` on every build; delete retired ones.
 - Standard folders with distinct first letters; subfolders are fine.

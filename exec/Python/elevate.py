@@ -9,7 +9,7 @@ program to its newest release, and F11 is its key (elevate sounds like eleven).
 
 AN APP CONFIGURES IT ONCE, at startup:
 
-    from homer import elevate
+    import elevate
     elevate.configure("JamalMazrui", "urlCheck", sVersion)
 
 and calls elevate.offer() from its F11 handler. offer checks, says what it
@@ -17,7 +17,7 @@ found, and on Yes fetches <repo>_setup.exe into the temporary folder and starts
 it. The setup program asks for elevation itself.
 
 NO WINDOW TOOLKIT IS ASSUMED. A Homer Python program may draw its windows with
-wx (homer.lbc), with WinForms through pythonnet (urlCheck), or have no window
+wx (lbc), with WinForms through pythonnet (urlCheck), or have no window
 at all. The questions here are Windows message boxes called through ctypes, so
 every one of those programs gets the same box, owned by whatever window handle
 it passes.

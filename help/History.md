@@ -5,6 +5,56 @@ author: "Jamal Mazrui"
 
 # History
 
+# 1.43.22 -- 27 September 2026
+
+From the first run of all ten apps on 1.43.21, whose program and script logs
+came out in the new format:
+
+- **An abbreviation is a word in a key.** Log.cs made "CLR" into cLR; it and
+  log.py now write clr, as they write nvdaClient for "NVDA client".
+- **The scripts name Windows as the programs do**: "Windows 11 25H2
+  (10.0.26200.9550)" in tidy's, check's and every kit script's log, where they
+  wrote Python's "Windows-11-10.0.26200-SP0".
+- **The build templates' ISO start and end lines reach the apps.** An app's
+  build script is its own copy of the template, made when the app was, so
+  1.43.21's change to the template reached no existing app: 2htm's log still
+  began "2htm build started Sun 09/27/2026 17:06:47.56". All ten apps' build
+  scripts now start and end with `build start app=...` and `build end
+  result=...`, EdSharp's build engine stamps every line in the Homer format,
+  and DbDo's no longer writes "(Pacific time, Seattle)" after a time with no
+  offset.
+
+**The libraries live in exec, each named for its platform.** exec holds the
+code an app's core work runs on, in any form -- native, .NET, or source for an
+interpreter -- and scripts the tools that maintain the code base or extend an
+app beyond its core. So the kit's C# classes are now exec\\CSharp and its Python
+modules exec\\Python, beside exec\\Homer.dll. C# and Python are equal platforms,
+so neither goes by the name Homer on the Python side: each module is imported
+by its own name -- `import log`, `import inix, paths` -- as each C# class is a
+class of its own, and the homer package and its __init__.py are gone. This also
+ends homer sharing its first letter with help at the top of the kit. Every
+build template, sample and app build script finds the kit by
+exec\\CSharp\\Lbc.cs or exec\\Python\\log.py; a Python app's build puts
+exec\\Python on PyInstaller's path and names each module plainly with
+--hidden-import. buildHomerDev removes the old copies from CSharp, homer and
+exec\\homer once the new ones are in place, and the old folders once empty.
+exec stays off every repository, but tidy now honours a RepoFiles.txt line
+inside a folder kept off it: the kit's .gitignore ignores exec's contents
+("/exec/*") and puts exec/CSharp and exec/Python back after, since git never
+looks inside a folder it ignores whole. fixEncoding no longer passes over exec,
+touching there, as everywhere, only what RepoFiles.txt names.
+
+**The skills have a home: .claude\\skills.** Claude Code finds a project's
+skills there and nowhere else -- `.claude\skills\<name>\SKILL.md`, one folder
+deep -- and the leading dot gives the folder a first letter of its own beside
+scripts. homer-tutorial moves there from Templates\\skills, since a skill is not
+something an app is made from, and three join it: app-help-guide,
+blind-creators and podcast-directory, their descriptions put in the third
+person as Anthropic's guidance asks. An index, ReadMe.md, sits beside them.
+buildHomerDev packs each into exec\\skills\\<name>.zip for claude.ai. A new
+KeepEncoding.txt keeps SKILL.md free of a byte order mark, which would hide its
+front matter, and HomerDev.md gains "Claude skills", the rules for writing one.
+
 # 1.43.21 -- 27 September 2026
 
 **One log line format, for machines and for people.** From the session logs

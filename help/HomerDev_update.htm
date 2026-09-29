@@ -189,17 +189,19 @@ what makes a migration a few builds rather than twenty.</p>
 <p><code>C:\HomerDev</code> is one repository holding everything the
 Homer apps share:</p>
 <ul>
-<li><code>CSharp\</code> – the shared classes an app compiles against:
-<code>Elevate.cs</code>, <code>Inix.cs</code>, <code>KeyMap.cs</code>,
-<code>KeyName.cs</code>, <code>Lbc.cs</code>, <code>Log.cs</code>,
-<code>Mdi.cs</code>, <code>Ollama.cs</code>, <code>Paths.cs</code>,
-<code>PdfRead.cs</code>, <code>Say.cs</code>, <code>Util.cs</code>,
-<code>Web.cs</code>, <code>inixVert.cs</code>. An app never carries a
-copy; it names the kit’s file on the compiler line.</li>
-<li><code>homer\</code> – the same for Python: <code>elevate.py</code>,
-<code>inix.py</code>, <code>lbc.py</code>, <code>log.py</code>,
-<code>mdi.py</code>, <code>paths.py</code>, <code>say.py</code>,
-<code>util.py</code>, <code>web.py</code>.</li>
+<li><code>exec\CSharp\</code> – the shared classes an app compiles
+against: <code>Elevate.cs</code>, <code>Inix.cs</code>,
+<code>KeyMap.cs</code>, <code>KeyName.cs</code>, <code>Lbc.cs</code>,
+<code>Log.cs</code>, <code>Mdi.cs</code>, <code>Ollama.cs</code>,
+<code>Paths.cs</code>, <code>PdfRead.cs</code>, <code>Say.cs</code>,
+<code>Util.cs</code>, <code>Web.cs</code>, <code>inixVert.cs</code>. An
+app never carries a copy; it names the kit’s file on the compiler
+line.</li>
+<li><code>exec\Python\</code> – the same for Python, each a module
+imported by its own name: <code>elevate.py</code>, <code>inix.py</code>,
+<code>lbc.py</code>, <code>log.py</code>, <code>mdi.py</code>,
+<code>paths.py</code>, <code>say.py</code>, <code>util.py</code>,
+<code>web.py</code>.</li>
 <li><code>scripts\</code> – the tools every app inherits, refreshed into
 its own <code>scripts</code> folder on every build:
 <code>buildTutorials</code>, <code>check</code>,
@@ -239,7 +241,7 @@ the version needed</h2>
 <code>buildHomerScribe.cmd</code>:</p>
 <pre><code>set &quot;homerDev=&quot;
 if defined HomerDev if exist &quot;%HomerDev%\CSharp\Lbc.cs&quot; set &quot;homerDev=%HomerDev%&quot;
-if not defined homerDev if exist &quot;C:\HomerDev\CSharp\Lbc.cs&quot; set &quot;homerDev=C:\HomerDev&quot;
+if not defined homerDev if exist &quot;C:\HomerDev\exec\CSharp\Lbc.cs&quot; set &quot;homerDev=C:\HomerDev&quot;
 if not defined homerDev if exist &quot;%CD%\CSharp\Lbc.cs&quot; set &quot;homerDev=%CD%&quot;
 if not defined homerDev (
   echo HomerScribe needs the Homer Development Kit and cannot find it.
@@ -600,7 +602,7 @@ loudness – into <code>help\tutorials\*.mp3</code>, writes
 <code>help\Tutorials.md</code> and <code>TutorialFeed.xml</code>. The
 build calls it with an explicit <code>-build</code> argument (see the
 <code>%*</code> quirk below).
-<code>Templates\skills\homer-tutorial\SKILL.md</code> teaches an AI to
+<code>.claude\skills\homer-tutorial\SKILL.md</code> teaches an AI to
 write them.</p>
 <h2 id="the-check-and-what-done-means">14. The check, and what “done”
 means</h2>
@@ -1034,10 +1036,10 @@ of it.</p>
 <h2 id="the-contract-is-the-same-the-template-now-says-so">The contract
 is the same; the template now says so</h2>
 <p><code>Templates\build_APP_Py.cmd</code> keeps every clause of the
-contract above: kit detection by <code>homer\log.py</code> and a trimmed
-<code>kitNeeded</code>; <code>version.txt</code> stepped, seeded when
-missing and written into <code>version.py</code>; one log per run in
-<code>logs</code>; the kit tools refreshed by name and retired ones
+contract above: kit detection by <code>exec\homer\log.py</code> and a
+trimmed <code>kitNeeded</code>; <code>version.txt</code> stepped, seeded
+when missing and written into <code>version.py</code>; one log per run
+in <code>logs</code>; the kit tools refreshed by name and retired ones
 deleted; <code>fixEncoding -build</code>; <code>/DHomerDev=</code> to
 ISCC. A Python app’s build is the template with its SETTINGS block
 filled in – <code>kitNeeded</code>, <code>seedVersion</code>,
@@ -1049,7 +1051,7 @@ layout (see below). buildUrlCheck.cmd is the worked example.</p>
 named, not copied</h2>
 <p>A frozen program cannot import from <code>C:\HomerDev</code> at run
 time, and a copy in the app drifts. So the build passes
-<code>--paths C:\HomerDev</code> and one
+<code>--paths C:\HomerDev\exec</code> and one
 <code>--hidden-import homer.&lt;module&gt;</code> for each module in
 <code>homerModules</code>. The .exe then carries the kit’s code as it
 was at build time. An NVDA add-on is the exception: NVDA gives add-ons
@@ -1058,11 +1060,12 @@ no way to share one copy, so an add-on copies <code>homer</code>.</p>
 version.py</h2>
 <p>Every Homer build writes <code>version.py</code> beside the program.
 <code>.gitignore</code> ignores that name wherever it appears, and the
-checks skip it as generated. The kit’s <code>homer\version.py</code> was
-therefore never pushed, sat stranded in an old <code>Python\homer</code>
-folder, and the kit’s own check called it missing on every build. Its
-comparison is now in <code>homer\elevate.py</code>. The general rule: a
-kit file must not share a name with anything a build generates.</p>
+checks skip it as generated. The kit’s
+<code>exec\homer\version.py</code> was therefore never pushed, sat
+stranded in an old <code>Python\homer</code> folder, and the kit’s own
+check called it missing on every build. Its comparison is now in
+<code>exec\homer\elevate.py</code>. The general rule: a kit file must
+not share a name with anything a build generates.</p>
 <h2 id="where-each-python-program-goes">Where each Python program
 goes</h2>
 <ul>
@@ -1282,7 +1285,7 @@ still needs</h1>
 <code>uiTest.inix</code>, a <code>help</code> folder with the full
 document set, a <code>templates</code> folder of starter databases,
 <code>scripts\buildTutorials</code> and <code>TutorialFeed.xml</code>,
-and it compiles against <code>C:\HomerDev\CSharp</code> with
+and it compiles against <code>C:\HomerDev\exec\CSharp</code> with
 <code>kitNeeded=1.25.0</code>. Thirteen kit versions have passed since.
 To bring it current:</p>
 <ul>
@@ -1376,9 +1379,9 @@ steps in the build, not separate scripts). Nothing binary is in
 <code>RepoFiles.txt</code>.</li>
 <li><strong>The shared classes</strong>: EdSharp builds
 <code>EdSharp.dll</code> from the shared classes so its JScript.NET side
-can call them. Build that DLL from the kit’s <code>CSharp</code> files
-by path, and delete the copies. <code>inixVert.cs</code> is in the kit
-too.</li>
+can call them. Build that DLL from the kit’s <code>exec\CSharp</code>
+files by path, and delete the copies. <code>inixVert.cs</code> is in the
+kit too.</li>
 <li><strong>Build script</strong>: <code>buildEdSharp.cmd</code>
 (lowercase b) wrapping the PowerShell, with the kit detection,
 <code>kitNeeded</code>, <code>version.txt</code> stepped and written to
@@ -1456,7 +1459,7 @@ release. A branch whose only content is a copy of one document is a
 publishing target, not a project, and should never be what someone
 unzips to build from.</li>
 <li><strong>The shared classes.</strong> Delete the seven copies and
-compile against <code>C:\HomerDev\CSharp</code> with
+compile against <code>C:\HomerDev\exec\CSharp</code> with
 <code>using Homer;</code> – the kit’s classes live in the Homer
 namespace, so the per-project namespace edit ends.
 <code>Ollama.cs</code>, <code>Log.cs</code> and <code>Util.cs</code> are
@@ -1569,8 +1572,8 @@ scripts and their order.</p>
 <h1 id="summary-of-the-rules-one-line-each">Summary of the rules, one
 line each</h1>
 <ul>
-<li>Compile against <code>C:\HomerDev\CSharp</code>; carry no copies;
-list <code>Elevate.cs</code> with <code>Lbc.cs</code>.</li>
+<li>Compile against <code>C:\HomerDev\exec\CSharp</code>; carry no
+copies; list <code>Elevate.cs</code> with <code>Lbc.cs</code>.</li>
 <li>State <code>kitNeeded</code>; stop with a message when the kit is
 older.</li>
 <li>Refresh the kit’s scripts into <code>scripts</code> on every build;

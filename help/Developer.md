@@ -11,10 +11,11 @@ HomerDev.md.
 # Layout
 
     C:\HomerDev\
-      CSharp\        the Homer namespace: Inix, KeyMap, KeyName, Lbc, Log, Mdi,
+      .claude\skills\   the Claude skills, one folder each
+      exec\CSharp\    the Homer namespace: Inix, KeyMap, KeyName, Lbc, Log, Mdi,
                      Paths, PdfRead, Say, Util, Web, inixVert
-      homer\         the same toolbox for Python and NVDA add-ons: inix, lbc,
-                     log, paths, say, util, web
+      exec\Python\    the same toolbox for Python and NVDA add-ons, a module
+                     each: inix, lbc, log, paths, say, util, web
       help\          every document, the style guides, the tutorial scripts
       Templates\samples\       the four fruit basket programs and their build scripts
       Templates\     the files a new app is written from, carrying _APP_

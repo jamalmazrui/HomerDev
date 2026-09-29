@@ -1,0 +1,8 @@
+﻿; KeepEncoding.txt -- files fixEncoding and check leave exactly as they are.
+;
+; A skill's SKILL.md opens with YAML front matter, and the "---" must be the
+; file's first three characters: a byte order mark before it would hide the
+; name and description Claude chooses a skill by. So SKILL.md is UTF-8 without
+; a mark; every other file in a skill follows the Homer encoding.
+
+.claude/skills/*/SKILL.md

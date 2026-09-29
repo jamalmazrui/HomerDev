@@ -72,9 +72,9 @@ echo Build log: %log%
 
 rem ---- the Homer Development Kit -------------------------------------
 set "homerDev="
-if defined HomerDev if exist "%HomerDev%\CSharp\Lbc.cs" set "homerDev=%HomerDev%"
-if not defined homerDev if exist "C:\HomerDev\CSharp\Lbc.cs" set "homerDev=C:\HomerDev"
-if not defined homerDev if exist "%CD%\CSharp\Lbc.cs" set "homerDev=%CD%"
+if defined HomerDev if exist "%HomerDev%\exec\CSharp\Lbc.cs" set "homerDev=%HomerDev%"
+if not defined homerDev if exist "C:\HomerDev\exec\CSharp\Lbc.cs" set "homerDev=C:\HomerDev"
+if not defined homerDev if exist "%CD%\exec\CSharp\Lbc.cs" set "homerDev=%CD%"
 if not defined homerDev (
   echo ERROR: the Homer Development Kit was not found.
   echo         Looked in %%HomerDev%%, C:\HomerDev, and this folder.
@@ -98,18 +98,18 @@ rem not exist in the current context", which is exactly how this comment came to
 rem be written. Nothing else in the kit has a dependency of its own.
 set "homerSources="
 rem Elevate.cs: Lbc's Help box checks the web for a newer release through it.
-set "homerSources=!homerSources! "!homerDev!\CSharp\Elevate.cs""
-set "homerSources=!homerSources! "!homerDev!\CSharp\Inix.cs""
-set "homerSources=!homerSources! "!homerDev!\CSharp\KeyName.cs""
-set "homerSources=!homerSources! "!homerDev!\CSharp\KeyMap.cs""
-set "homerSources=!homerSources! "!homerDev!\CSharp\Lbc.cs""
-set "homerSources=!homerSources! "!homerDev!\CSharp\Log.cs""
-set "homerSources=!homerSources! "!homerDev!\CSharp\Mdi.cs""
-set "homerSources=!homerSources! "!homerDev!\CSharp\Paths.cs""
-rem set "homerSources=!homerSources! "!homerDev!\CSharp\PdfRead.cs""
-set "homerSources=!homerSources! "!homerDev!\CSharp\Say.cs""
-set "homerSources=!homerSources! "!homerDev!\CSharp\Util.cs""
-set "homerSources=!homerSources! "!homerDev!\CSharp\Web.cs""
+set "homerSources=!homerSources! "!homerDev!\exec\CSharp\Elevate.cs""
+set "homerSources=!homerSources! "!homerDev!\exec\CSharp\Inix.cs""
+set "homerSources=!homerSources! "!homerDev!\exec\CSharp\KeyName.cs""
+set "homerSources=!homerSources! "!homerDev!\exec\CSharp\KeyMap.cs""
+set "homerSources=!homerSources! "!homerDev!\exec\CSharp\Lbc.cs""
+set "homerSources=!homerSources! "!homerDev!\exec\CSharp\Log.cs""
+set "homerSources=!homerSources! "!homerDev!\exec\CSharp\Mdi.cs""
+set "homerSources=!homerSources! "!homerDev!\exec\CSharp\Paths.cs""
+rem set "homerSources=!homerSources! "!homerDev!\exec\CSharp\PdfRead.cs""
+set "homerSources=!homerSources! "!homerDev!\exec\CSharp\Say.cs""
+set "homerSources=!homerSources! "!homerDev!\exec\CSharp\Util.cs""
+set "homerSources=!homerSources! "!homerDev!\exec\CSharp\Web.cs""
 echo Homer modules: !homerSources!>> "%log%"
 
 rem ---- component options ----------------------------------------------

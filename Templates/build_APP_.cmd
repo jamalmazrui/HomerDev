@@ -18,7 +18,7 @@ rem     one past its newest release tag, never from 1.0.0 over a released
 rem     app, and written into Version.cs as BuildVersion.Version;
 rem   - the program goes to exec\, as in the installed tree;
 rem   - the kit's classes are NOT copied: each module named in homerModules
-rem     is compiled straight from C:\HomerDev\CSharp, and a stale copy of a
+rem     is compiled straight from C:\HomerDev\exec\CSharp, and a stale copy of a
 rem     kit class at the top of the project is deleted once the kit's is here;
 rem   - the compiler is Roslyn, found with vswhere or installed with winget
 rem     as the free Build Tools. The Framework's own csc stops at C# 5 and
@@ -58,7 +58,7 @@ set "progFiles=%ProgramFiles%"
 
 rem ---- SETTINGS: the part an app edits -------------------------------
 rem The oldest kit with everything this build uses.
-set "kitNeeded=1.43.21"
+set "kitNeeded=1.43.22"
 rem The number to start from when version.txt is missing. A newer release
 rem tag, if the repository has one, wins. It is also a floor: a version.txt
 rem holding less is raised to it.
@@ -68,7 +68,7 @@ rem console, even if it also opens a dialog.
 set "cscTarget=winexe"
 rem The kit classes the program uses, alphabetical. Lbc needs Elevate (its
 rem Help box offers the update), Log, Paths, Say and Util; Log needs Paths and
-rem Say; Mdi needs KeyMap. Each is compiled from C:\HomerDev\CSharp.
+rem Say; Mdi needs KeyMap. Each is compiled from C:\HomerDev\exec\CSharp.
 set "homerModules=Elevate Inix KeyName Lbc Log Paths Say Util Web"
 rem The app's own sources beside _APP_.cs, if any, space separated.
 set "appSources="
@@ -128,9 +128,9 @@ echo Building %app%. The log is %log%
 
 rem ---- the Homer Development Kit -------------------------------------
 set "homerDev="
-if defined HomerDev if exist "%HomerDev%\CSharp\Lbc.cs" set "homerDev=%HomerDev%"
-if not defined homerDev if exist "C:\HomerDev\CSharp\Lbc.cs" set "homerDev=C:\HomerDev"
-if not defined homerDev if exist "%CD%\CSharp\Lbc.cs" set "homerDev=%CD%"
+if defined HomerDev if exist "%HomerDev%\exec\CSharp\Lbc.cs" set "homerDev=%HomerDev%"
+if not defined homerDev if exist "C:\HomerDev\exec\CSharp\Lbc.cs" set "homerDev=C:\HomerDev"
+if not defined homerDev if exist "%CD%\exec\CSharp\Lbc.cs" set "homerDev=%CD%"
 if not defined homerDev (
   echo %app% needs the Homer Development Kit and cannot find it.
   echo Unzip HomerDev.zip into C:\HomerDev, or set the HomerDev environment variable.
@@ -261,17 +261,17 @@ goto :failed
 rem ---- the kit's classes, and the stale copies they replace ---------------
 set "homerSources="
 for %%M in (!homerModules!) do (
-  if exist "!homerDev!\CSharp\%%M.cs" (
-    set "homerSources=!homerSources! "!homerDev!\CSharp\%%M.cs""
+  if exist "!homerDev!\exec\CSharp\%%M.cs" (
+    set "homerSources=!homerSources! "!homerDev!\exec\CSharp\%%M.cs""
   ) else (
-    echo The kit has no CSharp\%%M.cs. Update HomerDev to !kitNeeded! or later.
-    >> "%log%" echo ERROR: NOT IN THE KIT: CSharp\%%M.cs
+    echo The kit has no exec\CSharp\%%M.cs. Update HomerDev to !kitNeeded! or later.
+    >> "%log%" echo ERROR: NOT IN THE KIT: exec\CSharp\%%M.cs
     goto :failed
   )
 )
 >> "%log%" echo Kit sources: !homerSources!
 for %%F in (!kitClasses!) do (
-  if exist "%%F" if exist "!homerDev!\CSharp\%%F" (
+  if exist "%%F" if exist "!homerDev!\exec\CSharp\%%F" (
     del /q "%%F" && >> "%log%" echo Removed the app's own copy of %%F; the kit's is compiled instead
   )
 )

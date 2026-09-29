@@ -46,7 +46,7 @@ THREE TREES, AND WHAT EACH HOLDS.
 
 Usage:
 
-    from homer import paths
+    import paths
     paths.start("JobDo")
     sInix = paths.configFile("JobDo.inix")   # the user's, else the shipped one
     sOut = paths.results()                   # where output goes

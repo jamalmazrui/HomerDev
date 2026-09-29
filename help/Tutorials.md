@@ -160,7 +160,7 @@ while it reports a problem. Zero problems is a real answer.
 
 ### The skill, for an AI writing these
 
-`Templates\skills\homer-tutorial\SKILL.md` is a skill for Claude, or any
+`.claude\skills\homer-tutorial\SKILL.md` is a skill for Claude, or any
 assistant that reads one: the format, the four beats, the reader's grammar,
 where the truth of a `Hear` line comes from (the dialog's code, the program's
 own announcements, a speech history, a transcript), and the check-then-build

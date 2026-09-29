@@ -55,7 +55,7 @@ set "app=_APP_"
 
 rem ---- SETTINGS: the part an app edits -------------------------------
 rem The oldest kit with everything this build uses.
-set "kitNeeded=1.43.21"
+set "kitNeeded=1.43.22"
 rem The number to start from when version.txt is missing. A newer release
 rem tag, if the repository has one, wins. It is also a floor: a version.txt
 rem holding less is raised to it.
@@ -70,7 +70,7 @@ rem The kit modules the program imports, alphabetical. Each becomes a
 rem --hidden-import, so PyInstaller bundles it from the kit.
 set "homerModules=elevate inix lbc log paths say util web"
 rem 1 when the program builds WinForms dialogs with the kit's C# LbcDialog
-rem through homer.lbcnet: C:\HomerDev\exec\Homer.dll, which buildHomerDev
+rem through lbcnet: C:\HomerDev\exec\Homer.dll, which buildHomerDev
 rem compiles, is bundled into the program. Empty for a console or wx program.
 set "homerDll="
 rem Anything else PyInstaller needs, such as --collect-all pythonnet.
@@ -117,9 +117,9 @@ echo Building %app%. The log is %log%
 
 rem ---- the Homer Development Kit -------------------------------------
 set "homerDev="
-if defined HomerDev if exist "%HomerDev%\homer\log.py" set "homerDev=%HomerDev%"
-if not defined homerDev if exist "C:\HomerDev\homer\log.py" set "homerDev=C:\HomerDev"
-if not defined homerDev if exist "%CD%\homer\log.py" set "homerDev=%CD%"
+if defined HomerDev if exist "%HomerDev%\exec\Python\log.py" set "homerDev=%HomerDev%"
+if not defined homerDev if exist "C:\HomerDev\exec\Python\log.py" set "homerDev=C:\HomerDev"
+if not defined homerDev if exist "%CD%\exec\Python\log.py" set "homerDev=%CD%"
 if not defined homerDev (
   echo %app% needs the Homer Development Kit and cannot find it.
   echo Unzip HomerDev.zip into C:\HomerDev, or set the HomerDev environment variable.
@@ -269,8 +269,8 @@ if not exist "exec" mkdir "exec"
 set "workDir=%CD%\work\pyinstaller"
 set "icon="
 if exist "%app%.ico" set "icon=--icon "%CD%\%app%.ico""
-set "hidden=--hidden-import homer"
-for %%M in (!homerModules!) do set "hidden=!hidden! --hidden-import homer.%%M"
+set "hidden="
+for %%M in (!homerModules!) do set "hidden=!hidden! --hidden-import %%M"
 set "homerDllArg="
 if defined homerDll (
   if not exist "!homerDev!\exec\Homer.dll" (
@@ -279,11 +279,11 @@ if defined homerDll (
     goto :failed
   )
   set "homerDllArg=--add-binary "!homerDev!\exec\Homer.dll;.""
-  >> "%log%" echo Bundling !homerDev!\exec\Homer.dll for homer.lbcnet
+  >> "%log%" echo Bundling !homerDev!\exec\Homer.dll for lbcnet
 )
 echo Building exec\%app%.exe, which takes a minute or two
 >> "%log%" echo PyInstaller: !pyiMode! !hidden! !pyiExtra! !icon!
-"!venvPy!" -m PyInstaller --noconfirm --clean --onefile !pyiMode! --name %app% --paths "!homerDev!" !hidden! !homerDllArg! !pyiExtra! !icon! --distpath "%CD%\exec" --workpath "!workDir!" --specpath "!workDir!" %app%.py >> "%log%" 2>&1
+"!venvPy!" -m PyInstaller --noconfirm --clean --onefile !pyiMode! --name %app% --paths "!homerDev!\exec\Python" !hidden! !homerDllArg! !pyiExtra! !icon! --distpath "%CD%\exec" --workpath "!workDir!" --specpath "!workDir!" %app%.py >> "%log%" 2>&1
 set "iCode=!errorlevel!"
 >> "%log%" echo Ran: PyInstaller, exit code !iCode!
 if not "!iCode!"=="0" (

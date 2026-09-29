@@ -117,6 +117,23 @@ def logFact(sKey, sValue):
     """One environment fact: env key=value."""
     return logLine("env %s=%s" % (sKey, logValue(sValue)))
 
+def logWindows():
+    """The Windows actually running, worded as Log.cs and log.py word it:
+    "Windows 11 25H2 (10.0.26200.9550)"."""
+    try:
+        import winreg as _winreg
+        with _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows NT\CurrentVersion") as oKey:
+            def read(sName):
+                try: return str(_winreg.QueryValueEx(oKey, sName)[0])
+                except OSError: return ""
+            sBuild, sUbr, sDisplay = read("CurrentBuild"), read("UBR"), read("DisplayVersion")
+        sName = "Windows 11" if sBuild.isdigit() and int(sBuild) >= 22000 else "Windows 10"
+        return ("%s %s" % (sName, sDisplay)).strip() + " (10.0.%s%s)" % (sBuild, "." + sUbr if sUbr else "")
+    except Exception:
+        import platform as _platform
+        return _platform.platform()
+
+
 
 
 def sayLine(sText=""):
@@ -311,7 +328,7 @@ def moduleAssemblies():
     exactly that on its first build against the kit.
     """
     dNeeds = {}
-    for sPath in sorted(glob.glob(os.path.join(c_sKit, "CSharp", "*.cs"))):
+    for sPath in sorted(glob.glob(os.path.join(c_sKit, "exec", "CSharp", "*.cs"))):
         sText = open(sPath, "rb").read().decode("utf-8-sig", "replace")
         oMatch = re.search(r"//\s*ASSEMBLIES:\s*([^\n\r]+)", sText)
         if not oMatch: continue
@@ -328,7 +345,7 @@ def moduleRequirements():
     needs another is invisible until a build script leaves one out.
     """
     dNeeds = {}
-    for sPath in sorted(glob.glob(os.path.join(c_sKit, "CSharp", "*.cs"))):
+    for sPath in sorted(glob.glob(os.path.join(c_sKit, "exec", "CSharp", "*.cs"))):
         sText = open(sPath, "rb").read().decode("utf-8-sig", "replace")
         oMatch = re.search(r"//\s*REQUIRES:\s*([^\n\r]+)", sText)
         if not oMatch: continue
@@ -461,7 +478,7 @@ def main():
     logLine("checkHomerDev start pid=%d" % os.getpid())
     logFact("script", os.path.abspath(__file__))
     logFact("python", platform.python_version())
-    logFact("windows", platform.platform())
+    logFact("windows", logWindows())
     logLine("Kit: %s" % c_sKit)
     logLine("Samples: %s" % c_sSamples)
     logFact("arguments", " ".join(sys.argv[1:]))
