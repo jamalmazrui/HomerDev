@@ -173,3 +173,11 @@ From NV Access's and the add-on team's guides (NVDAScripting.md):
 - **Testing.** The NVDA Python console and NVDA's log are the first tools;
   test on more than one computer, and read "Changes for developers" in each
   NVDA release, since the API moves (the control types change of 2021.2).
+
+## Nothing of Homer's own in Roaming
+
+The JAWS scripts go into JAWS's settings folders and the NVDA add-on into
+NVDA's addons folder, both under `%APPDATA%`, because those readers read
+nowhere else. Everything the installer keeps about them -- the list of files
+placed (`jawsSettings.log`) and the fingerprint of the scripts compiled in each
+JAWS version (`jawsScripts.inix`) -- is under `%LOCALAPPDATA%\<App>`.

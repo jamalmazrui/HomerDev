@@ -113,15 +113,26 @@ public static class Log
             sFolder = Paths.logs();
             sPath = Path.Combine(sFolder, sAppName + "-" +
                 dtStarted.ToString("yyyyMMdd-HHmmss") + ".log");
-            // SHARED FOR READING, WRITING AND DELETING (1.43.40). A plain
-            // StreamWriter lets other programs only read the live log, and not
-            // at all if they ask for write sharing; on 29 September FileDir's
-            // "Zip then delete" of its own logs folder met "File In Use" on the
-            // log of the FileDir that was running. Now a zipper, an editor or
-            // the recycle bin can open, copy or remove it while it is written.
+            string sFallbackReason = "";
+            if (!Directory.Exists(sFolder))
+            {
+                // NOWHERE TO WRITE IS NOT A REASON TO WRITE NOTHING (1.43.48).
+                // The session is logged in the temporary folder instead, and
+                // the log says why.
+                sFallbackReason = "the logs folder " + sFolder + " could not be made";
+                sFolder = Path.GetTempPath();
+                sPath = Path.Combine(sFolder, sAppName + "-" + dtStarted.ToString("yyyyMMdd-HHmmss") + ".log");
+            }
+            // SHARED FOR READING, NOT FOR DELETING (1.43.48). Read-write sharing
+            // lets a zipper or an editor copy the live log. Delete sharing,
+            // added in 1.43.40, also let "Zip then delete" or the recycle bin
+            // remove the log of a program still running -- which then went on
+            // writing to a file nobody could see, and a session's whole record
+            // was lost. A live log is refused to deletion again, as it was.
             fLog = new StreamWriter(new FileStream(sPath, FileMode.Create, FileAccess.Write,
-                FileShare.ReadWrite | FileShare.Delete), new UTF8Encoding(true));
+                FileShare.ReadWrite), new UTF8Encoding(true));
             fLog.AutoFlush = true;
+            if (sFallbackReason != "") level("WARN", "log written to the temporary folder, because " + sFallbackReason);
             bWorking = true;
             writeHeader();
             prune();

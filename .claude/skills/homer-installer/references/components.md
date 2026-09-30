@@ -7,6 +7,7 @@
 - Ollama models
 - JAWS scripts and the NVDA add-on
 - Detection
+- Failures that looked like success
 
 ## Declaring a component
 
@@ -100,3 +101,22 @@ where winget is often unreachable and per-user tools are not on the PATH.
 Missing any of them makes an installed component read as absent. Each verdict
 is written to the setup log: `Component Pandoc: 3.9 found, 3.11 available;
 offered as Update`.
+
+## Failures that looked like success
+
+- **An Update that never updates.** A winget upgrade limited to `--scope
+  machine` answered "No installed package found" (-1978335212) for a Python
+  winget itself listed, so every install offered the same update. Retry
+  without a scope when that code comes back, log both answers, and have the
+  Results line compare the version found with the one offered.
+- **A support folder that only grows.** [Files] adds and never removes, so
+  files an old installer put in `{app}\scripts\jaws` stayed, and were copied
+  into every JAWS settings folder. Clear such a folder with [InstallDelete]
+  (`Type: filesandordirs`) and copy only the file types that belong there.
+- **A check that passes on an old copy.** An acceptance check looked for the
+  installer in `exec`, where an old one lingered, not at the top where the new
+  one is built. Check the real location, and check that no old copy remains.
+- **A screen reader started behind JAWS.** Opening an `.nvda-addon`, or
+  running nvda.exe with an add-on argument (it has none), started NVDA over
+  JAWS or failed with "invalid command line parameter". Install the add-on
+  into NVDA's addons folder directly (homer-screen-reader).

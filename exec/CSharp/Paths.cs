@@ -175,6 +175,70 @@ public static class Paths
     // Anything still in there is what a previous run could not clean up after
     // itself, which is exactly what the folder is for: a crash leaves its
     // half-written files somewhere known rather than somewhere shared.
+    // ------- only the local tree -------
+
+    // moveFromRoaming: A HOMER APP KEEPS NOTHING UNDER %APPDATA% (1.43.49).
+    // Its settings, data, scripts and logs are all under %LOCALAPPDATA%\<App>,
+    // the tree this class names. An earlier version that kept files under
+    // %APPDATA%\<App> -- the Roaming tree -- has them moved here the first
+    // time the new version starts: each file to the same place under the local
+    // tree, unless a file is already there, in which case the Roaming copy is
+    // left and reported. The Roaming folder is removed once it is empty.
+    // Returns one line per action, for the log; an empty list when there was
+    // nothing to move. Call it once, after Log.start and before any setting is
+    // read.
+    public static System.Collections.Generic.List<string> moveFromRoaming()
+    {
+        System.Collections.Generic.List<string> lsLines = new System.Collections.Generic.List<string>();
+        try
+        {
+            string sRoaming = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
+            if (!Directory.Exists(sRoaming)) return lsLines;
+            string sLocal = userFolder;
+            foreach (string sFile in Directory.GetFiles(sRoaming, "*", SearchOption.AllDirectories))
+            {
+                string sRelative = sFile.Substring(sRoaming.Length).TrimStart('\\');
+                string sTarget = Path.Combine(sLocal, sRelative);
+                try
+                {
+                    if (File.Exists(sTarget))
+                    {
+                        lsLines.Add("roaming kept file=" + sFile + " reason=\"a file of that name is already at " + sTarget + "\"");
+                        continue;
+                    }
+                    Directory.CreateDirectory(Path.GetDirectoryName(sTarget));
+                    File.Move(sFile, sTarget);
+                    lsLines.Add("roaming moved file=" + sFile + " to=" + sTarget);
+                }
+                catch (Exception oError)
+                {
+                    lsLines.Add("roaming kept file=" + sFile + " reason=\"" + oError.Message + "\"");
+                }
+            }
+            // Folders now empty, deepest first, then the app's Roaming folder.
+            string[] aFolders = Directory.GetDirectories(sRoaming, "*", SearchOption.AllDirectories);
+            Array.Sort(aFolders, delegate(string sOne, string sTwo) { return sTwo.Length.CompareTo(sOne.Length); });
+            foreach (string sFolder in aFolders)
+            {
+                try { if (Directory.GetFileSystemEntries(sFolder).Length == 0) Directory.Delete(sFolder); } catch (Exception) { }
+            }
+            try
+            {
+                if (Directory.GetFileSystemEntries(sRoaming).Length == 0)
+                {
+                    Directory.Delete(sRoaming);
+                    lsLines.Add("roaming removed folder=" + sRoaming);
+                }
+            }
+            catch (Exception) { }
+        }
+        catch (Exception oError)
+        {
+            lsLines.Add("roaming ERROR " + oError.Message);
+        }
+        return lsLines;
+    }
+
     public static int clearTemp()
     {
         int iRemoved = 0;

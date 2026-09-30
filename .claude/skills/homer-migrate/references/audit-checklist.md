@@ -71,6 +71,14 @@ Each item, then in brackets what it looked like when wrong.
   Results box is closed, with `ExecAsOriginalUser`. [EdSharp's was unticked,
   so Enter installed it and never opened it; the template's used Exec, which
   starts the program elevated.]
+- The JAWS scripts and NVDA add-on are judged like components (Install,
+  Update, Reinstall from a fingerprint and a manifest version), sorted
+  alphabetically in their group, and the add-on is installed without starting
+  NVDA. [EdSharp and HomerView always said "Install"; NVDA started over JAWS.]
+- The Results box reports only ticked boxes, between the install location and
+  the logs folder. [EdSharp's listed every component and key hints.]
+- A folder the installer fills from a wildcard is cleared first with
+  [InstallDelete]. [Stale scripts copied into every JAWS settings folder.]
 - Passes the version it is building to Inno, or reads version.txt only after
   the build has written it.
 
@@ -92,6 +100,14 @@ Each item, then in brackets what it looked like when wrong.
 
 - `Elevate.configure` at startup with the build's version; F11 on the Help
   menu (MDI) or in the Help box (single dialog).
+
+## The local tree
+
+- Everything of the app's own under `%LOCALAPPDATA%\<App>`; nothing under
+  `%APPDATA%` except JAWS's and NVDA's folders. `Paths.moveFromRoaming()` at
+  startup brings an earlier version's files across. [FileDir kept its settings
+  in `%APPDATA%\FileDir\FileDir.ini`; DbDo and the kit kept the JAWS settings
+  record there.]
 
 ## Documents and logging
 

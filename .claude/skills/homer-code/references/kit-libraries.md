@@ -62,6 +62,13 @@ and a class where C# keeps state (`lbc.Dialog`).
 - Start the log first, before anything can fail: `Log.start("<App>")` or
   `log.start("<App>")`.
 - Take every folder from `Paths` or `paths`; never build one by hand.
+- Only the local tree: everything of the app's own under `%LOCALAPPDATA%\<App>`,
+  nothing under `%APPDATA%` (Roaming). The one thing a Homer installer puts
+  there is the JAWS scripts and NVDA add-on themselves, where those readers
+  read them; records and fingerprints about them stay in the local tree. An
+  app that used Roaming before calls `Paths.moveFromRoaming()` once at startup,
+  after the log starts, and logs each line it returns. `check` fails any other
+  Roaming use.
 - Save a setting as soon as the user answers, not at exit.
 - Speak only what the screen reader cannot know; never repeat a dialog's
   title or a control's name.

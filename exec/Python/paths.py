@@ -111,6 +111,42 @@ def userFolder():
 # Each returns a path in the PER-USER tree and makes it when it is missing,
 # because these are the ones a program writes to.
 
+def moveFromRoaming():
+    r"""A Homer app keeps nothing under %APPDATA% (1.43.49). Files an earlier
+    version left in %APPDATA%\<App> -- the Roaming tree -- are moved to the same
+    place under %LOCALAPPDATA%\<App>, unless a file is already there, in which
+    case the Roaming copy is left and reported; the Roaming folder goes once it
+    is empty. Returns one line per action, for the log. As Paths.moveFromRoaming
+    in C#. Call it once, after log.start and before any setting is read."""
+    lsLines = []
+    try:
+        sRoaming = os.path.join(os.environ.get("APPDATA", ""), appName())
+        if not os.environ.get("APPDATA") or not os.path.isdir(sRoaming): return lsLines
+        sLocal = userFolder()
+        for sDir, lsDirs, lsFiles in os.walk(sRoaming):
+            for sName in lsFiles:
+                sFile = os.path.join(sDir, sName)
+                sTarget = os.path.join(sLocal, os.path.relpath(sFile, sRoaming))
+                try:
+                    if os.path.exists(sTarget):
+                        lsLines.append('roaming kept file=%s reason="a file of that name is already at %s"' % (sFile, sTarget))
+                        continue
+                    os.makedirs(os.path.dirname(sTarget), exist_ok=True)
+                    shutil.move(sFile, sTarget)
+                    lsLines.append("roaming moved file=%s to=%s" % (sFile, sTarget))
+                except Exception as oError:
+                    lsLines.append('roaming kept file=%s reason="%s"' % (sFile, oError))
+        for sDir, lsDirs, lsFiles in sorted(os.walk(sRoaming, topdown=False), key=lambda t: -len(t[0])):
+            try:
+                if not os.listdir(sDir): os.rmdir(sDir)
+            except Exception:
+                pass
+        if not os.path.isdir(sRoaming): lsLines.append("roaming removed folder=%s" % sRoaming)
+    except Exception as oError:
+        lsLines.append("roaming ERROR %s" % oError)
+    return lsLines
+
+
 def configs(): return _madeUnder(userFolder(), "configs")
 def data(): return _madeUnder(userFolder(), "data")
 def scripts(): return _madeUnder(userFolder(), "scripts")

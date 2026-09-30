@@ -32,6 +32,10 @@ Each entry: the symptom in the log, the cause, the fix.
 - **PowerShell parse error.** `"$var: text"` reads as a drive; write
   `${var}:`.
 
+- **"ALREADY RELEASED" right after a release.** The release was run twice;
+  the first published, the second correctly found nothing new. Check for an
+  earlier release log before treating it as a fault.
+
 ## Check
 
 - **accept: a `findstr` check fails** though the text is there. findstr reads

@@ -143,6 +143,28 @@ why." The probe made when the wizard opened is kept for the checkbox wording
 and for the "before" half of the outcome; it is never what the Results box
 reports, because by then it is a minute or more out of date.
 
+What the box holds, learned from EdSharp and HomerView on 29 September 2026:
+
+- **The first line says where the app is**: "EdSharp 5.0.30 is installed in
+  C:\Program Files\EdSharp." **The last says where the logs are.** Nothing else
+  but the ticked boxes' outcomes: no key hints, no "components" inventory, no
+  reminders, no date line (the box has its own title).
+- **The ticked captions are written down when Finish is pressed**, before any
+  step runs, so a separate summary program can report only on them.
+- **An Update says whether it happened.** "Update Python from 3.14.3 to 3.14.7"
+  once ran and changed nothing, and the box said "Python: installed, 3.14.3";
+  the line must compare the version found with the one offered: "updated to
+  3.14.7", or "NOT updated -- still 3.14.3".
+- **At most one blank line in a row**, whatever was ticked.
+
+## Launch
+
+The Launch box is ticked, like every Homer app's. Its [Run] entry only writes
+a marker; the app is started when the Results box is closed, so the box is not
+hidden behind the app, and with `ExecAsOriginalUser`, so it runs as the person
+and not with the installer's elevated rights. EdSharp's Launch box was once
+unticked, so pressing Enter installed it and never opened it.
+
 The kit does this in three pieces: homerNoteTicked, called from
 NextButtonClick when the page is wpFinished, records the ticked captions
 before any script runs; homerOutcomeLine(i) and homerModelOutcomeLine(model,

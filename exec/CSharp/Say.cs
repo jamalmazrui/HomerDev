@@ -972,7 +972,7 @@ public static class JawsSettingsInstaller
     // example, passes Homer as a library: FileDir.jss says
     // Use "Homer.jsb", so Homer.jss must compile first.
     // Records every path placed in a per-app log under
-    // %APPDATA%\<App>\jawsSettings.log so the matching uninstall can
+    // %LOCALAPPDATA%\<App>\jawsSettings.log so the matching uninstall can
     // remove exactly those files.
     public static string install(string sAppName, string sAppFolder, string[] aSupportFiles, string[] aLibraryScripts, out int iCopied, out int iCompiled)
     {
@@ -1164,11 +1164,31 @@ public static class JawsSettingsInstaller
         return sb.ToString();
     }
 
+    // THE LOCAL TREE ONLY (1.43.49): a Homer app keeps nothing of its own under
+    // %APPDATA% (Roaming). A record an earlier version left there is moved to
+    // %LOCALAPPDATA%\<App>\jawsSettings.log the first time it is looked for,
+    // so an uninstall still finds every file it placed. (The JAWS settings
+    // folders themselves stay where JAWS keeps them, under Roaming; they are
+    // JAWS's, not the app's.)
     private static string getLogPath(string sAppName)
     {
-        return System.IO.Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        string sLocal = System.IO.Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             sAppName + @"\jawsSettings.log");
+        try
+        {
+            string sOld = System.IO.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                sAppName + @"\jawsSettings.log");
+            if (!System.IO.File.Exists(sLocal) && System.IO.File.Exists(sOld))
+            {
+                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(sLocal));
+                System.IO.File.Move(sOld, sLocal);
+                try { System.IO.Directory.Delete(System.IO.Path.GetDirectoryName(sOld), false); } catch { }
+            }
+        }
+        catch { }
+        return sLocal;
     }
 }
 

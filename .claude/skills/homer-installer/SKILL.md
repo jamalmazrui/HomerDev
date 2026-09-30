@@ -52,6 +52,14 @@ declaring a component with `homerAdd`, the three [Run] entries per component
 (Install, Update, Reinstall, each with its own `Check:`), the label and
 outcome functions, and Ollama models.
 
+## The Results box and Launch
+
+One line per ticked box, the install location first and the logs folder last,
+nothing else; an Update says whether it happened. Launch is ticked, leaves a
+marker, and starts the app as the person once the Results box is closed.
+FinishPage.md has the details, and components.md the failures that looked
+like success.
+
 ## Checking an installer
 
 After a change, build, then install on the machine and read two logs: the

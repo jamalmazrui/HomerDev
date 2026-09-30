@@ -914,6 +914,24 @@ one keystroke.**
 
 No `exec` and no `templates` there: those are shipped, not made.
 
+**Only the local tree, never Roaming.** A Homer app keeps everything of its
+own -- settings, data, scripts, results, logs, temporary files -- under
+`%LOCALAPPDATA%\<App>`, and nothing under `%APPDATA%\<App>`, the Roaming tree.
+`Paths` names only the local tree. An app that kept files under Roaming in an
+earlier version calls `Paths.moveFromRoaming()` (Python: `paths.moveFromRoaming()`)
+once, after the log starts and before any setting is read: each file moves to
+the same place under the local tree, and each move goes to the log.
+
+Roaming was a good idea that failed in practice, and Homer does not use it,
+whatever other programs do. The only files a Homer installer puts under it are
+the JAWS scripts and the NVDA add-on themselves, in the folders those screen
+readers read -- `%APPDATA%\Freedom Scientific\JAWS\<version>\Settings` and
+`%APPDATA%\nvda\addons` -- because they read nowhere else. Nothing of the app's
+own goes there: not a setting, not a record of what was installed, not a
+fingerprint (those are in `%LOCALAPPDATA%\<App>`, as `jawsSettings.log` and
+`jawsScripts.inix`). The kit's `check` fails any other use of the Roaming tree
+in a project's code, installer or scripts.
+
 **exec and scripts divide the code by what it is for.** `exec` holds the code
 an app's core work runs on, in whatever form it runs: a native executable, a
 .NET assembly or a library's source compiled in, or source a Python or other
