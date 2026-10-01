@@ -19,8 +19,8 @@ ReadMe.htm
 License.md
 License.htm
 help/
-buildHomerDev.cmd
-buildHomerDev.py
+build.cmd
+build.py
 checkHomerDev.cmd
 checkHomerDev.py
 createHomerDevRepo.cmd

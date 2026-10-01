@@ -70,7 +70,7 @@ rem The kit modules the program imports, alphabetical. Each becomes a
 rem --hidden-import, so PyInstaller bundles it from the kit.
 set "homerModules=elevate inix lbc log paths say util web"
 rem 1 when the program builds WinForms dialogs with the kit's C# LbcDialog
-rem through lbcnet: C:\HomerDev\exec\Homer.dll, which buildHomerDev
+rem through lbcnet: C:\HomerDev\exec\Homer.dll, which build
 rem compiles, is bundled into the program. Empty for a console or wx program.
 set "homerDll="
 rem Anything else PyInstaller needs, such as --collect-all pythonnet.
@@ -274,7 +274,7 @@ for %%M in (!homerModules!) do set "hidden=!hidden! --hidden-import %%M"
 set "homerDllArg="
 if defined homerDll (
   if not exist "!homerDev!\exec\Homer.dll" (
-    echo !homerDev!\exec\Homer.dll is missing. Run buildHomerDev, which compiles it, then build again.
+    echo !homerDev!\exec\Homer.dll is missing. Run build, which compiles it, then build again.
     >> "%log%" echo ERROR: no !homerDev!\exec\Homer.dll
     goto :failed
   )

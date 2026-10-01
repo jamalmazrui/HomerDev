@@ -4,7 +4,7 @@ THE C# LBC, FROM PYTHON, THROUGH PYTHONNET.
 
 Every Homer dialog is built from Lbc primitives on the 64-bit WinForms API.
 A Python app with a WinForms interface (urlCheck, helpFido) does not get a
-second Lbc written in Python: it loads exec\Homer.dll, which buildHomerDev
+second Lbc written in Python: it loads exec\Homer.dll, which build
 compiles from the kit's own exec\CSharp\Elevate, Inix, Lbc, Log, Paths, Say, Util
 and Web, and builds its dialogs with the very LbcDialog the C# apps use. The
 focus order, the access keys, Control+Enter, Shift+F1, F7, the editing keys

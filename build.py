@@ -1,5 +1,5 @@
 ﻿#!/usr/bin/env python3
-"""buildHomerDev.py -- the build step for the Homer Development Kit.
+"""build.py -- the build step for the Homer Development Kit.
 
 The kit has no executable of its own, so "building" it means two things:
 
@@ -10,10 +10,10 @@ The kit has no executable of its own, so "building" it means two things:
      encoding, every template still carrying its _APP_ token, and no zero-byte
      file anywhere. Anything wrong is reported plainly and fails the build.
 
-Usage (through buildHomerDev.cmd, which is how it is meant to be run):
+Usage (through build.cmd, which is how it is meant to be run):
 
-    buildHomerDev              convert the documents and check the kit
-    buildHomerDev check        check only, convert nothing
+    build                      convert the documents and check the kit
+    build check                check only, convert nothing
 
 A detailed log is written to logs\\HomerDev-build-yyyyMMdd-HHmmss.log,
 one file per run, so the log of a run that went wrong is never overwritten
@@ -244,7 +244,11 @@ c_lMoved = [
     ("Docs/Logging.md", "help/Logging.md"),
     ("Docs/Logging.htm", "help/Logging.htm"),
     ("Inno/HomerComponents.iss", "Templates/HomerComponents.iss"),
-    ("buildHomerDev.log", "buildHomerDev.py"),
+    ("buildHomerDev.log", "build.py"),
+    # 1.43.58: the kit's build script is build.cmd, as every app's is; the old
+    # pair, left behind when the kit is unzipped over it, is removed.
+    ("buildHomerDev.cmd", "build.cmd"),
+    ("buildHomerDev.py", "build.py"),
     ("Samples/buildFruitBasketCs.log", "Templates/samples/buildFruitBasketCs.cmd"),
     ("Samples/buildFruitBasketMdiCs.log", "Templates/samples/buildFruitBasketMdiCs.cmd"),
     ("Samples/buildFruitBasketMdiPy.log", "Templates/samples/buildFruitBasketMdiPy.cmd"),
@@ -445,7 +449,7 @@ def normalizeHomer(sPath):
 def buildSamples():
     """Build every sample, and report each one.
 
-    buildHomerDev is the single command. Somebody who changes a shared class
+    build is the single command. Somebody who changes a shared class
     should not have to remember four build scripts and the order to run them in,
     and a problem in any of them should surface from the one thing they already
     run. Each script writes its own log beside itself; the failures are named
@@ -522,7 +526,7 @@ def buildHomerDll():
     sCsc = findRoslyn()
     if sCsc == "":
         return ("exec\\Homer.dll was not built: no Roslyn C# compiler. The C# samples "
-                "install the Build Tools; build them, then buildHomerDev again.")
+                "install the Build Tools; build them, then build again.")
     lsRefs = []
     for sName in ("System.Speech.dll", "UIAutomationProvider.dll", "UIAutomationTypes.dll"):
         sPath = findReference(sName)
@@ -591,7 +595,7 @@ def extractSkillSections():
         # title, as every Homer document does.
         for oMatch in re.finditer(r"(?ms)^## (.+?)\n(.*?)(?=^## |\Z)", sText):
             dChapters[oMatch.group(1).strip()] = oMatch.group(2)
-        lsOut = ["# " + sTitle, "", "Copied by buildHomerDev from %s; edit that, not this." % sDocument, "",
+        lsOut = ["# " + sTitle, "", "Copied by the kit's build from %s; edit that, not this." % sDocument, "",
                  "## Contents", ""]
         lsOut += ["- " + s for s in lsChapters if s in dChapters]
         lsOut.append("")
@@ -827,7 +831,7 @@ c_lRenamedWords = [
 # what was true that day, and the briefing names the old scripts on purpose so
 # a reader can recognise them in an old log. This file is here too -- it holds
 # the old names as data.
-c_lsKeepOldNames = ["buildHomerDev.py", "History.md", "History.htm",
+c_lsKeepOldNames = ["build.py", "History.md", "History.htm",
                     "HomerDev_update.md", "HomerDev_update.htm"]
 c_sKeepOldPrefixes = ("Kit-Findings-", "Rulings-")
 
@@ -1263,7 +1267,7 @@ def main():
     global oLog
     if not os.path.isdir(os.path.dirname(sLogPath)): os.makedirs(os.path.dirname(sLogPath))
     oLog = open(sLogPath, "w", encoding="utf-8")
-    logLine("buildHomerDev start pid=%d" % os.getpid())
+    logLine("build start pid=%d" % os.getpid())
     logFact("script", os.path.abspath(__file__))
     logFact("python", platform.python_version())
     logFact("windows", logWindows())
@@ -1311,12 +1315,12 @@ def main():
     lsProblems = checkKit()
     if len(lsProblems) == 0 and iSamplesFailed == 0:
         sayLine("0 problems found. The kit is complete.")
-        logLine("buildHomerDev end")
+        logLine("build end")
         return 0
     if len(lsProblems) == 0:
         sayLine("The kit itself is complete, but %d sample build%s failed."
                 % (iSamplesFailed, "" if iSamplesFailed == 1 else "s"))
-        logLine("buildHomerDev end")
+        logLine("build end")
         return 1
 
     sayLine("%d problem%s found:" % (len(lsProblems), "" if len(lsProblems) == 1 else "s"))
@@ -1329,7 +1333,7 @@ def main():
     if len(lsProblems) > c_iShowProblems:
         sayLine("  and %d more, all of them in %s." %
                 (len(lsProblems) - c_iShowProblems, c_sLogName))
-    logLine("buildHomerDev end result=problems")
+    logLine("build end result=problems")
     return 1
 
 

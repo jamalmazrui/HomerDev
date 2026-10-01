@@ -143,7 +143,7 @@ real answer.
     scripts\buildTutorials             speak what has no audio
     scripts\buildTutorials Tutorial_01 speak one again
 
-The voices live in `C:\HomerDev\exec`, fetched by `buildHomerDev` only.
+The voices live in `C:\HomerDev\exec`, fetched by `build` only.
 
 ## The kit's tutorial guide
 

@@ -106,6 +106,10 @@ def rewriteReferences(sAppDir, sApp):
             except UnicodeDecodeError:
                 continue
             sNew, iCount = oPattern.subn(lambda m: m.group(1) + "uild", sText)
+            # The kit's own build command is "build" too since 1.43.58, so an
+            # app's messages that say "run buildHomerDev" are brought along.
+            sNew, iKit = re.subn(r"(?<![A-Za-z_])buildHomerDev(?![A-Za-z0-9_])", "build", sNew)
+            iCount += iKit
             if iCount:
                 open(sPath, "wb").write((b"\xef\xbb\xbf" if bBom else b"") + sNew.encode("utf-8"))
                 iFiles += 1
@@ -113,9 +117,17 @@ def rewriteReferences(sAppDir, sApp):
     return iFiles
 
 
+def isKit(sFolder):
+    """The kit renames its own build script, in its build.py (1.43.58)."""
+    return os.path.isfile(os.path.join(sFolder, "Templates", "HomerComponents.iss"))
+
+
 def renameApp(sAppDir):
     sAppDir = os.path.abspath(sAppDir)
     sApp = os.path.basename(sAppDir.rstrip("\\/"))
+    if isKit(sAppDir):
+        sayLine("%s: the kit itself, which renames its own build script; nothing done here." % sApp)
+        return True
     sLog = startLog(sAppDir, sApp)
     sayLine("%s:" % sApp)
     bOk = True

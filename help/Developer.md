@@ -35,7 +35,7 @@ HomerDev.md.
       Templates\     the files a new app is written from, carrying _APP_
       scripts\         check, push, release, tidy,
                      buildTutorials, release
-      buildHomerDev.cmd / .py     convert the documents, audit the kit
+      build.cmd / .py     convert the documents, audit the kit
       checkHomerDev.cmd / .py     build all three samples and report
       newHomerApp.cmd / .py       write a new app folder
       ReadMe, License, RepoFiles.txt, version.txt, .gitignore
@@ -46,7 +46,7 @@ HomerDev.md.
 
 or one step at a time:
 
-    buildHomerDev                   documents, all four samples, the audit
+    build                   documents, all four samples, the audit
     checkHomerDev                   environment, clean build of everything, the
                                     tools on your PATH, and every program driven
                                     through its keys by uiCheck
@@ -68,8 +68,8 @@ goes away.
 
 ## Building the kit
 
-    buildHomerDev          convert the documents, build every sample, check the kit
-    buildHomerDev check    check only
+    build          convert the documents, build every sample, check the kit
+    build check    check only
     checkHomerDev          build all three samples from clean and report
 
 There is no compiler step, because the kit is source. The check is what stands
@@ -83,14 +83,14 @@ in for one:
 - nothing left behind by an earlier layout: a file the kit has moved is removed
   once its replacement is in place
 
-`buildHomerDev` reads files; it does not compile. `checkHomerDev` does, and it
+`build` reads files; it does not compile. `checkHomerDev` does, and it
 is the one to run before a release: it audits, checks that every module's
 `REQUIRES` line is satisfied, deletes what previous builds wrote, and builds all
 three samples. Three releases shipped a compile failure that only this would
 have caught.
 
 Any failure exits non-zero and names the file. The detail is in
-`buildHomerDev.log` beside the script.
+`build.log` beside the script.
 
 The kit's modules are not compiled here, so a C# mistake in one of them
 surfaces the first time an app builds. That is deliberate and matches the house
@@ -103,7 +103,7 @@ An app's build script compiles the Homer modules straight out of
 folder. So:
 
 1. Change the module here.
-2. Run `buildHomerDev` to check the kit still passes.
+2. Run `build` to check the kit still passes.
 3. Rebuild each app that uses it.
 
 The third step is the real test. A change to `Lbc.cs` that DbDo compiles and
@@ -148,7 +148,7 @@ first; a large file that must not go up needs one line in the second.
    base class library, WinForms, and each other, and nothing else. `PdfRead.cs`
    is the one exception, which is why it sits apart and why an app's build
    script fetches its package rather than the kit carrying it.
-3. Add it to `c_lsExpected` in `buildHomerDev.py`.
+3. Add it to `c_lsExpected` in `build.py`.
 4. Add a commented line for it in `Templates\build_APP_.cmd`, so a new app can
    switch it on by uncommenting.
 5. Describe it in HomerDev.md.

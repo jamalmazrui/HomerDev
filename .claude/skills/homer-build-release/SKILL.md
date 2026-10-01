@@ -21,7 +21,7 @@ uploads the `logs` folder, usually zipped as `temp.zip`.
 The steps, in order, with the commands as the user types them (backslashes:
 cmd reads a forward slash as a switch):
 
-1. `buildHomerDev` in C:\HomerDev, whenever the kit changed. App builds find
+1. `build` in C:\HomerDev, whenever the kit changed. App builds find
    the kit's code in `exec\CSharp` and `exec\Python`, and stop if the kit is
    older than their `kitNeeded`.
 2. `build` (or `build nobump` to keep the version). Steps the version

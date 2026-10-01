@@ -41,11 +41,11 @@ Note = Any folder works. If you put it somewhere else, set an environment variab
 
 [step]
 Say = Now open a command prompt in that folder and run the kit's own build.
-Key = buildHomerDev
+Key = build
 Hear = Homer Development Kit 1.4.0 in C colon backslash HomerDev
 Hear = 10 documents converted to HTML
 Hear = 0 problems found. The kit is complete.
-Note = buildHomerDev converts every document to HTML with pandoc, fetching pandoc if this machine has none, then checks the kit over: every component present, every file in the right encoding, no empty files.
+Note = build converts every document to HTML with pandoc, fetching pandoc if this machine has none, then checks the kit over: every component present, every file in the right encoding, no empty files.
 
 [step]
 Say = Notice the last line. Zero problems is a real answer, said plainly. That is a rule in this kit: a count always matches its noun, and nothing reports zero as though it were an error.

@@ -172,10 +172,13 @@
 <h1 id="history">History</h1>
 <h2 id="contents">Contents</h2>
 <ul>
-<li><a href="#october-2026">1.43.55 – 1 October 2026</a></li>
-<li><a href="#october-2026-1">1.43.54 – 1 October 2026</a></li>
-<li><a href="#october-2026-2">1.43.53 – 1 October 2026</a></li>
-<li><a href="#october-2026-3">1.43.52 – 1 October 2026</a></li>
+<li><a href="#october-2026">1.43.58 – 1 October 2026</a></li>
+<li><a href="#october-2026-1">1.43.57 – 1 October 2026</a></li>
+<li><a href="#october-2026-2">1.43.56 – 1 October 2026</a></li>
+<li><a href="#october-2026-3">1.43.55 – 1 October 2026</a></li>
+<li><a href="#october-2026-4">1.43.54 – 1 October 2026</a></li>
+<li><a href="#october-2026-5">1.43.53 – 1 October 2026</a></li>
+<li><a href="#october-2026-6">1.43.52 – 1 October 2026</a></li>
 <li><a href="#september-2026">1.43.51 – 30 September 2026</a></li>
 <li><a href="#september-2026-1">1.43.50 – 30 September 2026</a></li>
 <li><a href="#september-2026-2">1.43.49 – 30 September 2026</a></li>
@@ -292,7 +295,34 @@
 <li><a href="#september-2026-113">1.1.0 – 18 September 2026</a></li>
 <li><a href="#september-2026-114">1.0.0 – 18 September 2026</a></li>
 </ul>
-<h2 id="october-2026">1.43.55 – 1 October 2026</h2>
+<h2 id="october-2026">1.43.58 – 1 October 2026</h2>
+<p><strong>The kit’s build command is “build” too.</strong> In C:, as in
+every app folder, the command is now <code>build</code>:
+buildHomerDev.cmd and buildHomerDev.py are build.cmd and build.py, and
+the documents, skills, templates and scripts say “build”. The kit’s own
+build removes the old pair when it finds them beside the new one, so
+unzipping the kit over an older copy leaves nothing behind, and the push
+records it. check’s “buildname” now holds the kit to the same rule as
+the apps; tidy and renameBuild still leave the kit to its own build.
+renameBuild, when it renames an app, also changes the app’s messages
+that said “run buildHomerDev” to “run build”.</p>
+<h2 id="october-2026-1">1.43.57 – 1 October 2026</h2>
+<p><strong>The kit keeps buildHomerDev, and its own release goes
+through.</strong> 1.43.55 said the kit’s build script keeps its name,
+but check’s new “buildname” did not know the kit from an app, and failed
+the kit’s own release; 1.43.56’s tidy would even have renamed it. check,
+tidy and renameBuild now recognize the kit by its buildHomerDev.py and
+leave it alone.</p>
+<h2 id="october-2026-2">1.43.56 – 1 October 2026</h2>
+<p><strong>tidy gives the build script its short name by
+itself.</strong> After 1.43.55, every app’s release stopped at check’s
+“buildname”, because no app had been renamed yet. Tidy runs before every
+push and is refreshed from the kit at every build, so it now runs the
+kit’s renameBuild whenever build<App>.cmd or build<App>.ps1 is still
+there – git mv, every reference updated, its own log – and the push that
+follows records it. The usual build, tidy, push, release sequence needs
+no extra step.</p>
+<h2 id="october-2026-3">1.43.55 – 1 October 2026</h2>
 <p><strong>An app’s build script is build.cmd.</strong> The folder
 already names the app, so build<App>.cmd said it twice. newHomerApp now
 writes build.cmd (and build.ps1 where a build has a PowerShell half);
@@ -306,7 +336,7 @@ logs&lt;App&gt;-renameBuild-<time>.log. renameBuild all does every app
 beside the kit. check’s build step and the kit’s scan for stale app
 builds accept either name. The kit’s own buildHomerDev, and the samples,
 which share one folder, keep their names.</p>
-<h2 id="october-2026-1">1.43.54 – 1 October 2026</h2>
+<h2 id="october-2026-4">1.43.54 – 1 October 2026</h2>
 <p><strong>A build steps over every released number, as it always meant
 to.</strong> Each build takes the next version and skips any number
 already tagged on GitHub, by searching git’s list of tags with findstr
@@ -320,7 +350,7 @@ build templates and the four samples carry the fix; release 1.43.53’s
 evidence lines showed it (“GitHub has a published release tagged
 v5.0.36”, among 43). homer-build-release’s failures reference gains the
 case.</p>
-<h2 id="october-2026-2">1.43.53 – 1 October 2026</h2>
+<h2 id="october-2026-5">1.43.53 – 1 October 2026</h2>
 <p><strong>release shows GitHub’s answer when it decides a version is
 already out.</strong> EdSharp’s releases said “already on GitHub” for
 5.0.32 through 5.0.35, each straight after a build that had chosen a new
@@ -332,7 +362,7 @@ GitHub’s own record of that tag is fetched and read – a published
 release names the tag and is not a draft – instead of trusting the exit
 code of gh release view, which through gh.cmd has said “found” for
 releases that did not exist.</p>
-<h2 id="october-2026-3">1.43.52 – 1 October 2026</h2>
+<h2 id="october-2026-6">1.43.52 – 1 October 2026</h2>
 <p><strong>No Ollama window left open after an install.</strong>
 Ollama’s own installer starts its desktop app when it finishes, and the
 app opens a chat window, which confuses someone who never asked for it:

@@ -242,12 +242,12 @@ publish.</li>
 <h3 id="install-the-kit">Install the kit</h3>
 <p>Unzip <code>HomerDev.zip</code> into <code>C:\HomerDev</code>. That
 is the whole install. Then run:</p>
-<pre><code>buildHomerDev</code></pre>
+<pre><code>build</code></pre>
 <p>It converts every document to HTML with pandoc, fetching pandoc if
 the machine does not have it, and then checks the kit over: every
 component present, every text file in the right encoding, every template
 still holding its placeholder, and no empty files. It reports problems
-plainly and writes the detail to <code>buildHomerDev.log</code>.</p>
+plainly and writes the detail to <code>build.log</code>.</p>
 <p>If you keep the kit somewhere else, set the <code>HOMERDEV</code>
 environment variable to that folder. Every build script looks there
 first.</p>
@@ -758,10 +758,9 @@ quick start; stays at the root because GitHub surfaces it and because it
 is the first thing anybody opens</li>
 <li><strong>License.md, License.htm</strong> – the MIT license, naming
 the kit and its author</li>
-<li><strong>buildHomerDev.cmd, buildHomerDev.py</strong> – converts
-every document to HTML with pandoc, fetching pandoc if the machine has
-none, then audits the kit: components present, encodings right, no empty
-files</li>
+<li><strong>build.cmd, build.py</strong> – converts every document to
+HTML with pandoc, fetching pandoc if the machine has none, then audits
+the kit: components present, encodings right, no empty files</li>
 <li><strong>releaseHomerDev.cmd</strong> – the whole release as one
 command: tools, checks, push, tag</li>
 <li><strong>checkHomerDev.cmd, checkHomerDev.py</strong> – proves the
@@ -836,7 +835,7 @@ by check</li>
 run by uiCheck</li>
 <li><strong>buildFruitBasketCs.cmd, buildFruitBasketMdiCs.cmd,
 buildFruitBasketMdiPy.cmd, buildFruitBasketPy.cmd</strong> – one build
-script each; <code>buildHomerDev</code> runs all four</li>
+script each; <code>build</code> runs all four</li>
 </ul>
 <h3 id="templates-what-newhomerapp-copies">Templates – what newHomerApp
 copies</h3>
@@ -1367,7 +1366,7 @@ what the tool is for.</p>
 checks, and the one thing still done by hand</h2>
 <p>Four commands, each answering a different question, and between them
 almost nothing is left for a person to remember:</p>
-<pre><code>buildHomerDev      documents, all four samples, the kit audit
+<pre><code>build      documents, all four samples, the kit audit
 checkHomerDev      the environment, a clean build of everything, the tools
                    on your PATH, and every program driven through its keys
 check      one app: encodings, names, keys, build, smoke run, and
@@ -2461,8 +2460,8 @@ slash as a switch.</li>
 mark, since its first characters must be the <code>---</code> of its
 front matter (KeepEncoding.txt says so); every other file follows the
 Homer encoding.</li>
-<li><strong>Packing</strong>: <code>buildHomerDev</code> zips each skill
-into <code>exec\skills\&lt;name&gt;.zip</code> for claude.ai.</li>
+<li><strong>Packing</strong>: <code>build</code> zips each skill into
+<code>exec\skills\&lt;name&gt;.zip</code> for claude.ai.</li>
 </ul>
 </body>
 </html>

@@ -17,7 +17,7 @@ it works in this folder, each in its own folder:
 - **scripts** (when there is one): the working scripts, each with a .cmd
   wrapper.
 
-`buildHomerDev` also packs each skill into `exec\skills\<name>.zip`, the form in
+`build` also packs each skill into `exec\skills\<name>.zip`, the form in
 which claude.ai takes a skill. How a Homer skill is written is set out in
 HomerDev.md, under "Claude skills".
 

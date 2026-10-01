@@ -180,16 +180,16 @@ def runHere(sCommand, sFolder):
 # --- 1. the kit audit -------------------------------------------------------
 
 def checkKit():
-    """buildHomerDev's own audit: every component present and encoded right."""
-    iCode, sOut = runHere("python buildHomerDev.py check", c_sKit)
+    """build's own audit: every component present and encoded right."""
+    iCode, sOut = runHere("python build.py check", c_sKit)
     if iCode == 0 and "0 problems" in sOut:
-        return finding("kit audit", "pass", "buildHomerDev check found 0 problems")
+        return finding("kit audit", "pass", "build check found 0 problems")
     sFirst = ""
     for sLine in sOut.splitlines():
         if sLine.strip().startswith(("missing:", "empty:")) or "problem" in sLine:
             sFirst = sLine.strip()
             break
-    return finding("kit audit", "fail", "buildHomerDev check reported: " + (sFirst or "see the log"))
+    return finding("kit audit", "fail", "build check reported: " + (sFirst or "see the log"))
 
 
 # --- 2. clean ---------------------------------------------------------------

@@ -7,10 +7,13 @@ author: "Jamal Mazrui"
 
 ## Contents
 
-- [1.43.55 -- 1 October 2026](#october-2026)
-- [1.43.54 -- 1 October 2026](#october-2026-1)
-- [1.43.53 -- 1 October 2026](#october-2026-2)
-- [1.43.52 -- 1 October 2026](#october-2026-3)
+- [1.43.58 -- 1 October 2026](#october-2026)
+- [1.43.57 -- 1 October 2026](#october-2026-1)
+- [1.43.56 -- 1 October 2026](#october-2026-2)
+- [1.43.55 -- 1 October 2026](#october-2026-3)
+- [1.43.54 -- 1 October 2026](#october-2026-4)
+- [1.43.53 -- 1 October 2026](#october-2026-5)
+- [1.43.52 -- 1 October 2026](#october-2026-6)
 - [1.43.51 -- 30 September 2026](#september-2026)
 - [1.43.50 -- 30 September 2026](#september-2026-1)
 - [1.43.49 -- 30 September 2026](#september-2026-2)
@@ -126,6 +129,36 @@ author: "Jamal Mazrui"
 - [1.2.0 -- 18 September 2026](#september-2026-112)
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
+
+## 1.43.58 -- 1 October 2026
+
+**The kit's build command is "build" too.** In C:\HomerDev, as in every app
+folder, the command is now `build`: buildHomerDev.cmd and buildHomerDev.py
+are build.cmd and build.py, and the documents, skills, templates and scripts
+say "build". The kit's own build removes the old pair when it finds them
+beside the new one, so unzipping the kit over an older copy leaves nothing
+behind, and the push records it. check's "buildname" now holds the kit to
+the same rule as the apps; tidy and renameBuild still leave the kit to its
+own build. renameBuild, when it renames an app, also changes the app's
+messages that said "run buildHomerDev" to "run build".
+
+## 1.43.57 -- 1 October 2026
+
+**The kit keeps buildHomerDev, and its own release goes through.** 1.43.55
+said the kit's build script keeps its name, but check's new "buildname" did
+not know the kit from an app, and failed the kit's own release; 1.43.56's
+tidy would even have renamed it. check, tidy and renameBuild now recognize
+the kit by its buildHomerDev.py and leave it alone.
+
+## 1.43.56 -- 1 October 2026
+
+**tidy gives the build script its short name by itself.** After 1.43.55,
+every app's release stopped at check's "buildname", because no app had been
+renamed yet. Tidy runs before every push and is refreshed from the kit at
+every build, so it now runs the kit's renameBuild whenever build<App>.cmd or
+build<App>.ps1 is still there -- git mv, every reference updated, its own
+log -- and the push that follows records it. The usual build, tidy, push,
+release sequence needs no extra step.
 
 ## 1.43.55 -- 1 October 2026
 

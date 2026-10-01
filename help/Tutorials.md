@@ -33,7 +33,7 @@ reader answers in a different voice.
 ### The playlist
 
 1. **Tutorial_HomerDev** — the kit in twelve minutes: what it is, unarchiving it
-   into `C:\HomerDev`, running `buildHomerDev`, building and running both fruit
+   into `C:\HomerDev`, running `build`, building and running both fruit
    baskets, and hearing that the two behave the same. Start here.
 
 Two more are planned. Neither is written yet, and they are listed so the shape
@@ -73,10 +73,10 @@ spoken again; name one script on the command line to speak just that one.
 
 ### Where the voices live, and who fetches them
 
-One copy, in `C:\HomerDev\exec`, and **only `buildHomerDev` fetches it**.
+One copy, in `C:\HomerDev\exec`, and **only `build` fetches it**.
 The kit's build passes `-fetch` to the tutorial tool; an app's build never
 does. So an app's build finds the voices in the kit, or, when they are not
-there, says "Run buildHomerDev" and speaks nothing -- it never downloads a
+there, says "Run build" and speaks nothing -- it never downloads a
 copy of its own. Neither piper nor sherpa-onnx has an installer, so there is
 no default location the way there is for Whisper or Pandoc; the kit is the
 one place every Homer app already relies on, and `exec` is the Homer folder
@@ -532,7 +532,7 @@ Screen reader:
 
 Any folder works. If you put it somewhere else, set an environment variable called HomerDev to that path, and every build script will find it.
 
-### Step 4: buildHomerDev
+### Step 4: build
 
 Now open a command prompt in that folder and run the kit's own build.
 
@@ -542,7 +542,7 @@ Screen reader:
 - 10 documents converted to HTML
 - 0 problems found. The kit is complete.
 
-buildHomerDev converts every document to HTML with pandoc, fetching pandoc if this machine has none, then checks the kit over: every component present, every file in the right encoding, no empty files.
+build converts every document to HTML with pandoc, fetching pandoc if this machine has none, then checks the kit over: every component present, every file in the right encoding, no empty files.
 
 ### Step 5
 

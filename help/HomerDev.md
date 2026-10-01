@@ -65,13 +65,13 @@ holding the keyboard knows what a good program is before the AI writes one.
 
 Unzip `HomerDev.zip` into `C:\HomerDev`. That is the whole install. Then run:
 
-    buildHomerDev
+    build
 
 It converts every document to HTML with pandoc, fetching pandoc if the machine
 does not have it, and then checks the kit over: every component present, every
 text file in the right encoding, every template still holding its placeholder,
 and no empty files. It reports problems plainly and writes the detail to
-`buildHomerDev.log`.
+`build.log`.
 
 If you keep the kit somewhere else, set the `HOMERDEV` environment variable to
 that folder. Every build script looks there first.
@@ -583,7 +583,7 @@ than guessed at. Folders are in the order you meet them.
 
 - **ReadMe.md, ReadMe.htm** -- the introduction and the quick start; stays at the root because GitHub surfaces it and because it is the first thing anybody opens
 - **License.md, License.htm** -- the MIT license, naming the kit and its author
-- **buildHomerDev.cmd, buildHomerDev.py** -- converts every document to HTML with pandoc, fetching pandoc if the machine has none, then audits the kit: components present, encodings right, no empty files
+- **build.cmd, build.py** -- converts every document to HTML with pandoc, fetching pandoc if the machine has none, then audits the kit: components present, encodings right, no empty files
 - **releaseHomerDev.cmd** -- the whole release as one command: tools, checks, push, tag
 - **checkHomerDev.cmd, checkHomerDev.py** -- proves the kit still builds by building with it: audit, dependency rule, clean, all three samples, evidence report
 - **newHomerApp.cmd, newHomerApp.py** -- writes a new app folder from the templates, C# or Python, overwriting nothing
@@ -620,7 +620,7 @@ than guessed at. Folders are in the order you meet them.
 - **FruitBasketPy.py** -- the same program as FruitBasketCs, in Python, block for block
 - **accept.inix** -- what done means for the samples, run by check
 - **uiTest.inix** -- what the samples must do when driven, run by uiCheck
-- **buildFruitBasketCs.cmd, buildFruitBasketMdiCs.cmd, buildFruitBasketMdiPy.cmd, buildFruitBasketPy.cmd** -- one build script each; `buildHomerDev` runs all four
+- **buildFruitBasketCs.cmd, buildFruitBasketMdiCs.cmd, buildFruitBasketMdiPy.cmd, buildFruitBasketPy.cmd** -- one build script each; `build` runs all four
 
 ### Templates -- what newHomerApp copies
 
@@ -1103,7 +1103,7 @@ given `&S` to two controls at once. That is what the tool is for.
 Four commands, each answering a different question, and between them almost
 nothing is left for a person to remember:
 
-    buildHomerDev      documents, all four samples, the kit audit
+    build      documents, all four samples, the kit audit
     checkHomerDev      the environment, a clean build of everything, the tools
                        on your PATH, and every program driven through its keys
     check      one app: encodings, names, keys, build, smoke run, and
@@ -2130,5 +2130,5 @@ guidance for skills and the Homer rules together:
 - **Encoding**: SKILL.md is UTF-8 without a byte order mark, since its first
   characters must be the `---` of its front matter (KeepEncoding.txt says so);
   every other file follows the Homer encoding.
-- **Packing**: `buildHomerDev` zips each skill into `exec\skills\<name>.zip`
+- **Packing**: `build` zips each skill into `exec\skills\<name>.zip`
   for claude.ai.

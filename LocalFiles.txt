@@ -12,7 +12,7 @@ exec/
 # Build, tidy and tutorial logs, one file per run.
 logs/
 
-# What building the sample programs leaves beside them: rebuilt by buildHomerDev,
+# What building the sample programs leaves beside them: rebuilt by build,
 # never pushed, and not strays for tidy to carry off.
 Templates/samples/*.exe
 Templates/samples/*.log
@@ -24,7 +24,7 @@ Templates/samples/dist/
 scripts/release.cmd
 scripts/release.ps1
 
-# Copies of the kit's own documents a skill carries, made by buildHomerDev from
+# Copies of the kit's own documents a skill carries, made by build from
 # help at every build; git carries the originals.
 .claude/skills/homer-code/references/CamelType_*.md
 .claude/skills/homer-code/references/Logging.md

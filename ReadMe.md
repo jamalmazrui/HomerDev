@@ -44,11 +44,11 @@ environment variable to that folder.
 Unzip `HomerDev.zip` into `C:\HomerDev`. That is the install. Then:
 
     cd \HomerDev
-    buildHomerDev
+    build
 
 It converts every document to HTML with pandoc, fetching pandoc with winget if
 this machine does not have it, then checks the kit over and reports anything
-wrong. The detail goes to `buildHomerDev.log` beside the script.
+wrong. The detail goes to `build.log` beside the script.
 
 If you keep the kit somewhere else, set the `HomerDev` environment variable to
 that folder. Every build script looks there first, then in `C:\HomerDev`, then

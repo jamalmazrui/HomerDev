@@ -28,7 +28,7 @@ Windows ideas. If somebody ports the kit, tell me, and I will link to it.
 
 No, but you do need to be comfortable typing exact commands and reading what
 comes back. The kit is driven from a command prompt: you type
-`buildHomerDev`, you read the lines it prints, and when something is wrong you
+`build`, you read the lines it prints, and when something is wrong you
 open a log file and look for the word ERROR.
 
 If you have never written code, start with `help\Tutorials.md`, build the sample

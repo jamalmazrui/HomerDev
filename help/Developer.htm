@@ -201,14 +201,14 @@ rediscovering</a></li>
   Templates\     the files a new app is written from, carrying _APP_
   scripts\         check, push, release, tidy,
                  buildTutorials, release
-  buildHomerDev.cmd / .py     convert the documents, audit the kit
+  build.cmd / .py     convert the documents, audit the kit
   checkHomerDev.cmd / .py     build all three samples and report
   newHomerApp.cmd / .py       write a new app folder
   ReadMe, License, RepoFiles.txt, version.txt, .gitignore</code></pre>
 <h2 id="releasing-the-kit">Releasing the kit</h2>
 <pre><code>releaseHomerDev &quot;What changed.&quot;   all four steps below, stopping at the first failure</code></pre>
 <p>or one step at a time:</p>
-<pre><code>buildHomerDev                   documents, all four samples, the audit
+<pre><code>build                   documents, all four samples, the audit
 checkHomerDev                   environment, clean build of everything, the
                                 tools on your PATH, and every program driven
                                 through its keys by uiCheck
@@ -227,8 +227,8 @@ meant to exist:</p>
 <p>That is the old copy talking. Run <code>installTools</code> after
 updating the kit and it goes away.</p>
 <h2 id="building-the-kit">Building the kit</h2>
-<pre><code>buildHomerDev          convert the documents, build every sample, check the kit
-buildHomerDev check    check only
+<pre><code>build          convert the documents, build every sample, check the kit
+build check    check only
 checkHomerDev          build all three samples from clean and report</code></pre>
 <p>There is no compiler step, because the kit is source. The check is
 what stands in for one:</p>
@@ -241,14 +241,14 @@ what stands in for one:</p>
 <li>nothing left behind by an earlier layout: a file the kit has moved
 is removed once its replacement is in place</li>
 </ul>
-<p><code>buildHomerDev</code> reads files; it does not compile.
+<p><code>build</code> reads files; it does not compile.
 <code>checkHomerDev</code> does, and it is the one to run before a
 release: it audits, checks that every module’s <code>REQUIRES</code>
 line is satisfied, deletes what previous builds wrote, and builds all
 three samples. Three releases shipped a compile failure that only this
 would have caught.</p>
 <p>Any failure exits non-zero and names the file. The detail is in
-<code>buildHomerDev.log</code> beside the script.</p>
+<code>build.log</code> beside the script.</p>
 <p>The kit’s modules are not compiled here, so a C# mistake in one of
 them surfaces the first time an app builds. That is deliberate and
 matches the house preference: a build error you can see beats a
@@ -260,7 +260,7 @@ apps</h2>
 There is no copy in the app folder. So:</p>
 <ol type="1">
 <li>Change the module here.</li>
-<li>Run <code>buildHomerDev</code> to check the kit still passes.</li>
+<li>Run <code>build</code> to check the kit still passes.</li>
 <li>Rebuild each app that uses it.</li>
 </ol>
 <p>The third step is the real test. A change to <code>Lbc.cs</code> that
@@ -312,8 +312,7 @@ header comment saying what it is for and what it depends on.</li>
 <code>PdfRead.cs</code> is the one exception, which is why it sits apart
 and why an app’s build script fetches its package rather than the kit
 carrying it.</li>
-<li>Add it to <code>c_lsExpected</code> in
-<code>buildHomerDev.py</code>.</li>
+<li>Add it to <code>c_lsExpected</code> in <code>build.py</code>.</li>
 <li>Add a commented line for it in
 <code>Templates\build_APP_.cmd</code>, so a new app can switch it on by
 uncommenting.</li>

@@ -46,7 +46,7 @@ def errorLines(sText):
 
 def summarizeBuild(sText):
     sResult = firstMatch(sText, r"build end result=(\w+)")
-    # The kit's own build (buildHomerDev) ends with its audit's verdict.
+    # The kit's own build (build) ends with its audit's verdict.
     if not sResult and re.search(r"\b0 problems found", sText): sResult = "succeeded"
     elif not sResult and re.search(r"\b[1-9]\d* problems? found", sText): sResult = "failed"
     if not sResult:
