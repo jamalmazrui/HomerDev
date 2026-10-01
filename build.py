@@ -1153,7 +1153,9 @@ def convertDocs(sPandoc):
             if bSkillsIndex and sName.lower() != "readme.md": continue
             sMd = os.path.join(sRoot, sName)
             sHtm = os.path.join(sRoot, sName[:-3] + ".htm")
-            iCode, sOut = runCommand([sPandoc, "-f", "markdown", "-t", "html5",
+            # Dollar signs are text, not mathematics (1.43.59): a skill quoting a
+            # GitHub workflow's ${{ secrets }} or a price is not a formula.
+            iCode, sOut = runCommand([sPandoc, "-f", "markdown-tex_math_dollars", "-t", "html5",
                                       "--standalone", "--metadata",
                                       "title=" + sName[:-3], "-o", sHtm, sMd])
             if iCode == 0:

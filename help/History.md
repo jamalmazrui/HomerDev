@@ -7,13 +7,14 @@ author: "Jamal Mazrui"
 
 ## Contents
 
-- [1.43.58 -- 1 October 2026](#october-2026)
-- [1.43.57 -- 1 October 2026](#october-2026-1)
-- [1.43.56 -- 1 October 2026](#october-2026-2)
-- [1.43.55 -- 1 October 2026](#october-2026-3)
-- [1.43.54 -- 1 October 2026](#october-2026-4)
-- [1.43.53 -- 1 October 2026](#october-2026-5)
-- [1.43.52 -- 1 October 2026](#october-2026-6)
+- [1.43.59 -- 1 October 2026](#october-2026)
+- [1.43.58 -- 1 October 2026](#october-2026-1)
+- [1.43.57 -- 1 October 2026](#october-2026-2)
+- [1.43.56 -- 1 October 2026](#october-2026-3)
+- [1.43.55 -- 1 October 2026](#october-2026-4)
+- [1.43.54 -- 1 October 2026](#october-2026-5)
+- [1.43.53 -- 1 October 2026](#october-2026-6)
+- [1.43.52 -- 1 October 2026](#october-2026-7)
 - [1.43.51 -- 30 September 2026](#september-2026)
 - [1.43.50 -- 30 September 2026](#september-2026-1)
 - [1.43.49 -- 30 September 2026](#september-2026-2)
@@ -129,6 +130,21 @@ author: "Jamal Mazrui"
 - [1.2.0 -- 18 September 2026](#september-2026-112)
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
+
+## 1.43.59 -- 1 October 2026
+
+**Two documents about skills, in help.** A11ySkills.md gathers 175 published
+accessibility skills from eight collections, each with its facts, license and
+full text, as a reference for anyone writing a Homer skill. HomerSkills.md
+reads them for what they teach the kit: learnings that fit the HomerDev
+guidelines, questions that need a decision before any guideline changes, and
+proposed new skills (homer-listen, homer-ui-check, homer-audit,
+homer-bug-report, homer-test-pass) and improvements to existing ones.
+HomerDev.md's chapter on Claude skills and the skills index point to both.
+
+**Dollar signs stay text in every document.** The kit's build converts
+Markdown with Pandoc's dollar-sign mathematics turned off, so a workflow's
+${{ secrets }} or a price in a document is shown as written.
 
 ## 1.43.58 -- 1 October 2026
 

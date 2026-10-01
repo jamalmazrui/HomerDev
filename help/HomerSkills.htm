@@ -1,0 +1,397 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>HomerSkills</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">HomerSkills</h1>
+</header>
+<h1 id="homer-skills-what-the-accessibility-skills-teach">Homer Skills:
+What the Accessibility Skills Teach</h1>
+<h2 id="contents">Contents</h2>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#learnings-that-fit-homerdev">Learnings that fit
+HomerDev</a></li>
+<li><a href="#questions-before-adopting">Questions before
+adopting</a></li>
+<li><a href="#proposed-new-skills">Proposed new skills</a></li>
+<li><a href="#proposed-improvements-to-existing-skills">Proposed
+improvements to existing skills</a></li>
+<li><a href="#suggested-order">Suggested order</a></li>
+</ul>
+<h2 id="introduction">Introduction</h2>
+<p>This document reads the 175 accessibility skills gathered in <a
+href="A11ySkills.htm">Accessibility Skills for AI Agents</a>, which sits
+beside it in the kit’s help folder, and asks what they teach the Homer
+Development Kit. It has three parts: learnings that agree with the
+HomerDev guidelines and can be adopted, questions where a learning would
+change or stretch a guideline and so needs a decision first, and
+proposals for new and improved Homer skills.</p>
+<p>The skills come from eight collections. Three shapes recur:</p>
+<ul>
+<li><strong>A team of small skills with a shared contract</strong>
+(Community Access, 108 skills). Routers pick specialists; specialists
+return findings in one JSON schema; helpers do mechanical work;
+reference skills hold rule tables. Only routers can be chosen by the
+model, so the rest cost nothing until named.</li>
+<li><strong>Long rule sets, one per pattern</strong> (Mike Gifford, 33
+skills). Each opens with when to load it, states its rules firmly, and
+ends with how to test them, with a Planner and a Critic that weigh
+evidence rather than check.</li>
+<li><strong>Short checklists</strong> (Axel, 10 skills; Seth Hobson,
+Addy Osmani, Magnus Hedemark), and <strong>tool-driven audits</strong>
+(Agentic QE), which run axe-core, pa11y and Lighthouse and carry their
+own evaluations.</li>
+</ul>
+<p>The 14 Homer skills are a fourth shape: eleven hold the rules for
+building Windows programs for screen reader users, and three build
+reference collections in the same style. They are kept short (58 to 167
+lines each, well under the standard’s 500-line limit), with detail in
+references, and every one follows the standard’s naming and description
+rules.</p>
+<h2 id="learnings-that-fit-homerdev">Learnings that fit HomerDev</h2>
+<p>Each of these agrees with the HomerDev guidelines as they stand;
+several confirm a Homer rule from another direction.</p>
+<ul>
+<li><strong>Fix it where it starts.</strong> Mike Gifford’s
+upstream-first skill says to fix a barrier in the shared component or
+design system it comes from, not in each page. This is the Homer rule
+that Lbc owns focus order and is fixed in Lbc, not in the app, and the
+reason for the kit itself.</li>
+<li><strong>One shared contract, read by every skill.</strong> Community
+Access’s core skill holds the rules every skill follows (tiers, how one
+skill hands work to another, the findings schema, report rules), so no
+skill repeats them. HomerDev.md does this for the Homer skills, which
+take their rules from it at each build.</li>
+<li><strong>Findings as data, then a report.</strong> Community Access’s
+specialists return only JSON in one schema, with a severity and a
+confidence for each finding; a script renders the report and keeps each
+run in a history folder, so a regression detector can compare runs.
+Homer’s check already writes an evidence report; the same findings could
+also be written as data, so two runs can be compared.</li>
+<li><strong>Verify the fix.</strong> A verifier re-runs the one test
+that found a problem after it is fixed. Homer’s check runs before every
+release; a fix to an app could name the finding it closes and re-run
+that check alone.</li>
+<li><strong>Test with real assistive technology.</strong> Every
+collection that mentions automated scanning says it finds a third or so
+of problems, and that testing with JAWS, NVDA, Narrator and VoiceOver
+finds the rest. Mike Gifford’s Critic adds a caution: an AI must not
+claim to know a disabled person’s experience. Homer’s practice of
+testing with real readers, and taking reports from beta testers, is the
+same.</li>
+<li><strong>A simulated listener, clearly labelled.</strong> Community
+Access’s Screen Reader Lab walks HTML in reading order, tab order,
+heading order and form order, saying what a screen reader would
+announce, with a disclaimer that real readers differ. The same idea
+suits Homer dialogs (see homer-listen below).</li>
+<li><strong>Name, role, value and state for every control.</strong> The
+desktop specialist’s baseline: each control exposes all four through UI
+Automation, and keyboard use comes first. Its wxPython advice, to put a
+visible label immediately before its control, is the Homer rule that a
+preceding label names a control, and its warning that a set name is
+ignored when it conflicts matches the Homer rule against an accessible
+name that repeats the caption.</li>
+<li><strong>Visible words are the spoken words.</strong> The speech
+recognition skill (voice control with Windows Voice Access or Dragon)
+needs each control’s spoken name to contain its visible label. Homer
+controls already take their names from their captions and preceding
+labels.</li>
+<li><strong>Announce only what the reader cannot know.</strong> The live
+region skills warn against announcing what assistive technology already
+says. This is the Homer rule against duplicating the screen reader.</li>
+<li><strong>Single-key commands only where the focus is.</strong> WCAG
+2.1.4 allows a shortcut of one printable character when it works only
+while its control has focus. Homer’s single-key commands, such as
+Question Mark in FileDir’s file list, work only where they belong, so
+they meet it.</li>
+<li><strong>Plain language and a measured reading level.</strong> Both
+Community Access and Mike Gifford measure reading level and treat dense
+jargon as a barrier. Homer’s documentation already has a reading-level
+rule (see the questions below on the target).</li>
+<li><strong>Links that say where they go.</strong> The Markdown and link
+skills flag vague link text, bare addresses and missing alternatives for
+images and diagrams, as Homer’s documentation rules do.</li>
+<li><strong>Reference skills cost little.</strong> Community Access
+marks rule tables as reference data, read only when another skill needs
+them. Homer’s references folders do the same.</li>
+<li><strong>Descriptions that name the request.</strong> Skills that are
+chosen reliably say when to use them in words a request would contain
+(“Use when …”, “Load this skill whenever …”). The Homer skills follow
+this; a few could add the plain words people use, such as “installer”
+beside “Inno Setup”.</li>
+<li><strong>Skills tested like code.</strong> Agentic QE ships a schema,
+a validator and evaluations with each skill, so a change can be shown
+not to break it.</li>
+</ul>
+<h2 id="questions-before-adopting">Questions before adopting</h2>
+<p>Each of these would change, extend or loosen a HomerDev guideline, so
+none is adopted until you decide.</p>
+<ul>
+<li><strong>Reading level: grade 8 or 9?</strong> Community Access and
+Mike Gifford use grade 8, after WCAG 3.1.5 (Level AAA), which asks for
+“lower secondary education”. Homer documentation targets grade 9. Keep
+9, or move to 8?</li>
+<li><strong>An Accessibility document for each app?</strong> Mike
+Gifford’s accessibility-general skill centres on an ACCESSIBILITY.md in
+each project: what the project commits to, known issues, and how to
+report a barrier. Community Access writes accessibility statements and
+conformance reports (VPATs). Homer’s standard set is ReadMe, the guide,
+Developer, License, History and Hotkeys. Add Accessibility.md, or a
+conformance report, to the set?</li>
+<li><strong>Gender-neutral and inclusive wording.</strong> Mike
+Gifford’s content-design skill lists “gender-neutral and inclusive
+language throughout” among its style points. Homer tools do not police
+language. The recommendation is to leave this out of every Homer skill;
+confirm?</li>
+<li><strong>Tables for findings.</strong> Most collections report
+findings in tables. Homer prefers lists, except in reports for usually
+sighted managers and developers. A findings report under the proposed
+homer-audit would be such a report; tables there?</li>
+<li><strong>The NVDA Add-on Store.</strong> Community Access’s NVDA
+specialist covers publishing to NV Access’s Add-on Store, with its
+metadata schema and validation. Homer installs its add-ons directly,
+from its own installers. Also submit Homer add-ons to the store, or keep
+to the installers?</li>
+<li><strong>Narrator and Voice Access in testing.</strong> Several
+skills test with Narrator and with voice control as well as JAWS and
+NVDA. Add them to the Homer test pass, or keep to JAWS and NVDA?</li>
+</ul>
+<h2 id="proposed-new-skills">Proposed new skills</h2>
+<ul>
+<li><strong>homer-listen.</strong> Predicts what JAWS and NVDA will say
+in a Homer dialog or menu, read from its Lbc source: each control’s
+name, role and state in focus order, with trigger letters and hotkeys.
+Like Screen Reader Lab, it says plainly that it is a prediction. It
+flags what the Homer rules forbid: a name that repeats its label, two
+items claiming one trigger letter, a trigger letter in the middle of a
+word, app speech that repeats what the reader says, and a control with
+no name.</li>
+<li><strong>homer-ui-check.</strong> Checks a built app as it runs,
+through UI Automation: it opens each window, walks the tree, and records
+each control’s name, role, value, state, focusability and access key.
+The same Homer rules as homer-listen are tested on the real program, and
+the results go into check’s evidence. homer-listen reads the source;
+homer-ui-check proves the result.</li>
+<li><strong>homer-audit.</strong> One entry point for an app’s review,
+as Community Access’s Accessibility Lead is for theirs: it runs check,
+homer-ui-check and the finish-page and Local-tree checks; writes the
+findings as data, each with a severity; and compares them with the last
+run, saying what is new, what is fixed and what has regressed.</li>
+<li><strong>homer-bug-report.</strong> Turns logs and a description into
+a report an app’s developer can act on: what was done, what was
+expected, what happened, the version, Windows and screen reader, and the
+log lines that matter. It follows Mike Gifford’s bug-reporting skill,
+adapted to the Homer log layout, for beta testers’ messages and GitHub
+issues.</li>
+<li><strong>homer-test-pass.</strong> Writes the manual test pass for a
+release from its History and Hotkeys: each changed command to try with
+the keyboard, then with JAWS, then with NVDA, and the expected speech.
+It gives a tester such as a beta tester a short, ordered list instead of
+the whole guide.</li>
+</ul>
+<h2 id="proposed-improvements-to-existing-skills">Proposed improvements
+to existing skills</h2>
+<ul>
+<li><strong>homer-docs</strong>: check Markdown the way the Markdown
+skills do, as a script: vague link text, bare addresses, skipped heading
+levels, more than one H1, an image or diagram without a text
+alternative, emoji used as words, and tables where a list would serve.
+Measure the reading level of each document against the Homer target and
+report it.</li>
+<li><strong>homer-ui</strong>: add a short UI Automation reference, with
+the name, role, value and state each Lbc control exposes and which
+patterns screen readers use (invoke, value, selection, expand and
+collapse, toggle), so a new control is checked against it.</li>
+<li><strong>homer-screen-reader</strong>: add NVDA’s script decorator
+fields (<code>description</code>, <code>gesture</code>,
+<code>category</code>, <code>speakOnDemand</code>) and when
+<code>ui.message</code> is right, from the NVDA specialist; validate the
+add-on manifest; and repeat that a script is tested in the reader
+itself.</li>
+<li><strong>homer-build-release</strong>: name the finding a fix closes,
+and re-run only that check after it, as the verifier does.</li>
+<li><strong>homer-code</strong>: ask for a test with real assistive
+technology in a change’s evidence, as the testing skills do, so
+automated checks are never the whole proof.</li>
+<li><strong>All Homer skills</strong>: a few evaluation prompts each,
+with the expected behaviour, checked by the kit’s build, as Agentic QE
+does; and a review of each description for the plain words a request
+would use.</li>
+</ul>
+<h2 id="suggested-order">Suggested order</h2>
+<ul>
+<li>homer-listen and homer-ui-check first: they test the Homer rules
+that matter most to screen reader users, from the source and from the
+running program.</li>
+<li>Then homer-audit, which joins them with the existing checks and adds
+comparison between runs.</li>
+<li>Then the homer-docs Markdown check, homer-bug-report and
+homer-test-pass.</li>
+<li>The questions above can be settled at any point; each answer becomes
+a HomerDev guideline before any skill relies on it.</li>
+</ul>
+</body>
+</html>

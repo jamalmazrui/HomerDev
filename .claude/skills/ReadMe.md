@@ -73,3 +73,9 @@ HomerDev.md, under "Claude skills".
   menus, hotkeys and key names, the function-key families, and what to speak.
   Carries the kit's own chapters on Lbc, keys, speech and the shapes of app,
   taken from HomerDev.md at each build.
+
+Two documents in the kit's help folder look beyond these skills:
+Accessibility Skills for AI Agents (help\A11ySkills.htm) gathers 175 published
+accessibility skills from eight collections as a reference, and Homer Skills
+(help\HomerSkills.htm) reads them for what they teach the kit and proposes new
+and improved Homer skills.

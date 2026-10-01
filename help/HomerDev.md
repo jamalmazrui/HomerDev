@@ -2132,3 +2132,11 @@ guidance for skills and the Homer rules together:
   every other file follows the Homer encoding.
 - **Packing**: `build` zips each skill into `exec\skills\<name>.zip`
   for claude.ai.
+
+Two documents in the help folder look beyond the kit's own skills.
+[Accessibility Skills for AI Agents](A11ySkills.htm) gathers 175 published
+accessibility skills from eight collections, with each one's license and full
+text, as a reference when writing or improving a Homer skill.
+[Homer Skills](HomerSkills.htm) reads them for what they teach the kit: what
+fits the Homer guidelines, what needs a decision first, and which new and
+improved Homer skills are proposed.
