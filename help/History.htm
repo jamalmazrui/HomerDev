@@ -172,7 +172,8 @@
 <h1 id="history">History</h1>
 <h2 id="contents">Contents</h2>
 <ul>
-<li><a href="#october-2026">1.43.52 – 1 October 2026</a></li>
+<li><a href="#october-2026">1.43.53 – 1 October 2026</a></li>
+<li><a href="#october-2026-1">1.43.52 – 1 October 2026</a></li>
 <li><a href="#september-2026">1.43.51 – 30 September 2026</a></li>
 <li><a href="#september-2026-1">1.43.50 – 30 September 2026</a></li>
 <li><a href="#september-2026-2">1.43.49 – 30 September 2026</a></li>
@@ -289,7 +290,19 @@
 <li><a href="#september-2026-113">1.1.0 – 18 September 2026</a></li>
 <li><a href="#september-2026-114">1.0.0 – 18 September 2026</a></li>
 </ul>
-<h2 id="october-2026">1.43.52 – 1 October 2026</h2>
+<h2 id="october-2026">1.43.53 – 1 October 2026</h2>
+<p><strong>release shows GitHub’s answer when it decides a version is
+already out.</strong> EdSharp’s releases said “already on GitHub” for
+5.0.32 through 5.0.35, each straight after a build that had chosen a new
+number, and the log showed nothing of what GitHub had said. Now release
+prints how many releases GitHub lists, the newest tags, and whether the
+one asked for is among them. The list is read as one block of text,
+however gh splits its output into lines. When the list cannot be read,
+GitHub’s own record of that tag is fetched and read – a published
+release names the tag and is not a draft – instead of trusting the exit
+code of gh release view, which through gh.cmd has said “found” for
+releases that did not exist.</p>
+<h2 id="october-2026-1">1.43.52 – 1 October 2026</h2>
 <p><strong>No Ollama window left open after an install.</strong>
 Ollama’s own installer starts its desktop app when it finishes, and the
 app opens a chat window, which confuses someone who never asked for it:

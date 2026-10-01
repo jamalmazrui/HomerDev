@@ -7,7 +7,8 @@ author: "Jamal Mazrui"
 
 ## Contents
 
-- [1.43.52 -- 1 October 2026](#october-2026)
+- [1.43.53 -- 1 October 2026](#october-2026)
+- [1.43.52 -- 1 October 2026](#october-2026-1)
 - [1.43.51 -- 30 September 2026](#september-2026)
 - [1.43.50 -- 30 September 2026](#september-2026-1)
 - [1.43.49 -- 30 September 2026](#september-2026-2)
@@ -123,6 +124,19 @@ author: "Jamal Mazrui"
 - [1.2.0 -- 18 September 2026](#september-2026-112)
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
+
+## 1.43.53 -- 1 October 2026
+
+**release shows GitHub's answer when it decides a version is already out.**
+EdSharp's releases said "already on GitHub" for 5.0.32 through 5.0.35, each
+straight after a build that had chosen a new number, and the log showed
+nothing of what GitHub had said. Now release prints how many releases GitHub
+lists, the newest tags, and whether the one asked for is among them. The list
+is read as one block of text, however gh splits its output into lines. When
+the list cannot be read, GitHub's own record of that tag is fetched and read
+-- a published release names the tag and is not a draft -- instead of trusting
+the exit code of gh release view, which through gh.cmd has said "found" for
+releases that did not exist.
 
 ## 1.43.52 -- 1 October 2026
 
