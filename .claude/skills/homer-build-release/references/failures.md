@@ -32,6 +32,12 @@ Each entry: the symptom in the log, the cause, the fix.
 - **PowerShell parse error.** `"$var: text"` reads as a drive; write
   `${var}:`.
 
+- **"ALREADY RELEASED" for a number the build has just chosen.** The build's
+  step over tagged numbers never matched: git writes its tag list with LF
+  line ends, and findstr /e matches only before CR LF. An app with old
+  releases above its current number (EdSharp's v5.0.32 to v5.0.36) chose them
+  again and again. Kit 1.43.54 rewrites the list with CR LF first and logs how
+  many tags it read; an app's build script needs the same lines.
 - **"ALREADY RELEASED" right after a release.** The release was run twice;
   the first published, the second correctly found nothing new. Check for an
   earlier release log before treating it as a fault.

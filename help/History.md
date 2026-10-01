@@ -7,8 +7,9 @@ author: "Jamal Mazrui"
 
 ## Contents
 
-- [1.43.53 -- 1 October 2026](#october-2026)
-- [1.43.52 -- 1 October 2026](#october-2026-1)
+- [1.43.54 -- 1 October 2026](#october-2026)
+- [1.43.53 -- 1 October 2026](#october-2026-1)
+- [1.43.52 -- 1 October 2026](#october-2026-2)
 - [1.43.51 -- 30 September 2026](#september-2026)
 - [1.43.50 -- 30 September 2026](#september-2026-1)
 - [1.43.49 -- 30 September 2026](#september-2026-2)
@@ -124,6 +125,20 @@ author: "Jamal Mazrui"
 - [1.2.0 -- 18 September 2026](#september-2026-112)
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
+
+## 1.43.54 -- 1 October 2026
+
+**A build steps over every released number, as it always meant to.** Each
+build takes the next version and skips any number already tagged on GitHub,
+by searching git's list of tags with findstr /e. git writes that list with LF
+line ends, and findstr /e matches only before CR LF, so nothing ever matched.
+For most apps it did not matter; EdSharp has releases from long ago above its
+current number, so its builds chose v5.0.32, then 33, 34, 35 and 36, each
+already on GitHub, and each release rightly refused. The tag list is now
+rewritten with CR LF before the search, and the build log says how many tags
+it read. The build templates and the four samples carry the fix; release 1.43.53's
+evidence lines showed it ("GitHub has a published release tagged v5.0.36",
+among 43). homer-build-release's failures reference gains the case.
 
 ## 1.43.53 -- 1 October 2026
 
