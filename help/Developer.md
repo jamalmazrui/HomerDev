@@ -119,7 +119,7 @@ and runs them from its project folder. They share one fact: `.gitignore` is
 a whitelist written from `RepoFiles.txt`, so "add everything" means "add
 everything the project has named".
 
-1. `build<App>` -- steps `version.txt`, builds the program and the installer,
+1. `build` -- steps `version.txt`, builds the program and the installer,
    speaks any tutorial without audio, puts the project's own files into the
    Homer encoding (`scripts\fixEncoding`), refreshes these scripts from the kit.
 2. `scripts\push "message"` -- rewrites the whitelist from `RepoFiles.txt`,
@@ -183,7 +183,7 @@ which the kit does not have, so the kit is tagged by hand:
     git tag v1.0.0
     git push origin v1.0.0
 
-An app is different: its `build<App>.cmd` increments `version.txt`, generates
+An app is different: its `build.cmd` increments `version.txt`, generates
 `Version.cs` from it, and the `.iss` reads the same file, so the program, the
 installer and the tag cannot disagree. `release` then does the rest.
 

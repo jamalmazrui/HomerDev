@@ -172,9 +172,10 @@
 <h1 id="history">History</h1>
 <h2 id="contents">Contents</h2>
 <ul>
-<li><a href="#october-2026">1.43.54 – 1 October 2026</a></li>
-<li><a href="#october-2026-1">1.43.53 – 1 October 2026</a></li>
-<li><a href="#october-2026-2">1.43.52 – 1 October 2026</a></li>
+<li><a href="#october-2026">1.43.55 – 1 October 2026</a></li>
+<li><a href="#october-2026-1">1.43.54 – 1 October 2026</a></li>
+<li><a href="#october-2026-2">1.43.53 – 1 October 2026</a></li>
+<li><a href="#october-2026-3">1.43.52 – 1 October 2026</a></li>
 <li><a href="#september-2026">1.43.51 – 30 September 2026</a></li>
 <li><a href="#september-2026-1">1.43.50 – 30 September 2026</a></li>
 <li><a href="#september-2026-2">1.43.49 – 30 September 2026</a></li>
@@ -291,7 +292,21 @@
 <li><a href="#september-2026-113">1.1.0 – 18 September 2026</a></li>
 <li><a href="#september-2026-114">1.0.0 – 18 September 2026</a></li>
 </ul>
-<h2 id="october-2026">1.43.54 – 1 October 2026</h2>
+<h2 id="october-2026">1.43.55 – 1 October 2026</h2>
+<p><strong>An app’s build script is build.cmd.</strong> The folder
+already names the app, so build<App>.cmd said it twice. newHomerApp now
+writes build.cmd (and build.ps1 where a build has a PowerShell half);
+the templates, release’s messages, push, the documents and the skills
+say “build”. check gains “buildname”, which fails an app whose script
+still has the old name, and names the fix: the new scripts, which
+renames build<App>.cmd and .ps1 through git mv, changes every reference
+in the app’s own files – .htm pages and .gitignore included – except
+History.md and History.htm, and logs each change to
+logs&lt;App&gt;-renameBuild-<time>.log. renameBuild all does every app
+beside the kit. check’s build step and the kit’s scan for stale app
+builds accept either name. The kit’s own buildHomerDev, and the samples,
+which share one folder, keep their names.</p>
+<h2 id="october-2026-1">1.43.54 – 1 October 2026</h2>
 <p><strong>A build steps over every released number, as it always meant
 to.</strong> Each build takes the next version and skips any number
 already tagged on GitHub, by searching git’s list of tags with findstr
@@ -305,7 +320,7 @@ build templates and the four samples carry the fix; release 1.43.53’s
 evidence lines showed it (“GitHub has a published release tagged
 v5.0.36”, among 43). homer-build-release’s failures reference gains the
 case.</p>
-<h2 id="october-2026-1">1.43.53 – 1 October 2026</h2>
+<h2 id="october-2026-2">1.43.53 – 1 October 2026</h2>
 <p><strong>release shows GitHub’s answer when it decides a version is
 already out.</strong> EdSharp’s releases said “already on GitHub” for
 5.0.32 through 5.0.35, each straight after a build that had chosen a new
@@ -317,7 +332,7 @@ GitHub’s own record of that tag is fetched and read – a published
 release names the tag and is not a draft – instead of trusting the exit
 code of gh release view, which through gh.cmd has said “found” for
 releases that did not exist.</p>
-<h2 id="october-2026-2">1.43.52 – 1 October 2026</h2>
+<h2 id="october-2026-3">1.43.52 – 1 October 2026</h2>
 <p><strong>No Ollama window left open after an install.</strong>
 Ollama’s own installer starts its desktop app when it finishes, and the
 app opens a chat window, which confuses someone who never asked for it:

@@ -446,10 +446,10 @@ the <code>.md</code> and its <code>.htm</code> go in the list.</li>
 <h3 id="the-four-scripts-and-the-order-they-run-in">6. The four scripts,
 and the order they run in</h3>
 <ol type="1">
-<li><code>build&lt;App&gt;</code> – steps <code>version.txt</code>,
-writes <code>Version.cs</code>, builds the program and the installer,
-speaks any tutorial without audio, puts the project’s own files into the
-Homer encoding, refreshes the scripts.</li>
+<li><code>build</code> – steps <code>version.txt</code>, writes
+<code>Version.cs</code>, builds the program and the installer, speaks
+any tutorial without audio, puts the project’s own files into the Homer
+encoding, refreshes the scripts.</li>
 <li><code>scripts\push "message"</code> – rewrites the whitelist, adds
 what it names, commits, pushes, shows the status.</li>
 <li><code>scripts\tidy</code> – the periodic clean: strays into
@@ -476,9 +476,9 @@ own. The kit’s build deletes such copies when it finds them.</p>
 the developer’s machine – never in a delivered zip, never in the
 repository (it is in <code>LocalFiles.txt</code>). The build steps it,
 writes <code>Version.cs</code> from it, and stamps the installer;
-<code>build&lt;App&gt; nobump</code> keeps the number.
-<code>release</code> reads the version from the installer’s own
-resource, so the tag can never disagree with what was built.</p>
+<code>build nobump</code> keeps the number. <code>release</code> reads
+the version from the installer’s own resource, so the tag can never
+disagree with what was built.</p>
 <p><strong>Everything else is written from <code>version.txt</code>,
 every build, bumped or not</strong> – an NVDA add-on’s
 <code>manifest.ini</code>, a <code>Version.cs</code> – so they cannot
@@ -727,9 +727,9 @@ September the machine was at 1.41.3 and the GitHub archive at 1.41.0),
 and <code>release.*</code> is never in git by rule. Shipping renamed
 copies would have replaced the newer content with the older and then
 deleted the newer original.</p>
-<p><strong>Each app’s own <code>build&lt;App&gt;.cmd</code> is not in
-the kit and must be updated in that app’s chat</strong>: the refresh
-loop to the new names, the retired loop to include the old names, and
+<p><strong>Each app’s own <code>build.cmd</code> is not in the kit and
+must be updated in that app’s chat</strong>: the refresh loop to the new
+names, the retired loop to include the old names, and
 <code>kitNeeded</code> raised to 1.42.0. The kit’s build cannot reach
 it. Until that is done the app’s build will say “NOT IN THE KIT” for
 each tool – if it uses the loop in section 3 – or, with the old
@@ -1274,13 +1274,13 @@ in every language the app uses. Keep the map; a move is finished when a
 grep for the old path finds nothing live.</li>
 <li><strong>The contract, moving nothing.</strong> Rewrite the build
 from <code>Templates\build_APP_.cmd</code>, or wrap an existing engine
-in a <code>build&lt;App&gt;.cmd</code> that carries the contract: kit
-detection and a trimmed <code>kitNeeded</code> comparison; the kit’s C#
-compiled in by Roslyn and no local copies; the refresh loop naming only
-the tools this app uses and saying when one is missing; the retired loop
-including the renamed names; <code>fixEncoding</code> with
-<code>-build</code>; one log per session in <code>logs</code>. Pass
-lists to PowerShell semicolon-joined. Build green.</li>
+in a <code>build.cmd</code> that carries the contract: kit detection and
+a trimmed <code>kitNeeded</code> comparison; the kit’s C# compiled in by
+Roslyn and no local copies; the refresh loop naming only the tools this
+app uses and saying when one is missing; the retired loop including the
+renamed names; <code>fixEncoding</code> with <code>-build</code>; one
+log per session in <code>logs</code>. Pass lists to PowerShell
+semicolon-joined. Build green.</li>
 <li><strong>Write <code>RepoFiles.txt</code> and
 <code>LocalFiles.txt</code></strong> (start from
 <code>Templates\LocalFiles.txt</code>): scripts named one by one, never
@@ -1316,8 +1316,8 @@ tutorials, and add the tutorial tools to the refresh loop then.</li>
 <li><strong>Create the repository</strong> with
 <code>create&lt;App&gt;Repo</code> if there is none; otherwise
 <code>scripts\tidy</code>.</li>
-<li><strong>Build, check, push, release</strong>:
-<code>build&lt;App&gt;</code>, <code>scripts\check --build</code>,
+<li><strong>Build, check, push, release</strong>: <code>build</code>,
+<code>scripts\check --build</code>,
 <code>scripts\push "Move to the kit."</code>,
 <code>scripts\release</code>.</li>
 </ol>

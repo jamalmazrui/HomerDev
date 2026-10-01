@@ -744,7 +744,7 @@ than `run`, because the frame shows the window.
 Everything else, which is the point of the kit: `Inix` for settings, `Log` for
 the session log, `Paths` for the folder layout, `Say` for what the screen reader
 cannot know, `KeyName` and `KeyMap` for keys, `Lbc` for every control, the
-document set, `build<App>.cmd`, `<App>_setup.iss`, `RepoFiles.txt`, `accept.inix`
+document set, `build.cmd`, `<App>_setup.iss`, `RepoFiles.txt`, `accept.inix`
 and `check`. A person who learns one shape has learnt most of the other
 two.
 
@@ -1534,7 +1534,7 @@ the reader's fault -- but the program must not give it cause.
 
 Generate it from the source rather than keep it by hand: every key lives in one
 place in the code, and a list kept by hand drifts the first time a key changes.
-DbDo's `scripts/makeHotkeys.py` is the model; `build<App>` runs it before the
+DbDo's `scripts/makeHotkeys.py` is the model; `build` runs it before the
 documents are converted.
 
 Three sections, each an H2 with H3 groups inside: **by menu**, **by key** (grouped
@@ -1597,7 +1597,7 @@ the log from when it happened, and the log being read is never the log being
 written. The most recent thirty are kept and the rest deleted, which reaches
 back through a few weeks of ordinary use and keeps the folder readable.
 
-A build script is the exception, and it stays one: `build<App>.log` sits beside
+A build script is the exception, and it stays one: `logs\<App>-build-yyyyMMdd-HHmmss.log` sits beside
 the build script, because that is a developer's file and the developer is
 standing in that folder.
 
@@ -1694,7 +1694,7 @@ the file is there.
 
 Public, because somebody rebuilding the program needs it:
 
-- the source, the installer script, `build<App>.cmd`, `version.txt`
+- the source, the installer script, `build.cmd`, `version.txt`
 - `RepoFiles.txt` and the generated `.gitignore`
 - the documentation set, in both `.md` and `.htm`
 - `finish.cmd` and the `install*.cmd` scripts the installer ships
@@ -1789,7 +1789,7 @@ script, a repository tidy, and a release.
   on the default path, compiles the app with the Homer modules from
   `C:\HomerDev\exec\CSharp`, converts the documents with pandoc, and compiles the
   installer if Inno Setup is present. It fetches what it needs from the web
-  itself. Log: `build<App>.log`.
+  itself. Log: `logs\<App>-build-yyyyMMdd-HHmmss.log`.
 - **tidy** -- the folder and the repository, surveyed together and fixed in
   one pass. It carries its plan out in the same run: a stray goes into `notes`, which git never takes, and the log names every move. In the
   folder: empty files deleted, duplicates and files the project does not name
@@ -1809,10 +1809,20 @@ script, a repository tidy, and a release.
   released, writes it back, tags, pushes, and publishes the GitHub release with
   the installer attached. Log: `release.log`.
 
+### The build script's name
+
+An app's build script is `build.cmd`, with `build.ps1` beside it when the build
+has a PowerShell half. The folder, `C:\<App>`, already names the app, so the
+script does not repeat it. The kit's check fails an app whose script is still
+called `build<App>.cmd`. To rename one, run the kit's `scripts\renameBuild` in
+the app's folder, or `renameBuild all` for every app beside the kit: it renames
+the scripts through git and changes every reference to them, except in
+History.md, and logs each change.
+
 ### The release routine
 
 1. Unzip the app archive into `C:\<App>`.
-2. `build<App>` from that folder.
+2. `build` from that folder.
 3. Run `<App>.exe` as a quick test.
 4. Commit, then `release`.
 5. Install from the published `<App>_setup.exe`, or update in place with F11.

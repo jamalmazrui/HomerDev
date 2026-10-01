@@ -21,7 +21,8 @@
 !/.gitignore
 !/_APP_.cs
 !/_APP__setup.iss
-!/build_APP_.cmd
+!/build.cmd
+!/build.ps1
 !/finish.cmd
 !/installModels.cmd
 !/installOllama.cmd

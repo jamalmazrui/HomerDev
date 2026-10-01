@@ -639,7 +639,8 @@ def findStaleAppBuilds():
     <App>.zip is unzipped; until then it stops with "no kit found", and on 28
     September urlFido's did so twice after its new build script had been
     delivered. So the kit's build looks at each folder beside it for a
-    build<App>.cmd that still names the old paths, and says which to unzip.
+    build.cmd (or an older build<App>.cmd) that still names the old paths,
+    and says which to unzip.
     Returns the names found."""
     import glob
     lsStale = []
@@ -647,7 +648,7 @@ def findStaleAppBuilds():
     for sBuild in sorted(glob.glob(os.path.join(sParent, "*", "build*.cmd")), key=str.lower):
         sFolder = os.path.basename(os.path.dirname(sBuild))
         if os.path.normcase(os.path.dirname(sBuild)) == os.path.normcase(sScriptDir): continue
-        if os.path.basename(sBuild).lower() != ("build" + sFolder + ".cmd").lower(): continue
+        if os.path.basename(sBuild).lower() not in ("build.cmd", ("build" + sFolder + ".cmd").lower()): continue
         try:
             sText = open(sBuild, "rb").read().decode("utf-8", "replace")
         except Exception:

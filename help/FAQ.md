@@ -107,7 +107,7 @@ license text with the code.
 ## How do I report a problem or ask for something?
 
 Open an issue on the repository. A log file helps more than a description:
-`%LOCALAPPDATA%\<App>\logs` for a program, or `build<App>.log` beside the build
+`%LOCALAPPDATA%\<App>\logs` for a program, or `logs\<App>-build-yyyyMMdd-HHmmss.log` beside the build
 script for a build.
 
 ## Who made this, and why is it called Homer?

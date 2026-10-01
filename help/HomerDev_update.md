@@ -233,7 +233,7 @@ Three rules from HomerView, 26 September:
 
 ### 6. The four scripts, and the order they run in
 
-1. `build<App>` -- steps `version.txt`, writes `Version.cs`, builds the
+1. `build` -- steps `version.txt`, writes `Version.cs`, builds the
    program and the installer, speaks any tutorial without audio, puts the
    project's own files into the Homer encoding, refreshes the scripts.
 2. `scripts\push "message"` -- rewrites the whitelist, adds what it names,
@@ -261,7 +261,7 @@ copies when it finds them.
 `version.txt` holds the current number and lives only on the developer's
 machine -- never in a delivered zip, never in the repository (it is in
 `LocalFiles.txt`). The build steps it, writes `Version.cs` from it, and
-stamps the installer; `build<App> nobump` keeps the number. `release`
+stamps the installer; `build nobump` keeps the number. `release`
 reads the version from the installer's own resource, so the tag can never
 disagree with what was built.
 
@@ -471,7 +471,7 @@ archive at 1.41.0), and `release.*` is never in git by rule. Shipping
 renamed copies would have replaced the newer content with the older and
 then deleted the newer original.
 
-**Each app's own `build<App>.cmd` is not in the kit and must be updated in
+**Each app's own `build.cmd` is not in the kit and must be updated in
 that app's chat**: the refresh loop to the new names, the retired loop to
 include the old names, and `kitNeeded` raised to 1.42.0. The kit's build
 cannot reach it. Until that is done the app's build will say "NOT IN THE
@@ -947,7 +947,7 @@ contract first without moving files, then the layout one group at a time.
    path finds nothing live.
 4. **The contract, moving nothing.** Rewrite the build from
    `Templates\build_APP_.cmd`, or wrap an existing engine in a
-   `build<App>.cmd` that carries the contract: kit detection and a trimmed
+   `build.cmd` that carries the contract: kit detection and a trimmed
    `kitNeeded` comparison; the kit's C# compiled in by Roslyn and no local
    copies; the refresh loop naming only the tools this app uses and saying
    when one is missing; the retired loop including the renamed names;
@@ -977,7 +977,7 @@ contract first without moving files, then the layout one group at a time.
     to have tutorials, and add the tutorial tools to the refresh loop then.
 11. **Create the repository** with `create<App>Repo` if there is none;
     otherwise `scripts\tidy`.
-12. **Build, check, push, release**: `build<App>`, `scripts\check --build`,
+12. **Build, check, push, release**: `build`, `scripts\check --build`,
     `scripts\push "Move to the kit."`, `scripts\release`.
 
 ## DbDo: what it has, what it still needs

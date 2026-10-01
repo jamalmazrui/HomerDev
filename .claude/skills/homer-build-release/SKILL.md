@@ -24,7 +24,7 @@ cmd reads a forward slash as a switch):
 1. `buildHomerDev` in C:\HomerDev, whenever the kit changed. App builds find
    the kit's code in `exec\CSharp` and `exec\Python`, and stop if the kit is
    older than their `kitNeeded`.
-2. `build<App>` (or `build<App> nobump` to keep the version). Steps the version
+2. `build` (or `build nobump` to keep the version). Steps the version
    in `version.txt`, compiles into `exec`, builds `<App>_setup.exe` at the top
    of the project, refreshes the kit's scripts into `scripts`.
 3. A quick test of `exec\<App>.exe`.

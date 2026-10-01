@@ -7,9 +7,10 @@ author: "Jamal Mazrui"
 
 ## Contents
 
-- [1.43.54 -- 1 October 2026](#october-2026)
-- [1.43.53 -- 1 October 2026](#october-2026-1)
-- [1.43.52 -- 1 October 2026](#october-2026-2)
+- [1.43.55 -- 1 October 2026](#october-2026)
+- [1.43.54 -- 1 October 2026](#october-2026-1)
+- [1.43.53 -- 1 October 2026](#october-2026-2)
+- [1.43.52 -- 1 October 2026](#october-2026-3)
 - [1.43.51 -- 30 September 2026](#september-2026)
 - [1.43.50 -- 30 September 2026](#september-2026-1)
 - [1.43.49 -- 30 September 2026](#september-2026-2)
@@ -125,6 +126,21 @@ author: "Jamal Mazrui"
 - [1.2.0 -- 18 September 2026](#september-2026-112)
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
+
+## 1.43.55 -- 1 October 2026
+
+**An app's build script is build.cmd.** The folder already names the app, so
+build<App>.cmd said it twice. newHomerApp now writes build.cmd (and build.ps1
+where a build has a PowerShell half); the templates, release's messages, push,
+the documents and the skills say "build". check gains "buildname", which fails
+an app whose script still has the old name, and names the fix: the new
+scripts\renameBuild, which renames build<App>.cmd and .ps1 through git mv,
+changes every reference in the app's own files -- .htm pages and .gitignore
+included -- except History.md and History.htm, and logs
+each change to logs\<App>-renameBuild-<time>.log. renameBuild all does every
+app beside the kit. check's build step and the kit's scan for stale app
+builds accept either name. The kit's own buildHomerDev, and the samples, which
+share one folder, keep their names.
 
 ## 1.43.54 -- 1 October 2026
 

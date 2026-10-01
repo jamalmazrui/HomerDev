@@ -10,7 +10,7 @@ Usage (through the wrapper, which is how it is meant to be run):
 
 What it writes into the app folder (1.43.31):
     <App>.cs                the C# starter (a Python app writes its own .py)
-    build<App>.cmd          the build script, compiling from C:\HomerDev
+    build.cmd               the build script, compiling from C:\HomerDev
     <App>_setup.iss         the installer script
     create<App>Repo.cmd     the one-time GitHub bootstrap, and its .ps1
     version.txt             1.0.0
@@ -170,7 +170,7 @@ def newProjectFiles(sApp, bPython):
     lsRepo = ["# RepoFiles.txt -- what the %s repository carries. tidy writes the" % sApp,
               "# .gitignore whitelist from this list alone.", "",
               ".gitattributes", "LocalFiles.txt", "License.htm", "License.md", "ReadMe.htm", "ReadMe.md",
-              "RepoFiles.txt", "accept.inix", "build%s.cmd" % sApp, "help/", sApp + "_setup.iss", sSource,
+              "RepoFiles.txt", "accept.inix", "build.cmd", "help/", sApp + "_setup.iss", sSource,
               "scripts/", ""]
     lsLocal = ["# LocalFiles.txt -- what belongs to %s on this disk, but never in the repository." % sApp, "",
                "exec/", "logs/", "notes/", sApp + "_setup.exe", "scripts/release.cmd", "scripts/release.ps1",
@@ -187,8 +187,8 @@ def newProjectFiles(sApp, bPython):
         ("help/%s.md" % sApp, "# %s\n\nThe full guide to %s, in topics by heading.\n" % (sApp, sApp)),
         ("help/Announce.md", "# %s: what is new\n\n%s 1.0.0 is the first release.\n" % (sApp, sApp)),
         ("help/Developer.md", "# %s: how it is built\n\n%s is built with the Homer Development Kit in\n"
-                              "C:\\HomerDev: build%s makes exec\\%s.exe and %s_setup.exe.\n"
-                              % (sApp, sApp, sApp, sApp, sApp)),
+                              "C:\\HomerDev: build makes exec\\%s.exe and %s_setup.exe.\n"
+                              % (sApp, sApp, sApp, sApp)),
         ("help/History.md", "# %s History\n\n## 1.0.0, %s\n\nThe first release.\n" % (sApp, sToday)),
         ("help/self.md", "# %s notebook\n\nThe project's private notebook: plans, decisions and notes to\n"
                          "self. It is never pushed.\n" % sApp),
@@ -238,7 +238,7 @@ def main():
 
     lsScripts = [
         ("_APP_.cs",             sApp + ".cs"),
-        ("build_APP_.cmd",       "build" + sApp + ".cmd"),
+        ("build_APP_.cmd",       "build.cmd"),
         ("_APP__setup.iss",      sApp + "_setup.iss"),
         ("create_APP_Repo.cmd",  "create" + sApp + "Repo.cmd"),
         ("create_APP_Repo.ps1",  "create" + sApp + "Repo.ps1"),
@@ -250,7 +250,7 @@ def main():
         #  A Python app takes the Python build script instead of the C# one and
         #  writes its source from the Python sample rather than the C# starter.
         lsScripts = [t for t in lsScripts if t[0] not in ("_APP_.cs", "build_APP_.cmd")]
-        lsScripts.insert(0, ("build_APP_Py.cmd", "build" + sApp + ".cmd"))
+        lsScripts.insert(0, ("build_APP_Py.cmd", "build.cmd"))
 
     os.makedirs(sTarget, exist_ok=True)
     iWritten = 0
@@ -292,10 +292,10 @@ def main():
     if bPython:
         sayLine("Next: write %s.py -- Templates\\samples\\FruitBasketPy is the worked example --"
                 % sApp)
-        sayLine("set the AppId and hotkey in %s_setup.iss, then run build%s." % (sApp, sApp))
+        sayLine("set the AppId and hotkey in %s_setup.iss, then run build." % sApp)
     else:
-        sayLine("Next: fill in runScript() in %s.cs, set the AppId and hotkey in %s_setup.iss, then run build%s."
-                % (sApp, sApp, sApp))
+        sayLine("Next: fill in runScript() in %s.cs, set the AppId and hotkey in %s_setup.iss, then run build."
+                % (sApp, sApp))
     logLine("newHomerApp end")
     return 0
 

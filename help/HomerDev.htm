@@ -1000,7 +1000,7 @@ settings, <code>Log</code> for the session log, <code>Paths</code> for
 the folder layout, <code>Say</code> for what the screen reader cannot
 know, <code>KeyName</code> and <code>KeyMap</code> for keys,
 <code>Lbc</code> for every control, the document set,
-<code>build&lt;App&gt;.cmd</code>, <code>&lt;App&gt;_setup.iss</code>,
+<code>build.cmd</code>, <code>&lt;App&gt;_setup.iss</code>,
 <code>RepoFiles.txt</code>, <code>accept.inix</code> and
 <code>check</code>. A person who learns one shape has learnt most of the
 other two.</p>
@@ -1821,7 +1821,7 @@ must not give it cause.</p>
 <p>Generate it from the source rather than keep it by hand: every key
 lives in one place in the code, and a list kept by hand drifts the first
 time a key changes. DbDo’s <code>scripts/makeHotkeys.py</code> is the
-model; <code>build&lt;App&gt;</code> runs it before the documents are
+model; <code>build</code> runs it before the documents are
 converted.</p>
 <p>Three sections, each an H2 with H3 groups inside: <strong>by
 menu</strong>, <strong>by key</strong> (grouped by modifier family,
@@ -1882,9 +1882,9 @@ never the log being written. The most recent thirty are kept and the
 rest deleted, which reaches back through a few weeks of ordinary use and
 keeps the folder readable.</p>
 <p>A build script is the exception, and it stays one:
-<code>build&lt;App&gt;.log</code> sits beside the build script, because
-that is a developer’s file and the developer is standing in that
-folder.</p>
+<code>logs\&lt;App&gt;-build-yyyyMMdd-HHmmss.log</code> sits beside the
+build script, because that is a developer’s file and the developer is
+standing in that folder.</p>
 <h3 id="writing-to-it">Writing to it</h3>
 <p><code>Log</code> in C# and <code>log</code> in Python are the same
 class in two languages, with the same method names, so a log written by
@@ -1978,7 +1978,7 @@ apart.</p>
 and what stays on your machine</h3>
 <p>Public, because somebody rebuilding the program needs it:</p>
 <ul>
-<li>the source, the installer script, <code>build&lt;App&gt;.cmd</code>,
+<li>the source, the installer script, <code>build.cmd</code>,
 <code>version.txt</code></li>
 <li><code>RepoFiles.txt</code> and the generated
 <code>.gitignore</code></li>
@@ -2082,7 +2082,7 @@ the default path, compiles the app with the Homer modules from
 <code>C:\HomerDev\exec\CSharp</code>, converts the documents with
 pandoc, and compiles the installer if Inno Setup is present. It fetches
 what it needs from the web itself. Log:
-<code>build&lt;App&gt;.log</code>.</p></li>
+<code>logs\&lt;App&gt;-build-yyyyMMdd-HHmmss.log</code>.</p></li>
 <li><p><strong>tidy</strong> – the folder and the repository, surveyed
 together and fixed in one pass. It carries its plan out in the same run:
 a stray goes into <code>notes</code>, which git never takes, and the log
@@ -2107,10 +2107,20 @@ number is already released, writes it back, tags, pushes, and publishes
 the GitHub release with the installer attached. Log:
 <code>release.log</code>.</p></li>
 </ul>
+<h3 id="the-build-scripts-name">The build script’s name</h3>
+<p>An app’s build script is <code>build.cmd</code>, with
+<code>build.ps1</code> beside it when the build has a PowerShell half.
+The folder, <code>C:\&lt;App&gt;</code>, already names the app, so the
+script does not repeat it. The kit’s check fails an app whose script is
+still called <code>build&lt;App&gt;.cmd</code>. To rename one, run the
+kit’s <code>scripts\renameBuild</code> in the app’s folder, or
+<code>renameBuild all</code> for every app beside the kit: it renames
+the scripts through git and changes every reference to them, except in
+History.md, and logs each change.</p>
 <h3 id="the-release-routine">The release routine</h3>
 <ol type="1">
 <li>Unzip the app archive into <code>C:\&lt;App&gt;</code>.</li>
-<li><code>build&lt;App&gt;</code> from that folder.</li>
+<li><code>build</code> from that folder.</li>
 <li>Run <code>&lt;App&gt;.exe</code> as a quick test.</li>
 <li>Commit, then <code>release</code>.</li>
 <li>Install from the published <code>&lt;App&gt;_setup.exe</code>, or

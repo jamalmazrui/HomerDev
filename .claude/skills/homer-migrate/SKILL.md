@@ -38,7 +38,7 @@ fail several.
 
 1. Deliver the changed files and the kit, if the kit changed, stating which
    to unzip first: the kit, then the app.
-2. The user runs `buildHomerDev` (when the kit changed), `build<App>`, a
+2. The user runs `buildHomerDev` (when the kit changed), `build`, a
    quick test, `scripts\tidy`, `scripts\push` and `scripts\release`.
 3. Read the logs they send. The migration is done when the build succeeds,
    the check passes (acceptance included), and the release reports

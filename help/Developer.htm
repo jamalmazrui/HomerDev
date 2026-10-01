@@ -277,9 +277,9 @@ fact: <code>.gitignore</code> is a whitelist written from
 <code>RepoFiles.txt</code>, so “add everything” means “add everything
 the project has named”.</p>
 <ol type="1">
-<li><code>build&lt;App&gt;</code> – steps <code>version.txt</code>,
-builds the program and the installer, speaks any tutorial without audio,
-puts the project’s own files into the Homer encoding
+<li><code>build</code> – steps <code>version.txt</code>, builds the
+program and the installer, speaks any tutorial without audio, puts the
+project’s own files into the Homer encoding
 (<code>scripts\fixEncoding</code>), refreshes these scripts from the
 kit.</li>
 <li><code>scripts\push "message"</code> – rewrites the whitelist from
@@ -345,7 +345,7 @@ installer’s version resource, which the kit does not have, so the kit is
 tagged by hand:</p>
 <pre><code>git tag v1.0.0
 git push origin v1.0.0</code></pre>
-<p>An app is different: its <code>build&lt;App&gt;.cmd</code> increments
+<p>An app is different: its <code>build.cmd</code> increments
 <code>version.txt</code>, generates <code>Version.cs</code> from it, and
 the <code>.iss</code> reads the same file, so the program, the installer
 and the tag cannot disagree. <code>release</code> then does the

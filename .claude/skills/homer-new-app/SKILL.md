@@ -81,7 +81,7 @@ notebook `self.md`. It overwrites nothing. The kit's scripts arrive in
 
 ```
 cd \<App>
-build<App>
+build
 exec\<App>.exe --help
 create<App>Repo
 scripts\tidy
