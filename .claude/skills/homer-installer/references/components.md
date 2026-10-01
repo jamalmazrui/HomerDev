@@ -120,3 +120,7 @@ offered as Update`.
   running nvda.exe with an add-on argument (it has none), started NVDA over
   JAWS or failed with "invalid command line parameter". Install the add-on
   into NVDA's addons folder directly (homer-screen-reader).
+- **A window nobody asked for.** Ollama's installer starts its desktop app,
+  which opens a chat window. Homer apps use Ollama behind the scenes, so
+  installOllama closes that window politely after installing, updating or
+  reinstalling, leaving the service running, and logs whether it did.

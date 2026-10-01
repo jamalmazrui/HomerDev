@@ -281,7 +281,7 @@ FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installOllama.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause update"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelOllama}"; \
   Check: isUpdateOllama; \
@@ -303,7 +303,7 @@ FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated unchecked skipifdoesntexist
 
 FileName: "{app}\scripts\installOllama.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause reinstall"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelOllama}"; \
   Check: isReinstallOllama; \

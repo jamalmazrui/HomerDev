@@ -41,6 +41,20 @@ scripts and the NVDA add-on take their places among the others: "ExifTool,
 ffmpeg, ImageMagick, JAWS scripts, mpv, NVDA add-on, Ollama". Launch and the
 guide always come last.
 
+## The box decides, the script does
+
+The finish page compares versions; the script behind a box does not check
+again, and does not announce a check. An Update box passes `update` to its
+script and a Reinstall box `reinstall` (as in `noPause update`), so the
+script upgrades, or reinstalls with `winget install --force`, and says which
+it did -- "Updating Ollama to the newest version", then "Ollama was updated"
+or "Ollama was NOT updated; the log has winget's answer."
+
+The kit's `check` enforces the finish page: an Install or Update box not
+ticked, a Reinstall box ticked, an unticked Launch box, a component box
+without Install, Update or Reinstall, a box that starts NVDA, and a label
+saying NVDA must be running all fail the release.
+
 ## Whether the screen reader support is current
 
 The JAWS scripts and the NVDA add-on are judged as every component is, so the
