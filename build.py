@@ -61,7 +61,7 @@ c_lsExpected = [
     ".claude/skills/homer-build-release/SKILL.md", ".claude/skills/homer-code/SKILL.md",
     ".claude/skills/homer-convert/SKILL.md", ".claude/skills/homer-docs/SKILL.md", ".claude/skills/homer-ui/SKILL.md",
     ".claude/skills/homer-elevate/SKILL.md", ".claude/skills/homer-installer/SKILL.md", ".claude/skills/homer-migrate/SKILL.md", ".claude/skills/homer-new-app/SKILL.md",
-    ".claude/skills/homer-page/SKILL.md", ".claude/skills/homer-page/templates/_layouts/default.html",
+    ".claude/skills/homer-db/SKILL.md", ".claude/skills/homer-page/SKILL.md", ".claude/skills/homer-page/templates/_layouts/default.html",
     ".claude/skills/homer-page/templates/assets/css/style.scss", ".claude/skills/homer-screen-reader/SKILL.md",
     ".claude/skills/homer-installer/references/components.md",
     ".claude/skills/homer-tutorial/SKILL.md", ".claude/skills/podcast-directory/SKILL.md",

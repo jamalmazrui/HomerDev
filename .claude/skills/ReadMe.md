@@ -46,6 +46,11 @@ HomerDev.md, under "Claude skills".
   Pandoc, Office, PDF and other documents to accessible .htm or .txt with 2htm,
   tables with inixVert -- and put the output in the Homer encoding with its
   toHomerEncoding script.
+- **homer-db**: design, create and review SQLite .db files the way DbDo opens
+  them -- table and field names, the standard fields in their order, look and
+  prime, the lookups, maps and views tables, pick lists, and a database's own
+  folder -- with a checkDb script that reports where a database departs from
+  the conventions.
 - **homer-docs**: the documentation set, reading level, headings, lists,
   links, key naming, History and Hotkeys, with a checkDocs script that reports
   missing documents, stale .htm files, heading problems, bare URLs and each

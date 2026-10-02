@@ -25,6 +25,17 @@ collection is pushed and tidied like an app but has no build or installer; a
 page is published and released by `post`. The kit's HomerDev.md, under "Four
 kinds of Homer resource", lists what every script does for each kind.
 
+## Stages
+
+Know which stage a release is meant to be before running it: a build (the
+builder alone), a development release (public, labelled as development, for
+the testers who asked for new work), or a release version (made from time to
+time, for everybody, after a full JAWS and NVDA test pass, testers' real use,
+current documents and, for an app, an installer tried on a fresh computer).
+HomerDev.md, "Stages: from a build to a release version", gives the bar for
+each. A serious problem in a release version is fixed through a development
+release first.
+
 ## The cycle
 
 The steps, in order, with the commands as the user types them (backslashes:

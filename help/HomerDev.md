@@ -246,6 +246,12 @@ the long form; the JAWS Script version covers that language's differences.
 classic `.ini` with four additions, and any plain `.ini` file is already valid
 `.inix`.
 
+**Homer creates `.inix`, never `.ini`.** Every configuration file a Homer
+program or script writes for itself ends in `.inix`. `.ini` is deprecated in
+Homer and appears only where another program requires that name -- an NVDA
+add-on's `manifest.ini`, say -- or when a Homer program reads an old `.ini` of
+its own once, to carry its settings into the `.inix` that replaces it.
+
 ### The basics
 
     ; a comment. # also starts one.
@@ -1942,6 +1948,41 @@ History.md, and logs each change.
 3. Run `<App>.exe` as a quick test.
 4. Commit, then `release`.
 5. Install from the published `<App>_setup.exe`, or update in place with F11.
+
+### Stages: from a build to a release version
+
+Nothing a Homer builder makes is finished for good. Feedback, a new idea or a
+new technology will show how a released program, page or kit could be better,
+so each one moves through the same stages again and again. What changes from
+stage to stage is who has tried it and how hard it has been tested before it
+moves on.
+
+1. **A build**, on the builder's own computer. Who: the builder. Before it
+   moves on: the build succeeds, `check` passes, a quick run of the program
+   (or a dry run of `post` for a page) does what the change was for, and the
+   log has nothing unexplained.
+2. **A development release**, public on GitHub as the newest work. Who: the
+   builder, and the testers who have asked to try new work. Before it moves
+   on: everything above, plus `uiCheck` where there is a program, the changed
+   commands tried with the keyboard and with JAWS and NVDA, and a History
+   entry that says plainly what changed. It is labelled a development release,
+   so nobody mistakes it for one that has been through more.
+3. **A release version**, made from time to time, when a development release
+   has met the higher bar. Who: everybody. Before it is made: no known serious
+   problem; the testers have used it for real work and said so; a full test
+   pass with JAWS and NVDA, not just the changed commands; the documents
+   complete and current, with the license named; for an app, the installer
+   tried on a computer that has not had the program before; for the kit,
+   `checkHomerDev` and, when skills changed, `evalSkills`. Then its
+   announcement.
+
+A serious problem found in a release version is fixed in a development
+release first, tried by the testers, and then becomes the next release
+version -- quickly, but through the same stages.
+
+The stages fit every kind of resource. An app and the kit are released with
+`release`; a page or a collection is posted with `post` as it improves, and a
+release version is the tagged version made when it meets the same higher bar.
 
 ### Publishing a page
 

@@ -58,7 +58,7 @@ kit already has, never assumed.
 ## Build on the kit
 
 A Homer program uses the kit's shared code rather than its own: `Lbc` for
-every dialog, `Log` for its log, `Say` for speech, `Inix` for settings,
+every dialog, `Log` for its log, `Say` for speech, `Inix` for settings (a file Homer creates is always `.inix`, never `.ini`, which is only for another program that requires it),
 `Paths` for its folders, `Web` for downloads, `KeyMap` and `KeyName` for keys,
 `Util` for the small helpers. The more they are exercised, the better they
 get. Read [references/kit-libraries.md](references/kit-libraries.md) for what

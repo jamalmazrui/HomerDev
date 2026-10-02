@@ -7,19 +7,22 @@ author: "Jamal Mazrui"
 
 ## Contents
 
-- [1.48.0 -- 2 October 2026](#october-2026)
-- [1.47.0 -- 2 October 2026](#october-2026-1)
-- [1.46.0 -- 2 October 2026](#october-2026-2)
-- [1.45.0 -- 2 October 2026](#october-2026-3)
-- [1.44.0 -- 2 October 2026](#october-2026-4)
-- [1.43.59 -- 1 October 2026](#october-2026-5)
-- [1.43.58 -- 1 October 2026](#october-2026-6)
-- [1.43.57 -- 1 October 2026](#october-2026-7)
-- [1.43.56 -- 1 October 2026](#october-2026-8)
-- [1.43.55 -- 1 October 2026](#october-2026-9)
-- [1.43.54 -- 1 October 2026](#october-2026-10)
-- [1.43.53 -- 1 October 2026](#october-2026-11)
-- [1.43.52 -- 1 October 2026](#october-2026-12)
+- [1.50.0 -- 2 October 2026](#october-2026)
+- [1.49.1 -- 2 October 2026](#october-2026-1)
+- [1.49.0 -- 2 October 2026](#october-2026-2)
+- [1.48.0 -- 2 October 2026](#october-2026-3)
+- [1.47.0 -- 2 October 2026](#october-2026-4)
+- [1.46.0 -- 2 October 2026](#october-2026-5)
+- [1.45.0 -- 2 October 2026](#october-2026-6)
+- [1.44.0 -- 2 October 2026](#october-2026-7)
+- [1.43.59 -- 1 October 2026](#october-2026-8)
+- [1.43.58 -- 1 October 2026](#october-2026-9)
+- [1.43.57 -- 1 October 2026](#october-2026-10)
+- [1.43.56 -- 1 October 2026](#october-2026-11)
+- [1.43.55 -- 1 October 2026](#october-2026-12)
+- [1.43.54 -- 1 October 2026](#october-2026-13)
+- [1.43.53 -- 1 October 2026](#october-2026-14)
+- [1.43.52 -- 1 October 2026](#october-2026-15)
 - [1.43.51 -- 30 September 2026](#september-2026)
 - [1.43.50 -- 30 September 2026](#september-2026-1)
 - [1.43.49 -- 30 September 2026](#september-2026-2)
@@ -135,6 +138,57 @@ author: "Jamal Mazrui"
 - [1.2.0 -- 18 September 2026](#september-2026-112)
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
+
+## 1.50.0 -- 2 October 2026
+
+**Stages: from a build to a release version.** HomerDev.md sets out the
+sequence every Homer resource follows, since nothing built is finished for
+good: a build on the builder's computer; a development release, public and
+labelled as such, for the testers who asked for new work; and, from time to
+time, a release version for everybody, after a higher bar -- no known serious
+problem, testers' real use, a full JAWS and NVDA test pass, current documents
+with the license named, an installer tried on a fresh computer, and for the
+kit checkHomerDev and evalSkills. A serious problem in a release version is
+fixed through a development release first. The homer-build-release skill
+starts from the stages.
+
+**homer-db says exactly how DbDo follows foreign keys.** DbDo follows fields
+named <singular>_id; declared REFERENCES are shown by Table Summary and read by
+checkDb, and following a differently named declared key is planned in DbDo.
+
+## 1.49.1 -- 2 October 2026
+
+**homer-db: two ways to relate records, both first-class.** The skill now sets
+out that DbDo supports traditional foreign keys, named <singular>_id as in the
+Northwind and Chinook templates and best also declared with REFERENCES, and the
+maps table, which links any record to any other with a kind from lookups, in the
+same database or apart. It adds two triggers per table that keep maps links
+whole: when a record's prime changes its links follow it, and when it is
+deleted its links go too. checkDb now reads declared foreign keys and warns
+when a table in a database with maps lacks those triggers. The reference notes
+two gaps in DbDo itself: links are re-pointed only when a prime definition is
+rebuilt, not when a record is edited, and DbDo's own tables are recognized by
+name alone.
+
+## 1.49.0 -- 2 October 2026
+
+**homer-db, a skill for SQLite databases the DbDo way.** It sets out the
+conventions DbDo's generator and its Trail templates follow: plural lower-case
+tables with a singular id, the standard fields added, edited, url, notes, tags,
+look, prime and marked in their order, DbDo's field types, the edited trigger
+and unique prime index, the lookups, maps and views tables, pick lists in
+alphabetical order, rows short enough to be heard, a first letter for each
+table, and a database's own folder with its .inix settings, reports and
+scripts. Its checkDb script reads a .db file, or every .db under a folder, and
+reports each departure as a failure or a warning, with a log beside the
+database. Run over DbDo's templates, it found most tables without the edited
+trigger, lookups and maps without a unique prime index, and DbDo's generator
+deriving an id by dropping a trailing s (storie_id), all recorded in the
+skill's reference.
+
+**Homer creates .inix, never .ini.** HomerDev.md and the homer-code skill now
+say so: .ini is deprecated in Homer and used only where another program requires
+it, such as an NVDA add-on's manifest.ini, or to read an old Homer .ini once.
 
 ## 1.48.0 -- 2 October 2026
 

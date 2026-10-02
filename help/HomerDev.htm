@@ -432,6 +432,13 @@ that language’s differences.</p>
 <p><code>.inix</code> is the settings and small-table format every Homer
 app uses. It is classic <code>.ini</code> with four additions, and any
 plain <code>.ini</code> file is already valid <code>.inix</code>.</p>
+<p><strong>Homer creates <code>.inix</code>, never
+<code>.ini</code>.</strong> Every configuration file a Homer program or
+script writes for itself ends in <code>.inix</code>. <code>.ini</code>
+is deprecated in Homer and appears only where another program requires
+that name – an NVDA add-on’s <code>manifest.ini</code>, say – or when a
+Homer program reads an old <code>.ini</code> of its own once, to carry
+its settings into the <code>.inix</code> that replaces it.</p>
 <h3 id="the-basics">The basics</h3>
 <pre><code>; a comment. # also starts one.
 [Section]
@@ -2262,6 +2269,42 @@ History.md, and logs each change.</p>
 <li>Install from the published <code>&lt;App&gt;_setup.exe</code>, or
 update in place with F11.</li>
 </ol>
+<h3 id="stages-from-a-build-to-a-release-version">Stages: from a build
+to a release version</h3>
+<p>Nothing a Homer builder makes is finished for good. Feedback, a new
+idea or a new technology will show how a released program, page or kit
+could be better, so each one moves through the same stages again and
+again. What changes from stage to stage is who has tried it and how hard
+it has been tested before it moves on.</p>
+<ol type="1">
+<li><strong>A build</strong>, on the builder’s own computer. Who: the
+builder. Before it moves on: the build succeeds, <code>check</code>
+passes, a quick run of the program (or a dry run of <code>post</code>
+for a page) does what the change was for, and the log has nothing
+unexplained.</li>
+<li><strong>A development release</strong>, public on GitHub as the
+newest work. Who: the builder, and the testers who have asked to try new
+work. Before it moves on: everything above, plus <code>uiCheck</code>
+where there is a program, the changed commands tried with the keyboard
+and with JAWS and NVDA, and a History entry that says plainly what
+changed. It is labelled a development release, so nobody mistakes it for
+one that has been through more.</li>
+<li><strong>A release version</strong>, made from time to time, when a
+development release has met the higher bar. Who: everybody. Before it is
+made: no known serious problem; the testers have used it for real work
+and said so; a full test pass with JAWS and NVDA, not just the changed
+commands; the documents complete and current, with the license named;
+for an app, the installer tried on a computer that has not had the
+program before; for the kit, <code>checkHomerDev</code> and, when skills
+changed, <code>evalSkills</code>. Then its announcement.</li>
+</ol>
+<p>A serious problem found in a release version is fixed in a
+development release first, tried by the testers, and then becomes the
+next release version – quickly, but through the same stages.</p>
+<p>The stages fit every kind of resource. An app and the kit are
+released with <code>release</code>; a page or a collection is posted
+with <code>post</code> as it improves, and a release version is the
+tagged version made when it meets the same higher bar.</p>
 <h3 id="publishing-a-page">Publishing a page</h3>
 <p>A document can also go on the web as a GitHub Page:
 <code>post</code>, run in the project folder, does it in one command. An
