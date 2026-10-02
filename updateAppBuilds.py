@@ -1,7 +1,7 @@
 ﻿r"""
 updateAppBuilds.py -- bring app build scripts up to the kit's current layout.
 
-Usage (through updateAppBuilds.cmd, from C:\HomerDev):
+Usage (through updateAppBuilds.cmd, from the kit's folder, wherever it is):
 
     updateAppBuilds                 every app beside the kit that needs it
     updateAppBuilds Jobrise urlFido only these
@@ -25,7 +25,8 @@ and in a Python app's own .py files at the top of its folder:
 
 Each file changed is copied first into the app's notes folder, which git never
 takes, as <file>.<stamp>.bak. Nothing else is touched. A detailed log goes to
-C:\HomerDev\logs\HomerDev-updateAppBuilds-<stamp>.log.
+<kit>\logs\HomerDev-updateAppBuilds-<stamp>.log. The apps are the folders
+beside the kit, on its drive and at its depth (1.46.0).
 """
 
 import datetime, os, re, shutil, sys
@@ -62,6 +63,8 @@ def updateBuildText(sText):
     sText = sText.replace('set "hidden=--hidden-import homer"', 'set "hidden="')
     sText = re.sub(r"--hidden-import homer\.(%%\w|\w+)", r"--hidden-import \1", sText)
     sText = re.sub(r"(?m)^\s*--hidden-import homer \^\r?\n", "", sText)
+    # kind.py joins the kit tools every app refreshes (1.45.0).
+    sText = re.sub(r'(?m)^(set "kitTools=)(?![^"\n]*\bkind\.py\b)([^"\n]*)"', lambda m: m.group(1) + " ".join(sorted((m.group(2) + " kind.cmd kind.py").split(), key=str.lower)) + '"', sText)
     return sText
 
 
@@ -89,6 +92,33 @@ def updateFile(sApp, sPath, fnUpdate):
     return True
 
 
+
+def loadKind():
+    """The kit's kind.py (1.45.0): beside this script, or in the kit's scripts
+    folder wherever the kit is (1.46.0): the HomerDev variable, then a folder
+    named HomerDev above or beside where this runs, at any depth, then one at
+    the top of any fixed drive. Without it the project is taken to be an app,
+    as every script assumed before there were four kinds."""
+    lsDirs = [os.path.dirname(os.path.abspath(__file__)), os.path.join(os.environ.get("HomerDev", ""), "scripts")]
+    for sStart in (os.getcwd(), os.path.dirname(os.path.abspath(__file__))):
+        sDir = os.path.abspath(sStart)
+        while True:
+            lsDirs.append(os.path.join(sDir, "scripts"))
+            lsDirs.append(os.path.join(sDir, "HomerDev", "scripts"))
+            sUp = os.path.dirname(sDir)
+            if sUp == sDir: break
+            sDir = sUp
+    if os.name == "nt":
+        import ctypes
+        lsDirs += [sLetter + ":\\HomerDev\\scripts" for sLetter in "CDEFGHIJKLMNOPQRSTUVWXYZ"
+                   if ctypes.windll.kernel32.GetDriveTypeW(sLetter + ":\\") == 3]
+    for sDir in lsDirs:
+        if sDir and os.path.isfile(os.path.join(sDir, "kind.py")):
+            if sDir not in sys.path: sys.path.insert(0, sDir)
+            import kind
+            return kind.projectKind
+    return lambda sFolder: ("app", "kind.py was not found, so taken to be an app")
+
 def main():
     global fileLog
     os.makedirs(os.path.dirname(sLogPath), exist_ok=True)
@@ -102,8 +132,13 @@ def main():
         sFolder = os.path.join(sParent, sApp)
         if os.path.normcase(sFolder) == os.path.normcase(sKit) or not os.path.isdir(sFolder): continue
         if lsWanted and sApp.lower() not in lsWanted: continue
-        sBuild = os.path.join(sFolder, "build%s.cmd" % sApp)
-        if not os.path.isfile(sBuild): continue
+        # ONLY APPS (1.45.0): a page, a collection or a folder of another kind
+        # beside the kit is never touched. Since 1.43.55 the build is build.cmd.
+        sKind, sWhy = loadKind()(sFolder)
+        if sKind != "app":
+            logLine("INFO", 'skipped folder=%s kind=%s reason="%s"' % (sApp, sKind, sWhy))
+            continue
+        if not (os.path.isfile(os.path.join(sFolder, "build.cmd")) or os.path.isfile(os.path.join(sFolder, "build%s.cmd" % sApp))): continue
         # Only a project under git is an app, unless it is named: a folder left
         # from an idea (C:\\Jobrise, 28 September) is not changed unasked.
         if not lsWanted and not os.path.isdir(os.path.join(sFolder, ".git")):
@@ -111,7 +146,7 @@ def main():
             sayLine("%s: skipped, not a git repository. Name it to update it anyway." % sApp)
             continue
         lsChanged = []
-        for sName in ("build%s.cmd" % sApp, "build%s.ps1" % sApp):
+        for sName in ("build.cmd", "build.ps1", "build%s.cmd" % sApp, "build%s.ps1" % sApp):
             sPath = os.path.join(sFolder, sName)
             if os.path.isfile(sPath) and updateFile(sApp, sPath, updateBuildText): lsChanged.append(sName)
         for sName in sorted(os.listdir(sFolder)):

@@ -23,7 +23,8 @@ in `C:\HomerDev\exec\CSharp` and follow HomerDev.md."
 
 ## Install
 
-Unzip `HomerDev.zip` into `C:\HomerDev`. That is the install.
+Unzip `HomerDev.zip` into a folder named `HomerDev`, on any drive and at any
+depth -- beside your projects is simplest. That is the install.
 
 You also need, and the kit will tell you if one is missing:
 
@@ -34,25 +35,27 @@ You also need, and the kit will tell you if one is missing:
 - Inno Setup 6, to build an installer
 - git and the GitHub CLI, to publish
 
-If you keep the kit somewhere other than `C:\HomerDev`, set the `HOMERDEV`
-environment variable to that folder.
+The kit is found by its folder name: the `HomerDev` environment variable, then
+any folder above the one you are working in that is the kit or holds a
+HomerDev folder, then a HomerDev folder at the top of any drive. So a kit
+beside your projects needs no setting, wherever they are.
 
 ## Quick start
 
 ### 1. Install the kit
 
-Unzip `HomerDev.zip` into `C:\HomerDev`. That is the install. Then:
+Unzip `HomerDev.zip` into a folder named `HomerDev`, such as `C:\HomerDev`
+or `D:\Work\HomerDev`. That is the install. Then, in that folder:
 
-    cd \HomerDev
     build
 
 It converts every document to HTML with pandoc, fetching pandoc with winget if
 this machine does not have it, then checks the kit over and reports anything
 wrong. The detail goes to `build.log` beside the script.
 
-If you keep the kit somewhere else, set the `HomerDev` environment variable to
-that folder. Every build script looks there first, then in `C:\HomerDev`, then
-in the folder it is run from.
+Every build script looks for the kit in the `HomerDev` environment variable
+first, then in the folder it is run from and every folder above it, then in a
+HomerDev folder at the top of any drive.
 
 ### 2. Build and run the fruit basket in C#
 
@@ -249,7 +252,7 @@ own notebook, is in the never-pushed list and stays on your machine.
 
 ## The other documents
 
-- `HomerDev.md` -- the complete guide: the `.inix` format, AI-assisted coding
+- `HomerDev.md` -- the complete guide: the four kinds of Homer resource (app, collection, kit and page), the `.inix` format, AI-assisted coding
   and how to teach with the samples, Camel Type, direct speech across screen
   readers, Lbc and the standard dialogs, the launchpad app conventions, keys,
   scripts and logs, and the installer.
@@ -257,3 +260,8 @@ own notebook, is in the never-pushed list and stays on your machine.
 - `Hotkeys.md` -- the keys every Homer dialog and text box gives you.
 - `History.md` -- what changed, and when.
 - `License.md` -- MIT.
+
+For resources beyond the kit on building apps with AI as a blind screen reader
+user, HomerDev among them, see
+[Blind Vibe Coding: Building Apps Nonvisually with AI](https://jamalmazrui.github.io/BlindVibeCoding/).
+The kit's `post` script and homer-page skill publish a page like it.

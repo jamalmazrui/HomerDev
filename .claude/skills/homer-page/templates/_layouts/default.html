@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: 'en-US' }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% assign sTitle = page.title | default: site.title %}
+  {% assign sSubtitle = page.subtitle | default: site.description %}
+  {% assign sDescription = page.description | default: site.description %}
+  <title>{{ sTitle }}{% if page.subtitle %}: {{ page.subtitle }}{% endif %}</title>
+  <meta name="description" content="{{ sDescription | escape }}">
+  {% if page.author %}<meta name="author" content="{{ page.author | escape }}">{% endif %}
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ sTitle | escape }}{% if page.subtitle %}: {{ page.subtitle | escape }}{% endif %}">
+  <meta property="og:description" content="{{ sDescription | escape }}">
+  <meta property="og:url" content="{{ page.url | absolute_url }}">
+  {% if page.social_image %}
+  <meta property="og:image" content="{{ page.social_image | absolute_url }}">
+  <meta property="og:image:alt" content="{{ page.image_alt | escape }}">
+  <meta name="twitter:card" content="summary_large_image">
+  {% endif %}
+  {% if page.logo %}<link rel="icon" href="{{ page.logo | relative_url }}" type="image/svg+xml">{% endif %}
+  {% if page.icon_png %}<link rel="icon" href="{{ page.icon_png | relative_url }}" sizes="32x32" type="image/png">{% endif %}
+  {% if page.touch_icon %}<link rel="apple-touch-icon" href="{{ page.touch_icon | relative_url }}">{% endif %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap">
+  <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="page-header">
+    <div class="page-header-inner">
+      {% if page.logo %}<img class="site-logo" src="{{ page.logo | relative_url }}" alt="" width="88" height="88">{% endif %}
+      <div class="page-header-text">
+        <h1 class="project-name">{{ sTitle }}</h1>
+        {% if sSubtitle %}<p class="project-tagline">{{ sSubtitle }}</p>{% endif %}
+        <p class="project-links">
+          <a class="btn" href="{{ site.github.repository_url }}">Source on GitHub</a>
+          <a class="btn" href="{{ site.github.repository_url }}/releases">Releases</a>
+        </p>
+      </div>
+    </div>
+  </header>
+  <main id="main-content" class="main-content" tabindex="-1">
+    {% if page.image %}<img class="hero-image" src="{{ page.image | relative_url }}" alt="{{ page.image_alt | escape }}">{% endif %}
+    {{ content }}
+    <footer class="site-footer">
+      <p>{{ sTitle }}{% if page.version %}, version {{ page.version }}{% endif %}{% if page.date %}, {{ page.date }}{% endif %}{% if page.author %}, by {{ page.author }}{% endif %}.</p>
+      {% if page.license %}<p>License: {% if page.license_url %}<a href="{{ page.license_url }}">{{ page.license }}</a>{% else %}{{ page.license }}{% endif %}.</p>{% endif %}
+      <p><a href="{{ site.github.repository_url }}">Read the source and report problems on GitHub</a>.</p>
+    </footer>
+  </main>
+</body>
+</html>

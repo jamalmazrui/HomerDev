@@ -30,7 +30,7 @@ exists.
 
 THREE TREES, AND WHAT EACH HOLDS.
 
-  The INSTALLED tree, C:\Program Files\<App>, read-only to the user:
+  The INSTALLED tree, %ProgramFiles%\<App>, read-only to the user:
       configs, data, exec, help, scripts, templates, and the documents at its
       root where a person looking for the ReadMe expects them.
 
@@ -38,7 +38,7 @@ THREE TREES, AND WHAT EACH HOLDS.
       configs, data, logs, results, scripts, temp. No exec and no
       templates: those are shipped, not made.
 
-  The DEVELOPMENT folder, C:\<App>, mirrors the installed tree (21 Sep 2026,
+  The DEVELOPMENT folder, <App> on any drive and at any depth, mirrors the installed tree (21 Sep 2026,
   superseding "stays flat"): sources, build files, ReadMe and License at the
   top, and configs, data, exec, help, logs, scripts and templates beneath, so
   a program run from the project's exec folder finds its files exactly as the

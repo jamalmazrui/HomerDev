@@ -1,7 +1,7 @@
 @echo off
 rem ===================================================================
 rem buildFruitBasketCs.cmd -- build FruitBasketCs.exe from FruitBasketCs.cs and the Homer
-rem Development Kit modules in C:\HomerDev.
+rem Development Kit modules in the HomerDev folder, wherever it is.
 rem
 rem This is the HomerDev TEMPLATE. newHomerApp.cmd writes a copy of it
 rem with FruitBasketCs replaced by a real app name. If you are reading the copy,
@@ -13,8 +13,11 @@ rem on the machine and every app gets a fix the moment the kit gets it.
 rem
 rem WHERE THE KIT IS LOOKED FOR, in order, first hit wins:
 rem   1. %HomerDev%        the environment variable, when it is set
-rem   2. C:\HomerDev        the usual place
-rem   3. the current directory, for a folder that carries its own copy
+rem   2. the current folder and every folder above it, each either the kit
+rem      or holding a folder named HomerDev
+rem   3. this script's folder and every folder above it, the same way
+rem   4. a folder named HomerDev at the top of any drive
+rem Only Windows and the folder name are assumed (1.46.0), never a drive.
 rem
 rem The third is what lets a sample, a demonstration, or a machine with no
 rem kit installed still build: drop the CSharp folder beside the source.
@@ -73,12 +76,26 @@ echo Build log: %log%
 rem ---- the Homer Development Kit -------------------------------------
 set "homerDev="
 if defined HomerDev if exist "%HomerDev%\exec\CSharp\Lbc.cs" set "homerDev=%HomerDev%"
-if not defined homerDev if exist "C:\HomerDev\exec\CSharp\Lbc.cs" set "homerDev=C:\HomerDev"
-if not defined homerDev if exist "%CD%\exec\CSharp\Lbc.cs" set "homerDev=%CD%"
+rem FOUND WHEREVER IT IS (1.46.0): only Windows and the folder name HomerDev
+rem are assumed, never a drive or a depth. After the HomerDev variable: the
+rem current folder and every folder above it, then this script's folder and
+rem every folder above that, each either the kit or holding a HomerDev
+rem folder; then a HomerDev folder at the top of any drive.
+if not defined homerDev (
+  set "sUp=%CD%"
+  call :findKitUp
+)
+if not defined homerDev (
+  set "sUp=%~dp0."
+  call :findKitUp
+)
+if not defined homerDev for %%L in (C D E F G H I J K L M N O P Q R S T U V W X Y Z) do if not defined homerDev if exist "%%L:\HomerDev\exec\CSharp\Lbc.cs" set "homerDev=%%L:\HomerDev"
 if not defined homerDev (
   echo ERROR: the Homer Development Kit was not found.
-  echo         Looked in %%HomerDev%%, C:\HomerDev, and this folder.
-  echo         Unpack HomerDev.zip into C:\HomerDev, or set HomerDev to where it is.
+  echo         Looked in %%HomerDev%%, this folder and every folder above it, and
+  echo         a HomerDev folder at the top of each drive.
+  echo         Unpack HomerDev.zip into a folder named HomerDev, on any drive,
+  echo         or set HomerDev to where it is.
   echo ERROR: no kit found.>> "%log%"
   goto :failed
 )
@@ -178,13 +195,13 @@ rem Generated output: do not edit it, and do not commit it.
 
 rem ---- locate the compiler ------------------------------------------
 set "csc="
-if exist "C:\Program Files (x86)\Microsoft Visual Studio\2022\Buildscripts\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=C:\Program Files (x86)\Microsoft Visual Studio\2022\Buildscripts\MSBuild\Current\Bin\Roslyn\csc.exe"
-if not defined csc if exist "C:\Program Files\Microsoft Visual Studio\2022\Buildscripts\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=C:\Program Files\Microsoft Visual Studio\2022\Buildscripts\MSBuild\Current\Bin\Roslyn\csc.exe"
-if not defined csc if exist "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\Roslyn\csc.exe"
-if not defined csc if exist "C:\Program Files (x86)\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=C:\Program Files (x86)\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\Roslyn\csc.exe"
-if not defined csc if exist "C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\Roslyn\csc.exe"
-if not defined csc if exist "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\Roslyn\csc.exe"
-if not defined csc if exist "C:\Program Files (x86)\Microsoft Visual Studio\2019\Buildscripts\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=C:\Program Files (x86)\Microsoft Visual Studio\2019\Buildscripts\MSBuild\Current\Bin\Roslyn\csc.exe"
+if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Buildscripts\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Buildscripts\MSBuild\Current\Bin\Roslyn\csc.exe"
+if not defined csc if exist "%ProgramFiles%\Microsoft Visual Studio\2022\Buildscripts\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=%ProgramFiles%\Microsoft Visual Studio\2022\Buildscripts\MSBuild\Current\Bin\Roslyn\csc.exe"
+if not defined csc if exist "%ProgramFiles%\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=%ProgramFiles%\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\Roslyn\csc.exe"
+if not defined csc if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\Roslyn\csc.exe"
+if not defined csc if exist "%ProgramFiles%\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=%ProgramFiles%\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\Roslyn\csc.exe"
+if not defined csc if exist "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\Roslyn\csc.exe"
+if not defined csc if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Buildscripts\MSBuild\Current\Bin\Roslyn\csc.exe" set "csc=%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Buildscripts\MSBuild\Current\Bin\Roslyn\csc.exe"
 if not defined csc if exist "%SystemRoot%\Microsoft.NET\Framework64\v4.0.30319\csc.exe" set "csc=%SystemRoot%\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
 if not defined csc (
   echo ERROR: no C# compiler was found. Install the Visual Studio Build Tools:
@@ -530,3 +547,13 @@ if not defined new (
 )
 set "ver=!new!"
 goto :eof
+
+:findKitUp
+rem Climbs from sUp to the top of its drive (1.46.0), looking for the kit
+rem itself or for a folder named HomerDev that holds it.
+if exist "!sUp!\exec\CSharp\Lbc.cs" (set "homerDev=!sUp!" & goto :eof)
+if exist "!sUp!\HomerDev\exec\CSharp\Lbc.cs" (set "homerDev=!sUp!\HomerDev" & goto :eof)
+for %%I in ("!sUp!\..") do set "sNext=%%~fI"
+if /i "!sNext!"=="!sUp!" goto :eof
+set "sUp=!sNext!"
+goto :findKitUp

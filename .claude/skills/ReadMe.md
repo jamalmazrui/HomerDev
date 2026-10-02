@@ -35,7 +35,7 @@ HomerDev.md, under "Claude skills".
 
 ## Skills for Homer development
 
-- **homer-build-release**: run and troubleshoot the build, check, tidy, push
+- **homer-build-release**: know which of the four kinds of resource a folder holds, then run and troubleshoot the build, check, tidy, push
   and release cycle, and read the logs those steps leave. Its
   summarizeLogs script turns an uploaded zip of logs into one report: each
   app's build result, check counts, and release outcome.
@@ -62,6 +62,11 @@ HomerDev.md, under "Claude skills".
 - **homer-new-app**: start a new app -- choose its shape and language, run
   newHomerApp, fill in the starters, and take it through its first build,
   repository and release.
+- **homer-page**: publish a project's document as a GitHub Page that meets
+  WCAG 2.2 AA and the Homer conventions, with the kit's post script: front
+  matter, one h1, heading ids that work on the web, an accessible layout and
+  stylesheet, images with alt text, and the gh-pages branch for an app. Carries
+  the kit's page layout and stylesheet in its templates folder.
 - **homer-screen-reader**: JAWS scripts and NVDA add-ons -- the same commands
   and keys on both readers, where the files live, how they ship and install,
   compiling for each JAWS version, and diagnosing scripts that do not load.
@@ -75,7 +80,7 @@ HomerDev.md, under "Claude skills".
   taken from HomerDev.md at each build.
 
 Two documents in the kit's help folder look beyond these skills:
-Accessibility Skills for AI Agents (help\A11ySkills.htm) gathers 175 published
+[Accessibility Skills for AI Agents](https://github.com/JamalMazrui/A11ySkills), in its own repository, gathers 175 published
 accessibility skills from eight collections as a reference, and Homer Skills
 (help\HomerSkills.htm) reads them for what they teach the kit and proposes new
 and improved Homer skills.

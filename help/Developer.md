@@ -99,7 +99,7 @@ preference: a build error you can see beats a component quietly left out.
 ## How a change reaches the apps
 
 An app's build script compiles the Homer modules straight out of
-`%HOMERDEV%\CSharp`, defaulting to `C:\HomerDev`. There is no copy in the app
+`%HomerDev%\exec\CSharp`, or the HomerDev folder found above or beside the app on any drive (see "Where the kit and your projects live" in HomerDev.md). There is no copy in the app
 folder. So:
 
 1. Change the module here.

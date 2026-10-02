@@ -50,7 +50,7 @@ c_lsExpected = [
     "Templates/samples/buildFruitBasketCs.cmd", "Templates/samples/buildFruitBasketMdiCs.cmd",
     "Templates/samples/buildFruitBasketMdiPy.cmd", "Templates/samples/buildFruitBasketPy.cmd", "Templates/samples/version.txt",
     "checkHomerDev.cmd", "checkHomerDev.py", "releaseHomerDev.cmd",
-    "scripts/push.cmd", "scripts/unpushed.cmd", "scripts/unpushed.py",
+    "scripts/evalSkills.cmd", "scripts/evalSkills.py", "scripts/kind.cmd", "scripts/kind.py", "scripts/post.cmd", "scripts/post.ps1", "scripts/push.cmd", "scripts/unpushed.cmd", "scripts/unpushed.py",
     "scripts/check.cmd", "scripts/check.py", "scripts/uiCheck.cmd", "scripts/uiCheck.py",
     "scripts/tidy.cmd", "scripts/tidy.py",
     "scripts/buildTutorials.cmd", "scripts/buildTutorials.ps1", "scripts/checkTutorial.cmd", "scripts/checkTutorial.py",
@@ -61,7 +61,8 @@ c_lsExpected = [
     ".claude/skills/homer-build-release/SKILL.md", ".claude/skills/homer-code/SKILL.md",
     ".claude/skills/homer-convert/SKILL.md", ".claude/skills/homer-docs/SKILL.md", ".claude/skills/homer-ui/SKILL.md",
     ".claude/skills/homer-elevate/SKILL.md", ".claude/skills/homer-installer/SKILL.md", ".claude/skills/homer-migrate/SKILL.md", ".claude/skills/homer-new-app/SKILL.md",
-    ".claude/skills/homer-screen-reader/SKILL.md",
+    ".claude/skills/homer-page/SKILL.md", ".claude/skills/homer-page/templates/_layouts/default.html",
+    ".claude/skills/homer-page/templates/assets/css/style.scss", ".claude/skills/homer-screen-reader/SKILL.md",
     ".claude/skills/homer-installer/references/components.md",
     ".claude/skills/homer-tutorial/SKILL.md", ".claude/skills/podcast-directory/SKILL.md",
     "Templates/makeHotkeys.py",
@@ -298,6 +299,12 @@ c_lMoved = [
 # kit on each build instead. A retired file is deleted when the build finds
 # it, and the log says so. One tool per job.
 c_lsRetired = [
+    # 1.47.0: the gathered accessibility skills live in their own repository,
+    # A11ySkills, linked from the kit's documents rather than copied into it.
+    # 33 of the 175 are under the GNU Affero GPL, which a copy inside an MIT
+    # kit could be mistaken for; one current copy, kept where its licenses are
+    # stated skill by skill, is also simply easier to keep current.
+    "help/A11ySkills.htm", "help/A11ySkills.md",
     "homer/__init__.py", "exec/homer/__init__.py",
     "Templates/skills/homer-tutorial/SKILL.htm", "skills/homer-tutorial/SKILL.htm", "skills/ReadMe.md", "skills/ReadMe.htm",
     "scripts/cleanDir.cmd", "scripts/cleanDir.py", "scripts/gitRelease.cmd", "scripts/homerPolicy.py",

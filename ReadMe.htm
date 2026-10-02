@@ -187,8 +187,9 @@ HomerDev.md.”</p>
 <li><a href="#the-other-documents">The other documents</a></li>
 </ul>
 <h2 id="install">Install</h2>
-<p>Unzip <code>HomerDev.zip</code> into <code>C:\HomerDev</code>. That
-is the install.</p>
+<p>Unzip <code>HomerDev.zip</code> into a folder named
+<code>HomerDev</code>, on any drive and at any depth – beside your
+projects is simplest. That is the install.</p>
 <p>You also need, and the kit will tell you if one is missing:</p>
 <ul>
 <li>Windows 10 or later, 64-bit</li>
@@ -198,22 +199,25 @@ is the install.</p>
 <li>Inno Setup 6, to build an installer</li>
 <li>git and the GitHub CLI, to publish</li>
 </ul>
-<p>If you keep the kit somewhere other than <code>C:\HomerDev</code>,
-set the <code>HOMERDEV</code> environment variable to that folder.</p>
+<p>The kit is found by its folder name: the <code>HomerDev</code>
+environment variable, then any folder above the one you are working in
+that is the kit or holds a HomerDev folder, then a HomerDev folder at
+the top of any drive. So a kit beside your projects needs no setting,
+wherever they are.</p>
 <h2 id="quick-start">Quick start</h2>
 <h3 id="install-the-kit">1. Install the kit</h3>
-<p>Unzip <code>HomerDev.zip</code> into <code>C:\HomerDev</code>. That
-is the install. Then:</p>
-<pre><code>cd \HomerDev
-build</code></pre>
+<p>Unzip <code>HomerDev.zip</code> into a folder named
+<code>HomerDev</code>, such as <code>C:\HomerDev</code> or
+<code>D:\Work\HomerDev</code>. That is the install. Then, in that
+folder:</p>
+<pre><code>build</code></pre>
 <p>It converts every document to HTML with pandoc, fetching pandoc with
 winget if this machine does not have it, then checks the kit over and
 reports anything wrong. The detail goes to <code>build.log</code> beside
 the script.</p>
-<p>If you keep the kit somewhere else, set the <code>HomerDev</code>
-environment variable to that folder. Every build script looks there
-first, then in <code>C:\HomerDev</code>, then in the folder it is run
-from.</p>
+<p>Every build script looks for the kit in the <code>HomerDev</code>
+environment variable first, then in the folder it is run from and every
+folder above it, then in a HomerDev folder at the top of any drive.</p>
 <h3 id="build-and-run-the-fruit-basket-in-c">2. Build and run the fruit
 basket in C</h3>
 <pre><code>cd Templates\samples
@@ -400,11 +404,12 @@ voices</li>
 </ul>
 <h2 id="the-other-documents">The other documents</h2>
 <ul>
-<li><code>HomerDev.md</code> – the complete guide: the
-<code>.inix</code> format, AI-assisted coding and how to teach with the
-samples, Camel Type, direct speech across screen readers, Lbc and the
-standard dialogs, the launchpad app conventions, keys, scripts and logs,
-and the installer.</li>
+<li><code>HomerDev.md</code> – the complete guide: the four kinds of
+Homer resource (app, collection, kit and page), the <code>.inix</code>
+format, AI-assisted coding and how to teach with the samples, Camel
+Type, direct speech across screen readers, Lbc and the standard dialogs,
+the launchpad app conventions, keys, scripts and logs, and the
+installer.</li>
 <li><code>Developer.md</code> – how to change the kit itself and how a
 fix reaches the apps.</li>
 <li><code>Hotkeys.md</code> – the keys every Homer dialog and text box
@@ -412,5 +417,10 @@ gives you.</li>
 <li><code>History.md</code> – what changed, and when.</li>
 <li><code>License.md</code> – MIT.</li>
 </ul>
+<p>For resources beyond the kit on building apps with AI as a blind
+screen reader user, HomerDev among them, see <a
+href="https://jamalmazrui.github.io/BlindVibeCoding/">Blind Vibe Coding:
+Building Apps Nonvisually with AI</a>. The kit’s <code>post</code>
+script and homer-page skill publish a page like it.</p>
 </body>
 </html>

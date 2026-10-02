@@ -16,6 +16,15 @@ Every Homer app lives in `C:\<App>` and is built against the kit in
 it. The user runs each step in a Windows console from the project folder, then
 uploads the `logs` folder, usually zipped as `temp.zip`.
 
+## Four kinds of resource
+
+Before advising on any step, know what the folder holds: `kind` says app,
+collection, kit or page, and why. Only an app runs the app build, uiCheck and
+the tutorials; the kit uses build, checkHomerDev and releaseHomerDev; a
+collection is pushed and tidied like an app but has no build or installer; a
+page is published and released by `post`. The kit's HomerDev.md, under "Four
+kinds of Homer resource", lists what every script does for each kind.
+
 ## The cycle
 
 The steps, in order, with the commands as the user types them (backslashes:

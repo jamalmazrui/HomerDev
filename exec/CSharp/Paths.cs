@@ -25,7 +25,7 @@
 //
 // THREE TREES, AND WHAT EACH HOLDS.
 //
-//   The INSTALLED tree, C:\Program Files\<App>, read-only to the user:
+//   The INSTALLED tree, %ProgramFiles%\<App>, read-only to the user:
 //       <App>\configs  <App>\data  <App>\exec  <App>\help
 //       <App>\scripts  <App>\templates
 //       and the documents at its root, where a person looking for the ReadMe
@@ -36,7 +36,7 @@
 //       <App>\results  <App>\temp
 //       No exec, no templates: those are shipped, not made.
 //
-//   The DEVELOPMENT folder, C:\<App>, stays flat. It is a git repository, and
+//   The DEVELOPMENT folder, <App> on any drive and at any depth, stays flat. It is a git repository, and
 //   every tool that reads one -- the compiler, the installer script, the
 //   release script -- expects the source at the top. The structure is what the
 //   build SHIPS INTO, not what the developer works in.

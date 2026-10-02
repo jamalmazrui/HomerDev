@@ -17,8 +17,11 @@ rem KIT: the Homer Python package is NOT copied into the app folder. It
 rem is taken from the kit, which is looked for in this order, first hit
 rem wins:
 rem   1. %HomerDev%        the environment variable, when it is set
-rem   2. C:\HomerDev        the usual place
-rem   3. the current directory, for a folder that carries its own copy
+rem   2. the current folder and every folder above it, each either the kit
+rem      or holding a folder named HomerDev
+rem   3. this script's folder and every folder above it, the same way
+rem   4. a folder named HomerDev at the top of any drive
+rem Only Windows and the folder name are assumed (1.46.0), never a drive.
 rem
 rem VERSION: version.txt is the single source of truth, exactly as in
 rem the C# build. This script increments it on every build, stepping
@@ -54,11 +57,24 @@ echo Build log: %log%
 rem ---- the Homer Development Kit -------------------------------------
 set "homerDev="
 if defined HomerDev if exist "%HomerDev%\exec\Python\lbc.py" set "homerDev=%HomerDev%"
-if not defined homerDev if exist "C:\HomerDev\exec\Python\lbc.py" set "homerDev=C:\HomerDev"
-if not defined homerDev if exist "%CD%\exec\Python\lbc.py" set "homerDev=%CD%"
+rem FOUND WHEREVER IT IS (1.46.0): only Windows and the folder name HomerDev
+rem are assumed, never a drive or a depth. After the HomerDev variable: the
+rem current folder and every folder above it, then this script's folder and
+rem every folder above that, each either the kit or holding a HomerDev
+rem folder; then a HomerDev folder at the top of any drive.
+if not defined homerDev (
+  set "sUp=%CD%"
+  call :findKitUp
+)
+if not defined homerDev (
+  set "sUp=%~dp0."
+  call :findKitUp
+)
+if not defined homerDev for %%L in (C D E F G H I J K L M N O P Q R S T U V W X Y Z) do if not defined homerDev if exist "%%L:\HomerDev\exec\Python\lbc.py" set "homerDev=%%L:\HomerDev"
 if not defined homerDev (
   echo ERROR: the Homer Development Kit was not found.
-  echo         Looked in %%HomerDev%%, C:\HomerDev, and this folder.
+  echo         Looked in %%HomerDev%%, this folder and every folder above it, and
+  echo         a HomerDev folder at the top of each drive.
   echo ERROR: no kit found.>> "%log%"
   goto :failed
 )
@@ -340,3 +356,13 @@ if not defined new (
 )
 set "ver=!new!"
 goto :eof
+
+:findKitUp
+rem Climbs from sUp to the top of its drive (1.46.0), looking for the kit
+rem itself or for a folder named HomerDev that holds it.
+if exist "!sUp!\exec\Python\lbc.py" (set "homerDev=!sUp!" & goto :eof)
+if exist "!sUp!\HomerDev\exec\Python\lbc.py" (set "homerDev=!sUp!\HomerDev" & goto :eof)
+for %%I in ("!sUp!\..") do set "sNext=%%~fI"
+if /i "!sNext!"=="!sUp!" goto :eof
+set "sUp=!sNext!"
+goto :findKitUp

@@ -2412,7 +2412,13 @@ def buildGuide(sProduct, sTitle, sPreamble, lArticles, sOutputPath):
         [tArticle for tArticle in lArticles if tArticle[2]], sOutputPath))))
     dCategories = {}
     for sCategory, sArticleTitle, lBody in lArticles: dCategories.setdefault(sCategory, []).append((sArticleTitle, lBody))
-    lLines = ["---", 'title: "' + sTitle + '"', "lang: en", "---", "", "# " + sTitle, "", sPreamble, "", "## Contents", ""]
+    # LICENSE (HomerDev 1.48.0): the help text is the publisher's, gathered
+    # unchanged; only the guide's own arrangement and wording are CC BY-SA 4.0.
+    sLicense = ("The help text belongs to its publisher and is gathered here unchanged for accessible reading. "
+                "This guide's own arrangement and wording are available under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).")
+    lLines = ["---", 'title: "' + sTitle + '"', "lang: en", 'license: "CC BY-SA 4.0"',
+              'license_url: "https://creativecommons.org/licenses/by-sa/4.0/"', "---", "", "# " + sTitle, "", sPreamble, "", sLicense, "",
+              "## Contents", ""]
     for sCategory in sorted(dCategories, key=sortKeyCategory):
         lLines.append("- " + sCategory)
         for sArticleTitle, lBody in sorted(dCategories[sCategory], key=lambda tItem: sortKeyTitle(tItem[0])):

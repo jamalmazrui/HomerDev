@@ -34,6 +34,7 @@ holding the keyboard knows what a good program is before the AI writes one.
 - [The launchpad app](#the-launchpad-app)
 - [Keys and key names](#keys-and-key-names)
 - [Every file in the kit, and why it is here](#every-file-in-the-kit-and-why-it-is-here)
+- [Four kinds of Homer resource](#four-kinds-of-homer-resource)
 - [Three kinds of Homer app](#three-kinds-of-homer-app)
 - [Scripts and settings: the two lists every MDI app gets](#scripts-and-settings-the-two-lists-every-mdi-app-gets)
 - [Where an app puts its files](#where-an-app-puts-its-files)
@@ -63,7 +64,8 @@ holding the keyboard knows what a good program is before the AI writes one.
 
 ### Install the kit
 
-Unzip `HomerDev.zip` into `C:\HomerDev`. That is the whole install. Then run:
+Unzip `HomerDev.zip` into a folder named `HomerDev` -- `C:\HomerDev`, or one
+beside your projects on any drive. That is the whole install. Then run:
 
     build
 
@@ -73,8 +75,28 @@ text file in the right encoding, every template still holding its placeholder,
 and no empty files. It reports problems plainly and writes the detail to
 `build.log`.
 
-If you keep the kit somewhere else, set the `HOMERDEV` environment variable to
-that folder. Every build script looks there first.
+If the kit is not beside or above your projects, set the `HomerDev`
+environment variable to its folder. Every build script looks there first.
+
+### Where the kit and your projects live
+
+Only Windows and folder names are assumed: the kit is a folder named
+HomerDev, and each project is a folder named for the app, collection or page.
+Either can be on any drive and at any depth -- `C:\HomerDev` and
+`C:\EdSharp`, or `D:\Work\HomerDev` and `D:\Work\EdSharp`, work the same.
+
+Every kit script and every build finds the kit the same way, and stops at the
+first match:
+
+1. the `HomerDev` environment variable, when it names the kit
+2. the current folder and every folder above it, each one either the kit or
+   holding a folder named HomerDev
+3. the script's own folder and every folder above it, the same way
+4. a folder named HomerDev at the top of any fixed drive
+
+So keeping the kit beside your projects needs no setting at all, wherever
+they are. `kind --kit` prints the kit it finds. `newHomerApp` puts a new app
+beside the kit unless you name another folder.
 
 ### Start a new app
 
@@ -639,7 +661,10 @@ than guessed at. Folders are in the order you meet them.
 ### Tools -- scripts that act on a project
 
 - **check.cmd, check.py** -- gathers evidence about an app: encodings, names, keys, build, smoke run, acceptance criteria, and a report saying what it did not check
+- **evalSkills.cmd, evalSkills.py** -- asks Claude Code for the same small program without and with the Homer skills, builds each, scores them with check and uiCheck, and reports the difference
+- **kind.cmd, kind.py** -- says whether a folder holds an app, a collection, the kit or a page, and why; every kit script asks it first
 - **push.cmd** -- stage, commit and push what the whitelist allows
+- **post.cmd, post.ps1** -- publishes a document as a GitHub Page that meets WCAG 2.2 AA and the Homer conventions: an app's guide to its gh-pages branch, a page project's document to main
 - **release.cmd** -- check first, then tag and publish
 - **uiCheck.cmd, uiCheck.py** -- starts a program, sends the keys, and reads the accessibility tree back; driven by uiTest.inix beside the program
 - **installTools.cmd** -- copies the tools to a folder on the PATH, so one current copy serves every project
@@ -660,6 +685,97 @@ than guessed at. Folders are in the order you meet them.
 - **Tutorial_HomerDev.inix** -- the spoken walkthrough, narration and screen reader in two voices
 - **CamelType_CSharp.md, CamelType_CSharp_Reference.md, CamelType_JAWSScript.md** -- the coding style
 - **self.md** -- the private notebook: decisions, findings and open items. Never pushed
+
+## Four kinds of Homer resource
+
+The kit now serves four kinds of thing, and each kit script asks which one it
+is in before it acts. `kind`, run in a folder, answers the same question for a
+person, with the fact that decided it.
+
+- **An app** is a program. It has a source named for its folder (`<App>.cs`
+  or `<App>.py`) or an installer script (`<App>_setup.iss`) at the top, a
+  build, an installer, releases tagged by `version.txt`, and the document set
+  in `help`. EdSharp, FileDir and DbDo are apps. The three shapes an app takes
+  are in the next chapter.
+- **A collection** is many documents of one kind with no program: help guides
+  in AppHelpGuides, podcast directories in PodcastDirectories. Its documents
+  sit at the top beside a ReadMe, and the repository is the content; what is
+  distributed is the .htm files.
+- **The kit** is HomerDev itself: `Templates\HomerComponents.iss` and
+  `exec\CSharp\Lbc.cs`. It builds, checks and releases itself with its own
+  `build`, `checkHomerDev` and `releaseHomerDev`.
+- **A page** is one document published as a web page, named for its folder
+  (`BlindVibeCoding.md` in `C:\BlindVibeCoding`), with no program. Its folder
+  need not be a git repository; `post` creates and keeps the repository.
+
+The facts are checked in that order -- kit, then app, then page, then
+collection -- so a program that also carries many documents is still an app.
+A folder that fits none is "unknown", and a script that needs to know says so
+and does nothing.
+
+### Licenses for each kind
+
+Each resource names its license once, briefly, with a link -- never a bare
+address:
+
+- **An app and the kit: the MIT License,** in License.md beside the source,
+  naming the program and its author. The ReadMe says so in a sentence:
+  "free and open source under the [MIT License](License.htm)."
+- **A page: Creative Commons Attribution-ShareAlike 4.0** (CC BY-SA 4.0), the
+  license Wikipedia's text has used since June 2023. The front matter carries
+  `license` and `license_url`, the page's footer shows them, and one sentence
+  in the text says so for the .htm.
+- **A collection: the same CC BY-SA 4.0, for what is its own** -- its
+  selection, arrangement and wording. Material gathered from others keeps its
+  owners' terms, and the document says so in one sentence: a publisher's help
+  text, a show's episode summaries, a skill's full text. The ReadMe names the
+  license.
+
+Pointing to someone else's work -- its title, a few facts, a short
+description and a link -- needs no permission under any license, so a
+directory can list anything it can describe in its own words. Copying the
+work's full text is different: that text stays under its own license, which
+the entry names.
+
+check reports a missing or wrong license for every kind, post adds the kind's
+license to a page's front matter when the source lacks it (and says so in its
+log), and the builders of the podcast, help-guide and Blind Creators
+collections write the license lines themselves.
+
+### What each script does for each kind
+
+A script declines only on positive evidence: when kind.py says a step cannot
+apply, it says why and stops with nothing changed. When kind.py cannot be found
+or cannot place a folder, a script behaves as it did before there were four
+kinds.
+
+- **build** (an app's own): apps only. The kit has its own build.py.
+- **check**: an app gets every check. A page or a collection gets the checks
+  that fit documents -- documents, encoding, empty files, and the whitelist
+  when it is a repository -- and the report says the program checks did not
+  apply. The kit is sent to checkHomerDev.
+- **checkTutorial, makeTutorials, buildTutorials**: apps and the kit. A page or
+  a collection has no program to walk through, so nothing is made.
+- **finish and the install scripts** run on a user's computer, inside an
+  installed app, so the question does not arise.
+- **fixEncoding**: every kind. A page needs no RepoFiles.txt: its own files are
+  its documents, its scripts and the site files Jekyll reads.
+- **newHomerApp**: will not start an app in a folder that already holds a
+  page, a collection or the kit.
+- **post**: every kind. An app, a collection or the kit publishes to the
+  gh-pages branch -- an app's or the kit's guide, or a collection's ReadMe with
+  its .htm documents -- and never touches main or the releases. A page
+  publishes to main and is released by its version.
+- **push, tidy, unpushed**: apps, collections and the kit, which are
+  repositories. A page that is not one is told that post publishes it.
+- **release**: apps and the kit (releaseHomerDev runs it). A page is released
+  by post.
+- **renameBuild**: apps only; the kit renames its own build, and a page or a
+  collection has none.
+- **uiCheck**: apps and the kit's samples. A page or a collection has no
+  program to press keys in.
+- **updateAppBuilds**: apps only; every other folder beside the kit is passed
+  over. It also adds kind.cmd and kind.py to each app's kitTools.
 
 ## Three kinds of Homer app
 
@@ -1827,6 +1943,43 @@ History.md, and logs each change.
 4. Commit, then `release`.
 5. Install from the published `<App>_setup.exe`, or update in place with F11.
 
+### Publishing a page
+
+A document can also go on the web as a GitHub Page: `post`, run in the
+project folder, does it in one command. An app that uses it names
+`post.cmd post.ps1` in `kitTools`, and its build refreshes them into
+`scripts`.
+
+post asks kind.py what the folder holds (see "Four kinds of Homer
+resource"). An app's, a collection's or the kit's repository already holds its
+code or documents, and push and release own its main branch and its tags, so
+post publishes to a separate `gh-pages` branch -- the guide,
+`help\<App>.md`, or a collection's ReadMe with its .htm documents -- and never
+makes a release. A page's repository is the page, so post creates it,
+publishes to main, and makes a release from the document's `version` field.
+
+The page meets WCAG 2.2 AA and the Homer conventions without extra work:
+
+- **One h1**, the title, printed by the kit's layout; the subtitle is a
+  paragraph. post removes a body `# Title` from the copy it publishes.
+- **Heading ids that work in both places.** Pandoc and GitHub's kramdown name
+  headings differently, so post writes Pandoc's id into each heading, and one
+  contents list serves the .htm and the page.
+- **Colors measured.** The stock theme's green headings and gray footer fail
+  contrast, and its links are told apart by color alone. The kit's stylesheet
+  fixes each, underlines links, shows focus plainly, adds a skip link, and uses
+  Atkinson Hyperlegible.
+- **Images described.** A logo beside the title has empty alt text; a hero
+  image carries its alt text in the front matter, which the link preview uses
+  too.
+- **Encoding kept.** The document keeps the Homer encoding on disk; what
+  Jekyll reads is staged without a byte order mark, with `* -text` in
+  .gitattributes and images marked binary.
+
+The homer-page skill has the steps, the front matter fields, and the
+reasons behind each rule. Blind Vibe Coding, linked above, is a page project
+published this way.
+
 ## The installer
 
 `Templates\_APP__setup.iss` is the Inno Setup script every app starts from.
@@ -1894,6 +2047,13 @@ The hard part is knowing, before the AI starts, what a good program is:
 None of that comes out of a model. All of it can be given to one, and the giving
 is the skill. **AI-assisted coding** is that skill: the AI types, and the
 builder decides.
+
+People have used "vibe coding", and "blind vibe coding", for building apps by
+prompting an AI. For a directory of resources on doing that as a blind screen
+reader user -- guides, tools, courses, communities, podcasts and research,
+HomerDev among them -- see
+[Blind Vibe Coding: Building Apps Nonvisually with AI](https://jamalmazrui.github.io/BlindVibeCoding/).
+It claims the phrase for the careful kind of work this kit teaches.
 
 This kit is what makes the decisions transmissible. Every convention in it was
 paid for by somebody's afternoon, and each is written down here so it can be
@@ -2040,6 +2200,27 @@ there. Your own program should use what it needs and nothing more. The kit is
 meant to be the easy path, not a set of boxes to tick, and a dialog with three
 controls in it is a perfectly good Homer dialog.
 
+### Measuring the difference the skills make
+
+The exercise above shows the difference by hand. `evalSkills`, run in the
+kit, measures it. It gives Claude Code one plain task -- the fruit basket, a
+window with a text box, an Add button and a list named Basket, usable with a
+screen reader and the keyboard alone -- several times with nothing else, and
+several times with the Homer skills and the three sentences. Each program is
+built with the kit's sample build script and scored the same way: whether it
+was written, whether it compiled, what check finds, and whether uiCheck can
+type two fruits and find them, and the name Basket, in the UI Automation tree a
+screen reader reads.
+
+The report, in the kit's logs folder, gives each side's totals and every run,
+and says what the numbers cannot show: a few runs can differ by luck, three of
+check's findings partly measure Homer's own conventions, and nothing automated
+replaces opening the programs with JAWS or NVDA. `evalSkills --dry-run`
+prepares every folder without asking the AI, at no cost.
+
+Run it before and after any change to a skill. A skill that does not move the
+numbers is a candidate for removal, not a reason to add another.
+
 ### The legacy FruitBasket collection
 
 The original collection holds thirty-six fruit baskets in thirty-six languages
@@ -2134,7 +2315,7 @@ guidance for skills and the Homer rules together:
   for claude.ai.
 
 Two documents in the help folder look beyond the kit's own skills.
-[Accessibility Skills for AI Agents](A11ySkills.htm) gathers 175 published
+[Accessibility Skills for AI Agents](https://github.com/JamalMazrui/A11ySkills), in its own repository, gathers 175 published
 accessibility skills from eight collections, with each one's license and full
 text, as a reference when writing or improving a Homer skill.
 [Homer Skills](HomerSkills.htm) reads them for what they teach the kit: what

@@ -1,7 +1,7 @@
 @echo off
 rem ===================================================================
 rem build.cmd -- build _APP_.exe from _APP_.py and the Homer
-rem Python package in C:\HomerDev.
+rem Python package in the HomerDev folder, wherever it is.
 rem
 rem This is the HomerDev TEMPLATE for a PYTHON app. newHomerApp.cmd
 rem writes a copy of it, named build.cmd, with _APP_ replaced by the
@@ -70,7 +70,7 @@ rem The kit modules the program imports, alphabetical. Each becomes a
 rem --hidden-import, so PyInstaller bundles it from the kit.
 set "homerModules=elevate inix lbc log paths say util web"
 rem 1 when the program builds WinForms dialogs with the kit's C# LbcDialog
-rem through lbcnet: C:\HomerDev\exec\Homer.dll, which build
+rem through lbcnet: the kit's exec\Homer.dll, which build
 rem compiles, is bundled into the program. Empty for a console or wx program.
 set "homerDll="
 rem Anything else PyInstaller needs, such as --collect-all pythonnet.
@@ -79,8 +79,9 @@ rem pip packages beyond requirements.txt, which is installed when present.
 set "pipPackages=pyinstaller"
 rem The kit tools this app uses, refreshed into scripts\ on every build.
 rem Name each; add one the day it is used (installCommon.cmd for install
-rem scripts written in cmd, buildTutorials and its fellows once a walk exists).
-set "kitTools=check.cmd check.py fixEncoding.cmd fixEncoding.py push.cmd release.cmd release.ps1 tidy.cmd tidy.py unpushed.cmd unpushed.py"
+rem scripts written in cmd, buildTutorials and its fellows once a walk exists,
+rem post.cmd and post.ps1 once the app publishes a page).
+set "kitTools=check.cmd check.py fixEncoding.cmd fixEncoding.py kind.cmd kind.py push.cmd release.cmd release.ps1 tidy.cmd tidy.py unpushed.cmd unpushed.py"
 set "useDocs=1"
 set "useInstaller=1"
 set "useVersionSteps=1"
@@ -118,12 +119,25 @@ echo Building %app%. The log is %log%
 rem ---- the Homer Development Kit -------------------------------------
 set "homerDev="
 if defined HomerDev if exist "%HomerDev%\exec\Python\log.py" set "homerDev=%HomerDev%"
-if not defined homerDev if exist "C:\HomerDev\exec\Python\log.py" set "homerDev=C:\HomerDev"
-if not defined homerDev if exist "%CD%\exec\Python\log.py" set "homerDev=%CD%"
+rem FOUND WHEREVER IT IS (1.46.0): only Windows and the folder name HomerDev
+rem are assumed, never a drive or a depth. After the HomerDev variable: the
+rem current folder and every folder above it, then this script's folder and
+rem every folder above that, each either the kit or holding a HomerDev
+rem folder; then a HomerDev folder at the top of any drive.
+if not defined homerDev (
+  set "sUp=%CD%"
+  call :findKitUp
+)
+if not defined homerDev (
+  set "sUp=%~dp0."
+  call :findKitUp
+)
+if not defined homerDev for %%L in (C D E F G H I J K L M N O P Q R S T U V W X Y Z) do if not defined homerDev if exist "%%L:\HomerDev\exec\Python\log.py" set "homerDev=%%L:\HomerDev"
 if not defined homerDev (
   echo %app% needs the Homer Development Kit and cannot find it.
-  echo Unzip HomerDev.zip into C:\HomerDev, or set the HomerDev environment variable.
-  >> "%log%" echo ERROR: no kit found in %%HomerDev%%, C:\HomerDev or %CD%
+  echo Unzip HomerDev.zip into a folder named HomerDev beside your projects, on any drive,
+  echo or set the HomerDev environment variable to where it is.
+  >> "%log%" echo ERROR: no kit found from %%HomerDev%%, %CD% and the folders above it, this script's folder and those above it, or the top of any drive
   goto :failed
 )
 rem READ THE KIT'S VERSION WITHOUT ANYTHING INVISIBLE. A byte order mark or a
@@ -142,7 +156,7 @@ if errorlevel 2 (
 )
 if errorlevel 1 (
   echo %app% needs HomerDev !kitNeeded! or later, and the kit is !homerVer!.
-  echo Unzip HomerDev.zip into C:\HomerDev, then build again.
+  echo Unzip the newer HomerDev.zip into the HomerDev folder at !homerDev!, then build again.
   >> "%log%" echo ERROR: kit !homerVer! is older than !kitNeeded!
   goto :failed
 )
@@ -549,3 +563,13 @@ if not defined new (
 )
 set "ver=!new!"
 goto :eof
+
+:findKitUp
+rem Climbs from sUp to the top of its drive (1.46.0), looking for the kit
+rem itself or for a folder named HomerDev that holds it.
+if exist "!sUp!\exec\Python\log.py" (set "homerDev=!sUp!" & goto :eof)
+if exist "!sUp!\HomerDev\exec\Python\log.py" (set "homerDev=!sUp!\HomerDev" & goto :eof)
+for %%I in ("!sUp!\..") do set "sNext=%%~fI"
+if /i "!sNext!"=="!sUp!" goto :eof
+set "sUp=!sNext!"
+goto :findKitUp

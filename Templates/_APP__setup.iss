@@ -357,10 +357,11 @@ Type: files; Name: "{localappdata}\_APP_\*.inix"
 //  The include goes INSIDE [Code], and HomerComponents.iss carries no [Code]
 //  header of its own. Comments inside [Code] use // or (* *), never ;.
 //  The kit's folder comes from the build, which passes /DHomerDev=<kit>, so an
-//  app built against a kit somewhere other than C:\HomerDev includes that
-//  kit's table (1.43.0; the line named C:\HomerDev outright before).
+//  app built against a kit on any drive and at any depth includes that kit's
+//  table (1.43.0). Compiled by hand without it, the kit is taken to be the
+//  HomerDev folder beside the app's own (1.46.0; C:\HomerDev before).
 #ifndef HomerDev
-#define HomerDev "C:\HomerDev"
+#define HomerDev SourcePath + "..\HomerDev"
 #endif
 #include HomerDev + "\Templates\HomerComponents.iss"
 

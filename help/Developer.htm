@@ -256,8 +256,9 @@ component quietly left out.</p>
 <h2 id="how-a-change-reaches-the-apps">How a change reaches the
 apps</h2>
 <p>An app’s build script compiles the Homer modules straight out of
-<code>%HOMERDEV%\CSharp</code>, defaulting to <code>C:\HomerDev</code>.
-There is no copy in the app folder. So:</p>
+<code>%HomerDev%\exec\CSharp</code>, or the HomerDev folder found above
+or beside the app on any drive (see “Where the kit and your projects
+live” in HomerDev.md). There is no copy in the app folder. So:</p>
 <ol type="1">
 <li>Change the module here.</li>
 <li>Run <code>build</code> to check the kit still passes.</li>

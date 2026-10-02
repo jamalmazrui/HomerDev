@@ -118,6 +118,8 @@ def build(cfg, rows):
     w('date: "' + datetime.datetime.now().strftime("%B %Y") + '"')
     w('version: "v1.0.0"')
     w("lang: en-US")
+    w('license: "CC BY-SA 4.0"')
+    w('license_url: "https://creativecommons.org/licenses/by-sa/4.0/"')
     w("toc: false")
     w("abstract: |")
     w("  A screen-reader-friendly directory of the podcast " + cfg["name"] + ", covering " + str(len(rows)))
@@ -128,6 +130,11 @@ def build(cfg, rows):
     w("# " + cfg["title"])
     w()
     w(cfg["intro"])
+    w()
+    # LICENSE (HomerDev 1.48.0): the directory's own text and arrangement are
+    # CC BY-SA 4.0; the episodes and their summaries stay the publisher's.
+    w("Episode titles, summaries and audio belong to the show's publisher. This directory's own text and "
+      "arrangement are available under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).")
     w()
     sFields = "**Date**, **Duration**, **Episode**, " + ("**Guest**, " if g_guest else "") + "**Season**, and **Summary**"
     w("This directory covers **" + str(len(rows)) + " public episodes**, " + yspan + ". Each episode's title "

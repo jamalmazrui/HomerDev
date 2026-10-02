@@ -11,7 +11,7 @@
 
 ## Introduction
 
-This document reads the 175 accessibility skills gathered in [Accessibility Skills for AI Agents](A11ySkills.htm), which sits beside it in the kit's help folder, and asks what they teach the Homer Development Kit. It has three parts: learnings that agree with the HomerDev guidelines and can be adopted, questions where a learning would change or stretch a guideline and so needs a decision first, and proposals for new and improved Homer skills.
+This document reads the 175 accessibility skills gathered in [Accessibility Skills for AI Agents](https://github.com/JamalMazrui/A11ySkills), a separate repository that states each skill's license (142 are MIT and 33 are under the GNU Affero General Public License, so the full texts are kept there rather than copied into this MIT-licensed kit), and asks what they teach the Homer Development Kit. It has three parts: learnings that agree with the HomerDev guidelines and can be adopted, questions where a learning would change or stretch a guideline and so needs a decision first, and proposals for new and improved Homer skills.
 
 The skills come from eight collections. Three shapes recur:
 
@@ -54,11 +54,20 @@ Each of these would change, extend or loosen a HomerDev guideline, so none is ad
 
 ## Proposed new skills
 
-- **homer-listen.** Predicts what JAWS and NVDA will say in a Homer dialog or menu, read from its Lbc source: each control's name, role and state in focus order, with trigger letters and hotkeys. Like Screen Reader Lab, it says plainly that it is a prediction. It flags what the Homer rules forbid: a name that repeats its label, two items claiming one trigger letter, a trigger letter in the middle of a word, app speech that repeats what the reader says, and a control with no name.
-- **homer-ui-check.** Checks a built app as it runs, through UI Automation: it opens each window, walks the tree, and records each control's name, role, value, state, focusability and access key. The same Homer rules as homer-listen are tested on the real program, and the results go into check's evidence. homer-listen reads the source; homer-ui-check proves the result.
-- **homer-audit.** One entry point for an app's review, as Community Access's Accessibility Lead is for theirs: it runs check, homer-ui-check and the finish-page and Local-tree checks; writes the findings as data, each with a severity; and compares them with the last run, saying what is new, what is fixed and what has regressed.
+Revised in 1.47.0: fewer skills, and measurement first. Each new skill costs
+upkeep, and every skill an AI loads takes room in its context, so a proposal
+that an existing tool can absorb is folded into that tool instead.
+
+- **Measure before adding (done in 1.47.0, as a script, not a skill).**
+  scripts\evalSkills asks Claude Code to write the same small program several
+  times without the Homer skills and several times with them, builds each one,
+  and scores both sets with check and uiCheck. Without that evidence nobody,
+  Homer included, can say that a skill helps; with it, every proposal below
+  can be judged by whether the numbers move.
+- **homer-listen.** Predicts what JAWS and NVDA will say in a Homer dialog or menu, read from its Lbc source: each control's name, role and state in focus order, with trigger letters and hotkeys. It flags what the Homer rules forbid: a name that repeats its label, two items claiming one trigger letter, a trigger letter in the middle of a word, app speech that repeats what the reader says, and a control with no name. Because a confident prediction can stand in for the real check it was meant to support -- a risk that falls hardest on a blind developer -- every report opens with the word "Prediction" and ends with what still has to be heard in a real screen reader.
+- **uiCheck, extended (instead of a new homer-ui-check skill).** uiCheck already starts a program and reads the UI Automation tree a screen reader reads. Extending it to record each control's name, role, value, state, focusability and access key, and to test the Homer rules homer-listen predicts, gives the same proof without another skill to maintain.
+- **homer-audit, ending in the test pass.** One entry point for an app's review, as Community Access's Accessibility Lead is for theirs: it runs check, uiCheck and the finish-page and Local-tree checks; writes the findings as data, each with a severity; compares them with the last run, saying what is new, what is fixed and what has regressed; and ends by writing the manual test pass for the release from its History and Hotkeys -- each changed command to try with the keyboard, then JAWS, then NVDA. One skill rather than homer-audit and homer-test-pass, since the second is the last step of the first.
 - **homer-bug-report.** Turns logs and a description into a report an app's developer can act on: what was done, what was expected, what happened, the version, Windows and screen reader, and the log lines that matter. It follows Mike Gifford's bug-reporting skill, adapted to the Homer log layout, for beta testers' messages and GitHub issues.
-- **homer-test-pass.** Writes the manual test pass for a release from its History and Hotkeys: each changed command to try with the keyboard, then with JAWS, then with NVDA, and the expected speech. It gives a tester such as a beta tester a short, ordered list instead of the whole guide.
 
 ## Proposed improvements to existing skills
 
@@ -71,7 +80,14 @@ Each of these would change, extend or loosen a HomerDev guideline, so none is ad
 
 ## Suggested order
 
-- homer-listen and homer-ui-check first: they test the Homer rules that matter most to screen reader users, from the source and from the running program.
-- Then homer-audit, which joins them with the existing checks and adds comparison between runs.
-- Then the homer-docs Markdown check, homer-bug-report and homer-test-pass.
+- First, run evalSkills and keep its report. It is the baseline every later
+  change is measured against.
+- Then extend uiCheck, so the running program is tested for the rules that
+  matter most to screen reader users.
+- Then homer-listen, always labelled as a prediction, checked against uiCheck.
+- Then homer-audit, which joins them with the existing checks, compares runs
+  and ends with the manual test pass.
+- Then the homer-docs Markdown check and homer-bug-report.
+- After each step, run evalSkills again: a skill that does not move the numbers
+  is a candidate for removal, not a reason for another skill.
 - The questions above can be settled at any point; each answer becomes a HomerDev guideline before any skill relies on it.

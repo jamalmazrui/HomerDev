@@ -1,0 +1,110 @@
+﻿---
+---
+
+@import "{{ site.theme }}";
+
+// Homer overrides of the Cayman theme (HomerDev 1.44.0, 2 October 2026).
+// Every text and focus color below meets WCAG 2.2 AA contrast on its background.
+
+$ink: #14213d;        // header background; 16.0:1 with white
+$amber: #ffb000;      // accent on ink; 8.7:1 with $ink
+$teal: #0f5e63;       // headings on white; 7.5:1
+$text: #24303d;       // body text on white; 13.4:1
+$muted: #4a5868;      // footer and quotes on white; 7.3:1
+$link: #0b57a4;       // links on white; 7.2:1
+$linkVisited: #6a2c8a;  // visited links on white; 9.0:1
+
+body {
+  font-family: "Atkinson Hyperlegible", Verdana, "Segoe UI", Arial, sans-serif;
+  color: $text;
+  line-height: 1.6;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  background: #ffffff;
+  color: $ink;
+  font-weight: 700;
+  border: 3px solid $ink;
+  border-radius: 0.3rem;
+}
+.skip-link:focus { top: 1rem; }
+
+.page-header {
+  background: $ink;
+  background-image: none;
+  color: #ffffff;
+  border-bottom: 0.5rem solid $amber;
+  text-align: left;
+  padding: 2rem 1.5rem;
+}
+.page-header-inner {
+  max-width: 64rem;
+  margin: 0 auto;
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+.site-logo { flex: none; width: 88px; height: 88px; }
+.project-name { color: #ffffff; margin: 0; font-size: 2.6rem; line-height: 1.15; }
+.project-tagline { color: #ffffff; opacity: 1; margin: 0.4rem 0 1rem; font-size: 1.35rem; font-weight: 400; }
+.project-links { margin: 0; }
+.page-header .btn {
+  color: #ffffff;
+  background-color: transparent;
+  border: 2px solid #ffffff;
+  margin: 0 0.75rem 0.5rem 0;
+}
+.page-header .btn:hover { background-color: #ffffff; color: $ink; text-decoration: none; }
+
+.main-content {
+  max-width: 64rem;
+  color: $text;
+  font-size: 1.1rem;
+}
+.main-content:focus { outline: none; }
+.main-content h2, .main-content h3, .main-content h4 { color: $teal; }
+.main-content h2 { border-bottom: 2px solid #d5dde5; padding-bottom: 0.3rem; }
+.main-content h3 a { color: $link; }
+.main-content p, .main-content li { max-width: 46rem; }
+.main-content a { color: $link; text-decoration: underline; text-underline-offset: 0.15em; }
+.main-content a:visited { color: $linkVisited; }
+.main-content a:hover { text-decoration-thickness: 0.15em; }
+.main-content blockquote { color: $muted; border-left-color: #8a9aab; }
+
+.hero-image {
+  display: block;
+  width: 100%;
+  max-width: 46rem;
+  height: auto;
+  margin: 0 0 2rem;
+  border-radius: 0.5rem;
+}
+
+.site-footer { color: $muted; border-top: 2px solid #d5dde5; }
+.site-footer a { color: $link; }
+
+a:focus-visible, .btn:focus-visible {
+  outline: 3px solid $ink;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px #ffffff;
+}
+.page-header a:focus-visible { outline-color: $amber; box-shadow: none; }
+
+@media (max-width: 42em) {
+  .page-header-inner { flex-direction: column; align-items: flex-start; }
+  .project-name { font-size: 2rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+@media (forced-colors: active) {
+  .page-header { border-bottom: 3px solid CanvasText; }
+  .page-header .btn { border-color: ButtonText; }
+}

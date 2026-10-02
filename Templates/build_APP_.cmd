@@ -1,7 +1,7 @@
 @echo off
 rem ===================================================================
 rem build.cmd -- build _APP_.exe from _APP_.cs and the Homer C#
-rem classes in C:\HomerDev.
+rem classes in the HomerDev folder, wherever it is.
 rem
 rem This is the HomerDev TEMPLATE for a C# app. newHomerApp.cmd writes a
 rem copy of it with _APP_ replaced by the app's name. If you are reading
@@ -18,7 +18,7 @@ rem     one past its newest release tag, never from 1.0.0 over a released
 rem     app, and written into Version.cs as BuildVersion.Version;
 rem   - the program goes to exec\, as in the installed tree;
 rem   - the kit's classes are NOT copied: each module named in homerModules
-rem     is compiled straight from C:\HomerDev\exec\CSharp, and a stale copy of a
+rem     is compiled straight from the kit's exec\CSharp, and a stale copy of a
 rem     kit class at the top of the project is deleted once the kit's is here;
 rem   - the compiler is Roslyn, found with vswhere or installed with winget
 rem     as the free Build Tools. The Framework's own csc stops at C# 5 and
@@ -68,7 +68,7 @@ rem console, even if it also opens a dialog.
 set "cscTarget=winexe"
 rem The kit classes the program uses, alphabetical. Lbc needs Elevate (its
 rem Help box offers the update), Log, Paths, Say and Util; Log needs Paths and
-rem Say; Mdi needs KeyMap. Each is compiled from C:\HomerDev\exec\CSharp.
+rem Say; Mdi needs KeyMap. Each is compiled from the kit's exec\CSharp.
 set "homerModules=Elevate Inix KeyName Lbc Log Paths Say Util Web"
 rem The app's own sources beside _APP_.cs, if any, space separated.
 set "appSources="
@@ -87,8 +87,9 @@ rem Markdig:Markdig.dll. Each is fetched into exec and referenced there.
 set "nugetPackages="
 rem The kit tools this app uses, refreshed into scripts\ on every build.
 rem Name each; add one the day it is used (installCommon.cmd for install
-rem scripts written in cmd, buildTutorials and its fellows once a walk exists).
-set "kitTools=check.cmd check.py fixEncoding.cmd fixEncoding.py push.cmd release.cmd release.ps1 tidy.cmd tidy.py unpushed.cmd unpushed.py"
+rem scripts written in cmd, buildTutorials and its fellows once a walk exists,
+rem post.cmd and post.ps1 once the app publishes a page).
+set "kitTools=check.cmd check.py fixEncoding.cmd fixEncoding.py kind.cmd kind.py push.cmd release.cmd release.ps1 tidy.cmd tidy.py unpushed.cmd unpushed.py"
 set "useDocs=1"
 set "useInstaller=1"
 set "useVersionSteps=1"
@@ -129,12 +130,25 @@ echo Building %app%. The log is %log%
 rem ---- the Homer Development Kit -------------------------------------
 set "homerDev="
 if defined HomerDev if exist "%HomerDev%\exec\CSharp\Lbc.cs" set "homerDev=%HomerDev%"
-if not defined homerDev if exist "C:\HomerDev\exec\CSharp\Lbc.cs" set "homerDev=C:\HomerDev"
-if not defined homerDev if exist "%CD%\exec\CSharp\Lbc.cs" set "homerDev=%CD%"
+rem FOUND WHEREVER IT IS (1.46.0): only Windows and the folder name HomerDev
+rem are assumed, never a drive or a depth. After the HomerDev variable: the
+rem current folder and every folder above it, then this script's folder and
+rem every folder above that, each either the kit or holding a HomerDev
+rem folder; then a HomerDev folder at the top of any drive.
+if not defined homerDev (
+  set "sUp=%CD%"
+  call :findKitUp
+)
+if not defined homerDev (
+  set "sUp=%~dp0."
+  call :findKitUp
+)
+if not defined homerDev for %%L in (C D E F G H I J K L M N O P Q R S T U V W X Y Z) do if not defined homerDev if exist "%%L:\HomerDev\exec\CSharp\Lbc.cs" set "homerDev=%%L:\HomerDev"
 if not defined homerDev (
   echo %app% needs the Homer Development Kit and cannot find it.
-  echo Unzip HomerDev.zip into C:\HomerDev, or set the HomerDev environment variable.
-  >> "%log%" echo ERROR: no kit found in %%HomerDev%%, C:\HomerDev or %CD%
+  echo Unzip HomerDev.zip into a folder named HomerDev beside your projects, on any drive,
+  echo or set the HomerDev environment variable to where it is.
+  >> "%log%" echo ERROR: no kit found from %%HomerDev%%, %CD% and the folders above it, this script's folder and those above it, or the top of any drive
   goto :failed
 )
 rem READ THE KIT'S VERSION WITHOUT ANYTHING INVISIBLE. A byte order mark or a
@@ -153,7 +167,7 @@ if errorlevel 2 (
 )
 if errorlevel 1 (
   echo %app% needs HomerDev !kitNeeded! or later, and the kit is !homerVer!.
-  echo Unzip HomerDev.zip into C:\HomerDev, then build again.
+  echo Unzip the newer HomerDev.zip into the HomerDev folder at !homerDev!, then build again.
   >> "%log%" echo ERROR: kit !homerVer! is older than !kitNeeded!
   goto :failed
 )
@@ -655,3 +669,13 @@ if not defined new (
 )
 set "ver=!new!"
 goto :eof
+
+:findKitUp
+rem Climbs from sUp to the top of its drive (1.46.0), looking for the kit
+rem itself or for a folder named HomerDev that holds it.
+if exist "!sUp!\exec\CSharp\Lbc.cs" (set "homerDev=!sUp!" & goto :eof)
+if exist "!sUp!\HomerDev\exec\CSharp\Lbc.cs" (set "homerDev=!sUp!\HomerDev" & goto :eof)
+for %%I in ("!sUp!\..") do set "sNext=%%~fI"
+if /i "!sNext!"=="!sUp!" goto :eof
+set "sUp=!sNext!"
+goto :findKitUp

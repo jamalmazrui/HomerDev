@@ -7,14 +7,19 @@ author: "Jamal Mazrui"
 
 ## Contents
 
-- [1.43.59 -- 1 October 2026](#october-2026)
-- [1.43.58 -- 1 October 2026](#october-2026-1)
-- [1.43.57 -- 1 October 2026](#october-2026-2)
-- [1.43.56 -- 1 October 2026](#october-2026-3)
-- [1.43.55 -- 1 October 2026](#october-2026-4)
-- [1.43.54 -- 1 October 2026](#october-2026-5)
-- [1.43.53 -- 1 October 2026](#october-2026-6)
-- [1.43.52 -- 1 October 2026](#october-2026-7)
+- [1.48.0 -- 2 October 2026](#october-2026)
+- [1.47.0 -- 2 October 2026](#october-2026-1)
+- [1.46.0 -- 2 October 2026](#october-2026-2)
+- [1.45.0 -- 2 October 2026](#october-2026-3)
+- [1.44.0 -- 2 October 2026](#october-2026-4)
+- [1.43.59 -- 1 October 2026](#october-2026-5)
+- [1.43.58 -- 1 October 2026](#october-2026-6)
+- [1.43.57 -- 1 October 2026](#october-2026-7)
+- [1.43.56 -- 1 October 2026](#october-2026-8)
+- [1.43.55 -- 1 October 2026](#october-2026-9)
+- [1.43.54 -- 1 October 2026](#october-2026-10)
+- [1.43.53 -- 1 October 2026](#october-2026-11)
+- [1.43.52 -- 1 October 2026](#october-2026-12)
 - [1.43.51 -- 30 September 2026](#september-2026)
 - [1.43.50 -- 30 September 2026](#september-2026-1)
 - [1.43.49 -- 30 September 2026](#september-2026-2)
@@ -130,6 +135,142 @@ author: "Jamal Mazrui"
 - [1.2.0 -- 18 September 2026](#september-2026-112)
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
+
+## 1.48.0 -- 2 October 2026
+
+**Every resource names its license, briefly, with a link.** An app and the kit
+are MIT, in License.md; a page is Creative Commons Attribution-ShareAlike 4.0,
+the license Wikipedia's text uses; a collection is CC BY-SA 4.0 for its own
+selection, arrangement and wording, while what it gathers from others keeps
+its owners' terms and the document says so in one sentence. kind.py holds the
+table (licenseFor). check gains a license finding for every kind. post adds the
+kind's license to a page's front matter when the source lacks it and logs a
+reminder; the kit's page layout shows the license in its footer. newHomerApp's
+ReadMe names the MIT License. The podcast-directory, app-help-guide and
+blind-creators builders write the license lines and the one-sentence notice
+themselves. HomerDev.md has a new section, "Licenses for each kind".
+
+## 1.47.0 -- 2 October 2026
+
+**evalSkills: measuring whether the skills help.** scripts\evalSkills.cmd and
+evalSkills.py ask Claude Code, headless, for the same small program several
+times without the Homer skills and several times with them and the three
+sentences, build each with the kit's sample build script, and score them with
+check and uiCheck. The runs happen in a fresh folder outside the kit, so the
+plain runs cannot see the kit by accident; uiCheck tests only what the task
+asked for, and check's findings that partly measure Homer conventions are
+reported apart. The report and log go to the kit's logs folder. --dry-run
+prepares everything without asking the AI. HomerDev.md explains it under
+"Measuring the difference the skills make".
+
+**The gathered accessibility skills are linked, not copied.** help\A11ySkills.md
+and its .htm leave the kit; the kit's build removes them when it finds them.
+They live in their own repository, which states each skill's license: 142 are
+MIT and 33 are under the GNU Affero General Public License, whose full texts
+inside an MIT-licensed kit could be mistaken for MIT. HomerSkills.md,
+HomerDev.md and the skills index link to that repository.
+
+**Fewer proposed skills, measurement first.** HomerSkills.md now folds the
+proposed homer-ui-check into an extension of uiCheck, which already reads the
+UI Automation tree; joins homer-test-pass to homer-audit as its last step;
+requires homer-listen to label every report as a prediction and name what
+still needs a real screen reader; and puts evalSkills first in the suggested
+order, rerun after every change.
+
+**Comments match 1.46.0.** The build templates' and sample builds' opening
+notes no longer say the kit is looked for in C:\HomerDev.
+
+## 1.46.0 -- 2 October 2026
+
+**Any drive, any depth.** Only Windows and folder names are now assumed: the
+kit is a folder named HomerDev, a project is a folder named for itself, and
+either may be on any drive and at any level -- C:\HomerDev beside C:\EdSharp
+and D:\Work\HomerDev beside D:\Work\EdSharp work alike. Nothing in a script
+names drive C any more.
+
+Every script and build finds the kit the same way: the HomerDev environment
+variable; then the current folder and every folder above it, and the script's
+own folder and every folder above it, each either the kit or holding a
+HomerDev folder; then a HomerDev folder at the top of any fixed drive. This
+replaces "C:\HomerDev" in the app build templates, the four sample builds,
+push, post, buildTutorials, tidy and the kind loader in every Python script.
+kind.py gains findKit, and "kind --kit" prints the kit it finds.
+
+newHomerApp puts a new app beside the kit rather than at the top of drive C.
+The installer template, compiled by hand, takes the HomerDev folder beside the
+app instead of C:\HomerDev. The sample builds find the compiler under
+%ProgramFiles% and %ProgramFiles(x86)%, wherever Windows put them.
+HomerDev.md has a new section, "Where the kit and your projects live", and the
+ReadMe and Developer.md say the same.
+
+## 1.45.0 -- 2 October 2026
+
+**Four kinds of Homer resource, and every script knows which it is in.** The
+kit now serves apps, collections, the kit itself and pages, and they need
+different things: a page has no build, a collection has no installer, the kit
+checks itself. scripts\kind.py decides which a folder holds from one fact
+each, checked in order -- the kit's own files, then an installer script or a
+program source named for the folder (an app), then a document named for the
+folder (a page), then many documents at the top (a collection) -- and kind.cmd
+says it aloud with the reason.
+
+Every kit script now asks first and acts accordingly. check runs every check
+on an app, only the document checks on a page or a collection (with a new
+check that a page has its title and .htm, and a collection its ReadMe and an
+.htm for every .md), and sends the kit to checkHomerDev. post publishes an
+app's, the kit's or a collection's page to gh-pages and a page to main.
+push, tidy and unpushed tell a page that is not a repository that post
+publishes it. uiCheck and the three tutorial scripts leave a page or a
+collection alone. fixEncoding covers a page's documents, scripts and site files
+without a RepoFiles.txt. renameBuild leaves a page or collection alone.
+newHomerApp will not start an app on top of another kind. updateAppBuilds
+touches apps only, finds the build under its current name, build.cmd, and adds
+kind.cmd and kind.py to each app's kitTools, as the build templates now do.
+
+A script declines only on positive evidence. Where kind.py is missing or
+cannot place a folder, a script does what it did before, so nothing that
+worked stops working. HomerDev.md has a new chapter, "Four kinds of Homer
+resource", listing what each script does for each kind; homer-build-release
+and homer-page start from it.
+
+**Not yet changed: release.** scripts\release.cmd and release.ps1 are kept on
+this disk only, so they were not part of this update. They should release an
+app and the kit, and decline a page (post releases it) and a collection.
+
+## 1.44.0 -- 2 October 2026
+
+**Publish a page with post, and a skill to go with it.** scripts\post.cmd and
+post.ps1 publish a project's document as a GitHub Page that meets WCAG 2.2 AA
+and the Homer conventions. An app (a folder that is a git repository) has its
+guide, help\<App>.md, published to a gh-pages branch, so push and release keep
+main and the tags to themselves, and no release is made. A page project (a
+folder that is not a repository) is the repository: post creates it, publishes
+to main, keeps its description equal to the title and subtitle, and releases
+the document's version. -DryRun stages everything and stops. The log is
+logs\<App>-post-yyyyMMdd-HHmmss.log. An app opts in by naming post.cmd and
+post.ps1 in kitTools.
+
+post prepares the page the way the first ones taught: the byte order mark is
+removed from everything Jekyll reads, every heading gets Pandoc's id so one
+contents list works in the .htm and on the web, a body h1 that repeats the
+title is dropped so the page has one h1, Liquid-looking text is wrapped in raw,
+kramdown's hard wraps are turned off, the .htm files beside the document go up
+with it, self.md never does, and staged text is CRLF under "* -text" with
+images marked binary.
+
+The new homer-page skill gives the steps, the front matter fields (title,
+subtitle, description, version, lang, and logo, image and image_alt for
+pictures), and two references: what makes a page meet WCAG and the Homer rules,
+and what Jekyll and git need. Its templates folder holds the kit's page layout
+and stylesheet, which post uses when a project has none: one h1, a skip link,
+landmarks, underlined links, colors measured against WCAG with each ratio
+noted, a visible focus outline, Atkinson Hyperlegible, and support for reduced
+motion and Windows high contrast. GitHub's Cayman theme alone fails several of
+these.
+
+**Where to read more.** HomerDev.md and the ReadMe now point to Blind Vibe
+Coding, a directory of resources on building apps nonvisually with AI, which
+lists HomerDev and was itself published with post.
 
 ## 1.43.59 -- 1 October 2026
 

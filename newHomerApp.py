@@ -3,14 +3,18 @@ r"""newHomerApp.py -- start a new Homer Tools app from the HomerDev templates.
 
 Usage (through the wrapper, which is how it is meant to be run):
 
-    newHomerApp                     ask for the app name, write into C:\<App>
-    newHomerApp JobDo               write C:\JobDo, a C# app
-    newHomerApp JobDo --python      write C:\JobDo, a Python app
-    newHomerApp JobDo D:\Work\JobDo  write somewhere else
+    newHomerApp                     ask for the app name, write <App> beside the kit
+    newHomerApp JobDo               write JobDo beside the kit, a C# app
+    newHomerApp JobDo --python      write JobDo beside the kit, a Python app
+    newHomerApp JobDo D:\Work\JobDo  write somewhere else, on any drive
+
+Beside the kit means in the same folder as HomerDev: C:\JobDo for a kit in
+C:\HomerDev, D:\Work\JobDo for one in D:\Work\HomerDev (1.46.0). Only Windows
+and the folder names are assumed, never a drive or a depth.
 
 What it writes into the app folder (1.43.31):
     <App>.cs                the C# starter (a Python app writes its own .py)
-    build.cmd               the build script, compiling from C:\HomerDev
+    build.cmd               the build script, compiling from the kit wherever it is
     <App>_setup.iss         the installer script
     create<App>Repo.cmd     the one-time GitHub bootstrap, and its .ps1
     version.txt             1.0.0
@@ -183,17 +187,44 @@ def newProjectFiles(sApp, bPython):
         ("LocalFiles.txt", "\n".join(lsLocal) + "\n"),
         ("License.md", c_sMitLicense.replace("{year}", str(datetime.date.today().year)).replace("{app}", sApp)),
         ("ReadMe.md", "# %s\n\n%s is a Homer Tools app. This ReadMe is its quick start; the full guide\n"
-                      "is help\\%s.htm.\n" % (sApp, sApp, sApp)),
+                      "is help\\%s.htm. It is free and open source under the [MIT License](License.htm).\n" % (sApp, sApp, sApp)),
         ("help/%s.md" % sApp, "# %s\n\nThe full guide to %s, in topics by heading.\n" % (sApp, sApp)),
         ("help/Announce.md", "# %s: what is new\n\n%s 1.0.0 is the first release.\n" % (sApp, sApp)),
         ("help/Developer.md", "# %s: how it is built\n\n%s is built with the Homer Development Kit in\n"
-                              "C:\\HomerDev: build makes exec\\%s.exe and %s_setup.exe.\n"
+                              "its HomerDev folder: build makes exec\\%s.exe and %s_setup.exe.\n"
                               % (sApp, sApp, sApp, sApp)),
         ("help/History.md", "# %s History\n\n## 1.0.0, %s\n\nThe first release.\n" % (sApp, sToday)),
         ("help/self.md", "# %s notebook\n\nThe project's private notebook: plans, decisions and notes to\n"
                          "self. It is never pushed.\n" % sApp),
     ]
 
+
+
+def loadKind():
+    """The kit's kind.py (1.45.0): beside this script, or in the kit's scripts
+    folder wherever the kit is (1.46.0): the HomerDev variable, then a folder
+    named HomerDev above or beside where this runs, at any depth, then one at
+    the top of any fixed drive. Without it the project is taken to be an app,
+    as every script assumed before there were four kinds."""
+    lsDirs = [os.path.dirname(os.path.abspath(__file__)), os.path.join(os.environ.get("HomerDev", ""), "scripts")]
+    for sStart in (os.getcwd(), os.path.dirname(os.path.abspath(__file__))):
+        sDir = os.path.abspath(sStart)
+        while True:
+            lsDirs.append(os.path.join(sDir, "scripts"))
+            lsDirs.append(os.path.join(sDir, "HomerDev", "scripts"))
+            sUp = os.path.dirname(sDir)
+            if sUp == sDir: break
+            sDir = sUp
+    if os.name == "nt":
+        import ctypes
+        lsDirs += [sLetter + ":\\HomerDev\\scripts" for sLetter in "CDEFGHIJKLMNOPQRSTUVWXYZ"
+                   if ctypes.windll.kernel32.GetDriveTypeW(sLetter + ":\\") == 3]
+    for sDir in lsDirs:
+        if sDir and os.path.isfile(os.path.join(sDir, "kind.py")):
+            if sDir not in sys.path: sys.path.insert(0, sDir)
+            import kind
+            return kind.projectKind
+    return lambda sFolder: ("app", "kind.py was not found, so taken to be an app")
 
 def main():
     global oLog
@@ -222,7 +253,9 @@ def main():
             logLine("ERROR: bad character %r in app name %r" % (sBad, sApp))
             return 1
 
-    sTarget = lsWords[1] if len(lsWords) > 1 else os.path.join("C:\\", sApp)
+    # BESIDE THE KIT, NOT ON C: (1.46.0): a new app goes in the folder that
+    # holds HomerDev, on whatever drive and at whatever depth that is.
+    sTarget = lsWords[1] if len(lsWords) > 1 else os.path.join(os.path.dirname(sScriptDir), sApp)
     if os.name != "nt" and len(lsWords) <= 1:
         sTarget = os.path.join(os.getcwd(), sApp)
     sTemplates = os.path.join(sScriptDir, "Templates")
@@ -230,6 +263,15 @@ def main():
     logLine("App: %s" % sApp)
     logLine("Target: %s" % sTarget)
     logLine("Templates: %s" % sTemplates)
+
+    # AN APP IS NOT STARTED ON TOP OF ANOTHER KIND OF RESOURCE (1.45.0): a page,
+    # a collection or the kit in the target folder is left as it is.
+    if os.path.isdir(sTarget):
+        sKind, sWhy = loadKind()(sTarget)
+        logLine("Target kind: %s (%s)" % (sKind, sWhy))
+        if sKind in ("collection", "kit", "page"):
+            sayLine("%s already holds %s %s, so no app was started there." % (sTarget, "a" if sKind != "kit" else "the", sKind))
+            return 1
 
     if not os.path.isdir(sTemplates):
         sayLine("The Templates folder is missing from the kit.")
