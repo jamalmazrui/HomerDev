@@ -7,22 +7,24 @@ author: "Jamal Mazrui"
 
 ## Contents
 
-- [1.50.0 -- 2 October 2026](#october-2026)
-- [1.49.1 -- 2 October 2026](#october-2026-1)
-- [1.49.0 -- 2 October 2026](#october-2026-2)
-- [1.48.0 -- 2 October 2026](#october-2026-3)
-- [1.47.0 -- 2 October 2026](#october-2026-4)
-- [1.46.0 -- 2 October 2026](#october-2026-5)
-- [1.45.0 -- 2 October 2026](#october-2026-6)
-- [1.44.0 -- 2 October 2026](#october-2026-7)
-- [1.43.59 -- 1 October 2026](#october-2026-8)
-- [1.43.58 -- 1 October 2026](#october-2026-9)
-- [1.43.57 -- 1 October 2026](#october-2026-10)
-- [1.43.56 -- 1 October 2026](#october-2026-11)
-- [1.43.55 -- 1 October 2026](#october-2026-12)
-- [1.43.54 -- 1 October 2026](#october-2026-13)
-- [1.43.53 -- 1 October 2026](#october-2026-14)
-- [1.43.52 -- 1 October 2026](#october-2026-15)
+- [1.50.2 -- 2 October 2026](#october-2026)
+- [1.50.1 -- 2 October 2026](#october-2026-1)
+- [1.50.0 -- 2 October 2026](#october-2026-2)
+- [1.49.1 -- 2 October 2026](#october-2026-3)
+- [1.49.0 -- 2 October 2026](#october-2026-4)
+- [1.48.0 -- 2 October 2026](#october-2026-5)
+- [1.47.0 -- 2 October 2026](#october-2026-6)
+- [1.46.0 -- 2 October 2026](#october-2026-7)
+- [1.45.0 -- 2 October 2026](#october-2026-8)
+- [1.44.0 -- 2 October 2026](#october-2026-9)
+- [1.43.59 -- 1 October 2026](#october-2026-10)
+- [1.43.58 -- 1 October 2026](#october-2026-11)
+- [1.43.57 -- 1 October 2026](#october-2026-12)
+- [1.43.56 -- 1 October 2026](#october-2026-13)
+- [1.43.55 -- 1 October 2026](#october-2026-14)
+- [1.43.54 -- 1 October 2026](#october-2026-15)
+- [1.43.53 -- 1 October 2026](#october-2026-16)
+- [1.43.52 -- 1 October 2026](#october-2026-17)
 - [1.43.51 -- 30 September 2026](#september-2026)
 - [1.43.50 -- 30 September 2026](#september-2026-1)
 - [1.43.49 -- 30 September 2026](#september-2026-2)
@@ -138,6 +140,58 @@ author: "Jamal Mazrui"
 - [1.2.0 -- 18 September 2026](#september-2026-112)
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
+
+## 1.50.2 -- 2 October 2026
+
+**Every Homer app is MIT, and the kit keeps it so.** HomerView was the one
+app under the GPL, version 2, on the understanding that an NVDA add-on should
+share NVDA's license. NV Access's own submission guide checks no license, the
+store's form only records one, and MIT is compatible with the GPL, so
+HomerView is MIT like the rest.
+
+- **scripts\relicense** makes an app MIT throughout: License.md becomes the
+  kit's MIT text (a LICENSE.md is renamed to License.md through git mv, with
+  RepoFiles.txt, LocalFiles.txt and the installer script following), and the
+  app's own claims to another license become "MIT License" -- a line naming
+  Jamal Mazrui with a GNU license, a bare license line just after his
+  copyright line, and "<App> is free software under the GNU ...". Lines about
+  other people's software are left alone, as are History.md and History.htm.
+  Each change is logged in logs\<App>-relicense-<stamp>.log. "relicense all"
+  covers every app beside the kit.
+- **tidy runs it before each push**, with --if-needed, so it does nothing and
+  writes no log when an app is already MIT throughout.
+- **check's "license" now also fails a remaining claim,** naming each line in
+  the log: on the apps' current copies it found EdSharp's source header and
+  About box (still "GNU Lesser General Public License"), the ";Modified GPL
+  License" header of the homer.jss JAWS scripts in EdSharp and FileDir, and
+  HomerView's installer page and license file.
+- HomerDev.md's licenses section says why an app with an NVDA add-on is MIT.
+
+## 1.50.1 -- 2 October 2026
+
+**The skills take the settled lessons from the accessibility skills.** These
+were written as 1.43.60, which never reached GitHub; they are the parts of
+HomerSkills.md that agree with the HomerDev guidelines as they stand:
+
+- homer-build-release: a fix is shown to work by the check or symptom that
+  failed now passing, not by a successful build.
+- homer-code: fix a fault in the shared class it comes from, not the app; a
+  change to what is heard or which keys act is tried with JAWS and NVDA.
+- homer-docs: link text says where it goes and reads well out of context; an
+  image or diagram says what it shows. checkDocs now reports vague link text
+  ("click here", "read more") and images with no text alternative.
+- homer-screen-reader: declare an NVDA script with every field a person meets
+  (description, gesture, category, speakOnDemand for scripts that only
+  report); ui.message only for what NVDA cannot know; prove a script by
+  pressing its key in the reader.
+- homer-ui: the words on screen are the spoken words, for voice control as
+  for screen readers; a one-key command acts only where it belongs (WCAG
+  2.1.4); and a new reference, uia.md, says what each Lbc control exposes
+  through UI Automation and how to look at the tree.
+
+**summarizeLogs reports the kit's own check as what it is.** In C:\HomerDev,
+check recognizes the kit and hands over to checkHomerDev, with no totals; the
+summary had called that "FAILED: no totals".
 
 ## 1.50.0 -- 2 October 2026
 

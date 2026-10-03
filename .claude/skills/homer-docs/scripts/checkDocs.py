@@ -6,8 +6,9 @@ Usage:
 
 The app's name is the folder's name unless --app gives it. Reports, per
 document: a document missing from the Homer set, a .md with no .htm or with an
-.htm older than it, not exactly one H1, a skipped heading level, a bare URL, a
-long document with no contents list, and the reading grade (Flesch-Kincaid),
+.htm older than it, not exactly one H1, a skipped heading level, a bare URL,
+link text that does not say where it goes ("click here", "read more"), an
+image with no text alternative, a long document with no contents list, and the reading grade (Flesch-Kincaid),
 flagged above grade 9 for the documents a user reads (ReadMe, the guide,
 Announce). Developer and History may go further, so their grade is shown but
 not flagged; Hotkeys is a list of key names, which no reading formula fits.
@@ -20,6 +21,7 @@ import os, re, sys
 c_iContentsLines = 150  # a document this long needs a contents list
 c_iContentsHeadings = 5  # ...when it also has this many H2 sections
 c_nMaxGrade = 9.0
+c_lsVagueLinks = ["click here", "here", "learn more", "link", "more", "read more", "this", "this link"]
 c_lsHelpSet = ["Announce.md", "Developer.md", "History.md", "Hotkeys.md"]
 c_lsTopSet = ["License.md", "ReadMe.md"]
 
@@ -84,6 +86,15 @@ def checkDocument(sPath, bUserDocument):
     sLinks = re.sub(r"(?m)^\s*\[[^\]]+\]:\s+\S+.*$", "", sBody)
     for sUrl in re.findall(r"(?<![(<\"'])\bhttps?://[^\s)>\]]+", sLinks):
         lsFindings.append("bare URL: %s" % sUrl[:80])
+    # LINK TEXT THAT SAYS WHERE IT GOES (1.50.1). A screen reader user often
+    # lists a page's links out of context, where "click here" says nothing.
+    for sLinkText in re.findall(r"(?<!!)\[([^\]\n]+)\]\s*[\[(]", sBody):
+        if sLinkText.strip().lower().strip(".") in c_lsVagueLinks:
+            lsFindings.append("vague link text: \"%s\"; say where the link goes" % sLinkText.strip())
+    # AN IMAGE SAYS WHAT IT SHOWS. Empty alternative text leaves a picture
+    # silent for a screen reader user.
+    for sImage in re.findall(r"!\[\s*\]\(([^)\s]+)", sBody):
+        lsFindings.append("image with no text alternative: %s" % sImage[:80])
     iH2 = sum(1 for iLevel, s in lsHeadings if iLevel == 2)
     if len(sText.split("\n")) > c_iContentsLines and iH2 >= c_iContentsHeadings and not re.search(r"(?mi)^#+ contents|^\[TOC\]|^## Table of Contents", sText):
         lsFindings.append("%d lines and %d sections with no contents list" % (len(sText.split("\n")), iH2))

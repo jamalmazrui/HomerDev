@@ -46,6 +46,21 @@ events, or commands that act on another program's window.
 - **Camel Type** in JAWS script and in add-on Python alike; the JAWS rules are
   in [references/CamelType_JAWSScript.md](references/CamelType_JAWSScript.md).
 
+## An NVDA script, declared in full
+
+Declare each NVDA script with the `@script` decorator from `scriptHandler`,
+giving every field a person can meet: a `description` (what Input Help says
+and what NVDA's Input Gestures dialog lists, so it can be reassigned), its
+`gesture` or `gestures`, and a `category` named for the app. A script that
+only reports information sets `speakOnDemand=True`, so it still speaks when
+the person has chosen NVDA's "on demand" speech mode. `ui.message` is for
+what NVDA cannot know on its own -- a result, a count, a status -- never a
+control's name or a window title it already announces.
+
+A script is proved in the reader itself: one that compiles or imports
+cleanly can still fail to load, or lose its key to another script. Press its
+key with JAWS or NVDA running before calling it done.
+
 ## Where it lives and how it ships
 
 - JAWS sources in `scripts/jaws` (`<App>.jss`, `.jsh`, `.jsd`, `.jkm`, and a

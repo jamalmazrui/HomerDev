@@ -40,8 +40,11 @@ the rest in `help`. What each holds is in
   developers. Lists in lowercase alphabetical order unless another order is
   clearly more logical. "In order by title" ignores a leading A, An or The,
   case-insensitively; "by author" is by surname.
-- **Links**: a URL only when verified; link text that reads well, never a
-  bare URL.
+- **Links**: a URL only when verified; link text that says where it goes
+  and reads well out of context -- never "click here" or "read more", never a
+  bare URL. A screen reader user often lists a page's links on their own.
+- **An image or diagram says what it shows**: alternative text for an image,
+  and a text description beside a diagram.
 - **A page break** is a paragraph holding only `\pagebreak`, rendered with the
   pagebreak Lua filter.
 - Report what a program does, not what it could do; no promotional words.
@@ -73,6 +76,7 @@ python scripts/checkDocs.py C:/<App>
 
 It reports documents missing from the set, a `.md` without its `.htm` or an
 `.htm` older than its `.md`, heading problems (not one H1, a skipped level),
-bare URLs, a long document with no contents list, and each document's reading
+bare URLs, vague link text, an image with no alternative text, a long
+document with no contents list, and each document's reading
 grade, flagging a user document above grade 9. Zero findings is a real
 answer.

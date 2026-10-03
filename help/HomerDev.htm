@@ -990,7 +990,14 @@ bare address:</p>
 <li><strong>An app and the kit: the MIT License,</strong> in License.md
 beside the source, naming the program and its author. The ReadMe says so
 in a sentence: “free and open source under the <a href="License.htm">MIT
-License</a>.”</li>
+License</a>.” Every Homer app is MIT, the one with an NVDA add-on
+included: NV Access’s Add-on Store records an add-on’s license without
+requiring any particular one, and MIT is compatible with NVDA’s own GPL.
+Nothing else in an app claims another license – a source header, an
+About box, an installer page. check fails an app that does, and the
+kit’s <code>scripts\relicense</code> (run by tidy before each push)
+brings it into line; lines about other people’s software, such as 7-Zip
+under the LGPL, are left as they are.</li>
 <li><strong>A page: Creative Commons Attribution-ShareAlike 4.0</strong>
 (CC BY-SA 4.0), the license Wikipedia’s text has used since June 2023.
 The front matter carries <code>license</code> and

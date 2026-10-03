@@ -71,6 +71,11 @@ def summarizeBuild(sText):
 def summarizeCheck(sText):
     sCounts = firstMatch(sText, r"(\d+ checks? passed, \d+ checks? failed[^\r\n]*)")
     lsFailed = re.findall(r"^\S+ \S+\s+(\w+)\s+FAIL\s+(.*)$", sText, re.M)
+    # THE KIT'S OWN CHECK IS NOT A FAILURE (1.50.1). Run in C:\\HomerDev, check
+    # recognizes the kit and points to checkHomerDev, with no totals; that was
+    # reported as "FAILED: no totals". It is reported as what it is.
+    if not sCounts and re.search(r"This is the kit, which checkHomerDev checks", sText):
+        return ["the kit: check hands over to checkHomerDev"], False
     lsOut = [sCounts or "no totals"]
     lsOut += ["FAIL %s: %s" % (sName, sWhy.strip()[:120]) for sName, sWhy in lsFailed]
     return lsOut, bool(lsFailed) or not sCounts

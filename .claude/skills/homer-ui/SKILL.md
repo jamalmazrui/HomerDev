@@ -27,6 +27,9 @@ and can reach any command by a key they can guess.
 - **Access letters** come from `&` in a caption or the preceding label, first
   letter of a word, no extra code. **One trigger letter per menu or dialog**:
   the first item to claim a letter keeps it; a later one gets none.
+- **The words on screen are the spoken words.** A control's name comes from
+  its caption or the label before it, so what a screen reader says and what a
+  voice-control user says (Windows Voice Access, Dragon) are the words shown.
 - **Initial focus in a multi-line text box is at its start.**
 - **Save a setting as soon as the person answers**, not at exit.
 - **A field earns its line**: leave out empty values, a program's word for
@@ -49,6 +52,10 @@ is its hotkey's letter when it has one.
   strong association: X for Export, Z for toggles (sleep), Shift+Z for Say
   Status (Z at the bottom, like the status bar). Explain an exception in the
   docs.
+- **A one-key command works only where it belongs.** A command on a single
+  printable key (Question Mark in FileDir's file list) acts only while its
+  list or field has focus, never across the app, so typing elsewhere never
+  sets it off (WCAG 2.1.4).
 - **Alt+Control is for Windows desktop shortcuts**, never an app binding,
   function keys included. Two exceptions: the app's own desktop shortcut
   (Alt+Control+D opens DbDo), and Alt+Control with navigation keys to move
@@ -87,6 +94,17 @@ is its hotkey's letter when it has one.
 - **Speak the parts of a grouped announcement as separate utterances**
   (`Say.sayParts`), with no added pauses: column, row position and value as
   three.
+
+## Checking a control
+
+Every control a person can reach exposes four things through UI Automation,
+which is what JAWS, NVDA and Narrator read: its **name** (from its caption or
+the label before it), its **role** (button, edit, list ...), its **value**
+where it has one, and its **state** (checked, expanded, unavailable ...); and
+it can be reached and used from the keyboard alone. What each Lbc control
+exposes, and how to look at the tree with Accessibility Insights for Windows,
+is in [references/uia.md](references/uia.md). A check confirms the tree; a
+pass with JAWS and with NVDA confirms what the person hears.
 
 ## Shapes of app
 

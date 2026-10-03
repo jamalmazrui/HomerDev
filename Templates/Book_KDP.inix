@@ -1,0 +1,69 @@
+﻿[details]
+language = English
+kdpTitleId = 
+title = <Title>
+subtitle = <Subtitle>
+series = 
+editionNumber = 1
+author = <First Last>
+contributors = 
+description =
+<First paragraph: the hook.>
+
+<Second paragraph: the context.>
+
+<What the reader will gain, as a list:>
+
+- <one>
+- <two>
+
+**<Closing line, in bold.>**
+publishingRights = I own the copyright and I hold the necessary publishing rights.
+sexuallyExplicit = No
+readingAge = Leave blank
+primaryMarketplace = Amazon.com
+categories =
+<Kindle eBooks > Level > Level > Placement, exactly as KDP's picker names them>
+<second path>
+<third path>
+keywords = <up to seven phrases, none repeating a word of the title>
+releaseOption = Release now
+
+[content]
+manuscriptFile = exec/<Book>.epub
+coverFile = <Book>.jpg
+drm = No (do not apply DRM)
+isbn = None (KDP assigns an ASIN)
+publisher = Leave blank
+
+[aiContent]
+used = Yes
+texts = Entire work, with extensive editing
+images = One or a few AI-generated images, with extensive editing
+translations = None
+tools = <tool name>
+
+[accessibility]
+imageReading = All informative images include alternative text and/or extended description
+
+[pricing]
+kdpSelect = Do not enroll
+territories = All territories (worldwide rights)
+primaryMarketplacePricing = Amazon.com
+royalty = 70%
+priceUsd = 4.99
+otherMarketplaces = Based on the US price (automatic conversion)
+bookLending = Allow Kindle Book Lending
+matchBook = Not applicable (no print edition)
+
+[status]
+prepared = <date>
+status = <One sentence on which answers are judgment calls the author may override.>
+priceReasoning = <why this price>
+afterPublishing = <follow-up steps>
+recommended = 
+
+[notes]
+format = This file is .inix: [section] headings, key = value lines, and block values that start on the line after 'key =' and run to the next key line. A list is one item per line in a block (used for categories because their names contain commas) or comma-separated on one line. Sections other than aiContent, accessibility and notes are read as one flat set of answers. See help\Inix.md.
+kdpTitleId = Leave empty for a new book; after the first publication, put the id from the title's address on the Bookshelf here so kdpSubmit updates that title.
+description = Written in four parts, and claims only what the book does: sources are linked, not independently verified by a third party. Written in four parts: a hook, the context, what the reader will gain, and a closing call to act. It leads with competence and accessibility rather than sympathy. kdpSubmit turns this plain text into HTML (paragraphs, a bulleted list from lines starting with '- ', and **bold** for the closing line), because KDP accepts paragraph, bold, italic, heading and list tags but rejects the div tags its editor makes from typed plain text. KDP's limit of 4,000 characters applies to the HTML version as entered, tags included.

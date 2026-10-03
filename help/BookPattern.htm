@@ -1,0 +1,292 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>BookPattern</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">BookPattern</h1>
+</header>
+<h1 id="the-homer-book-pattern">The Homer book pattern</h1>
+<p><em>For the Homer Development Kit’s help folder. Revised 3 October
+2026 from the Blind Vibe Coding project.</em></p>
+<h2 id="contents">Contents</h2>
+<ul>
+<li>Files and folders</li>
+<li>Sections, in order</li>
+<li>Chapters</li>
+<li>Glossary</li>
+<li>Timeline and Key Figures</li>
+<li>Copyright page</li>
+<li>About the Author and the author’s other books</li>
+</ul>
+<h2 id="files-and-folders">Files and folders</h2>
+<p>A book is a Homer project and uses the Homer folder layout: sources
+and the build at the top; <code>configs</code> for the KDP answers;
+<code>exec</code> for the built EPUB, which is not kept in Git;
+<code>help</code> for the project’s guides; <code>logs</code> for one
+log per run; <code>pages</code> for a companion GitHub page and its
+images; <code>scripts</code> for the publishing and image scripts with
+their tests; <code>templates</code> for forms such as the bug
+report.</p>
+<ul>
+<li><code>Book.md</code>: the manuscript, Pandoc Markdown, UTF-8 with
+BOM and CRLF.</li>
+<li><code>Book.bib</code>: BibLaTeX entries, each web source with url
+and urldate.</li>
+<li><code>Book.yaml</code>: Pandoc defaults: from markdown, to epub3,
+citeproc, reference-location document, toc, css, cover.</li>
+<li><code>Book.jpg</code>: the cover, 1,600 by 2,560 pixels, RGB JPEG at
+300 dots per inch, saved with full color sampling. Draw it with a script
+(<code>scripts\makeCover.py</code>) rather than by hand, so every size,
+color and position is a number a screen reader user can read and change,
+and so the web copies (JPEG, PNG, SVG mark, social card) come from the
+same source. Check contrast in the script: at least 4.5 to 1 for
+text.</li>
+<li><code>book.css</code>: underlined links, no forced text colors.</li>
+<li><code>configs\Book_KDP.inix</code>: the KDP form answers, in .inix
+rather than JSON (see Inix.md); the kit’s
+<code>templates\Book_KDP.inix</code> is the starting point.
+<code>scripts\kdpSubmit.py</code> reads it, fills the KDP form, and
+updates a published book from the same file.</li>
+<li><code>ACCESSIBILITY.md</code> at the top of the repository: GitHub
+shows it as an Accessibility tab; the kit’s
+<code>templates\ACCESSIBILITY.md</code> is the starting point.</li>
+</ul>
+<h2 id="sections-in-order">Sections, in order</h2>
+<p>The YAML gives title, subtitle, author, date, lang and rights, plus
+bibliography and csl when the book cites sources. Then, at level 2:</p>
+<ol type="1">
+<li>Copyright</li>
+<li>Table of Contents, holding only <code>[TOC]</code></li>
+<li>Introduction, with Organization and Background at level 3</li>
+<li>The chapters</li>
+<li>Conclusion</li>
+<li>Any reference sections the book needs: Quick Reference, Appendix A,
+B, C</li>
+<li>Timeline, when the chapters are not in date order</li>
+<li>Key Figures</li>
+<li>Glossary (Strange Truths books call it Key Terms)</li>
+<li>Further Reading</li>
+<li>Bibliography, holding only <code>::: {#refs}</code> and
+<code>:::</code></li>
+<li>Also by the Author (in a series: Also in the Series)</li>
+<li>About the Author</li>
+</ol>
+<p>A book for screen reader users is read in speech, in braille, or in
+both; write so that either works, which means real headings, no meaning
+carried by layout alone, and punctuation that reads well cell by
+cell.</p>
+<p>Standard section names stay bare, with no colon and subtitle. Each
+back-matter section opens with one italic sentence saying what it holds.
+Sections are separated by a line of three hyphens.</p>
+<h2 id="chapters">Chapters</h2>
+<ul>
+<li>Heading: <code>## N. Title — a short subtitle in lower case</code>,
+numbered from 1.</li>
+<li>Narrative books open each chapter with its story; tutorial books
+open with a real person who did something similar, then: What You Will
+Build, What You Need, Steps, Check Your Work, When Something Goes Wrong,
+Practice.</li>
+<li>Every chapter ends with <strong>Learn More</strong>: free resources,
+grouped by kind (articles, podcasts, guides), each a link whose text
+names the resource and its publisher, linking to the resource itself
+rather than a page about it.</li>
+</ul>
+<h2 id="glossary">Glossary</h2>
+<pre><code>### Term {#book--term}
+
+One to three plain sentences defining the term.</code></pre>
+<p>The prefix before <code>--</code> is a short slug for the book.
+Entries are in alphabetical order. The first time each term appears in
+the chapters, it links to its entry: <code>[term](#book--term)</code>.
+Skip code, quoted prompts and headings when choosing that first use, and
+skip a use where the word means something else.</p>
+<h2 id="timeline-and-key-figures">Timeline and Key Figures</h2>
+<p><strong>Timeline</strong>:
+<code>- **Month Year**: what happened.[@key] See [chapter N](#book-chNN).</code>
+Give chapters explicit ids, such as <code>{#book-ch07}</code>, so these
+links are stable.</p>
+<p><strong>Key Figures</strong>:
+<code>- [Name](link). Role. What the book draws on. Chapters N and M.</code>
+In alphabetical order by surname for living subjects, or chronological
+for historical ones. Link to the person’s own site, a profile, or the
+source the book cites; leave the name unlinked when no link is
+verified.</p>
+<h2 id="copyright-page">Copyright page</h2>
+<p>State who holds the copyright, and say plainly how AI was used. When
+an AI drafted the prose, follow KDP’s definition: that is AI-generated
+content, even after substantial editing. Name the tool, say what the
+author did (chose topics, directed, verified facts, edited, made every
+decision), and say the author discloses it to KDP. Add when sources were
+last checked.</p>
+<h2 id="about-the-author-and-the-authors-other-books">About the Author
+and the author’s other books</h2>
+<p>About the Author is copied word for word from the author’s reference
+file; checkBook –bio confirms it. Also by the Author lists each other
+title as
+<code>**[Full Title: Subtitle](https://www.amazon.com/dp/ASIN)**. One sentence.</code>,
+in order by title ignoring a leading “The”, followed by any compilation
+and a link to the author’s Amazon page.</p>
+</body>
+</html>

@@ -71,6 +71,15 @@ that an existing tool can absorb is folded into that tool instead.
 
 ## Proposed improvements to existing skills
 
+Kit 1.50.1 added the parts of these that settle no open question: homer-docs
+now flags vague link text and images with no text alternative; homer-ui
+gains the spoken-words and one-key-command rules and a UI Automation
+reference; homer-screen-reader gains NVDA's script fields and testing in the
+reader; homer-code gains fixing at the source and trying changes with the
+readers; homer-build-release gains showing that a fix worked. Still open:
+emoji and tables in the Markdown check, NVDA manifest validation, evaluation
+prompts, and reworded descriptions.
+
 - **homer-docs**: check Markdown the way the Markdown skills do, as a script: vague link text, bare addresses, skipped heading levels, more than one H1, an image or diagram without a text alternative, emoji used as words, and tables where a list would serve. Measure the reading level of each document against the Homer target and report it.
 - **homer-ui**: add a short UI Automation reference, with the name, role, value and state each Lbc control exposes and which patterns screen readers use (invoke, value, selection, expand and collapse, toggle), so a new control is checked against it.
 - **homer-screen-reader**: add NVDA's script decorator fields (`description`, `gesture`, `category`, `speakOnDemand`) and when `ui.message` is right, from the NVDA specialist; validate the add-on manifest; and repeat that a script is tested in the reader itself.

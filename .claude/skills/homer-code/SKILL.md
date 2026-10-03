@@ -64,6 +64,15 @@ every dialog, `Log` for its log, `Say` for speech, `Inix` for settings (a file H
 get. Read [references/kit-libraries.md](references/kit-libraries.md) for what
 each offers and how an app compiles or imports it.
 
+**Fix a fault where it starts.** When an app's problem comes from a shared
+class -- focus order from Lbc, speech from Say -- fix the class in the kit,
+not the app, so every app gains the fix at its next build.
+
+**A change to what is heard is tried with the readers.** When a change
+alters what a screen reader says or which keys do what, it is tried with JAWS
+and with NVDA before release. The kit's checks prove the rules they test;
+only a screen reader proves what a person hears.
+
 ## Style references
 
 Read the one for the language at hand:

@@ -1,0 +1,257 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Inix</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Inix</h1>
+</header>
+<h1 id="the-.inix-format">The .inix format</h1>
+<p><em>How Homer programs keep settings, answers and small tables in
+plain text, and why they prefer it to JSON. For the Homer Development
+Kit’s help folder.</em></p>
+<h2 id="what-.inix-is">What .inix is</h2>
+<p>An .inix file is the familiar .ini settings format with a few
+additions. Section names sit in square brackets on a line of their own.
+Inside a section, each line is <code>name = value</code>. Lines that
+begin with a semicolon or a number sign are comments. Any plain .ini
+file is already a valid .inix file; the extension says that a Homer
+program wrote it and that the additions below may be in use. Homer
+programs create only .inix for their own configuration; .ini is used
+only when another program requires it.</p>
+<p>The additions:</p>
+<ul>
+<li><strong>A value can span several lines.</strong> Write the name and
+the equals sign with nothing after them, and put the value on the lines
+below. The value runs to the next <code>name =</code> line, the next
+section line, or the end of the file. Blank lines inside it are part of
+it; blank lines at its end are dropped. The reader keeps the text
+exactly as written, with no trimming of lines and no change of spacing;
+any trimming is the using program’s later decision. If a line of the
+value would itself read as a <code>name =</code> line, write it with one
+leading space, which the reader removes.</li>
+<li><strong>A list</strong> is a comma-separated value on one line, or,
+when the items themselves contain commas or are long, one item per line
+in a multi-line value.</li>
+<li><strong>A dictionary</strong> is a section: each field is a
+<code>name = value</code> line.</li>
+<li><strong>A table</strong> is one section per record, with each field
+on its own line and its own name, rather than a row of values that must
+be counted across. The kit’s inixVert converts such a table to and from
+CSV, Excel and Markdown tables.</li>
+</ul>
+<p>A short example, the shape of a book’s KDP answers:</p>
+<pre><code>[details]
+title = Blind Vibe Coding
+keywords = screen reader programming, accessible app development
+categories =
+Kindle eBooks &gt; Computers &amp; Technology &gt; Programming &gt; Software Development
+Kindle eBooks &gt; Computers &amp; Technology &gt; Computer Science &gt; Generative AI
+description =
+First paragraph of the description.
+
+Second paragraph, after a blank line that is part of the value.
+
+[aiContent]
+used = Yes
+tools = Claude</code></pre>
+<p>The program that reads the file turns these conventions into whatever
+structure suits it: the comma-separated line into a list, the multi-line
+value into a list of lines or one text, the section into a dictionary.
+That is a few lines of code in any language, and the Blind Vibe Coding
+project’s <code>kdpSubmit.py</code> carries a reference reader and
+writer in Python (<code>readInix</code>, <code>writeInix</code>,
+<code>inixList</code>) with tests that show a file reading back exactly
+as written.</p>
+<h2 id="why-prefer-.inix-to-json">Why prefer .inix to JSON</h2>
+<p>JSON is for programs talking to programs. Every string is quoted,
+every value must be followed by a comma except the last, brackets and
+braces must balance, and one missing comma makes the whole file
+unreadable. A screen reader reads all of that punctuation aloud. An
+.inix file says the same thing with less to hear and nothing to get
+wrong, and it can be opened and corrected in any text editor.</p>
+<p>The rule: when a person will read or edit the file, use .inix. When
+another program insists on JSON, such as a web API, a package manifest
+or a tool whose settings are JSON by design, use JSON there and nowhere
+else. The same holds for YAML and TOML: fine where a tool demands them,
+not for a Homer program’s own files.</p>
+<h2 id="writing-rules-for-homer-programs">Writing rules for Homer
+programs</h2>
+<ul>
+<li>Read and write without reordering sections or keys and without
+trimming values.</li>
+<li>Save a value as soon as the user answers, not at exit.</li>
+<li>A missing key means the default; do not write a key whose value is
+empty unless the empty value is itself the answer.</li>
+<li>Encoding is UTF-8 with BOM and CRLF, like every Homer text
+file.</li>
+<li>Name the file for the program or the job it serves, in
+Title_Snake_Case for a user-facing file
+(<code>Blind_Vibe_Coding_KDP.inix</code>) and the program’s own name for
+its settings (<code>EdSharp.inix</code>). Settings live in
+<code>configs\</code>; a record of what a run did lives in
+<code>logs\</code>.</li>
+</ul>
+</body>
+</html>

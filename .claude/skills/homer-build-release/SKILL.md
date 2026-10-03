@@ -90,6 +90,10 @@ as files in `<App>.zip` (never manual edits), and the numbered next steps as
 commands. Deliver a kit change as `HomerDev.zip` and say the kit must be
 built before the apps.
 
+When a fix answers a failed check or a reported fault, say which, and look
+for that same check or symptom in the next logs: a fix is shown to work by
+the check that failed now passing, not by the build succeeding.
+
 ## References
 
 - **Lists, whitelist and git rules** (RepoFiles.txt, LocalFiles.txt,
