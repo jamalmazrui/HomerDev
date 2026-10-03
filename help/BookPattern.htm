@@ -181,7 +181,17 @@
 <li>About the Author and the author’s other books</li>
 </ul>
 <h2 id="files-and-folders">Files and folders</h2>
-<p>A book is a Homer project and uses the Homer folder layout: sources
+<p>A book is a Homer project of its own kind, beside app, kit, page and
+collection. The kit’s <code>check</code> can tell it by
+<code>&lt;Book&gt;.yaml</code> with <code>to: epub3</code> beside a
+<code>&lt;Book&gt;.md</code> at the top; until check knows the kind, run
+it as a page and read the report with that in mind. The project keeps
+<code>version.txt</code> for the edition (stepped by hand for each
+submission, since the book has no build-time version resource) and
+<code>RepoFiles.txt</code> for the files it publishes, so
+<code>push</code>, <code>tidy</code> and <code>release</code> work as
+they do for an app; the build script is <code>build.cmd</code>, as the
+kit’s buildname rule asks. A book uses the Homer folder layout: sources
 and the build at the top; <code>configs</code> for the KDP answers;
 <code>exec</code> for the built EPUB, which is not kept in Git;
 <code>help</code> for the project’s guides; <code>logs</code> for one

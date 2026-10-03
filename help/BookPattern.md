@@ -14,7 +14,7 @@
 
 ## Files and folders
 
-A book is a Homer project and uses the Homer folder layout: sources and the build at the top; `configs` for the KDP answers; `exec` for the built EPUB, which is not kept in Git; `help` for the project's guides; `logs` for one log per run; `pages` for a companion GitHub page and its images; `scripts` for the publishing and image scripts with their tests; `templates` for forms such as the bug report.
+A book is a Homer project of its own kind, beside app, kit, page and collection. The kit's `check` can tell it by `<Book>.yaml` with `to: epub3` beside a `<Book>.md` at the top; until check knows the kind, run it as a page and read the report with that in mind. The project keeps `version.txt` for the edition (stepped by hand for each submission, since the book has no build-time version resource) and `RepoFiles.txt` for the files it publishes, so `push`, `tidy` and `release` work as they do for an app; the build script is `build.cmd`, as the kit's buildname rule asks. A book uses the Homer folder layout: sources and the build at the top; `configs` for the KDP answers; `exec` for the built EPUB, which is not kept in Git; `help` for the project's guides; `logs` for one log per run; `pages` for a companion GitHub page and its images; `scripts` for the publishing and image scripts with their tests; `templates` for forms such as the bug report.
 
 - `Book.md`: the manuscript, Pandoc Markdown, UTF-8 with BOM and CRLF.
 - `Book.bib`: BibLaTeX entries, each web source with url and urldate.
