@@ -191,8 +191,13 @@ submission, since the book has no build-time version resource) and
 <code>RepoFiles.txt</code> for the files it publishes, so
 <code>push</code>, <code>tidy</code> and <code>release</code> work as
 they do for an app; the build script is <code>build.cmd</code>, as the
-kit’s buildname rule asks. A book uses the Homer folder layout: sources
-and the build at the top; <code>configs</code> for the KDP answers;
+kit’s buildname rule asks. A book uses the Homer folder layout,
+including <code>notes</code> for the drafts, audits and transcripts a
+book accumulates; <code>notes</code> is a standard folder of every Homer
+project of every kind, ignored by Git and never packaged by an
+installer, and <code>tidy</code> moves stray files into it, dropping
+duplicates and suffixing name collisions. The layout: sources and the
+build at the top; <code>configs</code> for the KDP answers;
 <code>exec</code> for the built EPUB, which is not kept in Git;
 <code>help</code> for the project’s guides; <code>logs</code> for one
 log per run; <code>pages</code> for a companion GitHub page and its
