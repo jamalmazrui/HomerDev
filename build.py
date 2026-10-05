@@ -56,7 +56,7 @@ c_lsExpected = [
     "scripts/buildTutorials.cmd", "scripts/buildTutorials.ps1", "scripts/checkTutorial.cmd", "scripts/checkTutorial.py",
     "scripts/fixEncoding.cmd", "scripts/fixEncoding.py",
     "scripts/makeTutorials.cmd", "scripts/makeTutorials.py",
-    "Templates/Tutorial_00_Overview_and_Table_of_Contents.inix", "Templates/Tutorial_01_Install_and_Launch.inix", "Templates/Tutorial_02_User_Interface_Concepts.inix", "Templates/Tutorial_03_Key_Patterns.inix", "Templates/Tutorial_04_Task_One.inix", "Templates/Tutorial_05_Task_Two.inix", "Templates/Tutorial_06_Task_Three.inix", "Templates/Tutorial_07_Task_Four.inix", "Templates/Tutorial_08_Task_Five.inix", "Templates/Tutorial_09_Conclusion.inix", "Templates/Tutorial_10_More_Information.inix",
+    "Templates/Tutorial_00_Overview_and_Table_of_Contents.inix", "Templates/Tutorial_01_Install_and_Launch.inix", "Templates/Tutorial_02_User_Interface_Concepts.inix", "Templates/Tutorial_03_Key_Patterns.inix", "Templates/Tutorial_04_Task_One.inix", "Templates/Tutorial_05_Task_Two.inix", "Templates/Tutorial_06_Task_Three.inix", "Templates/Tutorial_07_Task_Four.inix", "Templates/Tutorial_08_Task_Five.inix", "Templates/Tutorial_09_Glossary.inix", "Templates/Tutorial_10_Conclusion.inix", "Templates/Tutorial_11_More_Information.inix",
     ".claude/skills/ReadMe.md", ".claude/skills/app-help-guide/SKILL.md", ".claude/skills/blind-creators/SKILL.md",
     ".claude/skills/homer-build-release/SKILL.md", ".claude/skills/homer-code/SKILL.md",
     ".claude/skills/homer-convert/SKILL.md", ".claude/skills/homer-docs/SKILL.md", ".claude/skills/homer-ui/SKILL.md",

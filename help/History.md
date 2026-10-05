@@ -141,6 +141,16 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.52.1 -- 5 October 2026
+
+**Twelve walks, with a glossary.** 09 Glossary joins the pattern, after the
+tasks and before 10 Conclusion and 11 More Information, which is always last.
+Tasks are 04 to 08, at least one and at most five, numbered without a gap. The
+glossary is two voices -- the host says the term, the reader says the meaning
+-- and so is every recap: the host says the key, the reader says the command.
+Tutorials.md has the pattern and the rule for the two voices: an exchange that
+teaches, never a chat.
+
 ## 1.52.0 -- 5 October 2026
 
 **Eleven walks for every program**, by name: 00 Overview and Table of Contents,

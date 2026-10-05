@@ -268,7 +268,7 @@ def main():
     # that is not the whole set is reported once, by what it lacks.
     if len(sys.argv) == 1 and sKind != "kit":
         c_dFixed = {"00": "Overview_and_Table_of_Contents", "01": "Install_and_Launch", "02": "User_Interface_Concepts",
-                    "03": "Key_Patterns", "09": "Conclusion", "10": "More_Information"}
+                    "03": "Key_Patterns", "09": "Glossary", "10": "Conclusion", "11": "More_Information"}
         dHave = {}
         for sScript in lsScripts:
             m = re.match(r"Tutorial_(\d\d)_(.+)\.inix$", os.path.basename(sScript))
@@ -276,11 +276,15 @@ def main():
         for sNum, sName in sorted(c_dFixed.items()):
             if dHave.get(sNum) != sName:
                 problem(os.path.basename(lsScripts[0]), 0, "the pattern wants Tutorial_%s_%s.inix%s" % (sNum, sName, (", not " + dHave[sNum]) if sNum in dHave else ""))
-        for sNum in ("04", "05", "06", "07", "08"):
-            if sNum not in dHave: problem(os.path.basename(lsScripts[0]), 0, "the pattern wants a task walk numbered %s" % sNum)
+        # Tasks are 04 to 08: at least one, at most five, filled from 04 up with
+        # no gap, so the numbers are the order and the order is the numbers.
+        lsTasks = [s for s in sorted(dHave) if s in ("04", "05", "06", "07", "08")]
+        if not lsTasks: problem(os.path.basename(lsScripts[0]), 0, "the pattern wants at least one task walk, numbered from 04")
+        for iAt, sNum in enumerate(lsTasks):
+            if int(sNum) != 4 + iAt: problem(os.path.basename(lsScripts[0]), 0, "the task walks must run from 04 without a gap; found %s" % ", ".join(lsTasks)); break
         for sNum in sorted(dHave):
             if sNum not in c_dFixed and sNum not in ("04", "05", "06", "07", "08"):
-                problem(os.path.basename(lsScripts[0]), 0, "Tutorial_%s is outside the pattern of 00 to 10" % sNum)
+                problem(os.path.basename(lsScripts[0]), 0, "Tutorial_%s is outside the pattern of 00 to 11" % sNum)
     for sText in lsProblems: say("  " + sText)
     say("%d script%s checked, %d problem%s." % (len(lsScripts), "" if len(lsScripts) == 1 else "s",
         len(lsProblems), "" if len(lsProblems) == 1 else "s"))

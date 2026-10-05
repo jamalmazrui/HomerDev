@@ -736,13 +736,15 @@ Questions and corrections are welcome. The kit is early, and it improves by bein
 
 <!-- walkthrough ends -->
 
-## The eleven walks every Homer program has
+## The twelve walks every Homer program has
 
 A program's walks follow one pattern, so a listener who has heard one
 program's knows where to find a thing in another's. The scripts are
 `help\Tutorial_NN_Title_With_Underscores.inix`; the audio is
 `help\tutorials\NN_Title_With_Underscores.mp3`, the same name without the
 word Tutorial, so a folder or a player shows the number and the title.
+Concepts come before the tasks; summaries come after them; More Information
+is always last.
 
 - **00_Overview_and_Table_of_Contents** -- what the program is, what each
   walk covers, and the two reader keys: Insert plus Up Arrow repeats a line,
@@ -753,13 +755,31 @@ word Tutorial, so a folder or a player shows the number and the title.
   its main view, its dialogs, its status bar. Listened to more than pressed.
 - **03_Key_Patterns** -- the rules every key follows, so a key can be
   guessed before it is learned.
-- **04 to 08** -- five tasks, each a whole piece of work from start to end,
-  in the order a new person meets them. A program with more to teach merges
-  tasks rather than adds walks; a program with less leaves a slot empty.
-- **09_Conclusion** -- four sentences to carry away, and where to begin.
-- **10_More_Information** -- the guide and history from inside the program,
+- **04 to 08, the tasks** -- each a whole piece of work from start to end, in
+  the order a new person meets them. At least one, at most five, numbered from
+  04 with no gap. A program with more to teach merges tasks; a program with
+  less stops early, and 09 to 11 keep their numbers.
+- **09_Glossary** -- the program's words in alphabetical order, one step per
+  term: the host says the term, the reader says what it means.
+- **10_Conclusion** -- four sentences to carry away, and where to begin.
+- **11_More_Information** -- the guide and history from inside the program,
   the documents, the project page, updates, and the other Homer Tools.
 
-`checkTutorial` requires the first three and the last two by name, and
-numbers 04 to 08 for whatever tasks the program chooses.
+`checkTutorial` requires the seven fixed names and the task numbering.
+
+## Two voices, and what they are for
+
+A walk has two voices because a program has two: the person, and the reader
+answering. That exchange is what makes a walk memorable, and it is used for
+more than keystrokes. A glossary is the host saying the term and the reader
+saying the meaning. A recap is the host saying the key and the reader saying
+the command. A key pattern is the host stating the rule and the reader giving
+the instance. Each is two short lines, and each lands better than one voice
+reading a list.
+
+What the voices never do is chat. No greeting, no banter, no "great question",
+no comment from one voice on the other. A turn of phrase or a change of tone
+is allowed where it helps a line stick; nothing is allowed that costs the
+listener a second and teaches nothing. The measure is useful information in
+the least time, by the channel that makes it stay.
 
