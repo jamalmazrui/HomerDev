@@ -5,7 +5,7 @@
     <link>Tutorials.htm</link>
     <description>Short spoken walkthroughs of building accessible Windows programs with the Homer Development Kit. Each episode is one task, with the narration in one voice and the screen reader in another.</description>
     <language>en-us</language>
-    <lastBuildDate>Mon, 05 Oct 2026 21:26:02 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 05 Oct 2026 22:17:20 +0000</lastBuildDate>
     <itunes:author>Jamal Mazrui</itunes:author>
     <itunes:explicit>false</itunes:explicit>
     <itunes:category text="Technology"/>
@@ -14,8 +14,8 @@
       <description>You need Windows 10 or later, 64-bit, and a screen reader running. Everything else the kit fetches for itself. Nothing in this tutorial costs anything. Full transcript: Tutorials.htm#0-the-homer-development-kit-and-two-fruit-baskets</description>
       <link>Tutorials.htm#0-the-homer-development-kit-and-two-fruit-baskets</link>
       <guid isPermaLink="false">homer-tutorial_homerdev</guid>
-      <enclosure url="tutorials/Tutorial_HomerDev.mp3" length="1545039" type="audio/mpeg"/>
-      <itunes:duration>00:03:41</itunes:duration>
+      <enclosure url="tutorials/HomerDev.mp3" length="1695896" type="audio/mpeg"/>
+      <itunes:duration>00:04:02</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
     </item>
   </channel>

@@ -1,0 +1,27 @@
+﻿[about]
+Title=01 - Install and Launch
+Intro=The download, the installer's pages, the finish page, and _APP_ opening by itself.
+Setup=_APP_ is installed and your reader is running.
+Homework=Install _APP_ and open it from its desktop shortcut.
+
+[step]
+
+Say=The installer is downloaded; Enter opens it, and the security warning is answered.
+Key=
+Hear=
+
+[step]
+
+Say=Each page of the installer, and the finish page with its boxes.
+Key=
+Hear=
+
+[step]
+
+Say=_APP_ opens by itself.
+Key=
+Hear=
+
+[step]
+
+Say=What this walk taught: the keys you heard.

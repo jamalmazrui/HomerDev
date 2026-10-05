@@ -1,0 +1,33 @@
+﻿[about]
+Title=03 - Key Patterns
+Intro=The rules every key follows, so a key can be guessed before it is learned.
+Setup=_APP_ is installed and your reader is running.
+Homework=Guess three keys before you look them up, then check with Control plus F1.
+
+[step]
+
+Say=A key is named for a word of its command, never from the middle of a word.
+Key=
+Hear=
+
+[step]
+
+Say=Control does; Shift asks and changes nothing; adding Shift reverses.
+Key=
+Hear=
+
+[step]
+
+Say=Alt plus Shift plus a letter is a command with no control of its own.
+Key=
+Hear=
+
+[step]
+
+Say=The function keys follow Windows: F1 help, F2 edit, F3 find again, F4 pick, F5 refresh, F10 menus, F11 version, F12 files.
+Key=
+Hear=
+
+[step]
+
+Say=What this walk taught: the keys you heard.

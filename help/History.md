@@ -141,6 +141,33 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.52.0 -- 5 October 2026
+
+**Eleven walks for every program**, by name: 00 Overview and Table of Contents,
+01 Install and Launch, 02 User Interface Concepts, 03 Key Patterns, 04 to 08
+five tasks, 09 Conclusion, 10 More Information. The templates carry a skeleton
+of each; checkTutorial requires the fixed six by name and the five task numbers;
+and the audio is named like a chapter -- 04_Open_and_Move.mp3 from
+Tutorial_04_Open_and_Move.inix -- so a folder or a player shows the number and
+the title. Tutorials.md has the pattern.
+
+## 1.51.5 -- 5 October 2026
+
+**The Homer Player records: two buttons and one key.** Record and Stop
+recording are buttons beside Stop playback, each available only when it
+applies, so the reader says which state you are in; Alt+Shift+R does whichever
+applies from anywhere in the dialog, as Scroll Lock does for playing. Where am
+I, Alt+Shift+W, says "recording for N minutes" while one runs, and closing the
+player finishes a recording rather than cutting it. The buttons carry no
+trigger letter: R is the Rate slider's and S is Stop playback's.
+
+**The player records** Alt+Shift+R writes the stream as it
+arrives to Music\Homer Player, named for the track and the time, and says the
+file; Alt+Shift+R again stops and says how long it ran. A copy of the stream,
+no re-encoding, no settings: enough to keep a programme to hear later, which
+is all a player should offer. Anyone making audio to publish has a studio
+program for that.
+
 ## 1.51.4 -- 5 October 2026
 
 **buildTutorials speaks only what is missing or stale.** A walk whose audio is

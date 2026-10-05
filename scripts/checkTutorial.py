@@ -263,6 +263,24 @@ def main():
         return 0
     for iAt, sScript in enumerate(lsScripts):
         checkOne(sScript, bFirst=(iAt == 0 and len(sys.argv) == 1))
+    # THE ELEVEN-WALK PATTERN (5 October 2026): the first three and the last
+    # two walks have fixed names, and 04 to 08 are the program's tasks. A set
+    # that is not the whole set is reported once, by what it lacks.
+    if len(sys.argv) == 1 and sKind != "kit":
+        c_dFixed = {"00": "Overview_and_Table_of_Contents", "01": "Install_and_Launch", "02": "User_Interface_Concepts",
+                    "03": "Key_Patterns", "09": "Conclusion", "10": "More_Information"}
+        dHave = {}
+        for sScript in lsScripts:
+            m = re.match(r"Tutorial_(\d\d)_(.+)\.inix$", os.path.basename(sScript))
+            if m: dHave[m.group(1)] = m.group(2)
+        for sNum, sName in sorted(c_dFixed.items()):
+            if dHave.get(sNum) != sName:
+                problem(os.path.basename(lsScripts[0]), 0, "the pattern wants Tutorial_%s_%s.inix%s" % (sNum, sName, (", not " + dHave[sNum]) if sNum in dHave else ""))
+        for sNum in ("04", "05", "06", "07", "08"):
+            if sNum not in dHave: problem(os.path.basename(lsScripts[0]), 0, "the pattern wants a task walk numbered %s" % sNum)
+        for sNum in sorted(dHave):
+            if sNum not in c_dFixed and sNum not in ("04", "05", "06", "07", "08"):
+                problem(os.path.basename(lsScripts[0]), 0, "Tutorial_%s is outside the pattern of 00 to 10" % sNum)
     for sText in lsProblems: say("  " + sText)
     say("%d script%s checked, %d problem%s." % (len(lsScripts), "" if len(lsScripts) == 1 else "s",
         len(lsProblems), "" if len(lsProblems) == 1 else "s"))

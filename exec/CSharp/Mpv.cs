@@ -412,6 +412,11 @@ public bool stop() { return setPause(true); }
 // clearAndStop: mpv's own stop, play list and all. Not what the Stop button
 // does; here for a caller that really does want the queue emptied.
 public bool clearAndStop() { return command("stop"); }
+// RECORDING IS ONE PROPERTY. mpv writes the stream it is receiving to a file
+// while stream-record names one, and stops when it is set to nothing. A copy
+// of the stream as it came, no re-encoding, no choices.
+public bool startRecording(string sPath) { return command("set_property", "stream-record", sPath); }
+public bool stopRecording() { return command("set_property", "stream-record", ""); }
 public bool seekRelative(double dSeconds) { return command("seek", dSeconds, "relative"); }
 public bool seekAbsolute(double dSeconds) { return command("seek", dSeconds, "absolute"); }
 public bool setVolume(int iVolume) { return command("set_property", "volume", iVolume); }

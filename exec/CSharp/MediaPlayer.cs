@@ -416,6 +416,19 @@ dlg.addBand();
 // Start collides with Stop, which has no better name than Stop playback.
 Button btnGo = dlg.addButton("&Execute playback", "Play the track the cursor is on, or resume what is paused, applying the order the cursor is on. Control+Enter does this from anywhere in the dialog, and so does Scroll Lock.");
 Button btnStop = dlg.addButton("&Stop playback", "Stop playing and stay exactly where you are, in the queue and in the track. Execute playback carries on from there. It is a pause; the name is Stop because Previous track already has the P.");
+// RECORDING HAS A START AND A STOP, as playing has Execute and Stop, and one
+// key that does whichever applies, as Scroll Lock does for playing. The two
+// buttons carry no trigger letter: R is the Rate slider's and S is Stop
+// playback's, and a letter from inside a word is worse than none. They are
+// reached by Tab or F7, and each is available only when it applies, so the
+// reader says "unavailable" on the one that does not -- which is the state
+// of the recording, told without a question asked.
+Button btnRecord = dlg.addButton("Record", "Start keeping a copy of the stream as it arrives, in your Music folder under Homer Player, named for the track and the time. Alt+Shift+R does this from anywhere in the dialog, and stops it again.");
+Button btnStopRecording = dlg.addButton("Stop recording", "Stop the recording and say how long it ran. Alt+Shift+R does this too while a recording is running.");
+btnStopRecording.Enabled = false;
+btnRecordNow = btnRecord; btnStopRecordingNow = btnStopRecording;
+btnRecord.Click += delegate(object o, EventArgs e) { if (sRecordingPath.Length == 0) toggleRecording(dlg, oPlayer, lsRef); };
+btnStopRecording.Click += delegate(object o, EventArgs e) { if (sRecordingPath.Length > 0) toggleRecording(dlg, oPlayer, lsRef); };
 Button btnDefaults = dlg.addButton("&Default settings", "Forget what this queue has been set to and go back to the built-in settings: one minute, normal speed, the play list's own order.");
 Button btnHelp = dlg.addButton("&Help", "What this dialog does and which keys do it, in one page.");
 Button btnClose = dlg.addButton("Close", "Close the player. Where each track had reached is written down first, so playing it again starts there.");
@@ -703,6 +716,7 @@ case Keys.O: sayOverview(dlg, lsRef, aOrder); break;
 case Keys.C: copyAddress(dlg, oPlayer, lsRef, lstTracks, aOrder); break;
 case Keys.L: saveList(dlg, lsRef, aOrder); break;
 case Keys.M: saveReport(dlg, lstTracks, lsRef, aOrder); break;
+case Keys.R: toggleRecording(dlg, oPlayer, lsRef); break;
 default: bHandled = false; break;
 }
 if (bHandled) { ev.Handled = true; ev.SuppressKeyPress = true; }
@@ -865,6 +879,13 @@ tmrWatch.Dispose();
 // WHERE EACH TRACK HAD REACHED IS WRITTEN DOWN, which is mpv's own
 // quit-watch-later and what uppercase Q does in its player window. Playing
 // the same thing again starts where it stopped, in this dialog or in mpv's.
+// A recording still running when the dialog closes is stopped first, so
+// the file is finished and said, not cut off in silence.
+if (sRecordingPath.Length > 0) {
+try { player.stopRecording(); Homer.Log.info("Homer Player: recording stopped at close: " + sRecordingPath); } catch (Exception) { }
+sRecordingPath = "";
+}
+btnRecordNow = null; btnStopRecordingNow = null;
 try { player.quitRemembering(); }
 catch (Exception) { }
 player.Dispose();
@@ -1180,6 +1201,61 @@ track.addFact(sField, sValue);
 // form being filled in. A player is a set of commands, and what a person wants
 // from its help is the keys -- especially the ones with no control to tab to.
 // Short lines, grouped, no prose.
+// RECORDING, AS SIMPLY AS IT CAN BE DONE. Alt+Shift+R starts writing the
+// stream as it arrives -- no re-encoding, no settings -- to Music\Homer
+// Player\<track>-<date>-<time>.<ext>, and says the file; Alt+Shift+R again
+// stops and says how long it ran. One key, one file, one message each way.
+// Anyone making audio to publish has a studio program for that and should
+// use it; this is for keeping a programme to hear later, which is all a
+// player should offer.
+private static string sRecordingPath = "";
+private static DateTime dtRecordingStart = DateTime.MinValue;
+private static Button btnRecordNow = null;
+private static Button btnStopRecordingNow = null;
+
+private static void showRecordingState() {
+try {
+if (btnRecordNow != null) btnRecordNow.Enabled = (sRecordingPath.Length == 0);
+if (btnStopRecordingNow != null) btnStopRecordingNow.Enabled = (sRecordingPath.Length > 0);
+} catch { }
+}
+
+private static void toggleRecording(LbcDialog dlg, Mpv oPlayer, List<MediaTrack> lsRef) {
+if (sRecordingPath.Length > 0) {
+oPlayer.stopRecording();
+TimeSpan ts = DateTime.Now - dtRecordingStart;
+// WHAT IS SAID IS SHORT: a file name with a time stamp is for the folder, not
+// the ear. The log has the path.
+string sDone = "Recording stopped after " + ((ts.TotalMinutes >= 1) ? ((int) ts.TotalMinutes) + " minutes" : ((int) ts.TotalSeconds) + " seconds")
++ ". It is in Music, Homer Player.";
+Homer.Log.info("Homer Player: " + sDone);
+sRecordingPath = "";
+showRecordingState();
+say(dlg, sDone);
+return;
+}
+int iNow = oPlayer.playlistIndex;
+string sName = (iNow >= 0 && iNow < lsRef.Count) ? lsRef[iNow].display() : "Recording";
+foreach (char c in Path.GetInvalidFileNameChars()) sName = sName.Replace(c, '_');
+if (sName.Length > 60) sName = sName.Substring(0, 60);
+string sFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "Homer Player");
+try { Directory.CreateDirectory(sFolder); } catch (Exception ex) { say(dlg, "Could not make the recordings folder: " + ex.Message); return; }
+// The container follows the stream: an MP3 stream copied is an MP3 file; anything
+// else is written as a transport stream, which every player opens.
+string sExt = ".ts";
+try {
+string sUrl = (iNow >= 0 && iNow < lsRef.Count) ? lsRef[iNow].sTarget.ToLowerInvariant() : "";
+if (sUrl.Contains("mp3") || sUrl.EndsWith(".mp3")) sExt = ".mp3";
+else if (sUrl.Contains("aac")) sExt = ".aac";
+} catch { }
+sRecordingPath = Path.Combine(sFolder, sName + "-" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + sExt);
+if (!oPlayer.startRecording(sRecordingPath)) { say(dlg, "The player would not start recording."); sRecordingPath = ""; return; }
+dtRecordingStart = DateTime.Now;
+showRecordingState();
+Homer.Log.info("Homer Player: recording to " + sRecordingPath);
+say(dlg, "Recording " + sName + ". Alt Shift R stops.");
+}
+
 private static void showHelp(IWin32Window owner) {
 StringBuilder sb = new StringBuilder();
 sb.Append("PLAYER\r\n\r\n");
@@ -1220,6 +1296,7 @@ sb.Append("THE REST\r\n");
 sb.Append("Alt+Shift+C    copy the address of the track\r\n");
 sb.Append("Alt+Shift+L    save the queue as a play list\r\n");
 sb.Append("Alt+Shift+M    write track notes to a Markdown file\r\n");
+sb.Append("Alt+Shift+R    record, or stop recording: the Record and Stop recording buttons do the same, one at a time\r\n");
 sb.Append("Alt+Shift+Z    undo the last jump within a track\r\n");
 sb.Append("Escape         close, remembering where each track had reached\r\n\r\n");
 sb.Append("F7 lists the controls; F1 lists them with their descriptions.\r\n");
@@ -1311,7 +1388,12 @@ if (sName.Length == 0) return "Nothing playing";
 string sCount = "";
 if (iNow >= 0) sCount = ", track " + (iNow + 1).ToString(CultureInfo.InvariantCulture)
 + " of " + lsTracks.Count.ToString(CultureInfo.InvariantCulture);
-return sName + sCount + ", " + positionText(player);
+string sRec = "";
+if (sRecordingPath.Length > 0) {
+TimeSpan ts = DateTime.Now - dtRecordingStart;
+sRec = ", recording for " + ((ts.TotalMinutes >= 1) ? ((int) ts.TotalMinutes) + " minutes" : ((int) ts.TotalSeconds) + " seconds");
+}
+return sName + sCount + ", " + positionText(player) + sRec;
 }
 
 // ---- settings ----
