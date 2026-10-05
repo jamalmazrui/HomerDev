@@ -31,7 +31,7 @@ import traceback
 
 c_lsExpected = [
     "exec/CSharp/Elevate.cs", "exec/CSharp/Inix.cs", "exec/CSharp/KeyName.cs", "exec/CSharp/KeyMap.cs", "exec/CSharp/Lbc.cs",
-    "exec/CSharp/Log.cs", "exec/CSharp/Mdi.cs", "exec/CSharp/Paths.cs",
+    "exec/CSharp/Log.cs", "exec/CSharp/Mdi.cs", "exec/CSharp/Media.cs", "exec/CSharp/MediaPlayer.cs", "exec/CSharp/Mpv.cs", "exec/CSharp/Paths.cs",
     "exec/CSharp/PdfRead.cs", "exec/CSharp/Say.cs", "exec/CSharp/Util.cs", "exec/CSharp/Web.cs",
     "exec/CSharp/inixVert.cs",
     "exec/Python/inix.py", "exec/Python/lbc.py", "exec/Python/lbcnet.py", "exec/Python/log.py",
@@ -150,6 +150,9 @@ c_lMoved = [
     ("CSharp/Lbc.cs", "exec/CSharp/Lbc.cs"),
     ("CSharp/Log.cs", "exec/CSharp/Log.cs"),
     ("CSharp/Mdi.cs", "exec/CSharp/Mdi.cs"),
+    ("CSharp/Media.cs", "exec/CSharp/Media.cs"),
+    ("CSharp/MediaPlayer.cs", "exec/CSharp/MediaPlayer.cs"),
+    ("CSharp/Mpv.cs", "exec/CSharp/Mpv.cs"),
     ("CSharp/Ollama.cs", "exec/CSharp/Ollama.cs"),
     ("CSharp/Paths.cs", "exec/CSharp/Paths.cs"),
     ("CSharp/PdfRead.cs", "exec/CSharp/PdfRead.cs"),

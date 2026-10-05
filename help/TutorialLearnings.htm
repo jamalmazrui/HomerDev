@@ -260,6 +260,68 @@ render the access key as “alt plus P” and the help key as “insert plus
 tab”: whether that is JAWS’s speech or Whisper’s spelling, the words are
 what a listener hears, and the checkTutorial rule that a Hear line
 writes the key in words is confirmed.</p>
+<h2 id="what-quill-does-with-tutorials-and-what-to-take">What Quill does
+with tutorials, and what to take</h2>
+<p><em>From the Quill Radio user guide, its generated tutorial document,
+the QUILL Lite tutorials page, and the QUILL Cast transcripts, read on 5
+October 2026. Quill Radio ships 41 guided tutorials, 281 steps, about
+244 minutes, in six tracks.</em></p>
+<p><strong>Tutorials live inside the app, and the app watches.</strong>
+Help &gt; Tutorials opens a window: find a lesson by typing words, or
+type “here” for lessons about the window you came from; a tree by track
+says each lesson’s steps, minutes, and whether you finished it. The
+lesson page shows one step in a read-only box. <strong>Try it</strong>
+has the app do the step; <strong>Follow me</strong> notices when you
+have done it – “it watches what changed in the app, never which key you
+pressed, it never takes the keyboard, and nothing is graded” – says what
+it saw, and reads the next; <strong>Say it again</strong> repeats the
+step. Your place is kept. This is the strongest idea in the set: a walk
+that is also a live lesson, run by the program it teaches. A Homer app
+already has the parts – the .inix walk, Say, the runtime log that
+records what was spoken, and uiTest.inix, which drives the program and
+reads back what happened. A Tutorials window in Lbc that steps through a
+walk, speaks the Say line, waits, confirms from the log that the Hear
+line was spoken, and moves on, would be Follow me.</p>
+<p><strong>The keys are the person’s keys.</strong> “Rebind a key and
+the tutorial says your key” inside the app; the generated document says
+so and shows the shipped keys. A Homer walk spoken from KeyMap can do
+the same.</p>
+<p><strong>Six tracks by the learner’s timeline, each with a goal
+sentence.</strong> Your first hour; Finding something to listen to;
+Making it yours; Recording; More than radio; Living with it. “By the end
+of this track you can find a station, keep it, work the player from any
+window, and get yourself unstuck.” Every lesson opens with its goal, its
+step count and its minutes.</p>
+<p><strong>Getting unstuck is lesson five of the first hour.</strong>
+Escape and where it lands you; hear the last announcement again; what is
+playing; the list of what has failed; why a menu item is dimmed. “Read
+it once now so it is familiar when you need it.” That is the
+planned-misstep learning made into a whole lesson, and a Homer app
+should have one by that name.</p>
+<p><strong>Every step has the same five parts.</strong> A bold
+imperative title; the explanation; <strong>Keys</strong>; <strong>You
+should hear</strong> – phrased so it survives a different reader,
+“Favorite stations, tree – or whatever your screen reader calls an empty
+tree”; and <strong>Worth knowing</strong>, the aside. The Homer walk’s
+Say, Key, Hear and Note are the same four; the hedge for readers that
+differ is worth borrowing in a Say line.</p>
+<p><strong>The empty state is explained, not apologized for.</strong>
+“An empty list here is not a fault; it is a list you have not filled in
+yet, and the next few minutes fill it.” A walk that opens a template
+should say the same of a table with three rows.</p>
+<p><strong>Speech that is gone can be got back.</strong> The Spoken Echo
+(QUILL) and Repeat Last Announcement (Quill Radio) keep the last
+announcements in a read-only list you can arrow through and copy.
+Homer’s double-press shows one announcement as text; a Say history
+command showing the last twenty, in Say.cs so every app has it, is the
+same thing done once.</p>
+<p><strong>The document is generated from the lessons</strong>, so “it
+says exactly what the app teaches” – the rule makeTutorials already
+follows.</p>
+<p><strong>The QUILL Cast is a second form, not a substitute</strong>:
+two hosts, episodes in arcs, each opening by recapping the last
+episode’s takeaway. An audio course beside the walks, for the car rather
+than the keyboard.</p>
 <h2 id="changes-to-make">Changes to make</h2>
 <ul>
 <li><strong>Tutorials.md and checkTutorial</strong>: verify-after-focus
@@ -277,6 +339,12 @@ Insert+Tab (where am I) in the first two steps, the way the trainers
 teach both in the first module.</li>
 <li><strong>The reader voice</strong>: a step slower than a working
 rate.</li>
+<li><strong>From Quill</strong>: walks grouped in tracks by the
+learner’s timeline, each with a goal sentence and a running time; a
+“Getting unstuck” walk in the first track; the empty state explained; a
+Say history command in Say.cs; and, the large one, a Tutorials window in
+Lbc with Try it and Follow me, built on the walk files, Say’s log and
+uiTest.</li>
 </ul>
 <p>The DbDo walks are local files, not in the repository, so they are
 not in this delivery; send <code>help\Tutorial_*.inix</code> and I will

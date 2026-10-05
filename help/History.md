@@ -141,6 +141,20 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.51.2 -- 5 October 2026
+
+**Mpv.cs looks for mpv machine-wide only**: under Program Files, where a Homer
+installer puts it, and on the PATH; never in a user's own profile.
+
+## 1.51.1 -- 5 October 2026
+
+**The Homer Player is a shared class.** Media.cs, Mpv.cs and MediaPlayer.cs
+move into the kit from FileDir, where they were written, with three lines
+changed: the namespace, the data folder, and the one voice. Any Homer app can
+hand the player a queue of tracks -- `Homer.MediaPlayer.run(owner, title,
+source, tracks)` -- and mpv plays them. DbDo's Play Stream is the first second
+user.
+
 ## 1.51.0 -- 5 October 2026
 
 **What the JAWS trainers do, applied to the walks.** From 98 transcripts of
