@@ -1,7 +1,7 @@
 ﻿// MediaPlayer.cs -- the Homer Player dialog, shared by every Homer app.
 //
 // MOVED INTO THE KIT on 5 October 2026 from FileDir, where it was written, so
-// that DbDo could play a radio station from a record. Three lines changed:
+// that DbDo could play a radio station from a record. Four lines changed:
 // the namespace, the data folder (Homer.Paths.data()), and the one voice
 // (Say.sayForced, which a program's own silence switch does not stop, for
 // the reason the SPEECH section gives). Everything else is as FileDir had it.
@@ -215,6 +215,29 @@ return sb.ToString();
 
 public static class MediaPlayer {
 
+// TWO SMALL DIALOGS FileDir kept in its own Lbc class -- a message box and a
+// Save As -- are here as private helpers, so this file depends on nothing
+// outside the kit. (The build failed in DbDo with "Lbc does not exist" the
+// first time it was compiled away from FileDir, 5 October 2026.)
+private static void showBox(string sText, string sTitle) {
+MessageBox.Show(sText, sTitle);
+}
+
+private static string askSavePath(string sTitle, string sDefaultFile, string sFilter) {
+SaveFileDialog dlg = new SaveFileDialog();
+dlg.Title = sTitle;
+dlg.AddExtension = true;
+dlg.CheckFileExists = false;
+dlg.CheckPathExists = true;
+dlg.OverwritePrompt = true;
+dlg.FileName = sDefaultFile;
+dlg.Filter = (sFilter.Length == 0) ? "All files (*.*)|*.*" : sFilter;
+dlg.FilterIndex = 1;
+dlg.RestoreDirectory = true;
+dlg.ValidateNames = true;
+return (dlg.ShowDialog() == DialogResult.OK) ? dlg.FileName : "";
+}
+
 // SETTINGS BELONG TO A PLAY LIST, NOT TO THE PROGRAM.
 //
 // Volume, speed, the jump size and the order suit the thing being played: a
@@ -268,7 +291,7 @@ if (lsTracks == null || lsTracks.Count == 0) { Say.sayForced("0 tracks"); return
 
 string sMpv = Homer.Media.mpvProgram();
 if (sMpv.Length == 0) {
-Lbc.Show("mpv is not installed, so there is nothing to play with.\r\n\r\n"
+showBox("mpv is not installed, so there is nothing to play with.\r\n\r\n"
 + "Run installMpv in the program's scripts folder, or install the program again and tick the mpv box.",
 "Player");
 return;
@@ -284,7 +307,7 @@ Homer.Mpv player = new Homer.Mpv(sMpv, Homer.Media.findInstalled("yt-dlp"));
 string sError;
 if (!player.start(out sError)) {
 Homer.Log.info("Homer Player: mpv would not start. " + sError);
-Lbc.Show("The player would not start.\r\n\r\n" + sError, "Player");
+showBox("The player would not start.\r\n\r\n" + sError, "Player");
 player.Dispose();
 return;
 }
@@ -924,8 +947,8 @@ catch (Exception) { say(dlg, "Could not copy the address"); }
 }
 
 private static void saveList(Homer.LbcDialog dlg, List<MediaTrack> lsTracks, int[] aOrder) {
-string sPath = Lbc.SaveFileDialog("Save Play List", "PlayList.m3u8",
-"Play lists (*.m3u8)|*.m3u8|All files (*.*)|*.*", 1, true);
+string sPath = askSavePath("Save Play List", "PlayList.m3u8",
+"Play lists (*.m3u8)|*.m3u8|All files (*.*)|*.*");
 if (sPath == null || sPath.Trim().Length == 0) return;
 StringBuilder sb = new StringBuilder();
 sb.Append("#EXTM3U\r\n");
@@ -1074,8 +1097,8 @@ if (iInOrder >= 0 && iInOrder < aOrder.Length) liShowing.Add(aOrder[iInOrder]);
 }
 if (liShowing.Count == 0) { say(dlg, "Nothing to write"); return; }
 
-string sPath = Lbc.SaveFileDialog("Save Track Notes", "Tracks.md",
-"Markdown (*.md)|*.md|All files (*.*)|*.*", 1, true);
+string sPath = askSavePath("Save Track Notes", "Tracks.md",
+"Markdown (*.md)|*.md|All files (*.*)|*.*");
 if (sPath == null || sPath.Trim().Length == 0) return;
 
 StringBuilder sb = new StringBuilder();

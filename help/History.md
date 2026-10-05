@@ -141,6 +141,12 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.51.3 -- 5 October 2026
+
+**MediaPlayer.cs stands on its own.** Two dialogs it had borrowed from
+FileDir's own Lbc class -- a message box and a Save As -- are private helpers
+now, so the player compiles in any app that takes it from the kit.
+
 ## 1.51.2 -- 5 October 2026
 
 **Mpv.cs looks for mpv machine-wide only**: under Program Files, where a Homer

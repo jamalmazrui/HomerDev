@@ -306,18 +306,23 @@
 <li><a href="#september-2026-113">1.1.0 – 18 September 2026</a></li>
 <li><a href="#september-2026-114">1.0.0 – 18 September 2026</a></li>
 </ul>
-<h2 id="october-2026">1.51.2 – 5 October 2026</h2>
+<h2 id="october-2026">1.51.3 – 5 October 2026</h2>
+<p><strong>MediaPlayer.cs stands on its own.</strong> Two dialogs it had
+borrowed from FileDir’s own Lbc class – a message box and a Save As –
+are private helpers now, so the player compiles in any app that takes it
+from the kit.</p>
+<h2 id="october-2026-1">1.51.2 – 5 October 2026</h2>
 <p><strong>Mpv.cs looks for mpv machine-wide only</strong>: under
 Program Files, where a Homer installer puts it, and on the PATH; never
 in a user’s own profile.</p>
-<h2 id="october-2026-1">1.51.1 – 5 October 2026</h2>
+<h2 id="october-2026-2">1.51.1 – 5 October 2026</h2>
 <p><strong>The Homer Player is a shared class.</strong> Media.cs, Mpv.cs
 and MediaPlayer.cs move into the kit from FileDir, where they were
 written, with three lines changed: the namespace, the data folder, and
 the one voice. Any Homer app can hand the player a queue of tracks –
 <code>Homer.MediaPlayer.run(owner, title, source, tracks)</code> – and
 mpv plays them. DbDo’s Play Stream is the first second user.</p>
-<h2 id="october-2026-2">1.51.0 – 5 October 2026</h2>
+<h2 id="october-2026-3">1.51.0 – 5 October 2026</h2>
 <p><strong>What the JAWS trainers do, applied to the walks.</strong>
 From 98 transcripts of Freedom Scientific training,
 <code>help\TutorialLearnings.md</code> records eleven habits and their
@@ -328,7 +333,7 @@ planned misstep with its Escape, and a closing step naming the keys
 taught. The overview template teaches the repeat key and the orientation
 key in its first steps and ends with a recap; checkTutorial requires the
 first script to teach both keys.</p>
-<h2 id="october-2026-3">1.50.2 – 2 October 2026</h2>
+<h2 id="october-2026-4">1.50.2 – 2 October 2026</h2>
 <p><strong>Every Homer app is MIT, and the kit keeps it so.</strong>
 HomerView was the one app under the GPL, version 2, on the understanding
 that an NVDA add-on should share NVDA’s license. NV Access’s own
@@ -358,7 +363,7 @@ license file.</li>
 <li>HomerDev.md’s licenses section says why an app with an NVDA add-on
 is MIT.</li>
 </ul>
-<h2 id="october-2026-4">1.50.1 – 2 October 2026</h2>
+<h2 id="october-2026-5">1.50.1 – 2 October 2026</h2>
 <p><strong>The skills take the settled lessons from the accessibility
 skills.</strong> These were written as 1.43.60, which never reached
 GitHub; they are the parts of HomerSkills.md that agree with the
@@ -386,7 +391,7 @@ control exposes through UI Automation and how to look at the tree.</li>
 is.</strong> In C:, check recognizes the kit and hands over to
 checkHomerDev, with no totals; the summary had called that “FAILED: no
 totals”.</p>
-<h2 id="october-2026-5">1.50.0 – 2 October 2026</h2>
+<h2 id="october-2026-6">1.50.0 – 2 October 2026</h2>
 <p><strong>Stages: from a build to a release version.</strong>
 HomerDev.md sets out the sequence every Homer resource follows, since
 nothing built is finished for good: a build on the builder’s computer; a
@@ -402,7 +407,7 @@ starts from the stages.</p>
 DbDo follows fields named <singular>_id; declared REFERENCES are shown
 by Table Summary and read by checkDb, and following a differently named
 declared key is planned in DbDo.</p>
-<h2 id="october-2026-6">1.49.1 – 2 October 2026</h2>
+<h2 id="october-2026-7">1.49.1 – 2 October 2026</h2>
 <p><strong>homer-db: two ways to relate records, both
 first-class.</strong> The skill now sets out that DbDo supports
 traditional foreign keys, named <singular>_id as in the Northwind and
@@ -415,7 +420,7 @@ keys and warns when a table in a database with maps lacks those
 triggers. The reference notes two gaps in DbDo itself: links are
 re-pointed only when a prime definition is rebuilt, not when a record is
 edited, and DbDo’s own tables are recognized by name alone.</p>
-<h2 id="october-2026-7">1.49.0 – 2 October 2026</h2>
+<h2 id="october-2026-8">1.49.0 – 2 October 2026</h2>
 <p><strong>homer-db, a skill for SQLite databases the DbDo way.</strong>
 It sets out the conventions DbDo’s generator and its Trail templates
 follow: plural lower-case tables with a singular id, the standard fields
@@ -434,7 +439,7 @@ all recorded in the skill’s reference.</p>
 homer-code skill now say so: .ini is deprecated in Homer and used only
 where another program requires it, such as an NVDA add-on’s
 manifest.ini, or to read an old Homer .ini once.</p>
-<h2 id="october-2026-8">1.48.0 – 2 October 2026</h2>
+<h2 id="october-2026-9">1.48.0 – 2 October 2026</h2>
 <p><strong>Every resource names its license, briefly, with a
 link.</strong> An app and the kit are MIT, in License.md; a page is
 Creative Commons Attribution-ShareAlike 4.0, the license Wikipedia’s
@@ -448,7 +453,7 @@ its footer. newHomerApp’s ReadMe names the MIT License. The
 podcast-directory, app-help-guide and blind-creators builders write the
 license lines and the one-sentence notice themselves. HomerDev.md has a
 new section, “Licenses for each kind”.</p>
-<h2 id="october-2026-9">1.47.0 – 2 October 2026</h2>
+<h2 id="october-2026-10">1.47.0 – 2 October 2026</h2>
 <p><strong>evalSkills: measuring whether the skills help.</strong>
 scripts.cmd and evalSkills.py ask Claude Code, headless, for the same
 small program several times without the Homer skills and several times
@@ -477,7 +482,7 @@ after every change.</p>
 <p><strong>Comments match 1.46.0.</strong> The build templates’ and
 sample builds’ opening notes no longer say the kit is looked for in
 C:.</p>
-<h2 id="october-2026-10">1.46.0 – 2 October 2026</h2>
+<h2 id="october-2026-11">1.46.0 – 2 October 2026</h2>
 <p><strong>Any drive, any depth.</strong> Only Windows and folder names
 are now assumed: the kit is a folder named HomerDev, a project is a
 folder named for itself, and either may be on any drive and at any level
@@ -497,7 +502,7 @@ folder beside the app instead of C:. The sample builds find the compiler
 under %ProgramFiles% and %ProgramFiles(x86)%, wherever Windows put them.
 HomerDev.md has a new section, “Where the kit and your projects live”,
 and the ReadMe and Developer.md say the same.</p>
-<h2 id="october-2026-11">1.45.0 – 2 October 2026</h2>
+<h2 id="october-2026-12">1.45.0 – 2 October 2026</h2>
 <p><strong>Four kinds of Homer resource, and every script knows which it
 is in.</strong> The kit now serves apps, collections, the kit itself and
 pages, and they need different things: a page has no build, a collection
@@ -529,7 +534,7 @@ homer-build-release and homer-page start from it.</p>
 release.ps1 are kept on this disk only, so they were not part of this
 update. They should release an app and the kit, and decline a page (post
 releases it) and a collection.</p>
-<h2 id="october-2026-12">1.44.0 – 2 October 2026</h2>
+<h2 id="october-2026-13">1.44.0 – 2 October 2026</h2>
 <p><strong>Publish a page with post, and a skill to go with it.</strong>
 scripts.cmd and post.ps1 publish a project’s document as a GitHub Page
 that meets WCAG 2.2 AA and the Homer conventions. An app (a folder that
@@ -563,7 +568,7 @@ these.</p>
 point to Blind Vibe Coding, a directory of resources on building apps
 nonvisually with AI, which lists HomerDev and was itself published with
 post.</p>
-<h2 id="october-2026-13">1.43.59 – 1 October 2026</h2>
+<h2 id="october-2026-14">1.43.59 – 1 October 2026</h2>
 <p><strong>Two documents about skills, in help.</strong> A11ySkills.md
 gathers 175 published accessibility skills from eight collections, each
 with its facts, license and full text, as a reference for anyone writing
@@ -577,7 +582,7 @@ chapter on Claude skills and the skills index point to both.</p>
 build converts Markdown with Pandoc’s dollar-sign mathematics turned
 off, so a workflow’s ${{ secrets }} or a price in a document is shown as
 written.</p>
-<h2 id="october-2026-14">1.43.58 – 1 October 2026</h2>
+<h2 id="october-2026-15">1.43.58 – 1 October 2026</h2>
 <p><strong>The kit’s build command is “build” too.</strong> In C:, as in
 every app folder, the command is now <code>build</code>:
 buildHomerDev.cmd and buildHomerDev.py are build.cmd and build.py, and
@@ -588,14 +593,14 @@ records it. check’s “buildname” now holds the kit to the same rule as
 the apps; tidy and renameBuild still leave the kit to its own build.
 renameBuild, when it renames an app, also changes the app’s messages
 that said “run buildHomerDev” to “run build”.</p>
-<h2 id="october-2026-15">1.43.57 – 1 October 2026</h2>
+<h2 id="october-2026-16">1.43.57 – 1 October 2026</h2>
 <p><strong>The kit keeps buildHomerDev, and its own release goes
 through.</strong> 1.43.55 said the kit’s build script keeps its name,
 but check’s new “buildname” did not know the kit from an app, and failed
 the kit’s own release; 1.43.56’s tidy would even have renamed it. check,
 tidy and renameBuild now recognize the kit by its buildHomerDev.py and
 leave it alone.</p>
-<h2 id="october-2026-16">1.43.56 – 1 October 2026</h2>
+<h2 id="october-2026-17">1.43.56 – 1 October 2026</h2>
 <p><strong>tidy gives the build script its short name by
 itself.</strong> After 1.43.55, every app’s release stopped at check’s
 “buildname”, because no app had been renamed yet. Tidy runs before every
@@ -604,7 +609,7 @@ kit’s renameBuild whenever build<App>.cmd or build<App>.ps1 is still
 there – git mv, every reference updated, its own log – and the push that
 follows records it. The usual build, tidy, push, release sequence needs
 no extra step.</p>
-<h2 id="october-2026-17">1.43.55 – 1 October 2026</h2>
+<h2 id="october-2026-18">1.43.55 – 1 October 2026</h2>
 <p><strong>An app’s build script is build.cmd.</strong> The folder
 already names the app, so build<App>.cmd said it twice. newHomerApp now
 writes build.cmd (and build.ps1 where a build has a PowerShell half);
@@ -618,7 +623,7 @@ logs&lt;App&gt;-renameBuild-<time>.log. renameBuild all does every app
 beside the kit. check’s build step and the kit’s scan for stale app
 builds accept either name. The kit’s own buildHomerDev, and the samples,
 which share one folder, keep their names.</p>
-<h2 id="october-2026-18">1.43.54 – 1 October 2026</h2>
+<h2 id="october-2026-19">1.43.54 – 1 October 2026</h2>
 <p><strong>A build steps over every released number, as it always meant
 to.</strong> Each build takes the next version and skips any number
 already tagged on GitHub, by searching git’s list of tags with findstr
@@ -632,7 +637,7 @@ build templates and the four samples carry the fix; release 1.43.53’s
 evidence lines showed it (“GitHub has a published release tagged
 v5.0.36”, among 43). homer-build-release’s failures reference gains the
 case.</p>
-<h2 id="october-2026-19">1.43.53 – 1 October 2026</h2>
+<h2 id="october-2026-20">1.43.53 – 1 October 2026</h2>
 <p><strong>release shows GitHub’s answer when it decides a version is
 already out.</strong> EdSharp’s releases said “already on GitHub” for
 5.0.32 through 5.0.35, each straight after a build that had chosen a new
@@ -644,7 +649,7 @@ GitHub’s own record of that tag is fetched and read – a published
 release names the tag and is not a draft – instead of trusting the exit
 code of gh release view, which through gh.cmd has said “found” for
 releases that did not exist.</p>
-<h2 id="october-2026-20">1.43.52 – 1 October 2026</h2>
+<h2 id="october-2026-21">1.43.52 – 1 October 2026</h2>
 <p><strong>No Ollama window left open after an install.</strong>
 Ollama’s own installer starts its desktop app when it finishes, and the
 app opens a chat window, which confuses someone who never asked for it:
