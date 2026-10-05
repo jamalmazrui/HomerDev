@@ -141,6 +141,12 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.51.4 -- 5 October 2026
+
+**buildTutorials speaks only what is missing or stale.** A walk whose audio is
+newer than the walk is skipped, so adding four walks to a set of fifteen costs
+four walks' speaking, not nineteen.
+
 ## 1.51.3 -- 5 October 2026
 
 **MediaPlayer.cs stands on its own.** Two dialogs it had borrowed from

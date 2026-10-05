@@ -815,6 +815,17 @@ function applyGlobal($dGlobal) {
 function buildOne([string] $sScript) {
   $sStem = [System.IO.Path]::GetFileNameWithoutExtension($sScript)
   $sOut = Join-Path $sAudioDir ($sStem + ".mp3")
+  # SPEAK ONLY WHAT IS MISSING OR STALE. A walk whose mp3 is newer than the
+  # walk itself is already spoken; re-speaking nineteen walks because four new
+  # ones arrived would cost twenty minutes for nothing (5 October 2026). -live
+  # performs regardless, since nothing is written.
+  if (-not $bLive -and (Test-Path -LiteralPath $sOut)) {
+    if ((Get-Item -LiteralPath $sOut).LastWriteTimeUtc -gt (Get-Item -LiteralPath $sScript).LastWriteTimeUtc) {
+      note ("  " + $sStem + " is already spoken and current; skipped")
+      say ("  " + $sStem + ": already spoken")
+      return
+    }
+  }
   $sWork = Join-Path $env:TEMP ("buildTutorial_" + [Guid]::NewGuid().ToString("N"))
   $script:iPiece = 0
   $script:lsPieces = New-Object System.Collections.Generic.List[string]
