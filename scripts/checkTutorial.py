@@ -191,6 +191,11 @@ def checkOne(sScript, bFirst):
         for sHear in lsHear: checkHear(sScript, iAt, sHear)
     if bFirst and not re.search(r"Insert (plus )?Up Arrow", sWhole):
         problem(sScript, 0, "the first script does not teach the repeat key, Insert plus Up Arrow")
+    # The orientation key goes with the repeat key: the trainers teach both in
+    # their first module, and a listener who can repeat a line but cannot ask
+    # "where am I" is half equipped.
+    if bFirst and not re.search(r"Insert (plus )?Tab", sWhole):
+        problem(sScript, 0, "the first script does not teach the orientation key, Insert plus Tab")
     logLine("%s: %d steps, %d Hear lines" % (os.path.basename(sScript), len(lsSteps), sum(len([h for h in d.get("Hear", []) if h]) for d in lsSteps)))
     return True
 

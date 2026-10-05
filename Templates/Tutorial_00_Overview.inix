@@ -62,4 +62,21 @@ Note=Name the two that have to be taken in order, and say the rest can be taken 
 Say=Every key is named with the word it comes from, so the key and the command stay together in memory.
 Key=
 Hear=
+
+[step]
+Say=Two keys before we start, both the reader's own. If a line goes by too fast, Insert plus Up Arrow says it again, as often as you like.
+Key=Insert+UpArrow
+Hear=(the last line, read a second time)
+Say=Nothing changed; the key only repeats.
+
+[step]
+Say=And if you lose your place, Insert plus Tab says where you are: the control, its state, its position, and any hint it carries.
+Key=Insert+Tab
+Hear=(the current control, with its state, position and hint)
+Say=That hint is a tutor message. The walks that follow are heard with tutor messages off, the way most people work; Insert plus Tab brings one back whenever you want it.
+
+[step]
+Say=What this walk taught: Insert plus Up Arrow repeats the last line, and Insert plus Tab says where you are. Every walk ends this way, with the keys it taught and nothing else.
+Key=
+Hear=
 Note=Control plus F1 is the key describer in every Homer app: press it, then a key, and it says what the key does instead of doing it.

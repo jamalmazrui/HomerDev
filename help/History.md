@@ -141,6 +141,18 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.51.0 -- 5 October 2026
+
+**What the JAWS trainers do, applied to the walks.** From 98 transcripts of
+Freedom Scientific training, `help\TutorialLearnings.md` records eleven habits
+and their evidence. Tutorials.md now asks for five of them: Insert Tab to
+verify inside a dialog (Insert T for the window), a lone letter spelled with
+its alphabet word, the tutor message shown once and then off, one planned
+misstep with its Escape, and a closing step naming the keys taught. The
+overview template teaches the repeat key and the orientation key in its first
+steps and ends with a recap; checkTutorial requires the first script to teach
+both keys.
+
 ## 1.50.2 -- 2 October 2026
 
 **Every Homer app is MIT, and the kit keeps it so.** HomerView was the one

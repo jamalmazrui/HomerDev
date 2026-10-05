@@ -204,7 +204,25 @@ cannot see the screen has come to expect.
 - **Verify after every change of focus.** The trainer presses Insert T to
   read the window title after every switch, and says he is doing it and why.
   A script does the same after Alt+Tab, after opening a dialog, after
-  closing one -- and says the word: "to verify".
+  closing one -- and says the word: "to verify". Inside a dialog the key is
+  **Insert Tab**, which re-reads the control with its state, position and
+  hint; Insert T is for the window. The Freedom Scientific trainers use both,
+  and teach both in their first module.
+- **Spell a lone letter.** "Windows key R, Romeo"; "Insert W, whiskey". A
+  letter is the hardest thing to hear in speech, so when the key is one
+  letter, the Say line gives its alphabet word.
+- **Show the hint once, then turn it off.** One step shows a tutor message;
+  the next Say line says they are off from here; the Hear lines after carry
+  none. That is what the trainers do, and it is what a reader at
+  intermediate verbosity says.
+- **One wrong turn, and the way back.** Each walk has one planned misstep --
+  the wrong letter, a dialog nobody wanted -- and the Escape that undoes it,
+  narrated as calmly as the rest. A walk with no misstep teaches no recovery.
+- **End with the keys.** The last step is a Say line naming the two or three
+  keys the walk taught, and nothing else.
+
+`TutorialLearnings.md` in this folder gives the evidence for each of these,
+from 98 transcripts of JAWS training.
 - **Teach the recovery key early.** "If you type too quickly and miss what
   is spoken, press Insert Up Arrow to repeat it." The first tutorial says
   this before the first thing worth missing.
@@ -512,7 +530,7 @@ This is a first look at HomerDev: what it is, how to install it, and how to buil
 
 ### Step 1
 
-HomerDev is a kit of parts for building Windows programs that work well by keyboard and screen reader. Nine C sharp classes, seven Python modules, the build and release scripts, and two sample programs that do the same job in both languages. It is free and open source. If you miss a line the reader says, Insert plus Up Arrow says it again.
+HomerDev is a kit of parts for building Windows programs that work well by keyboard and screen reader. Nine C sharp classes, seven Python modules, the build and release scripts, and two sample programs that do the same job in both languages. It is free and open source. If you miss a line the reader says, Insert plus Up Arrow says it again; if you lose your place, Insert plus Tab says where you are.
 
 The kit is at https://github.com/JamalMazrui/HomerDev
 

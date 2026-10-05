@@ -26,7 +26,7 @@ Homework = Build the Python fruit basket the same way, and notice that it answer
 Intro = This is a first look at HomerDev: what it is, how to install it, and how to build and run the two sample programs. It takes about twelve minutes. You can follow along, or just listen.
 
 [step]
-Say = HomerDev is a kit of parts for building Windows programs that work well by keyboard and screen reader. Nine C sharp classes, seven Python modules, the build and release scripts, and two sample programs that do the same job in both languages. It is free and open source. If you miss a line the reader says, Insert plus Up Arrow says it again.
+Say = HomerDev is a kit of parts for building Windows programs that work well by keyboard and screen reader. Nine C sharp classes, seven Python modules, the build and release scripts, and two sample programs that do the same job in both languages. It is free and open source. If you miss a line the reader says, Insert plus Up Arrow says it again; if you lose your place, Insert plus Tab says where you are.
 Note = The kit is at https://github.com/JamalMazrui/HomerDev
 
 [step]
