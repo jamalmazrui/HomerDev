@@ -40,10 +40,14 @@ where to look in another's:
 - **10_Conclusion** -- four sentences to carry away, and where to begin.
 - **11_More_Information** -- always last.
 
-**Five minutes is the ceiling for one walk.** At the voices' pace that is
-about twenty-five steps; a walk that would run longer is cut or split, never
-hurried. Twelve walks under five minutes each is "about an hour", which is
-what the ReadMe can promise. The glossary and the summaries are short.
+**Three to five minutes for parts 01 to 10; 00 and 11 may be shorter.**
+Under three is too thin to repay the listener's start; over five loses them.
+At the voices' pace, three minutes is about twenty steps and five about
+thirty. A short walk gets more substance -- the adjacent thing the want
+needs, a planned misstep and its recovery, a two-voice exchange -- never
+padding; a long one is cut or split, never hurried. The tool measures the
+audio and names what runs under or over. Twelve walks at three to five
+minutes is "about an hour", which the ReadMe can promise.
 
 **Later walks lean on earlier ones.** The set is a course, not a reference:
 each walk says in its Intro which walks it assumes, and a thing taught

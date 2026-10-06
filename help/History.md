@@ -141,6 +141,15 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.52.7 -- 6 October 2026
+
+**Three to five minutes a walk.** Parts 01 to 10 are to run between three and
+five minutes -- under three is too thin, over five too long; 00 and 11 may be
+short. buildTutorials names any walk under three as well as over five;
+checkTutorial notices a thin walk and exempts the glossary from the step
+ceiling, since its steps are two short lines. Tutorials.md and the skill have
+the rule.
+
 ## 1.52.6 -- 6 October 2026
 
 **An incomplete set is a notice, not a silence.** checkTutorial reports the

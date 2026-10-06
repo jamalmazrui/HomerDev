@@ -765,12 +765,16 @@ is always last.
 - **11_More_Information** -- the guide and history from inside the program,
   the documents, the project page, updates, and the other Homer Tools.
 
-**Five minutes is the ceiling for one walk.** At the voices' pace that is
-about twenty-five steps. A walk that would run longer is cut -- a thing
-taught in an earlier walk is named rather than shown again -- or split into
-two tasks while the slots last; it is never hurried. Twelve walks under five
-minutes is "about an hour", which the ReadMe can promise. The glossary and
-the summaries are short by nature.
+**Three to five minutes for parts 01 to 10.** Under three minutes is
+usually too thin to repay a listener's start; over five loses them. A walk
+that would run longer is cut -- a thing taught in an earlier walk is named
+rather than shown again -- or split into two tasks while the slots last; it
+is never hurried. A walk that runs short is given more substance -- the
+adjacent thing the want needs, one planned misstep and its recovery, a
+two-voice exchange -- never padding. The overview, 00, and More Information,
+11, may be shorter. At the voices' pace, three minutes is about twenty steps
+of ordinary length and five about thirty; the tool measures the audio and
+says what runs under or over.
 
 **Walk 00 has a shape.** Prose first: a paragraph on what the program is.
 Then the two reader keys. Then the table of contents as its own clean list,
