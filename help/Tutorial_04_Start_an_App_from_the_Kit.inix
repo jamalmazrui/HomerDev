@@ -1,0 +1,100 @@
+﻿[about]
+Title=04 - Start an App from the Kit
+Intro=One want: a new program of your own, built on the kit, running by the end of the walk. newHomerApp, what it makes, the first build, the first run, the first change, and where the kit's classes come in. This walk assumes walks one to three.
+Setup=The kit is at C colon backslash HomerDev, and a command prompt is open there.
+Homework=Make an app of your own with newHomerApp, build it, run it, and add one field to its dialog.
+
+[step]
+
+Say=The want: a new program of your own, built on the kit, running by the end of the walk. In the kit folder, newHomerApp with a name makes the folder and its files.
+Key=newHomerApp Recipes
+Hear=Made C colon backslash Recipes with 14 files. Run build there.
+Say=A folder beside the kit, with everything the kit's checks expect.
+
+[step]
+
+Say=What is in it. The program file, Recipes dot cs, with the Homer classes referenced from the kit; build dot cmd, the stages every Homer build runs; the installer script with the shared finish page; accept dot inix, the acceptance checks; the twelve tutorial skeletons in help; the ReadMe, guide and history, each with its HTML pair; and the policy files that say which files travel to the repository.
+Key=
+Hear=
+
+[step]
+
+Say=The template program is the fruit basket's shape with the new name: a dialog with a field and a list, a report, F1 help on the fields, a session log. It runs before you have written a line, so every change is made against a working program.
+Key=
+Hear=
+
+[step]
+
+Say=Change into the folder and build.
+Key=build
+Hear=Kit, C colon backslash HomerDev version 1.52.8
+Hear=Version, 1.0.0
+Hear=Built Recipes dot exe version 1.0.0
+Say=The build read the kit's version first and would have refused an older one; then it fixed the encoding of every file, generated the hotkey list, spoke the tutorials that had no audio, compiled, and built the installer.
+
+[step]
+
+Say=Run it.
+Key=Recipes
+Hear=Recipes, the list is empty
+Hear=Name, edit
+
+[step]
+
+Say=Type a name and press Enter.
+Key=pancakes
+Hear=pancakes added, 1 item in the list
+
+[step]
+
+Say=Alt plus F4, and run it again: kept.
+Key=Alt+F4
+Hear=Recipes, 1 item in the list
+
+[step]
+
+Say=Now the first real change. Open Recipes dot cs in EdSharp; the Camel Type conventions the kit's skill teaches are already followed in it: a prefix on every name says its type, functions in lower camel case, constants with c underscore. An AI assistant that has read the kit's skills writes the same way, so what it adds reads like what was there.
+Key=
+Hear=
+
+[step]
+
+Say=Where the Homer classes come in. Lbc builds every dialog; Say speaks; Log writes the session log; Inix reads settings; Web fetches; Util has the pluralizer that said one item and not one items. None of them is in your folder; they compile from the kit, so a kit update improves every app on the next build.
+Key=
+Hear=
+
+[step]
+
+Say=The Python template, newHomerApp with dash py, makes the same program in Python, built with the kit's Python modules; buildFruitBasketPy showed the shape in walk one: a build environment made, what the build needs installed, and an executable at the end.
+Key=
+Hear=Creating the build environment
+Hear=Installing what the build needs
+Hear=Built FruitBasketPy dot exe version 1.0.0
+
+[step]
+
+Say=A planned misstep. Name the app with a space, and newHomerApp refuses in one line, because the name becomes a folder, a file, a class and a shortcut key.
+Key=
+Hear=A Homer app's name is one word in upper camel case, like FruitBasket.
+
+[step]
+
+Say=From here the work is yours: fields in the dialog, commands on the menus with their keys named for their words, a template database or two. Walk five is what happens each time you type build.
+Key=
+Hear=
+
+[step]
+
+Say=What this walk taught. I say the idea or the key; the reader says the command or the name.
+
+[step]
+
+Say=Make a new app from the template.
+Key=
+Hear=newHomerApp
+
+[step]
+
+Say=Every stage, from encoding to installer.
+Key=
+Hear=build

@@ -1,0 +1,83 @@
+﻿[about]
+Title=10 - Conclusion
+Intro=What to carry away from the walks: four things with their names, one thing kept from each task walk, three habits, and where to begin.
+Setup=Nothing is needed.
+Homework=Make an app with newHomerApp, build it, and write its first task walk.
+
+[step]
+
+Say=Four things to carry away, each with a name. Every decision that makes a program pleasant to use without sight was made once and put in a class; an app inherits it.
+Key=
+Hear=Lbc, Say, Log, Inix, Web, Util
+
+[step]
+
+Say=The keys follow rules, so a key in a program you have never opened can be guessed; the word gives the letter.
+Key=
+Hear=Control plus K, Keywords, in every program that searches
+
+[step]
+
+Say=Three commands take a change from the morning to a published installer by lunch, and each refuses when it should.
+Key=
+Hear=build, check, release
+
+[step]
+
+Say=And a program teaches itself: twelve walks in two voices, spoken by the build, three to five minutes each.
+Key=
+Hear=Play Tutorials
+
+[step]
+
+Say=One thing kept from each task walk. Walk four: newHomerApp gives you a working program before you have written a line, so every change is made against something that runs.
+Key=
+Hear=
+
+[step]
+
+Say=Walk five: the console says one line; the log says everything. When something is wrong, send the log.
+Key=
+Hear=
+
+[step]
+
+Say=Walk six: the finish page's three words -- Install, Update, Reinstall -- are the state of the machine, read for you; you never have to know what is installed.
+Key=
+Hear=
+
+[step]
+
+Say=Walk seven: a walk is built around a want, not a feature; the checker reads it before anyone hears it; the tool measures it.
+Key=
+Hear=
+
+[step]
+
+Say=Walk eight: an app never copies a kit class into its own folder; it compiles against the kit, so a fix on Monday is in every program by Tuesday.
+Key=
+Hear=
+
+[step]
+
+Say=Three habits. Read the kit's history when you unarchive a new one: it says what changed and why. Run check before release, so the refusal comes in seconds. And write the walk for a feature the day you finish the feature, while you still know what the person wants from it.
+Key=
+Hear=
+
+[step]
+
+Say=Where to begin. Make an app with newHomerApp and build it, before you decide what it is for; the running program will suggest what it should become. Then a field, a command, a key named for its word, a template, a walk.
+Key=
+Hear=
+
+[step]
+
+Say=The kit is also for an AI assistant. Point it at the skills folder and it writes in Camel Type, builds the dialogs with Lbc, names the keys by the rules and writes the walks in the pattern -- which is how the apps these walks quote were built.
+Key=
+Hear=
+
+[step]
+
+Say=If something goes wrong in the kit, the kit's own logs folder has the build and check logs; the project page on GitHub is where to send one, with a line about what you were doing.
+Key=
+Hear=

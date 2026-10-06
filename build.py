@@ -73,7 +73,7 @@ c_lsExpected = [
     "ReadMe.md", "License.md",
     "help/Announce.md", "help/Developer.md", "help/History.md", "help/HomerDev.md",
     "help/FAQ.md", "help/FinishPage.md", "help/HomerDev_update.md", "help/Hotkeys.md", "help/Logging.md", "help/TutorialLearnings.md", "help/Tutorials.md",
-    "help/Tutorial_HomerDev.inix",
+    "help/Tutorial_00_Overview_and_Table_of_Contents.inix", "help/Tutorial_01_Install_and_Launch.inix", "help/Tutorial_02_User_Interface_Concepts.inix", "help/Tutorial_03_Key_Patterns.inix", "help/Tutorial_04_Start_an_App_from_the_Kit.inix", "help/Tutorial_05_Build_Check_and_Release.inix", "help/Tutorial_06_The_Installer_and_Its_Finish_Page.inix", "help/Tutorial_07_Spoken_Tutorials.inix", "help/Tutorial_08_Shared_Code_and_the_Homer_Player.inix", "help/Tutorial_09_Glossary.inix", "help/Tutorial_10_Conclusion.inix", "help/Tutorial_11_More_Information.inix",
     "License.md", "version.txt",
 ]
 
@@ -213,7 +213,6 @@ c_lMoved = [
     ("Style/CamelType_CSharp_Reference.htm", "help/CamelType_CSharp_Reference.htm"),
     ("Style/CamelType_JAWSScript.md", "help/CamelType_JAWSScript.md"),
     ("Style/CamelType_JAWSScript.htm", "help/CamelType_JAWSScript.htm"),
-    ("Tutorial_HomerDev.inix", "help/Tutorial_HomerDev.inix"),
     ("Samples/FruitBasketMdi.cs", "Templates/samples/FruitBasketMdiCs.cs"),
     ("Samples/FruitBasketMdi.exe", "Templates/samples/FruitBasketMdiCs.exe"),
     ("Samples/buildFruitBasketMdi.log", "Templates/samples/buildFruitBasketMdiCs.log"),
@@ -1275,7 +1274,18 @@ def checkKit():
     return lsProblems
 
 
+def retireOldWalk():
+    """The kit's one earlier walk, Tutorial_HomerDev.inix, gave way to the
+    twelve on 6 October 2026; a copy left from an older unarchive goes, with
+    its audio, so the set the checker sees is the set."""
+    for sOld in ("help/Tutorial_HomerDev.inix", "help/tutorials/Tutorial_HomerDev.mp3"):
+        sPath = os.path.join(sScriptDir, sOld)
+        if os.path.isfile(sPath):
+            try: os.remove(sPath); print("Removed the retired walk " + sOld)
+            except OSError: pass
+
 def main():
+    retireOldWalk()
     global oLog
     if not os.path.isdir(os.path.dirname(sLogPath)): os.makedirs(os.path.dirname(sLogPath))
     oLog = open(sLogPath, "w", encoding="utf-8")

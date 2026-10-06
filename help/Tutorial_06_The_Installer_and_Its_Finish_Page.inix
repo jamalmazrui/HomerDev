@@ -1,0 +1,101 @@
+﻿[about]
+Title=06 - The Installer and Its Finish Page
+Intro=One want: a program that installs itself and its helpers in one run and says what it did. The shared installer parts heard in DbDo's installer: boxes that say their state in one word, the results box, the summary, and the ten lines an app writes to get all of it. This walk assumes walk five.
+Setup=A Homer program's installer is downloaded, and your reader is running.
+Homework=Run a Homer installer, arrow its finish page, and read the results box.
+
+[step]
+
+Say=The want: a program that installs itself and its helpers in one run, and tells you what it did. The kit's HomerComponents dot iss is the shared part of every Homer installer: the finish page, its boxes, their states, and the results. Here is DbDo's.
+Key=
+Hear=
+
+[step]
+
+Say=The installer is downloaded; Enter opens it, and Windows asks because it came from the internet. Alt plus R, Run; then Alt plus Y, Yes, for administrator rights, because a Homer program installs for everyone.
+Key=Alt+R
+Hear=User Account Control dialog
+
+[step]
+
+Say=The pages are a wizard: the folder, then Install. Enter presses the default button on each. The page that asks a decision is the last.
+Key=Enter
+Hear=Setup, Finish page
+
+[step]
+
+Say=The finish page lists the optional pieces as boxes. Arrow through them; each says its name, its state, and its size.
+Key=DownArrow
+Hear=Update screen reader scripts checked, 1 of 6
+Say=Update, not Install: the scripts are there, and a newer set is available. The word is the state.
+
+[step]
+
+Say=The three words, from the kit. Install when the piece is not there. Update when it is there and a newer version is available -- the installer asked winget. Reinstall when it is there and current, unticked unless you want it. You never have to know what is on your machine; the box says.
+Key=
+Hear=
+
+[step]
+
+Say=Down Arrow to the player.
+Key=DownArrow
+Hear=Install mpv checked, 2 of 6
+Say=mpv is the Homer Player's engine; FileDir and DbDo share it, so one installation serves both.
+
+[step]
+
+Say=Ollama runs AI on your own computer. Its models are large, so it is unticked unless you tick it; Spacebar changes a box, and the answer is one word.
+Key=Space
+Hear=checked
+
+[step]
+
+Say=Launch is ticked already. Enter presses Finish, and whatever was ticked installs now; a results box then says what was done, one line per piece.
+Key=Enter
+Hear=DbDo Setup, screen reader scripts: updated. mpv: installed. Ollama: installed.
+
+[step]
+
+Say=The same summary is saved in the logs folder under your local application data, and summarizeSetup, in the program folder, shows it again on any later day.
+Key=
+Hear=
+
+[step]
+
+Say=What the app's installer script writes, and what the kit writes. The app names its pieces in a table -- a name, a winget id, an executable to look for, what it is used for -- and the kit does the rest: the probing, the three states, the labels, the ordering, the results. Ten lines of the app's, for a page that behaves the same in every Homer program.
+Key=
+Hear=
+
+[step]
+
+Say=Screen reader scripts are a piece of their own: the kit knows where each reader keeps its settings or its add-ons, and the box reads Install, Update or Reinstall for them as for the rest.
+Key=
+Hear=
+
+[step]
+
+Say=A planned misstep. Run the installer a second time: every piece already present says so, and Install becomes Reinstall, unticked. Nothing is installed twice.
+Key=
+Hear=
+
+[step]
+
+Say=Removing a Homer program is Windows Settings, Apps; the pieces it installed are programs in their own right and stay for the other Homer programs, and your data folder stays unless you delete it.
+Key=
+Hear=
+
+[step]
+
+Say=What this walk taught. I say the idea or the key; the reader says the command or the name.
+
+[step]
+
+Say=The one word that is the box's state.
+Key=
+Hear=Install, Update, or Reinstall
+
+[step]
+
+Say=The shared installer parts.
+Key=
+Hear=HomerComponents dot iss

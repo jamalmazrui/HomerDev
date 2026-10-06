@@ -688,7 +688,7 @@ than guessed at. Folders are in the order you meet them.
 - **History.md** -- what changed in each version, and why
 - **Hotkeys.md** -- every key three ways: by key, by description, by binding
 - **Tutorials.md** -- walkthroughs of common scenarios, and the audio tutorial playlist
-- **Tutorial_HomerDev.inix** -- the spoken walkthrough, narration and screen reader in two voices
+- **Tutorial_00 to Tutorial_11** -- the kit's twelve spoken walks, narrator and screen reader in two voices, in the pattern every Homer app follows
 - **CamelType_CSharp.md, CamelType_CSharp_Reference.md, CamelType_JAWSScript.md** -- the coding style
 - **self.md** -- the private notebook: decisions, findings and open items. Never pushed
 
@@ -2282,8 +2282,7 @@ worth reading for the breadth; these two are what to copy.
 
 ### Tutorials that can be heard
 
-`Tutorial_HomerDev.inix` is the kit's own walkthrough, written in the step
-format the tutorial tooling reads:
+The kit's own walks are the twelve in `help`, `Tutorial_00` to `Tutorial_11`, in the pattern the kit prescribes for every app: overview, install and launch, the interface, the key rules, five tasks, glossary, conclusion, more information. Where the kit has no screen of its own, the walks use an app built on it -- DbDo, EdSharp, FileDir -- so a listener hears what the kit's code does for a person. The build speaks them, like any app's.
 
     [step]
     Say  = the narration

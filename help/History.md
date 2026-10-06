@@ -141,6 +141,18 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.53.0 -- 6 October 2026
+
+**The kit has its own twelve walks**, in the pattern it prescribes: overview,
+install and launch -- the kit's build and the fruit basket --, the interface
+and the key rules heard in DbDo, EdSharp and FileDir, then five tasks --
+starting an app from the kit, build and check and release, the installer's
+finish page, spoken tutorials, shared code and the Homer Player heard in two
+programs -- then a glossary of twenty-six terms, a conclusion and more
+information. Where the kit has no screen of its own, an app built on it shows
+what the kit's code makes a person hear. The one earlier walk is retired, and
+checkTutorial holds the kit to the pattern like any app.
+
 ## 1.52.8 -- 6 October 2026
 
 **HomerComponents.iss supplies the screen reader wrappers** -- isInstallJaws,

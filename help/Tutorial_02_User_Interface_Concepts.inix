@@ -1,0 +1,102 @@
+﻿[about]
+Title=02 - User Interface Concepts
+Intro=What a Homer program is made of, each part heard in DbDo, EdSharp or FileDir: the single instance, the main view, the Lbc dialog, the Say layer, messages, pick lists, help in four places, templates, logs, and the finish page. This walk assumes walk one.
+Setup=Nothing is needed; this walk is listened to.
+Homework=Open any Homer program and name each part as you reach it: the view, a dialog, the status line, the Help menu.
+
+[step]
+
+Say=A Homer program is heard before it is seen, so its parts are defined by what they say. Here they are, each in a program built on the kit.
+Key=
+Hear=
+
+[step]
+
+Say=The window. One program, one instance: the desktop key opens it or brings it forward, never a second copy. Alt plus Control plus D for DbDo, E for EdSharp, F for FileDir -- the letter is the program's.
+Key=Alt+Control+D
+Hear=DbDo
+
+[step]
+
+Say=The main view is a Windows control the reader already knows: a list box in FileDir, a grid in DbDo, an edit box in EdSharp. Nothing custom to learn; what differs is what the program adds to the speech.
+Key=
+Hear=Untitled, edit, multiline, blank
+Say=EdSharp's edit box, as any reader reads it: the name, the kind, the state.
+
+[step]
+
+Say=The Lbc dialog -- label before control. Every dialog in every Homer program is built by the same class: a label, then its control, Tab between them, Alt plus the underlined letter to jump, Control plus Enter for OK from anywhere, Escape to cancel. Learn one dialog and you have learned them all.
+Key=
+Hear=Keywords dialog, Keywords: edit
+Say=DbDo's search dialog: the label is read before the box it labels.
+
+[step]
+
+Say=The Say layer. Shift plus a letter, or Alt plus a letter, asks a question and changes nothing: Say Cell, Say Status, Say Address. Pressed twice, the same words open in a window to arrow through.
+Key=Shift+Z
+Hear=jobs, 12 records, no filter, sorted by employer
+
+[step]
+
+Say=Messages are spoken when something happens, and shown on the status line, so a result is heard without being asked for.
+Key=
+Hear=Bookmark at percent 40
+Say=EdSharp, after Control plus K: the fact, with its number.
+
+[step]
+
+Say=The pick list. Where a field has fixed values, F4 opens them as a list, and a letter jumps to one; nothing is typed that could be mistyped.
+Key=F4
+Hear=status: list box, untried, 4 of 5
+
+[step]
+
+Say=Help is in four places, and they are the same in every program the kit builds. F1 the guide, Shift plus F1 the history, Alt plus F1 the version, Control plus F1 the Key Describer; the Help menu holds them and Play Tutorials; and every menu says each command's key as you arrow it.
+Key=
+Hear=
+
+[step]
+
+Say=Templates and data. A program's templates ship with it and are copied to your data folder the first time you open one; your copy is yours and an update never touches it. The data folder is under your local application data, named for the program.
+Key=
+Hear=
+
+[step]
+
+Say=Logs. Every Homer program writes a session log, every build writes a build log, every script writes its own, all under the program's logs folder; the console stays short and the log holds the detail. A problem report is that file and a line about what you were doing.
+Key=
+Hear=
+
+[step]
+
+Say=The result window. Output that is a document -- a report, an export, a compile's messages -- opens as a document, in your editor or in a read-only window, where the reader reads it as text.
+Key=
+Hear=
+
+[step]
+
+Say=The finish page. The installer's last page offers optional pieces as boxes, each saying what it does and its state -- Install, Update or Reinstall -- and a results box after Finish names each by outcome. Walk six is that page.
+Key=
+Hear=
+
+[step]
+
+Say=A planned misstep. Press a Homer program's Say key in a dialog where it means nothing, and nothing happens -- no error, no beep -- because a question that has no answer here is not a mistake.
+Key=
+Hear=
+
+[step]
+
+Say=What this walk taught. I say the idea or the key; the reader says the command or the name.
+
+[step]
+
+Say=The dialog class every Homer dialog is built with.
+Key=
+Hear=Lbc
+
+[step]
+
+Say=The question key that changes nothing.
+Key=
+Hear=Shift plus Z, Say Status

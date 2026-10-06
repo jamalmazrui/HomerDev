@@ -1,0 +1,115 @@
+﻿[about]
+Title=01 - Install and Launch
+Intro=One want: the kit on this computer, proved working. Unarchiving it, running its own build, building the C sharp sample and launching it -- the first Homer program you hear -- and one planned misstep. This walk assumes walk zero.
+Setup=Windows 10 or later, 64-bit, a screen reader running, and HomerDev dot zip downloaded. Everything else the kit fetches for itself.
+Homework=Unarchive the kit, run build, build and run the C sharp fruit basket.
+
+[step]
+
+Say=The want: the kit on this computer, proved working. Unarchive HomerDev dot zip into a folder called C colon backslash HomerDev. That is the whole install: open the archive, choose Extract All, and type the folder name.
+Key=Control+V
+Hear=Destination, edit, C colon backslash HomerDev
+Say=Any folder works. Somewhere else, set an environment variable called HomerDev to that path, and every build script finds it.
+
+[step]
+
+Say=Open a command prompt in that folder and run the kit's own build. The reader echoes what is typed and says nothing else until the command answers.
+Key=build
+Hear=Homer Development Kit 1.52.8 in C colon backslash HomerDev
+Hear=10 documents converted to HTML
+Hear=0 problems found. The kit is complete.
+
+[step]
+
+Say=Notice the last line. Zero problems is a real answer, said plainly. That is a rule in this kit: a count always matches its noun, and nothing reports zero as though it were an error.
+Key=
+Hear=
+
+[step]
+
+Say=What build did. It converted every document to HTML with pandoc, fetching pandoc if the machine had none; it checked the kit over -- every component present, every file in the Homer encoding, no empty files -- and it packed the sixteen skills an AI assistant reads. Its log is in the logs folder, every command with its exit code.
+Key=
+Hear=
+
+[step]
+
+Say=Next, the samples: change into the samples folder under Templates. Two programs, a C sharp one and a Python one, and a build script for each. Both are the fruit basket: a window with a fruit box, a basket list, and a report. The command is silent until the next one answers.
+Key=cd Templates\samples
+Hear=(silence)
+
+[step]
+
+Say=Build the C sharp one.
+Key=buildFruitBasketCs
+Hear=Kit, C colon backslash HomerDev version 1.52.8
+Hear=Compiler, Microsoft Visual Studio Build Tools
+Hear=Built FruitBasketCs dot exe version 1.0.0
+Say=The script found the compiler, found the reference assemblies off the default path, compiled the program together with the Homer classes straight out of the kit, and wrote its own log.
+
+[step]
+
+Say=Now run it. This is the launch: the first Homer program you hear.
+Key=FruitBasketCs
+Hear=Fruit Basket, the basket is empty
+Hear=Fruit, edit
+Say=The window title carries the state, and the focus starts in the field, because typing a fruit is the first thing anybody does.
+
+[step]
+
+Say=Type a fruit and press Enter.
+Key=apple
+Hear=apple added, 1 fruit in the basket
+Say=One fruit, not one fruits: the noun matches the count.
+
+[step]
+
+Say=Add two more, then Tab to the basket and arrow through it.
+Key=Tab
+Hear=Basket, list box, apple, 1 of 3
+
+[step]
+
+Say=F1 for help: every Homer dialog describes its own fields.
+Key=F1
+Hear=Help, Fields in this dialog, Fruit, type the name of a fruit
+
+[step]
+
+Say=Close it with Alt plus F4 and run it again: the basket was kept between sessions, in your local application data, without being asked to.
+Key=Alt+F4
+Hear=Fruit Basket, 2 fruits in the basket
+
+[step]
+
+Say=The Python one builds and runs the same way, and answers every key exactly as the C sharp one did -- walk four hears it. Two languages, one behaviour, because the behaviour lives in the kit's components rather than in either program.
+Key=
+Hear=
+
+[step]
+
+Say=A planned misstep. Run build in an app folder whose kit is older than the app needs, and the build refuses in one line.
+Key=
+Hear=ERROR: DbDo needs HomerDev 1.52.8 or later, and C colon backslash HomerDev is 1.52.6.
+Say=Unarchive the newer kit and build again; nothing else is touched.
+
+[step]
+
+Say=Where things went. The kit stays in its folder and is never installed in Program Files; each sample keeps its data and its session log under your local application data, in a folder named for it -- the layout every Homer app follows.
+Key=
+Hear=
+
+[step]
+
+Say=What this walk taught. I say the idea or the key; the reader says the command or the name.
+
+[step]
+
+Say=Run the kit's own check and documents.
+Key=
+Hear=build
+
+[step]
+
+Say=Build the C sharp sample.
+Key=
+Hear=buildFruitBasketCs

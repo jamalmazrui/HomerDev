@@ -293,7 +293,7 @@ def main():
     # walks spoken and still releases, and hears on every build what the set
     # lacks. A problem is something wrong in a walk; an incomplete set is work
     # not yet done, and the tool should not silence a program for that.
-    if len(sys.argv) == 1 and sKind != "kit":
+    if len(sys.argv) == 1:
         c_dFixed = {"00": "Overview_and_Table_of_Contents", "01": "Install_and_Launch", "02": "User_Interface_Concepts",
                     "03": "Key_Patterns", "09": "Glossary", "10": "Conclusion", "11": "More_Information"}
         dHave = {}

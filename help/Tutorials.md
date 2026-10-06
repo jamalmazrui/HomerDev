@@ -522,82 +522,190 @@ and a tab order that is an accident.
 
 <!-- walkthrough: written by makeTutorials.py, do not edit between the markers -->
 
-## 0. The Homer Development Kit, and two fruit baskets
+## 00 - Overview and Table of Contents
 
-This is a first look at HomerDev: what it is, how to install it, and how to build and run the two sample programs. It takes about twelve minutes. You can follow along, or just listen.
+What the Homer Development Kit is, in a paragraph; the two reader keys every walk assumes; then the table of contents, one line per walk.
 
-**Before you start:** You need Windows 10 or later, 64-bit, and a screen reader running. Everything else the kit fetches for itself. Nothing in this tutorial costs anything.
+**Before you start:** Nothing is needed; this walk is listened to.
 
 ### Step 1
 
-HomerDev is a kit of parts for building Windows programs that work well by keyboard and screen reader. Nine C sharp classes, seven Python modules, the build and release scripts, and two sample programs that do the same job in both languages. It is free and open source. If you miss a line the reader says, Insert plus Up Arrow says it again; if you lose your place, Insert plus Tab says where you are.
+HomerDev is a kit of parts for building Windows programs that work well by keyboard and screen reader: shared C sharp classes and Python modules, build and release scripts, installer parts, templates for a new app, and skills that teach an AI assistant the house rules. Every decision that makes a program pleasant to use without sight -- where the focus goes, what is spoken, what the keys do -- has been made once and put in a class, so an app built on the kit inherits it. DbDo, EdSharp and FileDir are built on it, and these walks use their voices to show what the kit's code does for a person.
 
-The kit is at https://github.com/JamalMazrui/HomerDev
+### Step 2: Insert+UpArrow
 
-### Step 2
+Two keys before anything else, both the reader's own. If a line goes by too fast, Insert plus Up Arrow says it again.
 
-The idea behind it is simple. Every decision that makes a program pleasant to use without sight -- where the focus goes, what gets spoken, what the keys do -- has already been made, tested, and put in a class. You get them by calling the class rather than by remembering them.
+Screen reader:
 
-The guide calls these the nine decisions, and both samples mark them where they occur.
+- (the last line, read a second time)
 
-### Step 3: Control+V
+### Step 3: Insert+Tab
 
-Start by unarchiving HomerDev dot zip into a folder called C colon backslash HomerDev. That is the whole install. Open the archive, choose Extract All, and type the folder name.
+And if you lose your place, Insert plus Tab says where you are: the control, its state, its position, and any hint it carries. The walks are heard with those hints off, the way most people work.
+
+Screen reader:
+
+- (the current control, with its state and position)
+
+### Step 4
+
+Now the table of contents. I say the number and the title; the reader says what the walk covers.
+
+### Step 5
+
+One, Install and Launch.
+
+Screen reader:
+
+- Unarchiving the kit, running its own build, and launching the sample program it builds.
+
+### Step 6
+
+Two, User Interface Concepts.
+
+Screen reader:
+
+- What a Homer program is made of, heard in DbDo, EdSharp and FileDir: the Lbc dialog, the Say layer, the status line, the single instance.
+
+### Step 7
+
+Three, Key Patterns.
+
+Screen reader:
+
+- The rules every Homer key follows, and the same key heard in three programs.
+
+### Step 8
+
+Four, Start an App from the Kit.
+
+Screen reader:
+
+- A new app from the template: its files, its first build, its first run.
+
+### Step 9
+
+Five, Build, Check and Release.
+
+Screen reader:
+
+- What build does, stage by stage; what check refuses; what release publishes.
+
+### Step 10
+
+Six, The Installer and Its Finish Page.
+
+Screen reader:
+
+- The shared installer parts: boxes that say their state, the results box, the summary.
+
+### Step 11
+
+Seven, Spoken Tutorials.
+
+Screen reader:
+
+- Writing a walk, the two voices, the pattern of twelve, and the tool that speaks and measures them.
+
+### Step 12
+
+Eight, Shared Code and the Homer Player.
+
+Screen reader:
+
+- The classes every app uses, and the player heard in FileDir and DbDo alike.
+
+### Step 13
+
+Nine, Glossary.
+
+Screen reader:
+
+- The words the kit uses, in alphabetical order, one line each.
+
+### Step 14
+
+Ten, Conclusion.
+
+Screen reader:
+
+- Four sentences to carry away, one thing from each walk, and where to begin.
+
+### Step 15
+
+Eleven, More Information.
+
+Screen reader:
+
+- The guide, the history, the skills, the GitHub page, and the apps built on the kit.
+
+### Step 16
+
+Twelve walks, three to five minutes each, about an hour together. They are a course, not a reference: each one assumes those before it.
+
+**Something to try:** Listen to the walks in order; each one assumes the ones before it.
+
+## 01 - Install and Launch
+
+One want: the kit on this computer, proved working. Unarchiving it, running its own build, building the C sharp sample and launching it -- the first Homer program you hear -- and one planned misstep. This walk assumes walk zero.
+
+**Before you start:** Windows 10 or later, 64-bit, a screen reader running, and HomerDev dot zip downloaded. Everything else the kit fetches for itself.
+
+### Step 1: Control+V
+
+The want: the kit on this computer, proved working. Unarchive HomerDev dot zip into a folder called C colon backslash HomerDev. That is the whole install: open the archive, choose Extract All, and type the folder name.
 
 Screen reader:
 
 - Destination, edit, C colon backslash HomerDev
 
-Any folder works. If you put it somewhere else, set an environment variable called HomerDev to that path, and every build script will find it.
+### Step 2: build
 
-### Step 4: build
-
-Now open a command prompt in that folder and run the kit's own build.
+Open a command prompt in that folder and run the kit's own build. The reader echoes what is typed and says nothing else until the command answers.
 
 Screen reader:
 
-- Homer Development Kit 1.4.0 in C colon backslash HomerDev
+- Homer Development Kit 1.52.8 in C colon backslash HomerDev
 - 10 documents converted to HTML
 - 0 problems found. The kit is complete.
 
-build converts every document to HTML with pandoc, fetching pandoc if this machine has none, then checks the kit over: every component present, every file in the right encoding, no empty files.
-
-### Step 5
+### Step 3
 
 Notice the last line. Zero problems is a real answer, said plainly. That is a rule in this kit: a count always matches its noun, and nothing reports zero as though it were an error.
 
-"1 match", never "1 matches"; "0 matches" rather than silence.
+### Step 4
 
-### Step 6: cd Templates\samples
+What build did. It converted every document to HTML with pandoc, fetching pandoc if the machine had none; it checked the kit over -- every component present, every file in the Homer encoding, no empty files -- and it packed the sixteen skills an AI assistant reads. Its log is in the logs folder, every command with its exit code.
 
-Next, the samples. Change into the samples folder under Templates. There are four files: a C sharp program, a Python program, and a build script for each. Both programs are the fruit basket -- a window with a fruit field and an Add button, a basket list and a Delete button. Blind programmers have taught with that specification since 2005.
+### Step 5: cd Templates\samples
 
-Typed at the prompt: the reader echoes the letters, and says nothing else until the next command answers. The legacy FruitBasket collection has thirty-six of these, one per language. These two are different: they are parallel to each other.
+Next, the samples: change into the samples folder under Templates. Two programs, a C sharp one and a Python one, and a build script for each. Both are the fruit basket: a window with a fruit box, a basket list, and a report. The command is silent until the next one answers.
 
-### Step 7: buildFruitBasketCs
+Screen reader:
+
+- (silence)
+
+### Step 6: buildFruitBasketCs
 
 Build the C sharp one.
 
 Screen reader:
 
-- Kit, C colon backslash HomerDev version 1.4.0
+- Kit, C colon backslash HomerDev version 1.52.8
 - Compiler, Microsoft Visual Studio Build Tools
 - Built FruitBasketCs dot exe version 1.0.0
 
-The script finds the compiler, finds the three reference assemblies that are not on the default path, compiles the program together with the Homer classes straight out of the kit, and writes buildFruitBasketCs.log beside itself.
+### Step 7: FruitBasketCs
 
-### Step 8: FruitBasketCs
-
-Now run it.
+Now run it. This is the launch: the first Homer program you hear.
 
 Screen reader:
 
 - Fruit Basket, the basket is empty
 - Fruit, edit
 
-The window title carries the state and the focus starts in the field, because typing a fruit is the first thing anybody does.
-
-### Step 9: apple, Enter
+### Step 8: apple
 
 Type a fruit and press Enter.
 
@@ -605,71 +713,356 @@ Screen reader:
 
 - apple added, 1 fruit in the basket
 
-One fruit, not one fruits. The screen reader announced nothing about the field or the button, because it had nothing new to say; what you heard is the program telling you what it did.
+### Step 9: Tab
 
-### Step 10: Tab, DownArrow
-
-Add two more, then tab to the basket and arrow through it.
+Add two more, then Tab to the basket and arrow through it.
 
 Screen reader:
 
 - Basket, list box, apple, 1 of 3
 
-An ordinary Windows list box. No custom control, no special mode, nothing to learn.
+### Step 10: F1
 
-### Step 11: Control+J
-
-Press Control plus J to search inside the list.
-
-Screen reader:
-
-- Find in list, edit
-
-That search, and F3 to repeat it, arrived with the list box. The program contains no code for either.
-
-### Step 12: Delete
-
-Press Delete on a fruit you no longer want.
-
-Screen reader:
-
-- banana deleted, 2 fruits in the basket
-
-The selection moves to the neighbour, so the list still has somewhere to speak from. A list with nothing selected says nothing, and a person who hears nothing assumes the program has stopped.
-
-### Step 13: Alt+R
-
-Press Alt plus R for the report.
-
-Screen reader:
-
-- Fruit basket report, read only edit
-
-A plain read-only window you arrow through line by line and close with Escape. The same window the Help button uses.
-
-### Step 14: F1
-
-Press F1 for help.
+F1 for help: every Homer dialog describes its own fields.
 
 Screen reader:
 
 - Help, Fields in this dialog, Fruit, type the name of a fruit
 
-That help was written once, as a tip beside each field, and it reaches the reader twice: in the status line when focus arrives, and in this window on demand.
+### Step 11: Alt+F4
 
-### Step 15: Alt+F4
-
-Close the program, then run it again.
+Close it with Alt plus F4 and run it again: the basket was kept between sessions, in your local application data, without being asked to.
 
 Screen reader:
 
 - Fruit Basket, 2 fruits in the basket
 
-The basket was saved the moment each fruit went in, not on the way out. A program that saves at exit loses everything when it is killed.
+### Step 12
 
-### Step 16: buildFruitBasketPy
+The Python one builds and runs the same way, and answers every key exactly as the C sharp one did -- walk four hears it. Two languages, one behaviour, because the behaviour lives in the kit's components rather than in either program.
 
-Now the same program in Python. Build it.
+### Step 13
+
+A planned misstep. Run build in an app folder whose kit is older than the app needs, and the build refuses in one line.
+
+Screen reader:
+
+- ERROR: DbDo needs HomerDev 1.52.8 or later, and C colon backslash HomerDev is 1.52.6.
+
+### Step 14
+
+Where things went. The kit stays in its folder and is never installed in Program Files; each sample keeps its data and its session log under your local application data, in a folder named for it -- the layout every Homer app follows.
+
+### Step 15
+
+What this walk taught. I say the idea or the key; the reader says the command or the name.
+
+### Step 16
+
+Run the kit's own check and documents.
+
+Screen reader:
+
+- build
+
+### Step 17
+
+Build the C sharp sample.
+
+Screen reader:
+
+- buildFruitBasketCs
+
+**Something to try:** Unarchive the kit, run build, build and run the C sharp fruit basket.
+
+## 02 - User Interface Concepts
+
+What a Homer program is made of, each part heard in DbDo, EdSharp or FileDir: the single instance, the main view, the Lbc dialog, the Say layer, messages, pick lists, help in four places, templates, logs, and the finish page. This walk assumes walk one.
+
+**Before you start:** Nothing is needed; this walk is listened to.
+
+### Step 1
+
+A Homer program is heard before it is seen, so its parts are defined by what they say. Here they are, each in a program built on the kit.
+
+### Step 2: Alt+Control+D
+
+The window. One program, one instance: the desktop key opens it or brings it forward, never a second copy. Alt plus Control plus D for DbDo, E for EdSharp, F for FileDir -- the letter is the program's.
+
+Screen reader:
+
+- DbDo
+
+### Step 3
+
+The main view is a Windows control the reader already knows: a list box in FileDir, a grid in DbDo, an edit box in EdSharp. Nothing custom to learn; what differs is what the program adds to the speech.
+
+Screen reader:
+
+- Untitled, edit, multiline, blank
+
+### Step 4
+
+The Lbc dialog -- label before control. Every dialog in every Homer program is built by the same class: a label, then its control, Tab between them, Alt plus the underlined letter to jump, Control plus Enter for OK from anywhere, Escape to cancel. Learn one dialog and you have learned them all.
+
+Screen reader:
+
+- Keywords dialog, Keywords: edit
+
+### Step 5: Shift+Z
+
+The Say layer. Shift plus a letter, or Alt plus a letter, asks a question and changes nothing: Say Cell, Say Status, Say Address. Pressed twice, the same words open in a window to arrow through.
+
+Screen reader:
+
+- jobs, 12 records, no filter, sorted by employer
+
+### Step 6
+
+Messages are spoken when something happens, and shown on the status line, so a result is heard without being asked for.
+
+Screen reader:
+
+- Bookmark at percent 40
+
+### Step 7: F4
+
+The pick list. Where a field has fixed values, F4 opens them as a list, and a letter jumps to one; nothing is typed that could be mistyped.
+
+Screen reader:
+
+- status: list box, untried, 4 of 5
+
+### Step 8
+
+Help is in four places, and they are the same in every program the kit builds. F1 the guide, Shift plus F1 the history, Alt plus F1 the version, Control plus F1 the Key Describer; the Help menu holds them and Play Tutorials; and every menu says each command's key as you arrow it.
+
+### Step 9
+
+Templates and data. A program's templates ship with it and are copied to your data folder the first time you open one; your copy is yours and an update never touches it. The data folder is under your local application data, named for the program.
+
+### Step 10
+
+Logs. Every Homer program writes a session log, every build writes a build log, every script writes its own, all under the program's logs folder; the console stays short and the log holds the detail. A problem report is that file and a line about what you were doing.
+
+### Step 11
+
+The result window. Output that is a document -- a report, an export, a compile's messages -- opens as a document, in your editor or in a read-only window, where the reader reads it as text.
+
+### Step 12
+
+The finish page. The installer's last page offers optional pieces as boxes, each saying what it does and its state -- Install, Update or Reinstall -- and a results box after Finish names each by outcome. Walk six is that page.
+
+### Step 13
+
+A planned misstep. Press a Homer program's Say key in a dialog where it means nothing, and nothing happens -- no error, no beep -- because a question that has no answer here is not a mistake.
+
+### Step 14
+
+What this walk taught. I say the idea or the key; the reader says the command or the name.
+
+### Step 15
+
+The dialog class every Homer dialog is built with.
+
+Screen reader:
+
+- Lbc
+
+### Step 16
+
+The question key that changes nothing.
+
+Screen reader:
+
+- Shift plus Z, Say Status
+
+**Something to try:** Open any Homer program and name each part as you reach it: the view, a dialog, the status line, the Help menu.
+
+## 03 - Key Patterns
+
+The rules every Homer key follows, so a key can be guessed in a program you have never opened: the word gives the letter, Control does, Shift asks, Shift reverses, Alt Shift is a command with no control, the function keys follow Windows, Insert is the reader's -- with a guessing exchange and the keys that explain the keys. This walk assumes walk two.
+
+**Before you start:** Nothing is needed; a Homer program open to try the keys is a bonus.
+
+### Step 1
+
+Every key in a Homer program is named for a word in its command, and the same word gives the same key in every program. Control plus K is Keywords in DbDo and in FileDir; Control plus F is Find in all three; F2 renames or edits in place everywhere. A key never comes from the middle of a word.
+
+### Step 2
+
+Control plus a letter does something. Shift plus a letter, or Alt plus a letter, asks something and changes nothing. Adding Shift to a doing key reverses or widens it: Control plus M marks, Control plus Shift plus M unmarks; Control plus O opens, Control plus Shift plus O opens converting.
+
+### Step 3
+
+Alt plus Shift plus a letter is a command with no control of its own: Alt plus Shift plus P plays a stream, Alt plus Shift plus R records or runs a report, Alt plus Shift plus E exports.
+
+### Step 4
+
+The function keys follow Windows and Office: F1 help, F2 edit or rename, F3 find again, F4 pick from a list or list the windows, F5 run or refresh, F7 spelling, F10 the menus, F11 the newer version, F12 the AI or the files.
+
+### Step 5
+
+Anything with Insert in it belongs to the screen reader; a Homer program never uses the Insert key, so the two can never collide.
+
+### Step 6
+
+The rules let a key be guessed, in a program you have never opened. I name a command; the reader says the key the rules give it.
+
+### Step 7
+
+Say Status.
+
+Screen reader:
+
+- Shift plus Z
+
+### Step 8
+
+Keywords.
+
+Screen reader:
+
+- Control plus K
+
+### Step 9
+
+Unmark, the reverse of Mark.
+
+Screen reader:
+
+- Control plus Shift plus M
+
+### Step 10
+
+Play Stream, which has no control of its own.
+
+Screen reader:
+
+- Alt plus Shift plus P
+
+### Step 11
+
+Check for a newer version.
+
+Screen reader:
+
+- F11
+
+### Step 12: Control+F1
+
+The keys that explain the keys, the same in every program. Control plus F1 is the Key Describer: on, every key says what it does instead of doing it.
+
+Screen reader:
+
+- Key Describer On
+
+### Step 13: Control+F1
+
+Control plus F1 again turns it off. Hotkeys, in the Help menu, lists every key three ways -- by menu, by key, by command -- generated from the program itself, so it cannot fall behind. And the menus say each command's key as you arrow them.
+
+Screen reader:
+
+- No Key Describer
+
+### Step 14
+
+Access letters in dialogs and menus come from the plain Windows rule: the underlined letter, the first letter of a word in the caption, one per dialog; better no letter than one from inside a word. The kit's check counts them per dialog and refuses a duplicate.
+
+### Step 15
+
+A planned misstep. Press a key the program does not bind, and nothing happens -- no beep, no message -- because an unbound key is not a mistake; the Key Describer or the Alternate Menu tells you what the key you wanted is.
+
+### Step 16
+
+What this walk taught. I say the idea or the key; the reader says the command or the name.
+
+### Step 17
+
+Control plus F1.
+
+Screen reader:
+
+- Key Describer
+
+### Step 18
+
+Every key three ways, from the program itself.
+
+Screen reader:
+
+- Hotkeys
+
+**Something to try:** Guess three keys in a Homer program you have not used, then check with Control plus F1.
+
+## 04 - Start an App from the Kit
+
+One want: a new program of your own, built on the kit, running by the end of the walk. newHomerApp, what it makes, the first build, the first run, the first change, and where the kit's classes come in. This walk assumes walks one to three.
+
+**Before you start:** The kit is at C colon backslash HomerDev, and a command prompt is open there.
+
+### Step 1: newHomerApp Recipes
+
+The want: a new program of your own, built on the kit, running by the end of the walk. In the kit folder, newHomerApp with a name makes the folder and its files.
+
+Screen reader:
+
+- Made C colon backslash Recipes with 14 files. Run build there.
+
+### Step 2
+
+What is in it. The program file, Recipes dot cs, with the Homer classes referenced from the kit; build dot cmd, the stages every Homer build runs; the installer script with the shared finish page; accept dot inix, the acceptance checks; the twelve tutorial skeletons in help; the ReadMe, guide and history, each with its HTML pair; and the policy files that say which files travel to the repository.
+
+### Step 3
+
+The template program is the fruit basket's shape with the new name: a dialog with a field and a list, a report, F1 help on the fields, a session log. It runs before you have written a line, so every change is made against a working program.
+
+### Step 4: build
+
+Change into the folder and build.
+
+Screen reader:
+
+- Kit, C colon backslash HomerDev version 1.52.8
+- Version, 1.0.0
+- Built Recipes dot exe version 1.0.0
+
+### Step 5: Recipes
+
+Run it.
+
+Screen reader:
+
+- Recipes, the list is empty
+- Name, edit
+
+### Step 6: pancakes
+
+Type a name and press Enter.
+
+Screen reader:
+
+- pancakes added, 1 item in the list
+
+### Step 7: Alt+F4
+
+Alt plus F4, and run it again: kept.
+
+Screen reader:
+
+- Recipes, 1 item in the list
+
+### Step 8
+
+Now the first real change. Open Recipes dot cs in EdSharp; the Camel Type conventions the kit's skill teaches are already followed in it: a prefix on every name says its type, functions in lower camel case, constants with c underscore. An AI assistant that has read the kit's skills writes the same way, so what it adds reads like what was there.
+
+### Step 9
+
+Where the Homer classes come in. Lbc builds every dialog; Say speaks; Log writes the session log; Inix reads settings; Web fetches; Util has the pluralizer that said one item and not one items. None of them is in your folder; they compile from the kit, so a kit update improves every app on the next build.
+
+### Step 10
+
+The Python template, newHomerApp with dash py, makes the same program in Python, built with the kit's Python modules; buildFruitBasketPy showed the shape in walk one: a build environment made, what the build needs installed, and an executable at the end.
 
 Screen reader:
 
@@ -677,62 +1070,775 @@ Screen reader:
 - Installing what the build needs
 - Built FruitBasketPy dot exe version 1.0.0
 
-The first build makes a virtual environment beside the script and installs PyInstaller and wxPython into it, which takes a few minutes once. What comes out is one file with Python and every dependency inside it, so whoever you give it to needs no Python of their own.
+### Step 11
 
-### Step 17: FruitBasketPy
-
-Run the Python one.
+A planned misstep. Name the app with a space, and newHomerApp refuses in one line, because the name becomes a folder, a file, a class and a shortcut key.
 
 Screen reader:
 
-- Fruit Basket, the basket is empty
-- Fruit, edit
+- A Homer app's name is one word in upper camel case, like FruitBasket.
 
-The same title, the same first control, the same starting focus.
+### Step 12
 
-### Step 18: cherry, Enter
+From here the work is yours: fields in the dialog, commands on the menus with their keys named for their words, a template database or two. Walk five is what happens each time you type build.
 
-Type a fruit and press Enter, exactly as before.
+### Step 13
 
-Screen reader:
+What this walk taught. I say the idea or the key; the reader says the command or the name.
 
-- cherry added, 1 fruit in the basket
+### Step 14
 
-The same sentence, from a different language, because both programs call the same Say class through the same kit.
-
-### Step 19: Control+J
-
-Tab to the basket, press Control plus J, press Delete, press Alt plus R. Every key does what it did in the C sharp version.
+Make a new app from the template.
 
 Screen reader:
 
-- Find in list, edit
+- newHomerApp
 
-Two differences, and only two. The C sharp dialog has a status line at the foot; a wx dialog has none, so the Python one puts the same sentence in the window title. And the tips are on Shift plus F1 in Python rather than in the status line.
+### Step 15
+
+Every stage, from encoding to installer.
+
+Screen reader:
+
+- build
+
+**Something to try:** Make an app of your own with newHomerApp, build it, run it, and add one field to its dialog.
+
+## 05 - Build, Check and Release
+
+One want: a change made this morning, published by lunch, with nothing shipped that does not work. What build does, stage by stage; what check refuses, with the misstep everybody meets; what release publishes and what it leaves behind. This walk assumes walk four.
+
+**Before you start:** An app built on the kit is open in a command prompt, with a change made and GitHub signed in.
+
+### Step 1: build
+
+The want: a change made this morning, published by lunch, with nothing shipped that does not work. Three commands do it, and each refuses when it should. First, build, in the app's folder.
+
+Screen reader:
+
+- Kit, C colon backslash HomerDev version 1.52.8
+- Version, 1.0.228 (bumped)
+
+### Step 2
+
+The stages, in order, each logged. The kit's version is checked against what the app needs. Old file names are retired. The encoding of every file is put right: UTF-8 with a byte order mark, CRLF line endings. The hotkey list is generated from the program itself. Any tutorial whose audio is missing or older than its script is spoken. The program compiles. The installer is built.
+
+### Step 3
+
+Each stage says one line and writes the rest to the log. Here is the line that matters most.
+
+Screen reader:
+
+- Built DbDo underscore setup dot exe version 1.0.228
+
+### Step 4: scripts\check
+
+Second, check. It is also the first thing release runs, so you may skip it; but it is a few seconds, and it says exactly what release would refuse.
+
+Screen reader:
+
+- 13 checks passed, 0 checks failed, 2 checks not checked.
+
+### Step 5
+
+What the checks are. Every file in the Homer encoding. Every access letter unique within its dialog or menu. No key on a reader's key. The app's files under the Local tree, never Roaming. The hotkey list current. The tutorials clean. Each acceptance check in accept dot inix passing. And an evidence report written in Markdown, for anyone who asks what was checked.
+
+### Step 6
+
+A planned misstep, the one everybody meets. Change a dialog and reuse a letter, and check names the dialog and the two captions.
+
+Screen reader:
+
+- 12 checks passed, 1 check failed. failed: access letters -- Filter Records: F is used by Find and Filter
+
+### Step 7: scripts\release
+
+Third, release. It reads the version from the installer, refuses if the last build did not succeed, runs check, commits and pushes, tags the version, and publishes the installer on GitHub.
+
+Screen reader:
+
+- GitHub has no published release tagged v1.0.228.
+- DbDo 1.0.228 published.
+
+### Step 8
+
+Release refuses for honest reasons and says which. A build still running: the last build did not succeed, build again, then release. A check failing: nothing was published, its report names it. And it never publishes an installer older than the source beside it.
+
+### Step 9
+
+What the release left behind. A tag, a release page with the installer, and in the logs folder a release log and an evidence report; the ReadMe's download link now points at the new installer. F11 in any installed copy finds it within the hour.
+
+### Step 10
+
+The logs. Every stage wrote its own: build, encoding, hotkeys, tutorials, check, push, release. The console said one line each; the logs say every command and its exit code. When something is wrong, the log is the thing to send -- never a description of the console.
+
+### Step 11
+
+A second planned misstep. Run release before the build has finished speaking its tutorials, and it refuses -- the build has not succeeded yet -- which is right, if blunt; wait for the Built line, then release.
+
+### Step 12
+
+What this walk taught. I say the idea or the key; the reader says the command or the name.
+
+### Step 13
+
+Every stage, encoding to installer.
+
+Screen reader:
+
+- build
+
+### Step 14
+
+What release would refuse, in seconds.
+
+Screen reader:
+
+- check
+
+### Step 15
+
+Tag, publish, and leave a log.
+
+Screen reader:
+
+- release
+
+**Something to try:** Make a small change in an app of your own, then build, check and release it.
+
+## 06 - The Installer and Its Finish Page
+
+One want: a program that installs itself and its helpers in one run and says what it did. The shared installer parts heard in DbDo's installer: boxes that say their state in one word, the results box, the summary, and the ten lines an app writes to get all of it. This walk assumes walk five.
+
+**Before you start:** A Homer program's installer is downloaded, and your reader is running.
+
+### Step 1
+
+The want: a program that installs itself and its helpers in one run, and tells you what it did. The kit's HomerComponents dot iss is the shared part of every Homer installer: the finish page, its boxes, their states, and the results. Here is DbDo's.
+
+### Step 2: Alt+R
+
+The installer is downloaded; Enter opens it, and Windows asks because it came from the internet. Alt plus R, Run; then Alt plus Y, Yes, for administrator rights, because a Homer program installs for everyone.
+
+Screen reader:
+
+- User Account Control dialog
+
+### Step 3: Enter
+
+The pages are a wizard: the folder, then Install. Enter presses the default button on each. The page that asks a decision is the last.
+
+Screen reader:
+
+- Setup, Finish page
+
+### Step 4: DownArrow
+
+The finish page lists the optional pieces as boxes. Arrow through them; each says its name, its state, and its size.
+
+Screen reader:
+
+- Update screen reader scripts checked, 1 of 6
+
+### Step 5
+
+The three words, from the kit. Install when the piece is not there. Update when it is there and a newer version is available -- the installer asked winget. Reinstall when it is there and current, unticked unless you want it. You never have to know what is on your machine; the box says.
+
+### Step 6: DownArrow
+
+Down Arrow to the player.
+
+Screen reader:
+
+- Install mpv checked, 2 of 6
+
+### Step 7: Space
+
+Ollama runs AI on your own computer. Its models are large, so it is unticked unless you tick it; Spacebar changes a box, and the answer is one word.
+
+Screen reader:
+
+- checked
+
+### Step 8: Enter
+
+Launch is ticked already. Enter presses Finish, and whatever was ticked installs now; a results box then says what was done, one line per piece.
+
+Screen reader:
+
+- DbDo Setup, screen reader scripts: updated. mpv: installed. Ollama: installed.
+
+### Step 9
+
+The same summary is saved in the logs folder under your local application data, and summarizeSetup, in the program folder, shows it again on any later day.
+
+### Step 10
+
+What the app's installer script writes, and what the kit writes. The app names its pieces in a table -- a name, a winget id, an executable to look for, what it is used for -- and the kit does the rest: the probing, the three states, the labels, the ordering, the results. Ten lines of the app's, for a page that behaves the same in every Homer program.
+
+### Step 11
+
+Screen reader scripts are a piece of their own: the kit knows where each reader keeps its settings or its add-ons, and the box reads Install, Update or Reinstall for them as for the rest.
+
+### Step 12
+
+A planned misstep. Run the installer a second time: every piece already present says so, and Install becomes Reinstall, unticked. Nothing is installed twice.
+
+### Step 13
+
+Removing a Homer program is Windows Settings, Apps; the pieces it installed are programs in their own right and stay for the other Homer programs, and your data folder stays unless you delete it.
+
+### Step 14
+
+What this walk taught. I say the idea or the key; the reader says the command or the name.
+
+### Step 15
+
+The one word that is the box's state.
+
+Screen reader:
+
+- Install, Update, or Reinstall
+
+### Step 16
+
+The shared installer parts.
+
+Screen reader:
+
+- HomerComponents dot iss
+
+**Something to try:** Run a Homer installer, arrow its finish page, and read the results box.
+
+## 07 - Spoken Tutorials
+
+One want: a spoken tutorial for your app, in two voices, without a microphone. The walk file and its four beats, the two voices and what they never do, the pattern of twelve, three to five minutes, the checker and its misstep, the tool that speaks and measures, and where the rules came from. This walk assumes walk five.
+
+**Before you start:** An app built on the kit, with its help folder open.
+
+### Step 1
+
+The want: a spoken tutorial for your app, in the two voices, without a microphone. A walk is a text file in help, Tutorial underscore, a number, a title with underscores, dot inix. The build speaks it.
+
+### Step 2
+
+The format has four beats per key. Say: the host says the key with the word it comes from. Key: the key pressed. Hear: what the reader says, word for word, as it would be spoken -- a file name as said, not as written. Say again: what that meant. Name silence when a key says nothing. Name no screen reader.
+
+### Step 3
+
+Two voices, because a program has two: the person, and the reader answering. The exchange is the teaching device, and it is used for more than keystrokes: a glossary is the host saying the term and the reader saying the meaning; a recap is the host saying the key and the reader saying the command. What the voices never do is chat.
+
+### Step 4
+
+The pattern of twelve, the same for every app. Zero, the overview and contents. One, install and launch. Two, the interface. Three, the key rules. Four to eight, up to five tasks, each built around a plain want. Nine, the glossary. Ten, the conclusion. Eleven, more information, always last.
+
+### Step 5
+
+Three to five minutes for parts one to ten: under three is too thin to repay the listener's start; over five loses them. A thin walk gets substance -- the adjacent thing the want needs, a planned misstep and its recovery -- never padding. The tool measures the audio and says what runs under or over.
+
+### Step 6: scripts\checkTutorial
+
+checkTutorial reads every walk before anything is spoken. It wants Intro and Setup, a Say in every step, Hear lines in words, no reader named, the first walk teaching the two reader keys, and the pattern's names and numbers; a set not yet the pattern is a notice, not a silence.
+
+Screen reader:
+
+- 12 scripts checked, 0 problems.
+
+### Step 7
+
+A planned misstep. Write a Hear line with a plus sign in it, or a file name as written, and the checker names the step.
+
+Screen reader:
+
+- Tutorial underscore 17, step 6: Hear writes an access key with a plus sign; the reader says the words
+
+### Step 8: scripts\buildTutorials -build
+
+buildTutorials speaks them. Two voices: Kokoro, with a narrator and a reader, both licensed to redistribute; Piper when Kokoro is not there. The reader's voice shifts by context -- a cursor line, a message, a menu -- so a message is heard as a message.
+
+Screen reader:
+
+- Creating 04 underscore Open underscore and underscore Move dot mp3, 23 steps. A few minutes.
+
+### Step 9
+
+The audio is named like a chapter -- 04 underscore Open underscore and underscore Move dot mp3 -- so a folder or a player shows the number and the title. A walk whose audio is older than its script is spoken again; the rest are kept.
+
+### Step 10
+
+At the end, the lengths, and the two lines that matter.
+
+Screen reader:
+
+- 04 underscore Open underscore and underscore Move dot mp3 runs 2 33
+- Wrote Tutorials dot m3u naming 12 tutorials, 27 minutes in all.
+
+### Step 11
+
+Under three minutes or over five, the tool says so by name, with the guideline in one line. Tutorials dot m3u is the playlist Play Tutorials uses; Tutorials dot md is the transcript, made from the same scripts; TutorialFeed dot xml is a podcast feed of the same audio.
+
+### Step 12
+
+Two kinds of listener. A walk is written for the person who will press the keys tomorrow; it is also what an AI assistant reads to learn the program, which is why the skills folder points at it.
+
+### Step 13
+
+The learning behind the rules came from ninety-eight recorded screen reader training sessions and from Quill Radio's tutorials: spell a lone letter with its alphabet word; one planned misstep per walk; close by naming the two or three keys taught; a concrete want before a feature. TutorialLearnings dot md in the kit's help has the rest.
+
+### Step 14
+
+What this walk taught. I say the idea or the key; the reader says the command or the name.
+
+### Step 15
+
+Reads every walk before anything is spoken.
+
+Screen reader:
+
+- checkTutorial
+
+### Step 16
+
+Speaks what is missing or stale and measures it.
+
+Screen reader:
+
+- buildTutorials
+
+### Step 17
+
+The playlist Play Tutorials uses.
+
+Screen reader:
+
+- Tutorials dot m3u
+
+**Something to try:** Write one task walk for your app, run checkTutorial, and let the build speak it.
+
+## 08 - Shared Code and the Homer Player
+
+One want: a feature written once and heard in every program. The Homer Player heard in FileDir and then in DbDo, the same window from the same class; the other shared classes and what each does for the listener; what sharing buys and the one rule it costs; a misstep from this week. This walk assumes walks two and four.
+
+**Before you start:** FileDir and DbDo are installed, with mpv.
+
+### Step 1: Control+Shift+L
+
+The want: a feature written once and heard in every program. The kit's shared code is where that happens, and the Homer Player is the plainest case. Here it is in FileDir, on a saved podcast page.
+
+Screen reader:
+
+- 4 tracks from Access On
+
+### Step 2
+
+The player opens on its track list, and the first track plays.
+
+Screen reader:
+
+- Access On, Track list: list box, Episode 212, 1 of 4
+
+### Step 3: Alt+Shift+P
+
+Now the same player in DbDo, on a radio station.
+
+Screen reader:
+
+- 1 track from stations
+- RadioTrail, Track list: list box, KIRO 710 ESPN Seattle, 1 of 1
+
+### Step 4
+
+Scroll Lock pauses and resumes; the Volume and Rate sliders are ordinary sliders; Alt plus Shift plus R records a copy of the stream; Escape closes it. Learned once in FileDir, known in DbDo, because MediaPlayer dot cs lives in the kit and both programs compile it from there.
+
+### Step 5
+
+The other classes work the same way, less visibly. Lbc builds every dialog you heard in walk two. Say speaks every message, choosing the channel of whichever screen reader is running, or the Windows voice when none is, and never speaking over a keystroke. Log writes the session log in one format for every program.
+
+### Step 6
+
+Inix reads the settings files -- the dot inix format, sections and lines, with the comments the kit's rules ask for, so a settings file is documentation too. Web fetches with the same user agent and the same patience. Util holds the small things: the pluralizer, the short path, the version string.
+
+### Step 7
+
+Mpv dot cs finds the player engine, machine-wide, and drives it: play, pause, record, the sliders. Media dot cs knows what a track is -- a file, a stream, an episode -- and what to say about one.
+
+### Step 8
+
+What sharing buys. A fix to the player on Monday is in every program's next build; a new Say channel for a new reader reaches all of them; and a person who learned the dialog in one program has learned it in the next. The cost is one rule: an app never copies a kit class into its own folder; it compiles against the kit.
+
+### Step 9
+
+A planned misstep, from this very week. A kit class had a line that depended on one app, and compiled in that app alone; the kit's check now compiles every shared class on its own, so the mistake is caught in the kit and not in the fifth app to try it.
+
+### Step 10
+
+The Python side has the same shape: a Say, a Log, an Inix, a dialog builder, so a Python app -- HomerScribe is one -- speaks and logs and asks exactly as the C sharp ones do. Walk one's two fruit baskets were the proof.
+
+### Step 11
+
+Updating the kit is unarchiving HomerDev dot zip over the folder and building; every app's build checks the kit's version against the one it needs, and says so in one line when the kit is too old.
+
+Screen reader:
+
+- ERROR: FileDir needs HomerDev 1.52.8 or later, and C colon backslash HomerDev is 1.52.6.
+
+### Step 12
+
+What this walk taught. I say the idea or the key; the reader says the command or the name.
+
+### Step 13
+
+The player every Homer program shares.
+
+Screen reader:
+
+- MediaPlayer dot cs
+
+### Step 14
+
+The dialog class.
+
+Screen reader:
+
+- Lbc
+
+### Step 15
+
+The speech class.
+
+Screen reader:
+
+- Say
+
+**Something to try:** Play something in FileDir and in DbDo, and notice the keys that are the same.
+
+## 09 - Glossary
+
+The words the kit uses, in alphabetical order. I say the term; the reader says what it means. Each is one line, for looking up or for listening straight through.
+
+**Before you start:** Nothing is needed.
+
+### Step 1
+
+accept dot inix.
+
+Screen reader:
+
+- An app's acceptance checks: a name and a command each, run by check and reported in the evidence.
+
+### Step 2
+
+access letter.
+
+Screen reader:
+
+- The underlined letter in a caption, from the first letter of a word, one per dialog or menu; the check counts them.
+
+### Step 3
+
+app.
+
+Screen reader:
+
+- A program built on the kit: DbDo, EdSharp, FileDir, HomerScribe, and any made with newHomerApp.
+
+### Step 4
+
+build.
+
+Screen reader:
+
+- The command that puts an app's files in order, speaks its tutorials, compiles it and makes its installer, logging every stage.
+
+### Step 5
+
+Camel Type.
+
+Screen reader:
+
+- The coding style the kit's skill teaches: a prefix on every name saying its type, lower camel case, constants with c underscore.
+
+### Step 6
+
+check.
+
+Screen reader:
+
+- The command that refuses what release would refuse: encoding, access letters, keys, the Local tree, hotkeys, tutorials, acceptance.
+
+### Step 7
+
+evidence.
+
+Screen reader:
+
+- The Markdown report check writes, saying what was checked and what it found.
+
+### Step 8
+
+finish page.
+
+Screen reader:
+
+- The installer's last page: optional pieces as boxes, each saying Install, Update or Reinstall, with a results box after.
+
+### Step 9
+
+fixEncoding.
+
+Screen reader:
+
+- The script that puts every file in the Homer encoding: UTF-8 with a byte order mark, CRLF line endings.
+
+### Step 10
+
+Homer encoding.
+
+Screen reader:
+
+- UTF-8 with a byte order mark and CRLF line endings, for every text file the kit or an app ships.
+
+### Step 11
+
+Homer Player.
+
+Screen reader:
+
+- The player shared by every Homer program: a track list, Scroll Lock to pause, sliders, Alt plus Shift plus R to record.
+
+### Step 12
+
+HomerComponents dot iss.
+
+Screen reader:
+
+- The shared installer script: the finish page, the three states, the results box, from a ten-line table in the app.
+
+### Step 13
+
+hotkeys.
+
+Screen reader:
+
+- Every command with its key, listed three ways -- by menu, by key, by command -- generated from the program itself.
+
+### Step 14
+
+inix.
+
+Screen reader:
+
+- The settings file format: sections and lines, read by the Inix class, with comments that make the file its own documentation.
+
+### Step 15
+
+Lbc.
+
+Screen reader:
+
+- Label before control: the class that builds every Homer dialog, with Tab, Alt letters, Control plus Enter and Escape.
+
+### Step 16
+
+Local tree.
+
+Screen reader:
+
+- Where an app keeps its data, settings and logs: under local application data, never Roaming.
+
+### Step 17
+
+LocalFiles.
+
+Screen reader:
+
+- The policy file naming the files that stay on the author's machine and never travel to the repository.
+
+### Step 18
+
+newHomerApp.
+
+Screen reader:
+
+- The command that makes a new app from the template: its folder, its files, its twelve tutorial skeletons.
+
+### Step 19
+
+pattern of twelve.
+
+Screen reader:
+
+- The walks every app has: overview, install, interface, keys, up to five tasks, glossary, conclusion, more information.
 
 ### Step 20
 
-That is the claim this kit makes, and you have just heard it tested. Two languages, one behaviour, because the behaviour lives in the components rather than in either program.
-
-Both source files carry twelve markers -- BLOCK 1 to BLOCK 12 -- with the same numbers, the same titles and the same function names, so they can be read side by side in two windows.
-
-### Step 21
-
-One last thing. Look in your local application data folder, under FruitBasketCs, then logs.
+release.
 
 Screen reader:
 
-- FruitBasketCs dash 2026 09 18 dash 1 3 0 5 2 2 dot log
+- The command that checks, commits, pushes, tags and publishes the installer on GitHub, refusing when it should.
 
-One log per session, named for when the session began, holding the environment, every setting and every error with its stack. Every Homer program writes one, from the same class, in the same place. So does every installer.
+### Step 21
+
+RepoFiles.
+
+Screen reader:
+
+- The policy file naming the files that travel to the repository, so a stray one is noticed.
 
 ### Step 22
 
-That is HomerDev. The guide, HomerDev dot md, has the rest: the Lbc dialogs, the inix settings format, the coding style, the release scripts, and a part on AI-assisted coding which is what the kit is really for. Thank you for listening.
+Say layer.
 
-Questions and corrections are welcome. The kit is early, and it improves by being used.
+Screen reader:
 
-**Something to try:** Build the Python fruit basket the same way, and notice that it answers every key exactly as the C sharp one did.
+- The question keys: Shift or Alt with a letter, speaking a fact and changing nothing; twice, the words in a window.
+
+### Step 23
+
+session log.
+
+Screen reader:
+
+- What a program did this session, one file per run, under its logs folder in the Local tree.
+
+### Step 24
+
+skill.
+
+Screen reader:
+
+- A folder of instructions an AI assistant reads to learn the kit's rules: coding, tutorials, installers, documents.
+
+### Step 25
+
+template.
+
+Screen reader:
+
+- A database or document an app ships and copies to the data folder the first time it is opened; the copy is the person's.
+
+### Step 26
+
+walk.
+
+Screen reader:
+
+- One spoken tutorial: a text file of steps in four beats, spoken by the build in two voices.
+
+### Step 27
+
+Twenty-six terms. The guide, HomerDev dot md, has each of them in context.
+
+**Something to try:** Pick five terms you did not know and find each one in the kit or an app.
+
+## 10 - Conclusion
+
+What to carry away from the walks: four things with their names, one thing kept from each task walk, three habits, and where to begin.
+
+**Before you start:** Nothing is needed.
+
+### Step 1
+
+Four things to carry away, each with a name. Every decision that makes a program pleasant to use without sight was made once and put in a class; an app inherits it.
+
+Screen reader:
+
+- Lbc, Say, Log, Inix, Web, Util
+
+### Step 2
+
+The keys follow rules, so a key in a program you have never opened can be guessed; the word gives the letter.
+
+Screen reader:
+
+- Control plus K, Keywords, in every program that searches
+
+### Step 3
+
+Three commands take a change from the morning to a published installer by lunch, and each refuses when it should.
+
+Screen reader:
+
+- build, check, release
+
+### Step 4
+
+And a program teaches itself: twelve walks in two voices, spoken by the build, three to five minutes each.
+
+Screen reader:
+
+- Play Tutorials
+
+### Step 5
+
+One thing kept from each task walk. Walk four: newHomerApp gives you a working program before you have written a line, so every change is made against something that runs.
+
+### Step 6
+
+Walk five: the console says one line; the log says everything. When something is wrong, send the log.
+
+### Step 7
+
+Walk six: the finish page's three words -- Install, Update, Reinstall -- are the state of the machine, read for you; you never have to know what is installed.
+
+### Step 8
+
+Walk seven: a walk is built around a want, not a feature; the checker reads it before anyone hears it; the tool measures it.
+
+### Step 9
+
+Walk eight: an app never copies a kit class into its own folder; it compiles against the kit, so a fix on Monday is in every program by Tuesday.
+
+### Step 10
+
+Three habits. Read the kit's history when you unarchive a new one: it says what changed and why. Run check before release, so the refusal comes in seconds. And write the walk for a feature the day you finish the feature, while you still know what the person wants from it.
+
+### Step 11
+
+Where to begin. Make an app with newHomerApp and build it, before you decide what it is for; the running program will suggest what it should become. Then a field, a command, a key named for its word, a template, a walk.
+
+### Step 12
+
+The kit is also for an AI assistant. Point it at the skills folder and it writes in Camel Type, builds the dialogs with Lbc, names the keys by the rules and writes the walks in the pattern -- which is how the apps these walks quote were built.
+
+### Step 13
+
+If something goes wrong in the kit, the kit's own logs folder has the build and check logs; the project page on GitHub is where to send one, with a line about what you were doing.
+
+**Something to try:** Make an app with newHomerApp, build it, and write its first task walk.
+
+## 11 - More Information
+
+Where the rest is: the guide, the guideline documents, the history, the skills, the GitHub page, and the apps built on the kit.
+
+**Before you start:** Nothing is needed.
+
+### Step 1
+
+The guide, HomerDev dot md in the kit's help folder, is the whole kit in one document: the classes, the dialog builder, the inix format, the coding style, the scripts, the installer parts, and a part on AI-assisted coding. Each document is also a web page of the same name.
+
+### Step 2
+
+Tutorials dot md is the guideline for walks, with the pattern of twelve, the two voices and the three-to-five rule; TutorialLearnings dot md is what ninety-eight training sessions and Quill Radio taught; FinishPage dot md is the installer's shared page; Logging dot md is the logging rule.
+
+### Step 3
+
+History dot md says what changed in every kit version and why, newest first, and is the first thing to read when a new HomerDev dot zip arrives.
+
+### Step 4
+
+The skills folder holds the instructions an AI assistant reads: Camel Type, the Homer tutorial skill, installers, documents, and more. A chat that has read them builds the way the kit expects.
+
+### Step 5
+
+The kit is at github dot com, slash JamalMazrui, slash HomerDev; its releases are source archives, one per version. The apps built on it are beside it on the same account: DbDo, EdSharp, FileDir, HomerScribe, each with its own installer and its own twelve walks.
+
+### Step 6
+
+The Homer Tools are free programs for working by ear: EdSharp for text, FileDir for files, DbDo for data, HomerScribe for describing video. They share their keys, their dialogs and their player, so learning one is most of learning the next -- which is the kit's purpose, heard.
+
+**Something to try:** Open HomerDev dot md and read the part on the Lbc dialog.
 
 <!-- walkthrough ends -->
 
