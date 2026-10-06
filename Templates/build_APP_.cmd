@@ -427,8 +427,18 @@ if exist "scripts\fixEncoding.cmd" (
 
 rem ---- spoken tutorials, when the app has any ---------------------------
 if exist "help\Tutorial_*.inix" (
+  rem THE AUDIO IS NAMED LIKE A CHAPTER: Tutorial_04_X.inix speaks to 04_X.mp3.
+  rem A walk with no audio, or audio older than the walk, calls the tool, which
+  rem speaks only what is missing or stale; the old names, with the word
+  rem Tutorial, are retired with the audio that carried them.
+  if exist "help\tutorials\Tutorial_*.mp3" del /q "help\tutorials\Tutorial_*.mp3"
   set "tutorialsMissing="
-  for %%F in (help\Tutorial_*.inix) do if not exist "help\tutorials\%%~nF.mp3" set "tutorialsMissing=1"
+  for %%F in (help\Tutorial_*.inix) do (
+    set "sChapter=%%~nF"
+    set "sChapter=!sChapter:Tutorial_=!"
+    if not exist "help\tutorials\!sChapter!.mp3" set "tutorialsMissing=1"
+    if exist "help\tutorials\!sChapter!.mp3" for /f %%N in ('powershell -NoProfile -Command "if ((Get-Item -LiteralPath '%%F').LastWriteTimeUtc -gt (Get-Item -LiteralPath 'help\tutorials\!sChapter!.mp3').LastWriteTimeUtc) { 1 } else { 0 }"') do if "%%N"=="1" set "tutorialsMissing=1"
+  )
   if defined tutorialsMissing (
     if exist "scripts\buildTutorials.cmd" (
       echo Speaking the tutorials that have no audio yet

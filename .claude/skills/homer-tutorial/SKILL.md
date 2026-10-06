@@ -8,9 +8,56 @@ description: Writes, checks and builds the spoken walkthroughs of a Homer Tools 
 A Homer tutorial is a dialogue: a person doing a real job in the app, and a
 screen reader answering exactly as a reader does. Each script is a
 `help\Tutorial_NN_Name.inix` file; `scripts\buildTutorials` speaks it into
-`help\tutorials\Tutorial_NN_Name.mp3` with two voices and writes the text into
+`help\tutorials\NN_Name.mp3` -- the number and the title, without the word Tutorial -- with two voices and writes the text into
 `help\Tutorials.md`. The reader's lines are the whole value: they must be
 what the listener will hear on their own machine.
+
+## The set: twelve walks, under an hour and a quarter
+
+Every app's walks follow one pattern, so a listener who knows one app's knows
+where to look in another's:
+
+- **00_Overview_and_Table_of_Contents** -- a paragraph of prose on what the
+  app is; the two reader keys, Insert plus Up Arrow to repeat a line and
+  Insert plus Tab to say where you are; then the table of contents as its
+  own clean list, one step per walk, the host saying the number and title
+  and the reader saying what it covers. Prose first, then the list; never
+  the two mixed.
+- **01_Install_and_Launch**
+- **02_User_Interface_Concepts** -- what the app is made of, and where help
+  is: F1 the guide, Shift plus F1 the history, Alt plus F1 the version, the
+  Help menu with Play Tutorials, and the menus themselves, which say every
+  key.
+- **03_Key_Patterns** -- the rules every key follows, and the keys that
+  explain the keys: Control plus F1 the Key Describer, Hotkeys in the Help
+  menu, F1, and the reader's Insert plus Tab.
+- **04 to 08, the tasks** -- at least one, at most five, numbered from 04
+  with no gap. Each is built around a plain want, said first -- the station
+  carrying the home team; jazz from anywhere; jazz near home -- and the
+  features appear as the way to it.
+- **09_Glossary** -- the app's words, alphabetical, one step per term: the
+  host says the term, the reader says the meaning.
+- **10_Conclusion** -- four sentences to carry away, and where to begin.
+- **11_More_Information** -- always last.
+
+**Five minutes is the ceiling for one walk.** At the voices' pace that is
+about twenty-five steps; a walk that would run longer is cut or split, never
+hurried. Twelve walks under five minutes each is "about an hour", which is
+what the ReadMe can promise. The glossary and the summaries are short.
+
+**Later walks lean on earlier ones.** The set is a course, not a reference:
+each walk says in its Intro which walks it assumes, and a thing taught
+earlier is named, not retaught -- "Control plus F, which you know from walk
+six".
+
+**Two voices, never a chat.** The exchange is the teaching device: a recap
+is the host saying the key and the reader saying the command; a glossary
+entry is the term and its meaning; a key rule is the rule and an instance.
+No greeting, no banter, no comment by one voice on the other; a turn of
+phrase only where it helps a line stick.
+
+`checkTutorial` enforces the seven fixed names, the task numbering, the
+step ceiling, and the first walk's two reader keys.
 
 ## The format
 

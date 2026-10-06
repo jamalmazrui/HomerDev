@@ -765,7 +765,43 @@ is always last.
 - **11_More_Information** -- the guide and history from inside the program,
   the documents, the project page, updates, and the other Homer Tools.
 
-`checkTutorial` requires the seven fixed names and the task numbering.
+**Five minutes is the ceiling for one walk.** At the voices' pace that is
+about twenty-five steps. A walk that would run longer is cut -- a thing
+taught in an earlier walk is named rather than shown again -- or split into
+two tasks while the slots last; it is never hurried. Twelve walks under five
+minutes is "about an hour", which the ReadMe can promise. The glossary and
+the summaries are short by nature.
+
+**Walk 00 has a shape.** Prose first: a paragraph on what the program is.
+Then the two reader keys. Then the table of contents as its own clean list,
+one step per walk, the host saying the number and the title and the reader
+saying what the walk covers. The two never mix: a contents list that wanders
+into explanation has lost its listener.
+
+**Help is taught twice.** Walk 02 says where help is -- F1 the guide, Shift
+plus F1 the history, Alt plus F1 the version, the Help menu with Play
+Tutorials, and the menus themselves, which say every key. Walk 03 names the
+keys that explain the keys: Control plus F1, the Key Describer; Hotkeys in
+the Help menu; and the reader's own Insert plus Tab.
+
+`checkTutorial` requires the seven fixed names, the task numbering, and the
+step ceiling.
+
+## Tasks are wants, and later walks lean on earlier ones
+
+A task walk is built around a thing a person would actually want, stated
+first and in plain words -- the station carrying the home team, jazz from
+anywhere, jazz near home, a job to record, a book to find again -- and the
+program's features are shown as the way to get it. Not "the Filter Records
+dialog", but "jazz, from anywhere", and the filter appears because the want
+needs it. A listener remembers the want and finds the feature attached to it.
+
+The walks are a course, not a reference. Each assumes the ones before it and
+says so in its Intro -- "this walk assumes walks four to six" -- and a thing
+taught earlier is named, not retaught: "Control plus F, which you know from
+walk six", "the same way as in walk four". A first walk explains a key; a
+later walk says it and moves on. Anyone who needs the explanation has the
+earlier walk, and the guide.
 
 ## Two voices, and what they are for
 

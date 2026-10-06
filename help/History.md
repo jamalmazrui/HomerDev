@@ -141,6 +141,29 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.52.4 -- 5 October 2026
+
+**The build template speaks walks by chapter name.** Its tutorial gate looks
+for 04_X.mp3 beside Tutorial_04_X.inix, retires audio under the old names, and
+calls the tool when a walk's audio is missing or older than the walk; the tool
+speaks only those. Every app's build takes this through updateAppBuilds.
+
+## 1.52.3 -- 5 October 2026
+
+**Five minutes a walk, and walk 00 has a shape.** A walk is under five
+minutes -- about twenty-five steps -- and checkTutorial sends back one plainly
+over; twelve such walks are "about an hour". Walk 00 is prose, then the two
+reader keys, then the table of contents as a clean two-voice list. Walks 02
+and 03 say where help is and name the keys that explain the keys. All of it
+is in Tutorials.md and in the homer-tutorial skill.
+
+## 1.52.2 -- 5 October 2026
+
+**Tasks are wants, and later walks lean on earlier ones**: a task walk
+states a plain want first and shows the features as the way to it; each walk
+assumes those before it and names rather than reteaches what they taught.
+Tutorials.md has the rule.
+
 ## 1.52.1 -- 5 October 2026
 
 **Twelve walks, with a glossary.** 09 Glossary joins the pattern, after the
