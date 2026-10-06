@@ -141,6 +141,16 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.52.5 -- 6 October 2026
+
+**buildTutorials measures, retires and re-speaks on its own.** Each walk's
+length is read with ffprobe, written into Tutorials.m3u, named in the log and
+summed aloud; a walk over five minutes is called out. Audio under the old names
+is retired by the tool, so no app's build has to know the naming changed. And a
+walk whose audio is older than the walk is spoken again -- the tool had kept any
+file that existed, so a changed walk kept its old voice until the folder was
+deleted by hand.
+
 ## 1.52.4 -- 5 October 2026
 
 **The build template speaks walks by chapter name.** Its tutorial gate looks
