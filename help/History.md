@@ -141,6 +141,15 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.52.8 -- 6 October 2026
+
+**HomerComponents.iss supplies the screen reader wrappers** -- isInstallJaws,
+isUpdateJaws, isReinstallJaws, labelJaws, and the same four for NVDA -- that an
+app's [Components] lines call. An app that defines its own writes
+`#define HomerReaderWrappersInApp` before the include. FileDir's installer
+failed on 6 October because a kit without these had been laid over one that
+had them.
+
 ## 1.52.7 -- 6 October 2026
 
 **Three to five minutes a walk.** Parts 01 to 10 are to run between three and

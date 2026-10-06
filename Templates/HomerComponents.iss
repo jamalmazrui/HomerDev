@@ -661,3 +661,23 @@ begin
     else Result := 'The ' + sUse + ' model ' + sModel + ' was not installed. Its log says why.';
   end;
 end;
+
+//  ---- the screen reader wrappers the [Components] lines call ------------
+//  An app's [Components] checks name isInstallJaws, isUpdateJaws and so on,
+//  and Inno wants each as a function of its own. They are the same three
+//  lines for every app, so the kit supplies them; an app that writes its
+//  own -- DbDo did, before the kit had these -- says so with
+//  #define HomerReaderWrappersInApp before the include, and these stay out,
+//  since Inno refuses a function defined twice. FileDir's build failed on
+//  6 October 2026 because a kit without these was laid over one that had
+//  them; the kit carries them from now on.
+#ifndef HomerReaderWrappersInApp
+function labelJaws(sParam: String): String;  begin Result := homerReaderLabel('jaws'); end;
+function isInstallJaws(): Boolean;           begin Result := homerReaderIs('jaws', 0); end;
+function isUpdateJaws(): Boolean;            begin Result := homerReaderIs('jaws', 1); end;
+function isReinstallJaws(): Boolean;         begin Result := homerReaderIs('jaws', 2); end;
+function labelNvda(sParam: String): String;  begin Result := homerReaderLabel('nvda'); end;
+function isInstallNvda(): Boolean;           begin Result := homerReaderIs('nvda', 0); end;
+function isUpdateNvda(): Boolean;            begin Result := homerReaderIs('nvda', 1); end;
+function isReinstallNvda(): Boolean;         begin Result := homerReaderIs('nvda', 2); end;
+#endif
