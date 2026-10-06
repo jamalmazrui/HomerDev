@@ -530,7 +530,7 @@ This is a first look at HomerDev: what it is, how to install it, and how to buil
 
 ### Step 1
 
-HomerDev is a kit of parts for building Windows programs that work well by keyboard and screen reader. Nine C sharp classes, seven Python modules, the build and release scripts, and two sample programs that do the same job in both languages. It is free and open source. If you miss a line the reader says, Insert plus Up Arrow says it again.
+HomerDev is a kit of parts for building Windows programs that work well by keyboard and screen reader. Nine C sharp classes, seven Python modules, the build and release scripts, and two sample programs that do the same job in both languages. It is free and open source. If you miss a line the reader says, Insert plus Up Arrow says it again; if you lose your place, Insert plus Tab says where you are.
 
 The kit is at https://github.com/JamalMazrui/HomerDev
 

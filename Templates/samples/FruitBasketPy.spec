@@ -1,9 +1,9 @@
-﻿# -*- mode: python ; coding: utf-8 -*-
+# -*- mode: python ; coding: utf-8 -*-
 
 
 a = Analysis(
     ['FruitBasketPy.py'],
-    pathex=['c:/HomerDev/exec/Python'],
+    pathex=['C:/HomerDev/exec/Python'],
     binaries=[],
     datas=[],
     hiddenimports=['inix', 'lbc', 'log', 'paths', 'say', 'util', 'web'],
