@@ -141,6 +141,15 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.52.6 -- 6 October 2026
+
+**An incomplete set is a notice, not a silence.** checkTutorial reports the
+twelve-walk pattern's gaps, and a first walk without the orientation key, as
+notices: the clean walks are spoken and the program releases, and every build
+says what the set still lacks. A problem is something wrong inside a walk; work
+not yet done is not a reason to leave a program with no audio, which is what
+EdSharp and FileDir had on 6 October.
+
 ## 1.52.5 -- 6 October 2026
 
 **buildTutorials measures, retires and re-speaks on its own.** Each walk's
