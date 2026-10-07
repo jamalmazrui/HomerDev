@@ -223,12 +223,14 @@ echo Built %app%.exe version !ver!
 
 rem ---- documentation ---------------------------------------------------
 if not defined useDocs goto :docsDone
-where pandoc >nul 2>&1
-if errorlevel 1 (
+rem The newest Pandoc on the machine, not merely the first on the PATH (kit 1.56.0).
+set "pandoc="
+for /f "usebackq delims=" %%p in (`powershell -NoProfile -ExecutionPolicy Bypass -File "!homerDev!\scripts\newest.ps1" pandoc -Log "%log%"`) do set "pandoc=%%p"
+if not defined pandoc (
   echo Pandoc was not found, so the .htm files were not rebuilt.>> "%log%"
 ) else (
   for %%m in (*.md) do (
-    pandoc -f markdown -t html5 --standalone --metadata title="%%~nm" -o "%%~nm.htm" "%%m" >> "%log%" 2>&1
+    "!pandoc!" -f markdown -t html5 --standalone --metadata title="%%~nm" -o "%%~nm.htm" "%%m" >> "%log%" 2>&1
     if errorlevel 1 echo WARN: pandoc failed on %%m>> "%log%"
   )
   echo Documentation converted with pandoc.>> "%log%"

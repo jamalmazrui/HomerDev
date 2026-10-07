@@ -34,12 +34,13 @@ c_lsExpected = [
     "exec/CSharp/Log.cs", "exec/CSharp/Mdi.cs", "exec/CSharp/Media.cs", "exec/CSharp/MediaPlayer.cs", "exec/CSharp/Mpv.cs", "exec/CSharp/Paths.cs",
     "exec/CSharp/PdfRead.cs", "exec/CSharp/Say.cs", "exec/CSharp/Util.cs", "exec/CSharp/Web.cs",
     "exec/CSharp/inixVert.cs",
-    "exec/Python/inix.py", "exec/Python/lbc.py", "exec/Python/lbcnet.py", "exec/Python/log.py",
+    "exec/Python/inix.py", "exec/Python/lbc.py", "exec/Python/lbcnet.py", "exec/Python/log.py", "exec/Python/media.py",
     "exec/Python/mdi.py", "exec/Python/elevate.py", "exec/Python/paths.py", "exec/Python/say.py", "exec/Python/util.py", "exec/Python/web.py",
     "Templates/build_APP_.cmd", "Templates/build_APP_Py.cmd",
     "Templates/_APP__setup.iss", "Templates/_APP_.cs",
     "Templates/installModels.cmd",
     "scripts/installOllama.cmd", "scripts/installScreenReaderSupport.cmd", "scripts/finish.cmd",
+    "scripts/newest.cmd", "scripts/newest.ps1",
     "Templates/HomerComponents.iss", "scripts/installCommon.cmd",
     "Templates/create_APP_Repo.cmd", "Templates/create_APP_Repo.ps1",
     "Templates/accept.inix", "Templates/gitignore.txt", "Templates/version.txt",
@@ -420,20 +421,32 @@ def runCommand(lsArgs):
 
 
 def findPandoc():
-    """The path to pandoc, fetching it with winget if it is not there yet."""
-    iCode, sOut = runCommand(["pandoc", "--version"])
-    if iCode == 0: return "pandoc"
-    if os.name != "nt":
-        logLine("No pandoc and no winget (not Windows), so no conversion.")
-        return ""
-    sayLine("Pandoc is not here yet. Fetching it.")
-    runCommand(["winget", "install", "--id", "JohnMacFarlane.Pandoc",
-                "--architecture", "x64", "--scope", "machine",
-                "--accept-source-agreements", "--accept-package-agreements",
-                "--silent"])
-    iCode, sOut = runCommand(["pandoc", "--version"])
-    if iCode == 0: return "pandoc"
-    logLine("Pandoc is still not on the PATH after the install attempt.")
+    """The path to the newest Pandoc on the machine, fetching it with winget if there is none.
+
+    NOT THE FIRST ON THE PATH (1.56.0). An old C:\\bin\\pandoc.exe, version
+    2.19.2, hid a current Pandoc in Program Files on the author's machine. The
+    kit's exec\\Python\\media.py runs every copy it can find and returns the
+    newest, as Media.cs's exifToolProgram does, and its search goes to the log.
+    """
+    sPython = os.path.join(sScriptDir, "exec", "Python")
+    if sPython not in sys.path: sys.path.insert(0, sPython)
+    import media
+    for iTry in range(2):
+        sPandoc = media.pandocProgram()
+        for sLine in media.searchLog().splitlines(): logLine(sLine)
+        if sPandoc:
+            if media.shadowNote(): sayLine(media.shadowNote())
+            return sPandoc
+        if iTry == 1: break
+        if os.name != "nt":
+            logLine("No pandoc and no winget (not Windows), so no conversion.")
+            return ""
+        sayLine("Pandoc is not here yet. Fetching it.")
+        runCommand(["winget", "install", "--id", "JohnMacFarlane.Pandoc",
+                    "--architecture", "x64", "--scope", "machine",
+                    "--accept-source-agreements", "--accept-package-agreements",
+                    "--silent"])
+    logLine("Pandoc is still not found after the install attempt.")
     return ""
 
 

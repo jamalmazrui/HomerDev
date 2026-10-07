@@ -297,6 +297,20 @@ leaves a manual fetch step. Two hard-won particulars:
 - **The tutorial voices are fetched only by the kit's build** into
   `C:\HomerDev\exec`. An app's build never downloads them; if they are
   absent, the tutorial tool says "Run buildHomerDev" and speaks nothing.
+- **One .inix reader in each language** (1.57.0). A Python app that
+  wrote settings with the old brace form still reads them; the next write
+  uses a backtick fence. A script with its own .inix reader, such as the
+  book projects' kdpSubmit and kdpBooks, should call the kit's inix.py
+  instead, since the old leading-space escape for a line that looked like a
+  name is gone: such a value belongs in a backtick fence.
+- **Use the newest copy of a shared tool, not the first on the PATH**
+  (1.56.0). An old `C:\bin\pandoc.exe` hid a current Pandoc in Program
+  Files. A Python script asks `media.newestInstalled` (or
+  `media.pandocProgram`) from `exec\Python\media.py`; a cmd build reads
+  the chosen path from the kit's `scripts\newest.ps1` with `for /f`, as the
+  two build templates now do. An app's own build script is its own copy, so
+  when bringing an app up to the kit, replace its `where pandoc` lines with
+  the template's block.
 
 ### 10. Logs, console and encoding
 

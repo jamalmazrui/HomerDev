@@ -337,15 +337,17 @@ for %%F in (!retiredTools!) do (
 
 rem ---- documents ----------------------------------------------------------
 if not defined useDocs goto :docsDone
+rem THE NEWEST PANDOC, NOT THE FIRST ON THE PATH (kit 1.56.0). An old copy early
+rem on the PATH, such as C:\bin\pandoc.exe, used to hide a current one in
+rem Program Files. The kit's newest.ps1 runs every copy it can find and prints
+rem the newest; the search, every copy with its version, goes to this log.
 set "pandoc="
-for /f "delims=" %%p in ('where pandoc 2^>nul') do if not defined pandoc set "pandoc=%%p"
-if not defined pandoc if exist "%ProgramFiles%\Pandoc\pandoc.exe" set "pandoc=%ProgramFiles%\Pandoc\pandoc.exe"
-if not defined pandoc if exist "%LOCALAPPDATA%\Pandoc\pandoc.exe" set "pandoc=%LOCALAPPDATA%\Pandoc\pandoc.exe"
+for /f "usebackq delims=" %%p in (`powershell -NoProfile -ExecutionPolicy Bypass -File "!homerDev!\scripts\newest.ps1" pandoc -Log "%log%"`) do set "pandoc=%%p"
 if not defined pandoc (
   echo Installing pandoc, which writes the .htm copy of each document
   winget install --id JohnMacFarlane.Pandoc --scope machine --silent --accept-source-agreements --accept-package-agreements >> "%log%" 2>&1
   >> "%log%" echo Ran: winget install JohnMacFarlane.Pandoc, exit code !errorlevel!
-  if exist "%ProgramFiles%\Pandoc\pandoc.exe" set "pandoc=%ProgramFiles%\Pandoc\pandoc.exe"
+  for /f "usebackq delims=" %%p in (`powershell -NoProfile -ExecutionPolicy Bypass -File "!homerDev!\scripts\newest.ps1" pandoc -Log "%log%"`) do set "pandoc=%%p"
 )
 if not defined pandoc (
   echo Pandoc could not be installed, so no .htm was rebuilt.

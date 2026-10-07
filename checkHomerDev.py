@@ -258,14 +258,26 @@ def buildSample(sName, sScript, sExe):
 def checkEnvironment():
     """What the build actually ran with, recorded rather than assumed."""
     lsFound = []
-    for sName, lsArgs in [("python", [sys.executable, "--version"]),
-                          ("pandoc", ["pandoc", "--version"])]:
-        try:
-            oResult = subprocess.run(lsArgs, capture_output=True, text=True, timeout=60)
-            sFirst = (oResult.stdout or oResult.stderr or "").splitlines()
-            lsFound.append("%s %s" % (sName, sFirst[0].strip() if sFirst else "(no version)"))
-        except Exception:
-            lsFound.append("%s not found" % sName)
+    try:
+        oResult = subprocess.run([sys.executable, "--version"], capture_output=True, text=True, timeout=60)
+        sFirst = (oResult.stdout or oResult.stderr or "").splitlines()
+        lsFound.append("python %s" % (sFirst[0].strip() if sFirst else "(no version)"))
+    except Exception:
+        lsFound.append("python not found")
+    # PANDOC AS A BUILD WILL CHOOSE IT (1.56.0): the newest copy anywhere, from
+    # exec\Python\media.py, not merely the first on the PATH. Every copy and its
+    # version go to the log, and an older copy ahead of it on the PATH is named,
+    # since other programs that run pandoc by name still get that one.
+    try:
+        sPython = os.path.join(os.path.dirname(os.path.abspath(__file__)), "exec", "Python")
+        if sPython not in sys.path: sys.path.insert(0, sPython)
+        import media
+        sPandoc = media.pandocProgram()
+        for sLine in media.searchLog().splitlines(): logLine(sLine)
+        lsFound.append("pandoc %s at %s" % (media.dLast.get("version", ""), sPandoc) if sPandoc else "pandoc not found")
+        if media.shadowNote(): lsFound.append(media.shadowNote())
+    except Exception as oError:
+        lsFound.append("pandoc not checked: %s" % oError)
     logLine("ENVIRONMENT: " + "; ".join(lsFound))
     return finding("environment", "pass", "; ".join(lsFound))
 

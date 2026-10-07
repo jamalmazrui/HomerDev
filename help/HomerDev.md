@@ -639,7 +639,7 @@ than guessed at. Folders are in the order you meet them.
 ### homer -- the same toolbox in Python
 
 - **__init__.py** -- the package
-- **elevate.py, inix.py, lbc.py, log.py, mdi.py, paths.py, say.py, util.py, web.py** -- the Python counterparts of Elevate, Inix, Lbc, Log, Mdi, Paths, Say, Util and Web, with the same names and the same behaviour. lbc and mdi use wx; a program whose windows are WinForms through pythonnet uses the others and keeps its own dialog code.
+- **elevate.py, inix.py, lbc.py, log.py, mdi.py, media.py, paths.py, say.py, util.py, web.py** -- the Python counterparts of Elevate, Inix, Lbc, Log, Mdi, Media, Paths, Say, Util and Web, with the same names and the same behaviour. media.py ports only Media's finding half, and adds newestInstalled, which runs every copy of a tool and chooses the newest, for any script where a version matters (1.56.0). lbc and mdi use wx; a program whose windows are WinForms through pythonnet uses the others and keeps its own dialog code.
 
 ### Templates\samples
 

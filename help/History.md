@@ -141,6 +141,58 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.57.0 -- 7 October 2026
+
+**One .inix format, read the same way in C# and Python.** A value that spans
+lines is written in one of three ways: plain, with nothing after the equals
+sign, for a value with no equals sign in it; between a backtick fence, for a
+value with an equals sign or whenever a writer wants the reliable form; or
+between triple quotes, for the rare value with a backtick. A name line is
+trimmed, so spaces around the equals sign mean nothing.
+
+- exec\Python\inix.py now reads exactly as Inix.cs does: plain values end
+  at the next name or section line, by the same test; [;Name] comments out a
+  section and [] makes Record1, Record2; quotes around a one-line value are
+  stripped once. Its writer chooses the fence as Inix.cs does. Comments,
+  blank lines and order still survive a round trip. The brace form it wrote
+  before is still read, never written; readInix, writeInix and inixList now
+  sit on the same reader.
+- Inix.cs keeps a fenced value verbatim (it had dropped a blank last line),
+  drops only the blank layout lines after a plain value, and writes a value
+  containing a backtick between triple quotes, in writeValue as well as
+  writeAsConfig.
+- help\Inix.md describes the three forms, and BookPattern.md gives KDP's
+  current definitions of AI-generated and AI-assisted with model wording for
+  a book's copyright page.
+
+## 1.56.0 -- 7 October 2026
+
+**The newest Pandoc, not the first one on the PATH.** Every Python and cmd script
+in the kit found Pandoc by taking the first copy on the PATH. On the author's
+machine that was C:\bin\pandoc.exe, version 2.19.2, ahead of a current Pandoc
+in Program Files, so MyBooks' book build asked winget to upgrade, winget
+truthfully said the installed copy was current, and the build gave up. Media.cs
+had met the same folder with mpv and already searched the official folders
+before the PATH; that rule had simply never reached Python or the cmd builds.
+
+- New exec\Python\media.py, the finding half of Media.cs in Python: findTool,
+  findInstalled and the same table of official folders, plus newestInstalled,
+  which runs every copy it finds and chooses the newest at or above an optional
+  minimum version, as exifToolProgram does. pandocProgram and javaProgram are
+  the common cases, and shadowNote says when an older copy is first on the PATH.
+- New scripts\newest.ps1, with newest.cmd, the same search for cmd builds that
+  do not require Python. It prints only the chosen path, for for /f, and puts
+  every copy and its version in the log.
+- exec\Python\inix.py gains readInix, writeInix and inixList, the reader of
+  the multi-line block form that help\Inix.md documents and every KDP answers
+  file uses, ported with their names from kdpSubmit.py, which Inix.md had named
+  as the reference. The module's read and write are unchanged. The kit still
+  holds three multi-line forms -- blocks in the documentation, braces in
+  inix.read, backtick fences in Inix.cs -- and Inix.md now says so plainly.
+- The kit's build.py, both app build templates and the four FruitBasket sample
+  builds now use them. checkHomerDev's environment line reports the Pandoc a
+  build will really use, and names any older copy ahead of it on the PATH.
+
 ## 1.55.0 -- 7 October 2026
 
 **The tutorial pattern is a recipe.** The homer-tutorial skill now carries the

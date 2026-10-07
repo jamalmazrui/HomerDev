@@ -132,9 +132,13 @@ public static class InixCodec
         {
             if (sPendingKey == null) return;
             string sFinal = (sbValue != null) ? sbValue.ToString() : "";
-            // Drop one trailing newline if present.
-            if (sFinal.EndsWith("\r\n")) sFinal = sFinal.Substring(0, sFinal.Length - 2);
-            else if (sFinal.EndsWith("\n")) sFinal = sFinal.Substring(0, sFinal.Length - 1);
+            // A FENCED VALUE IS VERBATIM (kit 1.57.0): every line between the
+            // fences is kept, a blank last line included. Lines are joined with
+            // CRLF between them, never after the last, so nothing is added that
+            // needs dropping; the old one-newline trim lost a blank last line.
+            // A PLAIN value ends at the next name or section line, and the
+            // blank lines before that line are layout, not value.
+            if (sFenceToken == null) sFinal = sFinal.TrimEnd('\r', '\n', ' ', '\t');
             if (secCurrent != null && !bSkipSection)
                 secCurrent.Pairs.Add(new Pair(sPendingKey, sFinal));
             sPendingKey = null;
@@ -326,10 +330,14 @@ public static class InixCodec
         bool bHasBkt    = sValue.IndexOf('[') >= 0;
         bool bMultiline = sValue.IndexOf('\n') >= 0 || sValue.IndexOf('\r') >= 0;
         if (!bMultiline && !bHasEq && !bHasBkt) return null;  // single-line literal OK
-        if (!bMultiline) return "`";  // single-line but with = or [ -> fence it for safety
-        // Multi-line. Choose a fence not present as a sole line.
+        if (!bMultiline && sValue.IndexOf('`') < 0) return "`";  // single-line but with = or [ -> fence it for safety
+        // Multi-line, or one line with = or [. help\Inix.md: the backtick
+        // fence by default; the triple quote fence for the rare value that
+        // contains a backtick anywhere (kit 1.57.0); otherwise whichever fence
+        // is not present as a line of its own.
         bool bBacktickFree = !containsSoleLine(sValue, "`");
         bool bTriquoteFree = !containsSoleLine(sValue, "\"\"\"");
+        if (sValue.IndexOf('`') >= 0 && bTriquoteFree) return "\"\"\"";
         if (bBacktickFree) return "`";
         if (bTriquoteFree) return "\"\"\"";
         // Both candidate fences collide. Backtick is rare in
@@ -532,10 +540,13 @@ public static class InixCodec
                         || sValue.TrimStart().StartsWith("[");
             if (bFenced)
             {
-                lsNewLines.Add(sKey + "=`");
+                // The same fence writeAsConfig would choose: a backtick, or a
+                // triple quote when the value contains a backtick (1.57.0).
+                string sFence = chooseFence(sValue) ?? "`";
+                lsNewLines.Add(sKey + "=" + sFence);
                 string sNormalized = sValue.Replace("\r\n", "\n").Replace("\r", "\n");
                 foreach (string sLn in sNormalized.Split('\n')) lsNewLines.Add(sLn);
-                lsNewLines.Add("`");
+                lsNewLines.Add(sFence);
             }
             else lsNewLines.Add(sKey + " = " + sValue);
         }

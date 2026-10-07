@@ -40,6 +40,8 @@ uses into its own folder and puts that folder on the import path first.
   focus order, Alt-letter access from the `&` in a caption or preceding label.
 - `Log`: the session log in the Homer line format.
 - `Mdi`: the frame and child of a multiple-document app.
+- `Media`: finding a shared tool (ExifTool, ffmpeg, mpv, Pandoc) in its official
+  folder before the PATH, and running ExifTool.
 - `Ollama`: talking to a local Ollama model.
 - `Paths`: the folder layout, installed and per-user.
 - `PdfRead`: reading a PDF with positions and font sizes (needs PdfPig, which
@@ -53,9 +55,12 @@ uses into its own folder and puts that folder on the import path first.
 ## Python modules
 
 `elevate`, `inix`, `lbc` (wxPython dialogs), `lbcnet` (WinForms dialogs
-through Homer.dll), `log`, `mdi`, `paths`, `say`, `util` and `web`: the same
+through Homer.dll), `log`, `mdi`, `media`, `paths`, `say`, `util` and `web`: the same
 names and behaviour as the C# classes, a module where C# has a static class
 and a class where C# keeps state (`lbc.Dialog`).
+`media` is the finding half of `Media` only, plus `newestInstalled`, which
+runs every copy of a tool and chooses the newest at or above a minimum
+version; `pandocProgram` and `javaProgram` are its common cases (1.56.0).
 
 ## Rules for using them
 

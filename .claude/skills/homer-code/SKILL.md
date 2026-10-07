@@ -60,13 +60,20 @@ kit already has, never assumed.
 A Homer program uses the kit's shared code rather than its own: `Lbc` for
 every dialog, `Log` for its log, `Say` for speech, `Inix` for settings (a file Homer creates is always `.inix`, never `.ini`, which is only for another program that requires it),
 `Paths` for its folders, `Web` for downloads, `KeyMap` and `KeyName` for keys,
-`Util` for the small helpers. The more they are exercised, the better they
+`Util` for the small helpers, `Media` (or `media.py`) to find a shared tool. The more they are exercised, the better they
 get. Read [references/kit-libraries.md](references/kit-libraries.md) for what
 each offers and how an app compiles or imports it.
 
 **Fix a fault where it starts.** When an app's problem comes from a shared
 class -- focus order from Lbc, speech from Say -- fix the class in the kit,
 not the app, so every app gains the fix at its next build.
+
+**Find a shared tool by its newest copy, never the first on the PATH.**
+A machine may hold several copies of Pandoc, Java or ExifTool, and an old one
+early on the PATH (an author's C:\bin\pandoc.exe, 2.19.2) hides the current
+one. A Python script asks `media.newestInstalled` or `media.pandocProgram`; a
+cmd script reads the path the kit's `scripts\newest.ps1` prints, as the build
+templates do. Give a minimum version when an older one would fail.
 
 **A change to what is heard is tried with the readers.** When a change
 alters what a screen reader says or which keys do what, it is tried with JAWS

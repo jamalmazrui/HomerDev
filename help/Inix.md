@@ -8,7 +8,13 @@ An .inix file is the familiar .ini settings format with a few additions. Section
 
 The additions:
 
-- **A value can span several lines.** Write the name and the equals sign with nothing after them, and put the value on the lines below. The value runs to the next `name =` line, the next section line, or the end of the file. Blank lines inside it are part of it; blank lines at its end are dropped. The reader keeps the text exactly as written, with no trimming of lines and no change of spacing; any trimming is the using program's later decision. If a line of the value would itself read as a `name =` line, write it with one leading space, which the reader removes.
+- **A name line is trimmed.** Spaces before and after the name, and around the equals sign, mean nothing: `title = Blind Vibe Coding`, `title=Blind Vibe Coding` and `  title =   Blind Vibe Coding` are the same. A one-line value whose first and last characters are double quotes loses that one outer pair, so `name = ""` is an empty value and `name = " dog"` keeps its leading space.
+- **A value can span several lines,** in one of three ways:
+    - **Plain**, for a value with no equals sign in it. Write the name and the equals sign with nothing after them, and put the value on the lines below, with no marks around it. The value runs to the next line that reads as `name = value`, the next section line, or the end of the file, which is why it cannot itself contain an equals sign. Blank lines inside it are part of it; blank lines at its end are layout and are dropped.
+    - **Backtick fence**, for a value that contains an equals sign, or whenever a writer wants the more reliable form every time. Write `` name = ` `` and then the value, and close it with a line holding only a backtick (`` ` ``). Everything between is the value exactly as written, equals signs, blank lines and all.
+    - **Triple quote fence**, the Python convention, for the rare value that contains a backtick. Write `name = """` and then the value, and close it with a line holding only `"""`.
+
+    A fenced value is verbatim: the reader neither trims nor drops any line of it. Any trimming is the using program's later decision. The kit's readers accept all three forms. Its writers write a one-line value on its name line, and every multi-line value, or one-line value with an equals sign or bracket, in a backtick fence, or a triple quote fence when the value contains a backtick.
 - **A list** is a comma-separated value on one line, or, when the items themselves contain commas or are long, one item per line in a multi-line value.
 - **A dictionary** is a section: each field is a `name = value` line.
 - **A table** is one section per record, with each field on its own line and its own name, rather than a row of values that must be counted across. The kit's inixVert converts such a table to and from CSV, Excel and Markdown tables.
@@ -32,7 +38,7 @@ used = Yes
 tools = Claude
 ```
 
-The program that reads the file turns these conventions into whatever structure suits it: the comma-separated line into a list, the multi-line value into a list of lines or one text, the section into a dictionary. That is a few lines of code in any language, and the Blind Vibe Coding project's `kdpSubmit.py` carries a reference reader and writer in Python (`readInix`, `writeInix`, `inixList`) with tests that show a file reading back exactly as written.
+The program that reads the file turns these conventions into whatever structure suits it: the comma-separated line into a list, the multi-line value into a list of lines or one text, the section into a dictionary. In the kit, C# programs use the `InixCodec` class in `exec\CSharp\Inix.cs`, and Python programs use `exec\Python\inix.py`, which reads the format the same way: `read`, `write`, `getValue` and `setValue` keep comments, blank lines and order, and `readInix`, `writeInix` and `inixList` give and take plain dictionaries and lists. A value written between `name = {` and a closing `}` line, which `inix.py` wrote before kit 1.57.0, is still read but never written.
 
 ## Why prefer .inix to JSON
 
