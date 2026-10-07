@@ -68,8 +68,11 @@ What it writes, all under the app's `help` folder:
   maintains, so the hand-written head of the file stays yours.
 - `TutorialFeed.xml` -- a podcast feed of the audio.
 
-A walk whose `.mp3` exists is not spoken again. Delete the file to have it
-spoken again; name one script on the command line to speak just that one.
+A walk is spoken again only when its text has changed since it was last
+spoken: each `.mp3` has a `.sha256` file beside it holding the fingerprint of
+the walk it came from. Dates are not used, since a walk unzipped from a kit
+can look newer than audio spoken from the same text. Delete an `.mp3` to have
+its walk spoken again; name one script on the command line to speak just that one.
 
 ### Where the voices live, and who fetches them
 
@@ -1594,7 +1597,7 @@ Screen reader:
 
 ### Step 9
 
-The audio is named like a chapter -- 04 underscore Open underscore and underscore Move dot mp3 -- so a folder or a player shows the number and the title. A walk whose audio is older than its script is spoken again; the rest are kept.
+The audio is named like a chapter -- 04 underscore Open underscore and underscore Move dot mp3 -- so a folder or a player shows the number and the title. A walk is spoken again only when its text has changed since it was last spoken; the rest are kept.
 
 ### Step 10
 

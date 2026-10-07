@@ -8,6 +8,8 @@
 - [Proposed new skills](#proposed-new-skills)
 - [Proposed improvements to existing skills](#proposed-improvements-to-existing-skills)
 - [Suggested order](#suggested-order)
+- [Learnings from the skill and agent guides](#learnings-from-the-skill-and-agent-guides)
+- [Learnings from Anthropic's skills repository](#learnings-from-anthropics-skills-repository)
 
 ## Introduction
 
@@ -100,3 +102,38 @@ prompts, and reworded descriptions.
 - After each step, run evalSkills again: a skill that does not move the numbers
   is a candidate for removal, not a reason for another skill.
 - The questions above can be settled at any point; each answer becomes a HomerDev guideline before any skill relies on it.
+
+## Learnings from the skill and agent guides
+
+*Added in kit 1.59.0, from four guides read in October 2026: Anthropic's Complete Guide to Building Skills for Claude (January 2026) and its Building Effective AI Agents, OpenAI's A Practical Guide to Building Agents, and Google's Adaptation of Foundation Models whitepaper.*
+
+The skill guide gives exact rules, and the Homer skills already met most of them: kebab-case folder names, a SKILL.md in each, no README inside a skill folder, a description that says what the skill does and when to use it, and bodies far under the 5,000-word limit. Checking them found one rule broken four times: angle brackets in a description (`<App>` three times, `<singular>` once). The guide warns that the frontmatter goes into the system prompt, so a skill holding an angle bracket is refused at upload. Those four now use the kit's own placeholder, `_APP_`.
+
+What the guides teach, and what the kit now does with it:
+
+- **Check exact rules with a script.** The skill guide's advice is that code is deterministic and reading is not, so a rule that must hold is checked by a program. The kit's new `scripts\checkSkills` checks every skill in a project against the guide's rules and exits 1 on a problem: run it after writing or changing a skill, as checkTutorial is run after writing a walk.
+- **The description is how a skill is chosen.** It is always in the model's context; the body is read only when the skill is chosen, and references only when needed. So the description carries the work and the words a request would contain, and detail goes to references. This is the Homer pattern already; checkSkills gives a notice when a description does not say when to use the skill.
+- **Test the choosing, not just the result.** The guide's tests are three kinds: prompts that should load the skill, paraphrases that should still load it, and unrelated prompts that should not; then whether the result is right; then whether the skill beats working without it. The kit's evalSkills measures the third. Writing ten prompts that should load each skill and five that should not, and asking "When would you use the homer-db skill?" to hear the description quoted back, would cover the first two.
+- **Put critical instructions first, briefly.** When a skill's instructions are not followed, the guide finds them too long, buried or ambiguous. Homer skills open with their rules; keep it so, and move worked detail to references as the homer-tutorial skill grows past 3,000 words.
+- **Start with one agent, and keep it simple.** Both agent guides recommend one agent with good tools before several, and splitting only when instructions sprawl or similar tools are confused. This matches the Homer preference not to over-engineer.
+- **A person decides what cannot be undone.** OpenAI's guide names two reasons to hand control back to a person: repeated failure, and actions that are irreversible or high-stakes. The Homer rule that a book's manuscript or cover is never sent to KDP without the author's word is this rule; the kit's scripts that publish, release or upload should keep it.
+- **One writes, another checks.** The evaluator-optimizer pattern pairs a generator with an evaluator against clear criteria, and is worth its cost only where the criteria are clear. This is the author's practice of having one AI audit another's work, and the Homer checkers are the clear criteria that make it pay.
+- **Keep what a tool returns small.** Long tool output crowds out reasoning; the guides advise paging, filtering and truncation with sensible defaults. Homer tools already keep the console short and put detail in the log, which is the same rule for a person.
+
+The foundation-model whitepaper is about tuning and serving models on Google's platform, and holds nothing a Homer skill needs.
+
+Questions before adopting:
+
+- **Trigger tests in each skill?** Should each Homer skill carry a short `references\triggers.md` of prompts that should and should not load it, for evalSkills to run?
+- **A version in each skill's metadata?** The guide suggests `metadata: version:` so a changed skill can be told from an old one. The kit's own version could serve, written into each skill by the build.
+
+## Learnings from Anthropic's skills repository
+
+*Added in kit 1.60.0, from Anthropic's public skills repository (anthropics/skills, 17 skills, read 7 October 2026), above all its skill-creator.*
+
+- **The official validator, now in checkSkills.** The skill-creator's own checker, quick_validate.py, allows only six frontmatter keys (name, description, license, allowed-tools, metadata, compatibility; custom values go under metadata), and limits a name to 64 characters with no hyphen at either end and no two together. checkSkills now applies all of it.
+- **Calibrated on Anthropic's own skills.** Run over the repository's 17 skills, checkSkills found 2 problems, both real (the claude-api skill uses the reserved word and has a 1,068-character description), and showed that a body past 5,000 words is advice, not a rule: Anthropic's skill-creator runs 5,151 words and the validator does not count words. That check is now a notice, as is a body past the skill-creator's ideal of 500 lines.
+- **Test the choosing with near misses.** The skill-creator's description check uses 20 realistic requests, 8 to 10 that should load the skill and 8 to 10 that should not, and the valuable negatives are near misses: requests that share the skill's words but need something else ("Write a fibonacci function" tests nothing for a PDF skill). It runs each request three times and splits them 60 to 40 so a better description is judged on requests it was not tuned on. That answers the question above about trigger tests in each skill: if adopted, each Homer skill's trigger file should hold near misses, such as a C# question that is not a Homer program for homer-code.
+- **Explain the why, keep it lean.** Its advice for improving a skill: generalize from feedback rather than patching one case, remove what is not pulling its weight, explain the reason behind each rule rather than shouting it, and when every test run writes the same helper script, put that script in the skill. The Homer skills already explain their reasons; the last point argues for moving repeated checks into scripts, as checkTutorial and checkSkills do.
+- **Look before acting on a web page.** The webapp-testing skill's pattern: wait for the page to settle, inspect what is really there, then act on the controls found. The kit's browser scripts for KDP, Author Central and Draft2Digital already work this way (kdpSubmit --inspect records a page's controls); it is the right model for any new one.
+- **Close a substantive answer with questions that check it.** The discernment-nudge skill has an assistant end advice, a plan or an estimate with two or three short questions tied to what it just said, to help the reader check the facts and the reasoning. That fits the course on AI-assisted development more than the kit: it is a habit to teach.

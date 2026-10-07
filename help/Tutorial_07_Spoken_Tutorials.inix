@@ -55,7 +55,7 @@ Hear=Creating 04 underscore Open underscore and underscore Move dot mp3, 23 step
 
 [step]
 
-Say=The audio is named like a chapter -- 04 underscore Open underscore and underscore Move dot mp3 -- so a folder or a player shows the number and the title. A walk whose audio is older than its script is spoken again; the rest are kept.
+Say=The audio is named like a chapter -- 04 underscore Open underscore and underscore Move dot mp3 -- so a folder or a player shows the number and the title. A walk is spoken again only when its text has changed since it was last spoken; the rest are kept.
 Key=
 Hear=
 

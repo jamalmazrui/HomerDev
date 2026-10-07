@@ -837,6 +837,43 @@ function audioName([string] $sScript) {
   return ($sStem + ".mp3")
 }
 
+# WHETHER A WALK'S AUDIO IS CURRENT IS DECIDED BY ITS CONTENT, NOT ITS DATE
+# (7 October 2026). The kit arrives in a zip, and a zip stores each file's time
+# with no time zone: a kit zipped on a computer seven hours ahead unzips with
+# every walk dated seven hours in the future, newer than any mp3, and the
+# 14:08 build re-spoke all twelve walks for nothing. So each mp3 now has a
+# fingerprint beside it, <name>.sha256, holding the SHA-256 of the walk it was
+# spoken from; the walk is spoken again only when that changes. Audio without a
+# fingerprint, from before this rule, is trusted once and its fingerprint
+# recorded: no date test can settle it, since an unzipped walk can look newer
+# than audio spoken from the very same text.
+function walkFingerprint([string] $sScript) {
+  try { return (Get-FileHash -LiteralPath $sScript -Algorithm SHA256).Hash.ToLower() } catch { return "" }
+}
+
+function markSpoken([string] $sScript, [string] $sOut) {
+  $sMark = [System.IO.Path]::ChangeExtension($sOut, ".sha256")
+  try { [System.IO.File]::WriteAllText($sMark, (walkFingerprint $sScript) + "`r`n") } catch { note ("  could not write " + $sMark + ": " + $_) }
+}
+
+function spokenCurrent([string] $sScript, [string] $sOut) {
+  if (-not (Test-Path -LiteralPath $sOut)) { return $false }
+  $sMark = [System.IO.Path]::ChangeExtension($sOut, ".sha256")
+  $sNow = walkFingerprint $sScript
+  if (Test-Path -LiteralPath $sMark) {
+    $sWas = ""
+    try { $sWas = ([System.IO.File]::ReadAllText($sMark)).Trim().ToLower() } catch { }
+    if ($sWas -ne "" -and $sWas -eq $sNow) { note ("  " + [System.IO.Path]::GetFileName($sOut) + ": the walk is unchanged since it was spoken (same fingerprint)"); return $true }
+    note ("  " + [System.IO.Path]::GetFileName($sOut) + ": the walk has changed since it was spoken (fingerprint " + $sWas.Substring(0, [Math]::Min(12, $sWas.Length)) + " now " + $sNow.Substring(0, [Math]::Min(12, $sNow.Length)) + ")")
+    return $false
+  }
+  # Audio from before fingerprints is trusted once and its fingerprint recorded: dates cannot settle it, since an
+  # unzipped walk can look newer than audio spoken from that same text. Delete an mp3 to have its walk spoken again.
+  note ("  " + [System.IO.Path]::GetFileName($sOut) + ": spoken before fingerprints were kept; trusted once, and its fingerprint recorded (delete the mp3 to speak the walk again)")
+  markSpoken $sScript $sOut
+  return $true
+}
+
 function buildOne([string] $sScript) {
   $sStem = [System.IO.Path]::GetFileNameWithoutExtension($sScript)
   $sOut = Join-Path $sAudioDir (audioName $sScript)
@@ -844,12 +881,10 @@ function buildOne([string] $sScript) {
   # walk itself is already spoken; re-speaking nineteen walks because four new
   # ones arrived would cost twenty minutes for nothing (5 October 2026). -live
   # performs regardless, since nothing is written.
-  if (-not $bLive -and (Test-Path -LiteralPath $sOut)) {
-    if ((Get-Item -LiteralPath $sOut).LastWriteTimeUtc -gt (Get-Item -LiteralPath $sScript).LastWriteTimeUtc) {
-      note ("  " + $sStem + " is already spoken and current; skipped")
-      say ("  " + $sStem + ": already spoken")
-      return
-    }
+  if (-not $bLive -and (spokenCurrent $sScript $sOut)) {
+    note ("  " + $sStem + " is already spoken and current; skipped")
+    say ("  " + $sStem + ": already spoken")
+    return
   }
   $sWork = Join-Path $env:TEMP ("buildTutorial_" + [Guid]::NewGuid().ToString("N"))
   $script:iPiece = 0
@@ -1178,6 +1213,7 @@ function buildOne([string] $sScript) {
   $dTook = ((Get-Date) - $dtStarted).TotalSeconds
   $sTook = $(if ($dTook -lt 90) { ([int]$dTook).ToString() + " seconds" } else { ([int][Math]::Round($dTook / 60.0)).ToString() + " minutes" })
   say ("Created " + [System.IO.Path]::GetFileName($sOut) + " in " + $sTook + ".")
+  markSpoken $sScript $sOut
   return $true
 }
 
@@ -1243,8 +1279,7 @@ foreach ($sScript in $lsScripts) {
   # KEPT ONLY WHEN CURRENT: audio older than its walk is spoken again. The
   # earlier test kept any file that existed, so a changed walk kept its old
   # voice until someone deleted the folder (5 October 2026).
-  if (-not $bLive -and $sOnly -eq "" -and (Test-Path -LiteralPath $sHave) -and
-      ((Get-Item -LiteralPath $sHave).LastWriteTimeUtc -gt (Get-Item -LiteralPath $sScript).LastWriteTimeUtc)) {
+  if (-not $bLive -and $sOnly -eq "" -and (spokenCurrent $sScript $sHave)) {
     note ("kept " + $sHave + ", already spoken and current")
     $iKept = $iKept + 1
     $iDone = $iDone + 1

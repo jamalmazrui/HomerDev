@@ -141,6 +141,45 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.60.1 -- 7 October 2026
+
+**Tutorial audio is kept by its content, not its date.** The 14:08 build
+re-spoke all twelve walks although none had changed. The cause: a zip stores
+each file's time without a time zone, so the kit, zipped on a computer seven
+hours ahead, unzipped with every walk dated seven hours in the future, newer
+than its audio. buildTutorials now writes a fingerprint beside each mp3
+(<name>.sha256, the SHA-256 of the walk it was spoken from) and speaks a walk
+again only when its fingerprint changes. Audio from before this rule is
+trusted once and fingerprinted. Every Homer app with tutorials gains this
+through the kit. Walk 07 and help\Tutorials.md now say so, which makes walk
+07 the one walk spoken again on the next build.
+
+## 1.60.0 -- 7 October 2026
+
+**checkSkills learns the official validator.** Anthropic's skills repository
+was read for the kit (help\HomerSkills.md has the lessons). checkSkills now
+also allows only the six frontmatter keys the standard permits, limits a
+name to 64 characters with no hyphen at either end and none doubled, and
+gives notices, not problems, for a body past 5,000 words or 500 lines: run
+over Anthropic's own 17 skills, it showed the word count is advice, not a
+rule. The kit's 16 skills pass.
+
+## 1.59.0 -- 7 October 2026
+
+**Skills checked like code.** Four guides on building skills and agents were
+read for the kit, and their lessons are in help\HomerSkills.md. The skill
+guide's exact rules are now checked by a new scripts\checkSkills, which runs
+over every skill in a project's .claude\skills and exits 1 on a problem:
+kebab-case folder names, SKILL.md named exactly, frontmatter delimiters, a
+name equal to the folder and free of reserved words, a description of at most
+1,024 characters, no angle brackets in the frontmatter, no README inside a
+skill, and a body of at most 5,000 words; with notices for a description that
+does not say when to use the skill, a long body, and a missing linked file.
+Its first run found four kit skills with angle brackets in their
+descriptions, which can make a skill fail to upload; homer-build-release,
+homer-db, homer-installer and homer-screen-reader now use the kit's own
+placeholder, _APP_, or plain words.
+
 ## 1.58.0 -- 7 October 2026
 
 **Show, then tell.** The User Interface Concepts walk ran on with the narrator

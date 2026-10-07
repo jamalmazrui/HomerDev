@@ -253,9 +253,13 @@ markers the tool maintains, so the hand-written head of the file stays
 yours.</li>
 <li><code>TutorialFeed.xml</code> – a podcast feed of the audio.</li>
 </ul>
-<p>A walk whose <code>.mp3</code> exists is not spoken again. Delete the
-file to have it spoken again; name one script on the command line to
-speak just that one.</p>
+<p>A walk is spoken again only when its text has changed since it was
+last spoken: each <code>.mp3</code> has a <code>.sha256</code> file
+beside it holding the fingerprint of the walk it came from. Dates are
+not used, since a walk unzipped from a kit can look newer than audio
+spoken from the same text. Delete an <code>.mp3</code> to have its walk
+spoken again; name one script on the command line to speak just that
+one.</p>
 <h3 id="where-the-voices-live-and-who-fetches-them">Where the voices
 live, and who fetches them</h3>
 <p>One copy, in <code>C:\HomerDev\exec</code>, and <strong>only
@@ -1642,8 +1646,8 @@ The reader’s voice shifts by context – a cursor line, a message, a menu
 <h3 id="step-9-6">Step 9</h3>
 <p>The audio is named like a chapter – 04 underscore Open underscore and
 underscore Move dot mp3 – so a folder or a player shows the number and
-the title. A walk whose audio is older than its script is spoken again;
-the rest are kept.</p>
+the title. A walk is spoken again only when its text has changed since
+it was last spoken; the rest are kept.</p>
 <h3 id="step-10-6">Step 10</h3>
 <p>At the end, the lengths, and the two lines that matter.</p>
 <p>Screen reader:</p>

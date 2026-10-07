@@ -40,7 +40,7 @@ c_lsExpected = [
     "Templates/_APP__setup.iss", "Templates/_APP_.cs",
     "Templates/installModels.cmd",
     "scripts/installOllama.cmd", "scripts/installScreenReaderSupport.cmd", "scripts/finish.cmd",
-    "scripts/newest.cmd", "scripts/newest.ps1",
+    "scripts/checkSkills.cmd", "scripts/checkSkills.py", "scripts/newest.cmd", "scripts/newest.ps1",
     "Templates/HomerComponents.iss", "scripts/installCommon.cmd",
     "Templates/create_APP_Repo.cmd", "Templates/create_APP_Repo.ps1",
     "Templates/accept.inix", "Templates/gitignore.txt", "Templates/version.txt",

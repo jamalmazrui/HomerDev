@@ -2,7 +2,7 @@
 name: homer-db
 description: >-
   Designs, creates, reviews and checks SQLite .db files the Homer way, as DbDo
-  opens them: plural lower-case table names, a <singular>_id integer key, the
+  opens them: plural lower-case table names, an integer key named for the singular, such as book_id, the
   standard fields added, edited, url, notes, tags, look, prime and marked in
   their fixed order, DbDo's field types (TEXTLINE, TEXTMEMO, TEXTMARKDOWN,
   TEXTTIME), the lookups, maps and views tables, pick lists, a database's own

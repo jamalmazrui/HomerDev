@@ -6,7 +6,7 @@ description: >-
   the logs those steps leave. Use when the user uploads Homer logs (often as
   temp.zip) and says "continue", asks why a build, check, tidy, push or release
   failed, asks whether an app is released or which version is latest, or asks
-  what to run next for an app in C:\<App> or C:\HomerDev.
+  what to run next for an app in C:\_APP_ or C:\HomerDev.
 ---
 
 # Homer build and release

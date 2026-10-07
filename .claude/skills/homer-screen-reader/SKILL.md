@@ -4,8 +4,8 @@ description: >-
   Writes, installs and troubleshoots screen reader scripting for Homer Tools
   apps: JAWS scripts (.jss, .jsh, .jkm, .jsd) and NVDA add-ons (global plugins
   and app modules), with the same commands and keys on both readers, direct
-  speech through the kit's Say, packaging as <App>_JAWS.zip and
-  <App>.nvda-addon, and installation for every JAWS version and NVDA. Use when
+  speech through the kit's Say, packaging as _APP__JAWS.zip and
+  _APP_.nvda-addon, and installation for every JAWS version and NVDA. Use when
   adding or fixing JAWS scripts or an NVDA add-on, choosing a reader key,
   making a command work under both readers, or diagnosing why scripts do not
   load, compile or answer.

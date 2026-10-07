@@ -5,7 +5,7 @@ description: >-
   template and shared HomerComponents.iss, machine-wide installation, which
   optional components to offer, the finish page's checkbox wording, defaults,
   grouping and order, the JAWS and NVDA boxes, the Results box, and component
-  logging. Use when creating or changing a <App>_setup.iss, when a finish-page
+  logging. Use when creating or changing a _APP__setup.iss, when a finish-page
   box is worded, ticked or ordered wrongly, when a component is detected wrongly
   or reinstalled needlessly, or when an install script misbehaves.
 ---
