@@ -141,6 +141,21 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.53.2 -- 6 October 2026
+
+**One build speaks at a time, and the clock is on the progress line.** Four
+builds spoke their tutorials at once on 6 October and each step took twenty
+seconds instead of five, which looked like a hang. buildTutorials now holds a
+machine-wide mutex while it speaks -- a second build waits and says so, each
+minute -- and its progress line carries elapsed time and an estimate, with one
+plain note when the pace says the computer is busy.
+
+## 1.53.1 -- 6 October 2026
+
+**A high step count is a notice.** The tool's measurement of the audio is the
+fact; a walk of many short two-voice exchanges is brisk, not long, and is no
+longer refused for its count.
+
 ## 1.53.0 -- 6 October 2026
 
 **The kit has its own twelve walks**, in the pattern it prescribes: overview,
