@@ -75,6 +75,24 @@ Hear=ERROR: FileDir needs HomerDev 1.52.8 or later, and C colon backslash HomerD
 
 [step]
 
+Say=How an app reaches the kit. Its build passes the kit's CSharp folder to the compiler, so Lbc dot cs, Say dot cs and the rest are compiled into the app from where they live; nothing is copied. The acceptance check named missing Lbc dot cs is the proof that nothing was.
+Key=
+Hear=
+
+[step]
+
+Say=A worked case of the gain. The Homer Player's recording -- Alt plus Shift plus R, a Record button and a Stop recording button -- was written once, in the kit, on 5 October. FileDir had it on its next build, and DbDo on its next, with no change to either program.
+Key=
+Hear=
+
+[step]
+
+Say=What belongs in the kit and what does not. A behaviour every app wants -- a dialog, speech, a log, a player -- belongs in the kit. A behaviour one app wants -- DbDo's grid, EdSharp's compiler table, FileDir's tags -- belongs in that app. The test: would a second app want it exactly as it is?
+Key=
+Hear=
+
+[step]
+
 Say=What this walk taught. I say the idea or the key; the reader says the command or the name.
 
 [step]

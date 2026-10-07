@@ -96,6 +96,56 @@ Hear=
 
 [step]
 
+Say=The other direction, which is how the hotkey list reads: I say the key, the reader says the command it names in each program.
+Key=
+Hear=
+
+[step]
+
+Say=Control plus K.
+Key=
+Hear=Keywords, in DbDo and in FileDir
+
+[step]
+
+Say=Control plus F.
+Key=
+Hear=Filter Records in DbDo; Forward Find in EdSharp; Filter in FileDir
+Say=The letter holds; the word it comes from is the program's own.
+
+[step]
+
+Say=Shift plus Z.
+Key=
+Hear=Say Status in DbDo; Zip in FileDir
+Say=The one place two programs part: in FileDir, Shift with a letter acts on tagged files, because FileDir's tags came before the Say layer did. The guide names the exception so the rule can stand.
+
+[step]
+
+Say=Alt plus F10.
+Key=
+Hear=The Alternate Menu in EdSharp: every command in one list you type into
+
+[step]
+
+Say=How a key gets chosen when a new command arrives. The word first: its first letter. Taken? The next word of the command. All taken? A command with no control gets Alt plus Shift and the letter. A key from inside a word is never chosen; a command without a good key is renamed until it has one.
+Key=
+Hear=
+
+[step]
+
+Say=A worked case. DbDo gained Play Stream. P was Pick Value's on the grid; Play had no control of its own; so Alt plus Shift plus P -- and the recording in the player took Alt plus Shift plus R, R for Record, after Rate had the plain R. The rules decided both in a minute, and both are guessable now.
+Key=
+Hear=
+
+[step]
+
+Say=A planned misstep. Give a dialog two controls whose captions start with the same letter, and the kit's check refuses the build by name: the dialog, the two captions. The fix is a caption, not a key table.
+Key=
+Hear=access letters -- Filter Records: F is used by Find and Filter
+
+[step]
+
 Say=What this walk taught. I say the idea or the key; the reader says the command or the name.
 
 [step]

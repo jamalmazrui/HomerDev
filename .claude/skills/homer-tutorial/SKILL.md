@@ -63,6 +63,108 @@ phrase only where it helps a line stick.
 `checkTutorial` enforces the seven fixed names, the task numbering, the
 step ceiling, and the first walk's two reader keys.
 
+
+## The recipe: applying the pattern to any Homer app
+
+This is the whole method, as it was worked out on DbDo, EdSharp, FileDir and
+the kit itself in October 2026. Follow it in order for HomerScribe, HomerView
+or any app; nothing here needs the author of the pattern in the room.
+
+### 1. Gather the truth before writing a line
+
+- The app's `help\Hotkeys.md` (or hotkey summary): every command with its
+  key and description. Keys and command names in the walks come from here,
+  never from memory.
+- Any real speech: a JAWS or NVDA speech-history capture, an earlier walk's
+  Hear lines, the program's own `AddMessage` or `Say` strings in its source.
+  A Hear line that was recorded is worth ten that were guessed.
+- The guide and ReadMe, for what the installer's boxes are, where data lives,
+  what the program is for.
+- The app's `accept.inix`, build log and session log, for console lines that
+  can serve as Hear lines in a build-or-script walk.
+
+### 2. Choose the tasks as wants, not features
+
+List what a person comes to the app wanting -- the station carrying the home
+team, a letter to finish, a Downloads folder cleaned, a video described --
+and pick up to five, in the order a new person meets them. Each task walk is
+one want from start to end; the features appear as the way to it. Write the
+Intro as the want in plain words, and say which earlier walks it assumes.
+
+### 3. Write the twelve, each to its shape
+
+- **00**: one paragraph of prose on what the app is; the two reader keys
+  (Insert plus Up Arrow, Insert plus Tab) as steps; then the table of
+  contents as a clean two-voice list, one step per walk, host saying the
+  number and title, reader saying what it covers; a closing line with the
+  count and "about an hour". Prose and list never mix.
+- **01**: download, the installer's pages, the finish page with each box's
+  purpose and the three words Install, Update, Reinstall, the results box,
+  where things went, the desktop key, F11 for later, one misstep (run while
+  open; a mistaken tick).
+- **02**: the parts of the program as heard -- window, main view, dialogs
+  that work one way, Say keys, messages, settings -- and where help is: F1,
+  Shift plus F1, Alt plus F1, the Help menu with Play Tutorials, the menus
+  that say their keys.
+- **03**: the rules, then a guessing exchange both ways (host names a
+  command, reader gives the key; host says a key, reader names the command),
+  the keys that explain the keys (Control plus F1, Hotkeys, Insert plus Tab),
+  one worked case of how a key was chosen, one misstep.
+- **04 to 08**: the wants. Each: the want stated, the keys taught in four
+  beats, one planned misstep with its recovery, things taught earlier named
+  rather than retaught, the recap in two voices.
+- **09**: the app's words, alphabetical, one step each: host says the term,
+  reader says the meaning with its key; twenty to thirty-five terms; a last
+  step with the count and "the guide has each in context".
+- **10**: four principles with their keys in two voices; one thing kept from
+  each task walk; three habits; three everyday tasks each in one breath;
+  what the app is for and is not; where to begin; where to send a problem.
+- **11**: the guide, history and version from inside the program; the
+  documents and their web pages; F11; the GitHub page; the other Homer
+  Tools. Short is fine here.
+
+### 4. Write every line for the ear
+
+- `Say=` lines are the host's, in the first person present ("I press"). A
+  lone letter is spelled with its alphabet word: "T, Tango".
+- `Key=` is one key or one typed string per step; typed text is a string,
+  not a key, and the checker knows the difference.
+- `Hear=` is what the reader says, word for word as spoken: "letter dot t x
+  t", never "letter.txt"; "Control plus K", never "Control+K"; a count in the
+  reader's own form ("1 of 60313"). Name no screen reader. Several Hear lines
+  in one step are several utterances.
+- A second `Say=` after Hear says what that meant, in one sentence.
+- Recaps: "What this walk taught. I say the key; the reader says what it
+  does." then one step per key, host says the key, reader says the command
+  from Hotkeys.
+- Numbers that the data will change -- a filter's count, a station's row --
+  are plausible, round, and said as such in the Say line.
+
+### 5. Measure, then adjust
+
+Run `checkTutorial`; fix problems; read notices. Build, and read the
+tool's lengths: parts 01 to 10 between 3:00 and 5:00; 00 and 11 may be short.
+The pace is about ten seconds a step of ordinary length and three seconds a
+two-voice exchange, so three minutes is about twenty ordinary steps or thirty
+exchanges; a Key Patterns or Conclusion walk built of exchanges runs short
+unless it also carries worked cases. A short walk gets the adjacent thing its
+want needs, a misstep, or a worked case -- never padding. Build again; the
+tool re-speaks only what changed.
+
+### 6. What this week's mistakes teach
+
+- A set that is not yet the pattern is a notice, not a silence: never leave
+  a program with no audio for a guideline's sake.
+- A Hear line with a plus sign, a file name as written, or a reader's name
+  is a checker problem; fix the line, not the checker.
+- A walk's steps are counted by the checker and timed by the tool; trust the
+  tool.
+- Never ship a project tree from an old checkout; deliver the walk files and
+  the build changes, nothing the repository already holds.
+- One build speaks at a time; the tool serializes them and says when it
+  waits. Run builds in series anyway.
+- An acceptance build speaks nothing; the ordinary build's audio ships.
+
 ## The format
 
 ```

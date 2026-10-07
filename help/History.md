@@ -141,6 +141,18 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.55.0 -- 7 October 2026
+
+**The tutorial pattern is a recipe.** The homer-tutorial skill now carries the
+whole method for applying the twelve walks to any Homer app -- gather the
+truth, choose tasks as wants, the shape of each walk, every line for the ear,
+measure and adjust, and what this week's mistakes teach -- so HomerScribe,
+HomerView and the rest can take the pattern without its author in the room.
+The kit's own short walks, and DbDo's, EdSharp's and FileDir's, were given
+their substance: twelve parts that ran under three minutes now carry worked
+cases, reverse guessing exchanges, missteps and the shape of what each
+program is for and is not.
+
 ## 1.54.2 -- 7 October 2026
 
 **An acceptance build speaks nothing.** check runs an app's build as an

@@ -975,9 +975,61 @@ A planned misstep. Press a key the program does not bind, and nothing happens --
 
 ### Step 16
 
-What this walk taught. I say the idea or the key; the reader says the command or the name.
+The other direction, which is how the hotkey list reads: I say the key, the reader says the command it names in each program.
 
 ### Step 17
+
+Control plus K.
+
+Screen reader:
+
+- Keywords, in DbDo and in FileDir
+
+### Step 18
+
+Control plus F.
+
+Screen reader:
+
+- Filter Records in DbDo; Forward Find in EdSharp; Filter in FileDir
+
+### Step 19
+
+Shift plus Z.
+
+Screen reader:
+
+- Say Status in DbDo; Zip in FileDir
+
+### Step 20
+
+Alt plus F10.
+
+Screen reader:
+
+- The Alternate Menu in EdSharp: every command in one list you type into
+
+### Step 21
+
+How a key gets chosen when a new command arrives. The word first: its first letter. Taken? The next word of the command. All taken? A command with no control gets Alt plus Shift and the letter. A key from inside a word is never chosen; a command without a good key is renamed until it has one.
+
+### Step 22
+
+A worked case. DbDo gained Play Stream. P was Pick Value's on the grid; Play had no control of its own; so Alt plus Shift plus P -- and the recording in the player took Alt plus Shift plus R, R for Record, after Rate had the plain R. The rules decided both in a minute, and both are guessable now.
+
+### Step 23
+
+A planned misstep. Give a dialog two controls whose captions start with the same letter, and the kit's check refuses the build by name: the dialog, the two captions. The fix is a caption, not a key table.
+
+Screen reader:
+
+- access letters -- Filter Records: F is used by Find and Filter
+
+### Step 24
+
+What this walk taught. I say the idea or the key; the reader says the command or the name.
+
+### Step 25
 
 Control plus F1.
 
@@ -985,7 +1037,7 @@ Screen reader:
 
 - Key Describer
 
-### Step 18
+### Step 26
 
 Every key three ways, from the program itself.
 
@@ -1084,9 +1136,21 @@ From here the work is yours: fields in the dialog, commands on the menus with th
 
 ### Step 13
 
-What this walk taught. I say the idea or the key; the reader says the command or the name.
+The twelve tutorial skeletons in help are part of what newHomerApp made. Each is a walk in the pattern with placeholder steps, so the day a feature is finished its walk is a file to fill in, not to invent; walk seven is about filling them.
 
 ### Step 14
+
+accept dot inix is the app's own acceptance list: a name and a command each -- the program was produced, the installer was produced, no kit class was copied into the folder. check runs them, and the release refuses on any that fails. Add one for each promise the app makes.
+
+### Step 15
+
+The policy files. RepoFiles dot txt names what the repository carries; LocalFiles dot txt names what stays on your machine; a file in neither is one tidy asks about. Together they are why a stray file is noticed and a private one is never pushed.
+
+### Step 16
+
+What this walk taught. I say the idea or the key; the reader says the command or the name.
+
+### Step 17
 
 Make a new app from the template.
 
@@ -1094,7 +1158,7 @@ Screen reader:
 
 - newHomerApp
 
-### Step 15
+### Step 18
 
 Every stage, from encoding to installer.
 
@@ -1290,9 +1354,21 @@ Removing a Homer program is Windows Settings, Apps; the pieces it installed are 
 
 ### Step 14
 
-What this walk taught. I say the idea or the key; the reader says the command or the name.
+What the table in the app's script looks like, in words: one line per piece -- the name the box shows, the winget id that installs it, the executable whose presence means it is there, and what it is for, which becomes the box's description. The kit reads the table and does everything else.
 
 ### Step 15
+
+Why winget. It knows what is installed and what the newest version is, so the three states are read rather than guessed; it fetches from the maker's own feed; and it is on every Windows 10 and 11 machine. The kit asks it once per piece as the finish page is built, so the boxes are right before you reach them.
+
+### Step 16
+
+The installer's own log is written beside the results -- every piece, every command, every exit code -- so a piece that failed to install names why, and the summary points at the log.
+
+### Step 17
+
+What this walk taught. I say the idea or the key; the reader says the command or the name.
+
+### Step 18
 
 The one word that is the box's state.
 
@@ -1300,7 +1376,7 @@ Screen reader:
 
 - Install, Update, or Reinstall
 
-### Step 16
+### Step 19
 
 The shared installer parts.
 
@@ -1484,9 +1560,21 @@ Screen reader:
 
 ### Step 12
 
-What this walk taught. I say the idea or the key; the reader says the command or the name.
+How an app reaches the kit. Its build passes the kit's CSharp folder to the compiler, so Lbc dot cs, Say dot cs and the rest are compiled into the app from where they live; nothing is copied. The acceptance check named missing Lbc dot cs is the proof that nothing was.
 
 ### Step 13
+
+A worked case of the gain. The Homer Player's recording -- Alt plus Shift plus R, a Record button and a Stop recording button -- was written once, in the kit, on 5 October. FileDir had it on its next build, and DbDo on its next, with no change to either program.
+
+### Step 14
+
+What belongs in the kit and what does not. A behaviour every app wants -- a dialog, speech, a log, a player -- belongs in the kit. A behaviour one app wants -- DbDo's grid, EdSharp's compiler table, FileDir's tags -- belongs in that app. The test: would a second app want it exactly as it is?
+
+### Step 15
+
+What this walk taught. I say the idea or the key; the reader says the command or the name.
+
+### Step 16
 
 The player every Homer program shares.
 
@@ -1494,7 +1582,7 @@ Screen reader:
 
 - MediaPlayer dot cs
 
-### Step 14
+### Step 17
 
 The dialog class.
 
@@ -1502,7 +1590,7 @@ Screen reader:
 
 - Lbc
 
-### Step 15
+### Step 18
 
 The speech class.
 
@@ -1806,6 +1894,18 @@ The kit is also for an AI assistant. Point it at the skills folder and it writes
 
 If something goes wrong in the kit, the kit's own logs folder has the build and check logs; the project page on GitHub is where to send one, with a line about what you were doing.
 
+### Step 14
+
+Three things a kit author does in a week, each in one breath. Add a class: write it in exec, compile the samples, every app has it on its next build. Change a rule: write it in the guide and the skill, teach the checker, and every app's next check enforces it. Fix a fault in a shared script: fix it once; every app's build refreshes its copy.
+
+### Step 15
+
+And three things an app author does with the kit. Start: newHomerApp, build, run. Ship: build, check, release. Teach: twelve walks in help, spoken by the build.
+
+### Step 16
+
+What the kit does not decide. What an app is for, what its tables or documents hold, which features it has: those are the app's. The kit decides only how the app behaves when it asks, speaks, logs, installs and teaches -- the parts a person meets in every program, and should meet the same way.
+
 **Something to try:** Make an app with newHomerApp, build it, and write its first task walk.
 
 ## 11 - More Information
@@ -1843,6 +1943,11 @@ The Homer Tools are free programs for working by ear: EdSharp for text, FileDir 
 <!-- walkthrough ends -->
 
 ## The twelve walks every Homer program has
+
+The recipe for applying the pattern to a new app, step by step, is in the
+homer-tutorial skill -- `.claude\skills\homer-tutorial\SKILL.md` -- which an
+AI assistant reads before writing walks; the homer-tutorial skill carries the whole recipe, and this document the rules behind it.
+
 
 A program's walks follow one pattern, so a listener who has heard one
 program's knows where to find a thing in another's. The scripts are

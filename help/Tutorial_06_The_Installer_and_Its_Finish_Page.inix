@@ -86,6 +86,24 @@ Hear=
 
 [step]
 
+Say=What the table in the app's script looks like, in words: one line per piece -- the name the box shows, the winget id that installs it, the executable whose presence means it is there, and what it is for, which becomes the box's description. The kit reads the table and does everything else.
+Key=
+Hear=
+
+[step]
+
+Say=Why winget. It knows what is installed and what the newest version is, so the three states are read rather than guessed; it fetches from the maker's own feed; and it is on every Windows 10 and 11 machine. The kit asks it once per piece as the finish page is built, so the boxes are right before you reach them.
+Key=
+Hear=
+
+[step]
+
+Say=The installer's own log is written beside the results -- every piece, every command, every exit code -- so a piece that failed to install names why, and the summary points at the log.
+Key=
+Hear=
+
+[step]
+
 Say=What this walk taught. I say the idea or the key; the reader says the command or the name.
 
 [step]

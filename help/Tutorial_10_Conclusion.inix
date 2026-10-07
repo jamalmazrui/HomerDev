@@ -81,3 +81,22 @@ Hear=
 Say=If something goes wrong in the kit, the kit's own logs folder has the build and check logs; the project page on GitHub is where to send one, with a line about what you were doing.
 Key=
 Hear=
+
+[step]
+
+Say=Three things a kit author does in a week, each in one breath. Add a class: write it in exec, compile the samples, every app has it on its next build. Change a rule: write it in the guide and the skill, teach the checker, and every app's next check enforces it. Fix a fault in a shared script: fix it once; every app's build refreshes its copy.
+Key=
+Hear=
+
+[step]
+
+Say=And three things an app author does with the kit. Start: newHomerApp, build, run. Ship: build, check, release. Teach: twelve walks in help, spoken by the build.
+Key=
+Hear=
+
+[step]
+
+Say=What the kit does not decide. What an app is for, what its tables or documents hold, which features it has: those are the app's. The kit decides only how the app behaves when it asks, speaks, logs, installs and teaches -- the parts a person meets in every program, and should meet the same way.
+Key=
+Hear=
+
