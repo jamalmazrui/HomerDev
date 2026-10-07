@@ -1,97 +1,172 @@
 ﻿[about]
 Title=02 - User Interface Concepts
-Intro=What a Homer program is made of, each part heard in DbDo, EdSharp or FileDir: the single instance, the main view, the Lbc dialog, the Say layer, messages, pick lists, help in four places, templates, logs, and the finish page. This walk assumes walk one.
+Intro=What a Homer program is made of, each part named by the narrator and then shown by the screen reader: the window, the main view, the dialog, the Say keys, messages, the pick list, menus, and help in four places.
 Setup=Nothing is needed; this walk is listened to.
-Homework=Open any Homer program and name each part as you reach it: the view, a dialog, the status line, the Help menu.
+Homework=Open any Homer program and, as each part takes focus, listen for its name, its kind, its value or state, and the hint after a pause.
 
 [step]
 
-Say=A Homer program is heard before it is seen, so its parts are defined by what they say. Here they are, each in a program built on the kit.
+Say=A Homer program is heard before it is seen. Each part I name, the reader then shows, as it would on your machine: the name, the kind of control, its value and state, and, a moment later, a hint.
 Key=
 Hear=
 
 [step]
 
-Say=The window. One program, one instance: the desktop key opens it or brings it forward, never a second copy. Alt plus Control plus D for DbDo, E for EdSharp, F for FileDir -- the letter is the program's.
+Say=First, the window. One program, one copy. Its desktop key opens it or brings it forward. Alt plus Control plus D, D for DbDo.
+Key=Alt+Control+D
+Hear=DbDo
+Hear=DbDo ready
+
+[step]
+
+Say=The title as the window came forward, then the program's own greeting, in the reader's message voice. I press the same key again.
 Key=Alt+Control+D
 Hear=DbDo
 
 [step]
 
-Say=The main view is a Windows control the reader already knows: a list box in FileDir, a grid in DbDo, an edit box in EdSharp. Nothing custom to learn; what differs is what the program adds to the speech.
-Key=
+Say=The same window, never a second copy. Next, the main view: a control the reader already knows. In EdSharp, it is an edit box.
+Key=Alt+Control+E
+Hear=EdSharp
 Hear=Untitled, edit, multiline, blank
-Say=EdSharp's edit box, as any reader reads it: the name, the kind, the state.
+Hear=Type in text.
 
 [step]
 
-Say=The Lbc dialog -- label before control. Every dialog in every Homer program is built by the same class: a label, then its control, Tab between them, Alt plus the underlined letter to jump, Control plus Enter for OK from anywhere, Escape to cancel. Learn one dialog and you have learned them all.
+Say=Name: Untitled. Role: edit, multiline. Value: blank, since nothing is typed yet. Then the hint, which tells a newcomer what the control expects. In FileDir, the main view is a list.
+Key=Alt+Control+F
+Hear=FileDir
+Hear=ReadMe dot m d, 1 of 24
+Note=Confirm this list item's wording with a live run: buildTutorials -live.
+
+[step]
+
+Say=A list item says its name, then where it sits: 1 of 24. That count is your map. Now a dialog. Every Homer dialog is built the same way, a label, then the control it names. Here is DbDo's search dialog.
 Key=
-Hear=Keywords dialog, Keywords: edit
-Say=DbDo's search dialog: the label is read before the box it labels.
+Hear=Keywords dialog
+Hear=Keywords: edit
+Hear=Type in text.
 
 [step]
 
-Say=The Say layer. Shift plus a letter, or Alt plus a letter, asks a question and changes nothing: Say Cell, Say Status, Say Address. Pressed twice, the same words open in a window to arrow through.
+Say=The title first, then the label read before its box, then the hint. Tab moves through the controls in the order they were added. At the end of every dialog come OK and Cancel.
+Key=Tab
+Hear=OK button
+Hear=To activate press Spacebar.
+Note=Confirm what Tab reaches first with a live run: buildTutorials -live.
+
+[step]
+
+Say=OK has no underlined letter: Enter presses it, Escape is Cancel, and Control plus Enter submits from any control in the dialog. Alt plus an underlined letter jumps straight to a control.
+Key=Alt+K
+Hear=Keywords: edit
+Hear=Type in text.
+Note=Confirm that K is the label's underlined letter with a live run: buildTutorials -live.
+
+[step]
+
+Say=Alt plus K, K for Keywords, and focus is back on the box. I press Escape.
+Key=Escape
+Hear=DbDo
+Note=Confirm the line read when the dialog closes with a live run: buildTutorials -live.
+
+[step]
+
+Say=Back in the main window. Next, the Say keys. They ask a question and change nothing. Shift plus Z is Say Status: Z, the end of the alphabet, where the status line sits.
 Key=Shift+Z
 Hear=jobs, 12 records, no filter, sorted by employer
 
 [step]
 
-Say=Messages are spoken when something happens, and shown on the status line, so a result is heard without being asked for.
-Key=
+Say=The table, its record count, the filter and the sort, in one breath. Pressed twice quickly, the same words open in a window to arrow through. Next, messages: they are spoken when something happens. In EdSharp, Control plus K sets a bookmark, K for marK.
+Key=Control+K
 Hear=Bookmark at percent 40
-Say=EdSharp, after Control plus K: the fact, with its number.
 
 [step]
 
-Say=The pick list. Where a field has fixed values, F4 opens them as a list, and a letter jumps to one; nothing is typed that could be mistyped.
+Say=The fact, with its number, in the message voice, and the same words on the status line. Next, the pick list. Where a field has fixed values, F4 opens them.
 Key=F4
 Hear=status: list box, untried, 4 of 5
+Hear=To move through items press Up or Down Arrow.
 
 [step]
 
-Say=Help is in four places, and they are the same in every program the kit builds. F1 the guide, Shift plus F1 the history, Alt plus F1 the version, Control plus F1 the Key Describer; the Help menu holds them and Play Tutorials; and every menu says each command's key as you arrow it.
+Say=Name: status. Role: list box. Value: untried. Position: 4 of 5. Then the hint. A letter jumps to a value, so nothing is typed that could be mistyped. Next, menus, which say their own keys. F10 opens the menu bar.
+Key=F10
+Hear=Menu bar
+Hear=File menu
+
+[step]
+
+Say=I arrow down to the first item.
+Key=Down Arrow
+Hear=Open Database..., Control plus O, O
+
+[step]
+
+Say=The item, its hotkey, then its letter. Learn the key from the menu once, and skip the menu after that. I leave the menus.
+Key=Escape
+Hear=Leaving menus
+
+[step]
+
+Say=Help is in four places, the same in every Homer program. I say which; the reader says the key.
+Key=
+Hear=F1, the guide
+
+[step]
+
+Say=The changes, release by release.
+Key=
+Hear=Shift plus F1, History
+
+[step]
+
+Say=The version, and a check for a newer one.
+Key=
+Hear=Alt plus F1, About
+
+[step]
+
+Say=The name of any key you press.
+Key=
+Hear=Control plus F1, Key Describer
+
+[step]
+
+Say=The Help menu holds all four, and Play Tutorials. Two more parts work out of sight. Your data folder holds your own copies of the program's templates, and an update never touches them. The logs folder holds one log per session, which is what a problem report attaches.
 Key=
 Hear=
 
 [step]
 
-Say=Templates and data. A program's templates ship with it and are copied to your data folder the first time you open one; your copy is yours and an update never touches it. The data folder is under your local application data, named for the program.
+Say=A planned misstep. In the main window, Shift plus Z asks a question. In an edit box, the same keys type a capital Z, so a Say key is for the window, not the field. I press it in EdSharp's edit box.
+Key=Shift+Z
+Hear=Z
+Note=Confirm how the reader echoes a typed capital with a live run: buildTutorials -live.
+
+[step]
+
+Say=The reader echoed the letter, and the box now holds a Z. Control plus Z undoes it.
+Key=Control+Z
+Hear=Undo
+Note=Confirm the undo echo with a live run: buildTutorials -live.
+
+[step]
+
+Say=What this walk taught. I name the part; the reader says the key or the word.
 Key=
 Hear=
 
 [step]
 
-Say=Logs. Every Homer program writes a session log, every build writes a build log, every script writes its own, all under the program's logs folder; the console stays short and the log holds the detail. A problem report is that file and a line about what you were doing.
+Say=The desktop key for DbDo.
 Key=
-Hear=
+Hear=Alt plus Control plus D
 
 [step]
 
-Say=The result window. Output that is a document -- a report, an export, a compile's messages -- opens as a document, in your editor or in a read-only window, where the reader reads it as text.
-Key=
-Hear=
-
-[step]
-
-Say=The finish page. The installer's last page offers optional pieces as boxes, each saying what it does and its state -- Install, Update or Reinstall -- and a results box after Finish names each by outcome. Walk six is that page.
-Key=
-Hear=
-
-[step]
-
-Say=A planned misstep. Press a Homer program's Say key in a dialog where it means nothing, and nothing happens -- no error, no beep -- because a question that has no answer here is not a mistake.
-Key=
-Hear=
-
-[step]
-
-Say=What this walk taught. I say the idea or the key; the reader says the command or the name.
-
-[step]
-
-Say=The dialog class every Homer dialog is built with.
+Say=The class every Homer dialog is built with.
 Key=
 Hear=Lbc
 
@@ -100,3 +175,21 @@ Hear=Lbc
 Say=The question key that changes nothing.
 Key=
 Hear=Shift plus Z, Say Status
+
+[step]
+
+Say=The list of a field's values.
+Key=
+Hear=F4, pick list
+
+[step]
+
+Say=The menu bar.
+Key=
+Hear=F10
+
+[step]
+
+Say=The guide.
+Key=
+Hear=F1

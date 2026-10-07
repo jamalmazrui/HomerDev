@@ -238,6 +238,12 @@ from 98 transcripts of JAWS training.
   reader's answer and his next instruction. `Pause=1` before each `[step]`
   is the script's breath.
 
+### Show, then tell
+
+A walk is a conversation between the two voices, not a talk by one. Whenever the narrator names a part of a program or a pattern of keys, the screen reader shows it right away: the window that comes forward, read by its title; or the control that takes focus, read as its name, its role, its value or state, and then, after a pause, its hint, such as "Type in text." or "To activate press Spacebar." The narrator then says in a sentence what was just heard. A listener who hears a list box answer "status: list box, untried, 4 of 5" learns more, and remembers it longer, than one who is told what a list box says.
+
+checkTutorial holds walks 02 and 03 to this: no more than two steps in a row without the reader, and the reader in at least half the steps. Other walks get a notice after three host-only steps in a row, and any narrator line over sixty words gets a notice. A reader line written from these rules rather than from a recording carries a Note asking for a live run, `buildTutorials -live`, to confirm it.
+
 ### How a reader phrases a control
 
 Taken from two screen reader training classes read back through HomerScribe on
@@ -777,99 +783,221 @@ Screen reader:
 
 ## 02 - User Interface Concepts
 
-What a Homer program is made of, each part heard in DbDo, EdSharp or FileDir: the single instance, the main view, the Lbc dialog, the Say layer, messages, pick lists, help in four places, templates, logs, and the finish page. This walk assumes walk one.
+What a Homer program is made of, each part named by the narrator and then shown by the screen reader: the window, the main view, the dialog, the Say keys, messages, the pick list, menus, and help in four places.
 
 **Before you start:** Nothing is needed; this walk is listened to.
 
 ### Step 1
 
-A Homer program is heard before it is seen, so its parts are defined by what they say. Here they are, each in a program built on the kit.
+A Homer program is heard before it is seen. Each part I name, the reader then shows, as it would on your machine: the name, the kind of control, its value and state, and, a moment later, a hint.
 
 ### Step 2: Alt+Control+D
 
-The window. One program, one instance: the desktop key opens it or brings it forward, never a second copy. Alt plus Control plus D for DbDo, E for EdSharp, F for FileDir -- the letter is the program's.
+First, the window. One program, one copy. Its desktop key opens it or brings it forward. Alt plus Control plus D, D for DbDo.
+
+Screen reader:
+
+- DbDo
+- DbDo ready
+
+### Step 3: Alt+Control+D
+
+The title as the window came forward, then the program's own greeting, in the reader's message voice. I press the same key again.
 
 Screen reader:
 
 - DbDo
 
-### Step 3
+### Step 4: Alt+Control+E
 
-The main view is a Windows control the reader already knows: a list box in FileDir, a grid in DbDo, an edit box in EdSharp. Nothing custom to learn; what differs is what the program adds to the speech.
+The same window, never a second copy. Next, the main view: a control the reader already knows. In EdSharp, it is an edit box.
 
 Screen reader:
 
+- EdSharp
 - Untitled, edit, multiline, blank
+- Type in text.
 
-### Step 4
+### Step 5: Alt+Control+F
 
-The Lbc dialog -- label before control. Every dialog in every Homer program is built by the same class: a label, then its control, Tab between them, Alt plus the underlined letter to jump, Control plus Enter for OK from anywhere, Escape to cancel. Learn one dialog and you have learned them all.
+Name: Untitled. Role: edit, multiline. Value: blank, since nothing is typed yet. Then the hint, which tells a newcomer what the control expects. In FileDir, the main view is a list.
 
 Screen reader:
 
-- Keywords dialog, Keywords: edit
+- FileDir
+- ReadMe dot m d, 1 of 24
 
-### Step 5: Shift+Z
+Confirm this list item's wording with a live run: buildTutorials -live.
 
-The Say layer. Shift plus a letter, or Alt plus a letter, asks a question and changes nothing: Say Cell, Say Status, Say Address. Pressed twice, the same words open in a window to arrow through.
+### Step 6
+
+A list item says its name, then where it sits: 1 of 24. That count is your map. Now a dialog. Every Homer dialog is built the same way, a label, then the control it names. Here is DbDo's search dialog.
+
+Screen reader:
+
+- Keywords dialog
+- Keywords: edit
+- Type in text.
+
+### Step 7: Tab
+
+The title first, then the label read before its box, then the hint. Tab moves through the controls in the order they were added. At the end of every dialog come OK and Cancel.
+
+Screen reader:
+
+- OK button
+- To activate press Spacebar.
+
+Confirm what Tab reaches first with a live run: buildTutorials -live.
+
+### Step 8: Alt+K
+
+OK has no underlined letter: Enter presses it, Escape is Cancel, and Control plus Enter submits from any control in the dialog. Alt plus an underlined letter jumps straight to a control.
+
+Screen reader:
+
+- Keywords: edit
+- Type in text.
+
+Confirm that K is the label's underlined letter with a live run: buildTutorials -live.
+
+### Step 9: Escape
+
+Alt plus K, K for Keywords, and focus is back on the box. I press Escape.
+
+Screen reader:
+
+- DbDo
+
+Confirm the line read when the dialog closes with a live run: buildTutorials -live.
+
+### Step 10: Shift+Z
+
+Back in the main window. Next, the Say keys. They ask a question and change nothing. Shift plus Z is Say Status: Z, the end of the alphabet, where the status line sits.
 
 Screen reader:
 
 - jobs, 12 records, no filter, sorted by employer
 
-### Step 6
+### Step 11: Control+K
 
-Messages are spoken when something happens, and shown on the status line, so a result is heard without being asked for.
+The table, its record count, the filter and the sort, in one breath. Pressed twice quickly, the same words open in a window to arrow through. Next, messages: they are spoken when something happens. In EdSharp, Control plus K sets a bookmark, K for marK.
 
 Screen reader:
 
 - Bookmark at percent 40
 
-### Step 7: F4
+### Step 12: F4
 
-The pick list. Where a field has fixed values, F4 opens them as a list, and a letter jumps to one; nothing is typed that could be mistyped.
+The fact, with its number, in the message voice, and the same words on the status line. Next, the pick list. Where a field has fixed values, F4 opens them.
 
 Screen reader:
 
 - status: list box, untried, 4 of 5
+- To move through items press Up or Down Arrow.
 
-### Step 8
+### Step 13: F10
 
-Help is in four places, and they are the same in every program the kit builds. F1 the guide, Shift plus F1 the history, Alt plus F1 the version, Control plus F1 the Key Describer; the Help menu holds them and Play Tutorials; and every menu says each command's key as you arrow it.
+Name: status. Role: list box. Value: untried. Position: 4 of 5. Then the hint. A letter jumps to a value, so nothing is typed that could be mistyped. Next, menus, which say their own keys. F10 opens the menu bar.
 
-### Step 9
+Screen reader:
 
-Templates and data. A program's templates ship with it and are copied to your data folder the first time you open one; your copy is yours and an update never touches it. The data folder is under your local application data, named for the program.
+- Menu bar
+- File menu
 
-### Step 10
+### Step 14: Down Arrow
 
-Logs. Every Homer program writes a session log, every build writes a build log, every script writes its own, all under the program's logs folder; the console stays short and the log holds the detail. A problem report is that file and a line about what you were doing.
+I arrow down to the first item.
 
-### Step 11
+Screen reader:
 
-The result window. Output that is a document -- a report, an export, a compile's messages -- opens as a document, in your editor or in a read-only window, where the reader reads it as text.
+- Open Database..., Control plus O, O
 
-### Step 12
+### Step 15: Escape
 
-The finish page. The installer's last page offers optional pieces as boxes, each saying what it does and its state -- Install, Update or Reinstall -- and a results box after Finish names each by outcome. Walk six is that page.
+The item, its hotkey, then its letter. Learn the key from the menu once, and skip the menu after that. I leave the menus.
 
-### Step 13
+Screen reader:
 
-A planned misstep. Press a Homer program's Say key in a dialog where it means nothing, and nothing happens -- no error, no beep -- because a question that has no answer here is not a mistake.
+- Leaving menus
 
-### Step 14
+### Step 16
 
-What this walk taught. I say the idea or the key; the reader says the command or the name.
+Help is in four places, the same in every Homer program. I say which; the reader says the key.
 
-### Step 15
+Screen reader:
 
-The dialog class every Homer dialog is built with.
+- F1, the guide
+
+### Step 17
+
+The changes, release by release.
+
+Screen reader:
+
+- Shift plus F1, History
+
+### Step 18
+
+The version, and a check for a newer one.
+
+Screen reader:
+
+- Alt plus F1, About
+
+### Step 19
+
+The name of any key you press.
+
+Screen reader:
+
+- Control plus F1, Key Describer
+
+### Step 20
+
+The Help menu holds all four, and Play Tutorials. Two more parts work out of sight. Your data folder holds your own copies of the program's templates, and an update never touches them. The logs folder holds one log per session, which is what a problem report attaches.
+
+### Step 21: Shift+Z
+
+A planned misstep. In the main window, Shift plus Z asks a question. In an edit box, the same keys type a capital Z, so a Say key is for the window, not the field. I press it in EdSharp's edit box.
+
+Screen reader:
+
+- Z
+
+Confirm how the reader echoes a typed capital with a live run: buildTutorials -live.
+
+### Step 22: Control+Z
+
+The reader echoed the letter, and the box now holds a Z. Control plus Z undoes it.
+
+Screen reader:
+
+- Undo
+
+Confirm the undo echo with a live run: buildTutorials -live.
+
+### Step 23
+
+What this walk taught. I name the part; the reader says the key or the word.
+
+### Step 24
+
+The desktop key for DbDo.
+
+Screen reader:
+
+- Alt plus Control plus D
+
+### Step 25
+
+The class every Homer dialog is built with.
 
 Screen reader:
 
 - Lbc
 
-### Step 16
+### Step 26
 
 The question key that changes nothing.
 
@@ -877,7 +1005,31 @@ Screen reader:
 
 - Shift plus Z, Say Status
 
-**Something to try:** Open any Homer program and name each part as you reach it: the view, a dialog, the status line, the Help menu.
+### Step 27
+
+The list of a field's values.
+
+Screen reader:
+
+- F4, pick list
+
+### Step 28
+
+The menu bar.
+
+Screen reader:
+
+- F10
+
+### Step 29
+
+The guide.
+
+Screen reader:
+
+- F1
+
+**Something to try:** Open any Homer program and, as each part takes focus, listen for its name, its kind, its value or state, and the hint after a pause.
 
 ## 03 - Key Patterns
 
@@ -885,31 +1037,32 @@ The rules every Homer key follows, so a key can be guessed in a program you have
 
 **Before you start:** Nothing is needed; a Homer program open to try the keys is a bonus.
 
-### Step 1
+### Step 1: Control+K
 
-Every key in a Homer program is named for a word in its command, and the same word gives the same key in every program. Control plus K is Keywords in DbDo and in FileDir; Control plus F is Find in all three; F2 renames or edits in place everywhere. A key never comes from the middle of a word.
+Every key in a Homer program is named for a word in its command, and the same word gives the same key in every program. Control plus K is Keywords in DbDo and in FileDir; Control plus F is Find in all three; F2 renames or edits in place everywhere. A key never comes from the middle of a word. In DbDo, Control plus K opens Keywords: the reader names the dialog, then the box, then the hint.
 
-### Step 2
+Screen reader:
 
-Control plus a letter does something. Shift plus a letter, or Alt plus a letter, asks something and changes nothing. Adding Shift to a doing key reverses or widens it: Control plus M marks, Control plus Shift plus M unmarks; Control plus O opens, Control plus Shift plus O opens converting.
+- Keywords dialog
+- Keywords: edit
+- Type in text.
+- jobs, 12 records, no filter, sorted by employer
+
+Confirm with a live run: buildTutorials -live.[step]
+
+### Step 2: F4
+
+The function keys follow Windows and Office: F1 help, F2 edit or rename, F3 find again, F4 pick from a list or list the windows, F5 run or refresh, F7 spelling, F10 the menus, F11 the newer version, F12 the AI or the files. F4 in a DbDo field with fixed values: pick from a list.
+
+Screen reader:
+
+- status: list box, untried, 4 of 5
+- To move through items press Up or Down Arrow.
+- DbDo
+
+Confirm with a live run: buildTutorials -live.[step]
 
 ### Step 3
-
-Alt plus Shift plus a letter is a command with no control of its own: Alt plus Shift plus P plays a stream, Alt plus Shift plus R records or runs a report, Alt plus Shift plus E exports.
-
-### Step 4
-
-The function keys follow Windows and Office: F1 help, F2 edit or rename, F3 find again, F4 pick from a list or list the windows, F5 run or refresh, F7 spelling, F10 the menus, F11 the newer version, F12 the AI or the files.
-
-### Step 5
-
-Anything with Insert in it belongs to the screen reader; a Homer program never uses the Insert key, so the two can never collide.
-
-### Step 6
-
-The rules let a key be guessed, in a program you have never opened. I name a command; the reader says the key the rules give it.
-
-### Step 7
 
 Say Status.
 
@@ -917,7 +1070,7 @@ Screen reader:
 
 - Shift plus Z
 
-### Step 8
+### Step 4
 
 Keywords.
 
@@ -925,7 +1078,7 @@ Screen reader:
 
 - Control plus K
 
-### Step 9
+### Step 5
 
 Unmark, the reverse of Mark.
 
@@ -933,7 +1086,7 @@ Screen reader:
 
 - Control plus Shift plus M
 
-### Step 10
+### Step 6
 
 Play Stream, which has no control of its own.
 
@@ -941,7 +1094,7 @@ Screen reader:
 
 - Alt plus Shift plus P
 
-### Step 11
+### Step 7
 
 Check for a newer version.
 
@@ -949,7 +1102,7 @@ Screen reader:
 
 - F11
 
-### Step 12: Control+F1
+### Step 8: Control+F1
 
 The keys that explain the keys, the same in every program. Control plus F1 is the Key Describer: on, every key says what it does instead of doing it.
 
@@ -957,7 +1110,7 @@ Screen reader:
 
 - Key Describer On
 
-### Step 13: Control+F1
+### Step 9: Control+F1
 
 Control plus F1 again turns it off. Hotkeys, in the Help menu, lists every key three ways -- by menu, by key, by command -- generated from the program itself, so it cannot fall behind. And the menus say each command's key as you arrow them.
 
@@ -965,19 +1118,22 @@ Screen reader:
 
 - No Key Describer
 
-### Step 14
+### Step 10: Alt+K
 
-Access letters in dialogs and menus come from the plain Windows rule: the underlined letter, the first letter of a word in the caption, one per dialog; better no letter than one from inside a word. The kit's check counts them per dialog and refuses a duplicate.
+Access letters in dialogs and menus come from the plain Windows rule: the underlined letter, the first letter of a word in the caption, one per dialog; better no letter than one from inside a word. The kit's check counts them per dialog and refuses a duplicate. In DbDo's Keywords dialog, Alt plus K, K for Keywords, lands on the box.
 
-### Step 15
+Screen reader:
 
-A planned misstep. Press a key the program does not bind, and nothing happens -- no beep, no message -- because an unbound key is not a mistake; the Key Describer or the Alternate Menu tells you what the key you wanted is.
+- Keywords: edit
+- Type in text.
 
-### Step 16
+Confirm with a live run: buildTutorials -live.[step]
+
+### Step 11
 
 The other direction, which is how the hotkey list reads: I say the key, the reader says the command it names in each program.
 
-### Step 17
+### Step 12
 
 Control plus K.
 
@@ -985,7 +1141,7 @@ Screen reader:
 
 - Keywords, in DbDo and in FileDir
 
-### Step 18
+### Step 13
 
 Control plus F.
 
@@ -993,7 +1149,7 @@ Screen reader:
 
 - Filter Records in DbDo; Forward Find in EdSharp; Filter in FileDir
 
-### Step 19
+### Step 14
 
 Shift plus Z.
 
@@ -1001,7 +1157,7 @@ Screen reader:
 
 - Say Status in DbDo; Zip in FileDir
 
-### Step 20
+### Step 15
 
 Alt plus F10.
 
@@ -1009,15 +1165,15 @@ Screen reader:
 
 - The Alternate Menu in EdSharp: every command in one list you type into
 
-### Step 21
+### Step 16
 
 How a key gets chosen when a new command arrives. The word first: its first letter. Taken? The next word of the command. All taken? A command with no control gets Alt plus Shift and the letter. A key from inside a word is never chosen; a command without a good key is renamed until it has one.
 
-### Step 22
+### Step 17
 
 A worked case. DbDo gained Play Stream. P was Pick Value's on the grid; Play had no control of its own; so Alt plus Shift plus P -- and the recording in the player took Alt plus Shift plus R, R for Record, after Rate had the plain R. The rules decided both in a minute, and both are guessable now.
 
-### Step 23
+### Step 18
 
 A planned misstep. Give a dialog two controls whose captions start with the same letter, and the kit's check refuses the build by name: the dialog, the two captions. The fix is a caption, not a key table.
 
@@ -1025,11 +1181,11 @@ Screen reader:
 
 - access letters -- Filter Records: F is used by Find and Filter
 
-### Step 24
+### Step 19
 
 What this walk taught. I say the idea or the key; the reader says the command or the name.
 
-### Step 25
+### Step 20
 
 Control plus F1.
 
@@ -1037,7 +1193,7 @@ Screen reader:
 
 - Key Describer
 
-### Step 26
+### Step 21
 
 Every key three ways, from the program itself.
 

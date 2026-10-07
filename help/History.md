@@ -141,6 +141,28 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.58.0 -- 7 October 2026
+
+**Show, then tell.** The User Interface Concepts walk ran on with the narrator
+alone. Each part it named is now shown by the screen reader straight after:
+the window that comes forward by its title, the control that takes focus by
+its name, role, value and state, then its hint in the message voice. The
+walk has 29 steps, 26 with the reader, and never two host-only steps in a
+row. The Key Patterns walk shows its rules the same way, with Control plus K,
+Shift plus Z, F4, Insert plus T and Alt plus K.
+
+- checkTutorial measures it: in walks 02 and 03, a problem after two
+  host-only steps in a row or when the reader speaks in fewer than half the
+  steps; in walks 01 and 04 to 10, a notice after three; and a notice for any
+  narrator line over sixty words. The log gives each walk's share. Walks 07,
+  08 and 10 draw notices, the Conclusion most, with twelve host-only steps in
+  a row.
+- The homer-tutorial skill, help\Tutorials.md and the starter
+  Templates\Tutorial_02_User_Interface_Concepts.inix carry the rule, so a
+  walk written for any Homer app starts in two voices.
+- Reader lines written from the phrasing rules rather than from a recording
+  carry a Note asking for a live run to confirm them.
+
 ## 1.57.0 -- 7 October 2026
 
 **One .inix format, read the same way in C# and Python.** A value that spans

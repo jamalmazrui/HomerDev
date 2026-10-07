@@ -1,33 +1,53 @@
 ﻿[about]
 Title=02 - User Interface Concepts
-Intro=What _APP_ is made of: its windows, its main view, its dialogs, its status bar. Listened to more than pressed.
+Intro=What _APP_ is made of, each part named by the narrator and then shown by the screen reader: its window, its main view, its dialogs, its status, its menus, and its help.
 Setup=_APP_ is installed and your reader is running.
-Homework=Open _APP_ and name each thing as you reach it.
+Homework=Open _APP_ and, as each part takes focus, listen for its name, its kind, its value or state, and the hint after a pause.
 
 [step]
 
-Say=The window, and the windows inside it.
+Say=Each part I name, the reader then shows: the name, the kind of control, its value and state, and a hint. First, the window. Its desktop key brings _APP_ forward, never a second copy.
+Key=Alt+Control+<letter>
+Hear=_APP_
+Hear=<the program's own greeting, if it has one>
+
+[step]
+
+Say=The title, then the greeting. Next, the main view, a control the reader already knows.
+Key=
+Hear=<name>, <role>, <value or state>
+Hear=<the hint, such as Type in text.>
+
+[step]
+
+Say=Name, role, value, then the hint. Dialogs all work one way: a label, then its control.
+Key=<the key that opens a dialog>
+Hear=<title> dialog
+Hear=<label>: <role>
+Hear=<the hint>
+
+[step]
+
+Say=Tab moves on; at the end come OK and Cancel. Enter is OK, Escape is Cancel, Control plus Enter submits from anywhere.
+Key=Tab
+Hear=OK button
+Hear=To activate press Spacebar.
+
+[step]
+
+Say=The status asks and changes nothing: Shift plus Z.
+Key=Shift+Z
+Hear=<the status line, word for word>
+
+[step]
+
+Say=Menus say their keys. F10 opens the menu bar.
+Key=F10
+Hear=Menu bar
+Hear=<first menu> menu
+
+[step]
+
+Say=What this walk taught. I name the part; the reader says the key.
 Key=
 Hear=
-
-[step]
-
-Say=The main view, and what a row or a line says.
-Key=
-Hear=
-
-[step]
-
-Say=Dialogs, which all work one way: Tab, Alt plus a letter, Control plus Enter, Escape.
-Key=
-Hear=
-
-[step]
-
-Say=The status bar, and Shift plus Z.
-Key=
-Hear=
-
-[step]
-
-Say=What this walk taught: the keys you heard.

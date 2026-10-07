@@ -425,6 +425,22 @@ box” makes the listener translate twice. - <strong>Pause before the next
 key.</strong> The trainer leaves a breath between the reader’s answer
 and his next instruction. <code>Pause=1</code> before each
 <code>[step]</code> is the script’s breath.</p>
+<h3 id="show-then-tell">Show, then tell</h3>
+<p>A walk is a conversation between the two voices, not a talk by one.
+Whenever the narrator names a part of a program or a pattern of keys,
+the screen reader shows it right away: the window that comes forward,
+read by its title; or the control that takes focus, read as its name,
+its role, its value or state, and then, after a pause, its hint, such as
+“Type in text.” or “To activate press Spacebar.” The narrator then says
+in a sentence what was just heard. A listener who hears a list box
+answer “status: list box, untried, 4 of 5” learns more, and remembers it
+longer, than one who is told what a list box says.</p>
+<p>checkTutorial holds walks 02 and 03 to this: no more than two steps
+in a row without the reader, and the reader in at least half the steps.
+Other walks get a notice after three host-only steps in a row, and any
+narrator line over sixty words gets a notice. A reader line written from
+these rules rather than from a recording carries a Note asking for a
+live run, <code>buildTutorials -live</code>, to confirm it.</p>
 <h3 id="how-a-reader-phrases-a-control">How a reader phrases a
 control</h3>
 <p>Taken from two screen reader training classes read back through

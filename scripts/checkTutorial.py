@@ -32,6 +32,21 @@ import datetime, glob, io, os, platform, re, sys
 c_lsReaderNames = ["JAWS", "NVDA", "Narrator", "VoiceOver", "Fusion", "ZoomText"]
 c_lsSilenceWords = ["nothing", "silent", "silence", "did not say", "says nothing"]
 c_lsModifierOrder = ["Alt", "Control", "Shift", "Windows"]
+# SHOW, THEN TELL (1.58.0). In a Homer walk the host names a concept and the
+# screen reader then shows it: the control that takes focus, read as name,
+# role, value and state, with the hint after; or the window that comes
+# forward, read by its title. The author heard walk 02 run on with the host
+# alone and found it far less instructive than an exchange. So in the concept
+# and pattern walks, 02 and 03, no more than c_iMaxHostRun steps in a row may
+# pass without the reader, and at least c_nMinReaderShare of the steps must
+# carry the reader. Other walks get a notice for a longer run. 00 is prose and
+# a table of contents by design, and 11 may be short, so neither is measured.
+c_dConceptWalks = {"02": "User Interface Concepts", "03": "Key Patterns"}
+c_iLongSay = 60
+c_iMaxHostRun = 2
+c_iNoticeHostRun = 3
+c_lsUnmeasuredWalks = ["00", "11"]
+c_nMinReaderShare = 0.5
 
 lsProblems = []
 oLog = None
@@ -195,6 +210,27 @@ def checkOne(sScript, bFirst):
             if not any(w in sText for w in c_lsSilenceWords):
                 problem(sScript, iAt, "Key %s has no Hear line and nothing names the silence" % sKey)
         for sHear in lsHear: checkHear(sScript, iAt, sHear)
+    oNumber = re.match(r"Tutorial_(\d\d)_", os.path.basename(sScript))
+    sNumber = oNumber.group(1) if oNumber else ""
+    if sNumber and sNumber not in c_lsUnmeasuredWalks and lsSteps:
+        iRun, iLongest, iAtLongest, iWithReader = 0, 0, 0, 0
+        for iAt, dStep in enumerate(lsSteps, 1):
+            if [s for s in dStep.get("Hear", []) if s]:
+                iWithReader += 1
+                iRun = 0
+                continue
+            iRun += 1
+            if iRun > iLongest: iLongest, iAtLongest = iRun, iAt
+        nShare = float(iWithReader) / len(lsSteps)
+        logLine("%s: the reader speaks in %d of %d steps; the longest stretch of the host alone is %d step%s" % (os.path.basename(sScript), iWithReader, len(lsSteps), iLongest, "" if iLongest == 1 else "s"))
+        if sNumber in c_dConceptWalks:
+            if iLongest > c_iMaxHostRun: problem(sScript, iAtLongest, "%d steps in a row with the host alone; in the %s walk each concept is shown by the reader, its name, role, value, state and hint, right after it is named" % (iLongest, c_dConceptWalks[sNumber]))
+            if nShare < c_nMinReaderShare: problem(sScript, 0, "the reader speaks in only %d of %d steps; in the %s walk at least half the steps show a concept in the reader's voice" % (iWithReader, len(lsSteps), c_dConceptWalks[sNumber]))
+        elif iLongest > c_iNoticeHostRun:
+            notice("%s: %d steps in a row with the host alone, ending at step %d; let the reader show what the host has named" % (os.path.basename(sScript), iLongest, iAtLongest))
+    for iAt, dStep in enumerate(lsSteps, 1):
+        iWords = len(firstOf(dStep, "Say").split())
+        if iWords > c_iLongSay: notice("%s step %d: a Say line of %d words; say less, then let the reader show it" % (os.path.basename(sScript), iAt, iWords))
     if bFirst and not re.search(r"Insert (plus )?Up Arrow", sWhole):
         problem(sScript, 0, "the first script does not teach the repeat key, Insert plus Up Arrow")
     # The orientation key goes with the repeat key: the trainers teach both in

@@ -105,8 +105,10 @@ Intro as the want in plain words, and say which earlier walks it assumes.
 - **02**: the parts of the program as heard -- window, main view, dialogs
   that work one way, Say keys, messages, settings -- and where help is: F1,
   Shift plus F1, Alt plus F1, the Help menu with Play Tutorials, the menus
-  that say their keys.
-- **03**: the rules, then a guessing exchange both ways (host names a
+  that say their keys. Every part is named in a sentence or two and then
+  shown: the host presses the key, and the reader speaks the window that
+  comes forward or the control that takes focus (see Show, then tell).
+- **03**: the rules, each shown with a key and the reader's answer, then a guessing exchange both ways (host names a
   command, reader gives the key; host says a key, reader names the command),
   the keys that explain the keys (Control plus F1, Hotkeys, Insert plus Tab),
   one worked case of how a key was chosen, one misstep.
@@ -216,6 +218,36 @@ Also:
 - **A breath before each key**: `Pause=1` where the listener needs it.
 - **Name no screen reader.** Write "the screen reader" or "the reader".
   The scripts are for everyone's reader.
+
+## Show, then tell
+
+A walk is a conversation, not a lecture. Whenever the host names a concept
+or a pattern, the reader shows it straight away, in the reader's own words:
+
+- **A control taking focus** is read as name, role, value, state, then the
+  hint, each its own `Hear=` line where the reader pauses: `Untitled, edit,
+  multiline, blank` then `Type in text.`; `status: list box, untried, 4 of 5`
+  then `To move through items press Up or Down Arrow.` Hint lines begin "To",
+  "Press" or "Type in", so the build speaks them in the message voice, as a
+  reader speaks a tutor message.
+- **A window activating** is read by its title, then the program's own
+  announcement, then the control with focus: `DbDo` then `DbDo ready`.
+- **A pattern** is shown by pressing one key that follows it and hearing the
+  result, then named in one sentence: Shift plus Z asks and changes nothing,
+  and the reader proves it.
+
+After the reader speaks, the host says in one sentence what the listener
+just heard, naming the parts: "Name: Untitled. Role: edit. Value: blank.
+Then the hint." Keep each `Say=` to two or three short sentences; a longer
+explanation is a sign the reader should be showing it instead.
+
+The checker measures this. In walks 02 and 03 no more than two steps in a
+row may pass without the reader, and at least half the steps must carry the
+reader; other walks get a notice after three host-only steps in a row, and
+any `Say=` over sixty words gets a notice. Walk 00 (prose, then the
+contents) and walk 11 are not measured. A `Hear=` line written from the
+phrasing rules below rather than from a recording carries a `Note=` asking
+for a live run (`buildTutorials -live`) to confirm it.
 
 ## How the reader phrases a control
 

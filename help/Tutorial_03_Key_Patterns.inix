@@ -6,17 +6,17 @@ Homework=Guess three keys in a Homer program you have not used, then check with 
 
 [step]
 
-Say=Every key in a Homer program is named for a word in its command, and the same word gives the same key in every program. Control plus K is Keywords in DbDo and in FileDir; Control plus F is Find in all three; F2 renames or edits in place everywhere. A key never comes from the middle of a word.
-Key=
-Hear=
+Say=Every key in a Homer program is named for a word in its command, and the same word gives the same key in every program. Control plus K is Keywords in DbDo and in FileDir; Control plus F is Find in all three; F2 renames or edits in place everywhere. A key never comes from the middle of a word. In DbDo, Control plus K opens Keywords: the reader names the dialog, then the box, then the hint.
+Key=Control+K
+Hear=Keywords dialog
+Hear=Keywords: edit
+Hear=Type in text.
+Note=Confirm with a live run: buildTutorials -live.[step]
 
-[step]
-
-Say=Control plus a letter does something. Shift plus a letter, or Alt plus a letter, asks something and changes nothing. Adding Shift to a doing key reverses or widens it: Control plus M marks, Control plus Shift plus M unmarks; Control plus O opens, Control plus Shift plus O opens converting.
-Key=
-Hear=
-
-[step]
+Say=Control plus a letter does something. Shift plus a letter, or Alt plus a letter, asks something and changes nothing. Adding Shift to a doing key reverses or widens it: Control plus M marks, Control plus Shift plus M unmarks; Control plus O opens, Control plus Shift plus O opens converting. Shift plus Z in DbDo asks for the status and changes nothing.
+Key=Shift+Z
+Hear=jobs, 12 records, no filter, sorted by employer
+Note=Confirm with a live run: buildTutorials -live.[step]
 
 Say=Alt plus Shift plus a letter is a command with no control of its own: Alt plus Shift plus P plays a stream, Alt plus Shift plus R records or runs a report, Alt plus Shift plus E exports.
 Key=
@@ -24,17 +24,16 @@ Hear=
 
 [step]
 
-Say=The function keys follow Windows and Office: F1 help, F2 edit or rename, F3 find again, F4 pick from a list or list the windows, F5 run or refresh, F7 spelling, F10 the menus, F11 the newer version, F12 the AI or the files.
-Key=
-Hear=
+Say=The function keys follow Windows and Office: F1 help, F2 edit or rename, F3 find again, F4 pick from a list or list the windows, F5 run or refresh, F7 spelling, F10 the menus, F11 the newer version, F12 the AI or the files. F4 in a DbDo field with fixed values: pick from a list.
+Key=F4
+Hear=status: list box, untried, 4 of 5
+Hear=To move through items press Up or Down Arrow.
+Note=Confirm with a live run: buildTutorials -live.[step]
 
-[step]
-
-Say=Anything with Insert in it belongs to the screen reader; a Homer program never uses the Insert key, so the two can never collide.
-Key=
-Hear=
-
-[step]
+Say=Anything with Insert in it belongs to the screen reader; a Homer program never uses the Insert key, so the two can never collide. Insert plus T is the reader's own: it says the window's title.
+Key=Insert+T
+Hear=DbDo
+Note=Confirm with a live run: buildTutorials -live.[step]
 
 Say=The rules let a key be guessed, in a program you have never opened. I name a command; the reader says the key the rules give it.
 Key=
@@ -84,11 +83,11 @@ Hear=No Key Describer
 
 [step]
 
-Say=Access letters in dialogs and menus come from the plain Windows rule: the underlined letter, the first letter of a word in the caption, one per dialog; better no letter than one from inside a word. The kit's check counts them per dialog and refuses a duplicate.
-Key=
-Hear=
-
-[step]
+Say=Access letters in dialogs and menus come from the plain Windows rule: the underlined letter, the first letter of a word in the caption, one per dialog; better no letter than one from inside a word. The kit's check counts them per dialog and refuses a duplicate. In DbDo's Keywords dialog, Alt plus K, K for Keywords, lands on the box.
+Key=Alt+K
+Hear=Keywords: edit
+Hear=Type in text.
+Note=Confirm with a live run: buildTutorials -live.[step]
 
 Say=A planned misstep. Press a key the program does not bind, and nothing happens -- no beep, no message -- because an unbound key is not a mistake; the Key Describer or the Alternate Menu tells you what the key you wanted is.
 Key=
