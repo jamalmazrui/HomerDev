@@ -457,6 +457,13 @@ if exist "help\Tutorial_*.inix" (
     if not exist "help\tutorials\!sChapter!.mp3" set "tutorialsMissing=1"
     if exist "help\tutorials\!sChapter!.mp3" for /f %%N in ('powershell -NoProfile -Command "if ((Get-Item -LiteralPath '%%F').LastWriteTimeUtc -gt (Get-Item -LiteralPath 'help\tutorials\!sChapter!.mp3').LastWriteTimeUtc) { 1 } else { 0 }"') do if "%%N"=="1" set "tutorialsMissing=1"
   )
+  rem AN ACCEPTANCE BUILD SPEAKS NOTHING (kit 1.54.2): check runs build.cmd
+  rem nobump with HomerAcceptance set; speaking twelve walks there ran out its
+  rem fifteen-minute clock. The ordinary build's audio is what ships.
+  if defined HomerAcceptance (
+    set "tutorialsMissing="
+    >> "%log%" echo Tutorials: acceptance build, speaking left to the ordinary build
+  )
   if defined tutorialsMissing (
     if exist "scripts\buildTutorials.cmd" (
       echo Speaking the tutorials that have no audio yet

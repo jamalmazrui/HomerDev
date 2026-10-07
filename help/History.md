@@ -141,6 +141,15 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.54.2 -- 7 October 2026
+
+**An acceptance build speaks nothing.** check runs an app's build as an
+acceptance check with HomerAcceptance in its environment, and a build that sees
+it leaves the speaking of tutorials to the ordinary build, which already did it;
+DbDo's acceptance build on 7 October spoke twelve walks and ran out the
+fifteen-minute clock, failing a release whose audio was complete. The build
+template, DbDo's and EdSharp's builds honour the mark.
+
 ## 1.54.1 -- 6 October 2026
 
 **An app stays an app under the kit's strays.** With the kit's Templates and
