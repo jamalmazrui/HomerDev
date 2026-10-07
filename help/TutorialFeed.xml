@@ -5,7 +5,7 @@
     <link>Tutorials.htm</link>
     <description>Spoken walks through the Homer Development Kit: what it is, how it builds and releases an app, and what its shared code makes a person hear. Twelve walks, each three to five minutes.</description>
     <language>en-us</language>
-    <lastBuildDate>Wed, 07 Oct 2026 01:28:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 07 Oct 2026 02:45:11 +0000</lastBuildDate>
     <itunes:author>Jamal Mazrui</itunes:author>
     <itunes:explicit>false</itunes:explicit>
     <itunes:category text="Technology"/>
@@ -15,7 +15,7 @@
       <description>Nothing is needed; this walk is listened to. Full transcript: Tutorials.htm#0-00-overview-and-table-of-contents</description>
       <link>Tutorials.htm#0-00-overview-and-table-of-contents</link>
       <guid isPermaLink="false">homer-tutorial_00_overview_and_table_of_contents</guid>
-      <enclosure url="tutorials/00_Overview_and_Table_of_Contents.mp3" length="1048557" type="audio/mpeg"/>
+      <enclosure url="tutorials/00_Overview_and_Table_of_Contents.mp3" length="1060079" type="audio/mpeg"/>
       <itunes:duration>00:02:31</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
     </item>
@@ -24,7 +24,7 @@
       <description>Windows 10 or later, 64-bit, a screen reader running, and HomerDev dot zip downloaded. Everything else the kit fetches for itself. Full transcript: Tutorials.htm#0a-01-install-and-launch</description>
       <link>Tutorials.htm#0a-01-install-and-launch</link>
       <guid isPermaLink="false">homer-tutorial_01_install_and_launch</guid>
-      <enclosure url="tutorials/01_Install_and_Launch.mp3" length="1378805" type="audio/mpeg"/>
+      <enclosure url="tutorials/01_Install_and_Launch.mp3" length="1385160" type="audio/mpeg"/>
       <itunes:duration>00:03:14</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
     </item>
@@ -33,7 +33,7 @@
       <description>Nothing is needed; this walk is listened to. Full transcript: Tutorials.htm#0b-02-user-interface-concepts</description>
       <link>Tutorials.htm#0b-02-user-interface-concepts</link>
       <guid isPermaLink="false">homer-tutorial_02_user_interface_concepts</guid>
-      <enclosure url="tutorials/02_User_Interface_Concepts.mp3" length="1367413" type="audio/mpeg"/>
+      <enclosure url="tutorials/02_User_Interface_Concepts.mp3" length="1372847" type="audio/mpeg"/>
       <itunes:duration>00:03:07</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
     </item>
@@ -42,7 +42,7 @@
       <description>Nothing is needed; a Homer program open to try the keys is a bonus. Full transcript: Tutorials.htm#0c-03-key-patterns</description>
       <link>Tutorials.htm#0c-03-key-patterns</link>
       <guid isPermaLink="false">homer-tutorial_03_key_patterns</guid>
-      <enclosure url="tutorials/03_Key_Patterns.mp3" length="1135594" type="audio/mpeg"/>
+      <enclosure url="tutorials/03_Key_Patterns.mp3" length="1137073" type="audio/mpeg"/>
       <itunes:duration>00:02:39</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
     </item>
@@ -51,7 +51,7 @@
       <description>The kit is at C colon backslash HomerDev, and a command prompt is open there. Full transcript: Tutorials.htm#0d-04-start-an-app-from-the-kit</description>
       <link>Tutorials.htm#0d-04-start-an-app-from-the-kit</link>
       <guid isPermaLink="false">homer-tutorial_04_start_an_app_from_the_kit</guid>
-      <enclosure url="tutorials/04_Start_an_App_from_the_Kit.mp3" length="1263528" type="audio/mpeg"/>
+      <enclosure url="tutorials/04_Start_an_App_from_the_Kit.mp3" length="1258918" type="audio/mpeg"/>
       <itunes:duration>00:02:55</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
     </item>
@@ -60,8 +60,8 @@
       <description>An app built on the kit is open in a command prompt, with a change made and GitHub signed in. Full transcript: Tutorials.htm#0e-05-build-check-and-release</description>
       <link>Tutorials.htm#0e-05-build-check-and-release</link>
       <guid isPermaLink="false">homer-tutorial_05_build_check_and_release</guid>
-      <enclosure url="tutorials/05_Build_Check_and_Release.mp3" length="1324887" type="audio/mpeg"/>
-      <itunes:duration>00:03:03</itunes:duration>
+      <enclosure url="tutorials/05_Build_Check_and_Release.mp3" length="1322227" type="audio/mpeg"/>
+      <itunes:duration>00:03:02</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
     </item>
     <item>
@@ -69,8 +69,8 @@
       <description>A Homer program's installer is downloaded, and your reader is running. Full transcript: Tutorials.htm#0f-06-the-installer-and-its-finish-page</description>
       <link>Tutorials.htm#0f-06-the-installer-and-its-finish-page</link>
       <guid isPermaLink="false">homer-tutorial_06_the_installer_and_its_finish_page</guid>
-      <enclosure url="tutorials/06_The_Installer_and_Its_Finish_Page.mp3" length="1202026" type="audio/mpeg"/>
-      <itunes:duration>00:02:47</itunes:duration>
+      <enclosure url="tutorials/06_The_Installer_and_Its_Finish_Page.mp3" length="1203047" type="audio/mpeg"/>
+      <itunes:duration>00:02:46</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
     </item>
     <item>
@@ -78,8 +78,44 @@
       <description>An app built on the kit, with its help folder open. Full transcript: Tutorials.htm#0g-07-spoken-tutorials</description>
       <link>Tutorials.htm#0g-07-spoken-tutorials</link>
       <guid isPermaLink="false">homer-tutorial_07_spoken_tutorials</guid>
-      <enclosure url="tutorials/07_Spoken_Tutorials.mp3" length="1610190" type="audio/mpeg"/>
+      <enclosure url="tutorials/07_Spoken_Tutorials.mp3" length="1615074" type="audio/mpeg"/>
       <itunes:duration>00:03:38</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>08 - Shared Code and the Homer Player</title>
+      <description>FileDir and DbDo are installed, with mpv. Full transcript: Tutorials.htm#0h-08-shared-code-and-the-homer-player</description>
+      <link>Tutorials.htm#0h-08-shared-code-and-the-homer-player</link>
+      <guid isPermaLink="false">homer-tutorial_08_shared_code_and_the_homer_player</guid>
+      <enclosure url="tutorials/08_Shared_Code_and_the_Homer_Player.mp3" length="1250672" type="audio/mpeg"/>
+      <itunes:duration>00:02:52</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>09 - Glossary</title>
+      <description>Nothing is needed. Full transcript: Tutorials.htm#0i-09-glossary</description>
+      <link>Tutorials.htm#0i-09-glossary</link>
+      <guid isPermaLink="false">homer-tutorial_09_glossary</guid>
+      <enclosure url="tutorials/09_Glossary.mp3" length="1319952" type="audio/mpeg"/>
+      <itunes:duration>00:03:14</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>10 - Conclusion</title>
+      <description>Nothing is needed. Full transcript: Tutorials.htm#0j-10-conclusion</description>
+      <link>Tutorials.htm#0j-10-conclusion</link>
+      <guid isPermaLink="false">homer-tutorial_10_conclusion</guid>
+      <enclosure url="tutorials/10_Conclusion.mp3" length="897221" type="audio/mpeg"/>
+      <itunes:duration>00:02:03</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>11 - More Information</title>
+      <description>Nothing is needed. Full transcript: Tutorials.htm#0k-11-more-information</description>
+      <link>Tutorials.htm#0k-11-more-information</link>
+      <guid isPermaLink="false">homer-tutorial_11_more_information</guid>
+      <enclosure url="tutorials/11_More_Information.mp3" length="643004" type="audio/mpeg"/>
+      <itunes:duration>00:01:26</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
     </item>
   </channel>

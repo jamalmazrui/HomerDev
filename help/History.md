@@ -141,6 +141,27 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.54.0 -- 6 October 2026
+
+**The build repairs what one-off scripts used to.** Three things delivered as
+separate scripts on 5 and 6 October are now steps of every app's ordinary
+build, each logged. tidy removes the kit's stray files from an app's folder -- a
+file at a kit path, byte for byte the kit's, not one the app may share -- along
+with the one-off scripts themselves, and the folders left empty. The build
+template sets version.txt back to the app's last published tag when it holds
+another series' number. The same two guards are in DbDo's and EdSharp's builds.
+One set of commands, every time: unzip, build, release.
+
+## 1.53.4 -- 6 October 2026
+
+**buildTutorials speaks again.** In 1.53.2 the helper that writes minutes and
+seconds was moved up the file and cut in half on the way: its first line went
+up, its last two lines stayed behind, and everything between -- the whole
+speaking loop -- became the body of a function nobody called. Every build on
+1.53.2 or 1.53.3 listed its voices and then stopped at the script's last line
+with nothing spoken, in DbDo and FileDir alike. The helper is whole again, the
+file's braces balance, and the defensive endings of 1.53.3 stay.
+
 ## 1.53.2 -- 6 October 2026
 
 **One build speaks at a time, and the clock is on the progress line.** Four

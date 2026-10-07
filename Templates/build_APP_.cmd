@@ -184,6 +184,24 @@ if "!ver!"=="" (
   >> "%log%" echo ERROR: version.txt is empty
   goto :failed
 )
+rem THE VERSION MUST BE THIS APP'S. A kit unarchived into the app's folder put
+rem the kit's version.txt in place of the app's (6 October 2026), and the next
+rem build would have bumped the wrong series. The last published tag is the
+rem app's own number: when version.txt's first two parts differ from the tag's,
+rem the tag wins, and the log says so.
+set "tagVer="
+for /f "usebackq delims=" %%t in (`git describe --tags --abbrev^=0 2^>nul`) do set "tagVer=%%t"
+set "tagVer=!tagVer:v=!"
+if not "!tagVer!"=="" (
+  for /f "tokens=1,2 delims=." %%a in ("!ver!") do set "verSeries=%%a.%%b"
+  for /f "tokens=1,2 delims=." %%a in ("!tagVer!") do set "tagSeries=%%a.%%b"
+  if not "!verSeries!"=="!tagSeries!" (
+    echo version.txt held !ver!, not this app's series; the last published tag is !tagVer!, so that is the version now.
+    >> "%log%" echo version.txt held !ver!, not this app's series; set to the last published tag !tagVer!
+    > version.txt echo !tagVer!
+    set "ver=!tagVer!"
+  )
+)
 rem SEEDVERSION IS A FLOOR, not only a starting point (kit 1.43.5). An app
 rem moved to the kit may already have a version.txt below the number its move
 rem was meant to start at -- 2htm had 1.18.4 and stepped to 1.18.5 while its
