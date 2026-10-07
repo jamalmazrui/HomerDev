@@ -141,6 +141,15 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.54.1 -- 6 October 2026
+
+**An app stays an app under the kit's strays.** With the kit's Templates and
+exec folders lying in C:\DbDo, kind.py called the folder the kit, and tidy's new
+stray removal, which declines to tidy the kit, did nothing; DbDo built and
+released around seventeen walks. An installer script or a program named for the
+folder now settles the kind as an app first, and tidy runs the stray removal
+regardless of kind, declining only when the folder is the kit's own.
+
 ## 1.54.0 -- 6 October 2026
 
 **The build repairs what one-off scripts used to.** Three things delivered as

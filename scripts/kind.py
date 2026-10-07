@@ -94,9 +94,18 @@ def projectKind(sFolder):
     sFolder = os.path.abspath(sFolder).rstrip("\\/")
     if not os.path.isdir(sFolder): return "unknown", "no such folder"
     sName = os.path.basename(sFolder)
-    if (os.path.isfile(os.path.join(sFolder, "Templates", "HomerComponents.iss"))
+    # AN APP IS AN APP EVEN WITH THE KIT'S FILES ON TOP OF IT. A HomerDev.zip
+    # unarchived into C:\\DbDo put the kit's Templates and exec\\CSharp beside
+    # DbDo.cs, and this test called the folder the kit, which turned off the
+    # very tidying that would have removed them (6 October 2026). An installer
+    # script or a program source named for the folder settles it as an app
+    # first; only then do the kit's marks make a kit.
+    lsIssFirst = glob.glob(os.path.join(sFolder, "*_setup.iss"))
+    bNamedProgram = any(os.path.isfile(os.path.join(sFolder, sName + sExt)) for sExt in (".cs", ".py", ".js", ".ps1"))
+    if (not lsIssFirst and not bNamedProgram
+            and os.path.isfile(os.path.join(sFolder, "Templates", "HomerComponents.iss"))
             and os.path.isfile(os.path.join(sFolder, "exec", "CSharp", "Lbc.cs"))):
-        return "kit", "Templates\\HomerComponents.iss and exec\\CSharp\\Lbc.cs are here"
+        return "kit", "Templates\\HomerComponents.iss and exec\\CSharp\\Lbc.cs are here, and no app's installer or program"
     lsIss = glob.glob(os.path.join(sFolder, "*_setup.iss"))
     if lsIss: return "app", "%s is its installer script" % os.path.basename(lsIss[0])
     for sExt in (".cs", ".py"):

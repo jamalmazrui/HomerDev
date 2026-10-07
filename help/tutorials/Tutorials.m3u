@@ -1,7 +1,7 @@
 #EXTM3U
 #EXTINF:151,HomerDev Walkthroughs
 00_Overview_and_Table_of_Contents.mp3
-#EXTINF:194,01 - Install and Launch
+#EXTINF:195,01 - Install and Launch
 01_Install_and_Launch.mp3
 #EXTINF:187,02 - User Interface Concepts
 02_User_Interface_Concepts.mp3
@@ -11,9 +11,9 @@
 04_Start_an_App_from_the_Kit.mp3
 #EXTINF:182,05 - Build, Check and Release
 05_Build_Check_and_Release.mp3
-#EXTINF:166,06 - The Installer and Its Finish Page
+#EXTINF:167,06 - The Installer and Its Finish Page
 06_The_Installer_and_Its_Finish_Page.mp3
-#EXTINF:218,07 - Spoken Tutorials
+#EXTINF:217,07 - Spoken Tutorials
 07_Spoken_Tutorials.mp3
 #EXTINF:172,08 - Shared Code and the Homer Player
 08_Shared_Code_and_the_Homer_Player.mp3
