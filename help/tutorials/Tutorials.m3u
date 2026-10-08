@@ -1,7 +1,7 @@
 #EXTM3U
 #EXTINF:142,HomerDev Walkthroughs
 0_Overview.mp3
-#EXTINF:291,1 - User Interface
+#EXTINF:292,1 - User Interface
 1_User_Interface.mp3
 #EXTINF:194,2 - Install and Launch
 2_Install_and_Launch.mp3
@@ -15,7 +15,7 @@
 6_Spoken_Tutorials.mp3
 #EXTINF:215,7 - Shared Code and the Homer Player
 7_Shared_Code_and_the_Homer_Player.mp3
-#EXTINF:183,8 - Build with an AI Assistant
+#EXTINF:182,8 - Build with an AI Assistant
 8_Build_with_an_AI_Assistant.mp3
 #EXTINF:208,9 - Conclusion
 9_Conclusion.mp3

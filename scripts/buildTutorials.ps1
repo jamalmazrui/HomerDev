@@ -207,6 +207,18 @@ note ("docs only: " + $bDocsOnly + ", Windows voices: " + $bSapi + ", live: " + 
 
 # ---- the scripts to build ----
 
+# THE PATTERN OF TEN REPLACES TWO-DIGIT WALKS (kit 1.62.4): an app moving to
+# one-digit walks gets them by unarchiving its zip, which adds files and deletes
+# none, so its old Tutorial_00_... walks would be checked and spoken beside the
+# new. Once the folder holds one-digit walks, the two-digit ones are retired
+# here, on every app's build, as the kit's own build does for the kit.
+$lsOneDigit = @(Get-ChildItem -LiteralPath $sHere -Filter "Tutorial_*.inix" -ErrorAction SilentlyContinue | Where-Object { $_.Name -match '^Tutorial_\d_' })
+if ($lsOneDigit.Count -gt 0) {
+  foreach ($f in @(Get-ChildItem -LiteralPath $sHere -Filter "Tutorial_*.inix" -ErrorAction SilentlyContinue | Where-Object { $_.Name -match '^Tutorial_\d\d_' })) {
+    try { Remove-Item -LiteralPath $f.FullName -Force; say ("Retired " + $f.Name + ", a walk of the old two-digit pattern.") } catch { note ("could not retire " + $f.Name + ": " + $_) }
+  }
+}
+
 $lsScripts = @()
 if ($sOnly -ne "") {
   $sOne = Join-Path $sHere ($sOnly + ".inix")

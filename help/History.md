@@ -141,6 +141,15 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.62.4 -- 8 October 2026
+
+**Apps move to the pattern of ten cleanly.** buildTutorials, which every app's
+build runs, now retires an app's old two-digit walks once its one-digit walks
+are in place, so an app's zip can bring its new set without its old one being
+spoken beside it. DbDo, EdSharp, FileDir, HomerScribe and HomerView now
+follow the pattern of ten; DbDo and HomerView have spoken tutorials for the
+first time.
+
 ## 1.62.3 -- 7 October 2026
 
 **The kit's build passes again after the pattern of ten.** Its 21:10 build
