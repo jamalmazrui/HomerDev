@@ -19,10 +19,14 @@ Templates/samples/*.log
 Templates/samples/build/
 Templates/samples/dist/
 
-# The release scripts come from a separate project of their own and, by
-# standing rule, stay out of every repository, the kit's included.
+# The release scripts and the new-repository templates come from a separate
+# project of their own and, by standing rule, stay out of every repository, the
+# kit's included. A fresh copy of the kit works without them: build does not
+# require them, and newHomerApp skips them with a note (1.62.5).
 scripts/release.cmd
 scripts/release.ps1
+Templates/create_APP_Repo.cmd
+Templates/create_APP_Repo.ps1
 
 # Copies of the kit's own documents a skill carries, made by build from
 # help at every build; git carries the originals.

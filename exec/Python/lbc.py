@@ -565,9 +565,11 @@ class Dialog(wx.Dialog):
         control = self.findControl(sName)
         if control is None:
             return vDefault
+        # The field's value first, its selection only for a control with no value of its own, such as a list (kit
+        # 1.62.5, from an audit by another AI: a text field with nothing selected read as empty).
         for functionRead in (
-            lambda: control.GetStringSelection(),
             lambda: control.GetValue(),
+            lambda: control.GetStringSelection(),
         ):
             try:
                 return functionRead()
@@ -882,19 +884,31 @@ class Dialog(wx.Dialog):
         ]))
 
     def _submit(self):
+        # Control+Enter accepts the way the default button does, through the same handler and checks, so a dialog gives
+        # the same answer however it is accepted (kit 1.62.5, from an audit by another AI).
+        button = self.GetDefaultItem() or self.FindWindowById(wx.ID_OK)
+        if isinstance(button, wx.Button):
+            self._accept(button)
+            return
         self.collect()
         self.EndModal(wx.ID_OK)
 
     def _onButton(self, event):
-        button = event.GetEventObject()
+        self._accept(event.GetEventObject())
+
+    def _accept(self, button):
         self.collect()
         self.dResults["button"] = stripMnemonic(button.GetLabel())
         if self.functionHandler:
             try:
                 if self.functionHandler(self, button) is False:
                     return
-            except Exception:
-                pass
+            except Exception as oError:
+                # A handler that fails leaves the dialog open with what was typed, and says so, rather than closing as
+                # if it had succeeded (kit 1.62.5, from an audit by another AI).
+                self.dResults["error"] = str(oError)
+                wx.MessageBox("That could not be done: " + str(oError), "Error", wx.OK | wx.ICON_ERROR, self)
+                return
         iId = button.GetId()
         if iId in (wx.ID_OK, wx.ID_CANCEL):
             self.EndModal(iId)

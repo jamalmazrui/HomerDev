@@ -1,10 +1,15 @@
 ﻿# The Homer book pattern
 
-*For the Homer Development Kit's help folder. Revised 3 October 2026 from the Blind Vibe Coding project.*
+*For the Homer Development Kit's help folder. Revised 8 October 2026, when the book publishing tools moved into the kit.*
 
 ## Contents
 
-- Files and folders
+- Book publishing projects
+- Folders
+- Settings files
+- The tools
+- Where the code comes from
+- Personal data stays in the project
 - Sections, in order
 - Chapters
 - Glossary
@@ -12,17 +17,50 @@
 - Copyright page
 - About the Author and the author's other books
 
-## Files and folders
+## Book publishing projects
 
-A book is a Homer project of its own kind, beside app, kit, page and collection. The kit's `check` can tell it by `<Book>.yaml` with `to: epub3` beside a `<Book>.md` at the top; until check knows the kind, run it as a page and read the report with that in mind. The project keeps `version.txt` for the edition (stepped by hand for each submission, since the book has no build-time version resource) and `RepoFiles.txt` for the files it publishes, so `push`, `tidy` and `release` work as they do for an app; the build script is `build.cmd`, as the kit's buildname rule asks. A book uses the Homer folder layout, including `notes` for the drafts, audits and transcripts a book accumulates; `notes` is a standard folder of every Homer project of every kind, ignored by Git and never packaged by an installer, and `tidy` moves stray files into it, dropping duplicates and suffixing name collisions. The layout: sources and the build at the top; `configs` for the KDP answers; `exec` for the built EPUB, which is not kept in Git; `help` for the project's guides; `logs` for one log per run; `pages` for a companion GitHub page and its images; `scripts` for the publishing and image scripts with their tests; `templates` for forms such as the bug report.
+A Homer project publishes books when its configs folder holds `books.inix`, the catalog of its books. That is one fact, and the kit's `kind` script reports it: "It also publishes books." Publishing books is a capability, not a kind of its own. A page, such as a GitHub Pages directory of the books, a collection, or a project of a single book may each publish books, and keeps its own kind for every other kit script.
 
-- `Book.md`: the manuscript, Pandoc Markdown, UTF-8 with BOM and CRLF.
-- `Book.bib`: BibLaTeX entries, each web source with url and urldate.
-- `Book.yaml`: Pandoc defaults: from markdown, to epub3, citeproc, reference-location document, toc, css, cover.
-- `Book.jpg`: the cover, 1,600 by 2,560 pixels, RGB JPEG at 300 dots per inch, saved with full color sampling. Draw it with a script (`scripts\makeCover.py`) rather than by hand, so every size, color and position is a number a screen reader user can read and change, and so the web copies (JPEG, PNG, SVG mark, social card) come from the same source. Check contrast in the script: at least 4.5 to 1 for text.
-- `book.css`: underlined links, no forced text colors.
-- `configs\Book_KDP.inix`: the KDP form answers, in .inix rather than JSON (see Inix.md); the kit's `templates\Book_KDP.inix` is the starting point. `scripts\kdpSubmit.py` reads it, fills the KDP form, and updates a published book from the same file.
-- `ACCESSIBILITY.md` at the top of the repository: GitHub shows it as an Accessibility tab; the kit's `templates\ACCESSIBILITY.md` is the starting point.
+The kit's book tools build each book as an EPUB, audit it, check it with EPUBCheck, Ace by DAISY and Kindle Previewer, and send it to Kindle Direct Publishing (KDP), together with its details, its AI answers and its accessibility answers. They work for any book and any author. Everything about a particular author or book is in the project's own settings files.
+
+## Folders
+
+A book publishing project uses the Homer folders, plus two of its own. Each folder starts with a different letter, so pressing a letter in a folder list moves straight to the folder you want:
+
+- `books` -- one folder per book, named by its root: `books\<root>\<root>.md`, the manuscript, in Pandoc Markdown, with any of `<root>.bib` and `<root>.csl` (citations), `<root>.jpg` (the cover inside the EPUB), `<root>.css` (the book's own styles) and an `images` folder.
+- `configs` -- the settings files below.
+- `data` -- what the tools keep between runs: `data\books\<root>.inix` for what KDP holds for each book, and `data\receipts\<root>.inix` for what was uploaded and submitted.
+- `help` -- the project's own guides.
+- `logs` -- one log per run.
+- `notes` -- drafts and working files, never published.
+- `results` -- each book's EPUB and its audit, `<root>-audit.md` and `.htm`, with a summary of every book.
+- `scripts` -- the kit's book tools, copied in (see "Where the code comes from").
+- `templates` -- optional: a project's own `epub.css` or `tocEpub.lua`, used in place of the kit's only when `buildBooks.inix` says `ownTemplates = yes`; otherwise the kit's are used, so an improvement to them reaches every project.
+
+## Settings files
+
+The kit's `Templates\books` folder holds a starting copy of each; copy them to the project's `configs` folder and fill them in. Each explains its own keys.
+
+- `books.inix` -- the catalog: one section per book, with its title, subtitle, author, series, ASIN, AI answers, reading-level target and the few settings a book may need.
+- `buildBooks.inix` -- how books are built: the project's own author, where to look for a book's Word file and cover on the first run, picture sizes, and how often the checking tools are brought up to date.
+- `<root>_KDP.inix` -- for a new book only, the answers to every KDP form, from `Templates\books\Book_KDP.inix`. A book already on KDP needs none: its details are read from KDP into `data\books`.
+
+## The tools
+
+Each runs from the project folder, and each writes its own log in `logs`:
+
+- `scripts\buildBooks` -- builds and audits every book, or those named. A book is ready only when every check passes.
+- `scripts\kdpBooks` -- reads every book's details from the KDP Bookshelf into `data\books`, and applies proposed changes to them.
+- `scripts\kdpSubmit` -- fills in KDP's forms for a new book from its answers file, and submits it.
+- `scripts\kdpUpdate` -- sends each ready book's EPUB and answers to its existing KDP title. A book unchanged since its last submission is left alone.
+
+## Where the code comes from
+
+The code lives in the kit, in its `scripts` folder, and nowhere else. Each tool's wrapper in a project, such as `scripts\buildBooks.cmd`, first copies the kit's current book tools into the project's `scripts` folder, as an app's build copies its kit tools, and logs each copy. So a fix made once in the kit reaches every book project on its next run. Without the kit on the computer, the copies already in the project run as they are.
+
+## Personal data stays in the project
+
+The kit's book tools hold no one's name, address, account or book. The author's name, the folders to search, a book's KDP title ID and every answer about a book come from the project's settings files and data. A project shares its own repository only if its author chooses to; its `data` folder, which holds what KDP holds, is the author's own.
 
 ## Sections, in order
 

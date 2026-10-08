@@ -34,7 +34,7 @@ c_lsExpected = [
     "exec/CSharp/Log.cs", "exec/CSharp/Mdi.cs", "exec/CSharp/Media.cs", "exec/CSharp/MediaPlayer.cs", "exec/CSharp/Mpv.cs", "exec/CSharp/Paths.cs",
     "exec/CSharp/PdfRead.cs", "exec/CSharp/Say.cs", "exec/CSharp/Util.cs", "exec/CSharp/Web.cs",
     "exec/CSharp/inixVert.cs",
-    "exec/Python/inix.py", "exec/Python/kdpEpub.py", "exec/Python/lbc.py", "exec/Python/lbcnet.py", "exec/Python/log.py", "exec/Python/media.py",
+    "exec/Python/inix.py", "exec/Python/kdpEpub.py", "scripts/buildBooks.cmd", "scripts/buildBooks.py", "scripts/kdpBooks.cmd", "scripts/kdpBooks.py", "scripts/kdpSubmit.cmd", "scripts/kdpSubmit.py", "scripts/kdpUpdate.cmd", "scripts/kdpUpdate.py", "scripts/testKdpUpdate.py", "Templates/books/Book_KDP.inix", "Templates/books/books.inix", "Templates/books/buildBooks.inix", "Templates/books/epub.css", "Templates/books/tocEpub.lua", ".claude/skills/homer-books/SKILL.md", "exec/Python/lbc.py", "exec/Python/lbcnet.py", "exec/Python/log.py", "exec/Python/media.py",
     "exec/Python/mdi.py", "exec/Python/elevate.py", "exec/Python/paths.py", "exec/Python/say.py", "exec/Python/util.py", "exec/Python/web.py",
     "Templates/build_APP_.cmd", "Templates/build_APP_Py.cmd",
     "Templates/_APP__setup.iss", "Templates/_APP_.cs",
@@ -42,9 +42,8 @@ c_lsExpected = [
     "scripts/installOllama.cmd", "scripts/installScreenReaderSupport.cmd", "scripts/finish.cmd",
     "scripts/checkSkills.cmd", "scripts/checkSkills.py", "scripts/newest.cmd", "scripts/newest.ps1",
     "Templates/HomerComponents.iss", "scripts/installCommon.cmd",
-    "Templates/create_APP_Repo.cmd", "Templates/create_APP_Repo.ps1",
     "Templates/accept.inix", "Templates/gitignore.txt", "Templates/version.txt",
-    "scripts/release.cmd", "scripts/release.ps1", "RepoFiles.txt", "LocalFiles.txt",
+    "RepoFiles.txt", "LocalFiles.txt",
     "Templates/samples/FruitBasketCs.cs", "Templates/samples/FruitBasketMdiCs.cs",
     "Templates/samples/FruitBasketMdiPy.py", "Templates/samples/FruitBasketPy.py",
     "Templates/samples/accept.inix", "Templates/samples/uiTest.inix",
@@ -1338,7 +1337,6 @@ def removeStrayErrorLevel():
 
 
 def main():
-    retireOldWalk()
     global oLog
     if not os.path.isdir(os.path.dirname(sLogPath)): os.makedirs(os.path.dirname(sLogPath))
     oLog = open(sLogPath, "w", encoding="utf-8")
@@ -1348,10 +1346,14 @@ def main():
     logFact("windows", logWindows())
     logLine("Working directory: %s" % os.getcwd())
     logFact("arguments", " ".join(sys.argv[1:]))
-    removeStrayErrorLevel()
 
     bCheckOnly = len(sys.argv) > 1 and sys.argv[1].lower() == "check"
     logLine("Check only: %s" % bCheckOnly)
+    # A CHECK OBSERVES ONLY (kit 1.62.5, from an audit by another AI): the repairs -- retiring old walks, removing a
+    # stray ERRORLEVEL variable -- run in a real build, which is where the author's rule puts them, never in a check.
+    if not bCheckOnly:
+        retireOldWalk()
+        removeStrayErrorLevel()
 
     sVersion = "unknown"
     sVersionPath = os.path.join(sScriptDir, "version.txt")

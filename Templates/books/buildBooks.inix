@@ -1,0 +1,27 @@
+﻿[build]
+author =
+imageMaxBytes = 150000
+imageMaxEdge = 1000
+jpegQuality = 75
+ownTemplates =
+pandocMinimum = 3.1
+searchDepth = 6
+searchFolders =
+%USERPROFILE%\Documents
+%USERPROFILE%\Downloads
+%USERPROFILE%\Desktop
+toolRefreshDays = 7
+userAgent = HomerBooksBuild/1
+
+[notes]
+author = The project's own author, as the books name them. A book whose author includes this name gets a copyright line and an About the Author section; any other book is treated as a public domain work the project reproduces, unless its catalog entry says otherwise. Blank treats every book as the author's own.
+imageMaxBytes = A picture larger than this many bytes is saved again, as JPEG at the quality below, even when its size in pixels is fine.
+imageMaxEdge = Pictures wider or taller than this many pixels are scaled down in the EPUB copy only; the files in each book's images folder are never changed. KDP charges a delivery fee per megabyte on 70 percent royalty books, so smaller pictures cost less; 1,000 pixels still fills a Kindle page width.
+jpegQuality = The quality, 1 to 100, for a picture saved again as JPEG after scaling.
+ownTemplates = yes uses the project's own templates\\epub.css and tocEpub.lua in place of the kit's; blank, the usual, uses the kit's, so improvements to them reach every project.
+pandocMinimum = buildBooks installs or upgrades Pandoc with winget when the one found is older than this.
+searchFolders = Where buildBooks looks, on the first run for a book and whenever you give --gather, for the book's published Word file, its cover, and any images folder beside an earlier copy of the manuscript. Folders that do not exist are skipped. %NAME% is replaced from the environment.
+searchDepth = How many folder levels below each search folder are looked at.
+toolRefreshDays = How often buildBooks checks for a newer EPUBCheck and Ace by DAISY, and asks Kindle Previewer to update itself.
+userAgent = How buildBooks names itself when it downloads a picture; Wikimedia Commons asks every program to give a name and a contact, so add yours in parentheses.
+format = See the kit's help\BookPattern.md. Block values start on the line after 'key =' and run to the next key line.

@@ -153,8 +153,7 @@ row shipped a fault that only a compiler could see.
 
 ### 9. Gather evidence
 
-    cd Tools
-    check --path ..\Templates\samples
+    scripts\check --path Templates\samples
 
 Eleven checks run, and an `evidence-<date>.md` appears saying what was verified,
 what was not checked, and what remains uncertain. Open it. The third list is the
@@ -181,7 +180,7 @@ script: a fresh AppId, and the desktop hotkey.
 ### 11. Build, run and publish
 
     cd \JobDo
-    buildJobDo
+    build
     JobDo
     createJobDoRepo
     release
@@ -194,15 +193,10 @@ every project.
 
 ### Listen instead
 
-`Tutorial_HomerDev.inix` is the same walkthrough as a spoken tutorial: what the
-kit is, unarchiving it, building both fruit baskets, and hearing that the two
-behave the same. `scripts\buildTutorials.cmd` renders it to audio in two voices --
-the narration in one, the screen reader's answers in another -- using Windows'
-own voices, with nothing installed and nothing uploaded.
-
-    cd Tools
-    buildTutorials --list
-    buildTutorials ..\Tutorial_HomerDev.inix
+The kit's ten spoken walks, in the Homer pattern of ten, are in `help`:
+`Tutorial_0_Overview.inix` to `Tutorial_9_Conclusion.inix`. Their audio comes
+ready-made in `help\tutorials`, one mp3 a walk, so there is nothing to wait for.
+After you change a walk, the kit's build speaks it again, and only that one.
 
 ### What gets published, and what does not
 
@@ -248,7 +242,7 @@ own notebook, is in the never-pushed list and stays on your machine.
 - `Hotkeys.md` -- every key three ways
 - `FAQ.md` -- the questions people ask, including why Windows only
 - `Announce.md` -- three ready-to-post announcements, already the right length
-- `Tutorial_HomerDev.inix` -- the spoken walkthrough, in two voices
+- `Tutorial_0_Overview.inix` to `Tutorial_9_Conclusion.inix` -- the ten spoken walks, with their audio in `tutorials`
 
 ## The other documents
 

@@ -50,21 +50,13 @@ or one step at a time:
     checkHomerDev                   environment, clean build of everything, the
                                     tools on your PATH, and every program driven
                                     through its keys by uiCheck
-    scripts\installTools              put the current tools on the PATH
     push "What changed."
     release
 
-`installTools` matters more than it looks. `release`, `tidy`,
-`check`, `push` and `release` all act on the current directory, so
-one copy on the PATH serves every project -- and an OLD copy on the PATH also
-serves every project. A `release` from before source-only releases were
-supported refuses to release a project that has no installer script, and the
-error names a file that was never meant to exist:
-
-    Could not find HomerDev_setup.iss in C:\HomerDev
-
-That is the old copy talking. Run `installTools` after updating the kit and it
-goes away.
+Each app's build copies the kit's current tools into its own `scripts` folder,
+so an app always runs the tools of the kit it was built with. Run them from the
+app's folder -- `scripts\push`, `scripts\release` -- rather than relying on a copy
+somewhere on your PATH, which may be older than the kit.
 
 ## Building the kit
 

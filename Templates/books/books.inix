@@ -1,0 +1,39 @@
+﻿# books.inix -- the catalog of a book publishing project: one section per book, named by its root -- the title with a
+# leading A, An or The dropped and the other words joined by underscores. Copy this file to the project's configs folder;
+# the HomerDev kit's book tools find a book publishing project by it. buildBooks builds books\<root>\<root>.md into
+# results\<root>.epub; kdpUpdate sends it to the book's existing KDP title, found in data\books\<root>.inix.
+#
+# Keys for each book:
+#   title, subtitle, author   What KDP shows buyers, and what the EPUB declares.
+#   series                    The series name, or blank.
+#   asin                      The book's Amazon ASIN once it is published; blank before.
+#   aiUse                     How AI was used, in KDP's terms: generated, assisted, or none.
+#   aiTools                   The AI tools that generated text, separated by commas.
+#   aiTextExtent, aiImages    KDP's AI answers in KDP's words: None, or Some sections / Entire work (images: One or a few /
+#                             Many), then "with minimal or no editing" or "with extensive editing".
+#   aiImageTools              The AI tools that generated images.
+#   aiConfirmed               The answers the author has confirmed (text, images, translations): given exactly, even
+#                             below what KDP already holds. Every other answer never discloses less than KDP holds.
+#   aiFromKdp                 yes: the AI answers already given to KDP for this book stand as they are.
+#   readingGrade              The reading-level target, 0 for none.
+#   tocDepth                  1 for chapters only in the tables of contents; 2, the default, for chapters and sections.
+#   publicDomain              yes: a public domain work this project reproduces, with no copyright line of its own.
+#   allowMissingPictures      yes: a picture found nowhere is a warning, for a text-only edition.
+#   importFrom                A folder the book's files came from; newer copies there are brought over at each build.
+#   externalProject           A project folder that builds this book itself (with externalBuild and externalEpub).
+#
+# Beside the manuscript, books\<root>\ may hold <root>.bib and <root>.csl (citations), <root>.jpg (the cover inside
+# the EPUB), <root>.css (the book's own styles, after the shared ones) and an images folder.
+
+[Example_Book]
+title = Example Book
+subtitle = A Subtitle That Says What the Book Is For
+author = Your Name
+series =
+asin =
+aiUse = none
+aiTools =
+aiTextExtent = None
+aiImages = None
+aiImageTools =
+readingGrade = 9

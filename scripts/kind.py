@@ -122,6 +122,15 @@ def projectKind(sFolder):
     return "unknown", "no installer script, program source or document at the top"
 
 
+def publishesBooks(sFolder):
+    """Whether the project publishes books, with the HomerDev kit's book tools: its configs folder holds books.inix, the
+    catalog of its books. This is a capability, not a kind: a page (a GitHub Pages directory of the books, say), a
+    collection or a project of one book may each publish books, and keeps its own kind for every other kit script. The
+    conventions it brings -- books\\<root>\\ for each book's sources, results\\ for the built EPUBs and their audits,
+    data\\books\\ for what KDP holds -- are in the kit's help\\BookPattern.md (1.63.0)."""
+    return os.path.isfile(os.path.join(os.path.abspath(sFolder), "configs", "books.inix"))
+
+
 def isKit(sFolder):
     """Does this folder hold the kit's shared classes?"""
     return bool(sFolder) and (os.path.isfile(os.path.join(sFolder, "exec", "CSharp", "Lbc.cs"))
@@ -177,6 +186,7 @@ def main():
     else:
         if sKind == "unknown": print("%s is not a kind of Homer resource kind.py knows: %s." % (sRoot, sWhy))
         else: print("%s is %s %s: %s." % (sRoot, "an" if sKind[0] in "aeiou" else "a", sKind, sWhy))
+        if publishesBooks(sRoot): print("It also publishes books: configs\\books.inix is its catalog.")
     return 0 if sKind != "unknown" else 1
 
 

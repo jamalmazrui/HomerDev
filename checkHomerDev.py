@@ -316,13 +316,15 @@ def checkSharedTools():
 
 def checkPrograms():
     """uiCheck: start each program, press the keys, read the tree back."""
-    sUi = os.path.join(c_sKit, "Tools", "uiCheck.py")
+    # uiCheck moved to scripts with the rest of the kit's tools; looking in the retired Tools folder skipped this check
+    # on every run (1.62.5, from an audit by another AI).
+    sUi = os.path.join(c_sKit, "scripts", "uiCheck.py")
     if not os.path.isfile(sUi):
-        return finding("programs", "skip", "uiCheck is not in Tools")
+        return finding("programs", "fail", "uiCheck is not in scripts, so the sample programs were not driven")
     if not sys.platform.startswith("win"):
         return finding("programs", "skip",
                        "uiCheck drives Windows programs; this is %s" % sys.platform)
-    iCode, sOut = runHere('python "%s" --path "%s"' % (sUi, c_sSamples), c_sKit)
+    iCode, sOut = runHere('"%s" "%s" --path "%s"' % (sys.executable, sUi, c_sSamples), c_sKit)
     sSummary = ""
     for sLine in sOut.splitlines():
         if "passed," in sLine: sSummary = sLine.strip()

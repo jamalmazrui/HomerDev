@@ -583,9 +583,14 @@ process.StartInfo.CreateNoWindow = true;
 process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
 process.StartInfo.StandardErrorEncoding = Encoding.UTF8;
 process.Start();
+// Both streams drained at once: the error stream is read on its own task while
+// the output stream is read here, so a program that fills either pipe first
+// cannot block the other (kit 1.62.5, from an audit by another AI: reading one
+// to its end and then the other could deadlock).
+System.Threading.Tasks.Task<string> taskErr = process.StandardError.ReadToEndAsync();
 sOut = process.StandardOutput.ReadToEnd();
-sErr = process.StandardError.ReadToEnd();
 process.WaitForExit();
+sErr = taskErr.Result;
 Homer.Log.command(sProgram + " " + sArguments, process.ExitCode);
 if (!string.IsNullOrEmpty(sErr)) Homer.Log.info("  said: " + sErr.Trim());
 return process.ExitCode;

@@ -54,6 +54,8 @@ Templates/samples/build/
 Templates/samples/dist/
 scripts/release.cmd
 scripts/release.ps1
+Templates/create_APP_Repo.cmd
+Templates/create_APP_Repo.ps1
 .claude/skills/homer-code/references/CamelType_*.md
 .claude/skills/homer-code/references/Logging.md
 .claude/skills/homer-installer/references/FinishPage.md

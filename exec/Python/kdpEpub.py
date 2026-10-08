@@ -201,10 +201,14 @@ def tocProblems(sEpub):
     lTocLinks = re.findall(r'href="([^"]+)"', oToc.group(1)) if oToc else []
     if not lTocLinks: lProblems.append("No logical table of contents: the navigation document has no toc nav with entries (KDP: Kindle Interactive TOC, required).")
     lMissed = [h for h in lTocLinks if not reaches(sNavPath, h)]
-    if lMissed: lProblems.append(plural(len(lMissed), "logical table of contents entry", "logical table of contents entries") + " lead nowhere, such as " + lMissed[0] + ".")
+    if lMissed: lProblems.append(plural(len(lMissed), "logical table of contents entry", "logical table of contents entries") + (" leads" if len(lMissed) == 1 else " lead") + " nowhere, such as " + lMissed[0] + ".")
     sNcxHref = next((h for h, sProps in dItems.values() if h.endswith(".ncx")), "")
     sNcx = dData.get(posixpath.join(sBase, sNcxHref), b"").decode("utf-8", "replace") if sNcxHref else ""
     if not re.search(r"<navPoint\b", sNcx): lProblems.append("No NCX with entries, the older form of the logical table of contents that some Kindle readers use.")
+    # Every NCX entry must lead somewhere too (kit 1.62.5, from an audit by another AI: only its presence was checked).
+    sNcxPath = posixpath.join(sBase, sNcxHref) if sNcxHref else ""
+    lNcxMissed = [h for h in re.findall(r'<content\b[^>]*\bsrc="([^"]+)"', sNcx) if not reaches(sNcxPath, h)]
+    if lNcxMissed: lProblems.append(plural(len(lNcxMissed), "NCX entry", "NCX entries") + (" leads" if len(lNcxMissed) == 1 else " lead") + " nowhere, such as " + lNcxMissed[0] + ".")
     oGuide = re.search(r'<reference[^>]*type="toc"[^>]*href="([^"]+)"', sOpf)
     oMark = re.search(r'<a[^>]*href="([^"]+)"[^>]*epub:type="toc"|<a[^>]*epub:type="toc"[^>]*href="([^"]+)"', re.search(r'<nav[^>]*epub:type="landmarks".*?</nav>', sNav, re.S).group(0) if re.search(r'<nav[^>]*epub:type="landmarks"', sNav) else "")
     sGuideFile = urllib.parse.unquote(oGuide.group(1)).partition("#")[0] if oGuide else ""
@@ -213,6 +217,9 @@ def tocProblems(sEpub):
     if not oMark: lProblems.append("No landmarks entry for the table of contents in the navigation document.")
     if sGuideFile == sNavHref or sMarkFile == sNavHref: lProblems.append("The table of contents items point at the navigation document; KDP wants them on the HTML table of contents page, a separate page.")
     if sGuideFile and sMarkFile and sGuideFile != sMarkFile: lProblems.append("The guide item and the landmarks entry point at different tables of contents: " + sGuideFile + " and " + sMarkFile + ".")
+    # Their places in the page must exist, not only the page (kit 1.62.5).
+    if oGuide and not reaches(sOpfPath, oGuide.group(1)): lProblems.append("The guide item for the table of contents leads nowhere: " + oGuide.group(1) + ".")
+    if oMark and not reaches(sNavPath, oMark.group(1) or oMark.group(2)): lProblems.append("The landmarks entry for the table of contents leads nowhere: " + (oMark.group(1) or oMark.group(2)) + ".")
     if sGuideFile and sGuideFile != sNavHref:
         if sGuideFile not in lSpine: lProblems.append("The HTML table of contents page, " + sGuideFile + ", is not in the reading order.")
         elif lSpine.index(sGuideFile) > 7: lProblems.append("The HTML table of contents page comes " + str(lSpine.index(sGuideFile) + 1) + "th in the reading order; KDP wants it at the beginning.")
@@ -223,5 +230,16 @@ def tocProblems(sEpub):
         if not lInternal: lProblems.append("The HTML table of contents page has no links; KDP requires its entries to be links.")
         if re.search(r"<table\b", sText): lProblems.append("The HTML table of contents page uses a table; KDP forbids tables for a table of contents.")
         lMissed = [h for h in lInternal if not reaches(sPage, h)]
-        if lMissed: lProblems.append(plural(len(lMissed), "HTML table of contents link") + " lead nowhere, such as " + lMissed[0] + ".")
+        if lMissed: lProblems.append(plural(len(lMissed), "HTML table of contents link") + (" leads" if len(lMissed) == 1 else " lead") + " nowhere, such as " + lMissed[0] + ".")
+        # The contents page must list everything the logical table of contents lists, in the same order, apart from
+        # the title page and the contents page itself (kit 1.62.5, from an audit by another AI).
+        def target(sFrom, sHref):
+            sFile, _, sAnchor = urllib.parse.unquote(sHref).partition("#")
+            return (posixpath.normpath(posixpath.join(posixpath.dirname(sFrom), sFile)) if sFile else sFrom) + ("#" + sAnchor if sAnchor else "")
+        lLogical = [target(sNavPath, h) for h in lTocLinks]
+        lLogical = [t for t in lLogical if not t.split("#")[0].endswith(("title_page.xhtml", posixpath.basename(sGuideFile)))]
+        lVisible = [target(sPage, h) for h in lInternal]
+        lAbsent = [t for t in lLogical if t not in lVisible]
+        if lAbsent: lProblems.append("The HTML table of contents leaves out " + plural(len(lAbsent), "entry", "entries") + " of the logical one, such as " + lAbsent[0] + ".")
+        elif [t for t in lVisible if t in lLogical] != lLogical: lProblems.append("The HTML table of contents lists its entries in a different order from the logical one.")
     return lProblems

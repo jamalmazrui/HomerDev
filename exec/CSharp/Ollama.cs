@@ -87,7 +87,14 @@ return modelList(false).Length > 0;
 
 public static bool hasModel(string sModel) {
 if (sModel == null || sModel.Length == 0) return false;
-return modelList(false).IndexOf(sModel, StringComparison.OrdinalIgnoreCase) >= 0;
+// A whole name, not part of one: qwen2.5:7b must not be found inside
+// qwen2.5vl:7b. A name with no tag means its :latest, as Ollama reads it
+// (kit 1.62.5, from an audit by another AI).
+foreach (string sName in modelList(false).Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)) {
+if (string.Equals(sName, sModel, StringComparison.OrdinalIgnoreCase)) return true;
+if (sModel.IndexOf(':') < 0 && string.Equals(sName, sModel + ":latest", StringComparison.OrdinalIgnoreCase)) return true;
+}
+return false;
 } // hasModel method
 
 public static string bestTranslateModel() {

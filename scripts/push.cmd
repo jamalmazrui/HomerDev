@@ -116,13 +116,32 @@ if defined sBig (
   endlocal & exit /b 1
 )
 
-git commit -m "%message%" >> "%log%" 2>&1
-if errorlevel 1 (
-  echo Nothing to commit, so nothing was pushed.
-  echo NOTHING TO COMMIT>> "%log%"
+rem NOTHING STAGED IS NOT A FAILED COMMIT (1.62.5, from an audit by another AI):
+rem every failed commit was called "nothing to commit" and ended with success,
+rem hiding a sign-in, hook or lock failure; and commits already made but not
+rem pushed were never pushed from a clean tree. Git is asked first whether
+rem anything is staged; a commit that then fails is a failure.
+git diff --cached --quiet >> "%log%" 2>&1
+if errorlevel 1 goto :commit
+set "sAhead=0"
+for /f "delims=" %%c in ('git rev-list --count @{u}..HEAD 2^>nul') do set "sAhead=%%c"
+if "%sAhead%"=="0" (
+  echo Nothing to commit or push.
+  echo NOTHING TO COMMIT OR PUSH>> "%log%"
   git status --short --branch
   endlocal & exit /b 0
 )
+echo Nothing new to commit; pushing %sAhead% earlier commits.
+>> "%log%" echo NOTHING STAGED; PUSHING %sAhead% EARLIER COMMITS
+goto :push
+:commit
+git commit -m "%message%" >> "%log%" 2>&1
+if errorlevel 1 (
+  echo The commit failed. The log has why: %log%
+  echo COMMIT FAILED>> "%log%"
+  endlocal & exit /b 1
+)
+:push
 git push >> "%log%" 2>&1
 if errorlevel 1 (
   echo The push failed. The log has why: %log%

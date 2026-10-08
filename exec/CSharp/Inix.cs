@@ -340,9 +340,17 @@ public static class InixCodec
         if (sValue.IndexOf('`') >= 0 && bTriquoteFree) return "\"\"\"";
         if (bBacktickFree) return "`";
         if (bTriquoteFree) return "\"\"\"";
-        // Both candidate fences collide. Backtick is rare in
-        // real-world text; prefer it and hope.
-        return "`";
+        // Both candidate fences collide: no fence can write this value so it
+        // reads back exactly, so it is refused rather than written corrupted
+        // (kit 1.62.5, from an audit by another AI).
+        throw new System.InvalidOperationException("an inix value cannot hold both a line of one backtick and a line of three double quotes");
+    }
+
+    private static bool isFenceMark(string sValue)
+    {
+        // One backtick, three double quotes, or {: the marks that open a fence.
+        string sTrim = (sValue ?? "").Trim();
+        return sTrim == "`" || sTrim == "\"\"\"" || sTrim == "{";
     }
 
     private static bool containsSoleLine(string sValue, string sToken)
@@ -436,9 +444,13 @@ public static class InixCodec
                 // begins and ends with a double quote (whose own quotes would be taken
                 // as delimiters on the way back in).  Wrapping adds one outer pair and
                 // the reader strips exactly one, so the original text survives.
+                // A fourth case (kit 1.62.5): a value that is itself a fence
+                // mark, one backtick, three double quotes or {, which bare
+                // would read back as the start of a fence.
                 bool bNeedsQuote = (sVal.Length == 0)
                     || (sVal != sVal.Trim())
-                    || (sVal.Length >= 2 && sVal.StartsWith("\"") && sVal.EndsWith("\""));
+                    || (sVal.Length >= 2 && sVal.StartsWith("\"") && sVal.EndsWith("\""))
+                    || isFenceMark(sVal);
                 if (bNeedsQuote) w.WriteLine(sKey + " = \"" + sVal + "\"");
                 else w.WriteLine(sKey + " = " + sVal);
             }
@@ -548,6 +560,7 @@ public static class InixCodec
                 foreach (string sLn in sNormalized.Split('\n')) lsNewLines.Add(sLn);
                 lsNewLines.Add(sFence);
             }
+            else if (sValue.Length == 0 || sValue != sValue.Trim() || isFenceMark(sValue) || (sValue.Length >= 2 && sValue.StartsWith("\"") && sValue.EndsWith("\""))) lsNewLines.Add(sKey + " = \"" + sValue + "\"");
             else lsNewLines.Add(sKey + " = " + sValue);
         }
 

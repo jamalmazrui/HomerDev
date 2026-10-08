@@ -179,16 +179,26 @@ def update():
     """Fetch the setup program found by check() and start it. False when nothing started."""
     if sSetupUrlFound == "" and check() < c_iCurrent: return False
     if sSetupUrlFound == "": return False
+    # Downloaded to a .part file and renamed only when complete, so a failed or partial download is never started
+    # (kit 1.62.5, from an audit by another AI: an interrupted download went on to launch the partial installer).
     sFile = os.path.join(tempfile.gettempdir(), sRepo + "_setup.exe")
+    sPart = sFile + ".part"
     try:
-        if os.path.exists(sFile): os.remove(sFile)
+        for sOld in (sFile, sPart):
+            if os.path.exists(sOld): os.remove(sOld)
         request = urllib.request.Request(sSetupUrlFound, headers={"User-Agent": c_sUserAgent})
-        with urllib.request.urlopen(request, timeout=120) as response, open(sFile, "wb") as fileOut:
+        with urllib.request.urlopen(request, timeout=120) as response, open(sPart, "wb") as fileOut:
+            iExpected = int(response.headers.get("Content-Length") or 0)
             while True:
                 binChunk = response.read(1024 * 256)
                 if not binChunk: break
                 fileOut.write(binChunk)
-        if not os.path.exists(sFile) or os.path.getsize(sFile) == 0: return False
+        iGot = os.path.getsize(sPart)
+        if iGot == 0 or (iExpected and iGot != iExpected): return False
+        os.replace(sPart, sFile)
+    except Exception:
+        return False
+    try:
         os.startfile(sFile)
         return True
     except Exception:

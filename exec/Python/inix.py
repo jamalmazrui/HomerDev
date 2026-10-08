@@ -155,9 +155,13 @@ def parseLines(lLines):
         if sValTrim in (c_sBacktick, c_sTripleQuote, c_sLegacyOpen):
             sClose = c_sLegacyClose if sValTrim == c_sLegacyOpen else sValTrim
             lBody = []
+            iOpenLine = iIndex
             while iIndex < len(lLines) and lLines[iIndex].rstrip("\r\n").strip() != sClose:
                 lBody.append(lLines[iIndex].rstrip("\r\n"))
                 iIndex += 1
+            # AN UNTERMINATED FENCE IS REPORTED (kit 1.62.5, from an audit by another AI): it still reads to the end of
+            # the file, as before, but no longer silently -- the diagnostics name the key and the line it opened on.
+            if iIndex >= len(lLines): lsIgnored.append("unterminated %s fence for %s, opened on line %d; read to the end of the file" % (sValTrim, sKey, iOpenLine))
             iIndex += 1
             lSections[-1].lPairs.append(Pair(sKey, "\n".join(lBody), sForm=c_sBacktick if sValTrim == c_sLegacyOpen else sValTrim))
             continue
@@ -194,6 +198,10 @@ def chooseFence(sValue):
     """How to write a value, by help\\Inix.md's rule and Inix.cs's chooseFence: None for one line with no equals sign
     or bracket; otherwise a backtick fence, or a triple quote fence when the value contains a backtick."""
     if "\n" not in sValue and "=" not in sValue and "[" not in sValue: return None
+    # A value holding both fences as lines of their own cannot be written so that it reads back exactly; it is refused,
+    # rather than written corrupted (kit 1.62.5, from an audit by another AI).
+    if hasSoleLine(sValue, c_sBacktick) and hasSoleLine(sValue, c_sTripleQuote):
+        raise ValueError("an inix value cannot hold both a line of one backtick and a line of three double quotes")
     if c_sBacktick in sValue and not hasSoleLine(sValue, c_sTripleQuote): return c_sTripleQuote
     if hasSoleLine(sValue, c_sBacktick) and not hasSoleLine(sValue, c_sTripleQuote): return c_sTripleQuote
     return c_sBacktick
@@ -207,7 +215,9 @@ def renderPair(pair):
     if sForm is None or (sForm in (c_sBacktick, c_sTripleQuote) and hasSoleLine(sValue, sForm)): sForm = chooseFence(sValue)
     if sForm == "plain": return [pair.sKey + " ="] + sValue.split("\n")
     if sForm in (c_sBacktick, c_sTripleQuote): return [pair.sKey + "=" + sForm] + sValue.split("\n") + [sForm]
-    bQuote = not sValue or sValue != sValue.strip() or (len(sValue) >= 2 and sValue.startswith('"') and sValue.endswith('"'))
+    # A value that is itself a fence mark -- one backtick, three double quotes, or { -- is quoted, since bare it would
+    # read back as the start of a fence and swallow what follows (kit 1.62.5).
+    bQuote = not sValue or sValue != sValue.strip() or (len(sValue) >= 2 and sValue.startswith('"') and sValue.endswith('"')) or sValue.strip() in (c_sBacktick, c_sTripleQuote, c_sLegacyOpen)
     return [pair.sKey + ' = "' + sValue + '"'] if bQuote else [pair.sKey + " = " + sValue]
 
 
@@ -225,7 +235,13 @@ def write(sPath, lSections, bBom=True):
     """Write sections back, with Windows line endings and, by default, a byte order mark."""
     sBody = "\r\n".join(renderLines(lSections))
     if sBody and not sBody.endswith("\r\n"): sBody += "\r\n"
-    with open(sPath, "w", encoding="utf-8-sig" if bBom else "utf-8", newline="") as fFile: fFile.write(sBody)
+    # Written to a temporary file beside it and then put in its place, so a crash never leaves half a file (kit 1.62.5).
+    sTemp = sPath + ".writing"
+    with open(sTemp, "w", encoding="utf-8-sig" if bBom else "utf-8", newline="") as fFile:
+        fFile.write(sBody)
+        fFile.flush()
+        os.fsync(fFile.fileno())
+    os.replace(sTemp, sPath)
     return True
 
 

@@ -295,6 +295,15 @@ def main():
         lsScripts = [t for t in lsScripts if t[0] not in ("_APP_.cs", "build_APP_.cmd")]
         lsScripts.insert(0, ("build_APP_Py.cmd", "build.cmd"))
 
+    # EVERY TEMPLATE CHECKED BEFORE ANYTHING IS WRITTEN (1.62.5, from an audit by another AI): a template found missing
+    # part-way left a half-made project. The new-repository templates are local-only by the author's rule, from a
+    # project of their own, so a fresh copy of the kit lacks them; they are skipped with a note, not treated as missing.
+    c_lsLocalOnly = ["create_APP_Repo.cmd", "create_APP_Repo.ps1"]
+    lsMissing = [sFrom for sFrom, sTo in lsScripts if not os.path.exists(os.path.join(sTemplates, sFrom)) and sFrom not in c_lsLocalOnly]
+    if lsMissing:
+        sayLine("Template missing: %s. Nothing was written." % ", ".join(lsMissing))
+        logLine("ERROR: templates missing %s" % ", ".join(lsMissing))
+        return 1
     os.makedirs(sTarget, exist_ok=True)
     iWritten = 0
     iSkipped = 0
@@ -302,9 +311,9 @@ def main():
         sFromPath = os.path.join(sTemplates, sFrom)
         sToPath = os.path.join(sTarget, sTo)
         if not os.path.exists(sFromPath):
-            sayLine("Template missing: %s" % sFrom)
-            logLine("ERROR: template missing %s" % sFromPath)
-            return 1
+            sayLine("No %s in this copy of the kit, so %s was not made; the author's own release tools supply it." % (sFrom, sTo))
+            logLine("SKIPPED, local-only template absent: %s" % sFromPath)
+            continue
         if os.path.exists(sToPath):
             iSkipped += 1
             logLine("SKIPPED, already there: %s" % sToPath)

@@ -5,141 +5,139 @@ author: "Jamal Mazrui"
 
 # History
 
-## Contents
+Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
-- [1.50.2 -- 2 October 2026](#october-2026)
-- [1.50.1 -- 2 October 2026](#october-2026-1)
-- [1.50.0 -- 2 October 2026](#october-2026-2)
-- [1.49.1 -- 2 October 2026](#october-2026-3)
-- [1.49.0 -- 2 October 2026](#october-2026-4)
-- [1.48.0 -- 2 October 2026](#october-2026-5)
-- [1.47.0 -- 2 October 2026](#october-2026-6)
-- [1.46.0 -- 2 October 2026](#october-2026-7)
-- [1.45.0 -- 2 October 2026](#october-2026-8)
-- [1.44.0 -- 2 October 2026](#october-2026-9)
-- [1.43.59 -- 1 October 2026](#october-2026-10)
-- [1.43.58 -- 1 October 2026](#october-2026-11)
-- [1.43.57 -- 1 October 2026](#october-2026-12)
-- [1.43.56 -- 1 October 2026](#october-2026-13)
-- [1.43.55 -- 1 October 2026](#october-2026-14)
-- [1.43.54 -- 1 October 2026](#october-2026-15)
-- [1.43.53 -- 1 October 2026](#october-2026-16)
-- [1.43.52 -- 1 October 2026](#october-2026-17)
-- [1.43.51 -- 30 September 2026](#september-2026)
-- [1.43.50 -- 30 September 2026](#september-2026-1)
-- [1.43.49 -- 30 September 2026](#september-2026-2)
-- [1.43.48 -- 30 September 2026](#september-2026-3)
-- [1.43.47 -- 30 September 2026](#september-2026-4)
-- [1.43.46 -- 29 September 2026](#september-2026-5)
-- [1.43.45 -- 29 September 2026](#september-2026-6)
-- [1.43.44 -- 29 September 2026](#september-2026-7)
-- [1.43.43 -- 29 September 2026](#september-2026-8)
-- [1.43.42 -- 29 September 2026](#september-2026-9)
-- [1.43.41 -- 29 September 2026](#september-2026-10)
-- [1.43.40 -- 29 September 2026](#september-2026-11)
-- [1.43.39 -- 29 September 2026](#september-2026-12)
-- [1.43.38 -- 29 September 2026](#september-2026-13)
-- [1.43.37 -- 29 September 2026](#september-2026-14)
-- [1.43.36 -- 28 September 2026](#september-2026-15)
-- [1.43.35 -- 28 September 2026](#september-2026-16)
-- [1.43.34 -- 28 September 2026](#september-2026-17)
-- [1.43.33 -- 28 September 2026](#september-2026-18)
-- [1.43.32 -- 28 September 2026](#september-2026-19)
-- [1.43.31 -- 28 September 2026](#september-2026-20)
-- [1.43.30 -- 28 September 2026](#september-2026-21)
-- [1.43.29 -- 28 September 2026](#september-2026-22)
-- [1.43.28 -- 28 September 2026](#september-2026-23)
-- [1.43.27 -- 28 September 2026](#september-2026-24)
-- [1.43.26 -- 28 September 2026](#september-2026-25)
-- [1.43.25 -- 28 September 2026](#september-2026-26)
-- [1.43.24 -- 28 September 2026](#september-2026-27)
-- [1.43.23 -- 28 September 2026](#september-2026-28)
-- [1.43.22 -- 27 September 2026](#september-2026-29)
-- [1.43.21 -- 27 September 2026](#september-2026-30)
-- [1.43.20 -- 27 September 2026](#september-2026-31)
-- [1.43.19 -- 26 September 2026](#september-2026-32)
-- [1.43.18 -- 26 September 2026](#september-2026-33)
-- [1.43.17 -- 26 September 2026](#september-2026-34)
-- [1.43.16 -- 26 September 2026](#september-2026-35)
-- [1.43.15 -- 26 September 2026](#september-2026-36)
-- [1.43.14 -- 26 September 2026](#september-2026-37)
-- [1.43.13 -- 26 September 2026](#september-2026-38)
-- [1.43.12 -- 26 September 2026](#september-2026-39)
-- [1.43.11 -- 26 September 2026](#september-2026-40)
-- [1.43.10 -- 26 September 2026](#september-2026-41)
-- [1.43.9 -- 26 September 2026](#september-2026-42)
-- [1.43.8 -- 26 September 2026](#september-2026-43)
-- [1.43.7 -- 26 September 2026](#september-2026-44)
-- [1.43.6 -- 26 September 2026](#september-2026-45)
-- [1.43.5 -- 26 September 2026](#september-2026-46)
-- [1.43.4 -- 26 September 2026](#september-2026-47)
-- [1.43.3 -- 26 September 2026](#september-2026-48)
-- [1.43.2 -- 26 September 2026](#september-2026-49)
-- [1.43.1 -- 26 September 2026](#september-2026-50)
-- [1.43.0 -- 26 September 2026](#september-2026-51)
-- [1.42.1 -- 26 September 2026](#september-2026-52)
-- [1.42.0 -- 26 September 2026](#september-2026-53)
-- [1.41.3 -- 26 September 2026](#september-2026-54)
-- [1.41.2 -- 26 September 2026](#september-2026-55)
-- [1.41.1 -- 26 September 2026](#september-2026-56)
-- [1.39.1 -- 25 September 2026](#september-2026-57)
-- [1.38.3 -- 25 September 2026](#september-2026-58)
-- [1.38.2 -- 25 September 2026](#september-2026-59)
-- [1.38.1 -- 25 September 2026](#september-2026-60)
-- [1.38.0 -- 25 September 2026](#september-2026-61)
-- [1.37.0 -- 25 September 2026](#september-2026-62)
-- [1.36.2 -- 25 September 2026](#september-2026-63)
-- [1.36.1 -- 25 September 2026](#september-2026-64)
-- [1.36.0 -- 25 September 2026](#september-2026-65)
-- [1.35.1 -- 25 September 2026](#september-2026-66)
-- [1.35.0 -- 25 September 2026](#september-2026-67)
-- [1.34.0 -- 25 September 2026](#september-2026-68)
-- [1.33.0 -- 25 September 2026](#september-2026-69)
-- [1.32.0 -- 25 September 2026](#september-2026-70)
-- [1.31.1 -- 25 September 2026](#september-2026-71)
-- [1.31.0 -- 25 September 2026](#september-2026-72)
-- [1.30.0 -- 25 September 2026](#september-2026-73)
-- [1.29.0 -- 25 September 2026](#september-2026-74)
-- [1.28.0 -- 24 September 2026](#september-2026-75)
-- [1.27.0 -- 23 September 2026](#september-2026-76)
-- [1.26.0 -- 22 September 2026](#september-2026-77)
-- [1.25.0 -- 21 September 2026](#september-2026-78)
-- [1.24.0 -- 21 September 2026](#september-2026-79)
-- [1.23.0 -- 21 September 2026](#september-2026-80)
-- [1.22.1 -- 21 September 2026](#september-2026-81)
-- [1.22.0 -- 21 September 2026](#september-2026-82)
-- [1.21.0 -- 21 September 2026](#september-2026-83)
-- [1.20.0 -- 20 September 2026](#september-2026-84)
-- [1.19.0 -- 20 September 2026](#september-2026-85)
-- [1.18.0 -- 19 September 2026](#september-2026-86)
-- [1.17.0 -- 19 September 2026](#september-2026-87)
-- [1.16.0 -- 19 September 2026](#september-2026-88)
-- [1.15.0 -- 19 September 2026](#september-2026-89)
-- [1.14.1 -- 19 September 2026](#september-2026-90)
-- [1.14.0 -- 19 September 2026](#september-2026-91)
-- [1.13.5 -- 19 September 2026](#september-2026-92)
-- [1.13.4 -- 19 September 2026](#september-2026-93)
-- [1.13.3 -- 19 September 2026](#september-2026-94)
-- [1.13.2 -- 19 September 2026](#september-2026-95)
-- [1.13.1 -- 19 September 2026](#september-2026-96)
-- [1.13.0 -- 19 September 2026](#september-2026-97)
-- [1.12.1 -- 19 September 2026](#september-2026-98)
-- [1.12.0 -- 19 September 2026](#september-2026-99)
-- [1.11.0 -- 19 September 2026](#september-2026-100)
-- [1.10.1 -- 19 September 2026](#september-2026-101)
-- [1.10.0 -- 19 September 2026](#september-2026-102)
-- [1.9.0 -- 19 September 2026](#september-2026-103)
-- [1.8.1 -- 19 September 2026](#september-2026-104)
-- [1.8.0 -- 19 September 2026](#september-2026-105)
-- [1.7.0 -- 19 September 2026](#september-2026-106)
-- [1.6.1 -- 19 September 2026](#september-2026-107)
-- [1.6.0 -- 19 September 2026](#september-2026-108)
-- [1.5.0 -- 18 September 2026](#september-2026-109)
-- [1.4.0 -- 18 September 2026](#september-2026-110)
-- [1.3.0 -- 18 September 2026](#september-2026-111)
-- [1.2.0 -- 18 September 2026](#september-2026-112)
-- [1.1.0 -- 18 September 2026](#september-2026-113)
-- [1.0.0 -- 18 September 2026](#september-2026-114)
+## 1.63.2 -- 8 October 2026
+
+**When an update is live.** kdpUpdate knew when it submitted a book, never
+when the update went live. KDP's email, "your book is now live and available",
+does not settle it: it adds that a republished book's changes follow later.
+The Bookshelf does: plain Live, with no update in review or publishing. Each
+run now reads that at the start and records, in the book's receipt, when a
+submitted update is first seen live, with the hours it took at most.
+Mastery in Men's Tennis, submitted at 11:36, was live by 12:57 -- though KDP
+quotes 24 to 72 hours -- so the receipts now measure it, book by book.
+kdpUpdate --survey records it without changing anything on KDP.
+
+## 1.63.1 -- 8 October 2026
+
+**Learned from a morning of logs.** Four apps' tutorials, six apps' builds and
+releases, and a kdpUpdate run over 22 books:
+
+- **Tutorials: no sentence lost to a quote.** Windows PowerShell does not
+  escape a double quote inside an argument to a program, so a line holding
+  "Processing 3 of 9" reached Kokoro as several arguments, it refused, and
+  the sentence was left out of the walk without a word -- twice in
+  HomerScribe. Straight quotes now become curly ones before Kokoro speaks;
+  a piece that makes no audio is counted and logged; a walk with one is not
+  marked spoken and is spoken again next build. A walk spoken before this,
+  whose text holds a straight quote, is spoken once more, so HomerScribe's
+  two walks mend themselves.
+- **Tutorials: who is speaking.** Four builds started within three minutes,
+  and three waited up to 108 minutes hearing only "Another Homer build is
+  speaking". The build speaking now writes its project and walk to a status
+  file, and a waiting build says, for example, "HomerDev is speaking walk 6
+  of 10, since 8:13".
+- **checkTutorial: words, not steps.** DbDo's walks had 12 to 14 steps,
+  passed the step rule, and ran 1:26 to 1:55. The kit's own walks are spoken
+  at about 186 words a minute, so the spoken words now give the estimate,
+  and a task walk clearly under three minutes, under about 465 words, gets a
+  notice before any minute is spent speaking it.
+- **tidy: the kit's sample programs out of an app.** DbDo's installer
+  shipped 30 files of the kit's samples -- six sample programs, PyInstaller's
+  build and dist folders, their logs -- left in templates\\samples by an
+  earlier unarchive. None is in the kit's RepoFiles, so none was a stray by
+  that test. An app's templates\\samples holding nothing but such leftovers
+  is now removed whole, and logged; one holding anything else is kept, with
+  the reason logged.
+- **kdpUpdate: KDP's manuscript check is reported.** KDP found possible
+  spelling errors in nine books (14 in one) and could not check two others,
+  yet the outcome list said only "submitted". Each book's line now adds what
+  KDP's check said, and its data file keeps it under [review].
+
+## 1.63.0 -- 8 October 2026
+
+**Book publishing tools, in the kit.** The scripts that build, audit and
+publish Kindle books, proven on 22 books in the MyBooks project, now originate
+in the kit, generic and free of personal data:
+
+- **scripts:** buildBooks, kdpBooks, kdpSubmit and kdpUpdate, with their .cmd
+  wrappers and testKdpUpdate.py. Each wrapper copies the kit's current book
+  tools into the project's scripts folder before running, as an app's build
+  copies its kit tools, and logs each copy; without the kit, the project's
+  copies run as they are.
+- **Templates\\books:** starting settings files -- books.inix, the catalog;
+  buildBooks.inix, the build settings; Book_KDP.inix, a new book's KDP
+  answers, moved here from Templates -- and the shared epub.css and
+  tocEpub.lua, which a project's own templates folder may override.
+- **kind:** publishesBooks tells a book publishing project by one fact,
+  configs\\books.inix. It is a capability, not a kind: a page, a collection
+  or a project of one book keeps its own kind and also publishes books.
+- **help\\BookPattern.md** describes book publishing projects: their
+  folders, settings files, tools, where the code comes from, and why personal
+  data stays in the project. Its manuscript conventions are unchanged.
+- **The homer-books skill** teaches an AI assistant the same.
+
+Generalized on the way in: whose books are the project's own is the author
+setting in buildBooks.inix, or a book's publicDomain key, not a name in the
+code; kdpSubmit takes a book's answers file by --book and rebuilds a book
+publishing project's EPUB with buildBooks; a book's newer files in another
+folder are brought over by the catalog's importFrom; logs are named for the
+project; no author's name, title ID or folder is in any tool. The two folders
+of a book publishing project, books and results, start with letters no other
+Homer folder uses.
+
+## 1.62.5 -- 8 October 2026
+
+**An audit by another AI.** ChatGPT audited the kit and reported 39 findings.
+Checked against the code, these held and are fixed:
+
+- **INIX keeps every value.** A value that is itself a fence mark -- one
+  backtick, three double quotes, or { -- is written in quotes, in Python and
+  C#, since bare it read back as the start of a fence and swallowed the rest of
+  the file. A value holding both fence marks as lines of their own is refused
+  with a clear message, where C# wrote it and hoped. An unterminated fence is
+  still read to the end of the file but named in the diagnostics. Python's
+  inix.write goes to a temporary file and replaces the original in one step.
+- **Dialogs (Python lbc).** getValue reads a field's value before any selection,
+  so a text field with nothing selected no longer reads empty; a handler that
+  fails leaves the dialog open with a message, rather than closing as if it
+  succeeded; and Control+Enter accepts through the default button's own handler.
+- **Updates (Python elevate).** The setup program downloads to a .part file and
+  is started only when complete; a failed download no longer starts a partial
+  installer.
+- **Programs (C# Media.run).** The error stream is read on its own task while
+  the output stream is read, so a program that fills one cannot hang both.
+- **Web (Python web).** Every relative link is made absolute, entities in links
+  and their text are decoded, and Windows device names such as CON are made
+  safe as file names.
+- **Ollama (C#).** hasModel matches a whole model name, so qwen2.5:7b is no
+  longer found inside qwen2.5vl:7b; a name with no tag means its :latest.
+- **Tables of contents (kdpEpub).** The check now follows every NCX entry, the
+  guide's and landmarks' places in the contents page, and requires the contents
+  page to list every entry of the logical one, in order. All 22 MyBooks books
+  pass; a deliberately broken copy fails on each of three faults.
+- **A check observes only.** build check no longer retires walks or edits the
+  environment; those repairs run in a real build.
+- **checkHomerDev** looks for uiCheck in scripts, where it moved, and fails
+  rather than skips when it is missing.
+- **push** asks git whether anything is staged: a failed commit is a failure,
+  no longer "nothing to commit", and commits already made are pushed from a
+  clean tree.
+- **A fresh copy of the kit works.** The release scripts and the new-repository
+  templates are local-only by the author's rule; build no longer requires them,
+  and newHomerApp skips the templates with a note. newHomerApp checks every
+  template before writing anything, so it never leaves a half-made project.
+- **Documents.** The ReadMe's retired Tools folder and single walk, and
+  Developer.md's retired installTools, are replaced by what the kit does now;
+  History's hand-kept contents list, stopped at 1.50.2, gives way to heading
+  navigation.
+
+Left for later, as larger changes needing Windows testing: atomic and locked
+settings writes in C#, unique temporary folders and logs for simultaneous
+instances, a dedicated STA thread for Pythonnet, background work for network
+calls, update digests, request-and-reply for mpv, namespace-aware EPUB editing,
+structured migration, and a pinned release toolchain.
 
 ## 1.62.4 -- 8 October 2026
 
