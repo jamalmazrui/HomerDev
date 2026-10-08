@@ -141,6 +141,17 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.62.3 -- 7 October 2026
+
+**The kit's build passes again after the pattern of ten.** Its 21:10 build
+reported 26 problems and release rightly refused: the list of files the build
+expects still named the 24 two-digit walks and templates the same build had
+just retired, the homer-tutorial skill had been saved with a byte order mark,
+and tidy.py had one line ending not CRLF. The list now names the ten walks and
+ten templates of the pattern of ten, and both files are in the Homer encoding.
+The tutorials themselves were already right: all ten spoken, and kept on the
+next build by their fingerprints.
+
 ## 1.62.2 -- 7 October 2026
 
 **kdpEpub may run any number of times over the same EPUB.** MyBooks runs

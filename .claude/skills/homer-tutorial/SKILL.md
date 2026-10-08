@@ -1,4 +1,4 @@
-﻿---
+---
 name: homer-tutorial
 description: Writes, checks and builds the spoken walkthroughs of a Homer Tools app -- Tutorial_NN_*.inix scripts where a narrator works and a screen reader answers. Use when asked to write a tutorial, walk, or walkthrough for a Homer app, to simulate what a screen reader says, to add a Hear line, or to check tutorial scripts before building their audio. Names no screen reader in the scripts.
 ---

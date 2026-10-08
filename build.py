@@ -57,8 +57,7 @@ c_lsExpected = [
     "scripts/buildTutorials.cmd", "scripts/buildTutorials.ps1", "scripts/checkTutorial.cmd", "scripts/checkTutorial.py",
     "scripts/fixEncoding.cmd", "scripts/fixEncoding.py",
     "scripts/makeTutorials.cmd", "scripts/makeTutorials.py",
-    "Templates/Tutorial_00_Overview_and_Table_of_Contents.inix", "Templates/Tutorial_01_Install_and_Launch.inix", "Templates/Tutorial_02_User_Interface_Concepts.inix", "Templates/Tutorial_03_Key_Patterns.inix", "Templates/Tutorial_04_Task_One.inix", "Templates/Tutorial_05_Task_Two.inix", "Templates/Tutorial_06_Task_Three.inix", "Templates/Tutorial_07_Task_Four.inix", "Templates/Tutorial_08_Task_Five.inix", "Templates/Tutorial_09_Glossary.inix", "Templates/Tutorial_10_Conclusion.inix", "Templates/Tutorial_11_More_Information.inix",
-    ".claude/skills/ReadMe.md", ".claude/skills/app-help-guide/SKILL.md", ".claude/skills/blind-creators/SKILL.md",
+    "help/Tutorial_0_Overview.inix", "help/Tutorial_1_User_Interface.inix", "help/Tutorial_2_Install_and_Launch.inix", "help/Tutorial_3_Start_an_App_from_the_Kit.inix", "help/Tutorial_4_Build_Check_and_Release.inix", "help/Tutorial_5_The_Installer_and_Its_Finish_Page.inix", "help/Tutorial_6_Spoken_Tutorials.inix", "help/Tutorial_7_Shared_Code_and_the_Homer_Player.inix", "help/Tutorial_8_Build_with_an_AI_Assistant.inix", "help/Tutorial_9_Conclusion.inix", "Templates/Tutorial_0_Overview.inix", "Templates/Tutorial_1_User_Interface.inix", "Templates/Tutorial_2_Install_and_Launch.inix", "Templates/Tutorial_3_Task_One.inix", "Templates/Tutorial_4_Task_Two.inix", "Templates/Tutorial_5_Task_Three.inix", "Templates/Tutorial_6_Task_Four.inix", "Templates/Tutorial_7_Task_Five.inix", "Templates/Tutorial_8_Task_Six.inix", "Templates/Tutorial_9_Conclusion.inix", ".claude/skills/ReadMe.md", ".claude/skills/app-help-guide/SKILL.md", ".claude/skills/blind-creators/SKILL.md",
     ".claude/skills/homer-build-release/SKILL.md", ".claude/skills/homer-code/SKILL.md",
     ".claude/skills/homer-convert/SKILL.md", ".claude/skills/homer-docs/SKILL.md", ".claude/skills/homer-ui/SKILL.md",
     ".claude/skills/homer-elevate/SKILL.md", ".claude/skills/homer-installer/SKILL.md", ".claude/skills/homer-migrate/SKILL.md", ".claude/skills/homer-new-app/SKILL.md",
@@ -74,7 +73,6 @@ c_lsExpected = [
     "ReadMe.md", "License.md",
     "help/Announce.md", "help/Developer.md", "help/History.md", "help/HomerDev.md",
     "help/FAQ.md", "help/FinishPage.md", "help/HomerDev_update.md", "help/Hotkeys.md", "help/Logging.md", "help/TutorialLearnings.md", "help/Tutorials.md",
-    "help/Tutorial_00_Overview_and_Table_of_Contents.inix", "help/Tutorial_01_Install_and_Launch.inix", "help/Tutorial_02_User_Interface_Concepts.inix", "help/Tutorial_03_Key_Patterns.inix", "help/Tutorial_04_Start_an_App_from_the_Kit.inix", "help/Tutorial_05_Build_Check_and_Release.inix", "help/Tutorial_06_The_Installer_and_Its_Finish_Page.inix", "help/Tutorial_07_Spoken_Tutorials.inix", "help/Tutorial_08_Shared_Code_and_the_Homer_Player.inix", "help/Tutorial_09_Glossary.inix", "help/Tutorial_10_Conclusion.inix", "help/Tutorial_11_More_Information.inix",
     "License.md", "version.txt",
 ]
 
