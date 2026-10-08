@@ -1,4 +1,4 @@
----
+﻿---
 name: homer-tutorial
 description: Writes, checks and builds the spoken walkthroughs of a Homer Tools app -- Tutorial_NN_*.inix scripts where a narrator works and a screen reader answers. Use when asked to write a tutorial, walk, or walkthrough for a Homer app, to simulate what a screen reader says, to add a Hear line, or to check tutorial scripts before building their audio. Names no screen reader in the scripts.
 ---
@@ -12,42 +12,45 @@ screen reader answering exactly as a reader does. Each script is a
 `help\Tutorials.md`. The reader's lines are the whole value: they must be
 what the listener will hear on their own machine.
 
-## The set: twelve walks, under an hour and a quarter
+## The set: the pattern of ten, numbered with one digit
 
 Every app's walks follow one pattern, so a listener who knows one app's knows
-where to look in another's:
+where to look in another's. The number is one digit, so any folder or player
+sorts the set without a leading zero (7 October 2026, replacing the twelve):
 
-- **00_Overview_and_Table_of_Contents** -- a paragraph of prose on what the
-  app is; the two reader keys, Insert plus Up Arrow to repeat a line and
-  Insert plus Tab to say where you are; then the table of contents as its
-  own clean list, one step per walk, the host saying the number and title
-  and the reader saying what it covers. Prose first, then the list; never
-  the two mixed.
-- **01_Install_and_Launch**
-- **02_User_Interface_Concepts** -- what the app is made of, and where help
-  is: F1 the guide, Shift plus F1 the history, Alt plus F1 the version, the
-  Help menu with Play Tutorials, and the menus themselves, which say every
-  key.
-- **03_Key_Patterns** -- the rules every key follows, and the keys that
-  explain the keys: Control plus F1 the Key Describer, Hotkeys in the Help
-  menu, F1, and the reader's Insert plus Tab.
-- **04 to 08, the tasks** -- at least one, at most five, numbered from 04
-  with no gap. Each is built around a plain want, said first -- the station
-  carrying the home team; jazz from anywhere; jazz near home -- and the
-  features appear as the way to it.
-- **09_Glossary** -- the app's words, alphabetical, one step per term: the
-  host says the term, the reader says the meaning.
-- **10_Conclusion** -- four sentences to carry away, and where to begin.
-- **11_More_Information** -- always last.
+- **0_Overview** -- a paragraph of prose on what the app is; the two reader
+  keys, Insert plus Up Arrow to repeat a line and Insert plus Tab to say where
+  you are; then the table of contents as its own clean list, one step per
+  walk, the host saying the number and title and the reader saying what it
+  covers. Prose first, then the list; never the two mixed.
+- **1_User_Interface** -- what the app is made of and the rules its keys
+  follow, together: the window, the main view, a dialog, the Say keys, the
+  pick list, the menus that say their keys; then the key rules (the word
+  gives the letter; Control does, Shift and Alt ask; Shift reverses; Alt plus
+  Shift for a command with no control; the function keys; Insert is the
+  reader's); the keys that explain the keys (Control plus F1, Hotkeys); and
+  help in its four places, F1, Shift plus F1, Alt plus F1, Control plus F1.
+  Every part is shown by the reader after it is named.
+- **2 to 8, the tasks** -- exactly seven, one for each number, usually
+  **2_Install_and_Launch** first. Each is built around a plain
+  want, said first -- the station carrying the home team; jazz from anywhere;
+  jazz near home -- and the features appear as the way to it.
+- **9_Conclusion** -- the conclusion and summary to carry away, then the
+  glossary (host says the term, reader the meaning), then more information:
+  the help built into the program (F1, Shift plus F1, Alt plus F1, Control
+  plus F1, Hotkeys, Play Tutorials) and where to learn more.
 
-**Three to five minutes for parts 01 to 10; 00 and 11 may be shorter.**
+**Three to five minutes for parts 1 to 9; 0 may be shorter.**
 Under three is too thin to repay the listener's start; over five loses them.
 At the voices' pace, three minutes is about twenty steps and five about
 thirty. A short walk gets more substance -- the adjacent thing the want
 needs, a planned misstep and its recovery, a two-voice exchange -- never
 padding; a long one is cut or split, never hurried. The tool measures the
-audio and names what runs under or over. Twelve walks at three to five
-minutes is "about an hour", which the ReadMe can promise.
+audio and names what runs under or over. Ten walks at three to five minutes
+is "under an hour", which the ReadMe can promise. Because walk 1 and walk 9
+each do the work of two or three old walks, both are kept to five minutes by
+choosing: the interface parts a listener meets first, the glossary's fifteen
+most useful terms rather than every one.
 
 **Later walks lean on earlier ones.** The set is a course, not a reference:
 each walk says in its Intro which walks it assumes, and a thing taught
@@ -91,39 +94,34 @@ and pick up to five, in the order a new person meets them. Each task walk is
 one want from start to end; the features appear as the way to it. Write the
 Intro as the want in plain words, and say which earlier walks it assumes.
 
-### 3. Write the twelve, each to its shape
+### 3. Write the ten, each to its shape
 
-- **00**: one paragraph of prose on what the app is; the two reader keys
+- **0**: one paragraph of prose on what the app is; the two reader keys
   (Insert plus Up Arrow, Insert plus Tab) as steps; then the table of
   contents as a clean two-voice list, one step per walk, host saying the
   number and title, reader saying what it covers; a closing line with the
-  count and "about an hour". Prose and list never mix.
-- **01**: download, the installer's pages, the finish page with each box's
-  purpose and the three words Install, Update, Reinstall, the results box,
-  where things went, the desktop key, F11 for later, one misstep (run while
-  open; a mistaken tick).
-- **02**: the parts of the program as heard -- window, main view, dialogs
-  that work one way, Say keys, messages, settings -- and where help is: F1,
-  Shift plus F1, Alt plus F1, the Help menu with Play Tutorials, the menus
-  that say their keys. Every part is named in a sentence or two and then
-  shown: the host presses the key, and the reader speaks the window that
-  comes forward or the control that takes focus (see Show, then tell).
-- **03**: the rules, each shown with a key and the reader's answer, then a guessing exchange both ways (host names a
-  command, reader gives the key; host says a key, reader names the command),
-  the keys that explain the keys (Control plus F1, Hotkeys, Insert plus Tab),
-  one worked case of how a key was chosen, one misstep.
-- **04 to 08**: the wants. Each: the want stated, the keys taught in four
+  count, that nine is always last, and "under an hour". Prose and list never
+  mix.
+- **1**: the parts of the program as heard -- window, main view, a dialog that
+  works one way, Say keys, messages, the pick list, menus that say their keys
+  -- each named in a sentence or two and then shown (see Show, then tell);
+  then the key rules, each shown with a key and the reader's answer; the keys
+  that explain the keys; help in its four places, host naming, reader giving
+  the key; one planned misstep; the recap in two voices.
+- **2**, usually Install and Launch: download, the installer's pages, the
+  finish page with each box's purpose and the three words Install, Update,
+  Reinstall, the results box, where things went, the desktop key, F11 for
+  later, one misstep (run while open; a mistaken tick).
+- **3 to 8**: the other six wants. Each: the want stated, the keys taught in four
   beats, one planned misstep with its recovery, things taught earlier named
   rather than retaught, the recap in two voices.
-- **09**: the app's words, alphabetical, one step each: host says the term,
-  reader says the meaning with its key; twenty to thirty-five terms; a last
-  step with the count and "the guide has each in context".
-- **10**: four principles with their keys in two voices; one thing kept from
-  each task walk; three habits; three everyday tasks each in one breath;
-  what the app is for and is not; where to begin; where to send a problem.
-- **11**: the guide, history and version from inside the program; the
-  documents and their web pages; F11; the GitHub page; the other Homer
-  Tools. Short is fine here.
+- **9**: three parts, in this order. The conclusion and summary: the
+  principles to carry away with their keys in two voices, and one thing kept
+  from the seven task walks. The glossary: the app's words, alphabetical, one
+  step each, host says the term and the reader the meaning with its key,
+  about fifteen terms. More information: the built-in help with the reader
+  giving each key, where to send a problem (the session log), the documents,
+  the GitHub page, and where to begin.
 
 ### 4. Write every line for the ear
 
@@ -145,7 +143,7 @@ Intro as the want in plain words, and say which earlier walks it assumes.
 ### 5. Measure, then adjust
 
 Run `checkTutorial`; fix problems; read notices. Build, and read the
-tool's lengths: parts 01 to 10 between 3:00 and 5:00; 00 and 11 may be short.
+tool's lengths: parts 1 to 9 between 3:00 and 5:00; 0 may be short.
 The pace is about ten seconds a step of ordinary length and three seconds a
 two-voice exchange, so three minutes is about twenty ordinary steps or thirty
 exchanges; a Key Patterns or Conclusion walk built of exchanges runs short
@@ -171,7 +169,7 @@ tool re-speaks only what changed.
 
 ```
 [about]
-Title=01 - Transcribe a Recording
+Title=3 - Transcribe a Recording
 Intro=One sentence: what this walk does.
 Setup=The starting state: what is installed, what file exists, where focus is.
 Homework=Something to try afterwards, one sentence.
@@ -241,11 +239,11 @@ just heard, naming the parts: "Name: Untitled. Role: edit. Value: blank.
 Then the hint." Keep each `Say=` to two or three short sentences; a longer
 explanation is a sign the reader should be showing it instead.
 
-The checker measures this. In walks 02 and 03 no more than two steps in a
+The checker measures this. In walk 1 no more than two steps in a
 row may pass without the reader, and at least half the steps must carry the
 reader; other walks get a notice after three host-only steps in a row, and
-any `Say=` over sixty words gets a notice. Walk 00 (prose, then the
-contents) and walk 11 are not measured. A `Hear=` line written from the
+any `Say=` over sixty words gets a notice. Walk 0 (prose, then the
+contents) is not measured. A `Hear=` line written from the
 phrasing rules below rather than from a recording carries a `Note=` asking
 for a live run (`buildTutorials -live`) to confirm it.
 

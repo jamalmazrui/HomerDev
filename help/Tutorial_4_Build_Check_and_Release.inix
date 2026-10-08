@@ -1,0 +1,96 @@
+﻿[about]
+Title=4 - Build, Check and Release
+Intro=One want: a change made this morning, published by lunch, with nothing shipped that does not work. What build does, stage by stage; what check refuses, with the misstep everybody meets; what release publishes and what it leaves behind. This walk assumes walk four.
+Setup=An app built on the kit is open in a command prompt, with a change made and GitHub signed in.
+Homework=Make a small change in an app of your own, then build, check and release it.
+
+[step]
+
+Say=The want: a change made this morning, published by lunch, with nothing shipped that does not work. Three commands do it, and each refuses when it should. First, build, in the app's folder.
+Key=build
+Hear=Kit, C colon backslash HomerDev version 1.52.8
+Hear=Version, 1.0.228 (bumped)
+
+[step]
+
+Say=The stages, in order, each logged. The kit's version is checked against what the app needs. Old file names are retired. The encoding of every file is put right: UTF-8 with a byte order mark, CRLF line endings. The hotkey list is generated from the program itself. Any tutorial whose audio is missing or older than its script is spoken. The program compiles. The installer is built.
+Key=
+Hear=
+
+[step]
+
+Say=Each stage says one line and writes the rest to the log. Here is the line that matters most.
+Key=
+Hear=Built DbDo underscore setup dot exe version 1.0.228
+
+[step]
+
+Say=Second, check. It is also the first thing release runs, so you may skip it; but it is a few seconds, and it says exactly what release would refuse.
+Key=scripts\check
+Hear=13 checks passed, 0 checks failed, 2 checks not checked.
+
+[step]
+
+Say=What the checks are. Every file in the Homer encoding. Every access letter unique within its dialog or menu. No key on a reader's key. The app's files under the Local tree, never Roaming. The hotkey list current. The tutorials clean. Each acceptance check in accept dot inix passing. And an evidence report written in Markdown, for anyone who asks what was checked.
+Key=
+Hear=
+
+[step]
+
+Say=A planned misstep, the one everybody meets. Change a dialog and reuse a letter, and check names the dialog and the two captions.
+Key=
+Hear=12 checks passed, 1 check failed. failed: access letters -- Filter Records: F is used by Find and Filter
+Say=Fix the caption, build, check again. Nothing was published, and nothing was going to be.
+
+[step]
+
+Say=Third, release. It reads the version from the installer, refuses if the last build did not succeed, runs check, commits and pushes, tags the version, and publishes the installer on GitHub.
+Key=scripts\release
+Hear=GitHub has no published release tagged v1.0.228.
+Hear=DbDo 1.0.228 published.
+
+[step]
+
+Say=Release refuses for honest reasons and says which. A build still running: the last build did not succeed, build again, then release. A check failing: nothing was published, its report names it. And it never publishes an installer older than the source beside it.
+Key=
+Hear=
+
+[step]
+
+Say=What the release left behind. A tag, a release page with the installer, and in the logs folder a release log and an evidence report; the ReadMe's download link now points at the new installer. F11 in any installed copy finds it within the hour.
+Key=
+Hear=
+
+[step]
+
+Say=The logs. Every stage wrote its own: build, encoding, hotkeys, tutorials, check, push, release. The console said one line each; the logs say every command and its exit code. When something is wrong, the log is the thing to send -- never a description of the console.
+Key=
+Hear=
+
+[step]
+
+Say=A second planned misstep. Run release before the build has finished speaking its tutorials, and it refuses -- the build has not succeeded yet -- which is right, if blunt; wait for the Built line, then release.
+Key=
+Hear=
+
+[step]
+
+Say=What this walk taught. I say the idea or the key; the reader says the command or the name.
+
+[step]
+
+Say=Every stage, encoding to installer.
+Key=
+Hear=build
+
+[step]
+
+Say=What release would refuse, in seconds.
+Key=
+Hear=check
+
+[step]
+
+Say=Tag, publish, and leave a log.
+Key=
+Hear=release

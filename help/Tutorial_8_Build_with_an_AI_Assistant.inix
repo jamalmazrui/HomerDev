@@ -1,0 +1,124 @@
+﻿[about]
+Title=8 - Build with an AI Assistant
+Intro=One want: a new feature written with an AI assistant, in the kit's house style, and proved before anyone hears it. The skills that teach an assistant the rules, the three sentences that carry the kit into a chat, the method -- specify, build small, verify without sight -- and a planned misstep the check catches.
+Setup=An app made with newHomerApp, as in walk three, and a command prompt in its folder.
+Homework=Write accept dot inix for one feature you want, then ask an assistant for it and run check.
+
+[step]
+
+Say=One want: a feature written with an AI assistant that follows the house rules, and proved before anyone hears it. This walk leans on walks three and four: an app from newHomerApp, and build, check and release.
+Key=
+Hear=
+
+[step]
+
+Say=The kit teaches an assistant through its skills: folders of instructions, one for each part of the work -- code, dialogs, installers, tutorials. Before trusting them, the kit checks them as it checks code. I type the command.
+Key=scripts\checkSkills
+Hear=(each word echoed as it is typed)
+
+[step]
+
+Say=Enter runs it.
+Key=Enter
+Hear=16 skills checked, 0 problems.
+
+[step]
+
+Say=Sixteen skills, none broken. A skill whose description held an angle bracket would be refused when uploaded, and this check names it first.
+Key=
+Hear=
+
+[step]
+
+Say=Three sentences carry the kit into a chat: what the program is; which classes to use -- Lbc for every dialog, Inix for settings, Log for the session log, Say only for what the reader cannot know; and the sample to follow, FruitBasketCs.
+Key=
+Hear=
+
+[step]
+
+Say=Then the method the kit is shaped around. Specify before you generate: write accept dot inix first, a few named checks of what done means, so the assistant works to your idea of done, not its own. I open it in EdSharp.
+Key=Control+O
+Hear=Open dialog
+Hear=File name: edit
+Note=Confirm the wording with a live run: buildTutorials -live.
+
+[step]
+
+Say=Each check is a name and a command, and check runs them all. Now one change, then one build: I ask for a Prefix box in the dialog, put the assistant's file in place, and type build.
+Key=build
+Hear=(each word echoed as it is typed)
+
+[step]
+
+Say=Enter.
+Key=Enter
+Hear=Built PatternRename underscore setup dot e x e, version 1.0.1
+Note=Confirm the wording with a live run: buildTutorials -live.
+
+[step]
+
+Say=The installer is built. Then check, which refuses what release would refuse, and writes the evidence.
+Key=check
+Hear=(each word echoed as it is typed)
+
+[step]
+
+Say=Enter.
+Key=Enter
+Hear=13 checks passed, 0 checks failed, 2 checks not checked.
+
+[step]
+
+Say=The two not checked are the build and the smoke run, which come with dash dash build. A planned misstep: the assistant gave two controls captions that start with the same letter. I run check again.
+Key=Enter
+Hear=access letters -- Prefix: P is used by Pattern and Prefix
+Note=Confirm the wording with a live run: buildTutorials -live.
+
+[step]
+
+Say=The check names the caption and the clash; the fix is a caption, not a key table. The assistant renames the box Text Before Each Name, so it takes T from the first letter of a word; I rebuild, and check passes again.
+Key=Enter
+Hear=13 checks passed, 0 checks failed, 2 checks not checked.
+
+[step]
+
+Say=Last, verify without sight: the log says what happened, and your ears do the rest. In the running program, Control plus F1 turns on the Key Describer, so the new box's key says what it does.
+Key=Control+F1
+Hear=Key Describer On
+
+[step]
+
+Say=Alt plus T, T for Text, the first letter of the new caption.
+Key=Alt+T
+Hear=Alt plus T, Text Before Each Name
+Note=Confirm the wording with a live run: buildTutorials -live.
+
+[step]
+
+Say=Control plus F1 again, and the keys act once more.
+Key=Control+F1
+Hear=No Key Describer
+
+[step]
+
+Say=What this walk taught. I name the step; the reader gives the command.
+Key=
+Hear=
+
+[step]
+
+Say=Say what done means, first.
+Key=
+Hear=accept dot inix
+
+[step]
+
+Say=Prove it before release.
+Key=
+Hear=check
+
+[step]
+
+Say=Make sure the instructions an assistant reads are sound.
+Key=
+Hear=checkSkills

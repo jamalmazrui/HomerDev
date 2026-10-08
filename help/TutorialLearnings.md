@@ -165,7 +165,7 @@ beside the walks, for the car rather than the keyboard.
 - **Every walk**: alphabet words for lone letters in Say lines; sounds named in
   Hear lines where an app has them; Hear lines in name, role, state, position,
   access-key order.
-- **Templates\Tutorial_00_Overview.inix**: teach Insert+Up Arrow (repeat) and
+- **Templates\Tutorial_0_Overview.inix**: teach Insert+Up Arrow (repeat) and
   Insert+Tab (where am I) in the first two steps, the way the trainers teach
   both in the first module.
 - **The reader voice**: a step slower than a working rate.

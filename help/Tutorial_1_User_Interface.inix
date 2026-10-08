@@ -1,0 +1,198 @@
+﻿[about]
+Title=1 - User Interface
+Intro=What a Homer program is made of, each part named by the narrator and then shown by the screen reader -- the window, the main view, the dialog, the Say keys, the pick list, the menus -- then the rules every key follows, so a key can be guessed in a program you have never opened, and the four places help lives.
+Setup=Nothing is needed; this walk is listened to.
+Homework=Open any Homer program and guess three keys from their words, then check each with Control plus F1.
+
+[step]
+
+Say=A Homer program is heard before it is seen. I name each part; the reader shows it as it would on your machine: name, kind, value and state, then a hint. After that, the rules that let you guess any key.
+Key=
+Hear=
+
+[step]
+
+Say=First, the window. One program, one copy. Its desktop key opens it or brings it forward. Alt plus Control plus D, D for DbDo.
+Key=Alt+Control+D
+Hear=DbDo
+Hear=DbDo ready
+
+[step]
+
+Say=The title, then the program's greeting in the message voice. Next, the main view, a control the reader knows. In EdSharp, an edit box.
+Key=Alt+Control+E
+Hear=EdSharp
+Hear=Untitled, edit, multiline, blank
+Hear=Type in text.
+
+[step]
+
+Say=Name: Untitled. Role: edit, multiline. Value: blank. Then the hint, for a newcomer. In FileDir, the main view is a list.
+Key=Alt+Control+F
+Hear=FileDir
+Hear=ReadMe dot m d, 1 of 24
+Note=Confirm this list item's wording with a live run: buildTutorials -live.
+
+[step]
+
+Say=A list item says its name, then where it sits: 1 of 24. That count is your map. Now a dialog, built the same way in every Homer program: a label, then the control it names. Control plus K, K for Keywords.
+Key=Control+K
+Hear=Keywords dialog
+Hear=Keywords: edit
+Hear=Type in text.
+Note=Confirm with a live run: buildTutorials -live.
+
+[step]
+
+Say=The title first, then the label read before its box, then the hint. Tab moves through the controls in the order they were added; OK and Cancel come last.
+Key=Tab
+Hear=OK button
+Hear=To activate press Spacebar.
+Note=Confirm what Tab reaches first with a live run: buildTutorials -live.
+
+[step]
+
+Say=Enter presses OK, Escape is Cancel, and Control plus Enter submits from any control in the dialog. Alt plus an underlined letter jumps straight to its control.
+Key=Alt+K
+Hear=Keywords: edit
+Hear=Type in text.
+
+[step]
+
+Say=Alt plus K, K for Keywords, and focus is back on the box. Escape closes the dialog.
+Key=Escape
+Hear=FileDir
+
+[step]
+
+Say=Now the Say keys, in DbDo. They ask a question and change nothing.
+Key=Alt+Control+D
+Hear=DbDo
+
+[step]
+
+Say=Shift plus Z is Say Status: Z, the end of the alphabet, where the status line sits.
+Key=Shift+Z
+Hear=jobs, 12 records, no filter, sorted by employer
+
+[step]
+
+Say=Table, count, filter and sort in one breath; pressed twice, the words open in a window. Where a field has fixed values, F4 opens them.
+Key=F4
+Hear=status: list box, untried, 4 of 5
+Hear=To move through items press Up or Down Arrow.
+
+[step]
+
+Say=Name, role, value, position, then the hint. A letter jumps to a value, so nothing is typed that could be mistyped. Next, menus, which say their own keys. F10 opens the menu bar.
+Key=F10
+Hear=Menu bar
+Hear=File menu
+
+[step]
+
+Say=I arrow down to the first item.
+Key=Down Arrow
+Hear=Open Database..., Control plus O, O
+
+[step]
+
+Say=The item, its hotkey, then its letter: learn a key from the menu once, then skip the menu.
+Key=Escape
+Hear=Leaving menus
+
+[step]
+
+Say=Now the rules behind every key, the same in every Homer program. The word gives the letter: Control plus K is Keywords wherever there is searching. Control plus a letter does something; Shift or Alt plus a letter asks and changes nothing.
+Key=
+Hear=
+
+[step]
+
+Say=Adding Shift to a doing key reverses it: Control plus M marks, Control plus Shift plus M unmarks. Alt plus Shift plus a letter is a command with no control of its own: Alt plus Shift plus P plays a stream.
+Key=
+Hear=
+
+[step]
+
+Say=The function keys follow Windows: F1 help, F2 edit, F3 find again, F4 pick, F10 the menus. Anything with Insert belongs to the screen reader; a Homer program never uses it. Insert plus T is the reader's own: the title.
+Key=Insert+T
+Hear=DbDo
+
+[step]
+
+Say=Two keys explain the keys. Control plus F1 is the Key Describer: while it is on, each key says what it does instead of doing it.
+Key=Control+F1
+Hear=Key Describer On
+
+[step]
+
+Say=Again, and it is off. Hotkeys, in the Help menu, lists every key by menu, by key and by command.
+Key=Control+F1
+Hear=No Key Describer
+
+[step]
+
+Say=Help is in four places, the same in every Homer program. I say which; the reader says the key. The guide.
+Key=
+Hear=F1, the guide
+
+[step]
+
+Say=The changes, release by release.
+Key=
+Hear=Shift plus F1, History
+
+[step]
+
+Say=The version, and a check for a newer one.
+Key=
+Hear=Alt plus F1, About
+
+[step]
+
+Say=The name of any key you press.
+Key=
+Hear=Control plus F1, Key Describer
+
+[step]
+
+Say=The Help menu holds all four, with Hotkeys and Play Tutorials. Now a planned misstep: a Say key belongs to the window, not a field. In EdSharp's edit box, I press Shift plus Z.
+Key=Alt+Control+E
+Hear=EdSharp
+
+[step]
+
+Say=Shift plus Z.
+Key=Shift+Z
+Hear=Z
+
+[step]
+
+Say=The reader echoed the letter, and the box now holds a Z. Control plus Z undoes it.
+Key=Control+Z
+Hear=Undo
+
+[step]
+
+Say=What this walk taught. I name the part or the command; the reader says the key.
+Key=
+Hear=
+
+[step]
+
+Say=Say Status, a question that changes nothing.
+Key=
+Hear=Shift plus Z
+
+[step]
+
+Say=A field's fixed values.
+Key=
+Hear=F4, pick list
+
+[step]
+
+Say=What any key does, without doing it.
+Key=
+Hear=Control plus F1, Key Describer

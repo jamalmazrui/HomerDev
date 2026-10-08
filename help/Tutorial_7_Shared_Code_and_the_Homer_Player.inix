@@ -1,0 +1,114 @@
+﻿[about]
+Title=7 - Shared Code and the Homer Player
+Intro=One want: a feature written once and heard in every program. The Homer Player heard in FileDir and then in DbDo, the same window from the same class; the other shared classes and what each does for the listener; what sharing buys and the one rule it costs; a misstep from this week. This walk assumes walks two and four.
+Setup=FileDir and DbDo are installed, with mpv.
+Homework=Play something in FileDir and in DbDo, and notice the keys that are the same.
+
+[step]
+
+Say=The want: a feature written once and heard in every program. The kit's shared code is where that happens, and the Homer Player is the plainest case. Here it is in FileDir, on a saved podcast page.
+Key=Control+Shift+L
+Hear=4 tracks from Access On
+Say=Every media link the page holds, counted and queued.
+
+[step]
+
+Say=The player opens on its track list, and the first track plays.
+Key=
+Hear=Access On, Track list: list box, Episode 212, 1 of 4
+
+[step]
+
+Say=Now the same player in DbDo, on a radio station.
+Key=Alt+Shift+P
+Hear=1 track from stations
+Hear=RadioTrail, Track list: list box, KIRO 710 ESPN Seattle, 1 of 1
+Say=The same window, the same list, the same keys, from a different program on different data.
+
+[step]
+
+Say=Scroll Lock pauses and resumes; the Volume and Rate sliders are ordinary sliders; Alt plus Shift plus R records a copy of the stream; Escape closes it. Learned once in FileDir, known in DbDo, because MediaPlayer dot cs lives in the kit and both programs compile it from there.
+Key=
+Hear=
+
+[step]
+
+Say=The other classes work the same way, less visibly. Lbc builds every dialog you heard in walk one. Say speaks every message, choosing the channel of whichever screen reader is running, or the Windows voice when none is, and never speaking over a keystroke. Log writes the session log in one format for every program.
+Key=
+Hear=
+
+[step]
+
+Say=Inix reads the settings files -- the dot inix format, sections and lines, with the comments the kit's rules ask for, so a settings file is documentation too. Web fetches with the same user agent and the same patience. Util holds the small things: the pluralizer, the short path, the version string.
+Key=
+Hear=
+
+[step]
+
+Say=Mpv dot cs finds the player engine, machine-wide, and drives it: play, pause, record, the sliders. Media dot cs knows what a track is -- a file, a stream, an episode -- and what to say about one.
+Key=
+Hear=
+
+[step]
+
+Say=What sharing buys. A fix to the player on Monday is in every program's next build; a new Say channel for a new reader reaches all of them; and a person who learned the dialog in one program has learned it in the next. The cost is one rule: an app never copies a kit class into its own folder; it compiles against the kit.
+Key=
+Hear=
+
+[step]
+
+Say=A planned misstep, from this very week. A kit class had a line that depended on one app, and compiled in that app alone; the kit's check now compiles every shared class on its own, so the mistake is caught in the kit and not in the fifth app to try it.
+Key=
+Hear=
+
+[step]
+
+Say=The Python side has the same shape: a Say, a Log, an Inix, a dialog builder, so a Python app -- HomerScribe is one -- speaks and logs and asks exactly as the C sharp ones do. Walk one's two fruit baskets were the proof.
+Key=
+Hear=
+
+[step]
+
+Say=Updating the kit is unarchiving HomerDev dot zip over the folder and building; every app's build checks the kit's version against the one it needs, and says so in one line when the kit is too old.
+Key=
+Hear=ERROR: FileDir needs HomerDev 1.52.8 or later, and C colon backslash HomerDev is 1.52.6.
+
+[step]
+
+Say=How an app reaches the kit. Its build passes the kit's CSharp folder to the compiler, so Lbc dot cs, Say dot cs and the rest are compiled into the app from where they live; nothing is copied. The acceptance check named missing Lbc dot cs is the proof that nothing was.
+Key=
+Hear=
+
+[step]
+
+Say=A worked case of the gain. The Homer Player's recording -- Alt plus Shift plus R, a Record button and a Stop recording button -- was written once, in the kit, on 5 October. FileDir had it on its next build, and DbDo on its next, with no change to either program.
+Key=
+Hear=
+
+[step]
+
+Say=What belongs in the kit and what does not. A behaviour every app wants -- a dialog, speech, a log, a player -- belongs in the kit. A behaviour one app wants -- DbDo's grid, EdSharp's compiler table, FileDir's tags -- belongs in that app. The test: would a second app want it exactly as it is?
+Key=
+Hear=
+
+[step]
+
+Say=What this walk taught. I say the idea or the key; the reader says the command or the name.
+
+[step]
+
+Say=The player every Homer program shares.
+Key=
+Hear=MediaPlayer dot cs
+
+[step]
+
+Say=The dialog class.
+Key=
+Hear=Lbc
+
+[step]
+
+Say=The speech class.
+Key=
+Hear=Say

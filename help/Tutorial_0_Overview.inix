@@ -1,0 +1,106 @@
+﻿; The format is in Tutorials.md: four beats per key -- say the key with the
+; word it comes from, press it, hear the reader word for word, say what that
+; meant. Name silence. Name no screen reader. Ten walks in the pattern of ten,
+; each three to five minutes, in the Homer pattern the kit itself prescribes. Where the kit has
+; no screen of its own, an app built on it -- DbDo, EdSharp, FileDir -- shows
+; what the kit's code makes a person hear.
+
+FileTask = tutorial
+
+[feed]
+Title=HomerDev Walkthroughs
+Description=Spoken walks through the Homer Development Kit: what it is, how it builds and releases an app, and what its shared code makes a person hear. Ten walks in the pattern of ten, each three to five minutes.
+Author=Jamal Mazrui
+Email=jamal.mazrui@outlook.com
+Base=
+
+[about]
+Title=0 - Overview
+Intro=What the Homer Development Kit is, in a paragraph; the two reader keys every walk assumes; then the table of contents, one line per walk.
+Setup=Nothing is needed; this walk is listened to.
+Homework=Listen to the walks in order; each one assumes the ones before it.
+
+[step]
+
+Say=HomerDev is a kit of parts for building Windows programs that work well by keyboard and screen reader: shared C sharp classes and Python modules, build and release scripts, installer parts, templates for a new app, and skills that teach an AI assistant the house rules. Every decision that makes a program pleasant to use without sight -- where the focus goes, what is spoken, what the keys do -- has been made once and put in a class, so an app built on the kit inherits it. DbDo, EdSharp and FileDir are built on it, and these walks use their voices to show what the kit's code does for a person.
+Key=
+Hear=
+
+[step]
+
+Say=Two keys before anything else, both the reader's own. If a line goes by too fast, Insert plus Up Arrow says it again.
+Key=Insert+UpArrow
+Hear=(the last line, read a second time)
+Say=Nothing changed; the key only repeats.
+
+[step]
+
+Say=And if you lose your place, Insert plus Tab says where you are: the control, its state, its position, and any hint it carries. The walks are heard with those hints off, the way most people work.
+Key=Insert+Tab
+Hear=(the current control, with its state and position)
+
+[step]
+
+Say=Now the table of contents. I say the number and the title; the reader says what the walk covers.
+Key=
+Hear=
+
+[step]
+
+Say=One, User Interface.
+Key=
+Hear=What a Homer program is made of, heard in DbDo, EdSharp and FileDir, and the rules every key follows, so a key can be guessed.
+
+[step]
+
+Say=Two, Install and Launch.
+Key=
+Hear=Unarchiving the kit, running its own build, and launching the sample program it builds.
+
+[step]
+
+Say=Three, Start an App from the Kit.
+Key=
+Hear=A new app from the template: its files, its first build, its first run.
+
+[step]
+
+Say=Four, Build, Check and Release.
+Key=
+Hear=What build does, stage by stage; what check refuses; what release publishes.
+
+[step]
+
+Say=Five, The Installer and Its Finish Page.
+Key=
+Hear=The shared installer parts: boxes that say their state, the results box, the summary.
+
+[step]
+
+Say=Six, Spoken Tutorials.
+Key=
+Hear=Writing a walk, the two voices, the pattern of ten, and the tool that speaks and measures them.
+
+[step]
+
+Say=Seven, Shared Code and the Homer Player.
+Key=
+Hear=The classes every app uses, and the player heard in FileDir and DbDo alike.
+
+[step]
+
+Say=Eight, Build with an AI Assistant.
+Key=
+Hear=A feature written with an AI assistant in the kit's house style: the skills, the three sentences, and the check that proves it.
+
+[step]
+
+Say=Nine, Conclusion.
+Key=
+Hear=The conclusion and summary, the words the kit uses, the help built into every program, and where to learn more.
+
+[step]
+
+Say=Ten walks, three to five minutes each, under an hour together: the overview, the user interface, seven tasks, and the conclusion. They are a course, not a reference: each one assumes those before it.
+Key=
+Hear=

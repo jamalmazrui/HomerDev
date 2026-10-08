@@ -818,10 +818,23 @@ function applyGlobal($dGlobal) {
 # Tutorial is the script's, and the folder is already called tutorials.
 # AUDIO UNDER THE OLD NAMES -- Tutorial_04_X.mp3 -- is retired by the tool
 # itself, so no app's build script has to know the naming changed.
+# AUDIO NO WALK MAKES IS RETIRED TOO (kit 1.62.0, the pattern of ten): when the
+# set moved from two-digit numbers (00_Overview_and_Table_of_Contents) to one
+# digit (0_Overview), the old files would have stayed in the folder and the
+# playlist. On a full run -- never when one walk is named, since then the list
+# holds only that walk -- every mp3 and fingerprint whose name no current walk
+# produces is retired, so the folder always holds exactly the set.
 function retireOldAudio() {
   if (-not (Test-Path -LiteralPath $sAudioDir)) { return }
   foreach ($f in @(Get-ChildItem -LiteralPath $sAudioDir -Filter "Tutorial_*.mp3" -ErrorAction SilentlyContinue)) {
     try { Remove-Item -LiteralPath $f.FullName -Force; note ("  retired " + $f.Name + ", an old-style name") } catch { }
+  }
+  if ($sOnly -ne "") { return }
+  $lsWanted = @($lsScripts | ForEach-Object { [System.IO.Path]::GetFileNameWithoutExtension((audioName $_)).ToLower() })
+  foreach ($f in @(Get-ChildItem -LiteralPath $sAudioDir -ErrorAction SilentlyContinue | Where-Object { $_.Extension -eq ".mp3" -or $_.Extension -eq ".sha256" })) {
+    if ($lsWanted -notcontains $f.BaseName.ToLower()) {
+      try { Remove-Item -LiteralPath $f.FullName -Force; note ("  retired " + $f.Name + ", which no current walk makes") } catch { note ("  could not retire " + $f.Name) }
+    }
   }
 }
 

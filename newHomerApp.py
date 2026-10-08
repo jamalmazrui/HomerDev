@@ -40,6 +40,7 @@ traceback. Camel Type throughout.
 """
 
 import datetime
+import glob
 import os
 import platform
 import sys
@@ -308,6 +309,20 @@ def main():
             iSkipped += 1
             logLine("SKIPPED, already there: %s" % sToPath)
             continue
+        writeHomer(sToPath, readTemplate(sFromPath).replace(c_sToken, sApp))
+        iWritten += 1
+
+    # THE TUTORIAL SKELETONS (1.62.0): one walk per part of the pattern of ten,
+    # from the kit's Templates, with the app's name in place of the token, so
+    # the day a feature is finished its walk is a file to fill in, not to
+    # invent -- which walk 3 of the kit's own tutorials tells a listener.
+    for sFromPath in sorted(glob.glob(os.path.join(sTemplates, "Tutorial_*.inix"))):
+        sToPath = os.path.join(sTarget, "help", os.path.basename(sFromPath))
+        if os.path.exists(sToPath):
+            iSkipped += 1
+            logLine("SKIPPED, already there: %s" % sToPath)
+            continue
+        os.makedirs(os.path.dirname(sToPath), exist_ok=True)
         writeHomer(sToPath, readTemplate(sFromPath).replace(c_sToken, sApp))
         iWritten += 1
 

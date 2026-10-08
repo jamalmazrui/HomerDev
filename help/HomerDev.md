@@ -688,7 +688,7 @@ than guessed at. Folders are in the order you meet them.
 - **History.md** -- what changed in each version, and why
 - **Hotkeys.md** -- every key three ways: by key, by description, by binding
 - **Tutorials.md** -- walkthroughs of common scenarios, and the audio tutorial playlist
-- **Tutorial_00 to Tutorial_11** -- the kit's twelve spoken walks, narrator and screen reader in two voices, in the pattern every Homer app follows
+- **Tutorial_0 to Tutorial_9** -- the kit's ten spoken walks, in the pattern of ten, narrator and screen reader in two voices, in the pattern every Homer app follows
 - **CamelType_CSharp.md, CamelType_CSharp_Reference.md, CamelType_JAWSScript.md** -- the coding style
 - **self.md** -- the private notebook: decisions, findings and open items. Never pushed
 
@@ -2282,7 +2282,7 @@ worth reading for the breadth; these two are what to copy.
 
 ### Tutorials that can be heard
 
-The kit's own walks are the twelve in `help`, `Tutorial_00` to `Tutorial_11`, in the pattern the kit prescribes for every app: overview, install and launch, the interface, the key rules, five tasks, glossary, conclusion, more information. Where the kit has no screen of its own, the walks use an app built on it -- DbDo, EdSharp, FileDir -- so a listener hears what the kit's code does for a person. The build speaks them, like any app's.
+The kit's own walks are the ten in `help`, `Tutorial_0` to `Tutorial_9`, in the pattern of ten the kit prescribes for every app: overview, install and launch, the interface, the key rules, five tasks, glossary, conclusion, more information. Where the kit has no screen of its own, the walks use an app built on it -- DbDo, EdSharp, FileDir -- so a listener hears what the kit's code does for a person. The build speaks them, like any app's.
 
     [step]
     Say  = the narration

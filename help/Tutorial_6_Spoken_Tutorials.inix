@@ -1,0 +1,107 @@
+﻿[about]
+Title=6 - Spoken Tutorials
+Intro=One want: a spoken tutorial for your app, in two voices, without a microphone. The walk file and its four beats, the two voices and what they never do, the pattern of ten, three to five minutes, the checker and its misstep, the tool that speaks and measures, and where the rules came from. This walk assumes walk five.
+Setup=An app built on the kit, with its help folder open.
+Homework=Write one task walk for your app, run checkTutorial, and let the build speak it.
+
+[step]
+
+Say=The want: a spoken tutorial for your app, in the two voices, without a microphone. A walk is a text file in help, Tutorial underscore, a number, a title with underscores, dot inix. The build speaks it.
+Key=
+Hear=
+
+[step]
+
+Say=The format has four beats per key. Say: the host says the key with the word it comes from. Key: the key pressed. Hear: what the reader says, word for word, as it would be spoken -- a file name as said, not as written. Say again: what that meant. Name silence when a key says nothing. Name no screen reader.
+Key=
+Hear=
+
+[step]
+
+Say=Two voices, because a program has two: the person, and the reader answering. The exchange is the teaching device, and it is used for more than keystrokes: a glossary is the host saying the term and the reader saying the meaning; a recap is the host saying the key and the reader saying the command. What the voices never do is chat.
+Key=
+Hear=
+
+[step]
+
+Say=The pattern of ten, the same for every app, numbered with one digit so a folder sorts it. Zero, the overview and contents. One, the user interface and the key rules together. Two to eight, seven tasks, each built around a plain want -- usually install and launch first. Nine, the conclusion: the summary, the glossary, and more information, the help built in among it.
+Key=
+Hear=
+
+[step]
+
+Say=Three to five minutes for parts one to ten: under three is too thin to repay the listener's start; over five loses them. A thin walk gets substance -- the adjacent thing the want needs, a planned misstep and its recovery -- never padding. The tool measures the audio and says what runs under or over.
+Key=
+Hear=
+
+[step]
+
+Say=checkTutorial reads every walk before anything is spoken. It wants Intro and Setup, a Say in every step, Hear lines in words, no reader named, the first walk teaching the two reader keys, and the pattern's names and numbers; a set not yet the pattern is a notice, not a silence.
+Key=scripts\checkTutorial
+Hear=12 scripts checked, 0 problems.
+
+[step]
+
+Say=A planned misstep. Write a Hear line with a plus sign in it, or a file name as written, and the checker names the step.
+Key=
+Hear=Tutorial underscore 17, step 6: Hear writes an access key with a plus sign; the reader says the words
+Say=Fix the line, run it again.
+
+[step]
+
+Say=buildTutorials speaks them. Two voices: Kokoro, with a narrator and a reader, both licensed to redistribute; Piper when Kokoro is not there. The reader's voice shifts by context -- a cursor line, a message, a menu -- so a message is heard as a message.
+Key=scripts\buildTutorials -build
+Hear=Creating 4 underscore Open underscore and underscore Move dot mp3, 23 steps. A few minutes.
+
+[step]
+
+Say=The audio is named like a chapter -- 4 underscore Open underscore and underscore Move dot mp3 -- so a folder or a player shows the number and the title. A walk is spoken again only when its text has changed since it was last spoken; the rest are kept.
+Key=
+Hear=
+
+[step]
+
+Say=At the end, the lengths, and the two lines that matter.
+Key=
+Hear=4 underscore Open underscore and underscore Move dot mp3 runs 2 33
+Hear=Wrote Tutorials dot m3u naming 12 tutorials, 27 minutes in all.
+
+[step]
+
+Say=Under three minutes or over five, the tool says so by name, with the guideline in one line. Tutorials dot m3u is the playlist Play Tutorials uses; Tutorials dot md is the transcript, made from the same scripts; TutorialFeed dot xml is a podcast feed of the same audio.
+Key=
+Hear=
+
+[step]
+
+Say=Two kinds of listener. A walk is written for the person who will press the keys tomorrow; it is also what an AI assistant reads to learn the program, which is why the skills folder points at it.
+Key=
+Hear=
+
+[step]
+
+Say=The learning behind the rules came from ninety-eight recorded screen reader training sessions and from Quill Radio's tutorials: spell a lone letter with its alphabet word; one planned misstep per walk; close by naming the two or three keys taught; a concrete want before a feature. TutorialLearnings dot md in the kit's help has the rest.
+Key=
+Hear=
+
+[step]
+
+Say=What this walk taught. I say the idea or the key; the reader says the command or the name.
+
+[step]
+
+Say=Reads every walk before anything is spoken.
+Key=
+Hear=checkTutorial
+
+[step]
+
+Say=Speaks what is missing or stale and measures it.
+Key=
+Hear=buildTutorials
+
+[step]
+
+Say=The playlist Play Tutorials uses.
+Key=
+Hear=Tutorials dot m3u

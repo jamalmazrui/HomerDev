@@ -184,7 +184,8 @@ c_lsStandingNames = [
     r"^[a-z0-9_+-]+\.(cs|py|js|iss|ico|inix|manifest|config|lua)$",
     # The fingerprint beside each tutorial's audio (1.60.3), 04_Open_and_Move.sha256: buildTutorials keeps it to know the
     # audio is current, and the repository carries it with the audio so a build elsewhere speaks nothing it need not.
-    r"^\d{2}_[a-z0-9_]+\.sha256$",
+    # One digit since the pattern of ten (1.62.0), 4_Open_and_Move.sha256; two-digit names are still kept until retired.
+    r"^\d{1,2}_[a-z0-9_]+\.sha256$",
 ]
 
 # Where an unnamed file goes when it is moved out of the way.

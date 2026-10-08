@@ -1,0 +1,95 @@
+﻿[about]
+Title=1 - User Interface
+Intro=What _APP_ is made of and the rules its keys follow: its window, its main view, a dialog, the Say keys, the menus, then the key rules and the four places help lives. Each part is named by the narrator and then shown by the screen reader.
+Setup=_APP_ is installed and your reader is running.
+Homework=Open _APP_ and guess three keys from their words, then check each with Control plus F1.
+
+; SHOW, THEN TELL. Every step names one part in a sentence or two, presses the
+; key that brings it to focus, and gives the reader's words, word for word:
+; name, role, value, state, then the hint after a pause. checkTutorial holds
+; this walk to it: never more than two host-only steps in a row, and the reader
+; in at least half the steps. The placeholders below are in that shape; replace
+; each with what _APP_ really says, confirmed with buildTutorials -live.
+
+[step]
+Say=_APP_ is heard before it is seen. I name each part; the reader shows it: name, kind, value and state, then a hint.
+Key=
+Hear=
+
+[step]
+Say=The window. Its desktop key opens it or brings it forward. Alt plus Control plus the program's letter.
+Key=Alt+Control+A
+Hear=(the window's title)
+Hear=(the program's greeting, in the message voice)
+Note=Use _APP_'s own desktop key.
+
+[step]
+Say=The main view: name, role, value, then the hint.
+Key=Tab
+Hear=(the main view's name, its role, its value)
+Hear=(its hint)
+
+[step]
+Say=A dialog: a label, then the control it names. Tab moves in the order the controls were added; OK and Cancel come last.
+Key=Control+K
+Hear=(the dialog's title)
+Hear=(the first label and its control)
+Note=Use a dialog _APP_ really has, opened by its own key.
+
+[step]
+Say=Enter presses OK, Escape is Cancel, Control plus Enter submits from anywhere, and Alt plus an underlined letter jumps to its control.
+Key=Escape
+Hear=(the main window's title again)
+
+[step]
+Say=The Say keys ask and change nothing. Shift plus Z is Say Status.
+Key=Shift+Z
+Hear=(the status line, in one breath)
+
+[step]
+Say=Menus say their own keys. F10 opens the menu bar, and Down Arrow reaches the first item.
+Key=F10
+Hear=Menu bar
+Hear=(the first menu's name)
+
+[step]
+Say=The item, its hotkey, then its letter.
+Key=Down Arrow
+Hear=(the first item, its hotkey, its letter)
+
+[step]
+Say=Now the rules behind every key. The word gives the letter; Control does; Shift and Alt ask; adding Shift reverses; Alt plus Shift is a command with no control of its own.
+Key=
+Hear=
+
+[step]
+Say=The function keys follow Windows. Anything with Insert is the screen reader's own: Insert plus T says the title.
+Key=Insert+T
+Hear=(the window's title)
+
+[step]
+Say=Control plus F1 is the Key Describer: each key says what it does instead of doing it.
+Key=Control+F1
+Hear=Key Describer On
+
+[step]
+Say=Help is in four places. I say which; the reader says the key. The guide.
+Key=
+Hear=F1, the guide
+
+[step]
+Say=The changes, release by release; the version; the name of any key.
+Key=
+Hear=Shift plus F1, History
+Hear=Alt plus F1, About
+Hear=Control plus F1, Key Describer
+
+[step]
+Say=What this walk taught. I name the part; the reader says the key.
+Key=
+Hear=
+
+[step]
+Say=Say Status.
+Key=
+Hear=Shift plus Z

@@ -1,0 +1,27 @@
+﻿[about]
+Title=3 - Task One
+Intro=One whole piece of work, from start to end.
+Setup=_APP_ is installed and your reader is running.
+Homework=Do the task yourself once.
+
+[step]
+
+Say=The first step of the task.
+Key=
+Hear=
+
+[step]
+
+Say=The next step.
+Key=
+Hear=
+
+[step]
+
+Say=The last step, and what you have at the end.
+Key=
+Hear=
+
+[step]
+
+Say=What this walk taught: the keys you heard.

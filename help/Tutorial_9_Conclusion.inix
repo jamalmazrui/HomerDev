@@ -1,0 +1,151 @@
+﻿[about]
+Title=9 - Conclusion
+Intro=The conclusion and summary of the walks; the words the kit uses, in two voices; then more information: the help built into every Homer program and where to learn more.
+Setup=Nothing is needed; this walk is listened to.
+Homework=Make an app with newHomerApp, build it, and press F1 in it to read its guide.
+
+[step]
+
+Say=To finish: what to carry away, the words the kit uses, and where to get help and learn more. First, the summary. Every decision that makes a program pleasant to use without sight was made once and put in a shared class; an app inherits it.
+Key=
+Hear=Lbc, Say, Log, Inix, Web, Util
+
+[step]
+
+Say=The keys follow rules, so a key in a program you have never opened can be guessed; the word gives the letter.
+Key=
+Hear=Control plus K, Keywords, in every program that searches
+
+[step]
+
+Say=Three commands take a change from the morning to a published installer by lunch, and each refuses when it should.
+Key=
+Hear=build, check, release
+
+[step]
+
+Say=And a program teaches itself, in ten walks spoken by its build.
+Key=
+Hear=Play Tutorials, in the Help menu
+
+[step]
+
+Say=From the seven task walks: newHomerApp gives a running program before you write a line; when something is wrong, send the log; an app never copies a kit class, so a fix reaches every program on its next build; and an assistant works to your idea of done when accept dot inix says it first.
+Key=
+Hear=
+
+[step]
+
+Say=Now the words, in alphabetical order. I say the term; the reader says what it means.
+Key=
+Hear=
+
+[step]
+
+Say=access letter.
+Key=
+Hear=The underlined letter in a caption, from the first letter of a word, one per dialog or menu; the check counts them.
+
+[step]
+
+Say=build.
+Key=
+Hear=The command that puts an app's files in order, speaks its tutorials, compiles it and makes its installer, logging every stage.
+
+[step]
+
+Say=check.
+Key=
+Hear=The command that refuses what release would refuse: encoding, access letters, keys, hotkeys, tutorials, acceptance.
+
+[step]
+
+Say=finish page.
+Key=
+Hear=The installer's last page: optional pieces as boxes, each saying Install, Update or Reinstall, with a results box after.
+
+[step]
+
+Say=Homer encoding.
+Key=
+Hear=UTF-8 with a byte order mark and CRLF line endings, for every text file the kit or an app ships.
+
+[step]
+
+Say=Homer Player.
+Key=
+Hear=The player shared by every Homer program: a track list, Scroll Lock to pause, sliders, Alt plus Shift plus R to record.
+
+[step]
+
+Say=inix.
+Key=
+Hear=The settings file format: sections and lines, with comments that make the file its own documentation.
+
+[step]
+
+Say=Lbc.
+Key=
+Hear=Label before control: the class that builds every Homer dialog, with Tab, Alt letters, Control plus Enter and Escape.
+
+[step]
+
+Say=newHomerApp.
+Key=
+Hear=The command that makes a new app from the template: its folder, its files, its tutorial skeletons.
+
+[step]
+
+Say=pattern of ten.
+Key=
+Hear=The walks every program has: zero, the overview; one, the user interface; two to eight, seven tasks; nine, the conclusion.
+
+[step]
+
+Say=release.
+Key=
+Hear=The command that checks, commits, pushes, tags and publishes the installer on GitHub, refusing when it should.
+
+[step]
+
+Say=Say layer.
+Key=
+Hear=The question keys: Shift or Alt with a letter, speaking a fact and changing nothing; twice, the words in a window.
+
+[step]
+
+Say=skill.
+Key=
+Hear=A folder of instructions an AI assistant reads to learn the kit's rules: coding, tutorials, installers, documents.
+
+[step]
+
+Say=walk.
+Key=
+Hear=One spoken tutorial: a text file of steps, spoken by the build in two voices.
+
+[step]
+
+Say=Last, more information. Help is built into every Homer program, the same in each. The guide, and what changed.
+Key=
+Hear=F1, the guide
+Hear=Shift plus F1, History
+
+[step]
+
+Say=The version, and what any key does without doing it.
+Key=
+Hear=Alt plus F1, About
+Hear=Control plus F1, Key Describer
+
+[step]
+
+Say=HomerDev dot md, in the kit's help folder, is the whole kit in one document; History dot md says what changed in every version and why, and is the first thing to read when a new kit arrives.
+Key=
+Hear=
+
+[step]
+
+Say=Tutorials dot md is the guideline for walks; the skills folder teaches an AI assistant the kit's rules; and the kit, with DbDo, EdSharp, FileDir and HomerScribe beside it, is on GitHub, at github dot com slash JamalMazrui. Where to begin: make an app with newHomerApp and build it; the running program will suggest what it should become.
+Key=
+Hear=

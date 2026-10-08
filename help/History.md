@@ -141,6 +141,80 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.62.2 -- 7 October 2026
+
+**kdpEpub may run any number of times over the same EPUB.** MyBooks runs
+Blind Vibe Coding's own build, which already gives its EPUB KDP's tables of
+contents through kdpEpub, and then gives the copy them again. On that second
+pass the contents page already held a nested list, and kdpEpub replaced it
+only up to the first closing tag, an inner one, leaving stray closing tags:
+EPUBCheck called the page fatal and Ace could not read the book. kdpEpub now
+finds the whole list by counting its opening and closing tags. Run four times
+over the book's EPUB, the page stays the same: 33 links, well-formed, every
+requirement met.
+
+## 1.62.1 -- 7 October 2026
+
+**The pattern of ten is always ten: exactly seven tasks.** 1.62.0 read the
+task walks as one to seven; the author's intent is seven, numbered 2 to 8, so
+every set is the full ten. checkTutorial now gives a notice for each missing
+task number. The kit gains its seventh task, 8_Build_with_an_AI_Assistant:
+the skills that teach an assistant the rules, checked by checkSkills; the
+three sentences that carry the kit into a chat; the method, specify first in
+accept dot inix, build small, verify without sight; and a planned misstep
+check catches, fixed by a caption, not a key table. 9_Conclusion now runs in
+the author's order: the conclusion and summary, then the glossary, then more
+information, with the help built into every program. The overview lists all
+ten; the templates gain 8_Task_Six, so a new app's set is the full ten; the
+skill, Tutorials.md and HomerDev.md say seven tasks.
+
+## 1.62.0 -- 7 October 2026
+
+**The pattern of ten: one digit sorts every program's tutorials.** The twelve
+two-digit walks give way to ten numbered 0 to 9: 0_Overview; 1_User_Interface,
+which now holds what were the interface-concepts and key-patterns walks; the
+task walks from 2 (usually 2_Install_and_Launch) to 8 with no gap; and
+9_Conclusion, always number nine and so always last, which holds the
+glossary, the reminders to carry away, the help built into every program
+(F1, Shift plus F1, Alt plus F1, Control plus F1, Hotkeys, Play Tutorials)
+and where to learn more.
+
+- **The kit's own set** is nine walks, 0 to 7 and 9. Walk 1 was written new
+  from walks 02 and 03, the reader speaking in 26 of its 30 steps, kept to
+  five minutes; walk 9 from 09, 10 and 11, with the fifteen most useful
+  glossary terms. The task walks were renumbered and their cross-references
+  corrected; the overview's contents list was rewritten.
+- **checkTutorial** knows the pattern of ten: walk 1 is held to show, then
+  tell; walk 0 is not measured; walk 9 is exempt from the step count, since
+  its glossary is many short exchanges. A set still named with two digits is
+  told, as notices, what each old walk becomes, and is still spoken, so apps
+  convert in their own time.
+- **buildTutorials** retires, on a full run, any audio and fingerprint that
+  no current walk makes, so renamed walks leave no stale files in the folder
+  or the playlist. **tidy** keeps one-digit fingerprints.
+- **Templates** hold the nine skeletons of the pattern, the walk 1 skeleton
+  in show-then-tell form so a new app passes the check, and **newHomerApp**
+  now copies them into a new app's help folder, as walk 3 says it does.
+- **The kit's build** removes the old two-digit walks from help and
+  Templates once the one-digit set is there, since unarchiving deletes
+  nothing.
+- **Tutorials.md, the homer-tutorial skill and HomerDev.md** describe the
+  pattern of ten.
+
+## 1.61.0 -- 7 October 2026
+
+**exec\Python\kdpEpub.py: KDP's tables of contents, for every book project.**
+KDP's Navigation Guidelines ask a Kindle book for a logical table of contents
+(a toc nav or an NCX), an HTML table of contents page near the start that is a
+separate document from the toc nav, made of nested links, and guide items
+(landmarks and the package <guide>) pointing at that page. kdpEpub gives an
+EPUB all of it, made from its own toc nav so the two always agree, and keeps
+the toc nav out of the reading order so readers meet the contents once;
+tocProblems checks every requirement in a finished EPUB. It moved here from
+MyBooks' buildBooks so Blind Vibe Coding's build uses the same code: that
+book's earlier EPUBs used the navigation document itself as the contents
+page, which KDP does not allow.
+
 ## 1.60.3 -- 7 October 2026
 
 **Spoken tutorials ship, made before release.** Every installer and every

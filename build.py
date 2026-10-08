@@ -34,7 +34,7 @@ c_lsExpected = [
     "exec/CSharp/Log.cs", "exec/CSharp/Mdi.cs", "exec/CSharp/Media.cs", "exec/CSharp/MediaPlayer.cs", "exec/CSharp/Mpv.cs", "exec/CSharp/Paths.cs",
     "exec/CSharp/PdfRead.cs", "exec/CSharp/Say.cs", "exec/CSharp/Util.cs", "exec/CSharp/Web.cs",
     "exec/CSharp/inixVert.cs",
-    "exec/Python/inix.py", "exec/Python/lbc.py", "exec/Python/lbcnet.py", "exec/Python/log.py", "exec/Python/media.py",
+    "exec/Python/inix.py", "exec/Python/kdpEpub.py", "exec/Python/lbc.py", "exec/Python/lbcnet.py", "exec/Python/log.py", "exec/Python/media.py",
     "exec/Python/mdi.py", "exec/Python/elevate.py", "exec/Python/paths.py", "exec/Python/say.py", "exec/Python/util.py", "exec/Python/web.py",
     "Templates/build_APP_.cmd", "Templates/build_APP_Py.cmd",
     "Templates/_APP__setup.iss", "Templates/_APP_.cs",
@@ -1295,6 +1295,18 @@ def retireOldWalk():
         sPath = os.path.join(sScriptDir, sOld)
         if os.path.isfile(sPath):
             try: os.remove(sPath); print("Removed the retired walk " + sOld)
+            except OSError: pass
+    # THE PATTERN OF TEN (1.62.0) replaced the twelve two-digit walks with one-
+    # digit ones. Unarchiving a kit adds files but deletes none, so the old walks
+    # in help and the old skeletons in Templates would be built and checked
+    # beside the new. Once a folder holds its one-digit set, its two-digit walks
+    # go; their audio goes on the next tutorial build, as audio no walk makes.
+    import glob as oGlob
+    for sFolder in ("help", "Templates"):
+        sDir = os.path.join(sScriptDir, sFolder)
+        if not oGlob.glob(os.path.join(sDir, "Tutorial_[0-9]_*.inix")): continue
+        for sPath in sorted(oGlob.glob(os.path.join(sDir, "Tutorial_[0-9][0-9]_*.inix"))):
+            try: os.remove(sPath); print("Removed " + sFolder + "\\" + os.path.basename(sPath) + ", a walk of the old two-digit pattern")
             except OSError: pass
 
 def removeStrayErrorLevel():
