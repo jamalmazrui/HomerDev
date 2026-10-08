@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.63.3 -- 8 October 2026
+
+**push stops on a stale whitelist.** When tidy could not rewrite the whitelist
+.gitignore, push warned and went on, and a stale whitelist can publish files
+never meant for it. It now stops, says so, and pushes nothing. From an audit of
+HomerScribe by another AI, which found its copy of push lacked the 1.62.5 fix
+too; an app's copies of the kit's tools are refreshed by its build.
+
 ## 1.63.2 -- 8 October 2026
 
 **When an update is live.** kdpUpdate knew when it submitted a book, never

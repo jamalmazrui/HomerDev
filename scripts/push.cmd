@@ -92,9 +92,15 @@ if not exist "%CD%\RepoFiles.txt" (
 
 rem The whitelist is rewritten on every push, so RepoFiles.txt and .gitignore
 rem cannot drift apart, and a line just added to the list counts now.
+rem A WHITELIST THAT CANNOT BE REWRITTEN STOPS THE PUSH (1.63.3, from an audit
+rem by another AI): a stale .gitignore can publish files never meant for it.
 if exist "%~dp0tidy.cmd" (
   call "%~dp0tidy.cmd" --gitignore >> "%log%" 2>&1
-  if errorlevel 1 echo WARN: the whitelist .gitignore could not be rewritten; see the log.
+  if errorlevel 1 (
+    echo The whitelist .gitignore could not be rewritten, so nothing was pushed. The log has why: %log%
+    echo WHITELIST FAILED>> "%log%"
+    endlocal & exit /b 1
+  )
 )
 
 git add -A >> "%log%" 2>&1

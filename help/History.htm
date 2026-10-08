@@ -190,7 +190,14 @@
 <h1 id="history">History</h1>
 <p>Each version is a level-2 heading, newest first, so your screen
 reader’s heading keys move from one version to the next.</p>
-<h2 id="october-2026">1.63.2 – 8 October 2026</h2>
+<h2 id="october-2026">1.63.3 – 8 October 2026</h2>
+<p><strong>push stops on a stale whitelist.</strong> When tidy could not
+rewrite the whitelist .gitignore, push warned and went on, and a stale
+whitelist can publish files never meant for it. It now stops, says so,
+and pushes nothing. From an audit of HomerScribe by another AI, which
+found its copy of push lacked the 1.62.5 fix too; an app’s copies of the
+kit’s tools are refreshed by its build.</p>
+<h2 id="october-2026-1">1.63.2 – 8 October 2026</h2>
 <p><strong>When an update is live.</strong> kdpUpdate knew when it
 submitted a book, never when the update went live. KDP’s email, “your
 book is now live and available”, does not settle it: it adds that a
@@ -201,7 +208,7 @@ first seen live, with the hours it took at most. Mastery in Men’s
 Tennis, submitted at 11:36, was live by 12:57 – though KDP quotes 24 to
 72 hours – so the receipts now measure it, book by book. kdpUpdate
 –survey records it without changing anything on KDP.</p>
-<h2 id="october-2026-1">1.63.1 – 8 October 2026</h2>
+<h2 id="october-2026-2">1.63.1 – 8 October 2026</h2>
 <p><strong>Learned from a morning of logs.</strong> Four apps’
 tutorials, six apps’ builds and releases, and a kdpUpdate run over 22
 books:</p>
@@ -239,7 +246,7 @@ check two others, yet the outcome list said only “submitted”. Each
 book’s line now adds what KDP’s check said, and its data file keeps it
 under [review].</li>
 </ul>
-<h2 id="october-2026-2">1.63.0 – 8 October 2026</h2>
+<h2 id="october-2026-3">1.63.0 – 8 October 2026</h2>
 <p><strong>Book publishing tools, in the kit.</strong> The scripts that
 build, audit and publish Kindle books, proven on 22 books in the MyBooks
 project, now originate in the kit, generic and free of personal
@@ -274,7 +281,7 @@ newer files in another folder are brought over by the catalog’s
 importFrom; logs are named for the project; no author’s name, title ID
 or folder is in any tool. The two folders of a book publishing project,
 books and results, start with letters no other Homer folder uses.</p>
-<h2 id="october-2026-3">1.62.5 – 8 October 2026</h2>
+<h2 id="october-2026-4">1.62.5 – 8 October 2026</h2>
 <p><strong>An audit by another AI.</strong> ChatGPT audited the kit and
 reported 39 findings. Checked against the code, these held and are
 fixed:</p>
@@ -333,14 +340,14 @@ simultaneous instances, a dedicated STA thread for Pythonnet, background
 work for network calls, update digests, request-and-reply for mpv,
 namespace-aware EPUB editing, structured migration, and a pinned release
 toolchain.</p>
-<h2 id="october-2026-4">1.62.4 – 8 October 2026</h2>
+<h2 id="october-2026-5">1.62.4 – 8 October 2026</h2>
 <p><strong>Apps move to the pattern of ten cleanly.</strong>
 buildTutorials, which every app’s build runs, now retires an app’s old
 two-digit walks once its one-digit walks are in place, so an app’s zip
 can bring its new set without its old one being spoken beside it. DbDo,
 EdSharp, FileDir, HomerScribe and HomerView now follow the pattern of
 ten; DbDo and HomerView have spoken tutorials for the first time.</p>
-<h2 id="october-2026-5">1.62.3 – 7 October 2026</h2>
+<h2 id="october-2026-6">1.62.3 – 7 October 2026</h2>
 <p><strong>The kit’s build passes again after the pattern of
 ten.</strong> Its 21:10 build reported 26 problems and release rightly
 refused: the list of files the build expects still named the 24
@@ -350,7 +357,7 @@ had one line ending not CRLF. The list now names the ten walks and ten
 templates of the pattern of ten, and both files are in the Homer
 encoding. The tutorials themselves were already right: all ten spoken,
 and kept on the next build by their fingerprints.</p>
-<h2 id="october-2026-6">1.62.2 – 7 October 2026</h2>
+<h2 id="october-2026-7">1.62.2 – 7 October 2026</h2>
 <p><strong>kdpEpub may run any number of times over the same
 EPUB.</strong> MyBooks runs Blind Vibe Coding’s own build, which already
 gives its EPUB KDP’s tables of contents through kdpEpub, and then gives
@@ -361,7 +368,7 @@ fatal and Ace could not read the book. kdpEpub now finds the whole list
 by counting its opening and closing tags. Run four times over the book’s
 EPUB, the page stays the same: 33 links, well-formed, every requirement
 met.</p>
-<h2 id="october-2026-7">1.62.1 – 7 October 2026</h2>
+<h2 id="october-2026-8">1.62.1 – 7 October 2026</h2>
 <p><strong>The pattern of ten is always ten: exactly seven
 tasks.</strong> 1.62.0 read the task walks as one to seven; the author’s
 intent is seven, numbered 2 to 8, so every set is the full ten.
@@ -376,7 +383,7 @@ glossary, then more information, with the help built into every program.
 The overview lists all ten; the templates gain 8_Task_Six, so a new
 app’s set is the full ten; the skill, Tutorials.md and HomerDev.md say
 seven tasks.</p>
-<h2 id="october-2026-8">1.62.0 – 7 October 2026</h2>
+<h2 id="october-2026-9">1.62.0 – 7 October 2026</h2>
 <p><strong>The pattern of ten: one digit sorts every program’s
 tutorials.</strong> The twelve two-digit walks give way to ten numbered
 0 to 9: 0_Overview; 1_User_Interface, which now holds what were the
@@ -412,7 +419,7 @@ unarchiving deletes nothing.</li>
 <li><strong>Tutorials.md, the homer-tutorial skill and
 HomerDev.md</strong> describe the pattern of ten.</li>
 </ul>
-<h2 id="october-2026-9">1.61.0 – 7 October 2026</h2>
+<h2 id="october-2026-10">1.61.0 – 7 October 2026</h2>
 <p><strong>exec.py: KDP’s tables of contents, for every book
 project.</strong> KDP’s Navigation Guidelines ask a Kindle book for a
 logical table of contents (a toc nav or an NCX), an HTML table of
@@ -425,7 +432,7 @@ checks every requirement in a finished EPUB. It moved here from MyBooks’
 buildBooks so Blind Vibe Coding’s build uses the same code: that book’s
 earlier EPUBs used the navigation document itself as the contents page,
 which KDP does not allow.</p>
-<h2 id="october-2026-10">1.60.3 – 7 October 2026</h2>
+<h2 id="october-2026-11">1.60.3 – 7 October 2026</h2>
 <p><strong>Spoken tutorials ship, made before release.</strong> Every
 installer and every repository carries the tutorial audio, made by the
 build before the installer is compiled, so no user waits for it; help.md
@@ -437,7 +444,7 @@ zip can shift by hours. tidy keeps each tutorial’s fingerprint
 (04_Open_and_Move.sha256) as a standing file, so it is never moved to
 notes and the repository carries it with the audio. Run updateAppBuilds
 to bring an app’s build up to the template.</p>
-<h2 id="october-2026-11">1.60.2 – 7 October 2026</h2>
+<h2 id="october-2026-12">1.60.2 – 7 October 2026</h2>
 <p><strong>From a day of logs across DbDo, EdSharp, FileDir, HomerDev
 and MyBooks.</strong></p>
 <ul>
@@ -462,7 +469,7 @@ a .cmd file, so a ladder that first sets a default and then tests “if
 errorlevel 1” always reads 0. The MyBooks and Blind Vibe Coding wrappers
 that did this are fixed.</li>
 </ul>
-<h2 id="october-2026-12">1.60.1 – 7 October 2026</h2>
+<h2 id="october-2026-13">1.60.1 – 7 October 2026</h2>
 <p><strong>Tutorial audio is kept by its content, not its date.</strong>
 The 14:08 build re-spoke all twelve walks although none had changed. The
 cause: a zip stores each file’s time without a time zone, so the kit,
@@ -474,7 +481,7 @@ fingerprint changes. Audio from before this rule is trusted once and
 fingerprinted. Every Homer app with tutorials gains this through the
 kit. Walk 07 and help.md now say so, which makes walk 07 the one walk
 spoken again on the next build.</p>
-<h2 id="october-2026-13">1.60.0 – 7 October 2026</h2>
+<h2 id="october-2026-14">1.60.0 – 7 October 2026</h2>
 <p><strong>checkSkills learns the official validator.</strong>
 Anthropic’s skills repository was read for the kit (help.md has the
 lessons). checkSkills now also allows only the six frontmatter keys the
@@ -483,7 +490,7 @@ either end and none doubled, and gives notices, not problems, for a body
 past 5,000 words or 500 lines: run over Anthropic’s own 17 skills, it
 showed the word count is advice, not a rule. The kit’s 16 skills
 pass.</p>
-<h2 id="october-2026-14">1.59.0 – 7 October 2026</h2>
+<h2 id="october-2026-15">1.59.0 – 7 October 2026</h2>
 <p><strong>Skills checked like code.</strong> Four guides on building
 skills and agents were read for the kit, and their lessons are in
 help.md. The skill guide’s exact rules are now checked by a new scripts,
@@ -498,7 +505,7 @@ kit skills with angle brackets in their descriptions, which can make a
 skill fail to upload; homer-build-release, homer-db, homer-installer and
 homer-screen-reader now use the kit’s own placeholder, <em>APP</em>, or
 plain words.</p>
-<h2 id="october-2026-15">1.58.0 – 7 October 2026</h2>
+<h2 id="october-2026-16">1.58.0 – 7 October 2026</h2>
 <p><strong>Show, then tell.</strong> The User Interface Concepts walk
 ran on with the narrator alone. Each part it named is now shown by the
 screen reader straight after: the window that comes forward by its
@@ -520,7 +527,7 @@ written for any Homer app starts in two voices.</li>
 <li>Reader lines written from the phrasing rules rather than from a
 recording carry a Note asking for a live run to confirm them.</li>
 </ul>
-<h2 id="october-2026-16">1.57.0 – 7 October 2026</h2>
+<h2 id="october-2026-17">1.57.0 – 7 October 2026</h2>
 <p><strong>One .inix format, read the same way in C# and
 Python.</strong> A value that spans lines is written in one of three
 ways: plain, with nothing after the equals sign, for a value with no
@@ -544,7 +551,7 @@ well as writeAsConfig.</li>
 current definitions of AI-generated and AI-assisted with model wording
 for a book’s copyright page.</li>
 </ul>
-<h2 id="october-2026-17">1.56.0 – 7 October 2026</h2>
+<h2 id="october-2026-18">1.56.0 – 7 October 2026</h2>
 <p><strong>The newest Pandoc, not the first one on the PATH.</strong>
 Every Python and cmd script in the kit found Pandoc by taking the first
 copy on the PATH. On the author’s machine that was C:.exe, version
@@ -575,7 +582,7 @@ FruitBasket sample builds now use them. checkHomerDev’s environment line
 reports the Pandoc a build will really use, and names any older copy
 ahead of it on the PATH.</li>
 </ul>
-<h2 id="october-2026-18">1.55.0 – 7 October 2026</h2>
+<h2 id="october-2026-19">1.55.0 – 7 October 2026</h2>
 <p><strong>The tutorial pattern is a recipe.</strong> The homer-tutorial
 skill now carries the whole method for applying the twelve walks to any
 Homer app – gather the truth, choose tasks as wants, the shape of each
@@ -586,7 +593,7 @@ DbDo’s, EdSharp’s and FileDir’s, were given their substance: twelve
 parts that ran under three minutes now carry worked cases, reverse
 guessing exchanges, missteps and the shape of what each program is for
 and is not.</p>
-<h2 id="october-2026-19">1.54.2 – 7 October 2026</h2>
+<h2 id="october-2026-20">1.54.2 – 7 October 2026</h2>
 <p><strong>An acceptance build speaks nothing.</strong> check runs an
 app’s build as an acceptance check with HomerAcceptance in its
 environment, and a build that sees it leaves the speaking of tutorials
@@ -594,7 +601,7 @@ to the ordinary build, which already did it; DbDo’s acceptance build on
 7 October spoke twelve walks and ran out the fifteen-minute clock,
 failing a release whose audio was complete. The build template, DbDo’s
 and EdSharp’s builds honour the mark.</p>
-<h2 id="october-2026-20">1.54.1 – 6 October 2026</h2>
+<h2 id="october-2026-21">1.54.1 – 6 October 2026</h2>
 <p><strong>An app stays an app under the kit’s strays.</strong> With the
 kit’s Templates and exec folders lying in C:, kind.py called the folder
 the kit, and tidy’s new stray removal, which declines to tidy the kit,
@@ -602,7 +609,7 @@ did nothing; DbDo built and released around seventeen walks. An
 installer script or a program named for the folder now settles the kind
 as an app first, and tidy runs the stray removal regardless of kind,
 declining only when the folder is the kit’s own.</p>
-<h2 id="october-2026-21">1.54.0 – 6 October 2026</h2>
+<h2 id="october-2026-22">1.54.0 – 6 October 2026</h2>
 <p><strong>The build repairs what one-off scripts used to.</strong>
 Three things delivered as separate scripts on 5 and 6 October are now
 steps of every app’s ordinary build, each logged. tidy removes the kit’s
@@ -612,7 +619,7 @@ themselves, and the folders left empty. The build template sets
 version.txt back to the app’s last published tag when it holds another
 series’ number. The same two guards are in DbDo’s and EdSharp’s builds.
 One set of commands, every time: unzip, build, release.</p>
-<h2 id="october-2026-22">1.53.4 – 6 October 2026</h2>
+<h2 id="october-2026-23">1.53.4 – 6 October 2026</h2>
 <p><strong>buildTutorials speaks again.</strong> In 1.53.2 the helper
 that writes minutes and seconds was moved up the file and cut in half on
 the way: its first line went up, its last two lines stayed behind, and
@@ -621,7 +628,7 @@ function nobody called. Every build on 1.53.2 or 1.53.3 listed its
 voices and then stopped at the script’s last line with nothing spoken,
 in DbDo and FileDir alike. The helper is whole again, the file’s braces
 balance, and the defensive endings of 1.53.3 stay.</p>
-<h2 id="october-2026-23">1.53.2 – 6 October 2026</h2>
+<h2 id="october-2026-24">1.53.2 – 6 October 2026</h2>
 <p><strong>One build speaks at a time, and the clock is on the progress
 line.</strong> Four builds spoke their tutorials at once on 6 October
 and each step took twenty seconds instead of five, which looked like a
@@ -629,12 +636,12 @@ hang. buildTutorials now holds a machine-wide mutex while it speaks – a
 second build waits and says so, each minute – and its progress line
 carries elapsed time and an estimate, with one plain note when the pace
 says the computer is busy.</p>
-<h2 id="october-2026-24">1.53.1 – 6 October 2026</h2>
+<h2 id="october-2026-25">1.53.1 – 6 October 2026</h2>
 <p><strong>A high step count is a notice.</strong> The tool’s
 measurement of the audio is the fact; a walk of many short two-voice
 exchanges is brisk, not long, and is no longer refused for its
 count.</p>
-<h2 id="october-2026-25">1.53.0 – 6 October 2026</h2>
+<h2 id="october-2026-26">1.53.0 – 6 October 2026</h2>
 <p><strong>The kit has its own twelve walks</strong>, in the pattern it
 prescribes: overview, install and launch – the kit’s build and the fruit
 basket –, the interface and the key rules heard in DbDo, EdSharp and
@@ -645,7 +652,7 @@ twenty-six terms, a conclusion and more information. Where the kit has
 no screen of its own, an app built on it shows what the kit’s code makes
 a person hear. The one earlier walk is retired, and checkTutorial holds
 the kit to the pattern like any app.</p>
-<h2 id="october-2026-26">1.52.8 – 6 October 2026</h2>
+<h2 id="october-2026-27">1.52.8 – 6 October 2026</h2>
 <p><strong>HomerComponents.iss supplies the screen reader
 wrappers</strong> – isInstallJaws, isUpdateJaws, isReinstallJaws,
 labelJaws, and the same four for NVDA – that an app’s [Components] lines
@@ -653,14 +660,14 @@ call. An app that defines its own writes
 <code>#define HomerReaderWrappersInApp</code> before the include.
 FileDir’s installer failed on 6 October because a kit without these had
 been laid over one that had them.</p>
-<h2 id="october-2026-27">1.52.7 – 6 October 2026</h2>
+<h2 id="october-2026-28">1.52.7 – 6 October 2026</h2>
 <p><strong>Three to five minutes a walk.</strong> Parts 01 to 10 are to
 run between three and five minutes – under three is too thin, over five
 too long; 00 and 11 may be short. buildTutorials names any walk under
 three as well as over five; checkTutorial notices a thin walk and
 exempts the glossary from the step ceiling, since its steps are two
 short lines. Tutorials.md and the skill have the rule.</p>
-<h2 id="october-2026-28">1.52.6 – 6 October 2026</h2>
+<h2 id="october-2026-29">1.52.6 – 6 October 2026</h2>
 <p><strong>An incomplete set is a notice, not a silence.</strong>
 checkTutorial reports the twelve-walk pattern’s gaps, and a first walk
 without the orientation key, as notices: the clean walks are spoken and
@@ -668,7 +675,7 @@ the program releases, and every build says what the set still lacks. A
 problem is something wrong inside a walk; work not yet done is not a
 reason to leave a program with no audio, which is what EdSharp and
 FileDir had on 6 October.</p>
-<h2 id="october-2026-29">1.52.5 – 6 October 2026</h2>
+<h2 id="october-2026-30">1.52.5 – 6 October 2026</h2>
 <p><strong>buildTutorials measures, retires and re-speaks on its
 own.</strong> Each walk’s length is read with ffprobe, written into
 Tutorials.m3u, named in the log and summed aloud; a walk over five
@@ -677,13 +684,13 @@ so no app’s build has to know the naming changed. And a walk whose audio
 is older than the walk is spoken again – the tool had kept any file that
 existed, so a changed walk kept its old voice until the folder was
 deleted by hand.</p>
-<h2 id="october-2026-30">1.52.4 – 5 October 2026</h2>
+<h2 id="october-2026-31">1.52.4 – 5 October 2026</h2>
 <p><strong>The build template speaks walks by chapter name.</strong> Its
 tutorial gate looks for 04_X.mp3 beside Tutorial_04_X.inix, retires
 audio under the old names, and calls the tool when a walk’s audio is
 missing or older than the walk; the tool speaks only those. Every app’s
 build takes this through updateAppBuilds.</p>
-<h2 id="october-2026-31">1.52.3 – 5 October 2026</h2>
+<h2 id="october-2026-32">1.52.3 – 5 October 2026</h2>
 <p><strong>Five minutes a walk, and walk 00 has a shape.</strong> A walk
 is under five minutes – about twenty-five steps – and checkTutorial
 sends back one plainly over; twelve such walks are “about an hour”. Walk
@@ -691,12 +698,12 @@ sends back one plainly over; twelve such walks are “about an hour”. Walk
 clean two-voice list. Walks 02 and 03 say where help is and name the
 keys that explain the keys. All of it is in Tutorials.md and in the
 homer-tutorial skill.</p>
-<h2 id="october-2026-32">1.52.2 – 5 October 2026</h2>
+<h2 id="october-2026-33">1.52.2 – 5 October 2026</h2>
 <p><strong>Tasks are wants, and later walks lean on earlier
 ones</strong>: a task walk states a plain want first and shows the
 features as the way to it; each walk assumes those before it and names
 rather than reteaches what they taught. Tutorials.md has the rule.</p>
-<h2 id="october-2026-33">1.52.1 – 5 October 2026</h2>
+<h2 id="october-2026-34">1.52.1 – 5 October 2026</h2>
 <p><strong>Twelve walks, with a glossary.</strong> 09 Glossary joins the
 pattern, after the tasks and before 10 Conclusion and 11 More
 Information, which is always last. Tasks are 04 to 08, at least one and
@@ -705,7 +712,7 @@ host says the term, the reader says the meaning – and so is every recap:
 the host says the key, the reader says the command. Tutorials.md has the
 pattern and the rule for the two voices: an exchange that teaches, never
 a chat.</p>
-<h2 id="october-2026-34">1.52.0 – 5 October 2026</h2>
+<h2 id="october-2026-35">1.52.0 – 5 October 2026</h2>
 <p><strong>Eleven walks for every program</strong>, by name: 00 Overview
 and Table of Contents, 01 Install and Launch, 02 User Interface
 Concepts, 03 Key Patterns, 04 to 08 five tasks, 09 Conclusion, 10 More
@@ -714,7 +721,7 @@ requires the fixed six by name and the five task numbers; and the audio
 is named like a chapter – 04_Open_and_Move.mp3 from
 Tutorial_04_Open_and_Move.inix – so a folder or a player shows the
 number and the title. Tutorials.md has the pattern.</p>
-<h2 id="october-2026-35">1.51.5 – 5 October 2026</h2>
+<h2 id="october-2026-36">1.51.5 – 5 October 2026</h2>
 <p><strong>The Homer Player records: two buttons and one key.</strong>
 Record and Stop recording are buttons beside Stop playback, each
 available only when it applies, so the reader says which state you are
@@ -729,27 +736,27 @@ the file; Alt+Shift+R again stops and says how long it ran. A copy of
 the stream, no re-encoding, no settings: enough to keep a programme to
 hear later, which is all a player should offer. Anyone making audio to
 publish has a studio program for that.</p>
-<h2 id="october-2026-36">1.51.4 – 5 October 2026</h2>
+<h2 id="october-2026-37">1.51.4 – 5 October 2026</h2>
 <p><strong>buildTutorials speaks only what is missing or stale.</strong>
 A walk whose audio is newer than the walk is skipped, so adding four
 walks to a set of fifteen costs four walks’ speaking, not nineteen.</p>
-<h2 id="october-2026-37">1.51.3 – 5 October 2026</h2>
+<h2 id="october-2026-38">1.51.3 – 5 October 2026</h2>
 <p><strong>MediaPlayer.cs stands on its own.</strong> Two dialogs it had
 borrowed from FileDir’s own Lbc class – a message box and a Save As –
 are private helpers now, so the player compiles in any app that takes it
 from the kit.</p>
-<h2 id="october-2026-38">1.51.2 – 5 October 2026</h2>
+<h2 id="october-2026-39">1.51.2 – 5 October 2026</h2>
 <p><strong>Mpv.cs looks for mpv machine-wide only</strong>: under
 Program Files, where a Homer installer puts it, and on the PATH; never
 in a user’s own profile.</p>
-<h2 id="october-2026-39">1.51.1 – 5 October 2026</h2>
+<h2 id="october-2026-40">1.51.1 – 5 October 2026</h2>
 <p><strong>The Homer Player is a shared class.</strong> Media.cs, Mpv.cs
 and MediaPlayer.cs move into the kit from FileDir, where they were
 written, with three lines changed: the namespace, the data folder, and
 the one voice. Any Homer app can hand the player a queue of tracks –
 <code>Homer.MediaPlayer.run(owner, title, source, tracks)</code> – and
 mpv plays them. DbDo’s Play Stream is the first second user.</p>
-<h2 id="october-2026-40">1.51.0 – 5 October 2026</h2>
+<h2 id="october-2026-41">1.51.0 – 5 October 2026</h2>
 <p><strong>What the JAWS trainers do, applied to the walks.</strong>
 From 98 transcripts of Freedom Scientific training,
 <code>help\TutorialLearnings.md</code> records eleven habits and their
@@ -760,7 +767,7 @@ planned misstep with its Escape, and a closing step naming the keys
 taught. The overview template teaches the repeat key and the orientation
 key in its first steps and ends with a recap; checkTutorial requires the
 first script to teach both keys.</p>
-<h2 id="october-2026-41">1.50.2 – 2 October 2026</h2>
+<h2 id="october-2026-42">1.50.2 – 2 October 2026</h2>
 <p><strong>Every Homer app is MIT, and the kit keeps it so.</strong>
 HomerView was the one app under the GPL, version 2, on the understanding
 that an NVDA add-on should share NVDA’s license. NV Access’s own
@@ -790,7 +797,7 @@ license file.</li>
 <li>HomerDev.md’s licenses section says why an app with an NVDA add-on
 is MIT.</li>
 </ul>
-<h2 id="october-2026-42">1.50.1 – 2 October 2026</h2>
+<h2 id="october-2026-43">1.50.1 – 2 October 2026</h2>
 <p><strong>The skills take the settled lessons from the accessibility
 skills.</strong> These were written as 1.43.60, which never reached
 GitHub; they are the parts of HomerSkills.md that agree with the
@@ -818,7 +825,7 @@ control exposes through UI Automation and how to look at the tree.</li>
 is.</strong> In C:, check recognizes the kit and hands over to
 checkHomerDev, with no totals; the summary had called that “FAILED: no
 totals”.</p>
-<h2 id="october-2026-43">1.50.0 – 2 October 2026</h2>
+<h2 id="october-2026-44">1.50.0 – 2 October 2026</h2>
 <p><strong>Stages: from a build to a release version.</strong>
 HomerDev.md sets out the sequence every Homer resource follows, since
 nothing built is finished for good: a build on the builder’s computer; a
@@ -834,7 +841,7 @@ starts from the stages.</p>
 DbDo follows fields named <singular>_id; declared REFERENCES are shown
 by Table Summary and read by checkDb, and following a differently named
 declared key is planned in DbDo.</p>
-<h2 id="october-2026-44">1.49.1 – 2 October 2026</h2>
+<h2 id="october-2026-45">1.49.1 – 2 October 2026</h2>
 <p><strong>homer-db: two ways to relate records, both
 first-class.</strong> The skill now sets out that DbDo supports
 traditional foreign keys, named <singular>_id as in the Northwind and
@@ -847,7 +854,7 @@ keys and warns when a table in a database with maps lacks those
 triggers. The reference notes two gaps in DbDo itself: links are
 re-pointed only when a prime definition is rebuilt, not when a record is
 edited, and DbDo’s own tables are recognized by name alone.</p>
-<h2 id="october-2026-45">1.49.0 – 2 October 2026</h2>
+<h2 id="october-2026-46">1.49.0 – 2 October 2026</h2>
 <p><strong>homer-db, a skill for SQLite databases the DbDo way.</strong>
 It sets out the conventions DbDo’s generator and its Trail templates
 follow: plural lower-case tables with a singular id, the standard fields
@@ -866,7 +873,7 @@ all recorded in the skill’s reference.</p>
 homer-code skill now say so: .ini is deprecated in Homer and used only
 where another program requires it, such as an NVDA add-on’s
 manifest.ini, or to read an old Homer .ini once.</p>
-<h2 id="october-2026-46">1.48.0 – 2 October 2026</h2>
+<h2 id="october-2026-47">1.48.0 – 2 October 2026</h2>
 <p><strong>Every resource names its license, briefly, with a
 link.</strong> An app and the kit are MIT, in License.md; a page is
 Creative Commons Attribution-ShareAlike 4.0, the license Wikipedia’s
@@ -880,7 +887,7 @@ its footer. newHomerApp’s ReadMe names the MIT License. The
 podcast-directory, app-help-guide and blind-creators builders write the
 license lines and the one-sentence notice themselves. HomerDev.md has a
 new section, “Licenses for each kind”.</p>
-<h2 id="october-2026-47">1.47.0 – 2 October 2026</h2>
+<h2 id="october-2026-48">1.47.0 – 2 October 2026</h2>
 <p><strong>evalSkills: measuring whether the skills help.</strong>
 scripts.cmd and evalSkills.py ask Claude Code, headless, for the same
 small program several times without the Homer skills and several times
@@ -909,7 +916,7 @@ after every change.</p>
 <p><strong>Comments match 1.46.0.</strong> The build templates’ and
 sample builds’ opening notes no longer say the kit is looked for in
 C:.</p>
-<h2 id="october-2026-48">1.46.0 – 2 October 2026</h2>
+<h2 id="october-2026-49">1.46.0 – 2 October 2026</h2>
 <p><strong>Any drive, any depth.</strong> Only Windows and folder names
 are now assumed: the kit is a folder named HomerDev, a project is a
 folder named for itself, and either may be on any drive and at any level
@@ -929,7 +936,7 @@ folder beside the app instead of C:. The sample builds find the compiler
 under %ProgramFiles% and %ProgramFiles(x86)%, wherever Windows put them.
 HomerDev.md has a new section, “Where the kit and your projects live”,
 and the ReadMe and Developer.md say the same.</p>
-<h2 id="october-2026-49">1.45.0 – 2 October 2026</h2>
+<h2 id="october-2026-50">1.45.0 – 2 October 2026</h2>
 <p><strong>Four kinds of Homer resource, and every script knows which it
 is in.</strong> The kit now serves apps, collections, the kit itself and
 pages, and they need different things: a page has no build, a collection
@@ -961,7 +968,7 @@ homer-build-release and homer-page start from it.</p>
 release.ps1 are kept on this disk only, so they were not part of this
 update. They should release an app and the kit, and decline a page (post
 releases it) and a collection.</p>
-<h2 id="october-2026-50">1.44.0 – 2 October 2026</h2>
+<h2 id="october-2026-51">1.44.0 – 2 October 2026</h2>
 <p><strong>Publish a page with post, and a skill to go with it.</strong>
 scripts.cmd and post.ps1 publish a project’s document as a GitHub Page
 that meets WCAG 2.2 AA and the Homer conventions. An app (a folder that
@@ -995,7 +1002,7 @@ these.</p>
 point to Blind Vibe Coding, a directory of resources on building apps
 nonvisually with AI, which lists HomerDev and was itself published with
 post.</p>
-<h2 id="october-2026-51">1.43.59 – 1 October 2026</h2>
+<h2 id="october-2026-52">1.43.59 – 1 October 2026</h2>
 <p><strong>Two documents about skills, in help.</strong> A11ySkills.md
 gathers 175 published accessibility skills from eight collections, each
 with its facts, license and full text, as a reference for anyone writing
@@ -1009,7 +1016,7 @@ chapter on Claude skills and the skills index point to both.</p>
 build converts Markdown with Pandoc’s dollar-sign mathematics turned
 off, so a workflow’s ${{ secrets }} or a price in a document is shown as
 written.</p>
-<h2 id="october-2026-52">1.43.58 – 1 October 2026</h2>
+<h2 id="october-2026-53">1.43.58 – 1 October 2026</h2>
 <p><strong>The kit’s build command is “build” too.</strong> In C:, as in
 every app folder, the command is now <code>build</code>:
 buildHomerDev.cmd and buildHomerDev.py are build.cmd and build.py, and
@@ -1020,14 +1027,14 @@ records it. check’s “buildname” now holds the kit to the same rule as
 the apps; tidy and renameBuild still leave the kit to its own build.
 renameBuild, when it renames an app, also changes the app’s messages
 that said “run buildHomerDev” to “run build”.</p>
-<h2 id="october-2026-53">1.43.57 – 1 October 2026</h2>
+<h2 id="october-2026-54">1.43.57 – 1 October 2026</h2>
 <p><strong>The kit keeps buildHomerDev, and its own release goes
 through.</strong> 1.43.55 said the kit’s build script keeps its name,
 but check’s new “buildname” did not know the kit from an app, and failed
 the kit’s own release; 1.43.56’s tidy would even have renamed it. check,
 tidy and renameBuild now recognize the kit by its buildHomerDev.py and
 leave it alone.</p>
-<h2 id="october-2026-54">1.43.56 – 1 October 2026</h2>
+<h2 id="october-2026-55">1.43.56 – 1 October 2026</h2>
 <p><strong>tidy gives the build script its short name by
 itself.</strong> After 1.43.55, every app’s release stopped at check’s
 “buildname”, because no app had been renamed yet. Tidy runs before every
@@ -1036,7 +1043,7 @@ kit’s renameBuild whenever build<App>.cmd or build<App>.ps1 is still
 there – git mv, every reference updated, its own log – and the push that
 follows records it. The usual build, tidy, push, release sequence needs
 no extra step.</p>
-<h2 id="october-2026-55">1.43.55 – 1 October 2026</h2>
+<h2 id="october-2026-56">1.43.55 – 1 October 2026</h2>
 <p><strong>An app’s build script is build.cmd.</strong> The folder
 already names the app, so build<App>.cmd said it twice. newHomerApp now
 writes build.cmd (and build.ps1 where a build has a PowerShell half);
@@ -1050,7 +1057,7 @@ logs&lt;App&gt;-renameBuild-<time>.log. renameBuild all does every app
 beside the kit. check’s build step and the kit’s scan for stale app
 builds accept either name. The kit’s own buildHomerDev, and the samples,
 which share one folder, keep their names.</p>
-<h2 id="october-2026-56">1.43.54 – 1 October 2026</h2>
+<h2 id="october-2026-57">1.43.54 – 1 October 2026</h2>
 <p><strong>A build steps over every released number, as it always meant
 to.</strong> Each build takes the next version and skips any number
 already tagged on GitHub, by searching git’s list of tags with findstr
@@ -1064,7 +1071,7 @@ build templates and the four samples carry the fix; release 1.43.53’s
 evidence lines showed it (“GitHub has a published release tagged
 v5.0.36”, among 43). homer-build-release’s failures reference gains the
 case.</p>
-<h2 id="october-2026-57">1.43.53 – 1 October 2026</h2>
+<h2 id="october-2026-58">1.43.53 – 1 October 2026</h2>
 <p><strong>release shows GitHub’s answer when it decides a version is
 already out.</strong> EdSharp’s releases said “already on GitHub” for
 5.0.32 through 5.0.35, each straight after a build that had chosen a new
@@ -1076,7 +1083,7 @@ GitHub’s own record of that tag is fetched and read – a published
 release names the tag and is not a draft – instead of trusting the exit
 code of gh release view, which through gh.cmd has said “found” for
 releases that did not exist.</p>
-<h2 id="october-2026-58">1.43.52 – 1 October 2026</h2>
+<h2 id="october-2026-59">1.43.52 – 1 October 2026</h2>
 <p><strong>No Ollama window left open after an install.</strong>
 Ollama’s own installer starts its desktop app when it finishes, and the
 app opens a chat window, which confuses someone who never asked for it:
