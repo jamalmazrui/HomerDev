@@ -141,6 +141,41 @@ author: "Jamal Mazrui"
 - [1.1.0 -- 18 September 2026](#september-2026-113)
 - [1.0.0 -- 18 September 2026](#september-2026-114)
 
+## 1.60.3 -- 7 October 2026
+
+**Spoken tutorials ship, made before release.** Every installer and every
+repository carries the tutorial audio, made by the build before the installer
+is compiled, so no user waits for it; help\Tutorials.md now says so. Both
+build templates now call buildTutorials on every build that has walks (an
+acceptance build excepted), leaving the decision to its fingerprints: the
+Python template had looked for Tutorial_00_...mp3, a name the audio never has,
+and the C# template compared dates, which a zip can shift by hours. tidy keeps
+each tutorial's fingerprint (04_Open_and_Move.sha256) as a standing file, so
+it is never moved to notes and the repository carries it with the audio.
+Run updateAppBuilds to bring an app's build up to the template.
+
+## 1.60.2 -- 7 October 2026
+
+**From a day of logs across DbDo, EdSharp, FileDir, HomerDev and MyBooks.**
+
+- **No build leftovers in an installer.** DbDo's installer took in
+  templates\samples\.venv and shipped it: 4,650 of its 4,805 files, 2,290 of
+  them compiled Python. tidy now adds Excludes for .venv, venv, __pycache__,
+  compiled Python and .git to every Source: line of an <App>_setup.iss that
+  takes in a folder with recursesubdirs, extending any Excludes already there.
+  Tidy runs before release builds the installer, so the next release is clean.
+- **The stray ERRORLEVEL variable is removed by the build.** A variable named
+  ERRORLEVEL hides every program's exit code from %ERRORLEVEL%; nineteen kit
+  wrappers read it that way, so on the author's PC every one reported 0, even
+  for a failure. build.py now removes it from the user environment, telling
+  Windows so new windows see the change, and reports a system-wide one, which
+  needs an administrator. build.cmd reads its own exit code with "if errorlevel"
+  from the highest down, since its window still has the variable.
+- **Exit codes in a .cmd file: test from the highest down, in one statement.**
+  A successful SET resets the error level to 0 in a .cmd file, so a ladder that
+  first sets a default and then tests "if errorlevel 1" always reads 0. The
+  MyBooks and Blind Vibe Coding wrappers that did this are fixed.
+
 ## 1.60.1 -- 7 October 2026
 
 **Tutorial audio is kept by its content, not its date.** The 14:08 build

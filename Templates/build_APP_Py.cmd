@@ -385,12 +385,24 @@ if exist "scripts\fixEncoding.cmd" (
 )
 
 rem ---- spoken tutorials, when the app has any ---------------------------
+rem THE AUDIO SHIPS (kit 1.60.3): help\tutorials\*.mp3 goes into the installer
+rem and the repository, made here before the installer is compiled, so no user
+rem ever waits for it. Every build calls buildTutorials, which speaks only a
+rem walk whose text changed since its audio was made, judged by the fingerprint
+rem beside each mp3 rather than by dates, which a zip can shift by hours.
 if exist "help\Tutorial_*.inix" (
-  set "tutorialsMissing="
-  for %%F in (help\Tutorial_*.inix) do if not exist "help\tutorials\%%~nF.mp3" set "tutorialsMissing=1"
-  if defined tutorialsMissing (
+  if exist "help\tutorials\Tutorial_*.mp3" del /q "help\tutorials\Tutorial_*.mp3"
+  set "tutorialsWanted=1"
+  rem AN ACCEPTANCE BUILD SPEAKS NOTHING (kit 1.54.2): check runs build.cmd
+  rem nobump with HomerAcceptance set; speaking twelve walks there ran out its
+  rem fifteen-minute clock. The ordinary build's audio is what ships.
+  if defined HomerAcceptance (
+    set "tutorialsWanted="
+    >> "%log%" echo Tutorials: acceptance build, speaking left to the ordinary build
+  )
+  if defined tutorialsWanted (
     if exist "scripts\buildTutorials.cmd" (
-      echo Speaking the tutorials that have no audio yet
+      echo Making sure the spoken tutorials are current
       call "scripts\buildTutorials.cmd" -build
       if errorlevel 1 echo Not every tutorial could be spoken. The tutorials log in logs\ says why.
     ) else (

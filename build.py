@@ -1297,6 +1297,36 @@ def retireOldWalk():
             try: os.remove(sPath); print("Removed the retired walk " + sOld)
             except OSError: pass
 
+def removeStrayErrorLevel():
+    """Removes an environment variable named ERRORLEVEL from the user's environment, and reports one set system-wide.
+
+    WHY (1.60.2, 7 October 2026): such a variable hides every program's real exit code from %ERRORLEVEL% in every
+    script, so a wrapper reading it gets nothing, and exit /b with nothing returns 0: on the author's PC a failing check
+    or build anywhere in the Homer tools reported success. Nothing legitimate sets it; cmd keeps the real value itself.
+    The user variable is removed with .NET's call, which tells Windows so that new windows see the change; a system-wide
+    one needs an administrator, so it is reported. Returns True when one was found."""
+    if os.name != "nt": return False
+    bFound = False
+    try:
+        import winreg
+        for oHive, sKey, sWhere in [(winreg.HKEY_CURRENT_USER, r"Environment", "user"), (winreg.HKEY_LOCAL_MACHINE, r"SYSTEM\CurrentControlSet\Control\Session Manager\Environment", "system")]:
+            try:
+                with winreg.OpenKey(oHive, sKey) as oKey: sValue, iType = winreg.QueryValueEx(oKey, "ERRORLEVEL")
+            except FileNotFoundError:
+                continue
+            bFound = True
+            logLine("Found an environment variable ERRORLEVEL in the %s environment, value %r" % (sWhere, sValue))
+            if sWhere == "user":
+                iCode = subprocess.call(["powershell.exe", "-NoProfile", "-Command", "[Environment]::SetEnvironmentVariable('ERRORLEVEL', $null, 'User')"])
+                logLine("Removed it from the user environment (exit %d)" % iCode)
+                sayLine("Removed a stray user environment variable named ERRORLEVEL, which hid every program's exit code from scripts. Windows opened from now on are free of it.")
+            else:
+                sayLine("NOTE: a system-wide environment variable named ERRORLEVEL hides every program's exit code from scripts. Remove it as an administrator: Start, type environment variables, Edit the system environment variables, Environment Variables, then delete ERRORLEVEL under System variables.")
+    except Exception as oError:
+        logLine("Could not check for an ERRORLEVEL variable: %s" % oError)
+    return bFound
+
+
 def main():
     retireOldWalk()
     global oLog
@@ -1308,6 +1338,7 @@ def main():
     logFact("windows", logWindows())
     logLine("Working directory: %s" % os.getcwd())
     logFact("arguments", " ".join(sys.argv[1:]))
+    removeStrayErrorLevel()
 
     bCheckOnly = len(sys.argv) > 1 and sys.argv[1].lower() == "check"
     logLine("Check only: %s" % bCheckOnly)

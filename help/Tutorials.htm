@@ -253,6 +253,11 @@ markers the tool maintains, so the hand-written head of the file stays
 yours.</li>
 <li><code>TutorialFeed.xml</code> – a podcast feed of the audio.</li>
 </ul>
+<p>The audio ships: every installer and every repository carries the
+<code>.mp3</code> files, made by the build before the installer is
+compiled, so no user ever waits for a tutorial to be spoken. The
+fingerprints go to the repository only, with the audio, so a build on
+another computer speaks nothing it need not.</p>
 <p>A walk is spoken again only when its text has changed since it was
 last spoken: each <code>.mp3</code> has a <code>.sha256</code> file
 beside it holding the fingerprint of the walk it came from. Dates are

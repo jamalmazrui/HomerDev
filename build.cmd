@@ -24,6 +24,8 @@ if errorlevel 1 (
     exit /b 1
 )
 python "build.py" %*
-set exitCode=%errorlevel%
+rem Read with "if errorlevel", from the highest down: this window may still hold a stray variable named ERRORLEVEL, which
+rem build.py removes for later windows but which hides %%ERRORLEVEL%% here (7 October 2026).
+if errorlevel 4 (set "exitCode=4") else if errorlevel 3 (set "exitCode=3") else if errorlevel 2 (set "exitCode=2") else if errorlevel 1 (set "exitCode=1") else (set "exitCode=0")
 popd
 endlocal & exit /b %exitCode%

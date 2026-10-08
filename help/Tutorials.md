@@ -68,6 +68,12 @@ What it writes, all under the app's `help` folder:
   maintains, so the hand-written head of the file stays yours.
 - `TutorialFeed.xml` -- a podcast feed of the audio.
 
+The audio ships: every installer and every repository carries the `.mp3`
+files, made by the build before the installer is compiled, so no user ever
+waits for a tutorial to be spoken. The fingerprints go to the repository
+only, with the audio, so a build on another computer speaks nothing it need
+not.
+
 A walk is spoken again only when its text has changed since it was last
 spoken: each `.mp3` has a `.sha256` file beside it holding the fingerprint of
 the walk it came from. Dates are not used, since a walk unzipped from a kit
