@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.65.13 -- 9 October 2026
+
+- **The book wrappers refresh one another.** buildBooks.cmd and kdpUpdate.cmd refreshed only the book tools' .py files from the kit, so the kit's kdpUpdate.cmd, which builds first since 1.65.7, never reached the book project: the old copy there sent books without building, and Blind Vibe Coding was refused as stale. Each of the four book wrappers now refreshes the other three from the kit, never itself, since cmd reads a running batch file as it goes.
+- **kdpUpdate says "their"** when several books are unchanged since their last submission.
+
 ## 1.65.12 -- 9 October 2026
 
 - **Tutorials.htm uses the newest Pandoc, with a page title.** makeTutorials took the first Pandoc on the PATH, which on the author's machine was an old 2.19.2 ahead of 3.12, and every app's tutorial log warned that the page had no title. It now asks each copy its version and uses the newest, as the kit's other tools do, and gives the page a title from the guide's own heading, as a page title only, so no second heading appears.

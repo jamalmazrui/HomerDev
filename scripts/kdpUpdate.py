@@ -562,7 +562,7 @@ def main():
     lUnchanged = [] if "--republish" in sys.argv or "--survey" in sys.argv or "--list" in sys.argv else [d for d in lReady if d["unchanged"]]
     lReady = [d for d in lReady if d not in lUnchanged]
     for d in lUnchanged: log("Unchanged since its last submission, so not sent: " + d["root"])
-    if lUnchanged: say(plural(len(lUnchanged), "book") + " unchanged since its last submission, so not sent again (--republish sends them).")
+    if lUnchanged: say(plural(len(lUnchanged), "book") + " unchanged since " + ("its" if len(lUnchanged) == 1 else "their") + " last submission, so not sent again (--republish sends them).")
     for d in lStates: log("Preflight " + d["root"] + ": " + ("ready" if not d["problems"] else "; ".join(d["problems"])))
     if "--list" in sys.argv or not lReady:
         say(plural(len(lReady), "book") + " of " + str(len(lStates)) + " ready to send to KDP:")

@@ -22,6 +22,10 @@ for %%D in (D E F G H I J K L M N O P Q R S T U V W X Y Z) do if not defined sKi
 if not defined sKit goto noKit
 if /i "%sKit%\scripts\"=="%sHere%" goto noKit
 for %%F in (buildBooks.py kdpBooks.py kdpSubmit.py kdpUpdate.py testKdpUpdate.py) do copy /y "%sKit%\scripts\%%F" "%sHere%%%F" >nul 2>&1 && echo %date% %time% copied %%F from %sKit%\scripts >> "%sSetupLog%"
+rem THE WRAPPERS TOO, NEVER ITSELF (9 October 2026): only the .py files were refreshed, so a change to the kit's
+rem kdpUpdate.cmd (building first) never reached the book project, and a book was refused as stale. Each wrapper
+rem refreshes the others; a running batch file is never overwritten, since cmd reads it as it goes.
+for %%F in (buildBooks.cmd kdpBooks.cmd kdpSubmit.cmd kdpUpdate.cmd) do if /i not "%%F"=="%~nx0" if exist "%sKit%\scripts\%%F" copy /y "%sKit%\scripts\%%F" "%sHere%%%F" >nul 2>&1 && echo %date% %time% copied %%F from %sKit%\scripts >> "%sSetupLog%"
 goto haveTools
 :noKit
 echo %date% %time% the HomerDev kit was not found, or this is the kit; the book tools here run as they are >> "%sSetupLog%"
