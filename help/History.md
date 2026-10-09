@@ -7,6 +7,21 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.64.7 -- 9 October 2026
+
+- **A failed build leaves no installer.** The app templates removed the previous <App>_setup.exe, if at all, only just before compiling the installer, so a build that stopped earlier -- DbDo's, on a compile error -- left the last build's installer in place, and installing it looked like installing this build. Both templates now remove it before anything is compiled or bundled. An app's own kitNeeded must also rise whenever its code uses something new in the kit: DbDo's still said 1.55.0 when it began to call MediaPlayer.playTutorials, which needs 1.64.5, so a 1.64.4 kit failed to compile instead of being named.
+
+## 1.64.6 -- 8 October 2026
+
+From the logs of the books' build and KDP run of 8 October.
+
+- **Book tasks are Homer logs.** summarizeLogs took a task name to be lowercase, so MyBooks-buildBooks and MyBooks-kdpUpdate, named in Camel Type, were skipped as not Homer logs. It now reads them: buildBooks as how many books are ready to submit, kdpUpdate as how many were submitted and which were not -- a book KDP locks for review is waiting, not failing, and "no spelling errors" is not an error.
+- **A browser message once, not a thousand times.** kdpSubmit, whose browser kdpUpdate shares, logged KDP's pages' every repeated message: one 404 was 1,187 of a 13,858-line log. Each distinct error or warning is now written its first three times, then counted at 10, 100 and 1,000.
+
+## 1.64.5 -- 8 October 2026
+
+- **The walks play in the Homer Player.** MediaPlayer.playTutorials(owner, app name, help folder) opens an app's spoken tutorials in the Homer Player: the .mp3 files of its help\\tutorials folder, in the order of their one-digit prefix, each named as its walk is ("0 - Overview"). The player opens paused with the cursor on the first walk, so Enter plays it and Down Arrow hears the next. DbDo's Play Tutorials had handed its playlist to Windows, which opened whatever player owned .m3u files. Without mpv, the playlist still goes to Windows; with no walks installed, it returns false so the app can say where they belong.
+
 ## 1.64.4 -- 8 October 2026
 
 From the logs of 8 October's builds and releases.

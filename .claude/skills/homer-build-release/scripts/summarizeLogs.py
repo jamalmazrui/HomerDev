@@ -19,7 +19,7 @@ not be read.
 import io, os, re, sys, tempfile, zipfile
 
 c_iMaxErrors = 3  # enough to show where a failure began without flooding
-c_reName = re.compile(r"^(?P<app>[A-Za-z0-9]+)-(?:(?P<task>[a-z][a-z-]*?)-)?(?P<stamp>\d{8}-\d{6})(?:-\d+)*\.(?:log|md)$")
+c_reName = re.compile(r"^(?P<app>[A-Za-z0-9]+)-(?:(?P<task>[a-z][A-Za-z-]*?)-)?(?P<stamp>\d{8}-\d{6})(?:-\d+)*\.(?:log|md)$")
 
 
 def readText(sPath):
@@ -133,7 +133,31 @@ def summarizeOther(sText):
     return lsErrors or ["no errors"], bool(lsErrors)
 
 
-c_dSummarizers = {"build": summarizeBuild, "check": summarizeCheck, "release": summarizeRelease,
+def summarizeBuildBooks(sText):
+    """BOOK TASKS ARE HOMER LOGS TOO (1.64.6): buildBooks and kdpUpdate, named in
+    Camel Type, were skipped as not Homer log names. buildBooks ends by saying how
+    many books are ready to submit."""
+    oReady = re.search(r"(\d+) books? of (\d+) ready to submit", sText)
+    if not oReady: return ["no ready count"] + errorLines(sText), True
+    return [oReady.group(0)], oReady.group(1) != oReady.group(2)
+
+
+def summarizeKdpUpdate(sText):
+    """kdpUpdate ends with each book's outcome; the counts, and any book not
+    submitted by name, are the summary."""
+    lsOutcomes = re.findall(r"CONSOLE:   (.+?): ([^\r\n]*?)\r?$", sText, re.M)
+    if not lsOutcomes: return ["no outcomes"] + errorLines(sText), True
+    iSubmitted = sum(1 for sBook, sWhat in lsOutcomes if sWhat.startswith("submitted") and "locks" not in sWhat)
+    lsOther = [sBook.strip() + " (" + sWhat.split(";")[0].strip() + ")" for sBook, sWhat in lsOutcomes
+               if not (sWhat.startswith("submitted") and "locks" not in sWhat)]
+    lsFacts = ["%d of %d submitted" % (iSubmitted, len(lsOutcomes))]
+    if lsOther: lsFacts.append("not submitted: " + ", ".join(lsOther)[:200])
+    # "no spelling errors" is good news, and a book KDP locks for review is waiting, not failing.
+    bFailed = any(re.search(r"(?i)\bfailed\b|could not|not submitted|stopped", sWhat) for sBook, sWhat in lsOutcomes)
+    return lsFacts, bFailed
+
+
+c_dSummarizers = {"build": summarizeBuild, "buildBooks": summarizeBuildBooks, "kdpUpdate": summarizeKdpUpdate, "check": summarizeCheck, "release": summarizeRelease,
                   "tidy": summarizeTidy, "push": summarizePush, "": summarizeSession}
 
 

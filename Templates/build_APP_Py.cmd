@@ -295,6 +295,14 @@ if defined homerDll (
   set "homerDllArg=--add-binary "!homerDev!\exec\Homer.dll;.""
   >> "%log%" echo Bundling !homerDev!\exec\Homer.dll for lbcnet
 )
+rem ---- the previous installer goes first (kit 1.64.7) -------------------------
+rem A build that stopped before the installer step left the last build's
+rem %app%_setup.exe in place, and installing it looked like installing this
+rem build (DbDo, 8 October 2026). It is removed before anything is built.
+if exist "%app%_setup.exe" (
+  del /f /q "%app%_setup.exe"
+  >> "%log%" echo Removed the previous %app%_setup.exe before building
+)
 echo Building exec\%app%.exe, which takes a minute or two
 >> "%log%" echo PyInstaller: !pyiMode! !hidden! !pyiExtra! !icon!
 "!venvPy!" -m PyInstaller --noconfirm --clean --onefile !pyiMode! --name %app% --paths "!homerDev!\exec\Python" !hidden! !homerDllArg! !pyiExtra! !icon! --distpath "%CD%\exec" --workpath "!workDir!" --specpath "!workDir!" %app%.py >> "%log%" 2>&1

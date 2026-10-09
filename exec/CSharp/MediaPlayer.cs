@@ -284,6 +284,41 @@ private const int c_iDefaultStep = 2;   // 1 minute
 private const int c_iDefaultRate = 100;
 private const int c_iDefaultOrder = 0;
 
+// playTutorials: THE WALKS PLAY IN THE HOMER PLAYER (1.64.5). An app's Play
+// Tutorials handed its playlist to Windows, so the walks opened in whatever
+// player owned .m3u files, not here, where they open paused with the cursor on
+// the first walk: Enter plays it, Down Arrow hears the next. The walks are the
+// .mp3 files in sHelpFolder's tutorials folder, in the order of their one-digit
+// prefix, each named as its walk is ("0 - Overview"). Without mpv, the playlist
+// goes to Windows after all, which is better than nothing. Returns false when
+// no walk is installed, so the app can say where they should be.
+public static bool playTutorials(IWin32Window owner, string sAppName, string sHelpFolder) {
+string sFolder = Path.Combine(sHelpFolder ?? "", "tutorials");
+if (!Directory.Exists(sFolder)) return false;
+string[] aFiles = Directory.GetFiles(sFolder, "*.mp3");
+if (aFiles.Length == 0) return false;
+Array.Sort(aFiles, StringComparer.OrdinalIgnoreCase);
+List<MediaTrack> lsTracks = new List<MediaTrack>();
+foreach (string sFile in aFiles) {
+string sStem = Path.GetFileNameWithoutExtension(sFile);
+Match oWalk = Regex.Match(sStem, @"^(\d)_(.+)$");
+string sName = oWalk.Success ? oWalk.Groups[1].Value + " - " + oWalk.Groups[2].Value.Replace("_", " ") : sStem.Replace("_", " ");
+lsTracks.Add(new MediaTrack(sName, sFile));
+}
+Homer.Log.info("Play Tutorials: " + lsTracks.Count + " walks from " + sFolder);
+if (Homer.Media.mpvProgram().Length == 0) {
+string[] aLists = Directory.GetFiles(sFolder, "*.m3u");
+string sOpen = aLists.Length > 0 ? aLists[0] : aFiles[0];
+Homer.Log.info("Play Tutorials: mpv is not installed, so Windows opens " + sOpen);
+System.Diagnostics.ProcessStartInfo oStart = new System.Diagnostics.ProcessStartInfo(sOpen);
+oStart.UseShellExecute = true;
+System.Diagnostics.Process.Start(oStart);
+return true;
+}
+run(owner, sAppName + " Tutorials", "tutorials", lsTracks);
+return true;
+}
+
 // run: open the player on a queue of tracks. Returns when the dialog closes,
 // by which time mpv has stopped and has written down where it had reached.
 public static void run(IWin32Window owner, string sTitle, string sSource, List<MediaTrack> lsTracks) {

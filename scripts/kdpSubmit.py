@@ -64,6 +64,23 @@ sProject = os.path.dirname(sFolder) if os.path.basename(sFolder).lower() in ("sc
 sLogPath = ""
 
 
+# A BROWSER MESSAGE ONCE, NOT A THOUSAND TIMES (kit 1.64.6): KDP's own pages log the
+# same 404 again and again -- 1,187 of one 13,858-line log on 8 October 2026. Each
+# distinct message is written its first three times, then counted at 10, 100 and
+# 1,000, so nothing is hidden and the log stays readable.
+dBrowserSeen = {}
+
+
+def logBrowserEntry(d):
+    dEntry = d.get("entry", {})
+    if dEntry.get("level") not in ("error", "warning"): return
+    sText = "BROWSER log " + dEntry.get("level", "") + ": " + str(dEntry.get("text", ""))[:160]
+    iSeen = dBrowserSeen.get(sText, 0) + 1
+    dBrowserSeen[sText] = iSeen
+    if iSeen <= 3: log(sText)
+    elif iSeen in (10, 100, 1000): log("%s -- seen %d times so far" % (sText, iSeen))
+
+
 def kitInix():
     """The HomerDev kit's inix module, which reads and writes every form of the format (help\\Inix.md in the kit), or None when
     the kit is not on this PC. Book projects share data files written by the kit's writer, with values between backtick fences
@@ -830,7 +847,7 @@ def watchBrowser(page):
         oCdp.on("Page.frameStoppedLoading", lambda d: log("BROWSER frame finished loading") if d.get("frameId") == dMain.get("id") else None)
         oCdp.on("Runtime.consoleAPICalled", lambda d: log("BROWSER console." + d.get("type", "") + " " + " ".join(str(a.get("value", a.get("description", "")))[:120] for a in d.get("args", [])[:3])) if d.get("type") in ("error", "warning") else None)
         oCdp.on("Runtime.exceptionThrown", lambda d: log("BROWSER script error: " + str(d.get("exceptionDetails", {}).get("text", ""))[:160]))
-        oCdp.on("Log.entryAdded", lambda d: log("BROWSER log " + d.get("entry", {}).get("level", "") + ": " + str(d.get("entry", {}).get("text", ""))[:160]) if d.get("entry", {}).get("level") in ("error", "warning") else None)
+        oCdp.on("Log.entryAdded", logBrowserEntry)
         oCdp.on("Network.requestWillBeSent", lambda d: log("BROWSER document request " + d.get("request", {}).get("method", "") + " " + d.get("request", {}).get("url", "")[:140]) if d.get("type") == "Document" else None)
         oCdp.on("Network.loadingFailed", lambda d: log("BROWSER request failed: " + d.get("errorText", "") + (" (" + d.get("type", "") + ")" if d.get("type") else "")) if not d.get("canceled") else None)
         dMain["id"] = oCdp.send("Page.getFrameTree").get("frameTree", {}).get("frame", {}).get("id", "")

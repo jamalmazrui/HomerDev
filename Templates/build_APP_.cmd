@@ -345,6 +345,16 @@ if errorlevel 1 (
   goto :failed
 )
 
+rem ---- the previous installer goes first (kit 1.64.7) -------------------------
+rem A build that stopped before the installer step -- a compile error, say -- left
+rem the last build's %app%_setup.exe in place, and installing it looked like
+rem installing this build (DbDo, 9 October 2026). It is removed before anything
+rem compiles, so a failed build leaves no installer rather than an old one.
+if exist "%app%_setup.exe" (
+  del /f /q "%app%_setup.exe"
+  >> "%log%" echo Removed the previous %app%_setup.exe before compiling
+)
+
 rem ---- compile into exec -----------------------------------------------------
 set "icon="
 if exist "%app%.ico" set "icon=/win32icon:%app%.ico"
