@@ -23,6 +23,7 @@
 !/checkHomerDev.py
 !/createHomerDevRepo.cmd
 !/createHomerDevRepo.ps1
+!/examples/
 !/exec/CSharp/
 !/exec/Python/
 !/help/

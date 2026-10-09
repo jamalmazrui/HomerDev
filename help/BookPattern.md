@@ -52,7 +52,7 @@ Each runs from the project folder, and each writes its own log in `logs`:
 - `scripts\buildBooks` -- builds and audits every book, or those named. A book is ready only when every check passes.
 - `scripts\kdpBooks` -- reads every book's details from the KDP Bookshelf into `data\books`, and applies proposed changes to them.
 - `scripts\kdpSubmit` -- fills in KDP's forms for a new book from its answers file, and submits it.
-- `scripts\kdpUpdate` -- sends each ready book's EPUB and answers to its existing KDP title. A book unchanged since its last submission is left alone.
+- `scripts\kdpUpdate` -- sends each ready book's EPUB and answers to its existing KDP title. A book unchanged since its last submission is left alone, and its pages on KDP are not opened: unchanged means its manuscript, cover, pictures and answers match, by content, never by file name or time. The everyday command is `scripts\kdpUpdate.cmd` with nothing after it: it builds any book that changed, then sends only the books that changed.
 
 ## Where the code comes from
 

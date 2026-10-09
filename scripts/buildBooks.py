@@ -26,7 +26,12 @@ USAGE
   scripts\\buildBooks.cmd                     build and audit every book
   scripts\\buildBooks.cmd --book Mental       only books whose root or title starts with Mental (may be repeated)
   scripts\\buildBooks.cmd --gather            search the folders again for Word files, covers and images folders
+  scripts\\buildBooks.cmd --all             build every book, even those unchanged since their last build
 A single dash works too, so -book means --book.
+
+Only books that changed are built (9 October 2026): a book's audit records a build fingerprint -- its sources by content,
+its catalog entry and data, the kit's book templates and the Pandoc version -- and a book whose ready audit names the
+same fingerprint and its exact EPUB is kept as it is.
 
 EXIT CODES  0 every book built and ready to submit; 1 at least one book not ready (see results\\Audit_Summary.md);
 2 the settings or catalog could not be read; 3 the HomerDev kit, Pandoc or Pillow could not be found or installed; 4 crash.
@@ -36,6 +41,8 @@ Every run writes logs\\MyBooks-buildBooks-<date>-<time>.log in the project folde
 
 import collections, datetime, glob, html, json, os, platform, posixpath, re, shutil, subprocess, sys, time, traceback, unicodedata, urllib.parse, urllib.request, uuid, zipfile
 
+# The way an EPUB is made: raised when buildBooks changes what it puts in a book, so every book is built again once.
+c_sBuildFormat = "2026-10-09"
 c_dDefaults = {"author": "", "ownTemplates": "", "imageMaxBytes": "150000", "imageMaxEdge": "1000", "jpegQuality": "75", "pandocMinimum": "3.1", "searchDepth": "6", "toolRefreshDays": "7", "userAgent": "HomerBooksBuild/1"}
 c_dSeriesSections = {"Strange Truths": ["Copyright", "Table of Contents", "Introduction", "Conclusion", "Key Terms", "Further Reading", "Also in the Strange Truths Series", "About the Author"]}
 c_iLongSentence = 30
@@ -1950,6 +1957,14 @@ def writeAudit(dBook, dAudit):
     if dAudit.get("epub") and os.path.exists(dAudit["epub"]):
         import hashlib
         l.append("- EPUB SHA-256: " + hashlib.sha256(open(dAudit["epub"], "rb").read()).hexdigest())
+        if dAudit.get("buildKey"): l.append("- Build SHA-256: " + dAudit["buildKey"])
+        # The sources this EPUB was made from, by content (9 October 2026): kdpUpdate knows an EPUB is stale when the
+        # book's sources no longer have this fingerprint, without trusting file times.
+        try:
+            import kdpSubmit
+            l.append("- Sources SHA-256: " + kdpSubmit.bookSourcesSha(os.path.join(sProject, "books", dBook["root"])))
+        except Exception as oError:
+            log("the sources fingerprint could not be taken: " + str(oError))
     if dAudit.get("wordCompare"): l.append("- Words: " + format(dAudit["wordCompare"][0], ",") + " in the manuscript, " + format(dAudit["wordCompare"][1], ",") + " in " + mdEscape(dAudit["wordCompare"][2]))
     dLevel = dAudit.get("readingLevel")
     if dLevel: l.append("- Reading level: grade " + str(dLevel["grade"]) + (" (target " + str(dBook["readingGrade"]) + ")" if dBook["readingGrade"] else " (no target for this book)") + "; " + plural(dLevel["long"], "sentence") + " of " + format(dLevel["sentences"], ",") + " over " + str(c_iLongSentence) + " words")
@@ -1971,6 +1986,40 @@ def writeAudit(dBook, dAudit):
     writeText(sMd, "\n".join(l))
     run([dTools["pandoc"], sMd, "-s", "-o", sMd[:-3] + ".htm"])
     return bReady
+
+
+def buildKey(dBook, sBookDir, dKdp):
+    """THE BUILD FINGERPRINT (9 October 2026): everything that shapes a book's EPUB -- its sources by content, its catalog
+    entry, the kdp and proposed sections of its data file, the kit's book templates, the Pandoc version and the build
+    format. A book whose last audit names this fingerprint, says ready and names its exact EPUB is not built again, so
+    a run builds only the books that changed. No file name or time is trusted."""
+    import hashlib, kdpSubmit
+    lsTemplates = []
+    for sDir in (os.path.join(dTools.get("kit", ""), "Templates", "books"), os.path.join(sProject, "templates", "books")):
+        if os.path.isdir(sDir):
+            for sName in sorted(os.listdir(sDir), key=str.lower):
+                sPath = os.path.join(sDir, sName)
+                if os.path.isfile(sPath): lsTemplates.append(sName.lower() + ":" + hashlib.sha256(open(sPath, "rb").read()).hexdigest())
+    lParts = [c_sBuildFormat, kdpSubmit.bookSourcesSha(sBookDir), dBook, {s: dKdp.get(s, {}) for s in ("kdp", "proposed")}, lsTemplates, dTools.get("pandocVersion", "")]
+    return hashlib.sha256(json.dumps(lParts, sort_keys=True, default=str).encode("utf-8")).hexdigest()
+
+
+def keptAudit(dBook, sKey):
+    """The book's last audit as a summary entry, when it was of this exact build and is still true: it names this build
+    fingerprint, says ready, and names the EPUB in results byte for byte. Otherwise None, and the book is built."""
+    import hashlib
+    sAudit = os.path.join(sProject, "results", dBook["root"] + "-audit.md")
+    sEpub = os.path.join(sProject, "results", dBook["root"] + ".epub")
+    if not os.path.exists(sAudit) or not os.path.exists(sEpub): return None
+    with open(sAudit, encoding="utf-8-sig") as f: sText = f.read().replace("\r\n", "\n")
+    oBuild = re.search(r"(?m)^- Build SHA-256: ([0-9a-f]{64})", sText)
+    oEpub = re.search(r"(?m)^- EPUB SHA-256: ([0-9a-f]{64})", sText)
+    if not oBuild or oBuild.group(1) != sKey or not re.search(r"(?m)^Ready to submit", sText): return None
+    if not oEpub or oEpub.group(1) != hashlib.sha256(open(sEpub, "rb").read()).hexdigest(): return None
+    oWarnings = re.search(r"(?ms)^## Warnings\n\n(.*?)(?:\n## |\Z)", sText)
+    lWarnings = [s[2:].strip() for s in (oWarnings.group(1).splitlines() if oWarnings else []) if s.startswith("- ")]
+    return {"root": dBook["root"], "title": dBook["title"], "errors": [], "warnings": lWarnings, "ready": True,
+            "size": os.path.getsize(sEpub), "kept": True}
 
 
 def writeSummary(lAudits):
@@ -2116,6 +2165,13 @@ def main():
             retireFormer(dBook)
             sKdpPath = os.path.join(sProject, "data", "books", dBook["root"] + ".inix")
             dKdp = readInix(sKdpPath) if os.path.exists(sKdpPath) else {}
+            dAudit["buildKey"] = buildKey(dBook, sBookDir, dKdp)
+            dKept = None if any(s.lstrip("-").lower() == "all" for s in lArgs) else keptAudit(dBook, dAudit["buildKey"])
+            if dKept:
+                lAudits.append(dKept)
+                log(dBook["root"] + ": unchanged since its last build (fingerprint " + dAudit["buildKey"][:12] + "), so its EPUB and audit are kept")
+                say(dBook["title"] + ": unchanged since its last build; kept.")
+                continue
             if not dKdp: dAudit["warnings"].append("No KDP metadata in data\\books\\" + dBook["root"] + ".inix, so the EPUB has no description or keywords.")
             sEpub = buildEpub(dBook, dKdp, dAudit)
             auditManuscript(dBook, dAudit, dCatalog)

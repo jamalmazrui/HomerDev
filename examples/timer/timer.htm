@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Talking Timer: a reference version from Blind Vibe Coding</title>
+<style>
+body { font-family: system-ui, sans-serif; line-height: 1.5; margin: 1em; max-width: 40em; }
+label, input, button { font-size: 1.1em; }
+button { margin-right: 0.5em; }
+</style>
+</head>
+<body>
+<main>
+<h1>Talking Timer</h1>
+<p>A countdown timer for a screen reader user, the reference version for chapter 2 of <cite>Blind Vibe Coding</cite>. Enter whole minutes from 1 to 120, then press Start. It says how many minutes remain once a minute and says when time is up. It is a convenience, not an alarm to rely on for medication or safety: a browser may pause a page that is not in front of you.</p>
+<p>
+<label for="minutes">Minutes</label>
+<input id="minutes" type="number" min="1" max="120" step="1" value="5" inputmode="numeric">
+</p>
+<p>
+<button id="start" type="button">Start</button>
+<button id="stop" type="button">Stop</button>
+</p>
+<div id="status" role="status" aria-live="polite"></div>
+</main>
+<script>
+"use strict";
+var c_iMaxMinutes = 120, c_iMinMinutes = 1, c_iTickMs = 1000, c_iMinuteMs = 60000;
+var bRunning = false;
+var iEndAt = 0, iLastSaid = 0, iTicker = 0;
+
+function say(sText) {
+  var oStatus = document.getElementById("status");
+  // Clearing first makes a live region announce the same words twice in a row, such as "1 minute remaining".
+  oStatus.textContent = "";
+  window.setTimeout(function () { oStatus.textContent = sText; }, 50);
+  return true;
+}
+
+function minutesWord(iCount) {
+  return iCount + (iCount === 1 ? " minute" : " minutes");
+}
+
+function stopTicking() {
+  if (iTicker) window.clearInterval(iTicker);
+  iTicker = 0;
+  bRunning = false;
+  return true;
+}
+
+function tick() {
+  var iLeftMs = iEndAt - Date.now();
+  var iLeftMinutes = 0;
+  if (iLeftMs <= 0) {
+    stopTicking();
+    say("Time is up");
+    return true;
+  }
+  // Counted from the clock, not from the number of ticks, so a page the browser slowed down stays accurate.
+  iLeftMinutes = Math.ceil(iLeftMs / c_iMinuteMs);
+  if (iLeftMinutes < iLastSaid) {
+    iLastSaid = iLeftMinutes;
+    say(minutesWord(iLeftMinutes) + " remaining");
+  }
+  return true;
+}
+
+function startClicked() {
+  var sEntry = document.getElementById("minutes").value.trim();
+  var iMinutes = 0;
+  if (!/^[0-9]+$/.test(sEntry)) return say("Enter whole minutes from " + c_iMinMinutes + " to " + c_iMaxMinutes + ".");
+  iMinutes = parseInt(sEntry, 10);
+  if (iMinutes < c_iMinMinutes || iMinutes > c_iMaxMinutes) return say("Enter whole minutes from " + c_iMinMinutes + " to " + c_iMaxMinutes + ".");
+  // One countdown at a time: Start while one runs starts it over.
+  stopTicking();
+  iEndAt = Date.now() + iMinutes * c_iMinuteMs;
+  iLastSaid = iMinutes;
+  bRunning = true;
+  iTicker = window.setInterval(tick, c_iTickMs);
+  return say("Started. " + minutesWord(iMinutes) + ".");
+}
+
+function stopClicked() {
+  if (!bRunning) return say("The timer is not running.");
+  stopTicking();
+  return say("Stopped");
+}
+
+document.getElementById("start").addEventListener("click", startClicked);
+document.getElementById("stop").addEventListener("click", stopClicked);
+</script>
+</body>
+</html>

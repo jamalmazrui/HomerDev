@@ -161,6 +161,57 @@ def testKitReader():
     return True
 
 
+def testFingerprints(sTemp):
+    """Version 11: a book's sources by content, an EPUB rebuilt from unchanged sources still unchanged, staleness from
+    the audit's sources fingerprint, and --record's receipt (9 October 2026)."""
+    sProject = os.path.join(sTemp, "fingerprints")
+    sBook = os.path.join(sProject, "books", "Print_Book")
+    os.makedirs(os.path.join(sBook, "images"))
+    os.makedirs(os.path.join(sProject, "results"))
+    os.makedirs(os.path.join(sProject, "data", "books"))
+    sManuscript = os.path.join(sBook, "Print_Book.md")
+    with open(sManuscript, "wb") as f: f.write("---\ntitle: Print Book\n---\n\nText.\n".encode("utf-8"))
+    with open(os.path.join(sBook, "Print_Book.jpg"), "wb") as f: f.write(b"\xff\xd8 a cover")
+    sFirst = k.bookSourcesSha(sBook)
+    with open(sManuscript, "wb") as f: f.write(b"\xef\xbb\xbf" + "---\r\ntitle: Print Book\r\n---\r\n\r\nText.\r\n".encode("utf-8"))
+    check("sources: line endings and a byte order mark alone are no change", k.bookSourcesSha(sBook) == sFirst)
+    with open(os.path.join(sBook, "found.inix"), "w", encoding="utf-8") as f: f.write("[found]\nwhen = " + str(time.time()) + "\n")
+    check("sources: the build's own found.inix is not a source", k.bookSourcesSha(sBook) == sFirst)
+    with open(os.path.join(sBook, "Print_Book.jpg"), "wb") as f: f.write(b"\xff\xd8 a new cover")
+    sCover = k.bookSourcesSha(sBook)
+    check("sources: a new cover is a change", sCover != sFirst)
+    with open(os.path.join(sBook, "images", "a.png"), "wb") as f: f.write(b"\x89PNG")
+    sPicture = k.bookSourcesSha(sBook)
+    check("sources: a new picture is a change", sPicture != sCover)
+    os.rename(os.path.join(sBook, "images", "a.png"), os.path.join(sBook, "images", "b.png"))
+    check("sources: a renamed picture is a change", k.bookSourcesSha(sBook) != sPicture)
+    os.rename(os.path.join(sBook, "images", "b.png"), os.path.join(sBook, "images", "a.png"))
+    k.writeInix(os.path.join(sProject, "data", "books", "Print_Book.inix"), {"kdp": {"asin": "B000000002", "titleId": "APRINT1", "title": "Print Book"}})
+    def build(bEpub):
+        with open(os.path.join(sProject, "results", "Print_Book.epub"), "wb") as f: f.write(bEpub)
+        with open(os.path.join(sProject, "results", "Print_Book-audit.md"), "w", encoding="utf-8") as f:
+            f.write("# Audit\n\n- EPUB SHA-256: " + u.fileSha(os.path.join(sProject, "results", "Print_Book.epub")) + "\n- Sources SHA-256: " + k.bookSourcesSha(sBook) + "\n\n## Verdict\n\nReady to submit: 0 errors.\n")
+    u.sProject = sProject
+    dBook = {"title": "Print Book"}
+    build(b"PK built at nine")
+    d = u.bookState("Print_Book", dBook)
+    check("record: a book built from its sources is ready", d["problems"] == [], str(d["problems"]))
+    u.recordReceipt(d, "recorded in a test")
+    build(b"PK built again at ten, the same sources")
+    d = u.bookState("Print_Book", dBook)
+    check("unchanged: an EPUB rebuilt from the same sources is unchanged", d["unchanged"] and not d["problems"], str(d))
+    with open(sManuscript, "a", encoding="utf-8") as f: f.write("More text.\n")
+    d = u.bookState("Print_Book", dBook)
+    check("preflight: a manuscript changed since its build stops the book, by content", any("changed since its EPUB was built" in s for s in d["problems"]), str(d["problems"]))
+    build(b"PK built with the new text")
+    d = u.bookState("Print_Book", dBook)
+    check("unchanged: changed sources, rebuilt, are a change to send", not d["unchanged"] and not d["problems"], str(d))
+    k.writeInix(u.receiptFile("Print_Book"), {"submission": {"at": "2026-10-08 10:00:00", "epubSha": d["sha"], "answersKey": d["answersKey"]}})
+    d = u.bookState("Print_Book", dBook)
+    check("unchanged: a receipt from before version 11, of this very EPUB, still counts", d["unchanged"], str(d))
+    return True
+
+
 def main():
     sTemp = tempfile.mkdtemp(prefix="testKdpUpdate-")
     sProjectWas = u.sProject
@@ -172,6 +223,7 @@ def main():
         testRoyalty()
         testKitReader()
         testPreflightAndChoice(sTemp)
+        testFingerprints(sTemp)
     finally:
         u.sProject = sProjectWas
         shutil.rmtree(sTemp, ignore_errors=True)

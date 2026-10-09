@@ -7,6 +7,17 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.65.8 -- 9 October 2026
+
+- **examples: tested projects for blind vibe coders.** A new examples folder, declared in RepoFiles.txt, holds small projects that go with the tutorials in *Blind Vibe Coding*, one folder each, with a ReadMe giving the request each answers. The first is the talking timer of chapter 2, moved here from the book's directory page so the kit is the one home for the book's projects. It was tested with a controllable clock: it refuses blank and out-of-range entries, runs one countdown at a time, announces each minute and the end, and keeps time from the clock on a slowed page.
+
+## 1.65.7 -- 9 October 2026
+
+- **One command for the books: scripts\kdpUpdate.cmd.** It builds any book that changed, then opens on KDP only the books that changed since their last submission, with no options to remember. buildBooks now keeps a book whose last audit names the same build fingerprint -- its sources by content, its catalog entry, the kdp and proposed sections of its data file, the kit's book templates and the Pandoc version -- says ready and names its exact EPUB; --all builds every book. kdpUpdate.cmd runs buildBooks first, and --no-build skips it. Tested: an unchanged book is kept with its warnings; an edit, a change to its proposals or a new Pandoc rebuilds it; kdpUpdate's own review notes do not; a book not ready, or whose EPUB is not the audited one, is never kept. testKdpUpdate: 102 pass.
+
+
+- **kdpUpdate visits only books that changed (version 11).** A book's EPUB changed fingerprint with every build -- its time stamp and generated identifier -- so after buildBooks rebuilt all the books, kdpUpdate counted every one as changed and opened all their pages on KDP. A book is now unchanged when its sources and its answers match its last submission: kdpSubmit's bookSourcesSha hashes every file in the book's folder by relative path and content -- manuscript, cover, pictures, bibliography, styles -- counting text by its text, so line endings and a byte order mark alone are no change, and leaving out the build's own found.inix. No file name or time is trusted. buildBooks records the sources fingerprint in each audit, and kdpUpdate judges an EPUB stale when its sources no longer match, with the old time test only for audits from before. --record writes the current fingerprints as what KDP holds, without opening KDP, and --except leaves books out the way --book picks them. testKdpUpdate has ten new tests; 102 pass.
+
 ## 1.65.5 -- 9 October 2026
 
 From the build, tidy, push and release logs of every project, 9 October 2026.

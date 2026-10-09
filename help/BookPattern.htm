@@ -277,7 +277,11 @@ to them.</li>
 from its answers file, and submits it.</li>
 <li><code>scripts\kdpUpdate</code> – sends each ready book’s EPUB and
 answers to its existing KDP title. A book unchanged since its last
-submission is left alone.</li>
+submission is left alone, and its pages on KDP are not opened: unchanged
+means its manuscript, cover, pictures and answers match, by content,
+never by file name or time. The everyday command is
+<code>scripts\kdpUpdate.cmd</code> with nothing after it: it builds any
+book that changed, then sends only the books that changed.</li>
 </ul>
 <h2 id="where-the-code-comes-from">Where the code comes from</h2>
 <p>The code lives in the kit, in its <code>scripts</code> folder, and

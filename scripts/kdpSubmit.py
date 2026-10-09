@@ -103,6 +103,36 @@ def kitInix():
 
 oKitInix = None
 
+# A BOOK'S SOURCES, BY CONTENT (9 October 2026). The fingerprint of everything a book is made from: every file in its
+# folder -- the manuscript, cover, bibliography, citation style, stylesheet and pictures -- by relative path and content.
+# Text files count by their text, so a change of line endings or byte order mark alone is no change. Files the build
+# writes into the folder itself are left out, so a rebuild changes nothing. No file name or time is trusted.
+# buildBooks records it in each book's audit and kdpUpdate in each submission, so a book that has not changed is not
+# sent to KDP again.
+c_lsSourceText = [".md", ".markdown", ".txt", ".bib", ".csl", ".css", ".yaml", ".yml", ".inix", ".json", ".lua", ".htm", ".html", ".svg"]
+c_lsNotSources = ["found.inix", "thumbs.db", "desktop.ini"]
+
+
+def bookSourcesSha(sFolder):
+    """SHA-256 of a book's sources in sFolder; "" when the folder is missing."""
+    import hashlib
+    if not sFolder or not os.path.isdir(sFolder): return ""
+    oHash = hashlib.sha256(b"book sources 1\n")
+    lsFiles = []
+    for sDir, lsDirs, lsNames in os.walk(sFolder):
+        lsDirs[:] = [s for s in lsDirs if s.lower() not in ("logs", "temp", "__pycache__") and not s.startswith(".")]
+        for sName in lsNames:
+            if sName.lower() in c_lsNotSources or sName.startswith((".", "~$")) or sName.endswith(".writing"): continue
+            lsFiles.append(os.path.join(sDir, sName))
+    for sFile in sorted(lsFiles, key=lambda s: os.path.relpath(s, sFolder).replace("\\", "/").lower()):
+        oHash.update(os.path.relpath(sFile, sFolder).replace("\\", "/").lower().encode("utf-8") + b"\n")
+        with open(sFile, "rb") as f: bData = f.read()
+        if os.path.splitext(sFile)[1].lower() in c_lsSourceText:
+            bData = bData[3:] if bData.startswith(b"\xef\xbb\xbf") else bData
+            bData = bData.replace(b"\r\n", b"\n")
+        oHash.update(hashlib.sha256(bData).digest())
+    return oHash.hexdigest()
+
 
 def readInix(sPath):
     oKit = kitInix()

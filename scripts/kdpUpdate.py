@@ -23,14 +23,24 @@ or when its data file has no title ID; and after the Bookshelf is read, when KDP
 it.
 
 USAGE
+  scripts\kdpUpdate.cmd                                 THE EVERYDAY COMMAND: builds any book that changed, then sends to KDP
+                                                        only the books that changed since their last submission
   scripts\kdpUpdate.cmd --list                          list every book and whether it is ready; no browser
   scripts\kdpUpdate.cmd --survey                        read each title's Content tab and record what KDP holds; change nothing
   scripts\kdpUpdate.cmd --book Returning_Alive --no-publish   one book, stopping at the saved draft
   scripts\kdpUpdate.cmd --book Returning_Alive          one book, published
   scripts\kdpUpdate.cmd --limit 4                       the next four ready books
   scripts\kdpUpdate.cmd                                 every ready book
---book takes a folder name, an ASIN or the start of a title, and may be given more than once. --ask asks before each Publish.
+--book takes a folder name, an ASIN or the start of a title, and may be given more than once; --except leaves books out the
+same way. --ask asks before each Publish.
 --reupload sends the EPUB even when the receipt says KDP holds it. Unknown options stop the script before it does anything.
+
+WHAT COUNTS AS CHANGED (version 11, 9 October 2026). A book is sent only when something in it changed since its last
+submission: its sources -- the manuscript, cover, pictures and the other files in its folder, by content, never by name
+or time -- or the answers kdpUpdate gives from its catalog entry and data file. The fingerprints are kept in
+data\\receipts\\<book>.inix, so an unchanged book's pages on KDP are never opened, and a run with nothing changed does not
+open Edge at all. --republish sends a book anyway. --record writes the current fingerprints as what KDP holds, without
+opening KDP, for books known to be current there.
 
 Every run writes logs\MyBooks-kdpUpdate-<date>-<time>.log, every step as it happens. Exit codes: 0 every chosen book done;
 2 options wrong or no book ready; 3 no sign-in; 4 crash; 5 some book kept as a draft, blocked, locked or of unknown outcome,
@@ -43,10 +53,10 @@ import kdpSubmit as k
 import kdpBooks as kb
 
 c_iProcessingMinutes = 20
-c_lFlags = ["--ask", "--book", "--limit", "--list", "--no-publish", "--republish", "--reupload", "--survey"]
-c_lValueFlags = ["--book", "--limit"]
+c_lFlags = ["--ask", "--book", "--except", "--limit", "--list", "--no-build", "--no-publish", "--record", "--republish", "--reupload", "--survey"]
+c_lValueFlags = ["--book", "--except", "--limit"]
 c_sContentButton = "data-assets-interior-file-upload-browse-button-announce"
-c_sVersion = "2026-10-08 version 10: readiness requires the audited EPUB fingerprint, a book unchanged since its last submission is not sent, only a submission counts as one, DRM failure blocks Publish, royalty follows the $2.99-$12.99 band; version 9: an AI answer the author has confirmed (aiConfirmed) is given exactly, even below what KDP holds; version 8: a recent submission is also known from the upload receipt, which survives a replaced data file; version 7: a title that will not open within 72 hours of being submitted is reported as in review, not as a problem; version 6: a book built by its own project, such as Blind Vibe Coding, is read from there, and a title with no ASIN is found on the Bookshelf by its title ID; version 5: when KDP stays on the Content tab without naming a problem, the boxes are checked again and the step tried once more; a live title with an update in review is reported as such; version 4: a title KDP shows as Publishing is locked like one In Review, and is not opened; version 3: AI answers never disclose less than KDP already holds, read live before answering; version 2: a manuscript dated in the future, as an unzipped one can be, no longer counts as newer than its EPUB; version 1 was the first, built on kdpSubmit version 36 and kdpBooks version 14"
+c_sVersion = "2026-10-09 version 11: a book is unchanged when its sources' and answers' fingerprints match its last submission, whatever its EPUB's build time; staleness is the audit's sources fingerprint, not file times; --record writes the current fingerprints without opening KDP; version 10: readiness requires the audited EPUB fingerprint, a book unchanged since its last submission is not sent, only a submission counts as one, DRM failure blocks Publish, royalty follows the $2.99-$12.99 band; version 9: an AI answer the author has confirmed (aiConfirmed) is given exactly, even below what KDP holds; version 8: a recent submission is also known from the upload receipt, which survives a replaced data file; version 7: a title that will not open within 72 hours of being submitted is reported as in review, not as a problem; version 6: a book built by its own project, such as Blind Vibe Coding, is read from there, and a title with no ASIN is found on the Bookshelf by its title ID; version 5: when KDP stays on the Content tab without naming a problem, the boxes are checked again and the step tried once more; a live title with an update in review is reported as such; version 4: a title KDP shows as Publishing is locked like one In Review, and is not opened; version 3: AI answers never disclose less than KDP already holds, read live before answering; version 2: a manuscript dated in the future, as an unzipped one can be, no longer counts as newer than its EPUB; version 1 was the first, built on kdpSubmit version 36 and kdpBooks version 14"
 
 sProject = k.sProject
 
@@ -122,6 +132,24 @@ def answersKey(dBook, sData):
     return hashlib.sha256(json.dumps([dBook, dProposed], sort_keys=True, default=str).encode("utf-8")).hexdigest()
 
 
+def auditSourcesSha(sRoot):
+    """The sources fingerprint the book's audit recorded when its EPUB was built, or "" for an audit from before 9 October."""
+    sAudit = os.path.join(sProject, "results", sRoot + "-audit.md")
+    if not os.path.exists(sAudit): return ""
+    with open(sAudit, encoding="utf-8-sig") as f: oMatch = re.search(r"(?m)^- Sources SHA-256: ([0-9a-f]{64})", f.read())
+    return oMatch.group(1) if oMatch else ""
+
+
+def recordReceipt(dState, sHow):
+    """Writes the book's [submission]: when, how, and the fingerprints of what KDP now holds."""
+    dReceipt = k.readInix(receiptFile(dState["root"])) if os.path.exists(receiptFile(dState["root"])) else {}
+    dReceipt["submission"] = {"at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "how": sHow, "epubSha": dState["sha"],
+                              "sourcesSha": dState["sources"], "answersKey": dState["answersKey"]}
+    os.makedirs(os.path.dirname(receiptFile(dState["root"])), exist_ok=True)
+    k.writeInix(receiptFile(dState["root"]), dReceipt)
+    return True
+
+
 def receiptFile(sRoot):
     """The book's receipt in data\\receipts: its uploads, and its submissions."""
     return os.path.join(sProject, "data", "receipts", sRoot + ".inix")
@@ -139,22 +167,33 @@ def bookState(sRoot, dBook):
     # A manuscript dated in the future was unzipped, not edited: a zip stores times without a time zone, so a project zipped
     # on a computer hours ahead arrives dated hours ahead (7 October 2026). Only a manuscript dated in the past, after its
     # EPUB, means the EPUB is stale.
-    elif os.path.exists(sManuscript) and os.path.getmtime(sEpub) < os.path.getmtime(sManuscript) <= time.time() + 300: lProblems.append("the manuscript is newer than its EPUB; run scripts\\buildBooks.cmd")
+    elif auditSourcesSha(sRoot) and auditSourcesSha(sRoot) != k.bookSourcesSha(os.path.dirname(sManuscript)): lProblems.append("the manuscript, cover or pictures changed since its EPUB was built; run scripts\\buildBooks.cmd")
+    elif not auditSourcesSha(sRoot) and os.path.exists(sManuscript) and os.path.getmtime(sEpub) < os.path.getmtime(sManuscript) <= time.time() + 300: lProblems.append("the manuscript is newer than its EPUB; run scripts\\buildBooks.cmd")
     elif auditProblem(sRoot, sEpub): lProblems.append(auditProblem(sRoot, sEpub))
     if not dKdp.get("titleId"): lProblems.append("no KDP title ID in data\\books\\" + sRoot + ".inix; run scripts\\kdpBooks.cmd --export")
     # UNCHANGED SINCE ITS LAST SUBMISSION (8 October 2026, from an audit by another AI): a run used to open, save and
     # republish every unlocked book though nothing in it had changed, each time starting another KDP review.
-    sSha, sKey = fileSha(sEpub), answersKey(dBook, sData)
+    # BY CONTENT, NOT BY BUILD (9 October 2026): the EPUB's own fingerprint changed with every build, its time stamp
+    # and identifier with it, so a rebuild of all the books made every one look changed and a run visited all of them.
+    # A book is now unchanged when its sources -- manuscript, cover, pictures -- and the answers kdpUpdate gives match
+    # its last submission. A receipt from before this records only the EPUB, which still counts when it matches.
+    sSha, sKey, sSources = fileSha(sEpub), answersKey(dBook, sData), k.bookSourcesSha(os.path.dirname(sManuscript))
     dSubmitted = k.readInix(receiptFile(sRoot)).get("submission", {}) if os.path.exists(receiptFile(sRoot)) else {}
-    bUnchanged = bool(sSha) and dSubmitted.get("epubSha") == sSha and dSubmitted.get("answersKey") == sKey
-    return {"sha": sSha, "answersKey": sKey, "unchanged": bUnchanged, "root": sRoot, "title": dBook["title"], "epub": sEpub, "manuscript": sManuscript, "data": sData, "titleId": dKdp.get("titleId", ""), "asin": dKdp.get("asin", ""), "problems": lProblems}
+    bSameSources = bool(sSources) and dSubmitted.get("sourcesSha") == sSources
+    bSameEpub = bool(sSha) and dSubmitted.get("epubSha") == sSha
+    bUnchanged = (bSameSources or bSameEpub) and dSubmitted.get("answersKey") == sKey
+    return {"sha": sSha, "answersKey": sKey, "sources": sSources, "unchanged": bUnchanged, "root": sRoot, "title": dBook["title"], "epub": sEpub, "manuscript": sManuscript, "data": sData, "titleId": dKdp.get("titleId", ""), "asin": dKdp.get("asin", ""), "problems": lProblems}
 
 
 def chosen(lStates):
     """The books --book names, or all; --limit then keeps the first that many ready ones."""
     lWanted = [s.lower() for s in optionValues("--book")]
-    if lWanted:
-        lStates = [d for d in lStates if any(w in (d["root"].lower(), d["asin"].lower()) or d["title"].lower().startswith(w) or d["root"].lower().startswith(w) for w in lWanted)]
+    def named(d, lNames): return any(w in (d["root"].lower(), d["asin"].lower()) or d["title"].lower().startswith(w) or d["root"].lower().startswith(w) for w in lNames)
+    if lWanted: lStates = [d for d in lStates if named(d, lWanted)]
+    # --except leaves books out, the way --book picks them (9 October 2026): "--record --except Blind_Vibe_Coding" records
+    # every other book as what KDP holds.
+    lExcept = [s.lower() for s in optionValues("--except")]
+    if lExcept: lStates = [d for d in lStates if not named(d, lExcept)]
     if "--limit" in sys.argv:
         iLimit, lKept = int(optionValues("--limit")[0]), []
         for d in lStates:
@@ -486,11 +525,7 @@ def updateBook(page, dState, dBook):
         k.fillText(page, "US list price", ["input[name='data[digital][channels][amazon][US][price_vat_inclusive]']"], "%.2f" % float(sPrice))
         time.sleep(2)
     sOutcome = k.finalReview(page)
-    if sOutcome == "submitted":
-        dReceipt = k.readInix(receiptFile(dState["root"])) if os.path.exists(receiptFile(dState["root"])) else {}
-        dReceipt["submission"] = {"at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "epubSha": dState["sha"], "answersKey": dState["answersKey"]}
-        os.makedirs(os.path.dirname(receiptFile(dState["root"])), exist_ok=True)
-        k.writeInix(receiptFile(dState["root"]), dReceipt)
+    if sOutcome == "submitted": recordReceipt(dState, "submitted by kdpUpdate")
     dFile = k.readInix(dState["data"])
     sCheck = manuscriptCheck(k.lPageMessages)
     dState["check"] = sCheck
@@ -515,6 +550,15 @@ def main():
     dCatalog = dict(catalog())
     lStates = chosen([bookState(sRoot, dBook) for sRoot, dBook in dCatalog.items()])
     lReady = [d for d in lStates if not d["problems"]]
+    if "--record" in sys.argv:
+        # RECORDING WHAT KDP HOLDS, WITHOUT OPENING IT (9 October 2026): for books the author knows KDP already holds
+        # as they are -- after receipts from before the sources fingerprint, say -- so the next run does not visit them.
+        lRecorded = [d for d in lReady if recordReceipt(d, "recorded by --record, without opening KDP")]
+        for d in lRecorded: log("Recorded as what KDP holds: " + d["root"] + " sources " + d["sources"][:12] + " answers " + d["answersKey"][:12])
+        say(plural(len(lRecorded), "book") + " recorded as what KDP holds; KDP was not opened, and the next run sends only what changes after this.")
+        for d in lStates:
+            if d["problems"]: say("  Not recorded, not ready: " + d["title"][:60] + ": " + "; ".join(d["problems"]))
+        return 0
     lUnchanged = [] if "--republish" in sys.argv or "--survey" in sys.argv or "--list" in sys.argv else [d for d in lReady if d["unchanged"]]
     lReady = [d for d in lReady if d not in lUnchanged]
     for d in lUnchanged: log("Unchanged since its last submission, so not sent: " + d["root"])
@@ -522,7 +566,7 @@ def main():
     for d in lStates: log("Preflight " + d["root"] + ": " + ("ready" if not d["problems"] else "; ".join(d["problems"])))
     if "--list" in sys.argv or not lReady:
         say(plural(len(lReady), "book") + " of " + str(len(lStates)) + " ready to send to KDP:")
-        for d in lStates: say("  " + d["title"][:60] + ": " + ("ready" if not d["problems"] else "; ".join(d["problems"])))
+        for d in lStates: say("  " + d["title"][:60] + ": " + (("unchanged since its last submission" if d["unchanged"] else "ready, changed since its last submission") if not d["problems"] else "; ".join(d["problems"])))
         if not lReady and "--list" not in sys.argv: say("Nothing to do. Log: " + k.sLogPath)
         return 0 if "--list" in sys.argv or (lUnchanged and not any(d["problems"] for d in lStates)) else 2
     bSurvey = "--survey" in sys.argv
