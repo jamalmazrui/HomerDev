@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.65.12 -- 9 October 2026
+
+- **Tutorials.htm uses the newest Pandoc, with a page title.** makeTutorials took the first Pandoc on the PATH, which on the author's machine was an old 2.19.2 ahead of 3.12, and every app's tutorial log warned that the page had no title. It now asks each copy its version and uses the newest, as the kit's other tools do, and gives the page a title from the guide's own heading, as a page title only, so no second heading appears.
+
 ## 1.65.11 -- 9 October 2026
 
 - **pptx to PDF works.** The conversion engine hands each route a target ending in .part and renames it on success. Word saves under exactly that name, but PowerPoint adds the extension of the format it saves, so it wrote sample.pdf.part.pdf, and the rename failed with "cannot find the file specified"; the kit's pptx > pdf test failed on every build for a day. Office now saves into a folder of its own under a name with the right extension, and the result is moved to the target. Reproduced with an Office stand-in that saves as Word and PowerPoint do: the old engine failed and left the stray file, the new one wrote the PDF for both.

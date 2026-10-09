@@ -54,14 +54,26 @@ c_sFeed = os.path.join(c_sHere, "TutorialFeed.xml")
 
 
 def findPandoc():
-    """Pandoc's path: on the PATH, or where its installer puts it machine-wide; "" when absent."""
+    """The NEWEST Pandoc on this computer, as the kit's other tools choose it (9 October 2026): the first one on the
+    PATH was an old 2.19.2 in c:\\bin on the author's machine, ahead of 3.12 in Program Files. Each copy is asked its
+    version; "" when there is none."""
     import shutil
-    sFound = shutil.which("pandoc")
-    if sFound: return sFound
+    lsCandidates = []
+    sOnPath = shutil.which("pandoc")
+    if sOnPath: lsCandidates.append(sOnPath)
     for sBase in (os.environ.get("ProgramFiles", ""), os.environ.get("LOCALAPPDATA", "")):
         sPath = os.path.join(sBase, "Pandoc", "pandoc.exe") if sBase else ""
-        if sPath and os.path.isfile(sPath): return sPath
-    return ""
+        if sPath and os.path.isfile(sPath) and sPath.lower() not in [s.lower() for s in lsCandidates]: lsCandidates.append(sPath)
+    tBest, sBest = (), ""
+    for sPath in lsCandidates:
+        try:
+            sFirst = subprocess.run([sPath, "--version"], capture_output=True, text=True, timeout=30).stdout.splitlines()[0]
+            tVersion = tuple(int(s) for s in re.findall(r"\d+", sFirst.split()[-1]))
+        except Exception:
+            continue
+        note("pandoc candidate %s, version %s" % (sPath, ".".join(str(i) for i in tVersion)))
+        if tVersion > tBest: tBest, sBest = tVersion, sPath
+    return sBest
 
 
 def writeTutorialsHtm(sMarkdown):
@@ -75,7 +87,11 @@ def writeTutorialsHtm(sMarkdown):
         note("Tutorials.htm not written: Pandoc was not found; the build's document step converts it")
         return False
     sHtm = os.path.splitext(sMarkdown)[0] + ".htm"
-    lsCommand = [sPandoc, "-f", "markdown", "-t", "html5", "--standalone", "-o", sHtm, sMarkdown]
+    # A PAGE TITLE FROM THE GUIDE'S OWN HEADING (9 October 2026): Pandoc warned "requires a nonempty <title>" on
+    # every app. pagetitle sets the window title only; title would add a second heading above the guide's own.
+    with open(sMarkdown, encoding="utf-8-sig") as f: oHeading = re.search(r"(?m)^#\s+(.+?)\s*(\{[^}]*\})?\s*$", f.read())
+    sTitle = oHeading.group(1).strip() if oHeading else "Tutorials"
+    lsCommand = [sPandoc, "-f", "markdown", "-t", "html5", "--standalone", "--metadata", "pagetitle=" + sTitle, "-o", sHtm, sMarkdown]
     note("run: " + subprocess.list2cmdline(lsCommand))
     oRun = subprocess.run(lsCommand, capture_output=True, text=True, timeout=120)
     note("pandoc exit code: %d%s" % (oRun.returncode, ("; " + oRun.stderr.strip()[:400]) if oRun.stderr.strip() else ""))
