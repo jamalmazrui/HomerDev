@@ -1394,6 +1394,7 @@ def main():
     sayLine("Homer Development Kit %s in %s" % (sVersion, sScriptDir))
 
     iSamplesFailed = 0
+    lsFailedParts = []
     if not bCheckOnly:
         # FIRST, AND WHETHER OR NOT PANDOC IS HERE. Renaming and retiring used
         # to run only inside the pandoc branch, so a machine without pandoc
@@ -1408,11 +1409,16 @@ def main():
             iDone = convertDocs(sPandoc)
             sayLine("%d document%s converted to HTML." % (iDone, "" if iDone == 1 else "s"))
         iSamplesFailed = buildSamples()
+        # WHAT FAILED, BY NAME (9 October 2026): a failing conversion route ended the build with "1 sample build
+        # failed", which named the wrong thing, so the pptx > pdf failure went unexamined for a day. Each failing
+        # part is now named in the closing line, with the failing routes themselves.
+        lsFailedParts = ["%d sample build%s" % (iSamplesFailed, "" if iSamplesFailed == 1 else "s")] if iSamplesFailed else []
         # After the samples, whose C# build installs the Build Tools if needed.
         sDllProblem = buildHomerDll()
         if sDllProblem != "":
             sayLine(sDllProblem)
             iSamplesFailed += 1
+            lsFailedParts.append("Homer.dll")
         # THE SHARED CONVERSION ROUTES ARE PROVED HERE (1.65.0), on sample files made
         # at the time, before any app relies on them: a failing route fails the kit's
         # build; a route whose engine is not on this computer is reported, not passed.
@@ -1421,10 +1427,14 @@ def main():
                                    capture_output=True, text=True, timeout=1800)
             for sLine in (oDone.stdout or "").strip().splitlines(): sayLine(sLine)
             logLine("testConversion exit %d" % oDone.returncode)
-            if oDone.returncode != 0: iSamplesFailed += 1
+            if oDone.returncode != 0:
+                iSamplesFailed += 1
+                lsRoutes = [re.sub(r":.*$", "", s.strip()) for s in (oDone.stdout or "").splitlines() if s.strip().startswith("FAIL ")]
+                lsFailedParts.append("the conversion test" + (" (" + "; ".join(lsRoutes) + ")" if lsRoutes else ""))
         except Exception as oError:
             sayLine("The conversion routes could not be tested: %s" % oError)
             iSamplesFailed += 1
+            lsFailedParts.append("the conversion test, which could not run")
         buildTutorials()
         removeSkillHtm()
         findStaleAppBuilds()
@@ -1440,8 +1450,8 @@ def main():
         logLine("build end")
         return 0
     if len(lsProblems) == 0:
-        sayLine("The kit itself is complete, but %d sample build%s failed."
-                % (iSamplesFailed, "" if iSamplesFailed == 1 else "s"))
+        sayLine("The kit itself is complete, but this failed: " + "; ".join(lsFailedParts) + ". The log has the details."
+                if lsFailedParts else "The kit itself is complete, but %d part%s failed." % (iSamplesFailed, "" if iSamplesFailed == 1 else "s"))
         logLine("build end")
         return 1
 

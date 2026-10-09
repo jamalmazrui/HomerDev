@@ -352,6 +352,28 @@ def engineOfficeCom(sSource, sTo, sOut):
     iFormat = c_dOfficeFormat.get((sApp, sTo))
     if iFormat is None: raise RuntimeError("Office cannot write .%s from .%s here" % (sTo, sFrom))
     say("officecom: the last resort, for %s" % os.path.basename(sSource))
+    # OFFICE WRITES ITS OWN NAME (9 October 2026): the engine hands every route a target ending in .part, renamed
+    # when the route succeeds. Word saves under exactly that name, but PowerPoint adds the extension of the format
+    # it saves, so sample.pdf.part came out as sample.pdf.part.pdf and the rename failed with "cannot find the file
+    # specified" -- the kit's pptx > pdf test failed on every build. Office now saves into a folder of its own under
+    # a name with the right extension, and the result is moved to the target.
+    sOfficeDir = tempfile.mkdtemp(prefix="homerOffice-")
+    sFinal = sOut
+    sOut = os.path.join(sOfficeDir, "converted." + sTo)
+    try:
+        engineOfficeComSave(sApp, sSource, sOut, iFormat)
+        if not os.path.isfile(sOut):
+            lsMade = [s for s in os.listdir(sOfficeDir) if s.lower().startswith("converted")]
+            if not lsMade: raise RuntimeError("Office reported success but wrote no file")
+            sOut = os.path.join(sOfficeDir, lsMade[0])
+        os.replace(sOut, sFinal)
+    finally:
+        shutil.rmtree(sOfficeDir, ignore_errors=True)
+
+
+def engineOfficeComSave(sApp, sSource, sOut, iFormat):
+    """Opens sSource in the Office application sApp and saves it to sOut in format iFormat."""
+    import win32com.client
     if sApp == "word":
         oApp = win32com.client.DispatchEx("Word.Application"); oApp.Visible = False
         try:
