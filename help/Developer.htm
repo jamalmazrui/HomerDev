@@ -192,6 +192,7 @@
 read HomerDev.md.</p>
 <h2 id="contents">Contents</h2>
 <ul>
+<li><a href="#two-principles">Two principles</a></li>
 <li><a href="#layout">Layout</a></li>
 <li><a href="#releasing-the-kit">Releasing the kit</a></li>
 <li><a href="#building-the-kit">Building the kit</a></li>
@@ -207,6 +208,34 @@ scripts, and the order they run in</a></li>
 <li><a href="#conventions-worth-not-rediscovering">Conventions worth not
 rediscovering</a></li>
 </ul>
+<h2 id="two-principles">Two principles</h2>
+<p>Homer follows two principles, adopted on 8 October 2026. Everything
+after this section applies them.</p>
+<ul>
+<li><strong>Convention over configuration.</strong> A project that
+follows the Homer conventions needs no settings to be understood. Its
+kind is settled by one fact about its folder; its folders have standard
+names; its build is <code>build.cmd</code>, its installer script
+<code>&lt;App&gt;_setup.iss</code>, its walks
+<code>help\Tutorial_N_*.inix</code>. A setting exists only for what
+truly differs between projects – an author’s name, a book’s catalog
+entry – never to say what a convention already says. When a script needs
+a setting to find something, the convention is missing, and the
+convention is the fix.</li>
+<li><strong>Don’t repeat yourself.</strong> Every rule, value and piece
+of code has one authoritative home. Code lives once, in the kit; an app
+or a book project receives a copy made by its build or wrapper, logged,
+and never edited by hand. A skill that must carry its own copy, to work
+when uploaded on its own, gets that copy from the kit’s build, as the
+skills’ reference documents do. A fix is made once, in the authoritative
+home, and reaches every project from there. When the same thing is found
+written twice, one becomes the source and the other is made from
+it.</li>
+</ul>
+<p>The two meet in the checks: the rules a skill teaches are the rules
+the kit’s <code>check</code> runs on every project, from the skill’s own
+scripts, so what the kit asks of others it first proves on its own
+work.</p>
 <h2 id="layout">Layout</h2>
 <pre><code>C:\HomerDev\
   .claude\skills\   the Claude skills, one folder each

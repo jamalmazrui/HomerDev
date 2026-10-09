@@ -193,6 +193,29 @@ def cleanLines(lLines, sName):
     return lTidy, lRemoved
 
 
+def finishPage(sHtmPath):
+    """PANDOC'S PAGE, PUT RIGHT (8 October 2026): the Homer encoding, and a title said
+    once rather than twice. Both come from homer-convert's toHomerEncoding, beside this
+    skill in the kit, so the rule lives in one place; a skill uploaded on its own,
+    without it, still gets the encoding."""
+    # Beside this skill in the kit; or, for a copy kept in a collection's folder,
+    # in the kit wherever it is: the HomerDev variable, then C:\HomerDev.
+    lsPlaces = [os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "homer-convert", "scripts")]
+    for sKit in (os.environ.get("HomerDev", ""), r"C:\HomerDev"):
+        if sKit: lsPlaces.append(os.path.join(sKit, ".claude", "skills", "homer-convert", "scripts"))
+    try:
+        for sConvert in lsPlaces:
+            if os.path.isfile(os.path.join(sConvert, "toHomerEncoding.py")) and sConvert not in sys.path:
+                sys.path.insert(0, sConvert)
+                break
+        import toHomerEncoding
+        return toHomerEncoding.convert(sHtmPath)
+    except ImportError:
+        binData = open(sHtmPath, "rb").read()
+        sText = binData.decode("utf-8-sig").replace("\r\n", "\n").replace("\n", "\r\n")
+        open(sHtmPath, "wb").write(b"\xef\xbb\xbf" + sText.encode("utf-8"))
+        return "changed"
+
 def rebuildPage(sMarkdownPath):
     """Rebuilds the .htm beside a .md, if Pandoc is here to do it."""
     sPandoc = shutil.which("pandoc")
@@ -207,6 +230,7 @@ def rebuildPage(sMarkdownPath):
     if oResult.returncode != 0:
         logging.error("Pandoc said: %s", oResult.stderr.decode("utf-8", "replace")[:400])
         return False
+    logging.info("finished %s: %s", sPagePath, finishPage(sPagePath))
     return True
 
 

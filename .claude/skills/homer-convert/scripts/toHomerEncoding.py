@@ -9,18 +9,21 @@ except .cmd and .bat files, version.txt and a skill's SKILL.md, which take
 CRLF and no mark. Pandoc and most converters write UTF-8 with no mark and bare line
 feeds, so run this on what they write. A file is read in the first encoding
 that decodes it cleanly (UTF-8 with or without a mark, UTF-16 with a mark,
-then Windows-1252); binary files are left alone. A folder is walked
+then Windows-1252); binary files are left alone. A Pandoc page whose
+title is repeated as its first heading keeps one of the two. A folder is walked
 recursively. Each file changed is reported, and a count at the end.
 
 Exit code 0 when every file was read, 1 when one could not be, 2 for no
 arguments.
 """
 
-import glob, os, sys
+import glob, html, os, re, sys
 
 c_lsNoMark = (".bat", ".cmd")
-c_lsTextExt = (".bat", ".cmd", ".cs", ".css", ".csv", ".htm", ".html", ".inix", ".iss", ".js", ".json",
-               ".md", ".ps1", ".py", ".tsv", ".txt", ".xml")
+# The same rules as the kit's scripts\\fixEncoding.py, their authoritative home;
+# the kit's build fails if the two ever differ (1.64.0, don't repeat yourself).
+c_lsTextExt = (".bat", ".cmd", ".cs", ".css", ".csv", ".htm", ".html", ".inix", ".iss", ".js", ".json", ".lua",
+               ".m3u", ".md", ".ps1", ".py", ".spec", ".tsv", ".txt", ".xml")
 
 
 def decode(binData):
@@ -36,11 +39,35 @@ def decode(binData):
     return None
 
 
+def plainText(sHtml):
+    """A heading's words, as a screen reader says them: no tags, entities read, spacing and case ignored."""
+    sText = html.unescape(re.sub(r"<[^>]+>", "", sHtml))
+    return " ".join(sText.split()).casefold()
+
+
+def dropRepeatedTitle(sText):
+    """ONE TITLE, SAID ONCE (8 October 2026): Pandoc's standalone page puts the title
+    in a header block as a top-level heading, and a Markdown file that also opens with
+    the same # heading gave every page two -- a screen reader said the title twice
+    before anything else. When the header's heading says exactly what the first body
+    heading says, the header's is removed, and the header with it if nothing else is
+    in it. A title that differs from the first heading is left as it is."""
+    oHeader = re.search(r'<header id="title-block-header">(.*?)</header>\s*', sText, re.S)
+    if not oHeader: return sText
+    oTitle = re.search(r'<h1 class="title">(.*?)</h1>\s*', oHeader.group(1), re.S)
+    oFirst = re.search(r"<h1(?: [^>]*)?>(.*?)</h1>", sText[oHeader.end():], re.S)
+    if not oTitle or not oFirst or plainText(oTitle.group(1)) != plainText(oFirst.group(1)): return sText
+    sInside = oHeader.group(1)[:oTitle.start()] + oHeader.group(1)[oTitle.end():]
+    sHeader = "" if not sInside.strip() else '<header id="title-block-header">' + sInside + "</header>\n"
+    return sText[:oHeader.start()] + sHeader + sText[oHeader.end():]
+
+
 def convert(sPath):
     """Rewrite one file in the Homer encoding. Returns "changed", "same" or a problem."""
     binData = open(sPath, "rb").read()
     sText = decode(binData)
     if sText is None: return "not text"
+    if sPath.lower().endswith((".htm", ".html")): sText = dropRepeatedTitle(sText)
     sText = sText.replace("\r\n", "\n").replace("\r", "\n").replace("\n", "\r\n")
     sName = os.path.basename(sPath)
     # version.txt is read by build scripts and Inno, which want the number alone.

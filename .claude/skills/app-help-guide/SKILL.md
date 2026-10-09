@@ -41,7 +41,13 @@ Read `references/fence-faults.md` before writing a fence,
    its `.log` and its `.zip`. Read the log first: it says what was refused and
    why, and a run that gathered nothing says so in one line.
 4. **Build.** Write a reader for that publisher's page shape in `buildGuide.py`,
-   run it, check the gates, and build the `.htm`.
+   run it, check the gates, and build the `.htm`, then finish it with the
+   homer-convert skill's `toHomerEncoding` -- the Homer encoding, and the title
+   said once where Pandoc's title block repeats the guide's first heading.
+   cleanFeedback does both when it rebuilds a page. The collection's ReadMe
+   names its license: CC BY-SA 4.0 for the collection's own selection,
+   arrangement and wording, while each guide's help text keeps its publisher's
+   terms -- one sentence, kept whenever the ReadMe is rewritten.
 
 ## Running the scripts
 

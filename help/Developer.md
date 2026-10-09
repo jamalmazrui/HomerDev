@@ -10,6 +10,7 @@ HomerDev.md.
 
 ## Contents
 
+- [Two principles](#two-principles)
 - [Layout](#layout)
 - [Releasing the kit](#releasing-the-kit)
 - [Building the kit](#building-the-kit)
@@ -21,6 +22,15 @@ HomerDev.md.
 - [Versioning and release](#versioning-and-release)
 - [Publishing the kit](#publishing-the-kit)
 - [Conventions worth not rediscovering](#conventions-worth-not-rediscovering)
+
+## Two principles
+
+Homer follows two principles, adopted on 8 October 2026. Everything after this section applies them.
+
+- **Convention over configuration.** A project that follows the Homer conventions needs no settings to be understood. Its kind is settled by one fact about its folder; its folders have standard names; its build is `build.cmd`, its installer script `<App>_setup.iss`, its walks `help\Tutorial_N_*.inix`. A setting exists only for what truly differs between projects -- an author's name, a book's catalog entry -- never to say what a convention already says. When a script needs a setting to find something, the convention is missing, and the convention is the fix.
+- **Don't repeat yourself.** Every rule, value and piece of code has one authoritative home. Code lives once, in the kit; an app or a book project receives a copy made by its build or wrapper, logged, and never edited by hand. A skill that must carry its own copy, to work when uploaded on its own, gets that copy from the kit's build, as the skills' reference documents do. A fix is made once, in the authoritative home, and reaches every project from there. When the same thing is found written twice, one becomes the source and the other is made from it.
+
+The two meet in the checks: the rules a skill teaches are the rules the kit's `check` runs on every project, from the skill's own scripts, so what the kit asks of others it first proves on its own work.
 
 ## Layout
 

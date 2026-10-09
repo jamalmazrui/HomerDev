@@ -38,12 +38,17 @@ without typing a Python or PowerShell invocation.
    audio_url, summary. It also saves the raw feed as `<Slug>_feed.xml` and writes
    `harvestShows.log`.
 3. **Build the directory.** `buildDirectory.py` reads one TSV and writes
-   `<Slug>.md`, then `<Slug>.htm` via Pandoc. It self-verifies and logs.
+   `<Slug>.md`, then `<Slug>.htm` via Pandoc, finished by the homer-convert
+   skill's `toHomerEncoding`: the Homer encoding, and the title said once where
+   Pandoc's title block repeats the page's first heading. It self-verifies and logs.
 4. **Verify.** Confirm zero broken internal anchors, zero duplicate anchors, zero
    bare URLs, and UTF-8 BOM with CRLF endings (the builder reports the first three
    in its log).
 5. **(Optional) Add to a collection.** Slot the show into a themed category and
    regenerate the collection's README and Announce pages and its single zip.
+   The README keeps its License section: CC BY-SA 4.0 for the collection's own
+   selection, arrangement and wording, while each episode's title, description
+   and audio keep their publisher's terms.
 
 ## Running the scripts
 

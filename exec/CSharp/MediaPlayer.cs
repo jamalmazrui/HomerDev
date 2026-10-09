@@ -1174,8 +1174,9 @@ info.CreateNoWindow = true;
 info.RedirectStandardOutput = true;
 info.RedirectStandardError = true;
 System.Diagnostics.Process oExif = System.Diagnostics.Process.Start(info);
+// Both streams drained at once, so neither can fill and hang ExifTool (8 October 2026).
+System.Threading.Tasks.Task<string> taskExifErr = oExif.StandardError.ReadToEndAsync();
 sOut = oExif.StandardOutput.ReadToEnd();
-oExif.StandardError.ReadToEnd();
 if (!oExif.WaitForExit(20000)) { try { oExif.Kill(); } catch (Exception) { } }
 }
 catch (Exception ex) {

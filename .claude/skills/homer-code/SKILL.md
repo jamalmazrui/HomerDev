@@ -18,6 +18,11 @@ one complete statement per line; lists and names in alphabetical order.
 
 ## The rules that matter most
 
+- **Convention over configuration, and don't repeat yourself.** Follow the
+  Homer conventions so a project needs no settings to be understood; add a
+  setting only for what truly differs. Give every rule, value and piece of
+  code one authoritative home, normally the kit, and copy it into a project
+  only by the build, never by hand. Fix a shared thing at its source.
 - **Hungarian prefixes** on every variable, argument, field and constant: `a`
   array, `b` boolean, `bin` binary buffer, `d` dictionary, `dt` date-time, `f`
   file, `h` handle, `i` integer, `ls` list, `n` real, `s` string, `v` variant.

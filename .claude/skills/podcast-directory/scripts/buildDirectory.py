@@ -204,6 +204,30 @@ def build(cfg, rows):
     return "\n".join(out) + "\n"
 
 
+
+def finishPage(sHtmPath):
+    """PANDOC'S PAGE, PUT RIGHT (8 October 2026): the Homer encoding, and a title said
+    once rather than twice. Both come from homer-convert's toHomerEncoding, beside this
+    skill in the kit, so the rule lives in one place; a skill uploaded on its own,
+    without it, still gets the encoding."""
+    # Beside this skill in the kit; or, for a copy kept in a collection's folder,
+    # in the kit wherever it is: the HomerDev variable, then C:\HomerDev.
+    lsPlaces = [os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "homer-convert", "scripts")]
+    for sKit in (os.environ.get("HomerDev", ""), r"C:\HomerDev"):
+        if sKit: lsPlaces.append(os.path.join(sKit, ".claude", "skills", "homer-convert", "scripts"))
+    try:
+        for sConvert in lsPlaces:
+            if os.path.isfile(os.path.join(sConvert, "toHomerEncoding.py")) and sConvert not in sys.path:
+                sys.path.insert(0, sConvert)
+                break
+        import toHomerEncoding
+        return toHomerEncoding.convert(sHtmPath)
+    except ImportError:
+        binData = open(sHtmPath, "rb").read()
+        sText = binData.decode("utf-8-sig").replace("\r\n", "\n").replace("\n", "\r\n")
+        open(sHtmPath, "wb").write(b"\xef\xbb\xbf" + sText.encode("utf-8"))
+        return "changed"
+
 def main():
     global oLog
     ap = argparse.ArgumentParser()
@@ -245,10 +269,7 @@ def main():
         sHtm = sOut[:-3] + ".htm"
         subprocess.run(["pandoc", sOut, "-f", "markdown", "-t", "html5", "-s", "-M", "toc=false", "-o", sHtm], check=False)
         try:
-            b = open(sHtm, "rb").read()
-            if b[:3] == b"\xef\xbb\xbf": b = b[3:]
-            open(sHtm, "wb").write(b"\xef\xbb\xbf" + b.decode("utf-8").replace("\r\n", "\n").replace("\n", "\r\n").encode("utf-8"))
-            logLine("wrote " + sHtm)
+            logLine("wrote " + sHtm + ": " + finishPage(sHtm))
         except Exception as oExc:
             logLine("htm normalize error: " + repr(oExc))
     else:

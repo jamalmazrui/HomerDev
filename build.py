@@ -1273,6 +1273,35 @@ def checkKit():
                     if re.search(r"if\s+exist\s+\"?%~dp0" + re.escape(sCalled), sLine, re.I): continue
                     lsProblems.append("scripts/%s calls %s, which is not in scripts" % (sName, sCalled))
 
+    # ONE SET OF ENCODING RULES (1.64.0, don't repeat yourself): scripts\\fixEncoding.py
+    # is their home, and the homer-convert skill's copy must say the same.
+    try:
+        import ast as astModule
+        def ruleSets(sPath, dNames):
+            dFound = {}
+            for oNode in astModule.parse(open(sPath, "rb").read().decode("utf-8-sig")).body:
+                if isinstance(oNode, astModule.Assign) and isinstance(oNode.targets[0], astModule.Name) and oNode.targets[0].id in dNames:
+                    dFound[dNames[oNode.targets[0].id]] = set(s.lower() for s in astModule.literal_eval(oNode.value))
+            return dFound
+        dKit = ruleSets(os.path.join(sScriptDir, "scripts", "fixEncoding.py"), {"c_lsTextExt": "text types", "c_lsNoBom": "no-mark types"})
+        dSkill = ruleSets(os.path.join(sScriptDir, ".claude", "skills", "homer-convert", "scripts", "toHomerEncoding.py"), {"c_lsTextExt": "text types", "c_lsNoMark": "no-mark types"})
+        for sRule in dKit:
+            if dKit[sRule] != dSkill.get(sRule, set()):
+                lsProblems.append("toHomerEncoding.py and fixEncoding.py differ in %s: %s" % (sRule, ", ".join(sorted(dKit[sRule] ^ dSkill.get(sRule, set())))))
+    except Exception as oError:
+        lsProblems.append("the encoding rules could not be compared: %s" % oError)
+
+    # THE TEMPLATE'S INSTALLER COMPILES WITH THE KIT'S COMPONENTS (1.64.4): no function in
+    # both, which Inno refuses -- the template had eight, so every new app would have failed.
+    try:
+        if os.path.join(sScriptDir, "scripts") not in sys.path: sys.path.insert(0, os.path.join(sScriptDir, "scripts"))
+        import kind as kindModule
+        def issText(sName): return open(os.path.join(sScriptDir, "Templates", sName), "rb").read().decode("utf-8-sig")
+        lsClash = kindModule.issFunctionClashes(issText("_APP__setup.iss"), issText("HomerComponents.iss"))
+        if lsClash: lsProblems.append("Templates\\_APP__setup.iss defines what HomerComponents.iss does: " + ", ".join(lsClash))
+    except Exception as oError:
+        lsProblems.append("the template's installer could not be compared with the components: %s" % oError)
+
     # A template that has lost its token would silently produce a broken app.
     for sName in ["build_APP_.cmd", "build_APP_Py.cmd", "_APP__setup.iss", "_APP_.cs",
                   "create_APP_Repo.cmd", "create_APP_Repo.ps1"]:

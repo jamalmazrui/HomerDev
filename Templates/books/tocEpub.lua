@@ -1,4 +1,4 @@
--- tocEpub.lua -- a Pandoc filter used by buildBooks for every MyBooks EPUB.
+﻿-- tocEpub.lua -- a Pandoc filter used by buildBooks for every MyBooks EPUB.
 -- 1. Replaces a paragraph that reads [TOC] with a linked list of the book's chapter headings, so the contents page works in any reader.
 -- 2. Drops a horizontal rule that only separates one section from the next heading or ends the book, since each chapter starts a new page anyway.
 -- The heading level listed is the highest one the book uses for its sections, which is the level each EPUB page starts with.

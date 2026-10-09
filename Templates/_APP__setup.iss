@@ -458,14 +458,9 @@ end;
 //  ---- checkbox wording and visibility, one line each ----------------------
 //  AI NOTE FOR CUSTOMIZING: three functions per component, one per verb, and
 //  a label function; two per model. Name the model as installModels.cmd does.
-function labelJaws(sParam: String): String;    begin Result := homerReaderLabel('jaws'); end;
-function isInstallJaws(): Boolean;             begin Result := homerReaderIs('jaws', 0); end;
-function isUpdateJaws(): Boolean;              begin Result := homerReaderIs('jaws', 1); end;
-function isReinstallJaws(): Boolean;           begin Result := homerReaderIs('jaws', 2); end;
-function labelNvda(sParam: String): String;    begin Result := homerReaderLabel('nvda'); end;
-function isInstallNvda(): Boolean;             begin Result := homerReaderIs('nvda', 0); end;
-function isUpdateNvda(): Boolean;              begin Result := homerReaderIs('nvda', 1); end;
-function isReinstallNvda(): Boolean;           begin Result := homerReaderIs('nvda', 2); end;
+//  The screen readers' four each (labelJaws, isInstallJaws ... labelNvda ...)
+//  come from HomerComponents.iss; writing them here too is a duplicate Inno
+//  refuses, as HomerView's build found on 8 October 2026.
 function labelOllama(sParam: String): String;  begin Result := homerLabel(iOllama); end;
 function isInstallOllama(): Boolean;           begin Result := homerIs(iOllama, 0); end;
 function isUpdateOllama(): Boolean;            begin Result := homerIs(iOllama, 1); end;

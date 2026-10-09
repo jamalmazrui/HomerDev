@@ -7,6 +7,41 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.64.4 -- 8 October 2026
+
+From the logs of 8 October's builds and releases.
+
+- **The template's installer compiled into a duplicate.** _APP__setup.iss defined the eight screen-reader wrappers (labelJaws, isInstallJaws and the rest, and NVDA's) that HomerComponents.iss supplies, so every new app's installer would have failed as HomerView's did: Duplicate identifier LABELJAWS. The template's copies are gone. kind.issFunctionClashes finds such a clash from the scripts themselves, honouring the #define that keeps the kit's copies out; check runs it for every app as the installer check, and the kit's build runs it on the template.
+- **A walk's length predicted from what is spoken.** checkTutorial estimated from words at 186 a minute, which ran 21% short on average and up to 33% on walks of many short two-voice steps. Fitted to twenty walks the build measured: the host speaks at about 225 words a minute, the reader voice at about 575, and each step adds about 3.6 seconds. Average error 1%, worst 13%; the kit's own walk 8, outside the fit, measured 182 seconds and is predicted 188. A notice comes below 2.75 or above 5.25 predicted minutes, and says how it was reached.
+- **Unfinished is not failed.** summarizeLogs reported three builds FAILED that were waiting their turn for the voices. A build with no end line is now UNFINISHED, not a failure, and shows the last line of its tutorials log -- still waiting, 27 minutes; EdSharp is speaking walk 9 of 10.
+
+## 1.64.3 -- 8 October 2026
+
+**A page's title said once.** Pandoc's standalone page puts the title in a header block as a top-level heading, and a Markdown file that also opens with the same # heading gave the page two: a screen reader said the title twice before anything else. Found by an audit of the AppHelpGuides and PodcastDirectories collections, where 216 and 86 pages did it.
+
+- **homer-convert's toHomerEncoding removes the repeat.** When a page's title-block heading says exactly what its first heading says -- tags, entities, spacing and case aside -- the title block's goes, and the header with it if nothing else is in it. A title that differs is left alone. It is the one home of the rule.
+- **The app-help-guide and podcast-directory skills finish every page with it.** cleanFeedback's rebuild and buildDirectory call it -- beside them in the kit, or through the HomerDev variable or C:\HomerDev for a copy kept in a collection's folder -- and fall back to the encoding alone when it cannot be found. Each skill's instructions name it, and say the collection's ReadMe keeps its CC BY-SA 4.0 license sentence.
+- **Not yet for the apps.** An app's documents have a title-block heading taken from the file name (History) above a body heading that differs (extCheck History), so the rule leaves them, and every app page still has two top-level headings. Using pagetitle instead of title in the build templates' Pandoc call would make the body's heading the only one; that is a change to every app's build, and waits for the author's word.
+
+## 1.64.2 -- 8 October 2026
+
+- **The skills check catches a failing database.** It looked for the word "fail" in checkDb's report, which says "1 failure", so a failing database passed. It now reads the failure count. Found on DbDo, where it named two real failures -- a table with columns after marked, and a key still called prm -- both since fixed in DbDo.
+- **check.py's line endings** are all CRLF again, after the edit above mixed in bare line feeds.
+- **Seven kit files put into the Homer encoding**, which fixEncoding had not yet been run over: the books templates' epub.css and tocEpub.lua, the samples' two .spec files and version.py, the page skill's default layout, and the tutorial playlist. A UTF-8 mark is safe in each: Lua's loader and Jekyll both skip one.
+
+## 1.64.1 -- 8 October 2026
+
+- **MediaPlayer.cs reads ExifTool's two streams at once.** Its output and error streams were read one after the other, the hang the kit fixed in Media.cs in 1.62.5; found while auditing FileDir, which had the same code.
+- **FileDir now compiles the kit's Media.cs and Mpv.cs.** Its own copies had drifted, lacking the 1.62.5 fix, the machine-wide mpv search and recording. MediaPlayer.cs is still compiled from FileDir's own copy, in its own namespace; moving it to the kit's is the next step for one shared Homer Player.
+
+## 1.64.0 -- 8 October 2026
+
+**Two principles, and the kit eats its own cooking.**
+
+- **Convention over configuration, and don't repeat yourself.** The author made both Homer principles; Developer.md opens with them, and the homer-code skill teaches them.
+- **The skills' checks run on every project.** check, which build and release run, now has a skills check: checkDocs (homer-docs) on the documents, checkDb (homer-db) on each DbDo database a project holds, and summarizeLogs (homer-build-release) on its recent runs, from the kit's own skill folders. A failing database fails it; document and log findings are recorded and named. Three of the five checking skills had never been run by any step.
+- **One set of encoding rules.** fixEncoding.py and the homer-convert skill's toHomerEncoding.py had drifted: only the skill knew SKILL.md takes no byte order mark, read UTF-16 and Windows-1252, and knew .css, .csv, .js and .tsv; only fixEncoding knew .lua, .m3u and .spec. fixEncoding.py is now the rules' authoritative home with all of it, and the kit's build fails, naming the difference, if the skill's copy ever says otherwise -- tested by removing one type from the copy.
+
 ## 1.63.3 -- 8 October 2026
 
 **push stops on a stale whitelist.** When tidy could not rewrite the whitelist

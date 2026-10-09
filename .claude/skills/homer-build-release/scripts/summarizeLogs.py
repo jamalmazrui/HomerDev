@@ -65,7 +65,10 @@ def summarizeBuild(sText):
     lsWarn = [re.sub(r"^\S+ WARN\s+", "", s.strip()) for s in sText.splitlines()
               if re.match(r"^\S+ WARN ", s) and "CONSOLE:" not in s]
     lsOut += ["WARN " + s[:120] for s in lsWarn[:c_iMaxErrors]]
-    return lsOut, sResult != "succeeded"
+    # UNFINISHED IS NOT FAILED (8 October 2026): a build still speaking its walks,
+    # queued behind another project's, has written no end line yet; three such
+    # builds were reported FAILED while they waited their turn.
+    return lsOut, sResult == "failed"
 
 
 def summarizeCheck(sText):
@@ -180,6 +183,14 @@ def main():
                     lsFacts, bFailed = ["could not read: %s" % oError], True
                 bAnyFailed = bAnyFailed or bFailed
                 sMark = "FAILED " if bFailed else ""
+                if not bFailed and "result=unfinished" in lsFacts:
+                    # What it was doing when the log was gathered: the last line of
+                    # the newest tutorials log, where a build waits for the voices.
+                    sMark = "UNFINISHED "
+                    lTutorials = dRuns.get((sApp, "tutorials"), [])
+                    if lTutorials:
+                        lsLast = [x.strip() for x in readText(lTutorials[0][1]).splitlines() if x.strip()]
+                        if lsLast: lsFacts = lsFacts + ["tutorials, last: " + re.sub(r"^\S+ \S+\s+", "", lsLast[-1])[:120]]
                 print("  %s%s %s: %s" % (sMark, sTask or "session", sStamp, "; ".join(lsFacts)))
     print("%d file%s skipped: not a Homer log name." % (iSkipped, "" if iSkipped == 1 else "s"))
     return 1 if bAnyFailed else 0
