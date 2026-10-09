@@ -65,6 +65,9 @@ def updateBuildText(sText):
     sText = re.sub(r"(?m)^\s*--hidden-import homer \^\r?\n", "", sText)
     # kind.py joins the kit tools every app refreshes (1.45.0).
     sText = re.sub(r'(?m)^(set "kitTools=)(?![^"\n]*\bkind\.py\b)([^"\n]*)"', lambda m: m.group(1) + " ".join(sorted((m.group(2) + " kind.cmd kind.py").split(), key=str.lower)) + '"', sText)
+    # A WRITTEN-OUT REFRESH LIST (9 October 2026): several apps refresh the kit's tools with "for %%F in (...)" naming
+    # each file rather than a kitTools variable; one naming check.py must name kind.py too, since check.py imports it.
+    sText = re.sub(r'(?m)^(\s*for %%F in \()((?=[^)\n]*\bcheck\.py\b)(?![^)\n]*\bkind\.py\b)[^)\n]*)(\))', lambda m: m.group(1) + " ".join(sorted((m.group(2) + " kind.cmd kind.py").split(), key=str.lower)) + m.group(3), sText)
     return sText
 
 

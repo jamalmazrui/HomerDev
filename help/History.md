@@ -7,9 +7,21 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
-## 1.65.8 -- 9 October 2026
+## 1.65.9 -- 9 October 2026
 
-- **examples: tested projects for blind vibe coders.** A new examples folder, declared in RepoFiles.txt, holds small projects that go with the tutorials in *Blind Vibe Coding*, one folder each, with a ReadMe giving the request each answers. The first is the talking timer of chapter 2, moved here from the book's directory page so the kit is the one home for the book's projects. It was tested with a controllable clock: it refuses blank and out-of-range entries, runs one countdown at a time, announces each minute and the end, and keeps time from the clock on a slowed page.
+From a conformance audit of eleven projects' logs.
+
+- **check finds the kit's kind.py, however a folder is written.** loadKind searched the app's own scripts folder first and compared folder names as text, so a difference of letter case (c:\\ against C:\\) put the app's stale kind.py ahead of the kit's, and the checks of EdSharp, FileDir and HomerScribe crashed on a kind function they lacked. Kit folders now come first, and a module already loaded from elsewhere is replaced. Reproduced with the 1.65.5 check, which crashed with the same message, and passed with this one.
+- **Apps refresh kind.py with check.py.** Five apps name the kit's tools in a written-out list that named check.py but not kind.py; updateAppBuilds now adds kind.cmd and kind.py to such lists too, and DbDo, EdSharp, FileDir, HomerScribe and HomerView carry the change.
+- **Tutorials wait for the voices only to speak.** buildTutorials took the machine-wide voice lock before asking whether any walk needed speaking, so HomerView's build, all ten walks current, waited 34 minutes behind HomerScribe's. It now asks first; and an acceptance build (HomerAcceptance set) speaks nothing in every app, as DbDo's and EdSharp's builds already arranged for themselves.
+- **makeTutorials writes Tutorials.htm** with Pandoc, in the Homer encoding, so an app whose build converts documents before the tutorial step still has the page; check had failed HomerView for its absence.
+- **check's time limit ends the whole command.** A timed-out acceptance build is stopped with every process it started; HomerView's "timed out after 900 seconds" had come thirty-five minutes in.
+- **check ignores __pycache__,** Python's own cache, which failed HomerView's layout check.
+- **The log summary reports a running check or release as unfinished,** not failed; a crash keeps its traceback and stays a failure.
+- **help\\examples, not examples:** the folder of tested projects for blind vibe coders moved into help, since a top-level examples folder shares its first letter with exec.
+
+
+- **help\\examples: tested projects for blind vibe coders.** A folder in help (moved there in 1.65.9; a top-level examples folder shared its first letter with exec) holds small projects that go with the tutorials in *Blind Vibe Coding*, one folder each, with a ReadMe giving the request each answers. The first is the talking timer of chapter 2, moved here from the book's directory page so the kit is the one home for the book's projects. It was tested with a controllable clock: it refuses blank and out-of-range entries, runs one countdown at a time, announces each minute and the end, and keeps time from the clock on a slowed page.
 
 ## 1.65.7 -- 9 October 2026
 

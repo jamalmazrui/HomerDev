@@ -79,6 +79,12 @@ def summarizeCheck(sText):
     # reported as "FAILED: no totals". It is reported as what it is.
     if not sCounts and re.search(r"This is the kit, which checkHomerDev checks", sText):
         return ["the kit: check hands over to checkHomerDev"], False
+    # UNFINISHED IS NOT FAILED (9 October 2026): the check started by a release is still running when the release
+    # gathers the logs, so its own log has no totals yet; every project's release reported "FAILED check: no
+    # totals". A check log with no totals, no failed finding and no traceback is unfinished. A crash keeps its
+    # traceback and stays a failure, as HomerScribe's did that day.
+    if not sCounts and not lsFailed and not re.search(r"Traceback|TRACEBACK", sText):
+        return ["result=unfinished"], False
     lsOut = [sCounts or "no totals"]
     lsOut += ["FAIL %s: %s" % (sName, sWhy.strip()[:120]) for sName, sWhy in lsFailed]
     return lsOut, bool(lsFailed) or not sCounts
@@ -94,6 +100,11 @@ def summarizeRelease(sText):
     sCounts = firstMatch(sText, r"(\d+ checks? passed, \d+ checks? failed[^\r\n]*)")
     if sCounts: lsOut.append("check: " + sCounts)
     lsOut += ["failed: " + s.strip()[:120] for s in re.findall(r"failed: (.*)", sText)]
+    # UNFINISHED IS NOT FAILED (9 October 2026): a release is still running while it gathers the logs, so its own
+    # log has no outcome yet. Without a published line, a FAILED marker, a "failed:" line or a traceback, it is
+    # unfinished rather than failed.
+    if not sPublished and "=== FAILED" not in sText and not re.search(r"failed: |Traceback|TRACEBACK", sText):
+        return ["result=unfinished"], False
     bFailed = not sPublished or "=== FAILED" in sText
     if bFailed and not re.findall(r"failed: ", sText): lsOut += errorLines(sText)
     return lsOut or ["no outcome"], bFailed

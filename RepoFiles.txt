@@ -8,8 +8,6 @@ exec/CSharp/
 exec/Python/
 Templates/
 
-# Tested example projects for blind vibe coders, one folder each, matching tutorials in Blind Vibe Coding (9 October 2026)
-examples/
 
 # The Claude skills, where Claude Code finds them: one folder each, SKILL.md at the top
 .claude/
