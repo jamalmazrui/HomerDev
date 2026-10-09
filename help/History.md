@@ -7,7 +7,33 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
-## 1.64.8 -- 9 October 2026
+## 1.65.3 -- 9 October 2026
+
+**The conformance backlog is empty: every departure found on 9 October is settled.**
+
+- **PdfRead.cs went home to HomerScribe.** It was HomerScribe's own partial class, kept here as if shared; no other program could use it. The build retires the kit's copy, the guide, ReadMe, License and skills no longer describe it as a kit class, and the License now names the packages the conversion engine fetches instead. A shared way to read a PDF belongs to the conversion engine.
+- **FileDir uses the kit's MediaPlayer.cs.** Its own copy was the same player before the kit made it general. The kit's player now moves an older settings file, kept one folder up beside data, into data the first time, so no choice is lost.
+- **lbc.py works flat or in a package.** Its imports of say and util try the package form first, so HomerView's NVDA add-on can carry the kit's modules exactly; its build now copies them in. Tested both ways where it was written.
+- **A copy, or only a name in common, for classes too.** check's class test matched on name alone, and listed EdSharp's MdiFrame and MdiChild -- the editor itself, over 14,000 lines each, sharing no member with the kit's Mdi -- as copies. A class now counts as a drifted copy only when it shares at least half its public members with the kit's class of that name; otherwise the clash is logged. DbDo's KeyMap, which shares a purpose with the kit's but 3 of its 11 members, is logged the same way.
+- **The ReadMe and the guide list all sixteen C# modules,** which they had undercounted.
+
+## 1.65.2 -- 9 October 2026
+
+- **A copy, or only a name in common.** check's shared finding called any app file with a kit module's name a duplicate. HomerView's own paths.py and elevate.py, and a 23-line lbc.py, share 9 to 16 percent of their lines with the kit's files of the same names: different modules, not copies. A same-named file now counts as a drifted copy only when at least half of its meaningful lines are the kit's; otherwise the log names the clash, and suggests a different name, without failing. HomerView's backlog entry now lists its five real copies, in its homer package, with a plan that first brings into the kit what HomerView needs inside NVDA.
+
+## 1.65.1 -- 9 October 2026
+
+- **Only approved components convert.** The routing table had routes through a converting program that was never approved, and the scanned-page route drew pages with another; both are gone from the table, the engine, the test and this guide, and pages are now drawn by pypdfium2, a PyPI package. The approved components are Pandoc, NuGet and PyPI packages, and Tesseract, with Office by COM as the last resort -- and the only way, for now, for .doc, .xls and .ppt. An Excel workbook's first sheet becomes a comma-separated file read straight from its XML. testConversion now makes its samples with Pandoc and Python alone, including a PDF with a larger-type heading and a scanned page; 46 routes passed where it was written, none failed, and 21 needing Office or a sample only Office can make were reported as not tested.
+
+## 1.65.0 -- 9 October 2026
+
+**One way to convert a file, and two checks that keep the projects alike.**
+
+- **The shared conversion engine.** Seven projects converted files, each its own way, and five reached for Office by COM. `exec\conversions.inix` is now the one routing table -- for each source type, the ways to each target, free engines first, Office last -- and `exec\Python\conversion.py` follows it: `convert`, `toText` and `plan`. Plain text takes the quickest route with no work on structure (a PDF's text layer in milliseconds); Markdown, HTML and Word keep headings, lists and tables; a scanned PDF falls back to Tesseract. `scripts\testConversion` proves every route on sample files made at the time -- 70 of 70 passed where it was written -- and the kit's build runs it. C#'s Conversion.cs, reading the same table, comes next, and then the apps move onto it, 2htm first. The homer-convert skill now sends any conversion to the engine.
+- **The Homer tree is checked.** kind.py holds the folders a project of each kind may have, and check's layout finding fails a top-level folder outside them that the project's lists do not declare; a declared one is logged for the author to confirm. A folder had been added to a Homer project unasked.
+- **One copy of every shared class is checked.** check's shared finding fails an app source that duplicates a kit module or class, unless it is the build's byte-identical copy.
+- **Known debt in view, new debt refused.** `scripts\conformanceBacklog.inix` lists what the two checks found on 9 October -- duplicates in DbDo, EdSharp, FileDir and HomerView, EdSharp's Convert and Samples folders, and the kit's own PdfRead.cs, which is HomerScribe's code, not a shared class -- each with its plan. A listed item is reported on every check; anything else fails.
+
 
 - **The project's own lists decide what tidy keeps.** Tidy's standing names included broad fallbacks from before every project declared its files: any .py, .cs, .inix, .js or .lua file anywhere, and any build*, get* or install* script, belonged. Once projects had RepoFiles.txt and LocalFiles.txt, those fallbacks quietly overruled them: DbDo's top folder held twelve stray scripts and settings files that no list named -- seven build_*.py, conform_samples.py, migratePrm.py and three .inix files -- and tidy reported 0 files to move into notes. A project with a RepoFiles.txt is now judged by its lists, the installer's Source lines, and the true standing names (the standard documents, version.txt, the list files, logs, tutorial fingerprints); a project without one keeps the fallback. A dry run over the kit and seven apps found nothing else affected; DbDo's twelve go to notes, and nothing is deleted.
 

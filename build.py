@@ -32,7 +32,7 @@ import traceback
 c_lsExpected = [
     "exec/CSharp/Elevate.cs", "exec/CSharp/Inix.cs", "exec/CSharp/KeyName.cs", "exec/CSharp/KeyMap.cs", "exec/CSharp/Lbc.cs",
     "exec/CSharp/Log.cs", "exec/CSharp/Mdi.cs", "exec/CSharp/Media.cs", "exec/CSharp/MediaPlayer.cs", "exec/CSharp/Mpv.cs", "exec/CSharp/Paths.cs",
-    "exec/CSharp/PdfRead.cs", "exec/CSharp/Say.cs", "exec/CSharp/Util.cs", "exec/CSharp/Web.cs",
+    "exec/CSharp/Say.cs", "exec/CSharp/Util.cs", "exec/CSharp/Web.cs",
     "exec/CSharp/inixVert.cs",
     "exec/Python/inix.py", "exec/Python/kdpEpub.py", "scripts/buildBooks.cmd", "scripts/buildBooks.py", "scripts/kdpBooks.cmd", "scripts/kdpBooks.py", "scripts/kdpSubmit.cmd", "scripts/kdpSubmit.py", "scripts/kdpUpdate.cmd", "scripts/kdpUpdate.py", "scripts/testKdpUpdate.py", "Templates/books/Book_KDP.inix", "Templates/books/books.inix", "Templates/books/buildBooks.inix", "Templates/books/epub.css", "Templates/books/tocEpub.lua", ".claude/skills/homer-books/SKILL.md", "exec/Python/lbc.py", "exec/Python/lbcnet.py", "exec/Python/log.py", "exec/Python/media.py",
     "exec/Python/mdi.py", "exec/Python/elevate.py", "exec/Python/paths.py", "exec/Python/say.py", "exec/Python/util.py", "exec/Python/web.py",
@@ -153,7 +153,6 @@ c_lMoved = [
     ("CSharp/Mpv.cs", "exec/CSharp/Mpv.cs"),
     ("CSharp/Ollama.cs", "exec/CSharp/Ollama.cs"),
     ("CSharp/Paths.cs", "exec/CSharp/Paths.cs"),
-    ("CSharp/PdfRead.cs", "exec/CSharp/PdfRead.cs"),
     ("CSharp/Say.cs", "exec/CSharp/Say.cs"),
     ("CSharp/Util.cs", "exec/CSharp/Util.cs"),
     ("CSharp/Web.cs", "exec/CSharp/Web.cs"),
@@ -321,6 +320,10 @@ c_lsRetired = [
     # generated -- and the kit's check reported it missing on every build. Its
     # version comparison is now part of homer\elevate.py, as it is of Elevate.cs.
     "Python/homer/version.py", "exec/Python/version.py",
+    # 1.65.3: PdfRead.cs was HomerScribe's own partial class, kept here as if
+    # it were shared; no other program could use it. It went home to
+    # HomerScribe, and a shared way of reading a PDF is the conversion engine's.
+    "exec/CSharp/PdfRead.cs", "CSharp/PdfRead.cs",
 ]
 
 # Folders that existed in an earlier layout and hold nothing the kit wants now.
@@ -1409,6 +1412,18 @@ def main():
         sDllProblem = buildHomerDll()
         if sDllProblem != "":
             sayLine(sDllProblem)
+            iSamplesFailed += 1
+        # THE SHARED CONVERSION ROUTES ARE PROVED HERE (1.65.0), on sample files made
+        # at the time, before any app relies on them: a failing route fails the kit's
+        # build; a route whose engine is not on this computer is reported, not passed.
+        try:
+            oDone = subprocess.run([sys.executable, os.path.join(sScriptDir, "scripts", "testConversion.py")],
+                                   capture_output=True, text=True, timeout=1800)
+            for sLine in (oDone.stdout or "").strip().splitlines(): sayLine(sLine)
+            logLine("testConversion exit %d" % oDone.returncode)
+            if oDone.returncode != 0: iSamplesFailed += 1
+        except Exception as oError:
+            sayLine("The conversion routes could not be tested: %s" % oError)
             iSamplesFailed += 1
         buildTutorials()
         removeSkillHtm()

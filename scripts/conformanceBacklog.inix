@@ -1,0 +1,21 @@
+﻿; conformanceBacklog.inix -- known departures from the Homer standards, each with its plan.
+;
+; check fails on any duplicate of kit code, and any folder outside the Homer
+; tree, that is NOT listed here: new debt is refused. What is listed here was
+; found on 9 October 2026, when the checks were written; it is reported on
+; every check, so it stays in view, and an entry is removed when it is fixed.
+; Nobody adds an entry without the author's word.
+;
+; folders = top-level folders outside the Homer tree, awaiting the author's decision
+; shared  = app sources duplicating kit code: a path, or path:Class
+;
+; On 9 October 2026 the class check was first written to match by name alone,
+; and listed DbDo's KeyMap, EdSharp's MdiFrame, MdiChild and Util, and FileDir's
+; MdiChild here. Measured, they are different classes with the kit's names --
+; EdSharp's MdiFrame is the editor itself -- so they are logged as name clashes,
+; not listed as copies.
+; plan    = what will be done
+
+; 9 October 2026: HomerView's five copies became exact ones, copied from the
+; kit by its build, and HomerScribe's entry was settled by moving PdfRead.cs
+; home. Nothing is listed now; a new departure fails check.

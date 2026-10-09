@@ -44,7 +44,7 @@ builds rather than twenty.
 
 - `exec\CSharp\` -- the shared classes an app compiles against: `Elevate.cs`,
   `Inix.cs`, `KeyMap.cs`, `KeyName.cs`, `Lbc.cs`, `Log.cs`, `Mdi.cs`,
-  `Ollama.cs`, `Paths.cs`, `PdfRead.cs`, `Say.cs`, `Util.cs`, `Web.cs`,
+  `Ollama.cs`, `Paths.cs`, `Say.cs`, `Util.cs`, `Web.cs`,
   `inixVert.cs`. An app never carries a copy; it names the kit's file on the
   compiler line.
 - `exec\Python\` -- the same for Python, each a module imported by its own name: `elevate.py`, `inix.py`, `lbc.py`, `log.py`,

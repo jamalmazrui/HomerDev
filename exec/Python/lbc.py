@@ -39,6 +39,12 @@ exists at all:
     unaffected, because their text belongs to the control itself.
 """
 
+# THE SAME FILE, FLAT OR IN A PACKAGE (kit 1.65.3). lbc imports its sibling
+# modules, say and util, only inside the functions that need them, first as
+# part of a package -- HomerView's NVDA add-on carries the kit's modules in a
+# homer package -- and then flat, as every other Homer Python program has them.
+# One file serves both, so HomerView carries the kit's file exactly, rather
+# than a hand-kept copy that had missed the kit's fixes.
 import configparser
 import os
 from collections import OrderedDict
@@ -223,12 +229,18 @@ class ListSearch:
             pass
         # A selection changed in code does not raise the event a screen reader
         # listens for, so the item is announced here.
-        import say as sayModule
+        try:
+            from . import say as sayModule
+        except ImportError:
+            import say as sayModule
         sayModule.say(listBox.GetString(iIndex))
 
     @staticmethod
     def prompt(listBox, bForward=True):
-        import say as sayModule
+        try:
+            from . import say as sayModule
+        except ImportError:
+            import say as sayModule
         sTerm = dialogInput(
             "Find backwards" if not bForward else "Find",
             "Find substring, not case sensitive:",
@@ -247,7 +259,10 @@ class ListSearch:
 
     @staticmethod
     def again(listBox, bForward=True):
-        import say as sayModule
+        try:
+            from . import say as sayModule
+        except ImportError:
+            import say as sayModule
         if not ListSearch.sTerm:
             sayModule.say("Press Control+J first to search")
             return
@@ -266,7 +281,10 @@ class ListSearch:
         Every Lbc control answers the same chords, so a user does not have to
         remember which kind of control they are in.
         """
-        import say as sayModule
+        try:
+            from . import say as sayModule
+        except ImportError:
+            import say as sayModule
         iIndex = listBox.GetSelection()
         if iIndex < 0:
             sayModule.say("No item")
@@ -403,8 +421,14 @@ class Dialog(wx.Dialog):
         thing anyone wants, and offering it would take the key from something
         that is.
         """
-        import say as sayModule
-        import util
+        try:
+            from . import say as sayModule
+        except ImportError:
+            import say as sayModule
+        try:
+            from . import util
+        except ImportError:
+            import util
         if not textCtrl.IsMultiLine():
             sayModule.say("Not a multi-line field")
             return
@@ -438,8 +462,14 @@ class Dialog(wx.Dialog):
             return sText[iStart:iEnd if iEnd >= 0 else len(sText)].rstrip("\r")
 
         def onKey(event):
-            import say as sayModule
-            import util
+            try:
+                from . import say as sayModule
+            except ImportError:
+                import say as sayModule
+            try:
+                from . import util
+            except ImportError:
+                import util
             iKey = event.GetKeyCode()
             bControl, bShift, bAlt = event.ControlDown(), event.ShiftDown(), event.AltDown()
 
@@ -845,7 +875,10 @@ class Dialog(wx.Dialog):
         iTipId = wx.NewIdRef()
 
         def onTip(event):
-            import say as sayModule
+            try:
+                from . import say as sayModule
+            except ImportError:
+                import say as sayModule
             control = self.FindFocus()
             sayModule.say(self.dTips.get(control) or "No tip for this control")
 

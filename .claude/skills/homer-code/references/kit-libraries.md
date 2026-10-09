@@ -44,8 +44,6 @@ uses into its own folder and puts that folder on the import path first.
   folder before the PATH, and running ExifTool.
 - `Ollama`: talking to a local Ollama model.
 - `Paths`: the folder layout, installed and per-user.
-- `PdfRead`: reading a PDF with positions and font sizes (needs PdfPig, which
-  the app's build fetches).
 - `Say`: speech straight to JAWS or NVDA, each part of a grouped announcement
   a separate utterance.
 - `Util`: string and file helpers.

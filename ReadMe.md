@@ -207,10 +207,11 @@ own notebook, is in the never-pushed list and stays on your machine.
 
 ## What is in the kit
 
-- `exec\CSharp\` -- twelve modules in the `Homer` namespace: Inix (settings and
-  tables), KeyMap, KeyName, Lbc (dialogs), Log (the session log), Mdi
-  (multiple-document frames), Paths (the folder layout), PdfRead, Say (speech),
-  Util, Web, inixVert.
+- `exec\CSharp\` -- sixteen modules in the `Homer` namespace: Elevate
+  (permission and updates), Inix (settings and tables), inixVert, KeyMap,
+  KeyName, Lbc (dialogs), Log (the session log), Mdi (multiple-document
+  frames), Media, MediaPlayer, Mpv, Ollama (local AI), Paths (the folder
+  layout), Say (speech), Util and Web.
 - `exec\Python\` -- the same toolbox for Python and NVDA add-ons: inix, lbc, log,
   paths, say, util and web, each a module imported by its own name, with the
   same names and the same behaviour.

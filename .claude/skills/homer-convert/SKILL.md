@@ -19,6 +19,15 @@ in INI form are `.inix`.
 
 ## Which tool
 
+- **Converting a file from one type to another inside a Homer program**: never
+  call Pandoc or Office from the app. Use the kit's shared engine,
+  `exec\\Python\\conversion.py` -- `convert(source, target)`, `toText(source)`,
+  `plan(source, type)` -- which takes its routes from `exec\\conversions.inix`:
+  only approved components (Pandoc, NuGet and PyPI packages, Tesseract), plain
+  text by the quickest way, Office only as the last resort. No other converting
+  program is looked for, offered or installed. The C# twin, `Conversion.cs`, reads the same table. A route that is
+  missing goes into the table, not into the app.
+
 - **A Homer document, Markdown to .htm** (every .md in a Homer project has
   one): Pandoc, reading Pandoc's own Markdown.
 
@@ -59,8 +68,8 @@ in INI form are `.inix`.
   [references/conversions.md](references/conversions.md).
 
 In a program, prefer the kit to a shelled-out tool where it can do the job:
-`Inix` (C#) or `inix` (Python) converts tables, `PdfRead` reads a PDF with
-positions and font sizes.
+`Inix` (C#) or `inix` (Python) converts tables, and the conversion engine
+reads a PDF's text, or its text with headings worked out from type sizes.
 
 ## Encoding
 

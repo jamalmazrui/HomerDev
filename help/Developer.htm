@@ -194,6 +194,7 @@ read HomerDev.md.</p>
 <ul>
 <li><a href="#two-principles">Two principles</a></li>
 <li><a href="#layout">Layout</a></li>
+<li><a href="#converting-files">Converting files</a></li>
 <li><a href="#releasing-the-kit">Releasing the kit</a></li>
 <li><a href="#building-the-kit">Building the kit</a></li>
 <li><a href="#how-a-change-reaches-the-apps">How a change reaches the
@@ -239,8 +240,9 @@ work.</p>
 <h2 id="layout">Layout</h2>
 <pre><code>C:\HomerDev\
   .claude\skills\   the Claude skills, one folder each
-  exec\CSharp\    the Homer namespace: Inix, KeyMap, KeyName, Lbc, Log, Mdi,
-                 Paths, PdfRead, Say, Util, Web, inixVert
+  exec\CSharp\    the Homer namespace: Elevate, Inix, inixVert, KeyMap,
+                 KeyName, Lbc, Log, Mdi, Media, MediaPlayer, Mpv, Ollama,
+                 Paths, Say, Util, Web
   exec\Python\    the same toolbox for Python and NVDA add-ons, a module
                  each: inix, lbc, log, paths, say, util, web
   help\          every document, the style guides, the tutorial scripts
@@ -252,6 +254,33 @@ work.</p>
   checkHomerDev.cmd / .py     build all three samples and report
   newHomerApp.cmd / .py       write a new app folder
   ReadMe, License, RepoFiles.txt, version.txt, .gitignore</code></pre>
+<h2 id="converting-files">Converting files</h2>
+<p>Every Homer program that turns a file of one type into another uses
+the kit’s shared engine, never Pandoc or Office directly. The routes are
+in <code>exec\conversions.inix</code>, one section per source type and
+one line per target, each listing the ways to get there, best first; the
+first whose engines are all on the computer is used, and a way can take
+steps through an intermediate type
+(<code>pdfstructure:md &gt; pandoc</code>). Python’s
+<code>exec\Python\conversion.py</code> reads it now; C#’s
+<code>Conversion.cs</code> will read the same table, so a route is
+decided once for both languages.</p>
+<p>The route follows the purpose. Plain text takes the quickest way and
+spends nothing on structure: a PDF’s text layer, or the text of a Word,
+Excel or PowerPoint file read straight from the XML inside it, in a few
+milliseconds. Markdown, HTML or Word asks for headings, lists and
+tables: Pandoc where it reads the source, and a PDF’s headings worked
+out from its type sizes. A scanned PDF falls back to Tesseract, its
+pages drawn by pypdfium2.</p>
+<p>Only approved components are used: Pandoc, NuGet and PyPI packages,
+and Tesseract. Microsoft Office by COM is the last resort, logged when
+used, and the only way for the older binary formats, .doc, .xls and
+.ppt, until a free package to read them is approved. No other converting
+program is looked for, offered or installed by any Homer project.</p>
+<p><code>scripts\testConversion</code> proves every route on sample
+files it makes at the time, and the kit’s build runs it: a failing route
+fails the build; a route whose engine is missing on this computer is
+reported as not tested.</p>
 <h2 id="releasing-the-kit">Releasing the kit</h2>
 <pre><code>releaseHomerDev &quot;What changed.&quot;   all four steps below, stopping at the first failure</code></pre>
 <p>or one step at a time:</p>
@@ -350,10 +379,10 @@ not go up needs one line in the second.</p>
 <li>Write it in Camel Type, in <code>namespace Homer</code>, with a
 header comment saying what it is for and what it depends on.</li>
 <li>Depend on as little as possible. The existing modules depend on the
-.NET base class library, WinForms, and each other, and nothing else.
-<code>PdfRead.cs</code> is the one exception, which is why it sits apart
-and why an app’s build script fetches its package rather than the kit
-carrying it.</li>
+.NET base class library, WinForms, and each other, and nothing else. A
+module that would need a package belongs to the app that needs it, or to
+the conversion engine, whose packages are fetched when they are
+used.</li>
 <li>Add it to <code>c_lsExpected</code> in <code>build.py</code>.</li>
 <li>Add a commented line for it in
 <code>Templates\build_APP_.cmd</code>, so a new app can switch it on by

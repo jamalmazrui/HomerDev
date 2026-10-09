@@ -247,7 +247,22 @@ return (dlg.ShowDialog() == DialogResult.OK) ? dlg.FileName : "";
 // played before gets the built-in defaults, which is what Defaults restores by
 // deleting the section.
 private static string settingsPath() {
-return Path.Combine(Paths.data(), "HomerPlayer.inix");
+string sPath = Path.Combine(Paths.data(), "HomerPlayer.inix");
+// SETTINGS KEPT WHEN A COPY BECOMES THE KIT'S (1.65.3): FileDir's own copy of
+// this player kept its settings one folder up, beside data rather than in it.
+// When the kit's player first runs there, it moves that file into data, once,
+// and says so in the log, so nothing the user chose is lost.
+string sOld = Path.Combine(Path.GetDirectoryName(Paths.data()), "HomerPlayer.inix");
+if (!File.Exists(sPath) && File.Exists(sOld)) {
+try {
+File.Move(sOld, sPath);
+Homer.Log.info("Player settings moved from " + sOld + " to " + sPath);
+}
+catch (Exception oError) {
+Homer.Log.info("Player settings could not be moved from " + sOld + ": " + oError.Message);
+}
+}
+return sPath;
 }
 
 // sectionFor: a name for this queue's settings. Where it came from, which is

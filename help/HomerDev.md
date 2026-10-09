@@ -140,9 +140,6 @@ does.
   links, download a file with a sensible name.
 - **inixVert.cs** -- a command-line wrapper over the table converter in
   Inix.cs.
-- **PdfRead.cs** -- reading a PDF with position and font size, so headings can
-  be worked out. Optional: it needs the PdfPig package, which the app's own
-  build script fetches.
 
 ### Python
 
@@ -630,7 +627,6 @@ than guessed at. Folders are in the order you meet them.
 - **Log.cs** -- the session log: one file per run, named for when it began, with the environment and every error
 - **Mdi.cs** -- the frame and child of a multiple-document app, with the window, job, settings and help commands built in
 - **Paths.cs** -- the folder layout: the two trees, the nine folders, and the shipped-default-then-user-copy pattern
-- **PdfRead.cs** -- reading text out of a PDF, including a tagged one
 - **Say.cs** -- speech that reaches JAWS, NVDA and Narrator without the program knowing which is running
 - **Util.cs** -- the small shared helpers, including the plural that matches a count to its noun
 - **Web.cs** -- fetching a page, a file, or an API answer

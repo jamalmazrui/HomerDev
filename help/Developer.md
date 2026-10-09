@@ -12,6 +12,7 @@ HomerDev.md.
 
 - [Two principles](#two-principles)
 - [Layout](#layout)
+- [Converting files](#converting-files)
 - [Releasing the kit](#releasing-the-kit)
 - [Building the kit](#building-the-kit)
 - [How a change reaches the apps](#how-a-change-reaches-the-apps)
@@ -36,8 +37,9 @@ The two meet in the checks: the rules a skill teaches are the rules the kit's `c
 
     C:\HomerDev\
       .claude\skills\   the Claude skills, one folder each
-      exec\CSharp\    the Homer namespace: Inix, KeyMap, KeyName, Lbc, Log, Mdi,
-                     Paths, PdfRead, Say, Util, Web, inixVert
+      exec\CSharp\    the Homer namespace: Elevate, Inix, inixVert, KeyMap,
+                     KeyName, Lbc, Log, Mdi, Media, MediaPlayer, Mpv, Ollama,
+                     Paths, Say, Util, Web
       exec\Python\    the same toolbox for Python and NVDA add-ons, a module
                      each: inix, lbc, log, paths, say, util, web
       help\          every document, the style guides, the tutorial scripts
@@ -49,6 +51,16 @@ The two meet in the checks: the rules a skill teaches are the rules the kit's `c
       checkHomerDev.cmd / .py     build all three samples and report
       newHomerApp.cmd / .py       write a new app folder
       ReadMe, License, RepoFiles.txt, version.txt, .gitignore
+
+## Converting files
+
+Every Homer program that turns a file of one type into another uses the kit's shared engine, never Pandoc or Office directly. The routes are in `exec\conversions.inix`, one section per source type and one line per target, each listing the ways to get there, best first; the first whose engines are all on the computer is used, and a way can take steps through an intermediate type (`pdfstructure:md > pandoc`). Python's `exec\Python\conversion.py` reads it now; C#'s `Conversion.cs` will read the same table, so a route is decided once for both languages.
+
+The route follows the purpose. Plain text takes the quickest way and spends nothing on structure: a PDF's text layer, or the text of a Word, Excel or PowerPoint file read straight from the XML inside it, in a few milliseconds. Markdown, HTML or Word asks for headings, lists and tables: Pandoc where it reads the source, and a PDF's headings worked out from its type sizes. A scanned PDF falls back to Tesseract, its pages drawn by pypdfium2.
+
+Only approved components are used: Pandoc, NuGet and PyPI packages, and Tesseract. Microsoft Office by COM is the last resort, logged when used, and the only way for the older binary formats, .doc, .xls and .ppt, until a free package to read them is approved. No other converting program is looked for, offered or installed by any Homer project.
+
+`scripts\testConversion` proves every route on sample files it makes at the time, and the kit's build runs it: a failing route fails the build; a route whose engine is missing on this computer is reported as not tested.
 
 ## Releasing the kit
 
@@ -147,9 +159,9 @@ first; a large file that must not go up needs one line in the second.
 1. Write it in Camel Type, in `namespace Homer`, with a header comment saying
    what it is for and what it depends on.
 2. Depend on as little as possible. The existing modules depend on the .NET
-   base class library, WinForms, and each other, and nothing else. `PdfRead.cs`
-   is the one exception, which is why it sits apart and why an app's build
-   script fetches its package rather than the kit carrying it.
+   base class library, WinForms, and each other, and nothing else. A module
+   that would need a package belongs to the app that needs it, or to the
+   conversion engine, whose packages are fetched when they are used.
 3. Add it to `c_lsExpected` in `build.py`.
 4. Add a commented line for it in `Templates\build_APP_.cmd`, so a new app can
    switch it on by uncommenting.

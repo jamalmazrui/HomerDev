@@ -219,9 +219,11 @@ licenses</h2>
 <p>The kit is source only, and everything in it is covered above. Two
 things an app built with it may fetch are not:</p>
 <ul>
-<li><strong>PdfPig</strong>, which <code>PdfRead.cs</code> uses to read
-a PDF, is Apache License 2.0. It is fetched by an app’s own build
-script, not shipped here.</li>
+<li><strong>The packages the conversion engine uses</strong> – pypdf
+(BSD 3-Clause), pdfminer.six (MIT), pypdfium2 (Apache License 2.0 or BSD
+3-Clause) and Pillow (MIT-CMU) – and <strong>Tesseract</strong> (Apache
+License 2.0), which reads scanned pages, are fetched when they are
+needed, not shipped here.</li>
 <li><strong>Ollama</strong> and any model an app installs through
 <code>installOllama.cmd</code> carry their own licenses, which the
 installer shows.</li>
