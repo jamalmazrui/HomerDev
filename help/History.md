@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.65.10 -- 9 October 2026
+
+- **The log summary says "still running"** for a check that has failed a finding but not yet finished, where it said "no totals", which read as if the check had broken. A crash, with its traceback, still says "no totals".
+
 ## 1.65.9 -- 9 October 2026
 
 From a conformance audit of eleven projects' logs.

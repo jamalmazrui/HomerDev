@@ -85,7 +85,8 @@ def summarizeCheck(sText):
     # traceback and stays a failure, as HomerScribe's did that day.
     if not sCounts and not lsFailed and not re.search(r"Traceback|TRACEBACK", sText):
         return ["result=unfinished"], False
-    lsOut = [sCounts or "no totals"]
+    # A check still running that has already failed a finding says so plainly; "no totals" read as if it had broken.
+    lsOut = [sCounts or ("no totals" if re.search(r"Traceback|TRACEBACK", sText) else "still running")]
     lsOut += ["FAIL %s: %s" % (sName, sWhy.strip()[:120]) for sName, sWhy in lsFailed]
     return lsOut, bool(lsFailed) or not sCounts
 
