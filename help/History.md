@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.64.8 -- 9 October 2026
+
+- **The project's own lists decide what tidy keeps.** Tidy's standing names included broad fallbacks from before every project declared its files: any .py, .cs, .inix, .js or .lua file anywhere, and any build*, get* or install* script, belonged. Once projects had RepoFiles.txt and LocalFiles.txt, those fallbacks quietly overruled them: DbDo's top folder held twelve stray scripts and settings files that no list named -- seven build_*.py, conform_samples.py, migratePrm.py and three .inix files -- and tidy reported 0 files to move into notes. A project with a RepoFiles.txt is now judged by its lists, the installer's Source lines, and the true standing names (the standard documents, version.txt, the list files, logs, tutorial fingerprints); a project without one keeps the fallback. A dry run over the kit and seven apps found nothing else affected; DbDo's twelve go to notes, and nothing is deleted.
+
 ## 1.64.7 -- 9 October 2026
 
 - **A failed build leaves no installer.** The app templates removed the previous <App>_setup.exe, if at all, only just before compiling the installer, so a build that stopped earlier -- DbDo's, on a compile error -- left the last build's installer in place, and installing it looked like installing this build. Both templates now remove it before anything is compiled or bundled. An app's own kitNeeded must also rise whenever its code uses something new in the kit: DbDo's still said 1.55.0 when it began to call MediaPlayer.playTutorials, which needs 1.64.5, so a 1.64.4 kit failed to compile instead of being named.
