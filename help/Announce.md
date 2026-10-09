@@ -6,8 +6,6 @@ author: "Jamal Mazrui"
 
 # Announcing the Homer Development Kit
 
-## Foundations for Windows programs that work by keyboard and speech
-
 September 2026
 Copyright 2026 by Jamal Mazrui
 MIT License

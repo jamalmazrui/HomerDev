@@ -7,6 +7,18 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.65.5 -- 9 October 2026
+
+From the build, tidy, push and release logs of every project, 9 October 2026.
+
+- **check uses the kit's kind.py.** DbDo's, EdSharp's, FileDir's and HomerScribe's builds refreshed check.py from the kit but not kind.py, which it imports, so their checks ran against an old kind.py and skipped the layout and installer findings ("kind.py has no standard folders"). When the kit is on the computer, check now imports the kit's own kind.py; an app's copy is used only without a kit.
+- **A [Code] line that begins with ; fails check.** In an installer's [Code] section, which is Pascal, a semicolon is not a comment, and Inno stops with "BEGIN expected": HomerView's installer failed so, from comment lines added on 8 October. kind.issCodeSemicolons finds such lines, and check's isscode finding fails on them.
+- **A subtitle is not a heading.** Three Announce documents, the kit's among them, repeated their front matter's subtitle as a heading under the title, so the page said it twice; checkDocs now reports it, and the kit's Announce no longer does it.
+
+## 1.65.4 -- 9 October 2026
+
+- **A project of several GitHub Pages.** MyPages keeps a folder per page in pages\, each named for the repository that serves it, and posts only the pages whose folders have changed since they were last posted. kind.py has publishesPages beside publishesBooks: such a project is a page project, pages joins its standard folders, and check judges its documents page by page -- each folder holds one page; a page with no title is noted, since posting names it after its folder -- with the ReadMe and License, and their .htm, at the top.
+
 ## 1.65.3 -- 9 October 2026
 
 **The conformance backlog is empty: every departure found on 9 October is settled.**

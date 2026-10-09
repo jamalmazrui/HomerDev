@@ -77,6 +77,13 @@ def checkDocument(sPath, bUserDocument):
     bTitle = bool(re.match(r"(?s)\A\ufeff?---\n.*?^title:", sText, re.M))
     if iH1 > 1: lsFindings.append("%d H1 headings; a document has one, its title" % iH1)
     if iH1 == 0 and not bTitle: lsFindings.append("no H1 heading and no title in front matter")
+    # A SUBTITLE IS NOT A HEADING (1.65.5): three Announce documents repeated their front matter's subtitle as a
+    # heading under the title, so the page said it twice, once as a heading that skipped a level.
+    oSubtitle = re.search(r'(?m)^subtitle:\s*"?(.+?)"?\s*$', (re.match(r"(?s)\A\ufeff?---\n(.*?)\n---", sText) or re.match("", "")).group(0))
+    if oSubtitle:
+        for iLevel, sHeading in lsHeadings:
+            if sHeading.strip() == oSubtitle.group(1).strip():
+                lsFindings.append("the subtitle is repeated as an H%d heading; the front matter already shows it" % iLevel)
     iPrevious = 1
     for iLevel, sHeading in lsHeadings:
         if iLevel > iPrevious + 1:
