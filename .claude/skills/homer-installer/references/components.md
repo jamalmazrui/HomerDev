@@ -87,7 +87,11 @@ function isUpdateJaws(): Boolean;           begin Result := homerReaderIs('jaws'
 function isReinstallJaws(): Boolean;        begin Result := homerReaderIs('jaws', 2); end;
 ```
 
-and the same with `Nvda` and `'nvda'`. `homerReaderState` asks the script's
+and the same with `Nvda` and `'nvda'`. **The kit supplies these wrappers**; an
+app never writes its own, and `check` fails one that defines
+`HomerReaderWrappersInApp` to keep its own (DbDo and HomerView did, until 10
+October 2026). An app whose screen reader script is its own defines
+`HomerReaderScript` before the include, and the kit asks that script. `homerReaderState` asks the script's
 `state` mode once: a fingerprint of the JAWS sources against the one kept in
 each JAWS version's settings folder, and the NVDA add-on's manifest version
 against the installed one. A reader not on the computer gets no box. The

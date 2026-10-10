@@ -430,18 +430,37 @@ def ensureAce():
     iCode, sPrefix = run([sNpm, "prefix", "-g"])
     sGlobal = sPrefix.strip().splitlines()[-1].strip() if iCode == 0 and sPrefix.strip() else ""
     if sGlobal: os.environ["PATH"] = (sGlobal if bWindows else os.path.join(sGlobal, "bin")) + os.pathsep + os.environ.get("PATH", "")
+    # COMPARE BEFORE INSTALLING (10 October 2026). Every few days this ran npm install @latest whatever was installed,
+    # and npm reinstalled Ace and its own copy of Chromium -- minutes, for nothing, when 1.4.6 was already the latest.
+    # Now the installed version is compared with the registry's (npm view downloads nothing), and npm installs only a
+    # newer one, or a missing one. Between checks, the stamp file holds the version, so not even ace --version runs.
     sStampFile = os.path.join(paths.data(), "aceChecked.txt")
     sAce = media.findInstalled("ace")
-    if not sAce or isStale(sStampFile):
-        say("Installing or updating Ace by DAISY with npm. The first time, this downloads a copy of Chromium and takes a few minutes.")
-        iCode, _ = run([sNpm, "install", "--global", c_sAceVersionCheck + "@latest"], iTimeout=3600)
-        if iCode == 0: writeText(sStampFile, datetime.datetime.now().isoformat(), False)
+    sStamped = open(sStampFile, encoding="utf-8").read().strip() if os.path.exists(sStampFile) else ""
+    sStampedVersion = sStamped.split("|")[1] if "|" in sStamped else ""
+    if sAce and sStampedVersion and not isStale(sStampFile):
+        log("Ace by DAISY " + sStampedVersion + " was checked against npm within the last " + str(dSettings["toolRefreshDays"]) + " days; not checked again")
+        dTools["ace"], dTools["aceVersion"] = sAce, sStampedVersion
+        return True
+    sInstalled = ""
+    if sAce:
+        iCode, sOut = run([sAce, "--version"])
+        sInstalled = sOut.strip().splitlines()[-1].strip() if iCode == 0 and sOut.strip() else ""
+    iCode, sOut = run([sNpm, "view", c_sAceVersionCheck, "version"])
+    sLatest = sOut.strip().splitlines()[-1].strip() if iCode == 0 and sOut.strip() else ""
+    log("Ace by DAISY: installed %s, latest on npm %s" % (sInstalled or "none", sLatest or "unknown (npm could not be asked)"))
+    if not sAce or (sLatest and versionTuple(sLatest) > versionTuple(sInstalled)):
+        say(("Updating Ace by DAISY from %s to %s" % (sInstalled, sLatest) if sAce else "Installing Ace by DAISY") + " with npm. This downloads a copy of Chromium and takes a few minutes.")
+        iCode, _ = run([sNpm, "install", "--global", c_sAceVersionCheck + "@" + (sLatest or "latest")], iTimeout=3600)
         sAce = media.findInstalled("ace")
+        if sAce:
+            iCode, sOut = run([sAce, "--version"])
+            sInstalled = sOut.strip().splitlines()[-1].strip() if iCode == 0 and sOut.strip() else sLatest
     log(media.searchLog())
     if not sAce: return False
-    iCode, sOut = run([sAce, "--version"])
-    dTools["ace"] = sAce
-    dTools["aceVersion"] = sOut.strip().splitlines()[-1] if sOut.strip() else ""
+    # The stamp is written only when npm answered, so a check that could not reach the registry is tried again next time.
+    if sLatest: writeText(sStampFile, datetime.datetime.now().isoformat() + "|" + sInstalled, False)
+    dTools["ace"], dTools["aceVersion"] = sAce, sInstalled
     return True
 
 

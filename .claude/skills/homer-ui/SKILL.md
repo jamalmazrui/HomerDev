@@ -27,6 +27,14 @@ and can reach any command by a key they can guess.
 - **Access letters** come from `&` in a caption or the preceding label, first
   letter of a word, no extra code. **One trigger letter per menu or dialog**:
   the first item to claim a letter keeps it; a later one gets none.
+- **Fixed choices are buttons; dynamic choices are a list.** When a dialog's
+  whole job is a choice among options built into the program, such as a
+  filter action, a chart type or a settings category, show them as buttons
+  with `runWithButtons`, and Cancel. Each button's letter begins one of its
+  words, the first to claim a letter keeps it, H stays free for Help, and
+  OK and Cancel get none. A pick list is for choices that come from the data
+  or the session: columns, tables, open windows, recent files. A choice that
+  is one field among several in a form stays a list or combo box there.
 - **The words on screen are the spoken words.** A control's name comes from
   its caption or the label before it, so what a screen reader says and what a
   voice-control user says (Windows Voice Access, Dragon) are the words shown.

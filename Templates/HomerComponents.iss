@@ -426,6 +426,14 @@ var
   gHomerJawsState, gHomerNvdaState: Integer;
   gHomerJawsRead, gHomerNvdaRead: Boolean;
 
+//  THE APP'S OWN SCREEN READER SCRIPT, ASKED THE KIT'S WAY (10 October 2026). Most apps ship the kit's
+//  installScreenReaderSupport.cmd. An app whose screen reader support needs more than unpacking and compiling --
+//  HomerView chains its scripts into JAWS's defaults -- names its own script with #define HomerReaderScript before
+//  this include; that script answers the same question in the same form ("state jaws <file>", writing install,
+//  update or reinstall), so every installer's verbs and ticks come from this one function.
+#ifndef HomerReaderScript
+  #define HomerReaderScript "installScreenReaderSupport.cmd"
+#endif
 function homerReaderState(sReader: String): Integer;
 var
   sFile, sScript: String;
@@ -435,7 +443,7 @@ begin
   if (sReader = 'jaws') and gHomerJawsRead then begin Result := gHomerJawsState; exit; end;
   if (sReader = 'nvda') and gHomerNvdaRead then begin Result := gHomerNvdaState; exit; end;
   Result := -1;
-  sScript := ExpandConstant('{app}\scripts\installScreenReaderSupport.cmd');
+  sScript := ExpandConstant('{app}\scripts\{#HomerReaderScript}');
   sFile := ExpandConstant('{tmp}\homerReader_') + sReader + '.txt';
   if FileExists(sScript) then
     if Exec(ExpandConstant('{cmd}'), '/c ""' + sScript + '" state ' + sReader + ' "' + sFile + '""',

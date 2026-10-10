@@ -7,6 +7,20 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.65.21 -- 10 October 2026
+
+- **One installer pattern, checked on every build.** Every Homer installer was meant to share one Finish page -- the verb (Install, Update, Reinstall) and tick of each box decided by the kit, so pressing Enter installs what is missing, updates what is stale and starts the app -- and to reuse the folder of an earlier install. The rule lived only in the homer-installer skill, and three apps kept code of their own: DbDo judged its JAWS scripts by DbDo's version, so every new installer said Update; EdSharp did not include HomerComponents.iss and asked for the folder on every reinstall; HomerView, like DbDo, kept its own wrappers behind HomerReaderWrappersInApp. check now has an installer check that fails any departure, naming each: no HomerComponents.iss, a folder not remembered (UsePreviousAppDir, DisableDirPage=auto, a fixed AppId), its own screen reader state, wrappers or version stamp, or no Install box for the JAWS scripts. Tested both ways: it fails the old DbDo, EdSharp and HomerView installers and passes the corrected ones, FileDir, HomerScribe, bookFido, 2htm, extCheck, urlCheck and urlFido.
+- **An app's own screen reader script, asked the kit's way.** HomerComponents.iss asks the script HomerReaderScript names, by default installScreenReaderSupport.cmd; an app whose support needs more, as HomerView's chaining does, names its own, which answers the kit's question, "state jaws <file>". The verbs and ticks come from the kit's one function in every installer.
+- **homer-installer states the pattern and the check;** components.md says the kit supplies the screen reader wrappers and how HomerReaderScript works.
+
+## 1.65.20 -- 10 October 2026
+
+- **homer-ui states when a choice is buttons and when it is a list.** A dialog whose whole job is choosing among options built into the program shows them as buttons with runWithButtons, each letter beginning a word, H left for Help, none for OK and Cancel; a pick list is for choices from the data or the session. DbDo's dialogs were reviewed against it and five were changed.
+
+## 1.65.19 -- 10 October 2026
+
+- **buildBooks compares Ace's version before installing it.** Every few days it ran npm install @latest whatever was installed, and npm reinstalled Ace by DAISY and its own copy of Chromium -- minutes of downloading when 1.4.6, the latest, was already there. It now compares the installed version with npm's (npm view downloads nothing) and installs only a newer or missing one, recording the version it checked; between checks it runs nothing at all, not even ace --version, which took 8 seconds. A check that cannot reach npm is tried again at the next build. Tested in five cases: current, within the refresh period, newer, missing and unreachable. The tutorial voices already follow this rule -- taken from exec, never downloaded again, each walk spoken again only when its fingerprint changes -- and their step took 1 to 5 seconds in every app.
+
 ## 1.65.18 -- 10 October 2026
 
 - **tidy gives every page one level-one heading.** FileDir's and HomerView's releases failed the headings check although their builds' encoding passes had repaired the pages: HomerView's build.ps1 makes hotkeys.htm after the pass, and FileDir's build runs the pass before refreshing the kit's scripts, so its first build after a kit update ran the old fixEncoding. tidy runs after every build and before every push, already refreshed, so it now applies fixEncoding's own rule to each .htm beside a .md, skipping a library's folders. Tested on HomerView's hotkeys page (17 level-one headings to 1) and a FileDir page (2 to 1), with a library's page and a page without Markdown left alone and a second run doing nothing.

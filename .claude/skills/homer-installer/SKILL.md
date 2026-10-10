@@ -36,6 +36,29 @@ where the release script looks for it.
 - **Pascal comments in [Code] are `//` or `(* *)`**; a `;` comment there stops
   the compile with "BEGIN expected".
 
+## One pattern, checked
+
+Every Homer installer follows one pattern, and `check` fails any that does
+not, naming each departure. Pressing Enter through the wizard must do what
+is wanted nine times in ten: install what is missing, update what is stale,
+put the screen reader support in place, and start the app.
+
+- **Include the kit's `Templates\HomerComponents.iss`** inside `[Code]`, and
+  use its functions for every box: `homerAdd`, `homerLabel` and `homerIs`
+  for components, and its own `labelJaws`, `isInstallJaws` and the rest for
+  the screen readers. Never write your own state, label or check functions,
+  never define `HomerReaderWrappersInApp`, and never stamp a version of your
+  own: a verb must come from comparing what is installed with what is
+  shipped, never from the app's version.
+- **Run the kit's `installScreenReaderSupport.cmd`** for the JAWS and NVDA
+  boxes. An app whose support needs more, as HomerView chains its scripts
+  into JAWS's defaults, names its own script with
+  `#define HomerReaderScript "installJawsScripts.cmd"` before the include;
+  that script answers the kit's question, `state jaws <file>`, with install,
+  update or reinstall, and the `[Run]` entries run it.
+- **Remember the folder.** `UsePreviousAppDir=yes`, `DisableDirPage=auto` and
+  a fixed `AppId`: a reinstall goes where the app already is, without asking.
+
 ## The finish page
 
 Read [references/FinishPage.md](references/FinishPage.md) before writing or
