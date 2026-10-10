@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.65.18 -- 10 October 2026
+
+- **tidy gives every page one level-one heading.** FileDir's and HomerView's releases failed the headings check although their builds' encoding passes had repaired the pages: HomerView's build.ps1 makes hotkeys.htm after the pass, and FileDir's build runs the pass before refreshing the kit's scripts, so its first build after a kit update ran the old fixEncoding. tidy runs after every build and before every push, already refreshed, so it now applies fixEncoding's own rule to each .htm beside a .md, skipping a library's folders. Tested on HomerView's hotkeys page (17 level-one headings to 1) and a FileDir page (2 to 1), with a library's page and a page without Markdown left alone and a second run doing nothing.
+- **push names only what actually leaves the repository.** The step that untracks local files announced every candidate as "no longer pushed", 29 of them kit sources that git add -A put straight back, because the whitelist includes them. The untracking now goes to the log, and push names only a file staged for removal that is still on the disk; HomerScribe's two notes and package files were the real ones.
+- **The announcement names the apps HomerDev stands behind:** DbDo, EdSharp, FileDir and HomerScribe, each in a few words, within its single address and grade 8.8.
+
 ## 1.65.17 -- 10 October 2026
 
 - **A new announcement.** help\\Announce.md, from September, described the kit as foundations for Windows programs; it now announces HomerDev for building apps nonvisually with AI, in about 300 words of plain paragraphs with no headings or lists in its body, so the same text can be pasted into Facebook, LinkedIn and email lists. It directs readers to one address, the archive of the repository, and says that an AI assistant can examine that archive, take what is relevant and adapt it under the MIT License. checkDocs grades it 8.7; it notes the written-out address, which is deliberate, so it survives a paste.
