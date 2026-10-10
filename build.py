@@ -461,7 +461,17 @@ def normalizeHomer(sPath):
     except Exception as oError:
         logLine("NORMALIZE FAILED: %s: %s" % (sPath, oError))
         return False
-    sText = sText.replace("\r\n", "\n").replace("\r", "\n").replace("\n", "\r\n")
+    sText = sText.replace("\r\n", "\n").replace("\r", "\n")
+    # One level-one heading on a page built from Markdown, by fixEncoding's own rule, so the kit's pages and every
+    # app's come out the same way (9 October 2026).
+    if sPath.lower().endswith(".htm") and os.path.isfile(sPath[:-4] + ".md"):
+        try:
+            sys.path.insert(0, os.path.join(sScriptDir, "scripts"))
+            import fixEncoding
+            sText = fixEncoding.oneTitleHeading(sText)
+        except Exception as oError:
+            logLine("HEADINGS NOT CHECKED: %s: %s" % (sPath, oError))
+    sText = sText.replace("\n", "\r\n")
     bBom = not sPath.lower().endswith((".cmd", ".bat", "version.txt"))
     open(sPath, "wb").write((("\ufeff" + sText) if bBom else sText).encode("utf-8"))
     logLine("NORMALIZED: %s" % sPath)
@@ -1177,9 +1187,12 @@ def convertDocs(sPandoc):
             sHtm = os.path.join(sRoot, sName[:-3] + ".htm")
             # Dollar signs are text, not mathematics (1.43.59): a skill quoting a
             # GitHub workflow's ${{ secrets }} or a price is not a formula.
+            # THE FRONT MATTER'S TITLE, NOT THE FILE NAME (9 October 2026): "title=" + the file name replaced
+            # "HomerDev ReadMe" with "ReadMe" and gave the page a second level-one heading. Only the window title is
+            # passed now, for files with no title of their own; fixEncoding then leaves one level-one heading.
             iCode, sOut = runCommand([sPandoc, "-f", "markdown-tex_math_dollars", "-t", "html5",
                                       "--standalone", "--metadata",
-                                      "title=" + sName[:-3], "-o", sHtm, sMd])
+                                      "pagetitle=" + sName[:-3], "-o", sHtm, sMd])
             if iCode == 0:
                 normalizeHomer(sHtm)
                 iDone += 1
@@ -1198,6 +1211,15 @@ def checkKit():
             continue
         if os.path.getsize(sPath) == 0:
             lsProblems.append("empty: " + sRelative)
+
+    # ONE LEVEL-ONE HEADING on every page the kit builds from Markdown (1.65.14), as check requires of every project.
+    for sDir, lsDirs, lsNames in os.walk(sScriptDir):
+        lsDirs[:] = [s for s in lsDirs if s.lower() not in ("logs", "notes", ".git", "node_modules", "packages", "work", "__pycache__")]
+        for sName in lsNames:
+            sPath = os.path.join(sDir, sName)
+            if not sName.lower().endswith(".htm") or not os.path.isfile(sPath[:-4] + ".md"): continue
+            iCount = len(re.findall(r"(?i)<h1\b", open(sPath, encoding="utf-8-sig", errors="replace").read()))
+            if iCount != 1: lsProblems.append("%d level-one headings, not one: %s" % (iCount, os.path.relpath(sPath, sScriptDir)))
 
     # Encoding: every text file UTF-8 with a BOM and CRLF, except .cmd and .bat,
     # which take CRLF and no BOM.

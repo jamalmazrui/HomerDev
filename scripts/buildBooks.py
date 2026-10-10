@@ -1363,15 +1363,69 @@ def buildExternal(dBook, dAudit):
     return sEpub
 
 
-def buildEpub(dBook, dKdp, dAudit):
-    """Builds results\\<root>.epub from the manuscript; records pictures, warnings and errors in the audit."""
+def editionRules(sRoot):
+    """EDITIONS FOR OTHER STORES (9 October 2026). The Kindle EPUB is built from the manuscript as it is; another store
+    can need a few differences -- Apple Books, through Draft2Digital, rejects links to Amazon, and "Kindle book" reads
+    oddly there. Each such edition is a file configs\\editions\\<root>-<Edition>.inix:
+        [edition]  name = Draft2Digital   file = <root>_Draft2Digital.epub   unlinkHosts = amazon.
+        [replace1] find = (exact manuscript text)   with = (its text in this edition)   ... [replace2], and so on.
+    The files sit outside the book's folder, so an edition never changes the book's own content fingerprint and never
+    sends the Kindle book to KDP again. Returns a list of {name, file, unlink, replacements}."""
+    lEditions = []
+    for sPath in sorted(glob.glob(os.path.join(sProject, "configs", "editions", sRoot + "-*.inix")), key=str.lower):
+        dInix = readInix(sPath)
+        dEdition = dInix.get("edition", {})
+        sName = dEdition.get("name", "").strip() or os.path.basename(sPath)[len(sRoot) + 1:-5]
+        lReplacements = [(dInix[s].get("find", ""), dInix[s].get("with", "")) for s in sorted(dInix, key=lambda s: (len(s), s)) if s.lower().startswith("replace") and dInix[s].get("find", "")]
+        lEditions.append({"name": sName, "file": dEdition.get("file", "").strip() or sRoot + "_" + sName + ".epub",
+                          "unlink": [s.strip().lower() for s in dEdition.get("unlinkHosts", "").split(",") if s.strip()],
+                          "replacements": lReplacements, "path": sPath})
+    return lEditions
+
+
+def unlinkHosts(sEpub, lsHosts):
+    """Every link in the EPUB's pages whose address names one of lsHosts becomes its plain text, citations included.
+    The mimetype entry stays first and uncompressed, as EPUB requires. Returns how many links were removed."""
+    import zipfile
+    iRemoved = [0]
+    def plain(oMatch):
+        if any(sHost in oMatch.group(1).lower() for sHost in lsHosts):
+            iRemoved[0] += 1
+            return oMatch.group(2)
+        return oMatch.group(0)
+    sNew = sEpub + ".writing"
+    with zipfile.ZipFile(sEpub) as zIn, zipfile.ZipFile(sNew, "w") as zOut:
+        for oInfo in zIn.infolist():
+            bData = zIn.read(oInfo.filename)
+            if oInfo.filename.lower().endswith((".xhtml", ".html", ".htm")):
+                sPage = bData.decode("utf-8")
+                sPage = re.sub(r'(?s)<a\b[^>]*\bhref="(https?://[^"]*)"[^>]*>(.*?)</a>', plain, sPage)
+                bData = sPage.encode("utf-8")
+            zOut.writestr(oInfo, bData, compress_type=zipfile.ZIP_STORED if oInfo.filename == "mimetype" else zipfile.ZIP_DEFLATED)
+    os.replace(sNew, sEpub)
+    return iRemoved[0]
+
+
+def buildEpub(dBook, dKdp, dAudit, dEdition=None):
+    """Builds results\\<root>.epub from the manuscript; records pictures, warnings and errors in the audit. With
+    dEdition (from editionRules), builds that edition instead, into its own file and working folder."""
     sRoot = dBook["root"]
     sBookDir = os.path.join(sProject, "books", sRoot)
     sManuscript = os.path.join(sBookDir, sRoot + ".md")
     sText = open(sManuscript, encoding="utf-8-sig").read()
+    if dEdition:
+        # Each replacement must find its text exactly once, so an edition never drifts silently from a revised manuscript.
+        sText = sText.replace("\r\n", "\n")
+        for sFind, sWith in dEdition["replacements"]:
+            sFind, sWith = sFind.replace("\r\n", "\n").strip("\n"), sWith.replace("\r\n", "\n").strip("\n")
+            iCount = sText.count(sFind)
+            if iCount != 1:
+                dAudit["errors"].append("The %s edition's replacement text was found %s in the manuscript, so the edition was not built: %s" % (dEdition["name"], "nowhere" if iCount == 0 else str(iCount) + " times", sFind[:90]))
+                return ""
+            sText = sText.replace(sFind, sWith)
     dYaml, sBody = splitFrontMatter(sText)
     dAudit["yaml"], dAudit["body"] = dYaml, sBody
-    sWork = workFolder(sRoot)
+    sWork = workFolder(sRoot) if not dEdition else workFolder(sRoot + "-" + dEdition["name"])
     dFoundAll = readInix(os.path.join(sBookDir, "found.inix")) if os.path.exists(os.path.join(sBookDir, "found.inix")) else {}
     sBody, lRecords, lErrors = resolvePictures(dBook, sBody, sWork, dFoundAll.get("found", {}))
     dAudit["pictures"] = lRecords
@@ -1391,7 +1445,7 @@ def buildEpub(dBook, dKdp, dAudit):
     writeText(sMetaPath, json.dumps(dMeta, ensure_ascii=False, indent=1), False)
     sWorkMd = os.path.join(sWork, sRoot + ".md")
     writeText(sWorkMd, sBody, False)
-    sEpub = os.path.join(sProject, "results", sRoot + ".epub")
+    sEpub = os.path.join(sProject, "results", dEdition["file"] if dEdition else sRoot + ".epub")
     os.makedirs(os.path.dirname(sEpub), exist_ok=True)
     lCommand = [dTools["pandoc"], sWorkMd, "--from", "markdown+autolink_bare_uris-raw_html", "--to", "epub3", "--output", sEpub, "--metadata-file", sMetaPath, "--css", bookTemplate("epub.css"), "--lua-filter", bookTemplate("tocEpub.lua"), "--shift-heading-level-by", str(iShift), "--split-level", "1", "--resource-path", sWork, "--toc-depth", dBook.get("tocDepth") or "2"]
     bMarker = bool(re.search(r"(?m)^\[TOC\]\s*$", sBody))
@@ -1422,6 +1476,10 @@ def buildEpub(dBook, dKdp, dAudit):
         dAudit["errors"].append("Pandoc could not build the EPUB (exit code " + str(iCode) + "); see the log.")
         return ""
     finishPackage(sEpub, bool(lRecords), dBook["subtitle"], os.path.join(sProject, "books", dBook["root"], dBook["root"] + ".md"))
+    if dEdition:
+        iUnlinked = unlinkHosts(sEpub, dEdition["unlink"]) if dEdition["unlink"] else 0
+        log("%s: built the %s edition, %s, %s bytes; %s replaced, %s to %s made plain text" % (sRoot, dEdition["name"], sEpub, format(os.path.getsize(sEpub), ","), plural(len(dEdition["replacements"]), "passage"), plural(iUnlinked, "link"), ", ".join(dEdition["unlink"]) or "no host"))
+        return sEpub
     dAudit["epub"] = sEpub
     dAudit["splitLevel"] = iLevel
     log(sRoot + ": built " + sEpub + ", " + format(os.path.getsize(sEpub), ",") + " bytes")
@@ -1958,6 +2016,7 @@ def writeAudit(dBook, dAudit):
         import hashlib
         l.append("- EPUB SHA-256: " + hashlib.sha256(open(dAudit["epub"], "rb").read()).hexdigest())
         if dAudit.get("buildKey"): l.append("- Build SHA-256: " + dAudit["buildKey"])
+        for sEdition in dAudit.get("editions", []): l.append("- Edition: " + sEdition)
         # The sources this EPUB was made from, by content (9 October 2026): kdpUpdate knows an EPUB is stale when the
         # book's sources no longer have this fingerprint, without trusting file times.
         try:
@@ -2000,7 +2059,8 @@ def buildKey(dBook, sBookDir, dKdp):
             for sName in sorted(os.listdir(sDir), key=str.lower):
                 sPath = os.path.join(sDir, sName)
                 if os.path.isfile(sPath): lsTemplates.append(sName.lower() + ":" + hashlib.sha256(open(sPath, "rb").read()).hexdigest())
-    lParts = [c_sBuildFormat, kdpSubmit.bookSourcesSha(sBookDir), dBook, {s: dKdp.get(s, {}) for s in ("kdp", "proposed")}, lsTemplates, dTools.get("pandocVersion", "")]
+    lsEditions = [os.path.basename(s) + ":" + hashlib.sha256(open(s, "rb").read()).hexdigest() for s in sorted(glob.glob(os.path.join(sProject, "configs", "editions", dBook["root"] + "-*.inix")), key=str.lower)]
+    lParts = [c_sBuildFormat, kdpSubmit.bookSourcesSha(sBookDir), dBook, {s: dKdp.get(s, {}) for s in ("kdp", "proposed")}, lsTemplates, dTools.get("pandocVersion", ""), lsEditions]
     return hashlib.sha256(json.dumps(lParts, sort_keys=True, default=str).encode("utf-8")).hexdigest()
 
 
@@ -2016,6 +2076,9 @@ def keptAudit(dBook, sKey):
     oEpub = re.search(r"(?m)^- EPUB SHA-256: ([0-9a-f]{64})", sText)
     if not oBuild or oBuild.group(1) != sKey or not re.search(r"(?m)^Ready to submit", sText): return None
     if not oEpub or oEpub.group(1) != hashlib.sha256(open(sEpub, "rb").read()).hexdigest(): return None
+    # An edition's file must still be there too; a missing one builds the book again.
+    for dEdition in editionRules(dBook["root"]):
+        if not os.path.isfile(os.path.join(sProject, "results", dEdition["file"])): return None
     oWarnings = re.search(r"(?ms)^## Warnings\n\n(.*?)(?:\n## |\Z)", sText)
     lWarnings = [s[2:].strip() for s in (oWarnings.group(1).splitlines() if oWarnings else []) if s.startswith("- ")]
     return {"root": dBook["root"], "title": dBook["title"], "errors": [], "warnings": lWarnings, "ready": True,
@@ -2180,6 +2243,14 @@ def main():
                 runEpubcheck(sEpub, dAudit)
                 runAce(sEpub, dAudit)
                 runKindlePreviewer(sEpub, dAudit)
+                # EVERY EDITION, built from the same manuscript and checked by EPUBCheck; an edition that fails makes the
+                # book not ready, since what goes to another store must be as sound as what goes to KDP.
+                for dEdition in editionRules(dBook["root"]):
+                    dEditionAudit = {"root": dBook["root"] + "-" + dEdition["name"], "errors": [], "warnings": []}
+                    sEditionEpub = buildEpub(dBook, dKdp, dEditionAudit, dEdition)
+                    if sEditionEpub: runEpubcheck(sEditionEpub, dEditionAudit)
+                    for sProblem in dEditionAudit["errors"]: dAudit["errors"].append(dEdition["name"] + " edition: " + sProblem)
+                    dAudit.setdefault("editions", []).append("%s: %s, %s" % (dEdition["name"], dEdition["file"], "built and checked" if sEditionEpub and not dEditionAudit["errors"] else plural(len(dEditionAudit["errors"]) or 1, "problem")))
         except Exception as oError:
             log("CRASH in " + dBook["root"] + ": " + traceback.format_exc())
             dAudit["errors"].append("The build stopped on this book: " + str(oError) + "; see the log.")

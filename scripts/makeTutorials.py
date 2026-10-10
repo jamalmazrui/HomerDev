@@ -97,7 +97,15 @@ def writeTutorialsHtm(sMarkdown):
     note("pandoc exit code: %d%s" % (oRun.returncode, ("; " + oRun.stderr.strip()[:400]) if oRun.stderr.strip() else ""))
     if oRun.returncode != 0 or not os.path.isfile(sHtm): return False
     with open(sHtm, "rb") as f: bData = f.read()
-    sText = bData.decode("utf-8-sig").replace("\r\n", "\n").replace("\n", "\r\n")
+    sText = bData.decode("utf-8-sig").replace("\r\n", "\n")
+    try:
+        # One level-one heading, by fixEncoding's rule; fixEncoding sits beside this script, in the kit and in every app.
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import fixEncoding
+        sText = fixEncoding.oneTitleHeading(sText)
+    except Exception as oError:
+        note("headings not checked: " + str(oError))
+    sText = sText.replace("\n", "\r\n")
     with open(sHtm + ".writing", "wb") as f: f.write(b"\xef\xbb\xbf" + sText.encode("utf-8"))
     os.replace(sHtm + ".writing", sHtm)
     return True

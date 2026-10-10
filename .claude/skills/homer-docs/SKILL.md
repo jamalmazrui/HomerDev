@@ -57,6 +57,16 @@ articles or folds into Miscellaneous. H3s are the articles, alphabetical
 within their category; H4 and below sit inside an article. No level is
 skipped. A long document opens with a contents list.
 
+The page built from it has one H1 too. Pandoc makes the front matter's
+`title:` into a level-one heading of its own, so a document that also opens
+with a `# ` line of the same title, or that uses `# ` for its sections, became
+a page with two or more. Every Homer build's encoding pass (the kit's
+`fixEncoding`, also used by homer-convert and fixPages) leaves each `.htm`
+beside a `.md` with exactly one: a repeated title keeps one copy, an author's
+single `# ` heading stays the page's heading, sections under the title move
+down a level, and a page with none gets its own title. check fails a page
+built from Markdown without exactly one H1.
+
 ## History
 
 Newest first. Each entry is headed with the version and date. It says what

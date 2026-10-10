@@ -62,12 +62,35 @@ def dropRepeatedTitle(sText):
     return sText[:oHeader.start()] + sHeader + sText[oHeader.end():]
 
 
+def kitHeadingRule():
+    """fixEncoding's oneTitleHeading, the authoritative rule (9 October 2026): from the kit this skill sits in, or the
+    kit wherever it is (the HomerDev variable, then C:\\HomerDev). None for a copy uploaded without the kit, which then
+    keeps its own narrower rule, dropRepeatedTitle."""
+    lsPlaces = [os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "..", "scripts")]
+    for sKit in (os.environ.get("HomerDev", ""), r"C:\HomerDev"):
+        if sKit: lsPlaces.append(os.path.join(sKit, "scripts"))
+    for sPlace in lsPlaces:
+        if os.path.isfile(os.path.join(sPlace, "fixEncoding.py")):
+            try:
+                import importlib.util
+                oSpec = importlib.util.spec_from_file_location("homerFixEncoding", os.path.join(sPlace, "fixEncoding.py"))
+                oModule = importlib.util.module_from_spec(oSpec); oSpec.loader.exec_module(oModule)
+                return oModule.oneTitleHeading
+            except Exception:
+                continue
+    return None
+
+
 def convert(sPath):
     """Rewrite one file in the Homer encoding. Returns "changed", "same" or a problem."""
     binData = open(sPath, "rb").read()
     sText = decode(binData)
     if sText is None: return "not text"
-    if sPath.lower().endswith((".htm", ".html")): sText = dropRepeatedTitle(sText)
+    if sPath.lower().endswith((".htm", ".html")):
+        # ONE LEVEL-ONE HEADING (9 October 2026): the kit's rule handles a repeated title, sections at level one, and
+        # a page with none; without the kit, the repeated title alone is put right.
+        fnRule = kitHeadingRule()
+        sText = fnRule(sText.replace("\r\n", "\n")) if fnRule else dropRepeatedTitle(sText)
     sText = sText.replace("\r\n", "\n").replace("\r", "\n").replace("\n", "\r\n")
     sName = os.path.basename(sPath)
     # version.txt is read by build scripts and Inno, which want the number alone.

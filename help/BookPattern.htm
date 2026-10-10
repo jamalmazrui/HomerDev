@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="pandoc 3.12" />
+  <meta name="generator" content="pandoc 3.12.1" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>BookPattern</title>
   <style>
@@ -182,9 +182,6 @@
   </style>
 </head>
 <body>
-<header id="title-block-header">
-<h1 class="title">BookPattern</h1>
-</header>
 <h1 id="the-homer-book-pattern">The Homer book pattern</h1>
 <p><em>For the Homer Development Kit’s help folder. Revised 8 October
 2026, when the book publishing tools moved into the kit.</em></p>
@@ -283,6 +280,18 @@ never by file name or time. The everyday command is
 <code>scripts\kdpUpdate.cmd</code> with nothing after it: it builds any
 book that changed, then sends only the books that changed.</li>
 </ul>
+<p><strong>Editions for other stores.</strong> The Kindle EPUB is built
+from the manuscript as it is. A store that needs a few differences, such
+as Draft2Digital, whose stores reject links to Amazon, gets an edition:
+a file <code>configs\editions\&lt;book&gt;-&lt;Edition&gt;.inix</code>
+naming the edition, its EPUB, the hosts whose links become plain text,
+and exact passages to replace. buildBooks builds every edition beside
+the Kindle EPUB, from the same manuscript, and checks it with EPUBCheck.
+A passage that no longer matches the manuscript exactly once stops that
+book, so an edition never drifts. The rules live outside the book’s
+folder, so adding an edition never sends the Kindle book to KDP again,
+and kdpUpdate only ever sends the Kindle EPUB; an edition is uploaded to
+its store by hand.</p>
 <h2 id="where-the-code-comes-from">Where the code comes from</h2>
 <p>The code lives in the kit, in its <code>scripts</code> folder, and
 nowhere else. Each tool’s wrapper in a project, such as

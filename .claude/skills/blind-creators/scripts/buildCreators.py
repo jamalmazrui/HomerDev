@@ -256,8 +256,16 @@ def buildHtm(sPath):
         logLine("pandoc not found on PATH"); return None
     logLine("exit code: " + str(oRun.returncode) + " " + (oRun.stderr or "").strip())
     if oRun.returncode != 0: return None
-    sText = open(sHtm, "rb").read().decode("utf-8-sig").replace("\r\n", "\n").replace("\n", "\r\n")
-    open(sHtm, "wb").write(b"\xef\xbb\xbf" + sText.encode("utf-8"))
+    # The Homer encoding and one level-one heading, by homer-convert's toHomerEncoding (9 October 2026), as the
+    # podcast-directory skill does; a copy without it still gets the encoding.
+    try:
+        sConvert = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "homer-convert", "scripts")
+        if sConvert not in sys.path: sys.path.insert(0, sConvert)
+        import toHomerEncoding
+        toHomerEncoding.convert(sHtm)
+    except ImportError:
+        sText = open(sHtm, "rb").read().decode("utf-8-sig").replace("\r\n", "\n").replace("\n", "\r\n")
+        open(sHtm, "wb").write(b"\xef\xbb\xbf" + sText.encode("utf-8"))
     return sHtm
 
 
