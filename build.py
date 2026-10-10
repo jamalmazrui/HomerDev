@@ -1214,7 +1214,9 @@ def checkKit():
 
     # ONE LEVEL-ONE HEADING on every page the kit builds from Markdown (1.65.14), as check requires of every project.
     for sDir, lsDirs, lsNames in os.walk(sScriptDir):
-        lsDirs[:] = [s for s in lsDirs if s.lower() not in ("logs", "notes", ".git", "node_modules", "packages", "work", "__pycache__")]
+        # A library's own pages are not the project's (10 October 2026): a sample's .venv held wxPython's README and
+        # CHANGELOG, which failed the kit's release; folders starting with a dot, venv and site-packages are skipped.
+        lsDirs[:] = [s for s in lsDirs if not s.startswith(".") and s.lower() not in ("logs", "notes", "node_modules", "packages", "work", "__pycache__", "venv", "site-packages")]
         for sName in lsNames:
             sPath = os.path.join(sDir, sName)
             if not sName.lower().endswith(".htm") or not os.path.isfile(sPath[:-4] + ".md"): continue

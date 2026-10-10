@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.65.16 -- 10 October 2026
+
+- **The headings check skips a library's pages.** The check added in 1.65.14 walked into a sample's .venv and failed the kit's own release on wxPython's README and CHANGELOG, which are not the kit's pages. Folders starting with a dot, venv and site-packages are skipped, in check and in the kit's own check.
+- **push untracks a file once it is local.** Git goes on staging a file it already tracks even when the whitelist .gitignore leaves it out, so a file newly named in LocalFiles.txt -- DbDo's 77 MB RadioTrail catalog, tracked since its 14-station start -- was staged again and refused as too large. push now untracks each file LocalFiles.txt names that Git still tracks; it stays on disk, and nothing LocalFiles.txt does not name is untracked. Tested with Git: the file untracked and kept on disk, nothing large staged, the commit made, a second run doing nothing.
+
 ## 1.65.15 -- 10 October 2026
 
 - **Book editions for other stores.** A Draft2Digital edition of Blind Vibe Coding had been made by editing a copy of the Kindle EPUB by hand, so it would fall behind at the manuscript's next change. buildBooks now builds every edition named in configs\\editions\\<book>-<Edition>.inix beside the Kindle EPUB, from the same manuscript: exact passages replaced, each required to match exactly once or the book is not ready, and every link to a named host made plain text throughout the finished EPUB, citations included. Each edition is checked with EPUBCheck, has its own working folder and audit line, joins the build fingerprint, and keeps a book from being kept when its file is missing. The rules sit outside the book's folder, so the Kindle book's content fingerprint does not change and kdpUpdate, which sends only the Kindle EPUB, does not send it again. Tested by building Blind Vibe Coding's two editions: the Draft2Digital one matches the edition submitted by hand, its copyright page exactly, with no links to Amazon, and the Kindle one is unchanged.
