@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.65.17 -- 10 October 2026
+
+- **A new announcement.** help\\Announce.md, from September, described the kit as foundations for Windows programs; it now announces HomerDev for building apps nonvisually with AI, in about 300 words of plain paragraphs with no headings or lists in its body, so the same text can be pasted into Facebook, LinkedIn and email lists. It directs readers to one address, the archive of the repository, and says that an AI assistant can examine that archive, take what is relevant and adapt it under the MIT License. checkDocs grades it 8.7; it notes the written-out address, which is deliberate, so it survives a paste.
+
 ## 1.65.16 -- 10 October 2026
 
 - **The headings check skips a library's pages.** The check added in 1.65.14 walked into a sample's .venv and failed the kit's own release on wxPython's README and CHANGELOG, which are not the kit's pages. Folders starting with a dot, venv and site-packages are skipped, in check and in the kit's own check.
