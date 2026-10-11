@@ -23,6 +23,7 @@ Key names follow the Homer conventions: modifiers in alphabetical order,
 ## By key
 
 - Alt+C -- append the current line or selection to the clipboard, in a text box
+- Alt+Control+Shift+D -- open the HomerDev dialog, from anywhere in Windows, after setup
 - Alt+F8 -- read the whole field aloud, in a text box
 - Alt+H -- press the Help button, in a dialog
 - Alt+X -- append the cut line to the clipboard, in a text box
@@ -53,6 +54,7 @@ Key names follow the Homer conventions: modifiers in alphabetical order,
 - Help for this dialog: F1, or Alt+H
 - Mark a selection in two keystrokes instead of holding Shift: F8 then Shift+F8
 - Move through the controls: Tab and Shift+Tab
+- Open the HomerDev dialog: Alt+Control+Shift+D
 - Open the link, path or address under the cursor: Shift+F5
 - Read the whole field aloud: Alt+F8
 - Search inside a list: Control+J, repeated with F3 and Shift+F3

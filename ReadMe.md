@@ -27,8 +27,14 @@ in `C:\HomerDev\exec\CSharp` and follow HomerDev.md."
 An AI assistant can use the kit too. AGENTS.md, at the top of the kit, tells any agent what the kit is, where things are, which skill to read for which task, and the rules to follow; CLAUDE.md, GEMINI.md and GitHub Copilot's instructions point to it. In Claude Code, the kit is also a plugin, so its skills and two reviewing agents work in any project: type `/plugin marketplace add JamalMazrui/HomerDev`, then `/plugin install homer-dev@homer-dev-kit`.
 ## Install
 
-Unzip `HomerDev.zip` into a folder named `HomerDev`, on any drive and at any
-depth -- beside your projects is simplest. That is the install.
+Run `HomerDev_setup.exe` from the kit's latest release. It installs the kit to
+`C:\Program Files\HomerDev`, puts the HomerDev dialog on the desktop with the
+hotkey Alt+Control+Shift+D, and offers every tool Homer programs use, so one
+install sets a computer up for all of them.
+
+Or unzip `HomerDev.zip` into a folder named `HomerDev`, on any drive and at any
+depth. If you work at the command line, `C:\HomerDev` keeps the paths short to
+type.
 
 You also need, and the kit will tell you if one is missing:
 

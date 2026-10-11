@@ -26,6 +26,7 @@ holding the keyboard knows what a good program is before the AI writes one.
 ## Contents
 
 - [Getting started](#getting-started)
+- [The HomerDev dialog](#the-homerdev-dialog)
 - [What is in the kit](#what-is-in-the-kit)
 - [Camel Type](#camel-type)
 - [The .inix format](#the-.inix-format)
@@ -64,8 +65,24 @@ holding the keyboard knows what a good program is before the AI writes one.
 
 ### Install the kit
 
-Unzip `HomerDev.zip` into a folder named `HomerDev` -- `C:\HomerDev`, or one
-beside your projects on any drive. That is the whole install. Then run:
+There are two ways, and the kit works the same either way.
+
+- **Run the setup program**, `HomerDev_setup.exe`, from the kit's latest
+  release. It installs the kit to `C:\Program Files\HomerDev`, the standard
+  place for programs, and puts a HomerDev shortcut on the desktop with the
+  hotkey **Alt+Control+Shift+D**. Its last page offers every tool any Homer
+  program uses -- ExifTool, ffmpeg, ImageMagick, mpv, Ollama, Pandoc, PDF tools,
+  Tesseract, Whisper and yt-dlp -- and a local AI model, each worded Install,
+  Update or Reinstall by what is already there, so pressing Enter sets the
+  computer up for all of them at once. It also sets the `HomerDev` environment
+  variable for the whole computer, unless one is already set, so every app's
+  build finds the kit there.
+- **Unzip `HomerDev.zip`** into a folder named `HomerDev`. If you work at the
+  command line, `C:\HomerDev` is a good choice: the paths are shorter to type
+  than ones under Program Files. A copy here needs no setting when your
+  projects are beside it.
+
+To build the kit itself, from its folder run:
 
     build
 
@@ -114,6 +131,44 @@ Then:
 
     cd \JobDo
     buildJobDo
+
+## The HomerDev dialog
+
+Press **Alt+Control+Shift+D** from anywhere in Windows, after setup, or run
+`exec\HomerDev.exe` in the kit. The dialog is a tour of the kit, and it is
+built only from the kit's own classes, so it shows them at work: its dialogs
+are Lbc, its player is the Homer Player, its reading window is the help box,
+and its chat is the kit's Ollama class.
+
+D stands for development. The H keys, with and without Shift, belong to
+HomerScribe and HomerView, and Alt+Control+D belongs to DbDo.
+
+The controls, in tab order:
+
+- **Kit contents**, a list of everything the kit holds, by kind and then by
+  name: documents, the plugin, samples and their sources, scripts, shared code
+  in C# and in Python, skills, subagents and templates. Each line says what the
+  item is. Control+J searches the list.
+- **Open**, or Enter in the list: a document opens in your browser; a sample
+  runs, so you can compare the one-dialog fruit basket with the version with
+  several windows, and the C# versions with the Python ones; any other file
+  opens in a window you read line by line.
+- **Play tutorials** plays the kit's ten spoken walks in the Homer Player. Focus
+  starts on the first walk: Enter plays it, and Down Arrow moves to the next.
+- **Inix explained** shows the inix format with an example file, and then what
+  the kit's own reader made of that file, section by section.
+- **Layout by Code** explains how every Homer dialog is made, shows the whole
+  code of a small dialog, and then opens that dialog, so you can tab through it
+  and hear that the order is the order of the lines.
+- **Ask the local AI** opens a chat with the AI model on this computer, through
+  Ollama. Nothing leaves the computer. Before your first question, the model is
+  given the kit's own maps for AI agents (`llms.txt` and `AGENTS.md`) and the
+  list of everything in the kit with each file's path, including the skills,
+  subagents and plugin, so it can say where things are. Type a question and
+  press Enter; the answer is added to the conversation, and focus goes to where
+  it begins.
+
+F1 lists every control with its tip, and F11 checks for a newer HomerDev.
 
 ## What is in the kit
 

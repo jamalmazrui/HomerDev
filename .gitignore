@@ -32,6 +32,9 @@
 !/exec/Python/
 !/GEMINI.md
 !/help/
+!/HomerDev.cs
+!/HomerDev.ico
+!/HomerDev_setup.iss
 !/KeepEncoding.txt
 !/License.htm
 !/License.md
@@ -70,6 +73,7 @@ Templates/create_APP_Repo.ps1
 .claude/skills/homer-ui/references/ui-guide.md
 .claude/skills/homer-screen-reader/references/CamelType_JAWSScript.md
 build_release.bat
+HomerDev_setup.exe
 
 # Named in RepoFiles.txt, so put back after the patterns above.
 !/exec/conversions.inix

@@ -25,6 +25,7 @@ import fnmatch
 import os
 import platform
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -479,6 +480,25 @@ def normalizeHomer(sPath):
     return True
 
 
+def sampleInputs(sName, sScript):
+    """What a sample's program is made from, relative to the kit: its own source, its build script, the shared version
+    files and the kit's code it compiles in. Its program is not an input, so a build never changes its own print."""
+    # A C# sample compiles in the kit's C# code only; a Python sample bundles the kit's Python and loads Homer.dll,
+    # which is built from the C# code, so it depends on both.
+    lsInputs = ["Templates/samples/" + sScript, "Templates/samples/version.txt", "Templates/samples/version.py", "exec/CSharp"]
+    if sName.endswith("Py"): lsInputs.append("exec/Python")
+    for sExt in (".cs", ".py", ".spec"):
+        if os.path.isfile(os.path.join(sScriptDir, "Templates", "samples", sName + sExt)): lsInputs.append("Templates/samples/" + sName + sExt)
+    return lsInputs
+
+
+def kitCache():
+    """The kit's fingerprint store, exec\\fingerprints.json, logging each decision (1.65.34)."""
+    sys.path.insert(0, os.path.join(sScriptDir, "scripts"))
+    import fingerprint
+    return fingerprint.Cache(sScriptDir, logLine)
+
+
 def buildSamples():
     """Build every sample, and report each one.
 
@@ -494,6 +514,14 @@ def buildSamples():
     for sScript in c_lsSampleScripts:
         if not os.path.isfile(os.path.join(sSamples, sScript)): continue
         sName = sScript[5:-4] if sScript.lower().startswith("build") else sScript
+        # A SAMPLE IS BUILT WHEN IT CHANGED (1.65.34): its source, its build script, the version files or the kit's
+        # code it compiles in -- or when its program is missing or not the one last built. Otherwise it stays.
+        oCache = kitCache()
+        sOutput = "Templates/samples/" + sName + ".exe"
+        sPrint = oCache.fingerprint(sampleInputs(sName, sScript))
+        if oCache.isCurrent("sample " + sName, sPrint, [sOutput]):
+            sayLine("%s is unchanged since its last build; not built again." % sName)
+            continue
         logLine("RUN: %s in %s" % (sScript, sSamples))
         try:
             oResult = subprocess.run('"%s" nobump' % sScript, shell=True, cwd=sSamples,
@@ -506,6 +534,7 @@ def buildSamples():
             iCode = 1
         logLine("EXIT: %d" % iCode)
         if iCode == 0:
+            oCache.record("sample " + sName, sPrint, [sOutput])
             sayLine("Built %s." % sName)
         else:
             iFailed += 1
@@ -581,6 +610,82 @@ def buildHomerDll():
     if iCode != 0 or not os.path.isfile(sOut):
         return "exec\\Homer.dll did not compile; the log has the compiler's messages"
     sayLine("Built exec\\Homer.dll for Python apps (%s)." % ", ".join(c_lsHomerDllClasses))
+    return ""
+
+
+# THE HOMERDEV DIALOG (1.66.0): exec\\HomerDev.exe, opened by Alt+Control+Shift+D after setup, compiled from
+# HomerDev.cs and the kit's own classes -- the ones an app with a player and the local AI compiles, as DbDo does.
+c_lsHomerDevAppClasses = ["Elevate", "Inix", "KeyMap", "KeyName", "Lbc", "Log", "Media", "MediaPlayer", "Mpv", "Ollama", "Paths", "Say", "Util", "Web"]
+
+
+def buildHomerDevApp():
+    """Compile exec\\HomerDev.exe, when HomerDev.cs, the icon or the kit's C# code changed or the program is missing.
+    Returns a problem or ""."""
+    if os.name != "nt": return ""
+    sSource = os.path.join(sScriptDir, "HomerDev.cs")
+    if not os.path.isfile(sSource): return ""
+    oCache = kitCache()
+    sPrint = oCache.fingerprint(["HomerDev.cs", "HomerDev.ico", "exec/CSharp"])
+    if oCache.isCurrent("HomerDev.exe", sPrint, ["exec/HomerDev.exe"]):
+        sayLine("exec\\HomerDev.exe is unchanged since its last build; not built again.")
+        return ""
+    sCsc = findRoslyn()
+    if sCsc == "": return "exec\\HomerDev.exe was not built: no Roslyn C# compiler; the C# samples install the Build Tools"
+    lsRefs = []
+    for sName in ("System.Speech.dll", "UIAutomationProvider.dll", "UIAutomationTypes.dll"):
+        sPath = findReference(sName)
+        if sPath == "": return "exec\\HomerDev.exe was not built: %s was not found" % sName
+        lsRefs.append("/reference:" + sPath)
+    for sName in ("System.dll", "System.Core.dll", "System.Data.dll", "System.Drawing.dll", "System.Windows.Forms.dll",
+                  "System.Web.dll", "System.Web.Extensions.dll", "System.Net.Http.dll", "System.Xml.dll",
+                  "System.IO.Compression.dll", "System.IO.Compression.FileSystem.dll", "Microsoft.VisualBasic.dll"):
+        lsRefs.append("/reference:" + sName)
+    lsSources = [sSource] + [os.path.join(sScriptDir, "exec", "CSharp", sClass + ".cs") for sClass in c_lsHomerDevAppClasses]
+    for sPath in lsSources:
+        if not os.path.isfile(sPath): return "exec\\HomerDev.exe was not built: %s is missing" % sPath
+    sOut = os.path.join(sScriptDir, "exec", "HomerDev.exe")
+    lsIcon = ["/win32icon:" + os.path.join(sScriptDir, "HomerDev.ico")] if os.path.isfile(os.path.join(sScriptDir, "HomerDev.ico")) else []
+    iCode, sOutput = runCommand([sCsc, "/nologo", "/target:winexe", "/platform:x64", "/optimize+", "/out:" + sOut] + lsIcon + lsRefs + lsSources)
+    if iCode != 0 or not os.path.isfile(sOut):
+        return "exec\\HomerDev.exe did not compile; the log has the compiler's messages"
+    oCache.record("HomerDev.exe", sPrint, ["exec/HomerDev.exe"])
+    sayLine("Built exec\\HomerDev.exe, the HomerDev dialog.")
+    return ""
+
+
+def findIscc():
+    """Inno Setup's compiler, installed with winget when missing, as every app's build does. "" when unavailable."""
+    def look():
+        for sBase in (os.environ.get("ProgramFiles(x86)", ""), os.environ.get("ProgramFiles", ""), os.path.join(os.environ.get("LOCALAPPDATA", ""), "Programs")):
+            sPath = os.path.join(sBase, "Inno Setup 6", "ISCC.exe") if sBase else ""
+            if sPath and os.path.isfile(sPath): return sPath
+        return shutil.which("iscc") or ""
+    sIscc = look()
+    if sIscc: return sIscc
+    sayLine("Installing Inno Setup, which builds HomerDev_setup.exe ...")
+    runCommand(["winget", "install", "--id", "JRSoftware.InnoSetup", "--exact", "--silent", "--accept-source-agreements", "--accept-package-agreements"])
+    return look()
+
+
+def buildHomerDevSetup():
+    """Compile HomerDev_setup.exe at the top of the kit, when anything it ships or the script itself changed, or the
+    setup program is missing. It is built last, since it ships everything the build made. Returns a problem or ""."""
+    if os.name != "nt": return ""
+    sScript = os.path.join(sScriptDir, "HomerDev_setup.iss")
+    if not os.path.isfile(sScript): return ""
+    oCache = kitCache()
+    lsInputs = [s for s in sorted(os.listdir(sScriptDir)) if s.lower() not in ("homerdev_setup.exe", "build_release.bat", "logs", "notes", ".git")]
+    sPrint = oCache.fingerprint(lsInputs)
+    if oCache.isCurrent("HomerDev_setup.exe", sPrint, ["HomerDev_setup.exe"]):
+        sayLine("HomerDev_setup.exe is unchanged since its last build; not built again.")
+        return ""
+    sIscc = findIscc()
+    if sIscc == "": return "HomerDev_setup.exe was not built: Inno Setup could not be installed"
+    iCode, sOutput = runCommand([sIscc, "/Q", "/DHomerDev=" + sScriptDir, sScript])
+    if iCode != 0 or not os.path.isfile(os.path.join(sScriptDir, "HomerDev_setup.exe")):
+        return "HomerDev_setup.exe did not compile; the log has Inno Setup's messages"
+    oCache.record("HomerDev_setup.exe", oCache.fingerprint(lsInputs), ["HomerDev_setup.exe"])
+    sayLine("Built HomerDev_setup.exe, which installs the kit to Program Files.")
     return ""
 
 
@@ -1603,15 +1708,34 @@ def main():
             sayLine(sDllProblem)
             iSamplesFailed += 1
             lsFailedParts.append("Homer.dll")
+        sAppProblem = buildHomerDevApp()
+        if sAppProblem != "":
+            sayLine(sAppProblem)
+            iSamplesFailed += 1
+            lsFailedParts.append("HomerDev.exe")
         # THE SHARED CONVERSION ROUTES ARE PROVED HERE (1.65.0), on sample files made
         # at the time, before any app relies on them: a failing route fails the kit's
         # build; a route whose engine is not on this computer is reported, not passed.
+        # THE ROUTES ARE TESTED WHEN SOMETHING THEY USE CHANGED (1.65.34): the test, the kit's Python code, the
+        # routing table, or a converter on this computer (named by path and date, so an upgrade counts). A passing
+        # result is reused until then; a failing one is never reused.
+        oCache = kitCache()
+        lsTools = []
+        for sTool in ("pandoc", "tesseract", "soffice", "java"):
+            sFound = shutil.which(sTool) or ""
+            lsTools.append("%s=%s@%s" % (sTool, sFound, int(os.path.getmtime(sFound)) if sFound else 0))
+        sPrint = oCache.fingerprint(["scripts/testConversion.py", "exec/Python", "exec/conversions.inix"], lsTools + [sys.version.split()[0]])
         try:
-            oDone = subprocess.run([sys.executable, os.path.join(sScriptDir, "scripts", "testConversion.py")],
-                                   capture_output=True, text=True, timeout=1800)
-            for sLine in (oDone.stdout or "").strip().splitlines(): sayLine(sLine)
-            logLine("testConversion exit %d" % oDone.returncode)
-            if oDone.returncode != 0:
+            if oCache.isCurrent("conversion test", sPrint, []):
+                sayLine("The conversion routes are unchanged since they last passed; not tested again.")
+                oDone = None
+            else:
+                oDone = subprocess.run([sys.executable, os.path.join(sScriptDir, "scripts", "testConversion.py")],
+                                       capture_output=True, text=True, timeout=1800)
+                for sLine in (oDone.stdout or "").strip().splitlines(): sayLine(sLine)
+                logLine("testConversion exit %d" % oDone.returncode)
+                if oDone.returncode == 0: oCache.record("conversion test", sPrint, [])
+            if oDone is not None and oDone.returncode != 0:
                 iSamplesFailed += 1
                 lsRoutes = [re.sub(r":.*$", "", s.strip()) for s in (oDone.stdout or "").splitlines() if s.strip().startswith("FAIL ")]
                 lsFailedParts.append("the conversion test" + (" (" + "; ".join(lsRoutes) + ")" if lsRoutes else ""))
@@ -1645,6 +1769,12 @@ def main():
         iSkills = packSkills()
         sayLine("%d skill%s packed into exec\\skills, ready to upload to claude.ai." % (iSkills, "" if iSkills == 1 else "s"))
         removeStaleBinCopies()
+        # LAST, since setup ships everything above: the program, the samples, the documents, the tutorials, the skills.
+        sSetupProblem = buildHomerDevSetup()
+        if sSetupProblem != "":
+            sayLine(sSetupProblem)
+            iSamplesFailed += 1
+            lsFailedParts.append("HomerDev_setup.exe")
 
     lsProblems = checkKit()
     if len(lsProblems) == 0 and iSamplesFailed == 0:

@@ -27,6 +27,10 @@ build.cmd
 build.py
 checkHomerDev.cmd
 checkHomerDev.py
+# The HomerDev dialog and the installer that puts the kit in Program Files (1.66.0).
+HomerDev.cs
+HomerDev.ico
+HomerDev_setup.iss
 createHomerDevRepo.cmd
 createHomerDevRepo.ps1
 newHomerApp.cmd

@@ -401,7 +401,11 @@ def cachedTool(sName):
         log("tool record unreadable, so every tool is looked for again: " + str(oError))
         return None
     dTool = dAll.get(sName)
-    if not dTool: return None
+    if not dTool:
+        # SAID, NOT SILENT (1.65.34): a build with no record looked for every tool without a word about why, so a
+        # first run and a lost record looked alike in the log.
+        log("%s: no record yet in %s, so it is looked for, and checked on the web" % (sName, toolCachePath()))
+        return None
     fAge = (time.time() - float(dTool.get("checked", 0))) / 86400
     lMissing = [s for s in dTool.get("files", []) if not os.path.exists(s)]
     if fAge > float(dSettings["toolRefreshDays"]) or lMissing or not dTool.get("files"):
@@ -422,8 +426,9 @@ def rememberTool(sName, lFiles, sVersion, **dExtra):
     dAll[sName] = dTool
     try:
         writeText(toolCachePath(), json.dumps(dAll, indent=2), False)
+        log("%s %s recorded in %s; not looked for or checked on the web again for %s days" % (sName, sVersion or "", toolCachePath(), dSettings.get("toolRefreshDays", "?")))
     except Exception as oError:
-        log("tool record not written: " + str(oError))
+        log("tool record not written, so %s is looked for again next build: %s" % (sName, oError))
 
 
 def ensureJava():

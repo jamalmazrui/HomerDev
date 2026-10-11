@@ -507,6 +507,8 @@ def main():
                          help="also delete the Python virtual environment before building")
     oParser.add_argument("--ui", action="store_true",
                          help="also start each sample program and press its keys through UI Automation")
+    oParser.add_argument("--fresh", action="store_true",
+                         help="run every check even when a pass with exactly these inputs is on record")
     oParser.add_argument("--no-clean", action="store_true",
                          help="build over what is there instead of cleaning first")
     dArguments = oParser.parse_args()
@@ -521,6 +523,26 @@ def main():
     logLine("Samples: %s" % c_sSamples)
     logFact("arguments", " ".join(sys.argv[1:]))
     logLine("settings deep=%s no-clean=%s" % (dArguments.deep, dArguments.no_clean))
+
+    # A PASS IS REUSED FOR THE SAME INPUTS (1.65.34). push and release both run this check, and each built all four
+    # samples from clean -- a minute and more of the same work, twice a cycle, with nothing changed between. The kit's
+    # inputs are fingerprinted (its templates, shared code, scripts, this checker and the version, build products
+    # left out); a pass recorded with the same fingerprint is reused, and the report says so. --fresh, --ui, --deep
+    # and --no-clean always run in full; a failure is never reused.
+    sys.path.insert(0, os.path.join(c_sKit, "scripts"))
+    import fingerprint
+    oCache = fingerprint.Cache(c_sKit, logLine)
+    lsInputs = ["Templates", "exec/CSharp", "exec/Python", "exec/conversions.inix", "scripts", "checkHomerDev.py", "build.py", "version.txt"]
+    sPrint = oCache.fingerprint(lsInputs, [platform.python_version()], bSkipProducts=True)
+    bReusable = not (dArguments.fresh or dArguments.ui or dArguments.deep or dArguments.no_clean)
+    if bReusable and oCache.isCurrent("checkHomerDev pass", sPrint, []):
+        sWhen = oCache.d["jobs"]["checkHomerDev pass"].get("when", "?")
+        finding("reused", "pass", "the kit passed this check at %s with exactly these inputs (fingerprint %s); not run again. checkHomerDev --fresh runs it in full" % (sWhen, sPrint[:12]))
+        sReport = writeReport(False, True)
+        sayLine("The kit passed this check at %s, and nothing it checks has changed since; not run again." % sWhen)
+        sayLine("checkHomerDev --fresh runs every check anyway. The report is %s." % os.path.basename(sReport))
+        logLine("checkHomerDev end, reused")
+        return 0
 
     sayLine("Checking the kit in %s" % c_sKit)
     sayLine("This builds all %s, which takes a few minutes." % countNoun(len(c_lSamples), "sample"))
@@ -551,6 +573,8 @@ def main():
     for sName, sVerdict, sEvidence in lsFindings:
         if sVerdict == "fail": sayLine("  failed: %s -- %s" % (sName, sEvidence))
     sayLine("The report is %s." % os.path.basename(sReport))
+    if not iFailed and bReusable: oCache.record("checkHomerDev pass", sPrint, [])
+    if iFailed: oCache.forget("checkHomerDev pass")
     logLine("checkHomerDev end")
     return 1 if iFailed else 0
 
