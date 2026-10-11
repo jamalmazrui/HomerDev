@@ -1864,6 +1864,20 @@ def fillContent(page):
     return True
 
 
+def marketplacePrices(lNamed):
+    """(marketplace code, price) from (input name, value) pairs. THE INCLUSIVE PRICE FIELD ONLY (11 October 2026, from
+    an audit of that day's log): every marketplace has a blank helper input whose name also holds "price", listed
+    before the real price_vat_inclusive one, so the check read the blank and warned that every price was missing when
+    each held its price. When price_vat_inclusive fields are present, only they are read; one code appears once."""
+    lPairs = [(sName, sValue) for sName, sValue in lNamed if sName.endswith("[price_vat_inclusive]")] or list(lNamed)
+    dSeen = {}
+    for sName, sValue in lPairs:
+        lParts = sName.split("][")
+        sCode = lParts[3] if len(lParts) > 3 else sName
+        if sCode not in dSeen or (not dSeen[sCode].strip() and (sValue or "").strip()): dSeen[sCode] = sValue or ""
+    return list(dSeen.items())
+
+
 def fillPricing(page):
     say("Pricing tab.")
     d = dAnswers
@@ -1891,7 +1905,7 @@ def fillPricing(page):
     fillText(page, "US list price", ["input[name='data[digital][channels][amazon][US][price_vat_inclusive]']"], sPrice)
     time.sleep(3)
     lOther = page.locator("input[name^='data[digital][channels][amazon]'][name*='price']")
-    lHeld = [(lOther.nth(i).get_attribute("name").split("][")[3], lOther.nth(i).input_value()) for i in range(lOther.count())]
+    lHeld = marketplacePrices([(lOther.nth(i).get_attribute("name"), lOther.nth(i).input_value()) for i in range(lOther.count())])
     log("Marketplace prices now: " + "; ".join(sCode + "=" + (sValue or "blank") for sCode, sValue in lHeld))
     sUs = next((sValue for sCode, sValue in lHeld if sCode == "US"), "")
     if sUs.strip() not in (sPrice, sPrice.rstrip("0").rstrip(".")): unresolved("US list price", "box holds '" + sUs + "' instead of " + sPrice)
@@ -1900,7 +1914,7 @@ def fillPricing(page):
     clickLabel(page, "Kindle Book Lending", ["Allow lending", "Kindle Book Lending"], "checkbox") if page.get_by_text(re.compile("Book Lending", re.I)).count() else log("No Book Lending option seen")
     logMessages(page, "pricing filled")
     saveDraft(page)
-    lAfter = [(lOther.nth(i).get_attribute("name").split("][")[3], lOther.nth(i).input_value()) for i in range(lOther.count())]
+    lAfter = marketplacePrices([(lOther.nth(i).get_attribute("name"), lOther.nth(i).input_value()) for i in range(lOther.count())])
     log("Marketplace prices after Save as Draft: " + "; ".join(sCode + "=" + (sValue or "blank") for sCode, sValue in lAfter))
     lStillBlank = [sCode for sCode, sValue in lAfter if not sValue.strip()]
     if lStillBlank: unresolved("Marketplace prices", "still blank after saving: " + ", ".join(lStillBlank))

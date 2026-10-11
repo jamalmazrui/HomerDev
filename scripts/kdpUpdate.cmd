@@ -49,16 +49,9 @@ python -m pip install --quiet --upgrade "playwright>=1.47" >> "%sSetupLog%" 2>&1
 python -c "import playwright" >nul 2>&1
 if errorlevel 1 goto noPlaywright
 :havePlaywright
-rem ONE COMMAND (9 October 2026): the books that changed are built first -- buildBooks keeps every book whose sources,
-rem data and templates are unchanged since its last build -- and kdpUpdate then opens on KDP only the books that changed
-rem since their last submission. --no-build skips the build.
-echo %* | find /i "--no-build" >nul
-if not errorlevel 1 goto afterBuild
-echo Building any book that changed since its last build.
-python "%sHere%buildBooks.py"
-set "iBuild=%errorlevel%"
-echo %date% %time% buildBooks.py ended with exit code %iBuild% >> "%sSetupLog%"
-:afterBuild
+rem ONE COMMAND: the books that changed are built first, and kdpUpdate then opens on KDP only the books that changed
+rem since their last submission. The build now runs inside kdpUpdate.py, after it has checked the options (11 October
+rem 2026): only the books named with --book, and none for --no-build, --list, --survey or --record.
 set "sErrors=%sProject%\logs\%sName%-kdpUpdate-errors.txt"
 python "%sHere%kdpUpdate.py" %* 2> "%sErrors%"
 rem The exit code is read with "if errorlevel N", from the highest down, in one statement: a variable named ERRORLEVEL

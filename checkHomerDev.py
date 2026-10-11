@@ -235,8 +235,11 @@ def cleanSamples(bDeep):
 # --- 3. build each sample ---------------------------------------------------
 
 def compilerErrors(sName):
-    """The error lines from a sample's own build log, which is where they are."""
-    sLog = os.path.join(c_sSamples, "build" + sName + ".log")
+    """The error lines from a sample's own build log, which is where they are: the newest <Name>-build-<stamp>.log in the
+    kit's logs (1.65.31). This read Templates\\samples\\build<Name>.log, a name no build writes any more, so a sample
+    that failed to compile never had its errors reported."""
+    lsLogs = sorted(glob.glob(os.path.join(c_sKit, "logs", sName + "-build-*.log")))
+    sLog = lsLogs[-1] if lsLogs else ""
     lsErrors = []
     try:
         for sLine in open(sLog, "rb").read().decode("utf-8-sig", "replace").splitlines():
@@ -253,7 +256,7 @@ def buildSample(sName, sScript, sExe):
     for sError in lsErrors: logLine("ERROR LINE: " + sError)
 
     if iCode != 0:
-        sWhy = lsErrors[0] if lsErrors else "exit code %d; build%s.log has the detail" % (iCode, sName)
+        sWhy = lsErrors[0] if lsErrors else "exit code %d; %s-build-<stamp>.log in logs has the detail" % (iCode, sName)
         return finding("build " + sName, "fail", sWhy)
     if not os.path.isfile(sExePath):
         return finding("build " + sName, "fail",

@@ -7,6 +7,17 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.65.31 -- 11 October 2026
+
+- **The samples log in the kit's logs.** The four fruit-basket build scripts wrote their logs in Templates\\samples\\logs, outside the kit's logs folder, so a zip of logs left them out. They now write logs\\<Sample>-build-<stamp>.log at the top of the kit; a copy of a sample elsewhere logs beside itself. The kit's build moves any old sample logs into logs and removes the empty folder.
+- **A sample that fails to compile says why again.** checkHomerDev read Templates\\samples\\build<Sample>.log for compiler errors, a name no build writes any more, so a failed sample build reported only its exit code. It now reads the newest <Sample>-build-<stamp>.log in logs.
+
+## 1.65.30 -- 11 October 2026
+
+- **Tidy keeps what the kit places.** Tidy took any file its project's lists did not name for a stray, including build_release.bat, which the kit writes at every project's top and which was running tidy at the time: DbDo's cycle ended in silence five times on 10 and 11 October, and scripts\\kind.cmd moved into notes on every run. build_release.bat and every kit tool in scripts now belong in the folder survey; git's whitelist is decided as before. `tidy --selftest` proves it in a scratch folder -- build_release.bat and a kit tool stay, a real stray still moves -- and fails the old behavior; the kit's build runs it as a gate.
+- **Four scripts, gates inside.** build_release ran check as a fifth step. It now runs build, tidy, push and release only; push runs the project's check before it stages anything (checkHomerDev for the kit, scripts\\check for any other project) and commits nothing when it fails, and release runs it again before it tags. The build-release skill, AGENTS.md and the ReadMe say so.
+- **Book scripts, from an audit of MyBooks by another AI.** buildBooks never replaces a manuscript with an older copy from a sources folder: an identical copy is removed, a different one is kept in notes and the conflict logged (the audit's reproduction now keeps the newer text). buildBooks refuses an unknown option or a --book with no name before doing anything. Its build fingerprint now reads the project's own templates where they are used. A failed build keeps the last EPUB: the new one is made as <name>.building.epub and replaces the old only when finished, tested with Pandoc succeeding, failing and succeeding again. kdpUpdate compares the build fingerprint, so a template fix with an unchanged manuscript is sent; builds only after its options pass, only the books named, and none for --list, --survey or --record. kdpSubmit reads each marketplace's price_vat_inclusive field alone, ending the false warnings that every price was blank.
+
 ## 1.65.29 -- 11 October 2026
 
 - **The conversion table is published.** exec\\conversions.inix, the routing table conversion.py reads, was never pushed: .gitignore keeps all of exec out of git except its CSharp and Python folders. So the kit on GitHub had the conversion module without its table. RepoFiles.txt now names it, and tidy's whitelist puts it back, tested with git on a copy.

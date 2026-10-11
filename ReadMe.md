@@ -190,8 +190,9 @@ script: a fresh AppId, and the desktop hotkey.
     release
 
 `createJobDoRepo` makes the GitHub repository and pushes the first commit; after
-that `build_release` is how every release goes out: build, tidy, check, push and
-release, stopping at the first step that fails. Copy `release.cmd` and
+that `build_release` is how every release goes out: build, tidy, push and
+release, stopping at the first step that fails. push runs the project's check
+before it stages anything, and release runs it again before it tags. Copy `release.cmd` and
 `release.ps1` from `scripts\` into the app folder first, or keep one copy in a
 folder on your PATH -- they act on the current directory, so one copy serves
 every project.

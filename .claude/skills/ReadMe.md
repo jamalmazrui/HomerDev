@@ -35,8 +35,8 @@ HomerDev.md, under "Claude skills".
 
 ## Skills for Homer development
 
-- **homer-build-release**: know which of the four kinds of resource a folder holds, then run and troubleshoot the build, check, tidy, push
-  and release cycle, and read the logs those steps leave. Its
+- **homer-build-release**: know which of the four kinds of resource a folder holds, then run and troubleshoot the build, tidy, push
+  and release cycle, with its checks inside, and read the logs those steps leave. Its
   summarizeLogs script turns an uploaded zip of logs into one report: each
   app's build result, check counts, and release outcome.
 - **homer-code**: write and review Homer code in Camel Type, in C#, Python,

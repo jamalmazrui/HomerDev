@@ -26,7 +26,7 @@ Each skill holds the rules for one kind of work. Claude loads a skill by its des
 - **app-help-guide** -- build a screen-reader-friendly help guide for a product from the publisher's own help pages. `.claude/skills/app-help-guide/SKILL.md`
 - **blind-creators** -- add, verify or remove a person or work in the Blind Authors, Developers, Presenters or Creators directories. `.claude/skills/blind-creators/SKILL.md`
 - **homer-books** -- build, audit and publish Kindle books with the kit's book tools. `.claude/skills/homer-books/SKILL.md`
-- **homer-build-release** -- run or troubleshoot build, check, tidy, push and release, and read their logs. `.claude/skills/homer-build-release/SKILL.md`
+- **homer-build-release** -- run or troubleshoot build, tidy, push and release, with the checks inside them, and read their logs. `.claude/skills/homer-build-release/SKILL.md`
 - **homer-code** -- write or review code in Camel Type with the kit's shared classes. `.claude/skills/homer-code/SKILL.md`
 - **homer-convert** -- convert documents and data between formats, writing the Homer encoding. `.claude/skills/homer-convert/SKILL.md`
 - **homer-db** -- design or check a SQLite database the way DbDo opens it. `.claude/skills/homer-db/SKILL.md`
@@ -54,6 +54,6 @@ Each works in its own context and returns a short report, so a long, read-heavy 
 - **The Homer encoding**: UTF-8 with a byte order mark and CRLF line endings, except the files `KeepEncoding.txt` lists, `.cmd` and `.bat` files, `version.txt` and `SKILL.md`.
 - **Detailed logs** from every script and build: environment, settings, every command with its exit code, every error. The console stays brief.
 - **Screen reader agnostic**: no screen reader's own vocabulary in an app's speech or documents; a tutorial names no screen reader.
-- **The cycle**: in `C:\<App>`, `build_release` runs build, then `scripts\tidy`, `scripts\check`, `scripts\push` and `scripts\release`, stopping at the first that fails, so nothing broken is pushed. The kit's build writes it into every project from `scripts\build_release.cmd`. A fix must work through those steps; repairs to a machine's state go in the build, never in a separate script for the person to run.
+- **The cycle**: in `C:\<App>`, `build_release` runs build, then `scripts\tidy`, `scripts\push` and `scripts\release`, stopping at the first that fails; push runs the project's check before it stages anything, and release again before it tags, so nothing broken is pushed. The kit's build writes it into every project from `scripts\build_release.cmd`. A fix must work through those steps; repairs to a machine's state go in the build, never in a separate script for the person to run.
 - **Checks decide**: `build.py check` for the kit, `scripts\check.py` in an app (which includes the installer pattern), `scripts\checkTutorial.py` for walks. A change is done when they pass.
 - **Deliver whole files**, as the project's zip, never as editing instructions.

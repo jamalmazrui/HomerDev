@@ -1,15 +1,15 @@
 @echo off
 setlocal EnableDelayedExpansion
-rem build_release -- the Homer development cycle for the project in the current folder: build, tidy, check, push
+rem build_release -- the Homer development cycle for the project in the current folder: build, tidy, push
 rem and release, in that order, stopping at the first step that fails, so nothing broken is pushed or released.
 rem
 rem THE KIT'S ONE COPY (1.65.25). Each project had its own build_release.bat, written by hand, and copies drift as
 rem the installers did. The kit's build now writes this file as build_release.bat at the top of every project beside
 rem the kit, and of the kit itself; it acts on the current folder, so the same file serves them all.
 rem
-rem CHECK BEFORE PUSH (1.65.25). The acceptance checks -- the installer pattern, the tutorials, the encoding -- ran
-rem only inside release, after push had already sent the code to GitHub. They now run after tidy and before push, so
-rem a failing check stops the cycle before anything leaves the computer. release still runs its own as the last gate.
+rem FOUR SCRIPTS, GATES INSIDE (1.65.30). The cycle is build, tidy, push and release, and nothing else; every audit gate
+rem runs inside one of them. push runs the project's check before it stages anything, so a failing check is never
+rem pushed, and release runs it again before it tags. 1.65.25 to 1.65.29 ran the check as a fifth step here.
 rem
 rem A LOG OF ITS OWN: logs\<Project>-build_release-<stamp>.log holds the environment, and each step's command, exit
 rem code and time; each step also writes its own detailed log. The console says one line a step.
@@ -30,30 +30,22 @@ for /f "tokens=*" %%v in ('ver') do set "sWindows=%%v"
 >> "%sLog%" echo Windows: !sWindows!
 >> "%sLog%" echo Arguments: %*
 
-rem The project's own steps; the kit releases with releaseHomerDev, and checks with checkHomerDev.
-set "sCheck="
-if exist "scripts\check.cmd" set "sCheck=scripts\check.cmd"
-if exist "checkHomerDev.cmd" set "sCheck=checkHomerDev.cmd"
+rem The project's own steps: its build.cmd, and the kit's tidy, push and release in its scripts folder.
 rem ONE CHECK, ONE PUSH (1.65.28). For the kit, release was releaseHomerDev, which runs checkHomerDev and push again
 rem after this cycle had just run both: on 11 October each ran twice. The cycle now calls release directly, as it does
 rem for every project; releaseHomerDev stays the one command for releasing the kit by hand.
 set "sRelease=scripts\release.cmd"
->> "%sLog%" echo Settings: check=!sCheck! release=!sRelease!
+>> "%sLog%" echo Settings: release=!sRelease!
 set "sSummary="
 
 call :step build "build.cmd" || goto :stopped
 call :step tidy "scripts\tidy.cmd" || goto :stopped
-if defined sCheck (
-  call :step check "!sCheck!" || goto :stopped
-) else (
-  >> "%sLog%" echo check: no check script in this project; skipped
-)
 call :step push "scripts\push.cmd" || goto :stopped
 call :step release "!sRelease!" || goto :stopped
 
 echo(
 set "sSummary=!sSummary:~0,-1!"
-echo Built, tidied, checked, pushed and released:!sSummary!.
+echo Built, tidied, pushed and released:!sSummary!.
 >> "%sLog%" echo Finished %date% %time%: every step passed:!sSummary!
 rem The kit's own copy is replaced here, on the same line as the exit: Windows reads the whole line before running
 rem it, so nothing of the old file is read after the copy (1.65.26). A project's copy is written by the kit's build.

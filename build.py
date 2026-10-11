@@ -905,6 +905,24 @@ def renameScripts():
     lsOldLogs = [os.path.join(sScriptDir, s) for s in ("checkHomerDev.log", "releaseHomerDev.log")]
     lsOldLogs += [os.path.join(sScripts, "uiCheck.log")]
     lsOldLogs += [os.path.join(sScriptDir, s) for s in os.listdir(sScriptDir) if s.lower().startswith("evidence-kit-") and s.lower().endswith(".md")]
+    # The samples logged in Templates\\samples\\logs until 1.65.31; those logs join the kit's, under their own names.
+    sSampleLogs = os.path.join(sScriptDir, "Templates", "samples", "logs")
+    if os.path.isdir(sSampleLogs):
+        for sName in sorted(os.listdir(sSampleLogs)):
+            sFrom = os.path.join(sSampleLogs, sName)
+            if not os.path.isfile(sFrom): continue
+            try:
+                os.makedirs(sLogs, exist_ok=True)
+                sTo = os.path.join(sLogs, sName)
+                if os.path.exists(sTo): sTo = os.path.join(sLogs, os.path.splitext(sName)[0] + "-moved" + os.path.splitext(sName)[1])
+                shutil.move(sFrom, sTo); iRemoved += 1
+                logLine("MOVED OLD LOG: Templates/samples/logs/%s into logs" % sName)
+            except Exception as oError:
+                logLine("COULD NOT MOVE Templates/samples/logs/%s: %s" % (sName, oError))
+        try:
+            os.rmdir(sSampleLogs); logLine("REMOVED: Templates/samples/logs, now empty")
+        except OSError as oError:
+            logLine("Templates/samples/logs kept: %s" % oError)
     for sOldLog in lsOldLogs:
         if not os.path.isfile(sOldLog): continue
         try:
@@ -1594,6 +1612,20 @@ def main():
             sayLine("The conversion routes could not be tested: %s" % oError)
             iSamplesFailed += 1
             lsFailedParts.append("the conversion test, which could not run")
+        # TIDY KEEPS WHAT THE KIT PLACES (1.65.30): proved here in a scratch folder before any project's tidy relies
+        # on it, since tidy once moved the running build_release.bat into notes and ended DbDo's cycle in silence.
+        try:
+            oDone = subprocess.run([sys.executable, os.path.join(sScriptDir, "scripts", "tidy.py"), "--selftest", "--path", sScriptDir],
+                                   capture_output=True, text=True, timeout=300)
+            for sLine in (oDone.stdout or "").strip().splitlines(): sayLine(sLine)
+            logLine("tidy self-test exit %d" % oDone.returncode)
+            if oDone.returncode != 0:
+                iSamplesFailed += 1
+                lsFailedParts.append("the tidy self-test")
+        except Exception as oError:
+            sayLine("The tidy self-test could not run: %s" % oError)
+            iSamplesFailed += 1
+            lsFailedParts.append("the tidy self-test, which could not run")
         buildTutorials()
         removeSkillHtm()
         findStaleAppBuilds()

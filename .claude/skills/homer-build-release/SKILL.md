@@ -1,10 +1,10 @@
 ---
 name: homer-build-release
 description: >-
-  Runs and troubleshoots the build, check, tidy, push and release cycle of a
+  Runs and troubleshoots the build, tidy, push and release cycle of a
   Homer Tools app or of the Homer Development Kit (HomerDev) itself, and reads
   the logs those steps leave. Use when the user uploads Homer logs (often as
-  temp.zip) and says "continue", asks why a build, check, tidy, push or release
+  temp.zip) and says "continue", asks why a build, tidy, push, release or a check inside them
   failed, asks whether an app is released or which version is latest, or asks
   what to run next for an app in C:\_APP_ or C:\HomerDev.
 ---
@@ -20,7 +20,7 @@ uploads the `logs` folder, usually zipped as `temp.zip`.
 
 Before advising on any step, know what the folder holds: `kind` says app,
 collection, kit or page, and why. Only an app runs the app build, uiCheck and
-the tutorials; the kit uses build, checkHomerDev and releaseHomerDev; a
+the tutorials; the kit's check is checkHomerDev, run inside push; a
 collection is pushed and tidied like an app but has no build or installer; a
 page is published and released by `post`. The kit's HomerDev.md, under "Four
 kinds of Homer resource", lists what every script does for each kind.
@@ -50,15 +50,19 @@ cmd reads a forward slash as a switch):
 3. A quick test of `exec\<App>.exe`.
 4. `scripts\tidy`: files into place, strays into `notes`, a whitelist
    `.gitignore` from RepoFiles.txt, untracks what the whitelist leaves out.
-   Acts in one run; nothing it moves is lost.
-5. `scripts\check`: the acceptance checks -- installer pattern, tutorials,
-   encoding, documents -- before anything leaves the computer.
-6. `scripts\push "What changed."`: tidy, commit, push.
-7. `scripts\release`: runs `scripts\check` again as the last gate, tags,
+   Acts in one run; nothing it moves is lost. What the kit places --
+   `build_release.bat` at the top and the kit's tools in `scripts` -- is never
+   a stray.
+5. `scripts\push "What changed."`: runs the project's check first -- the
+   acceptance checks: installer pattern, tutorials, encoding, documents; for the
+   kit, checkHomerDev -- and stages nothing if it fails; then commits and pushes.
+6. `scripts\release`: runs `scripts\check` again as the last gate, tags,
    publishes the installer, then confirms GitHub's latest release is this one.
 
-`build_release`, typed in the project's folder, runs steps 2 and 4 to 7 in
-order and stops at the first that fails, naming it; it writes
+FOUR SCRIPTS, GATES INSIDE. The cycle is build, tidy, push and release and no
+other script; every audit gate (checks, self-tests, the conversion test) runs
+inside one of them. `build_release`, typed in the project's folder, runs steps
+2, 4, 5 and 6 in order and stops at the first that fails, naming it; it writes
 `logs\<App>-build_release-<stamp>.log` with each step's exit code and time.
 The kit's build writes it as `build_release.bat` at the top of the kit and of
 every project beside it, from `scripts\build_release.cmd`, so every project

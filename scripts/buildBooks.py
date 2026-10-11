@@ -39,7 +39,7 @@ EXIT CODES  0 every book built and ready to submit; 1 at least one book not read
 Every run writes logs\\MyBooks-buildBooks-<date>-<time>.log in the project folder.
 """
 
-import collections, datetime, glob, html, json, os, platform, posixpath, re, shutil, subprocess, sys, time, traceback, unicodedata, urllib.parse, urllib.request, uuid, zipfile
+import collections, datetime, glob, hashlib, html, json, os, platform, posixpath, re, shutil, subprocess, sys, time, traceback, unicodedata, urllib.parse, urllib.request, uuid, zipfile
 
 # The way an EPUB is made: raised when buildBooks changes what it puts in a book, so every book is built again once.
 c_sBuildFormat = "2026-10-09"
@@ -227,8 +227,21 @@ def tidyEarlierLayout(dCatalog):
         if not os.path.isdir(sSources): continue
         for sName in os.listdir(sSources):
             sTarget = bookFile(dBook, sName)
-            if os.path.exists(sTarget): os.remove(sTarget)
-            shutil.move(os.path.join(sSources, sName), sTarget)
+            sFrom = os.path.join(sSources, sName)
+            # THE CURRENT FILE IS NEVER REPLACED (11 October 2026, from an audit that reproduced it): this removed the
+            # manuscript beside the book and moved an older one from sources in its place. Now a file already beside
+            # the manuscript always stays; a byte-identical copy in sources is removed, and a different one is kept in
+            # notes with the conflict logged, so neither version is lost.
+            if os.path.isdir(sFrom):
+                log(dBook["root"] + ": sources\\" + sName + " is a folder; kept in notes: " + retireTo(sFrom)); continue
+            if os.path.exists(sTarget):
+                if hashlib.sha256(open(sTarget, "rb").read()).digest() == hashlib.sha256(open(sFrom, "rb").read()).digest():
+                    os.remove(sFrom)
+                    log(dBook["root"] + ": sources\\" + sName + " matched the copy beside the manuscript; the duplicate was removed")
+                else:
+                    log(dBook["root"] + ": CONFLICT: sources\\" + sName + " differs from the copy beside the manuscript, which is kept; the sources copy is in notes: " + retireTo(sFrom))
+                continue
+            shutil.move(sFrom, sTarget)
             log(dBook["root"] + ": moved sources\\" + sName + " beside the manuscript")
         shutil.rmtree(sSources, ignore_errors=True)
     sLocal = os.environ.get("LOCALAPPDATA") or os.path.join(os.path.expanduser("~"), ".cache")
@@ -1525,6 +1538,11 @@ def buildEpub(dBook, dKdp, dAudit, dEdition=None):
     writeText(sWorkMd, sBody, False)
     sEpub = os.path.join(sProject, "results", dEdition["file"] if dEdition else sRoot + ".epub")
     os.makedirs(os.path.dirname(sEpub), exist_ok=True)
+    # THE LAST EPUB SURVIVES A FAILED BUILD (11 October 2026, from an audit): the EPUB was deleted before Pandoc ran, so a
+    # failed build left no EPUB at all. The new one is made as <name>.building.epub, finished there, and only then
+    # replaces the old; a failure removes the partial file and leaves the last EPUB as it was.
+    sFinal = sEpub
+    sEpub = sFinal[:-5] + ".building.epub"
     lCommand = [dTools["pandoc"], sWorkMd, "--from", "markdown+autolink_bare_uris-raw_html", "--to", "epub3", "--output", sEpub, "--metadata-file", sMetaPath, "--css", bookTemplate("epub.css"), "--lua-filter", bookTemplate("tocEpub.lua"), "--shift-heading-level-by", str(iShift), "--split-level", "1", "--resource-path", sWork, "--toc-depth", dBook.get("tocDepth") or "2"]
     bMarker = bool(re.search(r"(?m)^\[TOC\]\s*$", sBody))
     if not bMarker: lCommand.append("--toc")
@@ -1551,11 +1569,18 @@ def buildEpub(dBook, dKdp, dAudit, dEdition=None):
     for sLine in sOut.splitlines():
         if sLine.startswith("[WARNING]"): dAudit["warnings"].append("Pandoc: " + re.split(r": PandocHttpError| \(StatusCodeException", sLine[9:].strip())[0][:240])
     if iCode != 0 or not os.path.exists(sEpub):
-        dAudit["errors"].append("Pandoc could not build the EPUB (exit code " + str(iCode) + "); see the log.")
+        if os.path.exists(sEpub): os.remove(sEpub)
+        dAudit["errors"].append("Pandoc could not build the EPUB (exit code " + str(iCode) + "); see the log." + (" The last EPUB is kept." if os.path.exists(sFinal) else ""))
         return ""
-    finishPackage(sEpub, bool(lRecords), dBook["subtitle"], os.path.join(sProject, "books", dBook["root"], dBook["root"] + ".md"))
+    try:
+        finishPackage(sEpub, bool(lRecords), dBook["subtitle"], os.path.join(sProject, "books", dBook["root"], dBook["root"] + ".md"))
+        iUnlinked = unlinkHosts(sEpub, dEdition["unlink"]) if dEdition and dEdition["unlink"] else 0
+    except Exception:
+        if os.path.exists(sEpub): os.remove(sEpub)
+        raise
+    os.replace(sEpub, sFinal)
+    sEpub = sFinal
     if dEdition:
-        iUnlinked = unlinkHosts(sEpub, dEdition["unlink"]) if dEdition["unlink"] else 0
         log("%s: built the %s edition, %s, %s bytes; %s replaced, %s to %s made plain text" % (sRoot, dEdition["name"], sEpub, format(os.path.getsize(sEpub), ","), plural(len(dEdition["replacements"]), "passage"), plural(iUnlinked, "link"), ", ".join(dEdition["unlink"]) or "no host"))
         return sEpub
     dAudit["epub"] = sEpub
@@ -2133,7 +2158,14 @@ def buildKey(dBook, sBookDir, dKdp):
     a run builds only the books that changed. No file name or time is trusted."""
     import hashlib, kdpSubmit
     lsTemplates = []
-    for sDir in (os.path.join(dTools.get("kit", ""), "Templates", "books"), os.path.join(sProject, "templates", "books")):
+    # THE PROJECT'S OWN TEMPLATES ARE WHERE bookTemplate READS THEM (11 October 2026, from an audit): directly in
+    # templates, used when ownTemplates = yes. This looked in templates\\books, so a changed project stylesheet or filter
+    # did not rebuild the book. The builder's own code is deliberately not hashed: kdpUpdate compares this fingerprint,
+    # and an edit to buildBooks.py that changes nothing in a book would resend every book to KDP; c_sBuildFormat is raised
+    # instead when a change to the builder changes what goes into a book.
+    lsDirs = [os.path.join(dTools.get("kit", ""), "Templates", "books")]
+    if dSettings.get("ownTemplates", "").lower() == "yes": lsDirs.append(os.path.join(sProject, "templates"))
+    for sDir in lsDirs:
         if os.path.isdir(sDir):
             for sName in sorted(os.listdir(sDir), key=str.lower):
                 sPath = os.path.join(sDir, sName)
@@ -2200,6 +2232,22 @@ def loadCatalog():
     return dCatalog
 
 
+def argumentProblem(lArgs):
+    """KNOWN OPTIONS ONLY, CHECKED FIRST (11 October 2026, from an audit): an unknown option was ignored, so a mistyped
+    --boook built the whole catalog, and a --book with nothing after it built everything too. Returns what is wrong,
+    or "" when every argument is --book with a name, --gather or --all (a single dash works too)."""
+    i = 0
+    while i < len(lArgs):
+        sWord = lArgs[i].lstrip("-").lower()
+        if not lArgs[i].startswith("-"): return "%s is not an option; name a book with --book %s" % (lArgs[i], lArgs[i])
+        if sWord == "book":
+            if i + 1 >= len(lArgs) or lArgs[i + 1].startswith("-"): return "--book needs a book after it, such as --book Mental"
+            i += 2; continue
+        if sWord in ("all", "gather"): i += 1; continue
+        return "%s is not an option; the options are --book <name>, --gather and --all" % lArgs[i]
+    return ""
+
+
 def chosenBooks(dCatalog, lArgs):
     """The books named with --book, by the start of a root or title, or all books."""
     lWanted = [lArgs[i + 1].lower() for i, s in enumerate(lArgs[:-1]) if s.lstrip("-").lower() == "book"]
@@ -2239,6 +2287,10 @@ def main():
     log("platform " + platform.platform() + "; cwd " + os.getcwd() + "; project " + sProject)
     log("command line: " + subprocess.list2cmdline(sys.argv))
     lArgs = sys.argv[1:]
+    sArgProblem = argumentProblem(lArgs)
+    if sArgProblem:
+        say(sArgProblem + ". Nothing was built.")
+        return 2
     sKitProblem = loadKit()
     if sKitProblem:
         say(sKitProblem)

@@ -64,9 +64,13 @@ setlocal enabledelayedexpansion
 cd /d "%~dp0"
 
 set "app=FruitBasketMdiCs"
-if not exist "%CD%\logs" mkdir "%CD%\logs"
+rem THE KIT'S logs FOLDER (1.65.31): a sample in the kit logs where every kit script does, two folders up; a copy of
+rem a sample anywhere else logs in a logs folder beside itself.
+set "sLogs=%CD%\logs"
+if exist "%~dp0..\..\version.txt" if exist "%~dp0..\..\Templates" for %%K in ("%~dp0..\..") do set "sLogs=%%~fK\logs"
+if not exist "!sLogs!" mkdir "!sLogs!"
 for /f %%T in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd-HHmmss"') do set "sNow=%%T"
-set "log=%CD%\logs\%app%-build-%sNow%.log"
+set "log=!sLogs!\%app%-build-%sNow%.log"
 echo %app% build started %DATE% %TIME%> "%log%"
 echo Script: %~f0>> "%log%"
 echo Folder: %CD%>> "%log%"

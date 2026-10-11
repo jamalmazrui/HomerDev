@@ -358,11 +358,13 @@ createJobDoRepo
 release</code></pre>
 <p><code>createJobDoRepo</code> makes the GitHub repository and pushes
 the first commit; after that <code>build_release</code> is how every
-release goes out: build, tidy, check, push and release, stopping at the
-first step that fails. Copy <code>release.cmd</code> and
-<code>release.ps1</code> from <code>scripts\</code> into the app folder
-first, or keep one copy in a folder on your PATH – they act on the
-current directory, so one copy serves every project.</p>
+release goes out: build, tidy, push and release, stopping at the first
+step that fails. push runs the project’s check before it stages
+anything, and release runs it again before it tags. Copy
+<code>release.cmd</code> and <code>release.ps1</code> from
+<code>scripts\</code> into the app folder first, or keep one copy in a
+folder on your PATH – they act on the current directory, so one copy
+serves every project.</p>
 <h3 id="listen-instead">Listen instead</h3>
 <p>The kit’s ten spoken walks, in the Homer pattern of ten, are in
 <code>help</code>: <code>Tutorial_0_Overview.inix</code> to

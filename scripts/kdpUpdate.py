@@ -47,7 +47,7 @@ Every run writes logs\MyBooks-kdpUpdate-<date>-<time>.log, every step as it happ
 listed at the end.
 """
 
-import datetime, hashlib, json, os, platform, re, sys, time, traceback
+import datetime, hashlib, json, os, platform, re, subprocess, sys, time, traceback
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import kdpSubmit as k
 import kdpBooks as kb
@@ -140,11 +140,20 @@ def auditSourcesSha(sRoot):
     return oMatch.group(1) if oMatch else ""
 
 
+def auditBuildKey(sRoot):
+    """The build fingerprint the book's audit recorded -- its sources, catalog entry, data, the templates used, the
+    Pandoc version and the build format -- or "" when the audit has none."""
+    sAudit = os.path.join(sProject, "results", sRoot + "-audit.md")
+    if not os.path.exists(sAudit): return ""
+    with open(sAudit, encoding="utf-8-sig") as f: oMatch = re.search(r"(?m)^- Build SHA-256: ([0-9a-f]{64})", f.read())
+    return oMatch.group(1) if oMatch else ""
+
+
 def recordReceipt(dState, sHow):
     """Writes the book's [submission]: when, how, and the fingerprints of what KDP now holds."""
     dReceipt = k.readInix(receiptFile(dState["root"])) if os.path.exists(receiptFile(dState["root"])) else {}
     dReceipt["submission"] = {"at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "how": sHow, "epubSha": dState["sha"],
-                              "sourcesSha": dState["sources"], "answersKey": dState["answersKey"]}
+                              "sourcesSha": dState["sources"], "buildKey": dState.get("buildKey", ""), "answersKey": dState["answersKey"]}
     os.makedirs(os.path.dirname(receiptFile(dState["root"])), exist_ok=True)
     k.writeInix(receiptFile(dState["root"]), dReceipt)
     return True
@@ -179,10 +188,16 @@ def bookState(sRoot, dBook):
     # its last submission. A receipt from before this records only the EPUB, which still counts when it matches.
     sSha, sKey, sSources = fileSha(sEpub), answersKey(dBook, sData), k.bookSourcesSha(os.path.dirname(sManuscript))
     dSubmitted = k.readInix(receiptFile(sRoot)).get("submission", {}) if os.path.exists(receiptFile(sRoot)) else {}
+    # BY BUILD, NOT BY SOURCES ALONE (11 October 2026, from an audit): a fix to a template, the navigation or the build
+    # changes the EPUB while the manuscript stays the same, and source equality skipped that improved book. The audit's
+    # build fingerprint covers sources, templates, catalog entry and Pandoc version without the time stamps that change
+    # with every rebuild, so it is compared when the receipt has one; a receipt from before this still compares sources.
+    sBuild = auditBuildKey(sRoot)
     bSameSources = bool(sSources) and dSubmitted.get("sourcesSha") == sSources
+    bSameBuild = bool(sBuild) and dSubmitted.get("buildKey") == sBuild
     bSameEpub = bool(sSha) and dSubmitted.get("epubSha") == sSha
-    bUnchanged = (bSameSources or bSameEpub) and dSubmitted.get("answersKey") == sKey
-    return {"sha": sSha, "answersKey": sKey, "sources": sSources, "unchanged": bUnchanged, "root": sRoot, "title": dBook["title"], "epub": sEpub, "manuscript": sManuscript, "data": sData, "titleId": dKdp.get("titleId", ""), "asin": dKdp.get("asin", ""), "problems": lProblems}
+    bUnchanged = (bSameEpub or (bSameBuild if dSubmitted.get("buildKey") else bSameSources)) and dSubmitted.get("answersKey") == sKey
+    return {"sha": sSha, "answersKey": sKey, "sources": sSources, "buildKey": sBuild, "unchanged": bUnchanged, "root": sRoot, "title": dBook["title"], "epub": sEpub, "manuscript": sManuscript, "data": sData, "titleId": dKdp.get("titleId", ""), "asin": dKdp.get("asin", ""), "problems": lProblems}
 
 
 def chosen(lStates):
@@ -536,6 +551,33 @@ def updateBook(page, dState, dBook):
     return sOutcome
 
 
+def buildFirst():
+    """THE BUILD COMES AFTER THE OPTIONS ARE CHECKED, AND ONLY FOR WHAT IS SENT (11 October 2026, from an audit).
+    kdpUpdate.cmd built the whole catalog before this script read its options, so a mistyped option built every book
+    and then did nothing, and --list, --survey and --record, which send nothing, built everything too. Now the build
+    runs here, after the options passed: none for --no-build, --list, --survey or --record; only the named books for
+    --book; every book otherwise. A failed build is logged and said; a book it left unready is then refused by its own
+    readiness check below, so nothing stale is sent. Returns buildBooks' exit code, or 0 when it did not run."""
+    lSkip = [s for s in ("--no-build", "--list", "--survey", "--record") if s in sys.argv]
+    if lSkip:
+        log("Build skipped: " + ", ".join(lSkip) + " given")
+        return 0
+    sBuild = os.path.join(os.path.dirname(os.path.abspath(__file__)), "buildBooks.py")
+    if not os.path.isfile(sBuild):
+        say("scripts\\buildBooks.py is missing, so nothing was built; books not already built are refused below.")
+        return 0
+    lCommand = [sys.executable, sBuild]
+    if "--except" not in sys.argv:
+        for sName in optionValues("--book"): lCommand += ["--book", sName]
+    say("Building " + ("the books named" if len(lCommand) > 2 else "any book that changed since its last build") + " first.")
+    log("Build: " + subprocess.list2cmdline(lCommand))
+    oDone = subprocess.run(lCommand, cwd=sProject)
+    log("Build exit code " + str(oDone.returncode))
+    if oDone.returncode != 0:
+        say("buildBooks reported a problem (exit code " + str(oDone.returncode) + "); any book it left unready is listed below and not sent. Its log is in logs.")
+    return oDone.returncode
+
+
 def main():
     sProblem = checkOptions()
     if sProblem:
@@ -547,6 +589,7 @@ def main():
     log("Python " + sys.version.split()[0] + " on " + platform.platform() + "; project " + sProject + "; cwd " + os.getcwd() + "; command line " + " ".join(sys.argv))
     log("inix reader: " + ("the kit's, " + k.kitInix().__file__ if k.kitInix() else "kdpSubmit's own"))
     print("kdpUpdate " + c_sVersion.split(":")[0])
+    buildFirst()
     dCatalog = dict(catalog())
     lStates = chosen([bookState(sRoot, dBook) for sRoot, dBook in dCatalog.items()])
     lReady = [d for d in lStates if not d["problems"]]
