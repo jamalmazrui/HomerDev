@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.65.27 -- 11 October 2026
+
+- **releaseHomerDev passes -SkipCheck only when release takes it.** release.ps1 belongs to a separate project and is not in git. The copy in scripts on 11 October had no -SkipCheck, so PowerShell refused the parameter and kit 1.65.26 was pushed but never tagged. releaseHomerDev now asks release.ps1 first, passes -SkipCheck only when it is declared, and logs which.
+- **releaseHomerDev writes in logs,** as `HomerDev-releaseHomerDev-<stamp>.log`, not beside itself.
+- **Old logs move into logs.** The build moves checkHomerDev.log, releaseHomerDev.log, scripts\uiCheck.log and evidence-kit reports from their old places into logs, each move logged, rather than leaving them where a zip of logs misses them.
+
 ## 1.65.26 -- 11 October 2026
 
 - **uiCheck runs only when asked.** build_release runs checkHomerDev as the kit's check, and checkHomerDev started every fruit-basket sample and pressed its keys, so windows opened in the middle of an unattended build and took the screen reader's focus. The programs check is now reported as not checked unless `checkHomerDev --ui` asks for it; nothing else runs uiCheck.

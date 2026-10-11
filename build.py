@@ -898,6 +898,26 @@ def renameScripts():
         except Exception as oError:
             logLine("COULD NOT RENAME scripts/%s: %s" % (sOld, oError))
 
+    # LOGS FROM THEIR OLD PLACES GO INTO logs (1.65.27). checkHomerDev, releaseHomerDev and uiCheck wrote beside
+    # themselves before 1.65.26 and 1.65.27; a log is evidence, so it is moved, not deleted, each move logged.
+    import shutil
+    sLogs = os.path.join(sScriptDir, "logs")
+    lsOldLogs = [os.path.join(sScriptDir, s) for s in ("checkHomerDev.log", "releaseHomerDev.log")]
+    lsOldLogs += [os.path.join(sScripts, "uiCheck.log")]
+    lsOldLogs += [os.path.join(sScriptDir, s) for s in os.listdir(sScriptDir) if s.lower().startswith("evidence-kit-") and s.lower().endswith(".md")]
+    for sOldLog in lsOldLogs:
+        if not os.path.isfile(sOldLog): continue
+        try:
+            os.makedirs(sLogs, exist_ok=True)
+            sStamp = datetime.datetime.fromtimestamp(os.path.getmtime(sOldLog)).strftime("%Y%m%d-%H%M%S")
+            sBase = os.path.basename(sOldLog)
+            sNewName = sBase if sBase.lower().startswith("evidence-") else "HomerDev-%s-%s.log" % (os.path.splitext(sBase)[0], sStamp)
+            shutil.move(sOldLog, os.path.join(sLogs, "HomerDev-" + sNewName if sBase.lower().startswith("evidence-") else sNewName))
+            iRemoved += 1
+            logLine("MOVED OLD LOG: %s into logs" % os.path.relpath(sOldLog, sScriptDir))
+        except Exception as oError:
+            logLine("COULD NOT MOVE %s: %s" % (sOldLog, oError))
+
     # Reports check used to write beside itself. It writes them in logs now,
     # and the ones left here were committed by accident.
     if os.path.isdir(sScripts):
