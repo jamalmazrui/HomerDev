@@ -1072,122 +1072,163 @@ says the key.</p>
 <p><strong>Something to try:</strong> Open any Homer program and guess
 three keys from their words, then check each with Control plus F1.</p>
 <h2 id="install-and-launch">2 - Install and Launch</h2>
-<p>One want: the kit on this computer, proved working. Unarchiving it,
-running its own build, building the C sharp sample and launching it –
-the first Homer program you hear – and one planned misstep. This walk
-assumes walk zero.</p>
+<p>One want: the kit on this computer, and a first look around it.
+Running the setup program and its finish page, the folder a command-line
+user may choose instead, then the HomerDev dialog on Alt plus Control
+plus Shift plus D: its list of everything in the kit, a sample opened
+from it, and the tutorials. This walk assumes walk zero.</p>
 <p><strong>Before you start:</strong> Windows 10 or later, 64-bit, a
-screen reader running, and HomerDev dot zip downloaded. Everything else
-the kit fetches for itself.</p>
-<h3 id="step-1-controlv">Step 1: Control+V</h3>
-<p>The want: the kit on this computer, proved working. Unarchive
-HomerDev dot zip into a folder called C colon backslash HomerDev. That
-is the whole install: open the archive, choose Extract All, and type the
-folder name.</p>
+screen reader running, and HomerDev underscore setup dot e x e
+downloaded from the kit’s latest release.</p>
+<h3 id="step-1-enter">Step 1: Enter</h3>
+<p>The want: the kit on this computer, and a first look around. I run
+the setup program I downloaded. Windows asks for permission, since it
+installs for everyone on the computer, and then the wizard opens.</p>
 <p>Screen reader:</p>
 <ul>
-<li>Destination, edit, C colon backslash HomerDev</li>
+<li>Setup - HomerDev, Welcome to the HomerDev Setup Wizard</li>
 </ul>
-<h3 id="step-2-build">Step 2: build</h3>
-<p>Open a command prompt in that folder and run the kit’s own build. The
-reader echoes what is typed and says nothing else until the command
-answers.</p>
+<p>Confirm the wording with a live run: buildTutorials -live.</p>
+<h3 id="step-2-enter">Step 2: Enter</h3>
+<p>Enter through the pages. The kit goes to C colon backslash Program
+Files backslash HomerDev, the standard place for programs. The last page
+is the one to read.</p>
 <p>Screen reader:</p>
 <ul>
-<li>Homer Development Kit 1.52.8 in C colon backslash HomerDev</li>
-<li>10 documents converted to HTML</li>
-<li>0 problems found. The kit is complete.</li>
+<li>Install Ollama 0.40.3 (runs the local AI model), check box,
+checked</li>
 </ul>
-<h3 id="step-3">Step 3</h3>
-<p>Notice the last line. Zero problems is a real answer, said plainly.
-That is a rule in this kit: a count always matches its noun, and nothing
-reports zero as though it were an error.</p>
-<h3 id="step-4">Step 4</h3>
-<p>What build did. It converted every document to HTML with pandoc,
-fetching pandoc if the machine had none; it checked the kit over – every
-component present, every file in the Homer encoding, no empty files –
-and it packed the sixteen skills an AI assistant reads. Its log is in
-the logs folder, every command with its exit code.</p>
-<h3 id="step-5-cd-templates">Step 5: cd Templates</h3>
-<p>Next, the samples: change into the samples folder under Templates.
-Two programs, a C sharp one and a Python one, and a build script for
-each. Both are the fruit basket: a window with a fruit box, a basket
-list, and a report. The command is silent until the next one
-answers.</p>
+<h3 id="step-3-down">Step 3: Down</h3>
+<p>The finish page offers every tool any Homer program uses, each worded
+by what this computer already has: Install when it is missing, Update
+when it is old, Reinstall, unticked, when it is current. So Enter alone
+installs what is missing and updates what is old. Down Arrow hears each
+box.</p>
 <p>Screen reader:</p>
 <ul>
-<li>Kit, C colon backslash HomerDev version 1.52.8</li>
-<li>Compiler, Microsoft Visual Studio Build Tools</li>
-<li>Built FruitBasketCs dot exe version 1.0.0</li>
+<li>Install Pandoc 3.6 (converts documents between formats), check box,
+checked</li>
 </ul>
-<h3 id="step-6-fruitbasketcs">Step 6: FruitBasketCs</h3>
-<p>Now run it. This is the launch: the first Homer program you hear.</p>
+<h3 id="step-4-enter">Step 4: Enter</h3>
+<p>I press Enter on Finish. Each ticked tool installs in turn, and then
+one box says what happened.</p>
+<p>Screen reader:</p>
+<ul>
+<li>HomerDev Setup Results, dialog</li>
+<li>HomerDev 1.67.0 is installed. Ollama was updated from 0.40.2 to
+0.40.3. Logs are kept in C colon backslash Users backslash Jamal
+backslash AppData backslash Local backslash HomerDev backslash
+logs.</li>
+</ul>
+<h3 id="step-5-1">Step 5</h3>
+<p>One choice for later. If you type commands a lot, you can unzip
+HomerDev dot zip into C colon backslash HomerDev instead: the paths are
+shorter to type, and the kit works the same in either place.</p>
+<h3 id="step-6-altcontrolshiftd">Step 6: Alt+Control+Shift+D</h3>
+<p>Now the dialog, from anywhere in Windows: Alt plus Control plus Shift
+plus D. D for development.</p>
+<p>Screen reader:</p>
+<ul>
+<li>HomerDev, dialog</li>
+<li>Kit contents, list box, Document: AGENTS, HomerDev is a development
+kit for building Windows programs, documents, books, databases,
+installers and spoken tutorials for people who use screen readers, 1 of
+130</li>
+</ul>
+<h3 id="step-7-controlj">Step 7: Control+J</h3>
+<p>A hundred and thirty items: documents, samples, skills, templates,
+scripts and shared code, by kind and then by name. Control plus J
+searches the list. I search for fruit.</p>
+<p>Screen reader:</p>
+<ul>
+<li>Search, edit</li>
+</ul>
+<p>Confirm the wording with a live run: buildTutorials -live.</p>
+<h3 id="step-8-enter">Step 8: Enter</h3>
+<p>I type fruit and press Enter.</p>
+<p>Screen reader:</p>
+<ul>
+<li>Sample: FruitBasketCs, C sharp, one dialog: the smallest Homer
+program, a list you add to and take from. Open runs it., 23 of 130</li>
+</ul>
+<p>Confirm the wording with a live run: buildTutorials -live.</p>
+<h3 id="step-9-enter">Step 9: Enter</h3>
+<p>Enter opens the item I am on. A document opens in the browser, a file
+opens in a window I read line by line, and a sample runs.</p>
 <p>Screen reader:</p>
 <ul>
 <li>Fruit Basket, the basket is empty</li>
 <li>Fruit, edit</li>
 </ul>
-<h3 id="step-7-apple">Step 7: apple</h3>
-<p>Type a fruit and press Enter.</p>
+<h3 id="step-10-enter">Step 10: Enter</h3>
+<p>The window title carries the state, and focus starts in the field,
+because typing a fruit is the first thing anybody does. I type apple and
+press Enter.</p>
 <p>Screen reader:</p>
 <ul>
 <li>apple added, 1 fruit in the basket</li>
 </ul>
-<h3 id="step-8-tab">Step 8: Tab</h3>
-<p>Add two more, then Tab to the basket and arrow through it.</p>
-<p>Screen reader:</p>
-<ul>
-<li>Basket, list box, apple, 1 of 3</li>
-</ul>
-<h3 id="step-9-f1">Step 9: F1</h3>
-<p>F1 for help: every Homer dialog describes its own fields.</p>
+<h3 id="step-11-f1">Step 11: F1</h3>
+<p>One fruit, not one fruits: the noun matches the count. F1 for help:
+every Homer dialog describes its own fields.</p>
 <p>Screen reader:</p>
 <ul>
 <li>Help, Fields in this dialog, Fruit, type the name of a fruit</li>
 </ul>
-<h3 id="step-10-altf4">Step 10: Alt+F4</h3>
-<p>Close it with Alt plus F4 and run it again: the basket was kept
-between sessions, in your local application data, without being asked
-to.</p>
+<h3 id="step-12-altf4">Step 12: Alt+F4</h3>
+<p>I close the basket with Alt plus F4, and the HomerDev dialog is where
+I left it.</p>
 <p>Screen reader:</p>
 <ul>
-<li>Fruit Basket, 2 fruits in the basket</li>
+<li>HomerDev, dialog</li>
+<li>Kit contents, list box, Sample: FruitBasketCs, 23 of 130</li>
 </ul>
-<h3 id="step-11-1">Step 11</h3>
-<p>The Python one builds and runs the same way, and answers every key
-exactly as the C sharp one did – walk three hears it. Two languages, one
-behaviour, because the behaviour lives in the kit’s components rather
-than in either program.</p>
-<h3 id="step-12-1">Step 12</h3>
-<p>A planned misstep. Run build in an app folder whose kit is older than
-the app needs, and the build refuses in one line.</p>
+<p>Confirm the wording with a live run: buildTutorials -live.</p>
+<h3 id="step-13-down">Step 13: Down</h3>
+<p>Down Arrow from here reaches the other three baskets: the same
+program with several windows inside one, and both again in Python. They
+answer every key alike, because the behaviour lives in the kit, not in
+either program. Walk three compares them.</p>
 <p>Screen reader:</p>
 <ul>
-<li>ERROR: DbDo needs HomerDev 1.52.8 or later, and C colon backslash
-HomerDev is 1.52.6.</li>
+<li>Sample: FruitBasketMdiCs, C sharp, several windows inside one: the
+same basket as a multiple-document program. Open runs it., 25 of
+130</li>
 </ul>
-<h3 id="step-13-1">Step 13</h3>
-<p>Where things went. The kit stays in its folder and is never installed
-in Program Files; each sample keeps its data and its session log under
-your local application data, in a folder named for it – the layout every
-Homer app follows.</p>
-<h3 id="step-14-1">Step 14</h3>
-<p>What this walk taught. I say the idea or the key; the reader says the
-command or the name.</p>
+<p>Confirm the wording with a live run: buildTutorials -live.</p>
+<h3 id="step-14-tab">Step 14: Tab</h3>
+<p>Tab moves to the buttons. Play tutorials opens these ten walks in the
+Homer Player, Inix explained and Layout by Code show how settings and
+dialogs are written, Ask the local AI answers questions about the kit,
+typed or spoken, and Connect AI tools comes back in walk eight.</p>
+<p>Screen reader:</p>
+<ul>
+<li>Open, button</li>
+</ul>
+<p>Confirm the wording with a live run: buildTutorials -live.</p>
 <h3 id="step-15-2">Step 15</h3>
-<p>Run the kit’s own check and documents.</p>
-<p>Screen reader:</p>
-<ul>
-<li>build</li>
-</ul>
+<p>What this walk taught. I name the step; the reader gives the key or
+the command.</p>
 <h3 id="step-16-2">Step 16</h3>
-<p>Build the C sharp sample.</p>
+<p>Install the kit and the tools.</p>
 <p>Screen reader:</p>
 <ul>
-<li>buildFruitBasketCs</li>
+<li>HomerDev underscore setup dot e x e</li>
 </ul>
-<p><strong>Something to try:</strong> Unarchive the kit, run build,
-build and run the C sharp fruit basket.</p>
+<h3 id="step-17">Step 17</h3>
+<p>Open the HomerDev dialog.</p>
+<p>Screen reader:</p>
+<ul>
+<li>Alt plus Control plus Shift plus D</li>
+</ul>
+<h3 id="step-18">Step 18</h3>
+<p>Search the kit’s contents.</p>
+<p>Screen reader:</p>
+<ul>
+<li>Control plus J</li>
+</ul>
+<p><strong>Something to try:</strong> Install the kit, open the HomerDev
+dialog, and run the C sharp fruit basket from it.</p>
 <h2 id="start-an-app-from-the-kit">3 - Start an App from the Kit</h2>
 <p>One want: a new program of your own, built on the kit, running by the
 end of the walk. newHomerApp, what it makes, the first build, the first
@@ -1210,7 +1251,7 @@ build runs; the installer script with the shared finish page; accept dot
 inix, the acceptance checks; the tutorial skeletons in help, in the
 pattern of ten; the ReadMe, guide and history, each with its HTML pair;
 and the policy files that say which files travel to the repository.</p>
-<h3 id="step-3-1">Step 3</h3>
+<h3 id="step-3">Step 3</h3>
 <p>The template program is the fruit basket’s shape with the new name: a
 dialog with a field and a list, a report, F1 help on the fields, a
 session log. It runs before you have written a line, so every change is
@@ -1266,7 +1307,7 @@ needs installed, and an executable at the end.</p>
 <li>Installing what the build needs</li>
 <li>Built FruitBasketPy dot exe version 1.0.0</li>
 </ul>
-<h3 id="step-11-2">Step 11</h3>
+<h3 id="step-11-1">Step 11</h3>
 <p>A planned misstep. Name the app with a space, and newHomerApp refuses
 in one line, because the name becomes a folder, a file, a class and a
 shortcut key.</p>
@@ -1275,16 +1316,16 @@ shortcut key.</p>
 <li>A Homer app’s name is one word in upper camel case, like
 FruitBasket.</li>
 </ul>
-<h3 id="step-12-2">Step 12</h3>
+<h3 id="step-12-1">Step 12</h3>
 <p>From here the work is yours: fields in the dialog, commands on the
 menus with their keys named for their words, a template database or two.
 Walk four is what happens each time you type build.</p>
-<h3 id="step-13-2">Step 13</h3>
+<h3 id="step-13-1">Step 13</h3>
 <p>The tutorial skeletons in help, one for each walk in the pattern of
 ten, are part of what newHomerApp made. Each is a walk in the pattern
 with placeholder steps, so the day a feature is finished its walk is a
 file to fill in, not to invent; walk six is about filling them.</p>
-<h3 id="step-14-2">Step 14</h3>
+<h3 id="step-14-1">Step 14</h3>
 <p>accept dot inix is the app’s own acceptance list: a name and a
 command each – the program was produced, the installer was produced, no
 kit class was copied into the folder. check runs them, and the release
@@ -1297,13 +1338,13 @@ noticed and a private one is never pushed.</p>
 <h3 id="step-16-3">Step 16</h3>
 <p>What this walk taught. I say the idea or the key; the reader says the
 command or the name.</p>
-<h3 id="step-17">Step 17</h3>
+<h3 id="step-17-1">Step 17</h3>
 <p>Make a new app from the template.</p>
 <p>Screen reader:</p>
 <ul>
 <li>newHomerApp</li>
 </ul>
-<h3 id="step-18">Step 18</h3>
+<h3 id="step-18-1">Step 18</h3>
 <p>Every stage, from encoding to installer.</p>
 <p>Screen reader:</p>
 <ul>
@@ -1334,7 +1375,7 @@ every file is put right: UTF-8 with a byte order mark, CRLF line
 endings. The hotkey list is generated from the program itself. Any
 tutorial whose audio is missing or older than its script is spoken. The
 program compiles. The installer is built.</p>
-<h3 id="step-3-2">Step 3</h3>
+<h3 id="step-3-1">Step 3</h3>
 <p>Each stage says one line and writes the rest to the log. Here is the
 line that matters most.</p>
 <p>Screen reader:</p>
@@ -1349,7 +1390,7 @@ refuse.</p>
 <ul>
 <li>13 checks passed, 0 checks failed, 2 checks not checked.</li>
 </ul>
-<h3 id="step-5-1">Step 5</h3>
+<h3 id="step-5-2">Step 5</h3>
 <p>What the checks are. Every file in the Homer encoding. Every access
 letter unique within its dialog or menu. No key on a reader’s key. The
 app’s files under the Local tree, never Roaming. The hotkey list
@@ -1388,20 +1429,20 @@ installed copy finds it within the hour.</p>
 tutorials, check, push, release. The console said one line each; the
 logs say every command and its exit code. When something is wrong, the
 log is the thing to send – never a description of the console.</p>
-<h3 id="step-11-3">Step 11</h3>
+<h3 id="step-11-2">Step 11</h3>
 <p>A second planned misstep. Run release before the build has finished
 speaking its tutorials, and it refuses – the build has not succeeded yet
 – which is right, if blunt; wait for the Built line, then release.</p>
-<h3 id="step-12-3">Step 12</h3>
+<h3 id="step-12-2">Step 12</h3>
 <p>What this walk taught. I say the idea or the key; the reader says the
 command or the name.</p>
-<h3 id="step-13-3">Step 13</h3>
+<h3 id="step-13-2">Step 13</h3>
 <p>Every stage, encoding to installer.</p>
 <p>Screen reader:</p>
 <ul>
 <li>build</li>
 </ul>
-<h3 id="step-14-3">Step 14</h3>
+<h3 id="step-14-2">Step 14</h3>
 <p>What release would refuse, in seconds.</p>
 <p>Screen reader:</p>
 <ul>
@@ -1451,7 +1492,7 @@ them; each says its name, its state, and its size.</p>
 <ul>
 <li>Update screen reader scripts checked, 1 of 6</li>
 </ul>
-<h3 id="step-5-2">Step 5</h3>
+<h3 id="step-5-3">Step 5</h3>
 <p>The three words, from the kit. Install when the piece is not there.
 Update when it is there and a newer version is available – the installer
 asked winget. Reinstall when it is there and current, unticked unless
@@ -1471,7 +1512,7 @@ one word.</p>
 <ul>
 <li>checked</li>
 </ul>
-<h3 id="step-8-enter">Step 8: Enter</h3>
+<h3 id="step-8-enter-1">Step 8: Enter</h3>
 <p>Launch is ticked already. Enter presses Finish, and whatever was
 ticked installs now; a results box then says what was done, one line per
 piece.</p>
@@ -1490,19 +1531,19 @@ app names its pieces in a table – a name, a winget id, an executable to
 look for, what it is used for – and the kit does the rest: the probing,
 the three states, the labels, the ordering, the results. Ten lines of
 the app’s, for a page that behaves the same in every Homer program.</p>
-<h3 id="step-11-4">Step 11</h3>
+<h3 id="step-11-3">Step 11</h3>
 <p>Screen reader scripts are a piece of their own: the kit knows where
 each reader keeps its settings or its add-ons, and the box reads
 Install, Update or Reinstall for them as for the rest.</p>
-<h3 id="step-12-4">Step 12</h3>
+<h3 id="step-12-3">Step 12</h3>
 <p>A planned misstep. Run the installer a second time: every piece
 already present says so, and Install becomes Reinstall, unticked.
 Nothing is installed twice.</p>
-<h3 id="step-13-4">Step 13</h3>
+<h3 id="step-13-3">Step 13</h3>
 <p>Removing a Homer program is Windows Settings, Apps; the pieces it
 installed are programs in their own right and stay for the other Homer
 programs, and your data folder stays unless you delete it.</p>
-<h3 id="step-14-4">Step 14</h3>
+<h3 id="step-14-3">Step 14</h3>
 <p>What the table in the app’s script looks like, in words: one line per
 piece – the name the box shows, the winget id that installs it, the
 executable whose presence means it is there, and what it is for, which
@@ -1518,10 +1559,10 @@ right before you reach them.</p>
 <p>The installer’s own log is written beside the results – every piece,
 every command, every exit code – so a piece that failed to install names
 why, and the summary points at the log.</p>
-<h3 id="step-17-1">Step 17</h3>
+<h3 id="step-17-2">Step 17</h3>
 <p>What this walk taught. I say the idea or the key; the reader says the
 command or the name.</p>
-<h3 id="step-18-1">Step 18</h3>
+<h3 id="step-18-2">Step 18</h3>
 <p>The one word that is the box’s state.</p>
 <p>Screen reader:</p>
 <ul>
@@ -1553,20 +1594,20 @@ the word it comes from. Key: the key pressed. Hear: what the reader
 says, word for word, as it would be spoken – a file name as said, not as
 written. Say again: what that meant. Name silence when a key says
 nothing. Name no screen reader.</p>
-<h3 id="step-3-3">Step 3</h3>
+<h3 id="step-3-2">Step 3</h3>
 <p>Two voices, because a program has two: the person, and the reader
 answering. The exchange is the teaching device, and it is used for more
 than keystrokes: a glossary is the host saying the term and the reader
 saying the meaning; a recap is the host saying the key and the reader
 saying the command. What the voices never do is chat.</p>
-<h3 id="step-4-1">Step 4</h3>
+<h3 id="step-4">Step 4</h3>
 <p>The pattern of ten, the same for every app, numbered with one digit
 so a folder sorts it. Zero, the overview and contents. One, the user
 interface and the key rules together. Two to eight, seven tasks, each
 built around a plain want – usually install and launch first. Nine, the
 conclusion: the summary, the glossary, and more information, the help
 built in among it.</p>
-<h3 id="step-5-3">Step 5</h3>
+<h3 id="step-5-4">Step 5</h3>
 <p>Three to five minutes for parts one to ten: under three is too thin
 to repay the listener’s start; over five loses them. A thin walk gets
 substance – the adjacent thing the want needs, a planned misstep and its
@@ -1613,22 +1654,22 @@ it was last spoken; the rest are kept.</p>
 33</li>
 <li>Wrote Tutorials dot m3u naming 12 tutorials, 27 minutes in all.</li>
 </ul>
-<h3 id="step-11-5">Step 11</h3>
+<h3 id="step-11-4">Step 11</h3>
 <p>Under three minutes or over five, the tool says so by name, with the
 guideline in one line. Tutorials dot m3u is the playlist Play Tutorials
 uses; Tutorials dot md is the transcript, made from the same scripts;
 TutorialFeed dot xml is a podcast feed of the same audio.</p>
-<h3 id="step-12-5">Step 12</h3>
+<h3 id="step-12-4">Step 12</h3>
 <p>Two kinds of listener. A walk is written for the person who will
 press the keys tomorrow; it is also what an AI assistant reads to learn
 the program, which is why the skills folder points at it.</p>
-<h3 id="step-13-5">Step 13</h3>
+<h3 id="step-13-4">Step 13</h3>
 <p>The learning behind the rules came from ninety-eight recorded screen
 reader training sessions and from Quill Radio’s tutorials: spell a lone
 letter with its alphabet word; one planned misstep per walk; close by
 naming the two or three keys taught; a concrete want before a feature.
 TutorialLearnings dot md in the kit’s help has the rest.</p>
-<h3 id="step-14-5">Step 14</h3>
+<h3 id="step-14-4">Step 14</h3>
 <p>What this walk taught. I say the idea or the key; the reader says the
 command or the name.</p>
 <h3 id="step-15-6">Step 15</h3>
@@ -1643,7 +1684,7 @@ command or the name.</p>
 <ul>
 <li>buildTutorials</li>
 </ul>
-<h3 id="step-17-2">Step 17</h3>
+<h3 id="step-17-3">Step 17</h3>
 <p>The playlist Play Tutorials uses.</p>
 <p>Screen reader:</p>
 <ul>
@@ -1681,13 +1722,13 @@ plainest case. Here it is in FileDir, on a saved podcast page.</p>
 <li>1 track from stations</li>
 <li>RadioTrail, Track list: list box, KIRO 710 ESPN Seattle, 1 of 1</li>
 </ul>
-<h3 id="step-4-2">Step 4</h3>
+<h3 id="step-4-1">Step 4</h3>
 <p>Scroll Lock pauses and resumes; the Volume and Rate sliders are
 ordinary sliders; Alt plus Shift plus R records a copy of the stream;
 Escape closes it. Learned once in FileDir, known in DbDo, because
 MediaPlayer dot cs lives in the kit and both programs compile it from
 there.</p>
-<h3 id="step-5-4">Step 5</h3>
+<h3 id="step-5-5">Step 5</h3>
 <p>The other classes work the same way, less visibly. Lbc builds every
 dialog you heard in walk one. Say speaks every message, choosing the
 channel of whichever screen reader is running, or the Windows voice when
@@ -1716,12 +1757,12 @@ folder; it compiles against the kit.</p>
 depended on one app, and compiled in that app alone; the kit’s check now
 compiles every shared class on its own, so the mistake is caught in the
 kit and not in the fifth app to try it.</p>
-<h3 id="step-11-6">Step 11</h3>
+<h3 id="step-11-5">Step 11</h3>
 <p>The Python side has the same shape: a Say, a Log, an Inix, a dialog
 builder, so a Python app – HomerScribe is one – speaks and logs and asks
 exactly as the C sharp ones do. Walk one’s two fruit baskets were the
 proof.</p>
-<h3 id="step-12-6">Step 12</h3>
+<h3 id="step-12-5">Step 12</h3>
 <p>Updating the kit is unarchiving HomerDev dot zip over the folder and
 building; every app’s build checks the kit’s version against the one it
 needs, and says so in one line when the kit is too old.</p>
@@ -1730,12 +1771,12 @@ needs, and says so in one line when the kit is too old.</p>
 <li>ERROR: FileDir needs HomerDev 1.52.8 or later, and C colon backslash
 HomerDev is 1.52.6.</li>
 </ul>
-<h3 id="step-13-6">Step 13</h3>
+<h3 id="step-13-5">Step 13</h3>
 <p>How an app reaches the kit. Its build passes the kit’s CSharp folder
 to the compiler, so Lbc dot cs, Say dot cs and the rest are compiled
 into the app from where they live; nothing is copied. The acceptance
 check named missing Lbc dot cs is the proof that nothing was.</p>
-<h3 id="step-14-6">Step 14</h3>
+<h3 id="step-14-5">Step 14</h3>
 <p>A worked case of the gain. The Homer Player’s recording – Alt plus
 Shift plus R, a Record button and a Stop recording button – was written
 once, in the kit, on 5 October. FileDir had it on its next build, and
@@ -1749,13 +1790,13 @@ it exactly as it is?</p>
 <h3 id="step-16-6">Step 16</h3>
 <p>What this walk taught. I say the idea or the key; the reader says the
 command or the name.</p>
-<h3 id="step-17-3">Step 17</h3>
+<h3 id="step-17-4">Step 17</h3>
 <p>The player every Homer program shares.</p>
 <p>Screen reader:</p>
 <ul>
 <li>MediaPlayer dot cs</li>
 </ul>
-<h3 id="step-18-2">Step 18</h3>
+<h3 id="step-18-3">Step 18</h3>
 <p>The dialog class.</p>
 <p>Screen reader:</p>
 <ul>
@@ -1795,18 +1836,50 @@ I type the command.</p>
 <p>Enter runs it.</p>
 <p>Screen reader:</p>
 <ul>
-<li>16 skills checked, 0 problems.</li>
+<li>17 skills checked, 0 problems.</li>
 </ul>
-<h3 id="step-4-3">Step 4</h3>
-<p>Sixteen skills, none broken. A skill whose description held an angle
-bracket would be refused when uploaded, and this check names it
+<h3 id="step-4-2">Step 4</h3>
+<p>Seventeen skills, none broken. A skill whose description held an
+angle bracket would be refused when uploaded, and this check names it
 first.</p>
-<h3 id="step-5-5">Step 5</h3>
-<p>Three sentences carry the kit into a chat: what the program is; which
-classes to use – Lbc for every dialog, Inix for settings, Log for the
-session log, Say only for what the reader cannot know; and the sample to
-follow, FruitBasketCs.</p>
-<h3 id="step-6-controlo">Step 6: Control+O</h3>
+<h3 id="step-5-altt">Step 5: Alt+T</h3>
+<p>Next, the assistant has to find the kit. You work in your own
+project’s folder, and an assistant started there knows nothing of
+HomerDev until something tells it. One button does it once, for every
+assistant on the computer: in the HomerDev dialog, Connect AI tools. Its
+key is Alt plus T.</p>
+<p>Screen reader:</p>
+<ul>
+<li>Connect AI tools</li>
+<li>Connected 3 AI tools to the Homer Development Kit at C colon
+backslash Program Files backslash HomerDev.</li>
+</ul>
+<p>Confirm the wording with a live run: buildTutorials -live.</p>
+<h3 id="step-6-3">Step 6</h3>
+<p>What it did: Claude Code, Codex and Gemini each read a personal
+instructions file in every project. It added a short note to each,
+saying where the kit is and to read its AGENTS file first, and it linked
+the kit’s skills into each assistant’s own skills folder. Your own
+instructions in those files are left alone.</p>
+<h3 id="step-7-3">Step 7</h3>
+<p>From now on, mention Homer or HomerDev in any project, and say what
+you want in plain words. I start my assistant in the app’s folder and
+type one line.</p>
+<p>Screen reader:</p>
+<ul>
+<li>Using HomerDev, add a Prefix box to this dialog, the Homer way.</li>
+</ul>
+<h3 id="step-8-4">Step 8</h3>
+<p>The assistant reads the kit’s instructions, then the skill for
+dialogs, and uses the kit’s Lbc class rather than inventing its own.
+Without connecting, one sentence at the start of a session does the
+same.</p>
+<p>Screen reader:</p>
+<ul>
+<li>Read the AGENTS file of the Homer Development Kit, in the folder the
+HomerDev environment variable names, and follow it.</li>
+</ul>
+<h3 id="step-9-controlo">Step 9: Control+O</h3>
 <p>Then the method the kit is shaped around. Specify before you
 generate: write accept dot inix first, a few named checks of what done
 means, so the assistant works to your idea of done, not its own. I open
@@ -1817,35 +1890,35 @@ it in EdSharp.</p>
 <li>File name: edit</li>
 </ul>
 <p>Confirm the wording with a live run: buildTutorials -live.</p>
-<h3 id="step-7-build">Step 7: build</h3>
+<h3 id="step-10-build">Step 10: build</h3>
 <p>Each check is a name and a command, and check runs them all. Now one
-change, then one build: I ask for a Prefix box in the dialog, put the
-assistant’s file in place, and type build.</p>
+change, then one build: the assistant has written the Prefix box, I put
+its file in place, and type build.</p>
 <p>Screen reader:</p>
 <ul>
 <li>build</li>
 </ul>
-<h3 id="step-8-enter-1">Step 8: Enter</h3>
+<h3 id="step-11-enter">Step 11: Enter</h3>
 <p>Enter.</p>
 <p>Screen reader:</p>
 <ul>
 <li>Built PatternRename underscore setup dot e x e, version 1.0.1</li>
 </ul>
 <p>Confirm the wording with a live run: buildTutorials -live.</p>
-<h3 id="step-9-check">Step 9: check</h3>
+<h3 id="step-12-check">Step 12: check</h3>
 <p>The installer is built. Then check, which refuses what release would
 refuse, and writes the evidence.</p>
 <p>Screen reader:</p>
 <ul>
 <li>check</li>
 </ul>
-<h3 id="step-10-enter">Step 10: Enter</h3>
+<h3 id="step-13-enter">Step 13: Enter</h3>
 <p>Enter.</p>
 <p>Screen reader:</p>
 <ul>
 <li>13 checks passed, 0 checks failed, 2 checks not checked.</li>
 </ul>
-<h3 id="step-11-enter">Step 11: Enter</h3>
+<h3 id="step-14-enter">Step 14: Enter</h3>
 <p>The two not checked are the build and the smoke run, which come with
 dash dash build. A planned misstep: the assistant gave two controls
 captions that start with the same letter. I run check again.</p>
@@ -1854,7 +1927,7 @@ captions that start with the same letter. I run check again.</p>
 <li>access letters – Prefix: P is used by Pattern and Prefix</li>
 </ul>
 <p>Confirm the wording with a live run: buildTutorials -live.</p>
-<h3 id="step-12-enter">Step 12: Enter</h3>
+<h3 id="step-15-enter">Step 15: Enter</h3>
 <p>The check names the caption and the clash; the fix is a caption, not
 a key table. The assistant renames the box Text Before Each Name, so it
 takes T from the first letter of a word; I rebuild, and check passes
@@ -1863,7 +1936,7 @@ again.</p>
 <ul>
 <li>13 checks passed, 0 checks failed, 2 checks not checked.</li>
 </ul>
-<h3 id="step-13-controlf1">Step 13: Control+F1</h3>
+<h3 id="step-16-controlf1">Step 16: Control+F1</h3>
 <p>Last, verify without sight: the log says what happened, and your ears
 do the rest. In the running program, Control plus F1 turns on the Key
 Describer, so the new box’s key says what it does.</p>
@@ -1871,35 +1944,35 @@ Describer, so the new box’s key says what it does.</p>
 <ul>
 <li>Key Describer On</li>
 </ul>
-<h3 id="step-14-altt">Step 14: Alt+T</h3>
+<h3 id="step-17-altt">Step 17: Alt+T</h3>
 <p>Alt plus T, T for Text, the first letter of the new caption.</p>
 <p>Screen reader:</p>
 <ul>
 <li>Alt plus T, Text Before Each Name</li>
 </ul>
 <p>Confirm the wording with a live run: buildTutorials -live.</p>
-<h3 id="step-15-controlf1">Step 15: Control+F1</h3>
+<h3 id="step-18-controlf1-1">Step 18: Control+F1</h3>
 <p>Control plus F1 again, and the keys act once more.</p>
 <p>Screen reader:</p>
 <ul>
 <li>No Key Describer</li>
 </ul>
-<h3 id="step-16-7">Step 16</h3>
+<h3 id="step-19-2">Step 19</h3>
 <p>What this walk taught. I name the step; the reader gives the
 command.</p>
-<h3 id="step-17-4">Step 17</h3>
+<h3 id="step-20-1">Step 20</h3>
 <p>Say what done means, first.</p>
 <p>Screen reader:</p>
 <ul>
 <li>accept dot inix</li>
 </ul>
-<h3 id="step-18-3">Step 18</h3>
+<h3 id="step-21-1">Step 21</h3>
 <p>Prove it before release.</p>
 <p>Screen reader:</p>
 <ul>
 <li>check</li>
 </ul>
-<h3 id="step-19-2">Step 19</h3>
+<h3 id="step-22-1">Step 22</h3>
 <p>Make sure the instructions an assistant reads are sound.</p>
 <p>Screen reader:</p>
 <ul>
@@ -1929,14 +2002,14 @@ can be guessed; the word gives the letter.</p>
 <ul>
 <li>Control plus K, Keywords, in every program that searches</li>
 </ul>
-<h3 id="step-3-4">Step 3</h3>
+<h3 id="step-3-3">Step 3</h3>
 <p>Three commands take a change from the morning to a published
 installer by lunch, and each refuses when it should.</p>
 <p>Screen reader:</p>
 <ul>
 <li>build, check, release</li>
 </ul>
-<h3 id="step-4-4">Step 4</h3>
+<h3 id="step-4-3">Step 4</h3>
 <p>And a program teaches itself, in ten walks spoken by its build.</p>
 <p>Screen reader:</p>
 <ul>
@@ -1948,17 +2021,17 @@ you write a line; when something is wrong, send the log; an app never
 copies a kit class, so a fix reaches every program on its next build;
 and an assistant works to your idea of done when accept dot inix says it
 first.</p>
-<h3 id="step-6-3">Step 6</h3>
+<h3 id="step-6-4">Step 6</h3>
 <p>Now the words, in alphabetical order. I say the term; the reader says
 what it means.</p>
-<h3 id="step-7-3">Step 7</h3>
+<h3 id="step-7-4">Step 7</h3>
 <p>access letter.</p>
 <p>Screen reader:</p>
 <ul>
 <li>The underlined letter in a caption, from the first letter of a word,
 one per dialog or menu; the check counts them.</li>
 </ul>
-<h3 id="step-8-4">Step 8</h3>
+<h3 id="step-8-5">Step 8</h3>
 <p>build.</p>
 <p>Screen reader:</p>
 <ul>
@@ -1979,28 +2052,28 @@ letters, keys, hotkeys, tutorials, acceptance.</li>
 <li>The installer’s last page: optional pieces as boxes, each saying
 Install, Update or Reinstall, with a results box after.</li>
 </ul>
-<h3 id="step-11-7">Step 11</h3>
+<h3 id="step-11-6">Step 11</h3>
 <p>Homer encoding.</p>
 <p>Screen reader:</p>
 <ul>
 <li>UTF-8 with a byte order mark and CRLF line endings, for every text
 file the kit or an app ships.</li>
 </ul>
-<h3 id="step-12-7">Step 12</h3>
+<h3 id="step-12-6">Step 12</h3>
 <p>Homer Player.</p>
 <p>Screen reader:</p>
 <ul>
 <li>The player shared by every Homer program: a track list, Scroll Lock
 to pause, sliders, Alt plus Shift plus R to record.</li>
 </ul>
-<h3 id="step-13-7">Step 13</h3>
+<h3 id="step-13-6">Step 13</h3>
 <p>inix.</p>
 <p>Screen reader:</p>
 <ul>
 <li>The settings file format: sections and lines, with comments that
 make the file its own documentation.</li>
 </ul>
-<h3 id="step-14-7">Step 14</h3>
+<h3 id="step-14-6">Step 14</h3>
 <p>Lbc.</p>
 <p>Screen reader:</p>
 <ul>
@@ -2014,7 +2087,7 @@ Tab, Alt letters, Control plus Enter and Escape.</li>
 <li>The command that makes a new app from the template: its folder, its
 files, its tutorial skeletons.</li>
 </ul>
-<h3 id="step-16-8">Step 16</h3>
+<h3 id="step-16-7">Step 16</h3>
 <p>pattern of ten.</p>
 <p>Screen reader:</p>
 <ul>
@@ -2042,14 +2115,14 @@ changing nothing; twice, the words in a window.</li>
 <li>A folder of instructions an AI assistant reads to learn the kit’s
 rules: coding, tutorials, installers, documents.</li>
 </ul>
-<h3 id="step-20-1">Step 20</h3>
+<h3 id="step-20-2">Step 20</h3>
 <p>walk.</p>
 <p>Screen reader:</p>
 <ul>
 <li>One spoken tutorial: a text file of steps, spoken by the build in
 two voices.</li>
 </ul>
-<h3 id="step-21-1">Step 21</h3>
+<h3 id="step-21-2">Step 21</h3>
 <p>Last, more information. Help is built into every Homer program, the
 same in each. The guide, and what changed.</p>
 <p>Screen reader:</p>
@@ -2057,7 +2130,7 @@ same in each. The guide, and what changed.</p>
 <li>F1, the guide</li>
 <li>Shift plus F1, History</li>
 </ul>
-<h3 id="step-22-1">Step 22</h3>
+<h3 id="step-22-2">Step 22</h3>
 <p>The version, and what any key does without doing it.</p>
 <p>Screen reader:</p>
 <ul>

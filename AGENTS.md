@@ -6,8 +6,11 @@ This file is for any AI agent asked to use the kit. Read it first; then read the
 
 ## Using the kit from another project
 
+- **Finding the kit.** The `HomerDev` environment variable names its folder; HomerDev_setup.exe installs it to `C:\Program Files\HomerDev`, and developers often keep it at `C:\HomerDev`. `scripts\kind --kit` prints the folder it finds. Read files there directly; do not ask the person where the kit is.
+- **Connected once.** `scripts\connectAI` (also the HomerDev dialog's Connect AI tools button) puts a pointer to the kit in the personal instruction file of Claude Code, Codex and Gemini CLI or Antigravity, and links the kit's skills into each tool's personal skills folder. When the person mentions Homer or HomerDev, read this file, then the matching skill.
+
 - **Claude Code, as a plugin.** `/plugin marketplace add JamalMazrui/HomerDev`, then `/plugin install homer-dev@homer-dev-kit`. The skills and the two subagents then work in any project, named `homer-dev:<skill>`.
-- **Any agent, from the repository.** Download `https://github.com/JamalMazrui/HomerDev/archive/main.zip` (HomerDev-main.zip) and unzip it to `C:\HomerDev`; Homer apps build against that folder and never need it once installed. `newHomerApp` starts an app; `updateAppBuilds` refreshes the kit's scripts in every app.
+- **Any agent, from the installer or the repository.** Run HomerDev_setup.exe from the latest release, or download `https://github.com/JamalMazrui/HomerDev/archive/main.zip` (HomerDev-main.zip) and unzip it to `C:\HomerDev`; Homer apps build against that folder and never need it once installed. `newHomerApp` starts an app; `updateAppBuilds` refreshes the kit's scripts in every app.
 - **Only some parts.** Every skill, shared class and template stands on its own and may be used alone; each skill's SKILL.md names the files it relies on.
 
 ## Where things are

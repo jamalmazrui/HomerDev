@@ -365,12 +365,27 @@ private static string readCapped(string sPath, int iMost)
     return sText.Length > iMost ? sText.Substring(0, iMost) + "\r\n[...]" : sText;
 }
 
+// plainText: an answer as a screen reader reads it best. A small model writes Markdown even when asked not to, and
+// in a plain text box its asterisks and pound signs are read aloud as symbols (11 October 2026), so emphasis marks,
+// heading marks and code ticks are removed; list numbers and dashes, which read naturally, stay.
+private static string plainText(string sText)
+{
+    string sOut = sText ?? "";
+    sOut = Regex.Replace(sOut, @"\*\*(.+?)\*\*", "$1");
+    sOut = Regex.Replace(sOut, @"__(.+?)__", "$1");
+    sOut = Regex.Replace(sOut, @"(?m)^\s*#{1,6}\s+", "");
+    sOut = Regex.Replace(sOut, @"(?m)^(\s*)\*\s+", "$1- ");
+    sOut = sOut.Replace("`", "");
+    return sOut.Trim();
+}
+
 // kitContext: what the local AI is told before any question -- where the kit is, the kit's own map for AI agents
 // (llms.txt and AGENTS.md), and the list this dialog shows, each item with its path. Capped, since a small model
 // has a small window.
 private static string kitContext()
 {
     StringBuilder sb = new StringBuilder();
+    sb.AppendLine("Write plain text only: no Markdown, no asterisks, no pound signs, no tables. Use short paragraphs, and a numbered list only for steps that have an order. Answer only what was asked; mention a skill or file only when it bears on the question.");
     sb.AppendLine("You answer questions about the Homer Development Kit, HomerDev, for a blind developer who uses a screen reader. Answer in plain language, briefly, and name the file or folder the person should open when that helps. If you do not know, say so; never invent a file.");
     sb.AppendLine("The kit is installed at " + sKit + ", version " + sVersion + ". Skills are in .claude\\skills, subagents in .claude\\agents, the Claude Code plugin in .claude-plugin, documents in help, templates in Templates, the samples in Templates\\samples, scripts in scripts, and the shared code in exec\\CSharp and exec\\Python.");
     sb.AppendLine();
@@ -407,14 +422,31 @@ private static bool runChat(IWin32Window owner)
         dlg.addBand();
         TextBox txtQuestion = dlg.addInputBox("&Question:", "", "Ask about HomerDev: what a skill does, where a template is, how to start an app. Enter sends it.");
         Button btnSend = dlg.addButton("&Send", "Ask the local AI the question.");
+        Button btnVoice = dlg.addButton("&Voice", "Ask by voice: a rising tone, then speak; press Voice again, or simply stop talking, and Whisper writes what you said into the question. Escape throws a recording away. Everything stays on this computer.");
         dlg.endBand();
+        CheckBox chkSendHeard = dlg.addCheckBox("Send &when heard", false, "Send a spoken question as soon as it is written, instead of letting you check it first.");
         btnSend.Click += delegate(object oSender, EventArgs evArgs)
         {
             string sQuestion = txtQuestion.Text.Trim();
             if (sQuestion.Length == 0) return;
             btnSend.Enabled = false;
             txtQuestion.ReadOnly = true;
-            Say.say("Asking " + sModel);
+            // PROGRESS WHILE IT THINKS (11 October 2026): a local model can take a minute or more, and the first question
+            // longer while the model loads, so silence sounded like a hang. Every ten seconds the dialog says how long it
+            // has waited -- briefly, the one thing the reader cannot know -- and the status line says the same.
+            int iWaited = 0;
+            System.Windows.Forms.Timer oTicker = new System.Windows.Forms.Timer();
+            oTicker.Interval = 10000;
+            oTicker.Tick += delegate(object oTickSender, EventArgs evTick)
+            {
+                iWaited += 10;
+                dlg.setStatusText("Waiting for " + sModel + ", " + iWaited + " seconds");
+                Say.say(iWaited + " seconds");
+            };
+            Say.say("Asking " + sModel + "; it may take a minute");
+            dlg.setStatusText("Waiting for " + sModel);
+            DateTime dtAsked = DateTime.Now;
+            oTicker.Start();
             string sPrompt = sContext + "\r\n" + sbHistory.ToString() + "Question: " + sQuestion + "\r\nAnswer:";
             Log.info("Chat question: " + sQuestion);
             Thread oWorker = new Thread(delegate()
@@ -423,8 +455,10 @@ private static bool runChat(IWin32Window owner)
                 string sAnswer = Ollama.generate(sModel, sPrompt, c_iAiTimeoutMs, out sError);
                 dlg.form.BeginInvoke((MethodInvoker) delegate()
                 {
+                    oTicker.Stop();
+                    oTicker.Dispose();
                     if (string.IsNullOrEmpty(sAnswer)) sAnswer = "No answer came back" + (string.IsNullOrEmpty(sError) ? "." : ": " + sError);
-                    sAnswer = sAnswer.Trim();
+                    sAnswer = plainText(sAnswer);
                     Log.info("Chat answer: " + sAnswer.Length + " characters" + (string.IsNullOrEmpty(sError) ? "" : "; error " + sError));
                     sbHistory.Append("Question: ").Append(sQuestion).Append("\r\nAnswer: ").Append(sAnswer).Append("\r\n");
                     int iStart = txtConversation.TextLength;
@@ -437,17 +471,141 @@ private static bool runChat(IWin32Window owner)
                     txtConversation.SelectionStart = iStart + (iStart > 0 ? 2 : 0);
                     txtConversation.SelectionLength = 0;
                     txtConversation.ScrollToCaret();
-                    Say.say("Answered");
+                    int iTook = (int) Math.Round((DateTime.Now - dtAsked).TotalSeconds);
+                    dlg.setStatusText("Answered in " + iTook + (iTook == 1 ? " second" : " seconds"));
+                    Say.say("Answered in " + iTook + (iTook == 1 ? " second" : " seconds"));
                 });
             });
             oWorker.IsBackground = true;
             oWorker.Start();
+        };
+        // ---- VOICE (11 October 2026) ----
+        // The convention of Windows+H: one key starts and stops; silence after speech also stops; Escape cancels.
+        // Tones, not speech, mark the start and the end, so the screen reader is not recorded into the question.
+        VoiceRecorder oRecorder = null;
+        System.Windows.Forms.Timer oListen = new System.Windows.Forms.Timer();
+        oListen.Interval = 100;
+        MethodInvoker fnFinish = null;
+        fnFinish = delegate()
+        {
+            oListen.Stop();
+            if (oRecorder == null) return;
+            string sWav = oRecorder.stop(Paths.temp());
+            bool bSpoke = oRecorder.HeardSpeech;
+            oRecorder.Dispose();
+            oRecorder = null;
+            Console.Beep(660, 90); Console.Beep(440, 120);
+            if (sWav.Length == 0 || !bSpoke)
+            {
+                dlg.setStatusText("Nothing was heard");
+                Say.say("Nothing was heard");
+                btnVoice.Focus();
+                return;
+            }
+            dlg.setStatusText("Writing down what you said");
+            Say.say("Writing it down");
+            btnVoice.Enabled = false;
+            Thread oScribe = new Thread(delegate()
+            {
+                string sError;
+                string sText = Voice.transcribe(sWav, 120000, out sError);
+                try { File.Delete(sWav); } catch { }
+                dlg.form.BeginInvoke((MethodInvoker) delegate()
+                {
+                    btnVoice.Enabled = true;
+                    if (sText.Length == 0)
+                    {
+                        string sWhy = sError.Length > 0 ? sError : "no words were recognized";
+                        dlg.setStatusText("Not written down: " + sWhy);
+                        Say.say("Not written down: " + sWhy);
+                        btnVoice.Focus();
+                        return;
+                    }
+                    txtQuestion.Text = sText;
+                    txtQuestion.Focus();
+                    txtQuestion.SelectionStart = sText.Length;
+                    dlg.setStatusText("Heard: " + sText);
+                    Say.say("Heard: " + sText);
+                    if (chkSendHeard.Checked) btnSend.PerformClick();
+                });
+            });
+            oScribe.IsBackground = true;
+            oScribe.Start();
+        };
+        oListen.Tick += delegate(object oTickSender, EventArgs evTick)
+        {
+            if (oRecorder != null && oRecorder.poll()) fnFinish();
+        };
+        btnVoice.Click += delegate(object oSender, EventArgs evArgs)
+        {
+            if (oRecorder != null) { fnFinish(); return; }
+            if (Voice.whisperProgram().Length == 0 || Voice.whisperModel().Length == 0)
+            {
+                MessageBox.Show(dlg.form, "Asking by voice needs Whisper, which turns speech into text on this computer. HomerDev's setup program offers it: run it again and leave Whisper ticked.", c_sAppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            oRecorder = new VoiceRecorder();
+            Console.Beep(440, 90); Console.Beep(660, 120);
+            string sProblem = oRecorder.start();
+            if (sProblem.Length > 0)
+            {
+                oRecorder = null;
+                MessageBox.Show(dlg.form, "Could not listen: " + sProblem + ".", c_sAppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            dlg.setStatusText("Listening; press Voice again or stop talking to finish, Escape to cancel");
+            oListen.Start();
+        };
+        // Escape while listening throws the recording away and keeps the dialog open; otherwise it closes, as ever.
+        dlg.commandKey = delegate(Keys keys)
+        {
+            if (keys != Keys.Escape || oRecorder == null) return false;
+            oListen.Stop();
+            oRecorder.cancel();
+            oRecorder.Dispose();
+            oRecorder = null;
+            Console.Beep(330, 150);
+            dlg.setStatusText("Recording thrown away");
+            Say.say("Cancelled");
+            return true;
         };
         dlg.form.AcceptButton = btnSend;
         dlg.setInitialFocus(txtQuestion);
         dlg.runWithButtons(new string[] { "Close" });
     }
     return true;
+}
+
+// ---- connecting the AI tools ----
+
+// connectAiTools: runs scripts\\connectAI, which tells Claude Code, Codex, Gemini CLI and Antigravity where the kit is,
+// and shows what it said. Its own log has the detail.
+private static bool connectAiTools(IWin32Window owner)
+{
+    string sScript = Path.Combine(sKit, "scripts", "connectAI.cmd");
+    if (!File.Exists(sScript))
+    {
+        MessageBox.Show(owner, "scripts\\connectAI.cmd is not in the kit at " + sKit + ".", c_sAppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        return false;
+    }
+    Say.say("Connecting");
+    ProcessStartInfo oStart = new ProcessStartInfo("cmd.exe", "/c \"\"" + sScript + "\"\"");
+    oStart.UseShellExecute = false;
+    oStart.CreateNoWindow = true;
+    oStart.RedirectStandardOutput = true;
+    oStart.RedirectStandardError = true;
+    oStart.WorkingDirectory = sKit;
+    string sOut;
+    int iCode;
+    using (Process oRun = Process.Start(oStart))
+    {
+        sOut = oRun.StandardOutput.ReadToEnd() + oRun.StandardError.ReadToEnd();
+        oRun.WaitForExit();
+        iCode = oRun.ExitCode;
+    }
+    Log.command("connectAI", iCode);
+    HelpDialog.show(owner, "Connect AI tools", sOut.Trim() + "\r\n\r\nTo undo it, run scripts\\connectAI --remove in the kit's folder.");
+    return iCode == 0;
 }
 
 // ---- the dialog ----
@@ -470,6 +628,7 @@ private static bool runDialog()
         Button btnInix = dlg.addButton("&Inix explained", "What the inix format is, with an example read by the kit's own reader.");
         Button btnLayout = dlg.addButton("&Layout by Code", "How every Homer dialog is made, then a dialog that code builds.");
         Button btnAsk = dlg.addButton("&Ask the local AI", "Ask the AI on this computer what the kit can do and how, with a map of the kit as its context.");
+        Button btnConnect = dlg.addButton("Connect AI &tools", "Tell Claude Code, Codex, Gemini CLI and Antigravity where the kit is, once, so in any project they find its skills and code when you mention Homer.");
         dlg.endBand();
 
         btnOpen.Click += delegate(object oSender, EventArgs evArgs)
@@ -485,6 +644,7 @@ private static bool runDialog()
         btnInix.Click += delegate(object oSender, EventArgs evArgs) { showInix(dlg.form); };
         btnLayout.Click += delegate(object oSender, EventArgs evArgs) { showLayout(dlg.form); };
         btnAsk.Click += delegate(object oSender, EventArgs evArgs) { runChat(dlg.form); };
+        btnConnect.Click += delegate(object oSender, EventArgs evArgs) { connectAiTools(dlg.form); };
 
         // F11: is there a newer HomerDev on the web? (Elevate sounds like eleven.) Claimed before any control sees it.
         dlg.commandKey = delegate(Keys keys)

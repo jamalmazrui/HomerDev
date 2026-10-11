@@ -123,7 +123,7 @@ WelcomeLabel2=This will install [name/ver] on your computer.%n%n[name] -- the Ho
 ; samples' programs, the tutorials' audio. Left out: what is never shipped -- logs, notes, git's own folder,
 ; Python's virtual environments and caches, PyInstaller's work folders, the fingerprint store -- and this setup
 ; program itself. Each folder keeps its place, so a skill finds its references and a build finds the kit's code.
-Source: "*"; DestDir: "{app}"; Excludes: "\logs\*,\notes\*,.git,.venv,venv,__pycache__,*.pyc,\HomerDev_setup.exe,\build_release.bat,\Templates\samples\build,\Templates\samples\dist,\exec\fingerprints.json,\exec\fingerprints.json.tmp"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "*"; DestDir: "{app}"; Excludes: "\logs\*,\notes\*,.git,.venv,venv,__pycache__,*.pyc,\HomerDev_setup.exe,\HomerDev_setup.building.exe,\build_release.bat,\Templates\samples\build,\Templates\samples\dist,\exec\fingerprints.json,\exec\fingerprints.json.tmp"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Registry]
 ; HomerDev, FOR THE WHOLE MACHINE, ONLY WHEN IT IS NOT SET: every app's build looks for the kit by this variable

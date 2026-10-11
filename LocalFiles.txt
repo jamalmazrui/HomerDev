@@ -39,3 +39,4 @@ Templates/create_APP_Repo.ps1
 build_release.bat
 # The kit's setup program, made by the build and attached to each release, as every app's is (1.66.0).
 HomerDev_setup.exe
+HomerDev_setup.building.exe

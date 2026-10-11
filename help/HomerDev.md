@@ -27,6 +27,7 @@ holding the keyboard knows what a good program is before the AI writes one.
 
 - [Getting started](#getting-started)
 - [The HomerDev dialog](#the-homerdev-dialog)
+- [Telling your AI about HomerDev](#telling-your-ai-about-homerdev)
 - [What is in the kit](#what-is-in-the-kit)
 - [Camel Type](#camel-type)
 - [The .inix format](#the-.inix-format)
@@ -165,36 +166,138 @@ The controls, in tab order:
   given the kit's own maps for AI agents (`llms.txt` and `AGENTS.md`) and the
   list of everything in the kit with each file's path, including the skills,
   subagents and plugin, so it can say where things are. Type a question and
-  press Enter; the answer is added to the conversation, and focus goes to where
-  it begins.
+  press Enter. While it thinks, the dialog says every ten seconds how long it
+  has waited, so you know it has not stopped; the first question takes longest,
+  while the model loads. The answer is added to the conversation as plain text,
+  focus goes to where it begins, and the dialog says how long it took.
+  You can also ask by voice; see "Asking by voice" below.
+- **Connect AI tools** tells the AI tools you work with -- Claude Code, OpenAI
+  Codex, Gemini CLI and Antigravity -- where the kit is, once. The next chapter
+  says what it does and what to tell your AI afterwards.
 
 F1 lists every control with its tip, and F11 checks for a newer HomerDev.
+
+### Asking by voice
+
+In the chat, press **Voice** (Alt+V). A rising pair of tones means it is
+listening: say your question. When you stop talking for about a second and a
+half, it stops by itself, with a falling pair of tones; or press Voice again to
+stop sooner, the way Windows+H voice typing works. Escape throws the recording
+away. Whisper then writes what you said into the Question box, the dialog says
+what it heard, and you press Enter to send it, after correcting it if need be.
+Tick **Send when heard** to send it straight away instead.
+
+Nothing leaves the computer. The recording is made with Windows' own audio
+input, written down by Whisper, which HomerDev's setup program offers, and
+deleted once written down. While it listens, the dialog says nothing, so your
+screen reader is not recorded into the question; the tones say when it starts
+and stops.
+
+Why not start by saying a word, as a smart speaker does? That needs a wake-word
+model, and the free one, openWakeWord, licenses its trained models for
+non-commercial use only, which does not fit the kit's MIT license; the strong
+alternatives are commercial. A key to start, and silence or the same key to
+stop, needs no extra model at all.
+
+## Telling your AI about HomerDev
+
+You work in your own project's folder, such as `C:\PlantLog`, not in the kit's.
+An AI tool started there knows nothing about HomerDev until something tells it.
+There are two ways: connect once, or say one sentence each time.
+
+### Connect once
+
+Press **Connect AI tools** in the HomerDev dialog, or run `scripts\connectAI`
+in the kit's folder. For each AI tool on your computer, it does two things:
+
+- It adds a short note to the tool's personal instructions, which the tool
+  reads in every project: where the kit is, and to read its `AGENTS.md` first.
+  The note sits between two marker lines, so your own instructions in the same
+  file are left alone.
+- It links each of the kit's skills into the tool's personal skills folder.
+  These are links, not copies, so they always match the kit.
+
+A skill folder of your own with the same name is never replaced.
+`connectAI --check` says what is connected, and `connectAI --remove` takes it
+all back out, leaving your files exactly as they were. Run it again after
+moving the kit. A tool you install later is connected the next time you run it.
+
+### What to say once connected
+
+Mention Homer or HomerDev, and say what you want in plain words. The AI reads
+the kit's instructions and picks the matching skill. For example:
+
+- "Using HomerDev, start a new app called PlantLog, a list of my houseplants
+  with when each was last watered."
+- "Add a settings dialog to this Homer app, the Homer way."
+- "Here are my build logs. Why did the release step fail?"
+- "Write the spoken tutorials for this app, following the Homer pattern of ten."
+
+In Claude Code you can also name a skill as a command: `/homer-new-app`, for
+example. Codex and Antigravity pick a skill from what you ask; saying "use the
+homer-new-app skill" makes sure.
+
+### What to say without connecting
+
+One sentence at the start of a session is enough:
+
+- "Read the AGENTS.md of the Homer Development Kit, in the folder the HomerDev
+  environment variable names, and follow it for this project."
+
+Or name the folder itself, such as `C:\Program Files\HomerDev`.
+
+### Each tool's own way
+
+- **Claude Code** reads `CLAUDE.md` and skills in `.claude\skills`. It can
+  also install the kit as a plugin: type `/plugin marketplace add
+  JamalMazrui/HomerDev`, then `/plugin install homer-dev@homer-dev-kit`.
+- **Gemini CLI and Antigravity** read `GEMINI.md` and `AGENTS.md`, and skills
+  in `.agents\skills`.
+- **OpenAI Codex** reads `AGENTS.md`, and skills in `.agents\skills`. Start a
+  new session after connecting, so it loads them.
+
+These tools change often. If one stops finding the kit, the one-sentence way
+always works, and running `connectAI` again picks up any new place a tool
+looks.
 
 ## What is in the kit
 
 ### CSharp
 
-Twelve modules, all in the `Homer` namespace. Add `using Homer;` and compile the
-ones you use straight from `C:\HomerDev\exec\CSharp`; the build template already
-does.
+Seventeen modules, all in the `Homer` namespace. Add `using Homer;` and compile
+the ones you use straight from the kit's `exec\CSharp`; the build template
+already does.
 
-- **Mdi.cs** -- the frame and child of a multiple-document app.
+- **Elevate.cs** -- F11's check for a newer version on GitHub, and starting its
+  setup program.
+- **Inix.cs** -- the `.inix` settings format, plus table conversion between
+  `.inix`, `.csv`, `.tsv`, Markdown and `.xlsx`.
+- **inixVert.cs** -- a command-line wrapper over the table converter in
+  Inix.cs.
+- **KeyMap.cs** -- one table of commands, summaries, and their keys, which the
+  menus, the key describer and the hotkey list all read from.
+- **KeyName.cs** -- one spelling for every key, and converters to what each API
+  wants.
 - **Lbc.cs** -- Layout By Code. Dialogs built from labelled standard controls.
   The biggest and most used module. Its own section is below.
 - **Log.cs** -- the session log every Homer program writes.
+- **Mdi.cs** -- the frame and child of a multiple-document app.
+- **Media.cs** -- finding and running ExifTool, ffmpeg and ffprobe.
+- **MediaPlayer.cs** -- the Homer Player dialog, which plays tracks and
+  playlists, including an app's spoken tutorials.
+- **Mpv.cs** -- driving the mpv player from another program, with no window of
+  its own.
+- **Ollama.cs** -- asking the local AI model, through Ollama, on this computer.
+- **Paths.cs** -- the Homer folders: the installed ones, and the per-user ones
+  under `%LOCALAPPDATA%\<App>`.
 - **Say.cs** -- direct speech to whichever screen reader is running.
-- **Inix.cs** -- the `.inix` settings format, plus table conversion between
-  `.inix`, `.csv`, `.tsv`, Markdown and `.xlsx`.
-- **KeyName.cs** -- one spelling for every key, and converters to what each API
-  wants.
-- **KeyMap.cs** -- one table of commands, summaries, and their keys, which the
-  menus, the key describer and the hotkey list all read from.
 - **Util.cs** -- string and file helpers, ported from the older HomerLib so the
   names match.
+- **Voice.cs** -- recording a spoken question from the microphone, ending when
+  the person stops talking, and writing it down with Whisper, all on this
+  computer.
 - **Web.cs** -- a small dependency-free web client: fetch a page, pull its
   links, download a file with a sensible name.
-- **inixVert.cs** -- a command-line wrapper over the table converter in
-  Inix.cs.
 
 ### Python
 

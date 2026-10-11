@@ -34,6 +34,29 @@ rem The project's own steps: its build.cmd, and the kit's tidy, push and release
 rem ONE CHECK, ONE PUSH (1.65.28). For the kit, release was releaseHomerDev, which runs checkHomerDev and push again
 rem after this cycle had just run both: on 11 October each ran twice. The cycle now calls release directly, as it does
 rem for every project; releaseHomerDev stays the one command for releasing the kit by hand.
+rem ONE CYCLE PER PROJECT AT A TIME (1.66.1, from an audit). Two cycles of the same project overlapped on
+rem 11 October: an older cycle's release found an installer a newer, failed build had just written. Different projects
+rem may still run side by side. The lock is a folder in %TEMP% named for the project, since making a folder succeeds
+rem for only one process; a lock older than four hours is the trace of a window that was closed, and is cleared.
+set "sLock=%TEMP%\Homer-%sName%-cycle.lock"
+mkdir "!sLock!" 2>nul
+if errorlevel 1 (
+  set "iAge=0"
+  for /f %%a in ('powershell -NoProfile -Command "[int]((Get-Date)-(Get-Item -LiteralPath '!sLock!').CreationTime).TotalMinutes"') do set "iAge=%%a"
+  if !iAge! geq 240 (
+    >> "%sLog%" echo Lock !sLock! was !iAge! minutes old, from a cycle no longer running; cleared
+    rmdir /s /q "!sLock!" 2>nul
+    mkdir "!sLock!" 2>nul
+  ) else (
+    echo Another %sName% cycle started !iAge! minutes ago and is still running, so this one does not start.
+    echo Wait for it to finish. A lock older than four hours is cleared by itself.
+    >> "%sLog%" echo Refused: another cycle holds !sLock!, made !iAge! minutes ago
+    exit /b 1
+  )
+)
+> "!sLock!\holder.txt" echo %date% %time% %sLog%
+>> "%sLog%" echo Lock: !sLock!
+
 set "sRelease=scripts\release.cmd"
 rem EVERY RUNNER REPLACES ITSELF, AND ONLY AT ITS OWN END (1.65.32, from an audit). The kit's build overwrote every
 rem sibling project's build_release.bat, including one running a cycle at that moment; Windows reads a running batch
@@ -56,6 +79,7 @@ echo(
 set "sSummary=!sSummary:~0,-1!"
 echo Built, tidied, pushed and released:!sSummary!.
 >> "%sLog%" echo Finished %date% %time%: every step passed:!sSummary!
+rmdir /s /q "!sLock!" 2>nul
 rem The kit's own copy is replaced here, on the same line as the exit: Windows reads the whole line before running
 rem it, so nothing of the old file is read after the copy (1.65.26). A project's copy is written by the kit's build.
 if defined sRunner copy /y "!sRunner!" "build_release.bat" >nul & exit /b 0
@@ -87,5 +111,6 @@ echo(
 echo Stopped: %sStep% failed, so the steps after it did not run. Its own log is in logs, and this cycle's is
 echo logs\%sName%-build_release-%sStamp%.log.
 >> "%sLog%" echo Stopped %date% %time%: %sStep% failed; steps passed before it:!sSummary!
+rmdir /s /q "!sLock!" 2>nul
 if defined sRunner copy /y "!sRunner!" "build_release.bat" >nul & exit /b 1
 exit /b 1

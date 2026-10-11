@@ -1330,8 +1330,12 @@ def checkAccept():
         sField, sValue = sLine.split("=", 1)
         dNow[sField.strip().lower()] = sValue.strip()
 
+    # AN ACCEPTANCE FILE THAT RUNS NOTHING FAILS (1.66.1, from an audit). FileDir's accept.inix stated what done means
+    # in prose, with no [check] section the checker can run, and was reported as "not checked" release after release,
+    # so the promise it made was never tested. A file present but holding no runnable check is now a failure; an app
+    # with no accept.inix at all is still reported as not checked.
     if not lsChecks:
-        return finding("accept", "skip", "accept.inix holds 0 checks")
+        return finding("accept", "fail", "accept.inix holds 0 runnable checks: each needs a [check] section with a Run line")
     iPassed = 0
     for dCheck in lsChecks:
         sName = dCheck.get("name", dCheck.get("run", "unnamed"))

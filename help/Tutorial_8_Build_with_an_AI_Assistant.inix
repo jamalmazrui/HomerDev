@@ -20,19 +20,39 @@ Hear=scripts\checkSkills
 
 Say=Enter runs it.
 Key=Enter
-Hear=16 skills checked, 0 problems.
+Hear=17 skills checked, 0 problems.
 
 [step]
 
-Say=Sixteen skills, none broken. A skill whose description held an angle bracket would be refused when uploaded, and this check names it first.
+Say=Seventeen skills, none broken. A skill whose description held an angle bracket would be refused when uploaded, and this check names it first.
 Key=
 Hear=
 
 [step]
 
-Say=Three sentences carry the kit into a chat: what the program is; which classes to use -- Lbc for every dialog, Inix for settings, Log for the session log, Say only for what the reader cannot know; and the sample to follow, FruitBasketCs.
+Say=Next, the assistant has to find the kit. You work in your own project's folder, and an assistant started there knows nothing of HomerDev until something tells it. One button does it once, for every assistant on the computer: in the HomerDev dialog, Connect AI tools. Its key is Alt plus T.
+Key=Alt+T
+Hear=Connect AI tools
+Hear=Connected 3 AI tools to the Homer Development Kit at C colon backslash Program Files backslash HomerDev.
+Note=Confirm the wording with a live run: buildTutorials -live.
+
+[step]
+
+Say=What it did: Claude Code, Codex and Gemini each read a personal instructions file in every project. It added a short note to each, saying where the kit is and to read its AGENTS file first, and it linked the kit's skills into each assistant's own skills folder. Your own instructions in those files are left alone.
 Key=
 Hear=
+
+[step]
+
+Say=From now on, mention Homer or HomerDev in any project, and say what you want in plain words. I start my assistant in the app's folder and type one line.
+Key=
+Hear=Using HomerDev, add a Prefix box to this dialog, the Homer way.
+
+[step]
+
+Say=The assistant reads the kit's instructions, then the skill for dialogs, and uses the kit's Lbc class rather than inventing its own. Without connecting, one sentence at the start of a session does the same.
+Key=
+Hear=Read the AGENTS file of the Homer Development Kit, in the folder the HomerDev environment variable names, and follow it.
 
 [step]
 
@@ -44,7 +64,7 @@ Note=Confirm the wording with a live run: buildTutorials -live.
 
 [step]
 
-Say=Each check is a name and a command, and check runs them all. Now one change, then one build: I ask for a Prefix box in the dialog, put the assistant's file in place, and type build.
+Say=Each check is a name and a command, and check runs them all. Now one change, then one build: the assistant has written the Prefix box, I put its file in place, and type build.
 Key=build
 Hear=build
 

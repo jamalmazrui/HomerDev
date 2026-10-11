@@ -615,7 +615,7 @@ def buildHomerDll():
 
 # THE HOMERDEV DIALOG (1.66.0): exec\\HomerDev.exe, opened by Alt+Control+Shift+D after setup, compiled from
 # HomerDev.cs and the kit's own classes -- the ones an app with a player and the local AI compiles, as DbDo does.
-c_lsHomerDevAppClasses = ["Elevate", "Inix", "KeyMap", "KeyName", "Lbc", "Log", "Media", "MediaPlayer", "Mpv", "Ollama", "Paths", "Say", "Util", "Web"]
+c_lsHomerDevAppClasses = ["Elevate", "Inix", "KeyMap", "KeyName", "Lbc", "Log", "Media", "MediaPlayer", "Mpv", "Ollama", "Paths", "Say", "Util", "Voice", "Web"]
 
 
 def buildHomerDevApp():
@@ -674,16 +674,29 @@ def buildHomerDevSetup():
     sScript = os.path.join(sScriptDir, "HomerDev_setup.iss")
     if not os.path.isfile(sScript): return ""
     oCache = kitCache()
-    lsInputs = [s for s in sorted(os.listdir(sScriptDir)) if s.lower() not in ("homerdev_setup.exe", "build_release.bat", "logs", "notes", ".git")]
+    lsInputs = [s for s in sorted(os.listdir(sScriptDir)) if s.lower() not in ("homerdev_setup.exe", "homerdev_setup.building.exe", "build_release.bat", "logs", "notes", ".git")]
     sPrint = oCache.fingerprint(lsInputs)
     if oCache.isCurrent("HomerDev_setup.exe", sPrint, ["HomerDev_setup.exe"]):
         sayLine("HomerDev_setup.exe is unchanged since its last build; not built again.")
         return ""
     sIscc = findIscc()
     if sIscc == "": return "HomerDev_setup.exe was not built: Inno Setup could not be installed"
-    iCode, sOutput = runCommand([sIscc, "/Q", "/DHomerDev=" + sScriptDir, sScript])
-    if iCode != 0 or not os.path.isfile(os.path.join(sScriptDir, "HomerDev_setup.exe")):
-        return "HomerDev_setup.exe did not compile; the log has Inno Setup's messages"
+    # STAGED, AND ERROR 110 RETRIED (1.66.1, from an audit): Inno removes its output before writing, so a failure left
+    # no setup program. It writes HomerDev_setup.building.exe, which replaces HomerDev_setup.exe only when complete;
+    # "EndUpdateResource" (error 110, a file held by another program while Inno writes into it) is tried again, at
+    # most twice, ten seconds apart. Any other failure stops at once, and the last setup program is kept.
+    sBuilding = os.path.join(sScriptDir, "HomerDev_setup.building.exe")
+    for iTry in range(1, 4):
+        if os.path.exists(sBuilding): os.remove(sBuilding)
+        iCode, sOutput = runCommand([sIscc, "/Q", "/DHomerDev=" + sScriptDir, "/FHomerDev_setup.building", sScript])
+        logLine("ISCC attempt %d exit %d" % (iTry, iCode))
+        if iCode == 0 or "EndUpdateResource" not in (sOutput or "") or iTry == 3: break
+        sayLine("Inno Setup could not finish writing the setup program, error 110; trying again in ten seconds.")
+        time.sleep(10)
+    if iCode != 0 or not os.path.isfile(sBuilding):
+        if os.path.exists(sBuilding): os.remove(sBuilding)
+        return "HomerDev_setup.exe did not compile; the log has Inno Setup's messages, and the last one is kept"
+    os.replace(sBuilding, os.path.join(sScriptDir, "HomerDev_setup.exe"))
     oCache.record("HomerDev_setup.exe", oCache.fingerprint(lsInputs), ["HomerDev_setup.exe"])
     sayLine("Built HomerDev_setup.exe, which installs the kit to Program Files.")
     return ""

@@ -913,124 +913,163 @@ Screen reader:
 
 ## 2 - Install and Launch
 
-One want: the kit on this computer, proved working. Unarchiving it, running its own build, building the C sharp sample and launching it -- the first Homer program you hear -- and one planned misstep. This walk assumes walk zero.
+One want: the kit on this computer, and a first look around it. Running the setup program and its finish page, the folder a command-line user may choose instead, then the HomerDev dialog on Alt plus Control plus Shift plus D: its list of everything in the kit, a sample opened from it, and the tutorials. This walk assumes walk zero.
 
-**Before you start:** Windows 10 or later, 64-bit, a screen reader running, and HomerDev dot zip downloaded. Everything else the kit fetches for itself.
+**Before you start:** Windows 10 or later, 64-bit, a screen reader running, and HomerDev underscore setup dot e x e downloaded from the kit's latest release.
 
-### Step 1: Control+V
+### Step 1: Enter
 
-The want: the kit on this computer, proved working. Unarchive HomerDev dot zip into a folder called C colon backslash HomerDev. That is the whole install: open the archive, choose Extract All, and type the folder name.
-
-Screen reader:
-
-- Destination, edit, C colon backslash HomerDev
-
-### Step 2: build
-
-Open a command prompt in that folder and run the kit's own build. The reader echoes what is typed and says nothing else until the command answers.
+The want: the kit on this computer, and a first look around. I run the setup program I downloaded. Windows asks for permission, since it installs for everyone on the computer, and then the wizard opens.
 
 Screen reader:
 
-- Homer Development Kit 1.52.8 in C colon backslash HomerDev
-- 10 documents converted to HTML
-- 0 problems found. The kit is complete.
+- Setup - HomerDev, Welcome to the HomerDev Setup Wizard
 
-### Step 3
+Confirm the wording with a live run: buildTutorials -live.
 
-Notice the last line. Zero problems is a real answer, said plainly. That is a rule in this kit: a count always matches its noun, and nothing reports zero as though it were an error.
+### Step 2: Enter
 
-### Step 4
-
-What build did. It converted every document to HTML with pandoc, fetching pandoc if the machine had none; it checked the kit over -- every component present, every file in the Homer encoding, no empty files -- and it packed the sixteen skills an AI assistant reads. Its log is in the logs folder, every command with its exit code.
-
-### Step 5: cd Templates\samples
-
-Next, the samples: change into the samples folder under Templates. Two programs, a C sharp one and a Python one, and a build script for each. Both are the fruit basket: a window with a fruit box, a basket list, and a report. The command is silent until the next one answers.
+Enter through the pages. The kit goes to C colon backslash Program Files backslash HomerDev, the standard place for programs. The last page is the one to read.
 
 Screen reader:
 
-- Kit, C colon backslash HomerDev version 1.52.8
-- Compiler, Microsoft Visual Studio Build Tools
-- Built FruitBasketCs dot exe version 1.0.0
+- Install Ollama 0.40.3 (runs the local AI model), check box, checked
 
-### Step 6: FruitBasketCs
+### Step 3: Down
 
-Now run it. This is the launch: the first Homer program you hear.
+The finish page offers every tool any Homer program uses, each worded by what this computer already has: Install when it is missing, Update when it is old, Reinstall, unticked, when it is current. So Enter alone installs what is missing and updates what is old. Down Arrow hears each box.
+
+Screen reader:
+
+- Install Pandoc 3.6 (converts documents between formats), check box, checked
+
+### Step 4: Enter
+
+I press Enter on Finish. Each ticked tool installs in turn, and then one box says what happened.
+
+Screen reader:
+
+- HomerDev Setup Results, dialog
+- HomerDev 1.67.0 is installed. Ollama was updated from 0.40.2 to 0.40.3. Logs are kept in C colon backslash Users backslash Jamal backslash AppData backslash Local backslash HomerDev backslash logs.
+
+### Step 5
+
+One choice for later. If you type commands a lot, you can unzip HomerDev dot zip into C colon backslash HomerDev instead: the paths are shorter to type, and the kit works the same in either place.
+
+### Step 6: Alt+Control+Shift+D
+
+Now the dialog, from anywhere in Windows: Alt plus Control plus Shift plus D. D for development.
+
+Screen reader:
+
+- HomerDev, dialog
+- Kit contents, list box, Document: AGENTS, HomerDev is a development kit for building Windows programs, documents, books, databases, installers and spoken tutorials for people who use screen readers, 1 of 130
+
+### Step 7: Control+J
+
+A hundred and thirty items: documents, samples, skills, templates, scripts and shared code, by kind and then by name. Control plus J searches the list. I search for fruit.
+
+Screen reader:
+
+- Search, edit
+
+Confirm the wording with a live run: buildTutorials -live.
+
+### Step 8: Enter
+
+I type fruit and press Enter.
+
+Screen reader:
+
+- Sample: FruitBasketCs, C sharp, one dialog: the smallest Homer program, a list you add to and take from. Open runs it., 23 of 130
+
+Confirm the wording with a live run: buildTutorials -live.
+
+### Step 9: Enter
+
+Enter opens the item I am on. A document opens in the browser, a file opens in a window I read line by line, and a sample runs.
 
 Screen reader:
 
 - Fruit Basket, the basket is empty
 - Fruit, edit
 
-### Step 7: apple
+### Step 10: Enter
 
-Type a fruit and press Enter.
+The window title carries the state, and focus starts in the field, because typing a fruit is the first thing anybody does. I type apple and press Enter.
 
 Screen reader:
 
 - apple added, 1 fruit in the basket
 
-### Step 8: Tab
+### Step 11: F1
 
-Add two more, then Tab to the basket and arrow through it.
-
-Screen reader:
-
-- Basket, list box, apple, 1 of 3
-
-### Step 9: F1
-
-F1 for help: every Homer dialog describes its own fields.
+One fruit, not one fruits: the noun matches the count. F1 for help: every Homer dialog describes its own fields.
 
 Screen reader:
 
 - Help, Fields in this dialog, Fruit, type the name of a fruit
 
-### Step 10: Alt+F4
+### Step 12: Alt+F4
 
-Close it with Alt plus F4 and run it again: the basket was kept between sessions, in your local application data, without being asked to.
-
-Screen reader:
-
-- Fruit Basket, 2 fruits in the basket
-
-### Step 11
-
-The Python one builds and runs the same way, and answers every key exactly as the C sharp one did -- walk three hears it. Two languages, one behaviour, because the behaviour lives in the kit's components rather than in either program.
-
-### Step 12
-
-A planned misstep. Run build in an app folder whose kit is older than the app needs, and the build refuses in one line.
+I close the basket with Alt plus F4, and the HomerDev dialog is where I left it.
 
 Screen reader:
 
-- ERROR: DbDo needs HomerDev 1.52.8 or later, and C colon backslash HomerDev is 1.52.6.
+- HomerDev, dialog
+- Kit contents, list box, Sample: FruitBasketCs, 23 of 130
 
-### Step 13
+Confirm the wording with a live run: buildTutorials -live.
 
-Where things went. The kit stays in its folder and is never installed in Program Files; each sample keeps its data and its session log under your local application data, in a folder named for it -- the layout every Homer app follows.
+### Step 13: Down
 
-### Step 14
+Down Arrow from here reaches the other three baskets: the same program with several windows inside one, and both again in Python. They answer every key alike, because the behaviour lives in the kit, not in either program. Walk three compares them.
 
-What this walk taught. I say the idea or the key; the reader says the command or the name.
+Screen reader:
+
+- Sample: FruitBasketMdiCs, C sharp, several windows inside one: the same basket as a multiple-document program. Open runs it., 25 of 130
+
+Confirm the wording with a live run: buildTutorials -live.
+
+### Step 14: Tab
+
+Tab moves to the buttons. Play tutorials opens these ten walks in the Homer Player, Inix explained and Layout by Code show how settings and dialogs are written, Ask the local AI answers questions about the kit, typed or spoken, and Connect AI tools comes back in walk eight.
+
+Screen reader:
+
+- Open, button
+
+Confirm the wording with a live run: buildTutorials -live.
 
 ### Step 15
 
-Run the kit's own check and documents.
-
-Screen reader:
-
-- build
+What this walk taught. I name the step; the reader gives the key or the command.
 
 ### Step 16
 
-Build the C sharp sample.
+Install the kit and the tools.
 
 Screen reader:
 
-- buildFruitBasketCs
+- HomerDev underscore setup dot e x e
 
-**Something to try:** Unarchive the kit, run build, build and run the C sharp fruit basket.
+### Step 17
+
+Open the HomerDev dialog.
+
+Screen reader:
+
+- Alt plus Control plus Shift plus D
+
+### Step 18
+
+Search the kit's contents.
+
+Screen reader:
+
+- Control plus J
+
+**Something to try:** Install the kit, open the HomerDev dialog, and run the C sharp fruit basket from it.
 
 ## 3 - Start an App from the Kit
 
@@ -1613,17 +1652,44 @@ Enter runs it.
 
 Screen reader:
 
-- 16 skills checked, 0 problems.
+- 17 skills checked, 0 problems.
 
 ### Step 4
 
-Sixteen skills, none broken. A skill whose description held an angle bracket would be refused when uploaded, and this check names it first.
+Seventeen skills, none broken. A skill whose description held an angle bracket would be refused when uploaded, and this check names it first.
 
-### Step 5
+### Step 5: Alt+T
 
-Three sentences carry the kit into a chat: what the program is; which classes to use -- Lbc for every dialog, Inix for settings, Log for the session log, Say only for what the reader cannot know; and the sample to follow, FruitBasketCs.
+Next, the assistant has to find the kit. You work in your own project's folder, and an assistant started there knows nothing of HomerDev until something tells it. One button does it once, for every assistant on the computer: in the HomerDev dialog, Connect AI tools. Its key is Alt plus T.
 
-### Step 6: Control+O
+Screen reader:
+
+- Connect AI tools
+- Connected 3 AI tools to the Homer Development Kit at C colon backslash Program Files backslash HomerDev.
+
+Confirm the wording with a live run: buildTutorials -live.
+
+### Step 6
+
+What it did: Claude Code, Codex and Gemini each read a personal instructions file in every project. It added a short note to each, saying where the kit is and to read its AGENTS file first, and it linked the kit's skills into each assistant's own skills folder. Your own instructions in those files are left alone.
+
+### Step 7
+
+From now on, mention Homer or HomerDev in any project, and say what you want in plain words. I start my assistant in the app's folder and type one line.
+
+Screen reader:
+
+- Using HomerDev, add a Prefix box to this dialog, the Homer way.
+
+### Step 8
+
+The assistant reads the kit's instructions, then the skill for dialogs, and uses the kit's Lbc class rather than inventing its own. Without connecting, one sentence at the start of a session does the same.
+
+Screen reader:
+
+- Read the AGENTS file of the Homer Development Kit, in the folder the HomerDev environment variable names, and follow it.
+
+### Step 9: Control+O
 
 Then the method the kit is shaped around. Specify before you generate: write accept dot inix first, a few named checks of what done means, so the assistant works to your idea of done, not its own. I open it in EdSharp.
 
@@ -1634,15 +1700,15 @@ Screen reader:
 
 Confirm the wording with a live run: buildTutorials -live.
 
-### Step 7: build
+### Step 10: build
 
-Each check is a name and a command, and check runs them all. Now one change, then one build: I ask for a Prefix box in the dialog, put the assistant's file in place, and type build.
+Each check is a name and a command, and check runs them all. Now one change, then one build: the assistant has written the Prefix box, I put its file in place, and type build.
 
 Screen reader:
 
 - build
 
-### Step 8: Enter
+### Step 11: Enter
 
 Enter.
 
@@ -1652,7 +1718,7 @@ Screen reader:
 
 Confirm the wording with a live run: buildTutorials -live.
 
-### Step 9: check
+### Step 12: check
 
 The installer is built. Then check, which refuses what release would refuse, and writes the evidence.
 
@@ -1660,7 +1726,7 @@ Screen reader:
 
 - check
 
-### Step 10: Enter
+### Step 13: Enter
 
 Enter.
 
@@ -1668,7 +1734,7 @@ Screen reader:
 
 - 13 checks passed, 0 checks failed, 2 checks not checked.
 
-### Step 11: Enter
+### Step 14: Enter
 
 The two not checked are the build and the smoke run, which come with dash dash build. A planned misstep: the assistant gave two controls captions that start with the same letter. I run check again.
 
@@ -1678,7 +1744,7 @@ Screen reader:
 
 Confirm the wording with a live run: buildTutorials -live.
 
-### Step 12: Enter
+### Step 15: Enter
 
 The check names the caption and the clash; the fix is a caption, not a key table. The assistant renames the box Text Before Each Name, so it takes T from the first letter of a word; I rebuild, and check passes again.
 
@@ -1686,7 +1752,7 @@ Screen reader:
 
 - 13 checks passed, 0 checks failed, 2 checks not checked.
 
-### Step 13: Control+F1
+### Step 16: Control+F1
 
 Last, verify without sight: the log says what happened, and your ears do the rest. In the running program, Control plus F1 turns on the Key Describer, so the new box's key says what it does.
 
@@ -1694,7 +1760,7 @@ Screen reader:
 
 - Key Describer On
 
-### Step 14: Alt+T
+### Step 17: Alt+T
 
 Alt plus T, T for Text, the first letter of the new caption.
 
@@ -1704,7 +1770,7 @@ Screen reader:
 
 Confirm the wording with a live run: buildTutorials -live.
 
-### Step 15: Control+F1
+### Step 18: Control+F1
 
 Control plus F1 again, and the keys act once more.
 
@@ -1712,11 +1778,11 @@ Screen reader:
 
 - No Key Describer
 
-### Step 16
+### Step 19
 
 What this walk taught. I name the step; the reader gives the command.
 
-### Step 17
+### Step 20
 
 Say what done means, first.
 
@@ -1724,7 +1790,7 @@ Screen reader:
 
 - accept dot inix
 
-### Step 18
+### Step 21
 
 Prove it before release.
 
@@ -1732,7 +1798,7 @@ Screen reader:
 
 - check
 
-### Step 19
+### Step 22
 
 Make sure the instructions an assistant reads are sound.
 

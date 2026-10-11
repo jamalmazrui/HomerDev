@@ -7,6 +7,7 @@ Start with AGENTS.md. Each skill below is a folder under .claude/skills holding 
 ## For agents
 
 - [AGENTS.md](AGENTS.md): what the kit is, how to use it from another project, the folder map, which skill to read for which task, and the rules
+- [connectAI](scripts/connectAI.py): points Claude Code, Codex and Gemini CLI or Antigravity at the kit once, from their personal instruction files and skills folders, so any project finds it
 - [Plugin manifest](.claude-plugin/plugin.json): the kit as a Claude Code plugin
 - [homer-auditor](.claude/agents/homer-auditor.md): a subagent that audits projects against the kit
 - [homer-listener](.claude/agents/homer-listener.md): a subagent that reviews tutorial reader lines
