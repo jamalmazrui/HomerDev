@@ -6,6 +6,9 @@
 
 exec/CSharp/
 exec/Python/
+# The routing table conversion.py reads (1.65.29): exec/ is otherwise never pushed, so the published kit had the
+# conversion module without its table.
+exec/conversions.inix
 Templates/
 
 

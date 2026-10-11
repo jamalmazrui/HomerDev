@@ -7,6 +7,16 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.65.29 -- 11 October 2026
+
+- **The conversion table is published.** exec\\conversions.inix, the routing table conversion.py reads, was never pushed: .gitignore keeps all of exec out of git except its CSharp and Python folders. So the kit on GitHub had the conversion module without its table. RepoFiles.txt now names it, and tidy's whitelist puts it back, tested with git on a copy.
+- **testConversion fetches pdfminer.six, and does not ask recognition for headings.** 1.65.28 began fetching pypdfium2, which made the text-recognition engine available. With pdfminer.six still missing, PDF to Markdown then fell past the structure route to recognition, which reads a picture of each page and so keeps no headings, and the build failed on "no heading". pdfminer.six is now fetched too, so the structure route runs, and the recognition route is held to the marker word alone.
+
+## 1.65.28 -- 11 October 2026
+
+- **One check and one push per cycle.** For the kit, build_release's release step was releaseHomerDev, which ran checkHomerDev and push again right after the cycle had run both; on 11 October each ran twice. The cycle now calls release directly, as for every project; releaseHomerDev remains the one command for releasing the kit by hand.
+- **testConversion fetches its sample packages.** Without pypdfium2 it could not make the scanned-PDF sample, and said so. It now installs pypdfium2 and Pillow with its own Python when missing, each attempt logged.
+
 ## 1.65.27 -- 11 October 2026
 
 - **releaseHomerDev passes -SkipCheck only when release takes it.** release.ps1 belongs to a separate project and is not in git. The copy in scripts on 11 October had no -SkipCheck, so PowerShell refused the parameter and kit 1.65.26 was pushed but never tagged. releaseHomerDev now asks release.ps1 first, passes -SkipCheck only when it is declared, and logs which.

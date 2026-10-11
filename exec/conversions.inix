@@ -1,0 +1,126 @@
+﻿; conversions.inix -- the one routing table for converting a file in any Homer program.
+;
+; Read by the kit's conversion modules, Python's conversion.py and C#'s
+; Conversion.cs, so a route is decided once, for every app in either language.
+; One section per source type (the extension, without its dot). Each line names
+; a target type and the ways to reach it, best first, separated by commas; the
+; first whose engines are all present here is used. A way can take steps,
+; joined by >, each step an engine, with :type naming what it hands on.
+;
+; Only components the author has approved: Pandoc, and NuGet and PyPI
+; packages, with Tesseract for scanned pages; Microsoft Office, driven by COM,
+; is always last, and only where nothing approved will do. No other converting
+; program is looked for or offered. Engines:
+;   copy          the file as it is
+;   ocr           a scanned PDF: pages drawn by pypdfium2, read by Tesseract
+;   officecom     Microsoft Office, the last resort
+;   pandoc        Pandoc
+;   pdfstructure  a PDF's text with its headings worked out from type sizes (pdfminer.six)
+;   pdftext       a PDF's text layer, as it is: no structure, the quickest (pypdf)
+;   zipxml        the text of a Word, Excel, PowerPoint or OpenDocument file, read
+;                 straight from the XML inside it: no other program at all
+;
+; The older binary formats -- .doc, .xls and .ppt -- have only Office until a
+; free package to read them is approved.
+;
+; The purpose of the call chooses the target: plain text (txt) takes the
+; quickest way, with no work spent on structure; Markdown, HTML or Word asks
+; for headings, lists and tables.
+
+[doc]
+docx = officecom
+htm = officecom
+md = officecom:docx > pandoc
+pdf = officecom
+txt = officecom
+
+[docx]
+docx = copy
+epub = pandoc
+htm = pandoc, officecom
+md = pandoc
+odt = pandoc
+pdf = officecom
+txt = zipxml, pandoc, officecom
+
+[epub]
+docx = pandoc
+htm = pandoc
+md = pandoc
+txt = pandoc
+
+[htm]
+docx = pandoc
+md = pandoc
+pdf = officecom
+txt = pandoc
+
+[html]
+docx = pandoc
+md = pandoc
+pdf = officecom
+txt = pandoc
+
+[md]
+docx = pandoc
+epub = pandoc
+htm = pandoc
+odt = pandoc
+pdf = pandoc:docx > officecom
+pptx = pandoc
+rtf = pandoc
+txt = pandoc
+
+[odp]
+md = zipxml
+txt = zipxml
+
+[ods]
+md = zipxml
+txt = zipxml
+
+[odt]
+docx = pandoc
+htm = pandoc
+md = pandoc
+pdf = officecom
+txt = zipxml, pandoc
+
+[pdf]
+docx = pdfstructure:md > pandoc
+htm = pdfstructure:md > pandoc
+md = pdfstructure, ocr
+txt = pdftext, ocr
+
+[ppt]
+pdf = officecom
+pptx = officecom
+txt = officecom:pptx > zipxml
+
+[pptx]
+htm = zipxml:md > pandoc
+md = zipxml
+pdf = officecom
+txt = zipxml
+
+[rtf]
+docx = pandoc, officecom
+htm = pandoc, officecom
+md = pandoc, officecom:docx > pandoc
+txt = pandoc, officecom
+
+[txt]
+docx = pandoc
+htm = pandoc
+md = copy
+
+[xls]
+csv = officecom
+xlsx = officecom
+txt = officecom:xlsx > zipxml
+
+[xlsx]
+csv = zipxml
+htm = zipxml:md > pandoc
+md = zipxml
+txt = zipxml

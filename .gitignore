@@ -27,6 +27,7 @@
 !/CLAUDE.md
 !/createHomerDevRepo.cmd
 !/createHomerDevRepo.ps1
+!/exec/conversions.inix
 !/exec/CSharp/
 !/exec/Python/
 !/GEMINI.md
@@ -70,6 +71,9 @@ Templates/create_APP_Repo.ps1
 .claude/skills/homer-screen-reader/references/CamelType_JAWSScript.md
 build_release.bat
 
+# Named in RepoFiles.txt, so put back after the patterns above.
+!/exec/conversions.inix
+
 # Never pushed, whatever RepoFiles.txt says: private notes, maintainer
 # scripts, logs, and anything a build makes.
 *.exe
@@ -97,3 +101,4 @@ build_release.bat
 # Named in RepoFiles.txt inside a folder kept off the repository.
 !/exec/CSharp/
 !/exec/Python/
+!/exec/conversions.inix

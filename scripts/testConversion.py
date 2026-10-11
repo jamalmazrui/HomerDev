@@ -69,6 +69,25 @@ def makeXlsx(sPath):
         oZip.writestr("xl/worksheets/sheet1.xml", '<?xml version="1.0"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>%s</sheetData></worksheet>' % sRows)
 
 
+def ensurePackages(lsPackages):
+    """FETCHED, NOT SKIPPED (1.65.28): a missing PyPI package for a sample is installed with this Python's pip, each
+    try logged, rather than leaving the routes it serves untested on 11 October (pypdfium2 was not installed)."""
+    import importlib
+    for sPackage in lsPackages:
+        sModule = {"pillow": "PIL", "pdfminer.six": "pdfminer"}.get(sPackage, sPackage)
+        try:
+            importlib.import_module(sModule); continue
+        except ImportError:
+            pass
+        lsCommand = [sys.executable, "-m", "pip", "install", "--disable-pip-version-check", "--quiet", sPackage]
+        try:
+            oRun = subprocess.run(lsCommand, capture_output=True, text=True, timeout=600)
+            logLine("pip install %s: exit %d%s" % (sPackage, oRun.returncode, (" -- " + (oRun.stderr or "").strip()[-300:]) if oRun.returncode else ""))
+            importlib.invalidate_caches()
+        except Exception as oError:
+            logLine("pip install %s could not run: %s" % (sPackage, oError))
+
+
 def make(sDir):
     """The sample files this computer can make, by type, with approved tools only:
     Pandoc, Python, and the PyPI packages pypdfium2 and Pillow for the scanned page."""
@@ -87,6 +106,7 @@ def make(sDir):
         sPdf = os.path.join(sDir, "sample.pdf"); makePdf(sPdf); dMade["pdf"] = sPdf
     except Exception as oError: logLine("could not make sample .pdf: %s" % oError)
     if "pdf" in dMade:
+        ensurePackages(["pdfminer.six", "pypdfium2", "pillow"])
         try:
             import pypdfium2
             oPdf = pypdfium2.PdfDocument(dMade["pdf"])
@@ -114,7 +134,10 @@ def main():
                     sText = conversion.toText(sOut) if sTo not in ("txt", "md", "htm", "html", "csv") else open(sOut, encoding="utf-8-sig", errors="replace").read()
                     lsWrong = []
                     if c_sMarker.lower() not in sText.lower(): lsWrong.append("no marker word")
-                    if sTo == "md" and sFrom not in ("xlsx", "ods", "xls") and "#" not in sText: lsWrong.append("no heading")
+                    # RECOGNITION HAS NO HEADINGS TO KEEP (1.65.29): text read from a picture of a page carries no
+                    # structure, so the ocr route is held to the marker word alone. On 11 October it was the route
+                    # taken for pdf > md because pdfminer.six, which pdfstructure needs, was not fetched; it is now.
+                    if sTo == "md" and sFrom not in ("xlsx", "ods", "xls") and dDone.get("route") != "ocr" and "#" not in sText: lsWrong.append("no heading")
                     if lsWrong: iFail += 1; logLine("FAIL %s > %s by %s: %s" % (sFrom, sTo, dDone["route"], ", ".join(lsWrong)))
                     else: iPass += 1; logLine("pass %s > %s by %s, %d ms" % (sFrom, sTo, dDone["route"], dDone["ms"]))
                 except Exception as oError:

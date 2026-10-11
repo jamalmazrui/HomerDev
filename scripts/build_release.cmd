@@ -34,8 +34,10 @@ rem The project's own steps; the kit releases with releaseHomerDev, and checks w
 set "sCheck="
 if exist "scripts\check.cmd" set "sCheck=scripts\check.cmd"
 if exist "checkHomerDev.cmd" set "sCheck=checkHomerDev.cmd"
+rem ONE CHECK, ONE PUSH (1.65.28). For the kit, release was releaseHomerDev, which runs checkHomerDev and push again
+rem after this cycle had just run both: on 11 October each ran twice. The cycle now calls release directly, as it does
+rem for every project; releaseHomerDev stays the one command for releasing the kit by hand.
 set "sRelease=scripts\release.cmd"
-if exist "releaseHomerDev.cmd" set "sRelease=releaseHomerDev.cmd"
 >> "%sLog%" echo Settings: check=!sCheck! release=!sRelease!
 set "sSummary="
 
