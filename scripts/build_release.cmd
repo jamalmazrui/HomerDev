@@ -35,7 +35,16 @@ rem ONE CHECK, ONE PUSH (1.65.28). For the kit, release was releaseHomerDev, whi
 rem after this cycle had just run both: on 11 October each ran twice. The cycle now calls release directly, as it does
 rem for every project; releaseHomerDev stays the one command for releasing the kit by hand.
 set "sRelease=scripts\release.cmd"
->> "%sLog%" echo Settings: release=!sRelease!
+rem EVERY RUNNER REPLACES ITSELF, AND ONLY AT ITS OWN END (1.65.32, from an audit). The kit's build overwrote every
+rem sibling project's build_release.bat, including one running a cycle at that moment; Windows reads a running batch
+rem file a piece at a time, so the running copy could execute garbage. Now the kit's build only creates a missing
+rem runner, and each runner copies the kit's newest over itself on the line it exits by, which Windows reads whole
+rem before running, so the bytes change only when no cycle is running them. The kit's own copy is its scripts copy.
+set "sRunner="
+if exist "releaseHomerDev.cmd" if exist "scripts\build_release.cmd" set "sRunner=%CD%\scripts\build_release.cmd"
+if not defined sRunner if defined HomerDev if exist "%HomerDev%\scripts\build_release.cmd" set "sRunner=%HomerDev%\scripts\build_release.cmd"
+if not defined sRunner if exist "..\HomerDev\scripts\build_release.cmd" for %%R in ("..\HomerDev\scripts\build_release.cmd") do set "sRunner=%%~fR"
+>> "%sLog%" echo Settings: release=!sRelease! runner=!sRunner!
 set "sSummary="
 
 call :step build "build.cmd" || goto :stopped
@@ -49,7 +58,7 @@ echo Built, tidied, pushed and released:!sSummary!.
 >> "%sLog%" echo Finished %date% %time%: every step passed:!sSummary!
 rem The kit's own copy is replaced here, on the same line as the exit: Windows reads the whole line before running
 rem it, so nothing of the old file is read after the copy (1.65.26). A project's copy is written by the kit's build.
-if exist "releaseHomerDev.cmd" if exist "scripts\build_release.cmd" copy /y "scripts\build_release.cmd" "build_release.bat" >nul & exit /b 0
+if defined sRunner copy /y "!sRunner!" "build_release.bat" >nul & exit /b 0
 exit /b 0
 
 :step
@@ -78,4 +87,5 @@ echo(
 echo Stopped: %sStep% failed, so the steps after it did not run. Its own log is in logs, and this cycle's is
 echo logs\%sName%-build_release-%sStamp%.log.
 >> "%sLog%" echo Stopped %date% %time%: %sStep% failed; steps passed before it:!sSummary!
+if defined sRunner copy /y "!sRunner!" "build_release.bat" >nul & exit /b 1
 exit /b 1

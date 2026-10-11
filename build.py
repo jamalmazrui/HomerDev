@@ -1300,14 +1300,21 @@ def refreshBuildRelease():
             if os.path.normcase(sDir) != os.path.normcase(sScriptDir) and os.path.isfile(os.path.join(sDir, "build.cmd")): lsTargets.append(sDir)
     except OSError as oError:
         logLine("build_release: could not list %s: %s" % (sParent, oError))
+    # ONLY A MISSING RUNNER IS WRITTEN (1.65.32, from an audit): a differing copy may be running a cycle this moment,
+    # and overwriting a running batch file can make it execute garbage. Each runner replaces itself from the kit on
+    # the line it exits by, so an existing copy catches up at the end of its next cycle.
     iWritten = 0
     for sDir in lsTargets:
         sTarget = os.path.join(sDir, "build_release.bat")
         try:
-            if os.path.isfile(sTarget) and open(sTarget, "rb").read() == binNew:
-                logLine("build_release: %s is current" % sTarget); continue
+            # ONE UPGRADE: a runner from before 1.65.32 cannot replace itself, so it is replaced here, once.
+            if os.path.isfile(sTarget) and b"sRunner" not in open(sTarget, "rb").read():
+                open(sTarget, "wb").write(binNew); iWritten += 1
+                logLine("build_release: upgraded %s, which could not replace itself (one time)" % sTarget); continue
+            if os.path.isfile(sTarget):
+                logLine("build_release: %s is %s; it replaces itself at the end of its next cycle" % (sTarget, "current" if open(sTarget, "rb").read() == binNew else "older")); continue
             open(sTarget, "wb").write(binNew); iWritten += 1
-            logLine("build_release: wrote %s" % sTarget)
+            logLine("build_release: wrote %s, which was missing" % sTarget)
         except OSError as oError:
             logLine("build_release: could not write %s: %s" % (sTarget, oError))
     return iWritten
@@ -1626,7 +1633,11 @@ def main():
             sayLine("The tidy self-test could not run: %s" % oError)
             iSamplesFailed += 1
             lsFailedParts.append("the tidy self-test, which could not run")
-        buildTutorials()
+        # THE TUTORIALS COUNT (1.65.32, from an audit): their result was ignored, so a build whose voices or tutorial
+        # audio failed still said "The kit is complete".
+        if not buildTutorials():
+            iSamplesFailed += 1
+            lsFailedParts.append("the voices or tutorial audio")
         removeSkillHtm()
         findStaleAppBuilds()
         copySkillDocuments()

@@ -7,6 +7,15 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.65.32 -- 11 October 2026
+
+Four high findings from an audit of the kit by another AI, each fixed with the audit's own closure test.
+
+- **Tidy never commits or pushes.** With a tracked stray, tidy staged everything, committed and pushed before push had run the check, so a failing check could not stop what tidy had published, and a failed git step still let tidy succeed. Tidy now only untracks the stray (the file stays on disk), and a failed untrack fails tidy; push commits it after the check. Tested on a scratch repository: the remote stayed unchanged and no commit was made. Tidy also logs each phase, since a tidy that stopped after "Named by the project" on 11 October left no clue where.
+- **The kit's check runs checkHomerDev.** scripts\\check said "run checkHomerDev instead" and returned 0, so release reported "The check passed" for the kit with no check run. It now runs checkHomerDev and returns its exit code; a missing checkHomerDev fails. Tested with a stub failing, passing and absent.
+- **Required checks fail closed.** A build whose voices or tutorial audio failed said "The kit is complete"; it no longer does. The database check counted a failure only when its output matched a phrase, so a crash escaped it; it now trusts checkDb's exit code, treats a missing checker, timeout or crash as a failure, and checks every database rather than the first twenty. Tested with 21 databases and a malformed one.
+- **A running build_release is never overwritten.** The kit's build rewrote every sibling project's build_release.bat that differed, even one running a cycle at that moment. It now only creates a missing one, and upgrades once a runner from before this version; every runner copies the kit's newest over itself on the line it exits by, which Windows reads whole before running.
+
 ## 1.65.31 -- 11 October 2026
 
 - **The samples log in the kit's logs.** The four fruit-basket build scripts wrote their logs in Templates\\samples\\logs, outside the kit's logs folder, so a zip of logs left them out. They now write logs\\<Sample>-build-<stamp>.log at the top of the kit; a copy of a sample elsewhere logs beside itself. The kit's build moves any old sample logs into logs and removes the empty folder.
