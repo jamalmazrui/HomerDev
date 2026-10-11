@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.65.33 -- 11 October 2026
+
+- **Launch after setup works on a first install.** The installer template's Launch box wrote its marker into %LOCALAPPDATA%\\<App>\\logs before anything had made that folder -- setup makes it later, when it keeps its log -- so on a first install the marker failed (cmd exit 1, in bookFido's setup log) and the program did not start. The marker line now makes the folder first. Found by an audit of bookFido by another AI; Templates\\_APP__setup.iss and the six installers that copy it are fixed, and each still passes the installer pattern check.
+
 ## 1.65.32 -- 11 October 2026
 
 Four high findings from an audit of the kit by another AI, each fixed with the audit's own closure test.
