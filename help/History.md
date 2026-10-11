@@ -7,6 +7,13 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.65.26 -- 11 October 2026
+
+- **uiCheck runs only when asked.** build_release runs checkHomerDev as the kit's check, and checkHomerDev started every fruit-basket sample and pressed its keys, so windows opened in the middle of an unattended build and took the screen reader's focus. The programs check is now reported as not checked unless `checkHomerDev --ui` asks for it; nothing else runs uiCheck.
+- **uiCheck finds each sample by its program, and closes every copy.** It held each sample by the process it launched. A one-file PyInstaller program starts a launcher, which starts the program as a second process, so the Python samples' windows were never seen and never closed; and a sample left open took each new launch by the one-copy rule. Windows are now found by the name of the program that owns them, looked up again at each step; every copy is ended before a test and after it, each logged; a failure inside UI Automation is named as one; and a list reporting lists of lists is flattened, which had failed with "expected str instance, list found".
+- **checkHomerDev and uiCheck write in logs,** as `HomerDev-checkHomerDev-<stamp>.log`, `HomerDev-evidence-<stamp>.md`, `<Project>-uiCheck-<stamp>.log` and `<Project>-evidence-ui-<stamp>.md`. Written at the top of the kit, they were missing from a zip of the logs folder.
+- **The kit's build no longer rewrites its own running build_release.** Windows reads a running batch file a piece at a time, so replacing it mid-run could make it execute garbage. The kit's copy now replaces itself on its last line, which Windows reads whole before running; projects' copies are written by the build as before.
+
 ## 1.65.25 -- 10 October 2026
 
 - **A book build no longer pauses over tools it already has.** buildBooks searched the disk for Java and ran every Java it found, and searched for npm, started Node and searched for Ace, before reading the stamp that said Ace had been checked days ago. Each tool's path, version and check time are now kept in toolCache.json in the per-user data folder; while the record is younger than toolRefreshDays and its files exist, the tool is used at once, with no search and no process started. Only an old or broken record looks again and asks npm whether a newer Ace exists, installing only a newer one. A check is recorded even when npm or Kindle Previewer's -update fails, so a failure waits for the next period instead of costing every build. Tested: a fresh record is used, a record whose files are gone or that is eight days old is set aside, and no record means a search.

@@ -53,6 +53,9 @@ echo(
 set "sSummary=!sSummary:~0,-1!"
 echo Built, tidied, checked, pushed and released:!sSummary!.
 >> "%sLog%" echo Finished %date% %time%: every step passed:!sSummary!
+rem The kit's own copy is replaced here, on the same line as the exit: Windows reads the whole line before running
+rem it, so nothing of the old file is read after the copy (1.65.26). A project's copy is written by the kit's build.
+if exist "releaseHomerDev.cmd" if exist "scripts\build_release.cmd" copy /y "scripts\build_release.cmd" "build_release.bat" >nul & exit /b 0
 exit /b 0
 
 :step

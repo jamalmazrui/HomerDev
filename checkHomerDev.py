@@ -28,7 +28,8 @@ WHAT IT DOES
     4. dependencies         every module's REQUIRES line against every build
                             script that includes it
     5. shared tools         whether the copy on the PATH matches the kit's
-    6. the programs         uiCheck starts each one and presses the keys
+    6. the programs         with --ui only: uiCheck starts each one and presses
+                            the keys
     7. the report           what was verified, what was not, what is uncertain
 
 WHAT IT DOES NOT DO. It does not hear. uiCheck drives each program through UI
@@ -42,9 +43,15 @@ and capturing NVDA's speech log is the next step rather than a finished one.
     checkHomerDev --deep      also delete the Python virtual environment, so the
                               next build proves it can build that too (slow)
     checkHomerDev --no-clean  build over whatever is there (fast, weaker)
+    checkHomerDev --ui        also start each sample and press its keys
 
-Writes evidence-kit-<yyyymmdd-hhmmss>.md and checkHomerDev.log beside this
-script. Exit code 0 when nothing failed, 1 when something did.
+UICHECK RUNS ONLY WHEN ASKED (1.65.26). It opens every sample's window, which
+takes the screen reader's focus in the middle of a build, and build_release runs
+this check unattended. So the programs check is reported as not checked unless
+--ui is given.
+
+Writes logs\HomerDev-evidence-<yyyymmdd-hhmmss>.md and
+logs\HomerDev-checkHomerDev-<stamp>.log. Exit code 0 when nothing failed, 1 when something did.
 """
 
 import argparse
@@ -74,7 +81,10 @@ c_lsBuildProducts = ["Version.cs", "build", "dist", "version.py"]
 
 c_sKit = os.path.dirname(os.path.abspath(__file__))
 c_sSamples = os.path.join(c_sKit, "Templates", "samples")
-sLogPath = os.path.join(c_sKit, "checkHomerDev.log")
+# THE LOG AND REPORT GO IN logs (1.65.26), like every other script's: written at the top of the kit, a zip of the
+# logs folder held nothing to say why the check had failed.
+c_sLogs = os.path.join(c_sKit, "logs")
+sLogPath = os.path.join(c_sLogs, "HomerDev-checkHomerDev-%s.log" % datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
 oLog = None
 lsFindings = []          # (sName, sVerdict, sEvidence)
 
@@ -314,8 +324,12 @@ def checkSharedTools():
     return finding("shared tools", "pass", "no kit tool is on the PATH outside the kit")
 
 
-def checkPrograms():
-    """uiCheck: start each program, press the keys, read the tree back."""
+def checkPrograms(bUi):
+    """uiCheck: start each program, press the keys, read the tree back -- only when --ui asks for it."""
+    if not bUi:
+        return finding("programs", "skip",
+                       "not run: uiCheck opens each sample's window, which takes the screen reader's focus; "
+                       "run checkHomerDev --ui to drive them")
     # uiCheck moved to scripts with the rest of the kit's tools; looking in the retired Tools folder skipped this check
     # on every run (1.62.5, from an audit by another AI).
     sUi = os.path.join(c_sKit, "scripts", "uiCheck.py")
@@ -332,7 +346,7 @@ def checkPrograms():
         return finding("programs", "pass",
                        sSummary or "uiCheck ran every test and nothing failed")
     return finding("programs", "fail",
-                   (sSummary or "uiCheck reported a failure") + "; see evidence-ui in Tools")
+                   (sSummary or "uiCheck reported a failure") + "; see the uiCheck log and evidence-ui report in logs")
 
 
 # --- 4. the dependency rule -------------------------------------------------
@@ -422,7 +436,7 @@ def checkDependencies():
 
 def writeReport(bDeep, bCleaned):
     sStamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    sPath = os.path.join(c_sKit, "evidence-kit-%s.md" % sStamp)
+    sPath = os.path.join(c_sLogs, "HomerDev-evidence-%s.md" % sStamp)
     lsPassed = [t for t in lsFindings if t[1] == "pass"]
     lsFailed = [t for t in lsFindings if t[1] == "fail"]
     lsSkipped = [t for t in lsFindings if t[1] == "skip"]
@@ -436,7 +450,7 @@ def writeReport(bDeep, bCleaned):
         "# Evidence report: the Homer Development Kit",
         "",
         "Written by checkHomerDev. Every line below rests on a command that ran,",
-        "and the command and its exit code are in checkHomerDev.log.",
+        "and the command and its exit code are in %s." % os.path.basename(sLogPath),
         "",
         ("The samples were built from a clean start%s, so nothing here passed on a "
          "file an earlier build had left behind."
@@ -488,10 +502,13 @@ def main():
     oParser = argparse.ArgumentParser(description="Prove the kit still builds, by building with it.")
     oParser.add_argument("--deep", action="store_true",
                          help="also delete the Python virtual environment before building")
+    oParser.add_argument("--ui", action="store_true",
+                         help="also start each sample program and press its keys through UI Automation")
     oParser.add_argument("--no-clean", action="store_true",
                          help="build over what is there instead of cleaning first")
     dArguments = oParser.parse_args()
 
+    os.makedirs(c_sLogs, exist_ok=True)
     oLog = open(sLogPath, "w", encoding="utf-8")
     logLine("checkHomerDev start pid=%d" % os.getpid())
     logFact("script", os.path.abspath(__file__))
@@ -518,7 +535,7 @@ def main():
         sayLine("Building %s..." % sName)
         buildSample(sName, sScript, sExe)
 
-    checkPrograms()
+    checkPrograms(dArguments.ui)
 
     sReport = writeReport(dArguments.deep, not dArguments.no_clean)
     iPassed = len([t for t in lsFindings if t[1] == "pass"])

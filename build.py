@@ -1252,7 +1252,10 @@ def refreshBuildRelease():
         return 0
     binNew = open(sSource, "rb").read()
     sParent = os.path.dirname(os.path.abspath(sScriptDir))
-    lsTargets = [sScriptDir]
+    # NOT THE KIT'S OWN COPY (1.65.26): this build usually runs inside the kit's build_release.bat, and Windows reads a
+    # running batch file a piece at a time, so replacing it here could make the running copy execute garbage. The
+    # kit's build_release replaces itself on its last line instead.
+    lsTargets = []
     try:
         for sName in sorted(os.listdir(sParent)):
             sDir = os.path.join(sParent, sName)
