@@ -21,6 +21,7 @@ by the run that followed it.
 """
 
 import datetime
+import fnmatch
 import os
 import platform
 import re
@@ -1200,9 +1201,114 @@ def convertDocs(sPandoc):
     return iDone
 
 
+# THE ROUTES FOR AI AGENTS (1.65.24): AGENTS.md is what any agent reads, CLAUDE.md, GEMINI.md and Copilot's file point
+# to it, llms.txt indexes the documents, and .claude-plugin makes the kit a Claude Code plugin whose skills are the
+# ones in .claude/skills. The build keeps the plugin's version the kit's; the check keeps every route true.
+c_lsAgentRoutes = ["AGENTS.md", "CLAUDE.md", "GEMINI.md", "llms.txt", ".github/copilot-instructions.md",
+                   ".claude-plugin/plugin.json", ".claude-plugin/marketplace.json",
+                   ".claude/agents/homer-auditor.md", ".claude/agents/homer-listener.md"]
+
+
+def keepEncodingPatterns():
+    """The paths KeepEncoding.txt names, which keep their own encoding: fixEncoding leaves them, and check does not
+    ask them for a byte order mark."""
+    sPath = os.path.join(sScriptDir, "KeepEncoding.txt")
+    if not os.path.isfile(sPath): return []
+    return [s.strip().replace("\\", "/") for s in open(sPath, "rb").read().decode("utf-8-sig").splitlines()
+            if s.strip() and not s.strip().startswith((";", "#"))]
+
+
+def syncPluginVersion(sVersion):
+    """Write the kit's version into the plugin manifest and the marketplace entry, so the plugin a person installs
+    says which kit it is. Logged; a file that cannot be read as JSON is left for the check to report."""
+    import json
+    for sRelative in (".claude-plugin/plugin.json", ".claude-plugin/marketplace.json"):
+        sPath = os.path.join(sScriptDir, sRelative.replace("/", os.sep))
+        if not os.path.isfile(sPath): continue
+        try:
+            dData = json.loads(open(sPath, "rb").read().decode("utf-8-sig"))
+            if "plugins" in dData:
+                for dPlugin in dData["plugins"]:
+                    if dPlugin.get("name") == "homer-dev": dPlugin["version"] = sVersion
+            else:
+                dData["version"] = sVersion
+            sText = json.dumps(dData, indent=2) + "\n"
+            sOld = open(sPath, "rb").read().decode("utf-8-sig").replace("\r\n", "\n")
+            if sOld != sText:
+                open(sPath, "wb").write(sText.replace("\n", "\r\n").encode("utf-8"))
+                logLine("Plugin version: %s now says %s" % (sRelative, sVersion))
+        except Exception as oError:
+            logLine("Plugin version: could not update %s: %s" % (sRelative, oError))
+
+
+def refreshBuildRelease():
+    """THE KIT'S ONE build_release (1.65.25): write scripts/build_release.cmd as build_release.bat at the top of the kit
+    and of every project beside it -- each folder with a build.cmd -- when the copy there differs. It acts on the
+    current folder, so one file serves every project, and no project keeps a hand-made copy that drifts. Returns the
+    number of copies written; each is logged."""
+    sSource = os.path.join(sScriptDir, "scripts", "build_release.cmd")
+    if not os.path.isfile(sSource):
+        logLine("build_release: scripts/build_release.cmd is missing; nothing refreshed")
+        return 0
+    binNew = open(sSource, "rb").read()
+    sParent = os.path.dirname(os.path.abspath(sScriptDir))
+    lsTargets = [sScriptDir]
+    try:
+        for sName in sorted(os.listdir(sParent)):
+            sDir = os.path.join(sParent, sName)
+            if os.path.normcase(sDir) != os.path.normcase(sScriptDir) and os.path.isfile(os.path.join(sDir, "build.cmd")): lsTargets.append(sDir)
+    except OSError as oError:
+        logLine("build_release: could not list %s: %s" % (sParent, oError))
+    iWritten = 0
+    for sDir in lsTargets:
+        sTarget = os.path.join(sDir, "build_release.bat")
+        try:
+            if os.path.isfile(sTarget) and open(sTarget, "rb").read() == binNew:
+                logLine("build_release: %s is current" % sTarget); continue
+            open(sTarget, "wb").write(binNew); iWritten += 1
+            logLine("build_release: wrote %s" % sTarget)
+        except OSError as oError:
+            logLine("build_release: could not write %s: %s" % (sTarget, oError))
+    return iWritten
+
+
+def checkAgentRoutes(lsProblems):
+    """Every route for AI agents present and true: the JSON parses and carries the kit's version, every skill is in
+    AGENTS.md and llms.txt, and every subagent's front matter names it."""
+    import json
+    sVersion = open(os.path.join(sScriptDir, "version.txt"), "rb").read().decode("utf-8-sig").strip()
+    for sRelative in c_lsAgentRoutes:
+        if not os.path.isfile(os.path.join(sScriptDir, sRelative.replace("/", os.sep))): lsProblems.append("missing: " + sRelative)
+    for sRelative, bMarket in ((".claude-plugin/plugin.json", False), (".claude-plugin/marketplace.json", True)):
+        sPath = os.path.join(sScriptDir, sRelative.replace("/", os.sep))
+        if not os.path.isfile(sPath): continue
+        try:
+            dData = json.loads(open(sPath, "rb").read().decode("utf-8"))
+        except Exception as oError:
+            lsProblems.append("%s does not parse as JSON (a byte order mark is refused): %s" % (sRelative, oError)); continue
+        sHas = ([d.get("version", "") for d in dData.get("plugins", []) if d.get("name") == "homer-dev"] or [""])[0] if bMarket else dData.get("version", "")
+        if sHas != sVersion: lsProblems.append("%s says version %s; the kit is %s" % (sRelative, sHas or "none", sVersion))
+    sSkills = os.path.join(sScriptDir, ".claude", "skills")
+    lsSkills = sorted(s for s in os.listdir(sSkills) if os.path.isfile(os.path.join(sSkills, s, "SKILL.md"))) if os.path.isdir(sSkills) else []
+    for sRoute in ("AGENTS.md", "llms.txt"):
+        sPath = os.path.join(sScriptDir, sRoute)
+        if not os.path.isfile(sPath): continue
+        sText = open(sPath, "rb").read().decode("utf-8-sig")
+        for sSkill in lsSkills:
+            if ".claude/skills/%s/SKILL.md" % sSkill not in sText: lsProblems.append("%s does not list the skill %s" % (sRoute, sSkill))
+    sAgents = os.path.join(sScriptDir, ".claude", "agents")
+    for sName in (sorted(os.listdir(sAgents)) if os.path.isdir(sAgents) else []):
+        if not sName.endswith(".md"): continue
+        sText = open(os.path.join(sAgents, sName), "rb").read().decode("utf-8")
+        mName = re.search(r"(?m)^name:\s*(\S+)", sText)
+        if not sText.startswith("---") or not mName or mName.group(1) != sName[:-3]:
+            lsProblems.append(".claude/agents/%s: front matter must open the file and name %s" % (sName, sName[:-3]))
+
+
 def checkKit():
     """Report anything wrong with the kit. Returns a list of problems."""
     lsProblems = []
+    checkAgentRoutes(lsProblems)
 
     for sRelative in c_lsExpected:
         sPath = os.path.join(sScriptDir, sRelative.replace("/", os.sep))
@@ -1226,6 +1332,7 @@ def checkKit():
     # Encoding: every text file UTF-8 with a BOM and CRLF, except .cmd and .bat,
     # which take CRLF and no BOM.
     lsTextExt = (".cs", ".py", ".ps1", ".md", ".htm", ".inix", ".txt", ".iss", ".cmd")
+    lsKeepEncoding = keepEncodingPatterns()
     sExecDir = os.path.join(sScriptDir, "exec")
     for sRoot, lsDirs, lsFiles in os.walk(sScriptDir):
         # exec holds built files too, but its CSharp and Python folders are the
@@ -1248,7 +1355,8 @@ def checkKit():
             bBom = binData.startswith(b"\xef\xbb\xbf")
             # A skill's SKILL.md opens with front matter, which a byte order
             # mark would hide; KeepEncoding.txt says so, and the check agrees.
-            bWantBom = not (sName.lower().endswith((".cmd", ".bat", "version.txt")) or sName == "SKILL.md")
+            bWantBom = not (sName.lower().endswith((".cmd", ".bat", "version.txt")) or sName == "SKILL.md"
+                            or any(fnmatch.fnmatch(sShown, s) for s in lsKeepEncoding))
             if bBom != bWantBom:
                 lsProblems.append("%s: %s a byte order mark" %
                                   (sShown, "should not have" if bBom else "needs"))
@@ -1416,6 +1524,10 @@ def main():
     if os.path.exists(sVersionPath):
         sVersion = open(sVersionPath, "rb").read().decode("utf-8-sig").strip()
     sayLine("Homer Development Kit %s in %s" % (sVersion, sScriptDir))
+    if not bCheckOnly and sVersion != "unknown": syncPluginVersion(sVersion)
+    if not bCheckOnly:
+        iRefreshed = refreshBuildRelease()
+        if iRefreshed: sayLine("build_release.bat refreshed in %d %s." % (iRefreshed, "folder" if iRefreshed == 1 else "folders"))
 
     iSamplesFailed = 0
     lsFailedParts = []

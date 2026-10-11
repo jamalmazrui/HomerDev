@@ -203,7 +203,15 @@ HomerDev.md.”</p>
 <li><a href="#where-the-documents-are">Where the documents are</a></li>
 <li><a href="#the-other-documents">The other documents</a></li>
 </ul>
-<h2 id="install">Install</h2>
+<h2 id="for-ai-agents">For AI agents</h2>
+<p>An AI assistant can use the kit too. AGENTS.md, at the top of the
+kit, tells any agent what the kit is, where things are, which skill to
+read for which task, and the rules to follow; CLAUDE.md, GEMINI.md and
+GitHub Copilot’s instructions point to it. In Claude Code, the kit is
+also a plugin, so its skills and two reviewing agents work in any
+project: type <code>/plugin marketplace add JamalMazrui/HomerDev</code>,
+then <code>/plugin install homer-dev@homer-dev-kit</code>. ##
+Install</p>
 <p>Unzip <code>HomerDev.zip</code> into a folder named
 <code>HomerDev</code>, on any drive and at any depth – beside your
 projects is simplest. That is the install.</p>
@@ -349,11 +357,12 @@ JobDo
 createJobDoRepo
 release</code></pre>
 <p><code>createJobDoRepo</code> makes the GitHub repository and pushes
-the first commit; after that <code>release</code> is how every release
-goes out. Copy <code>release.cmd</code> and <code>release.ps1</code>
-from <code>scripts\</code> into the app folder first, or keep one copy
-in a folder on your PATH – they act on the current directory, so one
-copy serves every project.</p>
+the first commit; after that <code>build_release</code> is how every
+release goes out: build, tidy, check, push and release, stopping at the
+first step that fails. Copy <code>release.cmd</code> and
+<code>release.ps1</code> from <code>scripts\</code> into the app folder
+first, or keep one copy in a folder on your PATH – they act on the
+current directory, so one copy serves every project.</p>
 <h3 id="listen-instead">Listen instead</h3>
 <p>The kit’s ten spoken walks, in the Homer pattern of ten, are in
 <code>help</code>: <code>Tutorial_0_Overview.inix</code> to

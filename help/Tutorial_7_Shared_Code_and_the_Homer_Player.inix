@@ -51,7 +51,13 @@ Hear=
 
 [step]
 
-Say=What sharing buys. A fix to the player on Monday is in every program's next build; a new Say channel for a new reader reaches all of them; and a person who learned the dialog in one program has learned it in the next. The cost is one rule: an app never copies a kit class into its own folder; it compiles against the kit.
+Say=What sharing buys. A fix to the player on Monday is in every program's next build; a new Say channel for a new reader reaches all of them; and a person who learned the dialog in one program has learned it in the next.
+Key=
+Hear=
+
+[step]
+
+Say=The cost is one rule: an app never copies a kit class into its own folder; it compiles against the kit.
 Key=
 Hear=
 

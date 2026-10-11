@@ -553,27 +553,39 @@ What the Homer Development Kit is, in a paragraph; the two reader keys every wal
 
 HomerDev is a kit of parts for building Windows programs that work well by keyboard and screen reader: shared C sharp classes and Python modules, build and release scripts, installer parts, templates for a new app, and skills that teach an AI assistant the house rules. Every decision that makes a program pleasant to use without sight -- where the focus goes, what is spoken, what the keys do -- has been made once and put in a class, so an app built on the kit inherits it. DbDo, EdSharp and FileDir are built on it, and these walks use their voices to show what the kit's code does for a person.
 
-### Step 2: Insert+UpArrow
+### Step 2: Insert+Up Arrow
 
-Two keys before anything else, both the reader's own. If a line goes by too fast, Insert plus Up Arrow says it again.
+You know your screen reader's own keys already, and three of them are worth remembering whenever you feel lost or unsure. Insert plus Up Arrow says the line you are on again.
 
 Screen reader:
 
-- (the last line, read a second time)
+- Hello, world.
 
 ### Step 3: Insert+Tab
 
-And if you lose your place, Insert plus Tab says where you are: the control, its state, its position, and any hint it carries. The walks are heard with those hints off, the way most people work.
+Insert plus Tab says what has the focus: its name, its role, and its value or state.
 
 Screen reader:
 
-- (the current control, with its state and position)
+- Untitled, edit, multiline, Hello, world.
 
-### Step 4
+### Step 4: Insert+T
+
+Insert plus T says the title of the window.
+
+Screen reader:
+
+- EdSharp, Untitled
+
+### Step 5
+
+If you set your screen reader to use Caps Lock in place of Insert, Caps Lock works the same way for all three.
+
+### Step 6
 
 Now the table of contents. I say the number and the title; the reader says what the walk covers.
 
-### Step 5
+### Step 7
 
 One, User Interface.
 
@@ -581,7 +593,7 @@ Screen reader:
 
 - What a Homer program is made of, heard in DbDo, EdSharp and FileDir, and the rules every key follows, so a key can be guessed.
 
-### Step 6
+### Step 8
 
 Two, Install and Launch.
 
@@ -589,7 +601,7 @@ Screen reader:
 
 - Unarchiving the kit, running its own build, and launching the sample program it builds.
 
-### Step 7
+### Step 9
 
 Three, Start an App from the Kit.
 
@@ -597,7 +609,7 @@ Screen reader:
 
 - A new app from the template: its files, its first build, its first run.
 
-### Step 8
+### Step 10
 
 Four, Build, Check and Release.
 
@@ -605,7 +617,7 @@ Screen reader:
 
 - What build does, stage by stage; what check refuses; what release publishes.
 
-### Step 9
+### Step 11
 
 Five, The Installer and Its Finish Page.
 
@@ -613,7 +625,7 @@ Screen reader:
 
 - The shared installer parts: boxes that say their state, the results box, the summary.
 
-### Step 10
+### Step 12
 
 Six, Spoken Tutorials.
 
@@ -621,7 +633,7 @@ Screen reader:
 
 - Writing a walk, the two voices, the pattern of ten, and the tool that speaks and measures them.
 
-### Step 11
+### Step 13
 
 Seven, Shared Code and the Homer Player.
 
@@ -629,7 +641,7 @@ Screen reader:
 
 - The classes every app uses, and the player heard in FileDir and DbDo alike.
 
-### Step 12
+### Step 14
 
 Eight, Build with an AI Assistant.
 
@@ -637,7 +649,7 @@ Screen reader:
 
 - A feature written with an AI assistant in the kit's house style: the skills, the three sentences, and the check that proves it.
 
-### Step 13
+### Step 15
 
 Nine, Conclusion.
 
@@ -645,7 +657,7 @@ Screen reader:
 
 - The conclusion and summary, the words the kit uses, the help built into every program, and where to learn more.
 
-### Step 14
+### Step 16
 
 Ten walks, three to five minutes each, under an hour together: the overview, the user interface, seven tasks, and the conclusion. They are a course, not a reference: each one assumes those before it.
 
@@ -672,7 +684,7 @@ Screen reader:
 
 ### Step 3: Alt+Control+E
 
-The title, then the program's greeting in the message voice. Next, the main view, a control the reader knows. In EdSharp, an edit box.
+The title, then the program's greeting. Next, the main view, a control the reader knows. In EdSharp, an edit box.
 
 Screen reader:
 
@@ -937,19 +949,11 @@ Next, the samples: change into the samples folder under Templates. Two programs,
 
 Screen reader:
 
-- (silence)
-
-### Step 6: buildFruitBasketCs
-
-Build the C sharp one.
-
-Screen reader:
-
 - Kit, C colon backslash HomerDev version 1.52.8
 - Compiler, Microsoft Visual Studio Build Tools
 - Built FruitBasketCs dot exe version 1.0.0
 
-### Step 7: FruitBasketCs
+### Step 6: FruitBasketCs
 
 Now run it. This is the launch: the first Homer program you hear.
 
@@ -958,7 +962,7 @@ Screen reader:
 - Fruit Basket, the basket is empty
 - Fruit, edit
 
-### Step 8: apple
+### Step 7: apple
 
 Type a fruit and press Enter.
 
@@ -966,7 +970,7 @@ Screen reader:
 
 - apple added, 1 fruit in the basket
 
-### Step 9: Tab
+### Step 8: Tab
 
 Add two more, then Tab to the basket and arrow through it.
 
@@ -974,7 +978,7 @@ Screen reader:
 
 - Basket, list box, apple, 1 of 3
 
-### Step 10: F1
+### Step 9: F1
 
 F1 for help: every Homer dialog describes its own fields.
 
@@ -982,7 +986,7 @@ Screen reader:
 
 - Help, Fields in this dialog, Fruit, type the name of a fruit
 
-### Step 11: Alt+F4
+### Step 10: Alt+F4
 
 Close it with Alt plus F4 and run it again: the basket was kept between sessions, in your local application data, without being asked to.
 
@@ -990,11 +994,11 @@ Screen reader:
 
 - Fruit Basket, 2 fruits in the basket
 
-### Step 12
+### Step 11
 
 The Python one builds and runs the same way, and answers every key exactly as the C sharp one did -- walk three hears it. Two languages, one behaviour, because the behaviour lives in the kit's components rather than in either program.
 
-### Step 13
+### Step 12
 
 A planned misstep. Run build in an app folder whose kit is older than the app needs, and the build refuses in one line.
 
@@ -1002,15 +1006,15 @@ Screen reader:
 
 - ERROR: DbDo needs HomerDev 1.52.8 or later, and C colon backslash HomerDev is 1.52.6.
 
-### Step 14
+### Step 13
 
 Where things went. The kit stays in its folder and is never installed in Program Files; each sample keeps its data and its session log under your local application data, in a folder named for it -- the layout every Homer app follows.
 
-### Step 15
+### Step 14
 
 What this walk taught. I say the idea or the key; the reader says the command or the name.
 
-### Step 16
+### Step 15
 
 Run the kit's own check and documents.
 
@@ -1018,7 +1022,7 @@ Screen reader:
 
 - build
 
-### Step 17
+### Step 16
 
 Build the C sharp sample.
 
@@ -1521,17 +1525,21 @@ Mpv dot cs finds the player engine, machine-wide, and drives it: play, pause, re
 
 ### Step 8
 
-What sharing buys. A fix to the player on Monday is in every program's next build; a new Say channel for a new reader reaches all of them; and a person who learned the dialog in one program has learned it in the next. The cost is one rule: an app never copies a kit class into its own folder; it compiles against the kit.
+What sharing buys. A fix to the player on Monday is in every program's next build; a new Say channel for a new reader reaches all of them; and a person who learned the dialog in one program has learned it in the next.
 
 ### Step 9
 
-A planned misstep, from this very week. A kit class had a line that depended on one app, and compiled in that app alone; the kit's check now compiles every shared class on its own, so the mistake is caught in the kit and not in the fifth app to try it.
+The cost is one rule: an app never copies a kit class into its own folder; it compiles against the kit.
 
 ### Step 10
 
-The Python side has the same shape: a Say, a Log, an Inix, a dialog builder, so a Python app -- HomerScribe is one -- speaks and logs and asks exactly as the C sharp ones do. Walk one's two fruit baskets were the proof.
+A planned misstep, from this very week. A kit class had a line that depended on one app, and compiled in that app alone; the kit's check now compiles every shared class on its own, so the mistake is caught in the kit and not in the fifth app to try it.
 
 ### Step 11
+
+The Python side has the same shape: a Say, a Log, an Inix, a dialog builder, so a Python app -- HomerScribe is one -- speaks and logs and asks exactly as the C sharp ones do. Walk one's two fruit baskets were the proof.
+
+### Step 12
 
 Updating the kit is unarchiving HomerDev dot zip over the folder and building; every app's build checks the kit's version against the one it needs, and says so in one line when the kit is too old.
 
@@ -1539,23 +1547,23 @@ Screen reader:
 
 - ERROR: FileDir needs HomerDev 1.52.8 or later, and C colon backslash HomerDev is 1.52.6.
 
-### Step 12
+### Step 13
 
 How an app reaches the kit. Its build passes the kit's CSharp folder to the compiler, so Lbc dot cs, Say dot cs and the rest are compiled into the app from where they live; nothing is copied. The acceptance check named missing Lbc dot cs is the proof that nothing was.
 
-### Step 13
+### Step 14
 
 A worked case of the gain. The Homer Player's recording -- Alt plus Shift plus R, a Record button and a Stop recording button -- was written once, in the kit, on 5 October. FileDir had it on its next build, and DbDo on its next, with no change to either program.
 
-### Step 14
+### Step 15
 
 What belongs in the kit and what does not. A behaviour every app wants -- a dialog, speech, a log, a player -- belongs in the kit. A behaviour one app wants -- DbDo's grid, EdSharp's compiler table, FileDir's tags -- belongs in that app. The test: would a second app want it exactly as it is?
 
-### Step 15
+### Step 16
 
 What this walk taught. I say the idea or the key; the reader says the command or the name.
 
-### Step 16
+### Step 17
 
 The player every Homer program shares.
 
@@ -1563,7 +1571,7 @@ Screen reader:
 
 - MediaPlayer dot cs
 
-### Step 17
+### Step 18
 
 The dialog class.
 
@@ -1571,7 +1579,7 @@ Screen reader:
 
 - Lbc
 
-### Step 18
+### Step 19
 
 The speech class.
 
@@ -1597,7 +1605,7 @@ The kit teaches an assistant through its skills: folders of instructions, one fo
 
 Screen reader:
 
-- (each word echoed as it is typed)
+- scripts\checkSkills
 
 ### Step 3: Enter
 
@@ -1632,7 +1640,7 @@ Each check is a name and a command, and check runs them all. Now one change, the
 
 Screen reader:
 
-- (each word echoed as it is typed)
+- build
 
 ### Step 8: Enter
 
@@ -1650,7 +1658,7 @@ The installer is built. Then check, which refuses what release would refuse, and
 
 Screen reader:
 
-- (each word echoed as it is typed)
+- check
 
 ### Step 10: Enter
 

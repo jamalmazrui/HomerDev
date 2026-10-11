@@ -14,21 +14,27 @@
 # Put back what the project names.
 !/exec/
 /exec/*
+!/.claude-plugin/
 !/.claude/
 !/.gitattributes
+!/.github/
 !/.gitignore
+!/AGENTS.md
 !/build.cmd
 !/build.py
 !/checkHomerDev.cmd
 !/checkHomerDev.py
+!/CLAUDE.md
 !/createHomerDevRepo.cmd
 !/createHomerDevRepo.ps1
 !/exec/CSharp/
 !/exec/Python/
+!/GEMINI.md
 !/help/
 !/KeepEncoding.txt
 !/License.htm
 !/License.md
+!/llms.txt
 !/LocalFiles.txt
 !/newHomerApp.cmd
 !/newHomerApp.py
@@ -62,6 +68,7 @@ Templates/create_APP_Repo.ps1
 .claude/skills/homer-tutorial/references/Tutorials.md
 .claude/skills/homer-ui/references/ui-guide.md
 .claude/skills/homer-screen-reader/references/CamelType_JAWSScript.md
+build_release.bat
 
 # Never pushed, whatever RepoFiles.txt says: private notes, maintainer
 # scripts, logs, and anything a build makes.
@@ -84,6 +91,7 @@ self.htm
 self.md
 release.cmd
 release.ps1
+build_release.bat
 /version.py
 
 # Named in RepoFiles.txt inside a folder kept off the repository.

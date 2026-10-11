@@ -1,0 +1,43 @@
+# HomerDev
+
+> The Homer Development Kit: shared code, templates, build and release scripts, checks, skills and subagents for building Windows programs, documents, books, databases, installers and spoken tutorials for screen reader users.
+
+Start with AGENTS.md. Each skill below is a folder under .claude/skills holding a SKILL.md.
+
+## For agents
+
+- [AGENTS.md](AGENTS.md): what the kit is, how to use it from another project, the folder map, which skill to read for which task, and the rules
+- [Plugin manifest](.claude-plugin/plugin.json): the kit as a Claude Code plugin
+- [homer-auditor](.claude/agents/homer-auditor.md): a subagent that audits projects against the kit
+- [homer-listener](.claude/agents/homer-listener.md): a subagent that reviews tutorial reader lines
+
+## Skills
+
+- [app-help-guide](.claude/skills/app-help-guide/SKILL.md): build a screen-reader-friendly help guide for a product from the publisher's own help pages
+- [blind-creators](.claude/skills/blind-creators/SKILL.md): add, verify or remove a person or work in the Blind Authors, Developers, Presenters or Creators directories
+- [homer-books](.claude/skills/homer-books/SKILL.md): build, audit and publish Kindle books with the kit's book tools
+- [homer-build-release](.claude/skills/homer-build-release/SKILL.md): run or troubleshoot build, check, tidy, push and release, and read their logs
+- [homer-code](.claude/skills/homer-code/SKILL.md): write or review code in Camel Type with the kit's shared classes
+- [homer-convert](.claude/skills/homer-convert/SKILL.md): convert documents and data between formats, writing the Homer encoding
+- [homer-db](.claude/skills/homer-db/SKILL.md): design or check a SQLite database the way DbDo opens it
+- [homer-docs](.claude/skills/homer-docs/SKILL.md): write or review an app's documents at a ninth-grade reading level
+- [homer-elevate](.claude/skills/homer-elevate/SKILL.md): add or fix F11, Elevate Version, the update check
+- [homer-installer](.claude/skills/homer-installer/SKILL.md): write or fix an Inno Setup installer and its finish page
+- [homer-migrate](.claude/skills/homer-migrate/SKILL.md): bring an existing app onto the kit, or audit one that has drifted
+- [homer-new-app](.claude/skills/homer-new-app/SKILL.md): start a new app from the kit's templates
+- [homer-page](.claude/skills/homer-page/SKILL.md): publish a document as an accessible GitHub Page
+- [homer-screen-reader](.claude/skills/homer-screen-reader/SKILL.md): write or install JAWS scripts and NVDA add-ons
+- [homer-tutorial](.claude/skills/homer-tutorial/SKILL.md): write or check the spoken walkthroughs, where a host works and a screen reader answers
+- [homer-ui](.claude/skills/homer-ui/SKILL.md): design dialogs, menus, keys and speech for screen reader users
+- [podcast-directory](.claude/skills/podcast-directory/SKILL.md): build a screen-reader-friendly directory of a podcast from its RSS feed
+
+## Documents
+
+- [HomerDev guide](help/HomerDev.md): the kit for the people who use it
+- [Developer guide](help/Developer.md): how the kit is built and extended
+- [Finish page](help/FinishPage.md): the installer pattern every app follows
+- [Logging](help/Logging.md): what every log records
+- [Inix](help/Inix.md): the settings format
+- [Book pattern](help/BookPattern.md): the book publishing projects
+- [Camel Type for C#](help/CamelType_CSharp.md), [for Python](help/CamelType_Python.md), [for JAWS script](help/CamelType_JAWSScript.md): the coding style
+- [History](help/History.md): every change, newest first

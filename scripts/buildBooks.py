@@ -368,13 +368,63 @@ def isStale(sStampFile):
     return time.time() - os.path.getmtime(sStampFile) > float(dSettings["toolRefreshDays"]) * 86400
 
 
+# A RECORD OF EACH TOOL, TRUSTED FIRST (1.65.25). Each build searched the disk for Java, ran every Java it found to
+# read its version, searched for npm, started Node to ask npm where global packages go, and searched for Ace -- all
+# before reading the stamp that said Ace had been checked days ago -- so a book build paused for no reason. Each
+# tool's path, version and the time it was checked are now kept in toolCache.json in the per-user data folder. While
+# the record is younger than toolRefreshDays and its files still exist, the tool is used at once: no search, no
+# process started. Only an old or broken record sends the build to look again, and to ask the web whether something
+# newer exists; and a check is recorded even when the web cannot be reached, so a failure waits for the next period
+# instead of costing every build.
+def toolCachePath():
+    return os.path.join(paths.data(), "toolCache.json")
+
+
+def cachedTool(sName):
+    """The record of a tool when it is fresh and its files still exist, else None. Logged either way."""
+    try:
+        dAll = json.loads(open(toolCachePath(), encoding="utf-8").read()) if os.path.exists(toolCachePath()) else {}
+    except Exception as oError:
+        log("tool record unreadable, so every tool is looked for again: " + str(oError))
+        return None
+    dTool = dAll.get(sName)
+    if not dTool: return None
+    fAge = (time.time() - float(dTool.get("checked", 0))) / 86400
+    lMissing = [s for s in dTool.get("files", []) if not os.path.exists(s)]
+    if fAge > float(dSettings["toolRefreshDays"]) or lMissing or not dTool.get("files"):
+        log("%s record set aside: checked %.1f days ago%s" % (sName, fAge, ("; missing " + ", ".join(lMissing)) if lMissing else ""))
+        return None
+    log("%s %s from the record, checked %.1f days ago: %s" % (sName, dTool.get("version", ""), fAge, dTool["files"][0]))
+    return dTool
+
+
+def rememberTool(sName, lFiles, sVersion, **dExtra):
+    """Records where a tool is, its version and that it was checked now."""
+    try:
+        dAll = json.loads(open(toolCachePath(), encoding="utf-8").read()) if os.path.exists(toolCachePath()) else {}
+    except Exception:
+        dAll = {}
+    dTool = {"files": [s for s in lFiles if s], "version": sVersion or "", "checked": time.time()}
+    dTool.update(dExtra)
+    dAll[sName] = dTool
+    try:
+        writeText(toolCachePath(), json.dumps(dAll, indent=2), False)
+    except Exception as oError:
+        log("tool record not written: " + str(oError))
+
+
 def ensureJava():
     """The newest Java on the machine, 11 or later, which EPUBCheck needs, from the kit's media.javaProgram; installs
     Microsoft's OpenJDK 21 with winget only when no copy qualifies."""
+    dKnown = cachedTool("java")
+    if dKnown:
+        dTools["java"] = dKnown["files"][0]
+        return True
     for iTry in range(2):
         sJava = toolSearch(media.javaProgram("11"))
         if sJava:
             dTools["java"] = sJava
+            rememberTool("java", [sJava], media.dLast.get("version", ""))
             return True
         if iTry == 0: winget("Microsoft.OpenJDK.21")
     return False
@@ -419,6 +469,12 @@ def ensureAce():
     """Ace by DAISY, the EPUB accessibility checker, installed with npm's ordinary global install, so any project can
     run it; Node.js comes from winget. Checked for a newer release every few days, the check noted in MyBooks' per-user
     data folder."""
+    dKnown = cachedTool("ace")
+    if dKnown:
+        lPath = [s for s in (dKnown.get("nodeFolder", ""), dKnown.get("globalFolder", "")) if s]
+        if lPath: os.environ["PATH"] = os.pathsep.join(lPath) + os.pathsep + os.environ.get("PATH", "")
+        dTools["ace"], dTools["aceVersion"] = dKnown["files"][0], dKnown.get("version", "")
+        return True
     sNpm = media.findInstalled("npm")
     log(media.searchLog())
     if not sNpm:
@@ -460,6 +516,9 @@ def ensureAce():
     if not sAce: return False
     # The stamp is written only when npm answered, so a check that could not reach the registry is tried again next time.
     if sLatest: writeText(sStampFile, datetime.datetime.now().isoformat() + "|" + sInstalled, False)
+    else: log("Ace by DAISY: npm could not be asked for the latest version; checked again after " + str(dSettings["toolRefreshDays"]) + " days")
+    rememberTool("ace", [sAce, sNpm], sInstalled, latest=sLatest, nodeFolder=os.path.dirname(sNpm),
+                 globalFolder=(sGlobal if bWindows else os.path.join(sGlobal, "bin")) if sGlobal else "")
     dTools["ace"], dTools["aceVersion"] = sAce, sInstalled
     return True
 
@@ -1642,7 +1701,8 @@ def ensureKindlePreviewer():
             say("Asking Kindle Previewer 3 to update itself, which installs Kindle Previewer 4.")
             iCode, sOut = run([lFound[0], "-update"], iTimeout=1800)
             log("Kindle Previewer -update: exit " + str(iCode))
-            if iCode == 0: writeText(sStampFile, datetime.datetime.now().isoformat(), False)
+            # The attempt is recorded either way (1.65.25): a failing -update had been retried on every build.
+            writeText(sStampFile, datetime.datetime.now().isoformat(), False)
             lFound = [s for s in kindlePreviewerCandidates() if os.path.lexists(s)] or lFound
     dTools["kindlePreviewer"] = lFound[0]
     log("Kindle Previewer: " + lFound[0] + ", version " + dTools.get("kindlePreviewerVersion", "unknown") + (" (version 4)" if isPreviewer4(lFound[0]) else " (version 3)"))

@@ -18,9 +18,12 @@ Every app's walks follow one pattern, so a listener who knows one app's knows
 where to look in another's. The number is one digit, so any folder or player
 sorts the set without a leading zero (7 October 2026, replacing the twelve):
 
-- **0_Overview** -- a paragraph of prose on what the app is; the two reader
-  keys, Insert plus Up Arrow to repeat a line and Insert plus Tab to say where
-  you are; then the table of contents as its own clean list, one step per
+- **0_Overview** -- a paragraph of prose on what the app is; a gentle, brief
+  reminder of three reader keys the listener already knows and may want when
+  lost -- Insert plus Up Arrow says the line again, Insert plus Tab what has
+  the focus, Insert plus T the window's title -- each answered by a concrete
+  reader line, and one line that Caps Lock serves in place of Insert where the
+  screen reader is set up that way; then the table of contents as its own clean list, one step per
   walk, the host saying the number and title and the reader saying what it
   covers. Prose first, then the list; never the two mixed.
 - **1_User_Interface** -- what the app is made of and the rules its keys
@@ -96,8 +99,9 @@ Intro as the want in plain words, and say which earlier walks it assumes.
 
 ### 3. Write the ten, each to its shape
 
-- **0**: one paragraph of prose on what the app is; the two reader keys
-  (Insert plus Up Arrow, Insert plus Tab) as steps; then the table of
+- **0**: one paragraph of prose on what the app is; the three reader keys
+  (Insert plus Up Arrow, Insert plus Tab, Insert plus T) as a brief reminder,
+  one step each with a concrete reader line, then the Caps Lock line; then the table of
   contents as a clean two-voice list, one step per walk, host saying the
   number and title, reader saying what it covers; a closing line with the
   count, that nine is always last, and "under an hour". Prose and list never
@@ -133,6 +137,14 @@ Intro as the want in plain words, and say which earlier walks it assumes.
   t", never "letter.txt"; "Control plus K", never "Control+K"; a count in the
   reader's own form ("1 of 60313"). Name no screen reader. Several Hear lines
   in one step are several utterances.
+- **The reader is always concrete.** The host may speak of things in
+  general ("Insert plus Tab says what has the focus"); the reader says what a
+  screen reader would say at that moment -- a real control's name, role, value
+  and state ("Records list view, KEXP 90.3 Seattle, WA, 7 of 60342"), a real
+  title, the words just typed -- never a description of it, and never in
+  parentheses. Silence is an empty Hear with the host saying so.
+- **No screen reader's own vocabulary.** Describe what is heard, not one
+  reader's name for it: no "message voice".
 - A second `Say=` after Hear says what that meant, in one sentence.
 - Recaps: "What this walk taught. I say the key; the reader says what it
   does." then one step per key, host says the key, reader says the command

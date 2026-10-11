@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc 3.12.1" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>ReaderVoices</title>
+  <title>copilot-instructions</title>
   <style>
     /* Default styles provided by pandoc.
     ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -182,68 +182,12 @@
   </style>
 </head>
 <body>
-<h1 id="the-readers-voices-in-a-spoken-walk">The reader’s voices in a
-spoken walk</h1>
-<p><em>What was learned from the JAWS training and scripting
-documentation on 25 September 2026, and what the tutorial tool now does
-with it. For folding into the kit’s Tutorials.md.</em></p>
-<h2 id="how-jaws-actually-varies-its-voice">How JAWS actually varies its
-voice</h2>
-<p>JAWS speaks through <strong>voice contexts</strong>, each with its
-own rate, pitch and volume in Voice Adjustment: PC cursor, JAWS cursor,
-keyboard, tutor and message, menu and dialog, screen. Its scripts send
-each kind of speech to one context with <code>SayUsingVoice</code> and
-an output type – <code>OT_CONTROL_NAME</code>, <code>OT_HELP</code>
-(tutor), <code>OT_MESSAGE</code>, <code>OT_STATUS</code>,
-<code>OT_DIALOG_NAME</code>, <code>OT_POSITION</code> and so on. So a
-control’s name, role, value and state arrive through the PC cursor
-voice; a tutor message, a JAWS message and a program’s own
-<code>SayString</code> through the voice for hints and messages; a menu
-item or a dialog title through the menu-and-dialog voice; an echoed
-keystroke through the keyboard voice.</p>
-<p>Two things vary in every JAWS, out of the box: a <strong>capital
-letter is spoken 20 percent higher</strong> in pitch, and
-<strong>spelling runs 20 percent slower</strong>. Beyond those, the six
-contexts sound the same until the listener changes one. The one
-listeners most often change is tutor and message, raised a little so
-that a hint or an announcement stands apart from the screen.</p>
-<p>What JAWS does <strong>not</strong> do, out of the box, is speak
-name, role, value, state and hint in five voices. The parts of a control
-are one utterance in one voice; the hint that follows is a second
-utterance in the voice for hints and messages. A walk that gave each
-part its own pitch would be teaching something JAWS does not do.</p>
-<h2 id="what-the-tutorial-tool-does-now">What the tutorial tool does
-now</h2>
-<p>Each Hear line is placed in a context by its shape, as a listener
-places it by ear, and shifted by that context’s offset in semitones, set
-in <code>[global]</code>:</p>
-<ul>
-<li><strong>ReaderPitchMessage</strong> (default 2): tutor hints (“To
-activate press Spacebar”), JAWS messages (“Leaving menus”), and the
-program’s own announcements (“DbDo ready”, “Marked row 2”, “status:
-jobs, row 2 of 4”).</li>
-<li><strong>ReaderPitchMenu</strong> (default 0): menu items (“Open
-Database…, Control+O, O”) and dialog titles (“Filter Records
-dialog”).</li>
-<li><strong>ReaderPitchKeyboard</strong> (default 0): a single echoed
-character.</li>
-<li>The PC cursor voice is the reader’s own, unshifted: controls, rows,
-cells.</li>
-</ul>
-<p>A Hear line can force a context with a leading <code>@cursor:</code>,
-<code>@message:</code>, <code>@menu:</code> or <code>@key:</code>, which
-is removed before speaking. The tutorial log names each line’s context,
-so a misplaced one is easy to find.</p>
-<p>The defaults follow the common practice rather than the factory
-setting: a listener who leaves every context alone hears one voice, and
-a walk that raised nothing would be right for them but would hide the
-distinction that the walks themselves rely on – which line is the
-screen, and which is the program talking to you.</p>
-<h2 id="the-say-routines">The say routines</h2>
-<p><code>Say.say(params string[])</code> in Say.cs speaks each string as
-its own utterance, in order, with nothing inserted between them. Three
-facts handed to it sound like three facts; the same three joined with
-commas sound like one line with pauses the synthesizer chooses. DbDo’s
-Say Cell and Say Select use it.</p>
+<h1 id="instructions-for-github-copilot">Instructions for GitHub
+Copilot</h1>
+<p>The Homer Development Kit’s instructions for every AI agent are in
+AGENTS.md at the top of this repository. Read it first, then the
+SKILL.md under <code>.claude/skills</code> that matches the task, and
+follow its rules: Camel Type, the Homer encoding, detailed logs, and the
+checks.</p>
 </body>
 </html>

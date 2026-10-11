@@ -51,9 +51,19 @@ cmd reads a forward slash as a switch):
 4. `scripts\tidy`: files into place, strays into `notes`, a whitelist
    `.gitignore` from RepoFiles.txt, untracks what the whitelist leaves out.
    Acts in one run; nothing it moves is lost.
-5. `scripts\push "What changed."`: tidy, commit, push.
-6. `scripts\release`: runs `scripts\check`, tags, publishes the installer,
-   then confirms GitHub's latest release is this one.
+5. `scripts\check`: the acceptance checks -- installer pattern, tutorials,
+   encoding, documents -- before anything leaves the computer.
+6. `scripts\push "What changed."`: tidy, commit, push.
+7. `scripts\release`: runs `scripts\check` again as the last gate, tags,
+   publishes the installer, then confirms GitHub's latest release is this one.
+
+`build_release`, typed in the project's folder, runs steps 2 and 4 to 7 in
+order and stops at the first that fails, naming it; it writes
+`logs\<App>-build_release-<stamp>.log` with each step's exit code and time.
+The kit's build writes it as `build_release.bat` at the top of the kit and of
+every project beside it, from `scripts\build_release.cmd`, so every project
+runs the same cycle; it is local, never pushed. Ask for that log first when a
+cycle stopped.
 
 When a change touches only build scripts, a build with `nobump` proves it; a
 release can wait for the app's next real change.

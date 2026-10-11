@@ -19,7 +19,7 @@ Hear=DbDo ready
 
 [step]
 
-Say=The title, then the program's greeting in the message voice. Next, the main view, a control the reader knows. In EdSharp, an edit box.
+Say=The title, then the program's greeting. Next, the main view, a control the reader knows. In EdSharp, an edit box.
 Key=Alt+Control+E
 Hear=EdSharp
 Hear=Untitled, edit, multiline, blank

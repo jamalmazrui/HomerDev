@@ -1,0 +1,23 @@
+{
+  "name": "homer-dev",
+  "version": "1.65.25",
+  "description": "The Homer Development Kit's skills and agents: build accessible Windows programs, documents, books, databases, installers and spoken tutorials for screen reader users, the Homer way.",
+  "author": {
+    "name": "Jamal Mazrui",
+    "url": "https://github.com/JamalMazrui"
+  },
+  "homepage": "https://github.com/JamalMazrui/HomerDev",
+  "repository": "https://github.com/JamalMazrui/HomerDev",
+  "license": "MIT",
+  "keywords": [
+    "accessibility",
+    "screen reader",
+    "JAWS",
+    "NVDA",
+    "Windows",
+    "Camel Type",
+    "Inno Setup"
+  ],
+  "skills": "./.claude/skills/",
+  "agents": "./.claude/agents/"
+}

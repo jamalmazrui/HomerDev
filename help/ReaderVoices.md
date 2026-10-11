@@ -13,7 +13,7 @@ context with `SayUsingVoice` and an output type -- `OT_CONTROL_NAME`,
 `OT_HELP` (tutor), `OT_MESSAGE`, `OT_STATUS`, `OT_DIALOG_NAME`, `OT_POSITION`
 and so on. So a control's name, role, value and state arrive through the PC
 cursor voice; a tutor message, a JAWS message and a program's own `SayString`
-through the tutor-and-message voice; a menu item or a dialog title through the
+through the voice for hints and messages; a menu item or a dialog title through the
 menu-and-dialog voice; an echoed keystroke through the keyboard voice.
 
 Two things vary in every JAWS, out of the box: a **capital letter is spoken 20
@@ -24,7 +24,7 @@ hint or an announcement stands apart from the screen.
 
 What JAWS does **not** do, out of the box, is speak name, role, value, state
 and hint in five voices. The parts of a control are one utterance in one
-voice; the hint that follows is a second utterance in the message voice. A
+voice; the hint that follows is a second utterance in the voice for hints and messages. A
 walk that gave each part its own pitch would be teaching something JAWS does
 not do.
 

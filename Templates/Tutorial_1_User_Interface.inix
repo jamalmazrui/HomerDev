@@ -19,43 +19,43 @@ Hear=
 [step]
 Say=The window. Its desktop key opens it or brings it forward. Alt plus Control plus the program's letter.
 Key=Alt+Control+A
-Hear=(the window's title)
-Hear=(the program's greeting, in the message voice)
+Hear=CHANGE ME: the window's title, word for word as the reader says it
+Hear=CHANGE ME: the program's greeting, word for word
 Note=Use _APP_'s own desktop key.
 
 [step]
 Say=The main view: name, role, value, then the hint.
 Key=Tab
-Hear=(the main view's name, its role, its value)
-Hear=(its hint)
+Hear=CHANGE ME: the main view's name, its role, its value, word for word as the reader says it
+Hear=CHANGE ME: its hint, word for word as the reader says it
 
 [step]
 Say=A dialog: a label, then the control it names. Tab moves in the order the controls were added; OK and Cancel come last.
 Key=Control+K
-Hear=(the dialog's title)
-Hear=(the first label and its control)
+Hear=CHANGE ME: the dialog's title, word for word as the reader says it
+Hear=CHANGE ME: the first label and its control, word for word as the reader says it
 Note=Use a dialog _APP_ really has, opened by its own key.
 
 [step]
 Say=Enter presses OK, Escape is Cancel, Control plus Enter submits from anywhere, and Alt plus an underlined letter jumps to its control.
 Key=Escape
-Hear=(the main window's title again)
+Hear=CHANGE ME: the main window's title again, word for word as the reader says it
 
 [step]
 Say=The Say keys ask and change nothing. Shift plus Z is Say Status.
 Key=Shift+Z
-Hear=(the status line, in one breath)
+Hear=CHANGE ME: the status line, in one breath, word for word as the reader says it
 
 [step]
 Say=Menus say their own keys. F10 opens the menu bar, and Down Arrow reaches the first item.
 Key=F10
 Hear=Menu bar
-Hear=(the first menu's name)
+Hear=CHANGE ME: the first menu's name, word for word as the reader says it
 
 [step]
 Say=The item, its hotkey, then its letter.
 Key=Down Arrow
-Hear=(the first item, its hotkey, its letter)
+Hear=CHANGE ME: the first item, its hotkey, its letter, word for word as the reader says it
 
 [step]
 Say=Now the rules behind every key. The word gives the letter; Control does; Shift and Alt ask; adding Shift reverses; Alt plus Shift is a command with no control of its own.
@@ -65,7 +65,7 @@ Hear=
 [step]
 Say=The function keys follow Windows. Anything with Insert is the screen reader's own: Insert plus T says the title.
 Key=Insert+T
-Hear=(the window's title)
+Hear=CHANGE ME: the window's title, word for word as the reader says it
 
 [step]
 Say=Control plus F1 is the Key Describer: each key says what it does instead of doing it.

@@ -36,3 +36,4 @@ Templates/create_APP_Repo.ps1
 .claude/skills/homer-tutorial/references/Tutorials.md
 .claude/skills/homer-ui/references/ui-guide.md
 .claude/skills/homer-screen-reader/references/CamelType_JAWSScript.md
+build_release.bat

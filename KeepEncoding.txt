@@ -6,3 +6,15 @@
 ; a mark; every other file in a skill follows the Homer encoding.
 
 .claude/skills/*/SKILL.md
+
+; THE ROUTES FOR AI AGENTS (1.65.24) are read by other programs. JSON with a byte order mark is refused by many
+; parsers; a subagent's file opens with front matter, as a SKILL.md does; and the instruction files other agents
+; read are plain UTF-8, as they expect. So these are UTF-8 without a mark, with CRLF line endings.
+.claude-plugin/plugin.json
+.claude-plugin/marketplace.json
+.claude/agents/*.md
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+llms.txt
+.github/copilot-instructions.md

@@ -35,9 +35,8 @@ Hear=
 
 Say=Next, the samples: change into the samples folder under Templates. Two programs, a C sharp one and a Python one, and a build script for each. Both are the fruit basket: a window with a fruit box, a basket list, and a report. The command is silent until the next one answers.
 Key=cd Templates\samples
-Hear=(silence)
-
-[step]
+Hear=
+Say=The reader says nothing: a change of folder is silent until the next command.[step]
 
 Say=Build the C sharp one.
 Key=buildFruitBasketCs

@@ -21,6 +21,10 @@ in `C:\HomerDev\exec\CSharp` and follow HomerDev.md."
 - [Where the documents are](#where-the-documents-are)
 - [The other documents](#the-other-documents)
 
+
+## For AI agents
+
+An AI assistant can use the kit too. AGENTS.md, at the top of the kit, tells any agent what the kit is, where things are, which skill to read for which task, and the rules to follow; CLAUDE.md, GEMINI.md and GitHub Copilot's instructions point to it. In Claude Code, the kit is also a plugin, so its skills and two reviewing agents work in any project: type `/plugin marketplace add JamalMazrui/HomerDev`, then `/plugin install homer-dev@homer-dev-kit`.
 ## Install
 
 Unzip `HomerDev.zip` into a folder named `HomerDev`, on any drive and at any
@@ -186,7 +190,8 @@ script: a fresh AppId, and the desktop hotkey.
     release
 
 `createJobDoRepo` makes the GitHub repository and pushes the first commit; after
-that `release` is how every release goes out. Copy `release.cmd` and
+that `build_release` is how every release goes out: build, tidy, check, push and
+release, stopping at the first step that fails. Copy `release.cmd` and
 `release.ps1` from `scripts\` into the app folder first, or keep one copy in a
 folder on your PATH -- they act on the current directory, so one copy serves
 every project.

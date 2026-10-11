@@ -36,3 +36,11 @@ RepoFiles.txt
 LocalFiles.txt
 .gitignore
 .gitattributes
+
+# The routes for AI agents (1.65.24): the instructions any agent reads, and the kit as a Claude Code plugin.
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+llms.txt
+.claude-plugin/
+.github/

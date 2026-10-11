@@ -149,7 +149,7 @@ c_lsNeverPushed = [
     # build generates beside its source. HomerView's NVDA add-on carries its
     # own homer\version.py, which the add-on imports, and a bare version.py
     # here untracked it.
-    "exec/", "logs/", "self.htm", "self.md", "release.cmd", "release.ps1", "/version.py",
+    "exec/", "logs/", "self.htm", "self.md", "release.cmd", "release.ps1", "build_release.bat", "/version.py",
 ]
 
 # Folders a build makes. The survey does not walk into them, because what is
