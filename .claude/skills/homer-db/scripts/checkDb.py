@@ -7,8 +7,13 @@ that DbDo follows, and say what differs. Part of the homer-db skill.
 
 It only reads. Each finding is "pass", "warn" (a convention not followed, which
 DbDo copes with) or "fail" (something DbDo relies on is missing or wrong). The
-console gives each database's counts; the log beside the database, in
-<folder>\logs\<Name>-checkDb-<stamp>.log, gives every finding with its evidence.
+console gives each database's counts; the log gives every finding with its
+evidence. THE LOG GOES WHERE THE PROJECT'S LOGS GO (12 October 2026): a database
+inside a Homer project -- C:\DbDo\templates\RadioTrail\RadioTrail.db -- logs
+to that project's logs folder, as <Project>-checkDb-<Name>-<stamp>.log, beside
+every other log of the project. The log once went beside the database, which
+made a logs folder inside templates\RadioTrail and broke the Homer pattern. A
+database outside any project still logs beside itself, in <folder>\logs.
 """
 import datetime, glob, os, platform, re, sqlite3, sys
 
@@ -16,7 +21,28 @@ c_lsFieldTypes = ["BLOB", "BOOLEAN", "INTEGER", "NUMERIC", "REAL", "TEXT", "TEXT
 c_lsOwnTables = ["lookups", "maps", "views"]
 c_dOwnColumns = {"lookups": ["tbl", "fld", "val", "ordinal", "src"], "maps": ["tbl1", "prime1", "kind", "tbl2", "prime2"],
                  "views": ["tbl", "fld", "val"]}
+c_lsProjectMarks = ["build.cmd", "build.py", "build_release.bat", "RepoFiles.txt"]
 c_sStamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+
+
+def projectHolding(sPath):
+    """The Homer project folder holding a file: the nearest folder above it with a build script or RepoFiles.txt, or ''
+    when none does. Only the folder's own markers decide, never a drive or a depth."""
+    sDir = os.path.dirname(os.path.abspath(sPath))
+    while True:
+        if any(os.path.isfile(os.path.join(sDir, s)) for s in c_lsProjectMarks): return sDir
+        sUp = os.path.dirname(sDir)
+        if sUp == sDir: return ""
+        sDir = sUp
+
+
+def logPathFor(sPath):
+    """Where a database's log goes: the project's logs folder, named for the project, the task and the database; or,
+    outside any project, a logs folder beside the database."""
+    sName = os.path.splitext(os.path.basename(sPath))[0]
+    sProject = projectHolding(sPath)
+    if sProject: return os.path.join(sProject, "logs", "%s-checkDb-%s-%s.log" % (os.path.basename(sProject.rstrip("\\/")), sName, c_sStamp))
+    return os.path.join(os.path.dirname(sPath), "logs", "%s-checkDb-%s.log" % (sName, c_sStamp))
 
 
 def singular(sTable):
@@ -155,10 +181,9 @@ def main():
     for sPath in lsPaths:
         sPath = os.path.abspath(sPath)
         sName = os.path.splitext(os.path.basename(sPath))[0]
-        sLogDir = os.path.join(os.path.dirname(sPath), "logs")
-        os.makedirs(sLogDir, exist_ok=True)
-        sLog = os.path.join(sLogDir, "%s-checkDb-%s.log" % (sName, c_sStamp))
-        with open(sLog, "w", encoding="utf-8-sig", newline="\r\n") as oLog:
+        sLog = logPathFor(sPath)
+        os.makedirs(os.path.dirname(sLog), exist_ok=True)
+        with open(sLog, "a", encoding="utf-8-sig", newline="\r\n") as oLog:
             def logLine(sLevel, sText):
                 oLog.write("%s %-5s %s\n" % (datetime.datetime.now().astimezone().isoformat(timespec="milliseconds"), sLevel, sText))
             logLine("INFO", "checkDb start pid=%d" % os.getpid())
@@ -182,7 +207,8 @@ def main():
                                                noun(dCount["warn"], "warning"), noun(dCount["fail"], "failure")))
             logLine("INFO", "checkDb end pass=%d warn=%d fail=%d" % (dCount["pass"], dCount["warn"], dCount["fail"]))
             iFailedAll += 1 if dCount["fail"] else 0
-    if lsPaths: print("Each database's log, in its logs folder, lists every finding.")
+    lsLogDirs = sorted({os.path.dirname(logPathFor(os.path.abspath(s))) for s in lsPaths})
+    if lsLogDirs: print("Each database's log lists every finding, in " + " and ".join(lsLogDirs) + ".")
     return 1 if iFailedAll else 0
 
 

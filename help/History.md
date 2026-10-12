@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.2 -- 12 October 2026
+
+- **checkDb logs in the project's logs folder.** It wrote each database's log in a logs folder beside the database, so checking DbDo made a logs folder inside templates\\RadioTrail, twenty-four logs deep by 11 October, outside the project's logs and against the Homer pattern. A database inside a project now logs to that project's logs folder as `<Project>-checkDb-<Name>-<stamp>.log`; the project is the nearest folder above the database holding a build script or RepoFiles.txt. A database outside any project still logs beside itself. The log is opened for appending, so two checks in the same second no longer overwrite each other.
+
 ## 1.72.1 -- 11 October 2026
 
 - **The Results box's AI line reads as it should.** The first install to connect the AI tools said "Claude Code and Gemini CLI and Antigravity", the Gemini entry's own "and" running into the list's; it now says "Claude Code, and Gemini CLI with Antigravity".
