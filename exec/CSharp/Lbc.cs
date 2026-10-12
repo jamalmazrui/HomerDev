@@ -2214,6 +2214,11 @@ public class LbcDialog : IDisposable
 
         string sResult = "";
         Button btnAccept = null;
+        // THE CALLER'S DEFAULT IS KEPT (12 October 2026, from an audit). A dialog that set its own default button
+        // before running -- HomerDev's Send and Open, the player's Play -- had it replaced here by the first footer
+        // button, so Enter in HomerDev's question box pressed Close. A default set by the caller now stays the
+        // default, for Enter and for Control+Enter alike.
+        Button btnCallerDefault = (sDefaultLabel == null) ? frm.AcceptButton as Button : null;
         Button btnCancel = null;
 
         // Add buttons right-to-left so the visual order reads
@@ -2293,6 +2298,7 @@ public class LbcDialog : IDisposable
                 btnCancel = btn;
         }
         frm.Controls.Add(pnlButtonRow);
+        if (btnCallerDefault != null) btnAccept = btnCallerDefault;
         if (btnAccept != null) frm.AcceptButton = btnAccept;
         if (btnCancel != null) frm.CancelButton = btnCancel;
         // Control+Enter presses the accept button regardless of

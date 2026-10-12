@@ -585,10 +585,14 @@ private static bool runChat(IWin32Window owner)
             string sPrompt = bClaude ? sQuestion : sContext + "\r\n" + sbHistory.ToString() + "Question: " + sQuestion + "\r\nAnswer:";
             Thread oWorker = new Thread(delegate()
             {
-                string sError;
-                string sAnswer = bClaude ? askClaude(sClaude, sPrompt, sSession, bFirst, aRunning, out sError) : Ollama.generate(sModel, sPrompt, c_iAiTimeoutMs, out sError);
+                string sError = "";
+                string sAnswer = "";
+                // An error asking is an answer that did not come, never a crash.
+                try { sAnswer = bClaude ? askClaude(sClaude, sPrompt, sSession, bFirst, aRunning, out sError) : Ollama.generate(sModel, sPrompt, c_iAiTimeoutMs, out sError); }
+                catch (Exception oError) { Log.exception(oError); sError = oError.Message; }
                 try
                 {
+                    if (dlg.form.IsDisposed) { Log.info("An answer came after the chat closed, and was set aside"); return; }
                     dlg.form.BeginInvoke((MethodInvoker) delegate()
                     {
                         if (iThis != iAsk) { Log.info("An answer came after Stop, and was set aside"); return; }
@@ -613,7 +617,7 @@ private static bool runChat(IWin32Window owner)
                         if (bSpeak) Say.sayForced(sAnswer);
                     });
                 }
-                catch (Exception) { }
+                catch (Exception oError) { Log.info("The answer could not be shown: " + oError.Message); }
             });
             oWorker.IsBackground = true;
             oWorker.Start();
@@ -644,10 +648,17 @@ private static bool runChat(IWin32Window owner)
             btnVoice.Enabled = false;
             Thread oScribe = new Thread(delegate()
             {
-                string sError;
-                string sText = Voice.transcribe(sWav, 120000, out sError);
+                // THE CHAT MAY CLOSE WHILE WHISPER WRITES (12 October 2026). Enter pressed Close in this dialog, and
+                // a question spoken just before was still being written down; when Whisper finished, this thread
+                // reached for the closed dialog and the error ended HomerDev without a word. Every step is now
+                // guarded, and words that arrive after the chat closed are logged and set aside.
+                string sError = "";
+                string sText = "";
+                try { sText = Voice.transcribe(sWav, 120000, out sError) ?? ""; }
+                catch (Exception oError) { Log.exception(oError); sError = oError.Message; }
                 try { File.Delete(sWav); } catch { }
-                dlg.form.BeginInvoke((MethodInvoker) delegate()
+                if (dlg.form.IsDisposed) { Log.info("Voice: written down after the chat closed, and set aside: " + sText); return; }
+                try { dlg.form.BeginInvoke((MethodInvoker) delegate()
                 {
                     btnVoice.Enabled = true;
                     if (sText.Length == 0)
@@ -665,7 +676,8 @@ private static bool runChat(IWin32Window owner)
                     dlg.setStatusText("Heard: " + sText);
                     Say.say("Heard: " + sText);
                     if (chkSendHeard.Checked) btnSend.PerformClick();
-                });
+                }); }
+                catch (Exception oError) { Log.info("Voice: the chat closed before the words could be shown: " + oError.Message); }
             });
             oScribe.IsBackground = true;
             oScribe.Start();
@@ -740,9 +752,13 @@ private static bool runChat(IWin32Window owner)
         dlg.form.AcceptButton = btnSend;
         dlg.setInitialFocus(txtQuestion);
         dlg.runWithButtons(new string[] { "Close" });
+        Log.info("Chat closed" + (oRecorder != null ? ", while listening" : "") + (!btnSend.Enabled ? ", while an answer was awaited" : ""));
         iAsk++;
         fnStopTicker();
         try { if (aRunning[0] != null && !aRunning[0].HasExited) aRunning[0].Kill(); } catch { }
+        // Nothing keeps listening once the chat is gone.
+        try { oListen.Stop(); oListen.Dispose(); } catch { }
+        if (oRecorder != null) { try { oRecorder.cancel(); oRecorder.Dispose(); } catch { } oRecorder = null; }
     }
     return true;
 }

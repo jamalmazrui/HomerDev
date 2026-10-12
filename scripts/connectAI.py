@@ -107,6 +107,13 @@ def linkTarget(sPath):
     return ""
 
 
+def insideKit(sPath, sKit):
+    """Whether a path is the kit's folder or inside it -- by whole folder names, so C:\\HomerDevOld is not the kit.
+    (12 October 2026, from an audit: a bare "starts with" let a similarly named folder count as the kit.)"""
+    sPathN, sKitN = os.path.normcase(os.path.realpath(sPath)), os.path.normcase(os.path.realpath(sKit))
+    return sPathN == sKitN or sPathN.startswith(sKitN.rstrip("\\/") + os.sep)
+
+
 def makeLink(sLink, sTarget):
     """A Windows junction, which needs no administrator rights; a symbolic link elsewhere."""
     if os.name == "nt":
@@ -144,13 +151,17 @@ def main(lsArgs):
     lsSkills = sorted(s for s in os.listdir(sSkills) if os.path.isfile(os.path.join(sSkills, s, "SKILL.md"))) if os.path.isdir(sSkills) else []
     iFound = iChanged = 0
     lsConnected = []
+    dFailed = {}
     lsDoneFolders = set()
     for sTool in sorted(c_dTools):
         sProfile, sInstructions, lsSkillDirs = c_dTools[sTool]
         if not os.path.isdir(inProfile(sHome, sProfile)):
             logLine("%s: no %s folder in the profile, so it is not installed or never run; skipped" % (sTool, sProfile)); continue
         iFound += 1
-        lsConnected.append({"claude": "Claude Code", "codex": "Codex", "gemini": "Gemini CLI with Antigravity"}.get(sTool, sTool))
+        # A TOOL IS CONNECTED WHEN ITS LINKS ARE (12 October 2026, from an audit): it was listed the moment its profile
+        # folder was found, before a single link was tried, so a run whose links all failed still said "connected".
+        sToolName = {"claude": "Claude Code", "codex": "Codex", "gemini": "Gemini CLI with Antigravity"}.get(sTool, sTool)
+        dFailed[sToolName] = 0
         sFile = inProfile(sHome, sInstructions)
         if bCheck:
             bHas = os.path.isfile(sFile) and c_sBegin in open(sFile, "rb").read().decode("utf-8-sig", errors="replace")
@@ -171,7 +182,9 @@ def main(lsArgs):
                     if sNow and os.path.normcase(sNow) == os.path.normcase(os.path.realpath(sTarget)): iLinked += 1
                     continue
                 if sNow:
-                    if os.path.normcase(sNow).startswith(os.path.normcase(os.path.realpath(sKit))) or bRemove:
+                    # ONLY THE KIT'S OWN LINKS ARE TAKEN AWAY (12 October 2026, from an audit): --remove once removed
+                    # any link of the same name, so another tool's skill of that name was disconnected too.
+                    if insideKit(sNow, sKit):
                         removeLink(sLink); logLine("removed link %s" % sLink)
                         if bRemove: iChanged += 1
                     else:
@@ -181,6 +194,7 @@ def main(lsArgs):
                 if bRemove: continue
                 os.makedirs(sFolder, exist_ok=True)
                 if makeLink(sLink, sTarget): iLinked += 1
+                else: dFailed[sToolName] += 1
             if bCheck: say("%s: %d of %d skills linked in %s." % (sTool, iLinked, len(lsSkills), sFolder))
             elif not bRemove:
                 logLine("%s: %d skills linked in %s%s" % (sTool, iLinked, sFolder, ("; %d kept as they were" % iKept) if iKept else ""))
@@ -198,13 +212,21 @@ def main(lsArgs):
         say("No AI command-line tool was found: none of .claude, .codex or .gemini is in %s. Run a tool once, then this again." % sHome)
         writeResult("AI tools: none found -- no Claude Code, Codex or Gemini in this profile. Run one once, then scripts\\connectAI in the kit's folder.")
         return 0
+    lsConnected = [s for s in dFailed if dFailed[s] == 0]
+    lsPartly = ["%s (%d skill link%s failed)" % (s, dFailed[s], "" if dFailed[s] == 1 else "s") for s in dFailed if dFailed[s]]
+    def listed(ls): return ls[0] if len(ls) == 1 else ", ".join(ls[:-1]) + ", and " + ls[-1]
     # "Claude Code, and Gemini CLI with Antigravity": a comma before the last name, so a name with its own "with" reads
     # as one item (1.72.1; it read "Claude Code and Gemini CLI and Antigravity").
-    writeResult("AI tools connected to the kit: %s." % (lsConnected[0] if len(lsConnected) == 1 else ", ".join(lsConnected[:-1]) + ", and " + lsConnected[-1]))
+    sResult = ("AI tools connected to the kit: %s." % listed(lsConnected)) if lsConnected else ""
+    if lsPartly: sResult += (" " if sResult else "") + "Not fully connected: %s; the log in the kit's logs folder says why." % listed(lsPartly)
+    writeResult(sResult)
     if not bCheck:
-        say(("Took the kit back out of %d AI tool%s." if bRemove else "Connected %d AI tool%s to the Homer Development Kit at " + sKit + ".") % (iFound, "" if iFound == 1 else "s"))
-        if not bRemove: say("In any project, ask your AI about Homer or HomerDev, and it knows where to look. The log is " + sLogPath + ".")
-    return 0
+        if bRemove: say("Took the kit back out of %d AI tool%s." % (iFound, "" if iFound == 1 else "s"))
+        else:
+            if lsConnected: say("Connected %s to the Homer Development Kit at %s." % (listed(lsConnected), sKit))
+            if lsPartly: say("Not fully connected: %s." % listed(lsPartly))
+            say("In any project, ask your AI about Homer or HomerDev, and it knows where to look. The log is " + sLogPath + ".")
+    return 3 if lsPartly else 0
 
 
 if __name__ == "__main__":

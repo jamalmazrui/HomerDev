@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.3 -- 12 October 2026
+
+- **The chat no longer vanishes after a spoken question.** Two faults together. Lbc's runWithButtons replaced a dialog's own default button with its first footer button, so Enter in the question box pressed Close, not Send; and when the chat closed while Whisper was still writing down a question, the transcription thread reached for the closed dialog, and the error ended HomerDev on the spot. The log stopped right after Whisper's line, with no session end. Now a default the dialog sets is kept, for Enter and Control+Enter (Lbc, so every Homer app gains it on its next build); both chat workers are guarded and set aside anything that arrives after the chat closed; and closing the chat stops the listening and the recorder, and is logged.
+- **A crash is always written down.** Log.start now records any error nothing caught, with its stack, before the program ends. Every Homer program that keeps a Log gains this.
+- **connectAI takes away only its own links, and says when linking failed** (from an audit, both reproduced first). --remove removed any skill link of a kit skill's name, so another tool's link was disconnected too; it now removes only links into the kit, judged by whole folder names, so a folder such as HomerDevOld is not mistaken for the kit. And a tool was reported connected before a single link was tried; now a tool whose links failed is reported as not fully connected, with the count, and connectAI ends with code 3.
+
 ## 1.72.2 -- 12 October 2026
 
 - **checkDb logs in the project's logs folder.** It wrote each database's log in a logs folder beside the database, so checking DbDo made a logs folder inside templates\\RadioTrail, twenty-four logs deep by 11 October, outside the project's logs and against the Homer pattern. A database inside a project now logs to that project's logs folder as `<Project>-checkDb-<Name>-<stamp>.log`; the project is the nearest folder above the database holding a build script or RepoFiles.txt. A database outside any project still logs beside itself. The log is opened for appending, so two checks in the same second no longer overwrite each other.

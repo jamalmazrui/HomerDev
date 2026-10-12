@@ -78,6 +78,7 @@ public static class Log
     public const int c_iKeepLogs = 30;
 
     public static bool bWorking = false;
+    private static bool bCrashWatch = false;
 
     private static DateTime dtStarted = DateTime.Now;
     private static object oGate = new object();
@@ -136,6 +137,23 @@ public static class Log
             bWorking = true;
             writeHeader();
             prune();
+            // A CRASH IS WRITTEN DOWN (12 October 2026). An error on a background thread ends a .NET program at once,
+            // with no message and no log line: HomerDev's chat vanished after a spoken question, its log stopping
+            // mid-session. Every Homer program that starts this log now records such an error, with its stack,
+            // before the process ends.
+            if (!bCrashWatch)
+            {
+                bCrashWatch = true;
+                AppDomain.CurrentDomain.UnhandledException += delegate(object oSender, UnhandledExceptionEventArgs evArgs)
+                {
+                    try
+                    {
+                        level("ERROR", "the program is ending because of an error nothing caught" + (evArgs.IsTerminating ? "" : " (not ending)"));
+                        exception(evArgs.ExceptionObject as Exception);
+                    }
+                    catch { }
+                };
+            }
             return true;
         }
         catch (Exception)
