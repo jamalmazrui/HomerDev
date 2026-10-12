@@ -1340,7 +1340,8 @@ def removeMoved():
             # from ever being empty; its compiled copies go with it.
             sCache = os.path.join(sPath, "__pycache__")
             if os.path.isdir(sCache):
-                import shutil
+                # shutil is imported at the top: an import here made the name local to the whole function, so the
+                # Samples clean-up above failed with "cannot access local variable 'shutil'" (1.71.1).
                 shutil.rmtree(sCache, ignore_errors=True)
             if os.path.isdir(sPath) and not os.listdir(sPath):
                 os.rmdir(sPath)

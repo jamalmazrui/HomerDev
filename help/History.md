@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.71.1 -- 11 October 2026
+
+- **The leftover Samples folder is removed, as 1.69.2 meant.** Its removal failed with "cannot access local variable 'shutil'": an import of shutil further down the same function made the name local to all of it. That import is gone, since shutil is imported at the top. Tested: the folder is removed and logged.
+- **The 60-minute build of 11 October was a one-time cost.** tidy's deletion took the help folder's spoken tutorials with it, which the kit's zip does not carry, since the build makes them; so all ten walks were spoken again, though only walk 2 had changed. The next build speaks only what changed.
+
 ## 1.71.0 -- 11 October 2026
 
 - **A skill for adding a library: homer-library-source.** bookFido's five libraries were added the same way, and the NLS harvest, the newest, touches 26 functions. The skill writes that down: research where a library lives and how Windows can reach it, from a real sample, before any code; choose a browser, file or API source; build the ten touch points from the opening dialog to BookTrail; the rules every source keeps; and how to prove it. Apple Books is the worked example: its library lives in Apple's apps, so its candidate routes -- the Mac's library database copied across, Apple's purchase history in a browser -- are listed as unconfirmed until seen on the user's own devices.
