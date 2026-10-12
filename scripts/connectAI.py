@@ -150,7 +150,7 @@ def main(lsArgs):
         if not os.path.isdir(inProfile(sHome, sProfile)):
             logLine("%s: no %s folder in the profile, so it is not installed or never run; skipped" % (sTool, sProfile)); continue
         iFound += 1
-        lsConnected.append({"claude": "Claude Code", "codex": "Codex", "gemini": "Gemini CLI and Antigravity"}.get(sTool, sTool))
+        lsConnected.append({"claude": "Claude Code", "codex": "Codex", "gemini": "Gemini CLI with Antigravity"}.get(sTool, sTool))
         sFile = inProfile(sHome, sInstructions)
         if bCheck:
             bHas = os.path.isfile(sFile) and c_sBegin in open(sFile, "rb").read().decode("utf-8-sig", errors="replace")
@@ -198,7 +198,9 @@ def main(lsArgs):
         say("No AI command-line tool was found: none of .claude, .codex or .gemini is in %s. Run a tool once, then this again." % sHome)
         writeResult("AI tools: none found -- no Claude Code, Codex or Gemini in this profile. Run one once, then scripts\\connectAI in the kit's folder.")
         return 0
-    writeResult("AI tools connected to the kit: %s." % (" and ".join(lsConnected) if len(lsConnected) < 3 else ", ".join(lsConnected[:-1]) + " and " + lsConnected[-1]))
+    # "Claude Code, and Gemini CLI with Antigravity": a comma before the last name, so a name with its own "with" reads
+    # as one item (1.72.1; it read "Claude Code and Gemini CLI and Antigravity").
+    writeResult("AI tools connected to the kit: %s." % (lsConnected[0] if len(lsConnected) == 1 else ", ".join(lsConnected[:-1]) + ", and " + lsConnected[-1]))
     if not bCheck:
         say(("Took the kit back out of %d AI tool%s." if bRemove else "Connected %d AI tool%s to the Homer Development Kit at " + sKit + ".") % (iFound, "" if iFound == 1 else "s"))
         if not bRemove: say("In any project, ask your AI about Homer or HomerDev, and it knows where to look. The log is " + sLogPath + ".")

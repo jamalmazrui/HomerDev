@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.1 -- 11 October 2026
+
+- **The Results box's AI line reads as it should.** The first install to connect the AI tools said "Claude Code and Gemini CLI and Antigravity", the Gemini entry's own "and" running into the list's; it now says "Claude Code, and Gemini CLI with Antigravity".
+- **createHomerDevRepo leaves RepoFiles.txt.** Both of its files were listed but in no folder and not in git, so every build warned about them since 1.70.1 began restoring listed files.
+
 ## 1.72.0 -- 11 October 2026
 
 - **The setup program connects the AI tools; the dialog's button is gone.** Telling Claude Code, Codex, Gemini CLI and Antigravity where the kit is was a button in the HomerDev dialog; it is now a step of the install. connectAI runs hidden, as the person who started setup, since it writes into their own profile, and writes one line naming what it connected, which the Results box shows -- or says that none was found, or that Python is needed first. An earlier setup's line is cleared at the start, so it is never reported as this one's. Walks 2 and 8 and the guide say so.
