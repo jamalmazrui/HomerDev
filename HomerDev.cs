@@ -749,35 +749,6 @@ private static bool runChat(IWin32Window owner)
 
 // ---- connecting the AI tools ----
 
-// connectAiTools: runs scripts\\connectAI, which tells Claude Code, Codex, Gemini CLI and Antigravity where the kit is,
-// and shows what it said. Its own log has the detail.
-private static bool connectAiTools(IWin32Window owner)
-{
-    string sScript = Path.Combine(sKit, "scripts", "connectAI.cmd");
-    if (!File.Exists(sScript))
-    {
-        MessageBox.Show(owner, "scripts\\connectAI.cmd is not in the kit at " + sKit + ".", c_sAppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        return false;
-    }
-    Say.say("Connecting");
-    ProcessStartInfo oStart = new ProcessStartInfo("cmd.exe", "/c \"\"" + sScript + "\"\"");
-    oStart.UseShellExecute = false;
-    oStart.CreateNoWindow = true;
-    oStart.RedirectStandardOutput = true;
-    oStart.RedirectStandardError = true;
-    oStart.WorkingDirectory = sKit;
-    string sOut;
-    int iCode;
-    using (Process oRun = Process.Start(oStart))
-    {
-        sOut = oRun.StandardOutput.ReadToEnd() + oRun.StandardError.ReadToEnd();
-        oRun.WaitForExit();
-        iCode = oRun.ExitCode;
-    }
-    Log.command("connectAI", iCode);
-    HelpDialog.show(owner, "Connect AI tools", sOut.Trim() + "\r\n\r\nTo undo it, run scripts\\connectAI --remove in the kit's folder.");
-    return iCode == 0;
-}
 
 // ---- the dialog ----
 
@@ -802,7 +773,6 @@ private static bool runDialog()
         Button btnInix = dlg.addButton("&Inix explained", "What the inix format is, with an example read by the kit's own reader.");
         Button btnLayout = dlg.addButton("&Layout by Code", "How every Homer dialog is made, then a dialog that code builds.");
         Button btnAsk = dlg.addButton("&Ask an AI", "Ask what the kit can do and how: the AI on this computer, or Claude Code when it is installed, typed or by voice.");
-        Button btnConnect = dlg.addButton("Connect AI &tools", "Tell Claude Code, Codex, Gemini CLI and Antigravity where the kit is, once, so in any project they find its skills and code when you mention Homer.");
         dlg.endBand();
 
         btnOpen.Click += delegate(object oSender, EventArgs evArgs)
@@ -818,7 +788,6 @@ private static bool runDialog()
         btnInix.Click += delegate(object oSender, EventArgs evArgs) { showInix(dlg.form); };
         btnLayout.Click += delegate(object oSender, EventArgs evArgs) { showLayout(dlg.form); };
         btnAsk.Click += delegate(object oSender, EventArgs evArgs) { runChat(dlg.form); };
-        btnConnect.Click += delegate(object oSender, EventArgs evArgs) { connectAiTools(dlg.form); };
 
         // F11: is there a newer HomerDev on the web? (Elevate sounds like eleven.) Claimed before any control sees it.
         dlg.commandKey = delegate(Keys keys)

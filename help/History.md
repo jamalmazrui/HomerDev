@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.0 -- 11 October 2026
+
+- **The setup program connects the AI tools; the dialog's button is gone.** Telling Claude Code, Codex, Gemini CLI and Antigravity where the kit is was a button in the HomerDev dialog; it is now a step of the install. connectAI runs hidden, as the person who started setup, since it writes into their own profile, and writes one line naming what it connected, which the Results box shows -- or says that none was found, or that Python is needed first. An earlier setup's line is cleared at the start, so it is never reported as this one's. Walks 2 and 8 and the guide say so.
+- **The Results box reports every component.** Its list still named the first eight of 1.66.0's ten, so Ace by DAISY, EPUBCheck, Git, GitHub CLI, Java, Node.js, Python, Tesseract and Whisper never said what happened to them; all seventeen now do, and the model's line says it answers questions about the kit, not that it translates.
+
 ## 1.71.1 -- 11 October 2026
 
 - **The leftover Samples folder is removed, as 1.69.2 meant.** Its removal failed with "cannot access local variable 'shutil'": an import of shutil further down the same function made the name local to all of it. That import is gone, since shutil is imported at the top. Tested: the folder is removed and logged.

@@ -1129,7 +1129,7 @@ shorter to type, and the kit works the same in either place.</p>
 plus D. D for development.</p>
 <p>Screen reader:</p>
 <ul>
-<li>HomerDev 1.71.0, dialog</li>
+<li>HomerDev 1.72.0, dialog</li>
 <li>Kit contents, list box, Document: AGENTS, HomerDev is a development
 kit for building Windows programs, documents, books, databases,
 installers and spoken tutorials for people who use screen readers, 1 of
@@ -1180,7 +1180,7 @@ every Homer dialog describes its own fields.</p>
 I left it.</p>
 <p>Screen reader:</p>
 <ul>
-<li>HomerDev 1.71.0, dialog</li>
+<li>HomerDev 1.72.0, dialog</li>
 <li>Kit contents, list box, Sample: FruitBasketCs, 23 of 130</li>
 </ul>
 <p>Confirm the wording with a live run: buildTutorials -live.</p>
@@ -1199,9 +1199,10 @@ same basket as a multiple-document program. Open runs it., 25 of
 <h3 id="step-14-tab">Step 14: Tab</h3>
 <p>Tab moves to the buttons. Play tutorials opens these ten walks in the
 Homer Player, Inix explained and Layout by Code show how settings and
-dialogs are written, Ask an AI answers questions about the kit, typed or
-spoken, from the AI on this computer or Claude Code, and Connect AI
-tools comes back in walk eight.</p>
+dialogs are written, and Ask an AI answers questions about the kit,
+typed or spoken, from the AI on this computer or Claude Code. The setup
+program has already told your AI tools where the kit is; walk eight says
+more.</p>
 <p>Screen reader:</p>
 <ul>
 <li>Open, button</li>
@@ -1843,19 +1844,13 @@ I type the command.</p>
 <p>Seventeen skills, none broken. A skill whose description held an
 angle bracket would be refused when uploaded, and this check names it
 first.</p>
-<h3 id="step-5-altt">Step 5: Alt+T</h3>
+<h3 id="step-5-6">Step 5</h3>
 <p>Next, the assistant has to find the kit. You work in your own
 project’s folder, and an assistant started there knows nothing of
-HomerDev until something tells it. One button does it once, for every
-assistant on the computer: in the HomerDev dialog, Connect AI tools. Its
-key is Alt plus T.</p>
-<p>Screen reader:</p>
-<ul>
-<li>Connect AI tools</li>
-<li>Connected 3 AI tools to the Homer Development Kit at C colon
-backslash Program Files backslash HomerDev.</li>
-</ul>
-<p>Confirm the wording with a live run: buildTutorials -live.</p>
+HomerDev until something tells it. HomerDev’s setup program tells it,
+for every assistant on the computer, while it installs: its Results box
+ends with a line naming the AI tools it connected. To do it again later,
+run connectAI in the scripts folder of the kit.</p>
 <h3 id="step-6-3">Step 6</h3>
 <p>What it did: Claude Code, Codex and Gemini each read a personal
 instructions file in every project. It added a short note to each,
@@ -2016,7 +2011,7 @@ installer by lunch, and each refuses when it should.</p>
 <ul>
 <li>Play Tutorials, in the Help menu</li>
 </ul>
-<h3 id="step-5-6">Step 5</h3>
+<h3 id="step-5-7">Step 5</h3>
 <p>From the seven task walks: newHomerApp gives a running program before
 you write a line; when something is wrong, send the log; an app never
 copies a kit class, so a fix reaches every program on its next build;

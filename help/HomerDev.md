@@ -180,9 +180,6 @@ The controls, in tab order:
   when Speak answers is ticked. Control+Period stops waiting, Control+Shift+R
   says the last answer again, and Control+Shift+C copies it -- keys borrowed
   from The Chat Place, Kelly Ford's accessible companion for Claude Code.
-- **Connect AI tools** tells the AI tools you work with -- Claude Code, OpenAI
-  Codex, Gemini CLI and Antigravity -- where the kit is, once. The next chapter
-  says what it does and what to tell your AI afterwards.
 
 F1 lists every control with its tip, and F11 checks for a newer HomerDev.
 
@@ -216,8 +213,10 @@ There are two ways: connect once, or say one sentence each time.
 
 ### Connect once
 
-Press **Connect AI tools** in the HomerDev dialog, or run `scripts\connectAI`
-in the kit's folder. For each AI tool on your computer, it does two things:
+HomerDev's setup program does it while it installs, and its Results box ends
+with a line naming the AI tools it connected. To do it again -- after
+installing a new AI tool, say -- run `scripts\connectAI` in the kit's folder.
+For each AI tool on your computer, it does two things:
 
 - It adds a short note to the tool's personal instructions, which the tool
   reads in every project: where the kit is, and to read its `AGENTS.md` first.

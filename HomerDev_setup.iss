@@ -139,7 +139,16 @@ Name: "{group}\{#AppName} documentation"; Filename: "{app}\ReadMe.htm"; Flags: c
 Name: "{group}\Uninstall {#AppName}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\exec\{#AppExeName}"; WorkingDir: "{userdocs}"; IconFilename: "{app}\HomerDev.ico"; HotKey: "{#HotKey}"; Comment: "Open the HomerDev dialog ({#HotKeyDisplay})"
 
+[InstallDelete]
+; A result line from an earlier setup must not be reported as this one's.
+Type: files; Name: "{localappdata}\HomerDev\connectAI-result.txt"
+
 [Run]
+; ---- 0. Connect the AI tools, during the install (1.72.0) -----------------------------------------------------
+; Run as the person who started setup, since it writes into their own profile (.claude, .codex, .gemini), and hidden;
+; its one-line result goes in the Results box.
+FileName: "{app}\scripts\connectAI.cmd"; WorkingDir: "{app}\scripts"; StatusMsg: "Connecting the AI tools to the kit..."; Flags: runhidden waituntilterminated runasoriginaluser skipifdoesntexist
+
 ; FINISH-PAGE ORDER, a HomerDev rule (25 September 2026):
 ;   1. Install entries, ticked -- screen reader scripts first, then components
 ;      in alphabetical order.
@@ -821,19 +830,32 @@ end;
 procedure reportWhatHappened();
 var
   sBody: String;
+  sAiLine: AnsiString;
 begin
   //  AI NOTE FOR CUSTOMIZING: one addAction per component and per model, in
   //  the same alphabetical order as the [Run] section.
   addAction(homerScreenReaderOutcome());
+  addAction(homerOutcomeLine(iAce));
+  addAction(homerOutcomeLine(iEpubCheck));
   addAction(homerOutcomeLine(iExifTool));
-  addAction(homerOutcomeLine(iffmpeg));
+  addAction(homerOutcomeLine(iFfmpeg));
+  addAction(homerOutcomeLine(iGit));
+  addAction(homerOutcomeLine(iGitHubCli));
   addAction(homerOutcomeLine(iImageMagick));
-  addAction(homerOutcomeLine(impv));
+  addAction(homerOutcomeLine(iJava));
+  addAction(homerOutcomeLine(iMpv));
+  addAction(homerOutcomeLine(iNode));
   addAction(homerOutcomeLine(iOllama));
   addAction(homerOutcomeLine(iPandoc));
   addAction(homerOutcomeLine(iPdfTools));
+  addAction(homerOutcomeLine(iPython));
+  addAction(homerOutcomeLine(iTesseract));
+  addAction(homerOutcomeLine(iWhisper));
   addAction(homerOutcomeLine(iYtDlp));
-  addAction(homerModelOutcomeLine('qwen2.5:7b', 'translates text', 'about 4.7 GB'));
+  addAction(homerModelOutcomeLine('qwen2.5:7b', 'answers questions about the kit', 'about 4.7 GB'));
+  // THE AI TOOLS, CONNECTED DURING SETUP (1.72.0): connectAI writes one line saying which it found.
+  if FileExists(ExpandConstant('{localappdata}\HomerDev\connectAI-result.txt')) and LoadStringFromFile(ExpandConstant('{localappdata}\HomerDev\connectAI-result.txt'), sAiLine) then addAction(Trim(sAiLine))
+  else addAction('AI tools: not connected -- connectAI needs Python. Afterwards, run scripts\connectAI in the kit''s folder.');
   sBody := '{#AppName} {#AppVersion} is installed.';
   if sActions <> '' then sBody := sBody + #13#10 + #13#10 + sActions;
   sBody := sBody + #13#10 + #13#10

@@ -143,12 +143,14 @@ def main(lsArgs):
     sSkills = os.path.join(sKit, ".claude", "skills")
     lsSkills = sorted(s for s in os.listdir(sSkills) if os.path.isfile(os.path.join(sSkills, s, "SKILL.md"))) if os.path.isdir(sSkills) else []
     iFound = iChanged = 0
+    lsConnected = []
     lsDoneFolders = set()
     for sTool in sorted(c_dTools):
         sProfile, sInstructions, lsSkillDirs = c_dTools[sTool]
         if not os.path.isdir(inProfile(sHome, sProfile)):
             logLine("%s: no %s folder in the profile, so it is not installed or never run; skipped" % (sTool, sProfile)); continue
         iFound += 1
+        lsConnected.append({"claude": "Claude Code", "codex": "Codex", "gemini": "Gemini CLI and Antigravity"}.get(sTool, sTool))
         sFile = inProfile(sHome, sInstructions)
         if bCheck:
             bHas = os.path.isfile(sFile) and c_sBegin in open(sFile, "rb").read().decode("utf-8-sig", errors="replace")
@@ -183,9 +185,20 @@ def main(lsArgs):
             elif not bRemove:
                 logLine("%s: %d skills linked in %s%s" % (sTool, iLinked, sFolder, ("; %d kept as they were" % iKept) if iKept else ""))
                 iChanged += 1 if iLinked else 0
+    # ONE LINE FOR THE SETUP PROGRAM (1.72.0): HomerDev's setup connects the AI tools itself and says in its Results
+    # box what it found, from this file; the dialog's Connect AI tools button is gone.
+    def writeResult(sLine):
+        if bCheck or bRemove: return
+        try:
+            sDir = os.path.join(os.environ.get("LOCALAPPDATA", ""), "HomerDev")
+            os.makedirs(sDir, exist_ok=True)
+            with open(os.path.join(sDir, "connectAI-result.txt"), "w", encoding="utf-8") as oFile: oFile.write(sLine)
+        except Exception as oError: logLine("result line not written: %s" % oError)
     if iFound == 0:
         say("No AI command-line tool was found: none of .claude, .codex or .gemini is in %s. Run a tool once, then this again." % sHome)
+        writeResult("AI tools: none found -- no Claude Code, Codex or Gemini in this profile. Run one once, then scripts\\connectAI in the kit's folder.")
         return 0
+    writeResult("AI tools connected to the kit: %s." % (" and ".join(lsConnected) if len(lsConnected) < 3 else ", ".join(lsConnected[:-1]) + " and " + lsConnected[-1]))
     if not bCheck:
         say(("Took the kit back out of %d AI tool%s." if bRemove else "Connected %d AI tool%s to the Homer Development Kit at " + sKit + ".") % (iFound, "" if iFound == 1 else "s"))
         if not bRemove: say("In any project, ask your AI about Homer or HomerDev, and it knows where to look. The log is " + sLogPath + ".")

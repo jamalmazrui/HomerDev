@@ -5,7 +5,7 @@
     <link>Tutorials.htm</link>
     <description>Spoken walks through the Homer Development Kit: what it is, how it builds and releases an app, and what its shared code makes a person hear. Ten walks in the pattern of ten, each three to five minutes.</description>
     <language>en-us</language>
-    <lastBuildDate>Mon, 12 Oct 2026 01:10:59 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 12 Oct 2026 02:05:14 +0000</lastBuildDate>
     <itunes:author>Jamal Mazrui</itunes:author>
     <itunes:explicit>false</itunes:explicit>
     <itunes:category text="Technology"/>
@@ -33,8 +33,8 @@
       <description>Windows 10 or later, 64-bit, a screen reader running, and HomerDev underscore setup dot e x e downloaded from the kit's latest release. Full transcript: Tutorials.htm#0b-2-install-and-launch</description>
       <link>Tutorials.htm#0b-2-install-and-launch</link>
       <guid isPermaLink="false">homer-tutorial_2_install_and_launch</guid>
-      <enclosure url="tutorials/2_Install_and_Launch.mp3" length="1770703" type="audio/mpeg"/>
-      <itunes:duration>00:04:09</itunes:duration>
+      <enclosure url="tutorials/2_Install_and_Launch.mp3" length="1786397" type="audio/mpeg"/>
+      <itunes:duration>00:04:11</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
     </item>
     <item>
@@ -87,8 +87,8 @@
       <description>An app made with newHomerApp, as in walk three, and a command prompt in its folder. Full transcript: Tutorials.htm#0h-8-build-with-an-ai-assistant</description>
       <link>Tutorials.htm#0h-8-build-with-an-ai-assistant</link>
       <guid isPermaLink="false">homer-tutorial_8_build_with_an_ai_assistant</guid>
-      <enclosure url="tutorials/8_Build_with_an_AI_Assistant.mp3" length="1683626" type="audio/mpeg"/>
-      <itunes:duration>00:03:55</itunes:duration>
+      <enclosure url="tutorials/8_Build_with_an_AI_Assistant.mp3" length="1644458" type="audio/mpeg"/>
+      <itunes:duration>00:03:50</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
     </item>
     <item>

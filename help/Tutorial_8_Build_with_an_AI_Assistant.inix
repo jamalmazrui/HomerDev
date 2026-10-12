@@ -30,11 +30,9 @@ Hear=
 
 [step]
 
-Say=Next, the assistant has to find the kit. You work in your own project's folder, and an assistant started there knows nothing of HomerDev until something tells it. One button does it once, for every assistant on the computer: in the HomerDev dialog, Connect AI tools. Its key is Alt plus T.
-Key=Alt+T
-Hear=Connect AI tools
-Hear=Connected 3 AI tools to the Homer Development Kit at C colon backslash Program Files backslash HomerDev.
-Note=Confirm the wording with a live run: buildTutorials -live.
+Say=Next, the assistant has to find the kit. You work in your own project's folder, and an assistant started there knows nothing of HomerDev until something tells it. HomerDev's setup program tells it, for every assistant on the computer, while it installs: its Results box ends with a line naming the AI tools it connected. To do it again later, run connectAI in the scripts folder of the kit.
+Key=
+Hear=
 
 [step]
 

@@ -962,7 +962,7 @@ Now the dialog, from anywhere in Windows: Alt plus Control plus Shift plus D. D 
 
 Screen reader:
 
-- HomerDev 1.71.0, dialog
+- HomerDev 1.72.0, dialog
 - Kit contents, list box, Document: AGENTS, HomerDev is a development kit for building Windows programs, documents, books, databases, installers and spoken tutorials for people who use screen readers, 1 of 130
 
 ### Step 7: Control+J
@@ -1016,7 +1016,7 @@ I close the basket with Alt plus F4, and the HomerDev dialog is where I left it.
 
 Screen reader:
 
-- HomerDev 1.71.0, dialog
+- HomerDev 1.72.0, dialog
 - Kit contents, list box, Sample: FruitBasketCs, 23 of 130
 
 Confirm the wording with a live run: buildTutorials -live.
@@ -1033,7 +1033,7 @@ Confirm the wording with a live run: buildTutorials -live.
 
 ### Step 14: Tab
 
-Tab moves to the buttons. Play tutorials opens these ten walks in the Homer Player, Inix explained and Layout by Code show how settings and dialogs are written, Ask an AI answers questions about the kit, typed or spoken, from the AI on this computer or Claude Code, and Connect AI tools comes back in walk eight.
+Tab moves to the buttons. Play tutorials opens these ten walks in the Homer Player, Inix explained and Layout by Code show how settings and dialogs are written, and Ask an AI answers questions about the kit, typed or spoken, from the AI on this computer or Claude Code. The setup program has already told your AI tools where the kit is; walk eight says more.
 
 Screen reader:
 
@@ -1658,16 +1658,9 @@ Screen reader:
 
 Seventeen skills, none broken. A skill whose description held an angle bracket would be refused when uploaded, and this check names it first.
 
-### Step 5: Alt+T
+### Step 5
 
-Next, the assistant has to find the kit. You work in your own project's folder, and an assistant started there knows nothing of HomerDev until something tells it. One button does it once, for every assistant on the computer: in the HomerDev dialog, Connect AI tools. Its key is Alt plus T.
-
-Screen reader:
-
-- Connect AI tools
-- Connected 3 AI tools to the Homer Development Kit at C colon backslash Program Files backslash HomerDev.
-
-Confirm the wording with a live run: buildTutorials -live.
+Next, the assistant has to find the kit. You work in your own project's folder, and an assistant started there knows nothing of HomerDev until something tells it. HomerDev's setup program tells it, for every assistant on the computer, while it installs: its Results box ends with a line naming the AI tools it connected. To do it again later, run connectAI in the scripts folder of the kit.
 
 ### Step 6
 
