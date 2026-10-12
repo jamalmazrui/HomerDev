@@ -2631,6 +2631,97 @@ c_lEstates = [
         "sOkStatuses": "200, 202",
         "sExtraLinks": "",
     },
+    # LEARNING PLATFORMS (12 October 2026). Udemy is already a guide and Coursera is refused (its help is drawn in the
+    # browser). Every seed below was seen answering before this was written.
+    {
+        "sProduct": "edX",
+        "sScriptName": "getEdxHelp.py",
+        "sSystem": "Zendesk, by the listing route, on its learner and business hosts",
+        "sFolder": "EdxHelp",
+        "sLogName": "getEdxHelp.log",
+        "sZipName": "EdxHelp.zip",
+        "iMaxPages": 1500,
+        "nDelay": 1.0,
+        "sSeeds": ('"https://support.edx.org/api/v2/help_center/en-us/articles.json?per_page=100",\n'
+                   '              "https://support.edx.org/api/v2/help_center/en-us/categories.json?per_page=100",\n'
+                   '              "https://support.edx.org/api/v2/help_center/en-us/sections.json?per_page=100",\n'
+                   '              "https://support.edx.org/hc/en-us/categories/200357087-FAQ",\n'
+                   '              "https://business-support.edx.org/api/v2/help_center/en-us/articles.json?per_page=100",\n'
+                   '              "https://business-support.edx.org/api/v2/help_center/en-us/categories.json?per_page=100",\n'
+                   '              "https://business-support.edx.org/api/v2/help_center/en-us/sections.json?per_page=100",\n'
+                   '              "https://business-support.edx.org/hc/en-us/categories/4424971801239-Learner-Experience"'),
+        "sFencePattern": r"^https://(support|business-support)\.edx\.org/(hc/en-us(?!/community|/requests|/signin)|api/v2/help_center/en-us)",
+        "sSubjectPattern": "",
+        "sReadyPattern": r"(hc/en-us/articles/|edx help center|articles.:)",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": ('    if sText.lstrip().startswith("{"):\n'
+                        '        try:\n'
+                        '            dPayload = json.loads(sText)\n'
+                        '            if dPayload.get("next_page"): lFound.append(dPayload["next_page"])\n'
+                        '        except Exception as oError:\n'
+                        '            logging.warning("a listing page was not readable as JSON: %s", oError)\n'),
+    },
+    {
+        "sProduct": "Skillshare",
+        "sScriptName": "getSkillshareHelp.py",
+        "sSystem": "Zendesk, by the listing route",
+        "sFolder": "SkillshareHelp",
+        "sLogName": "getSkillshareHelp.log",
+        "sZipName": "SkillshareHelp.zip",
+        "iMaxPages": 1200,
+        "nDelay": 1.0,
+        "sSeeds": ('"https://help.skillshare.com/api/v2/help_center/en-us/articles.json?per_page=100",\n'
+                   '              "https://help.skillshare.com/api/v2/help_center/en-us/categories.json?per_page=100",\n'
+                   '              "https://help.skillshare.com/api/v2/help_center/en-us/sections.json?per_page=100",\n'
+                   '              "https://help.skillshare.com/hc/en-us/sections/200706918-Navigating-Skillshare-Classes"'),
+        "sFencePattern": r"^https://help\.skillshare\.com/(hc/en-us(?!/community|/requests|/signin)|api/v2/help_center/en-us)",
+        "sSubjectPattern": "",
+        "sReadyPattern": r"(hc/en-us/articles/|skillshare help center|articles.:)",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": ('    if sText.lstrip().startswith("{"):\n'
+                        '        try:\n'
+                        '            dPayload = json.loads(sText)\n'
+                        '            if dPayload.get("next_page"): lFound.append(dPayload["next_page"])\n'
+                        '        except Exception as oError:\n'
+                        '            logging.warning("a listing page was not readable as JSON: %s", oError)\n'),
+    },
+    {
+        "sProduct": "MasterClass",
+        "sScriptName": "getMasterClassHelp.py",
+        "sSystem": "the publisher's own help centre, one section per product",
+        "sFolder": "MasterClassHelp",
+        "sLogName": "getMasterClassHelp.log",
+        "sZipName": "MasterClassHelp.zip",
+        "iMaxPages": 700,
+        "nDelay": 1.0,
+        "sSeeds": ('"https://www.masterclass.com/help-center/masterclass",\n'
+                   '              "https://masterclass.com/help-center/masterclass-at-work",\n'
+                   '              "https://www.masterclass.com/help-center/masterclass/answers/Contacting-MasterClass-Support---id--6sH8j_CwT9iEZ_BJq_p6Sg",\n'
+                   '              "https://www.masterclass.com/help-center/certificates/answers/contacting-support--id--DDSE2BDjTSijyXsayqbMBQ",\n'
+                   '              "https://www.masterclass.com/help-center/oncall/answers/contacting-support--id--8DgXvrBRSUmsJbi4dWGu1w",\n'
+                   '              "https://www.masterclass.com/help-center/executive/answers/contacting-support--id--Foq1XppLTFS6Z88ftPbDcg"'),
+        "sFencePattern": r"^https://(www\.)?masterclass\.com/help-center/(?!(.*/)?(search|requests|login|signin)\b)",
+        "sSubjectPattern": "",
+        "sReadyPattern": r"(masterclass)",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": "",
+    },
+    {
+        "sProduct": "The Great Courses Plus",
+        "sScriptName": "getGreatCoursesPlusHelp.py",
+        "sSystem": "one page, served whole",
+        "sFolder": "GreatCoursesPlusHelp",
+        "sLogName": "getGreatCoursesPlusHelp.log",
+        "sZipName": "GreatCoursesPlusHelp.zip",
+        "iMaxPages": 3,
+        "nDelay": 1.0,
+        "sSeeds": '"https://thegreatcoursesplus.com/faq"',
+        "sFencePattern": r"^https://thegreatcoursesplus\.com/faq/?$",
+        "sSubjectPattern": "",
+        "sReadyPattern": r"(frequently asked questions|great courses)",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": "",
+    },
 ]
 
 

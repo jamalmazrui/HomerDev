@@ -10,6 +10,7 @@ Each version is a level-2 heading, newest first, so your screen reader's heading
 ## 1.72.2 -- 12 October 2026
 
 - **checkDb logs in the project's logs folder.** It wrote each database's log in a logs folder beside the database, so checking DbDo made a logs folder inside templates\\RadioTrail, twenty-four logs deep by 11 October, outside the project's logs and against the Homer pattern. A database inside a project now logs to that project's logs folder as `<Project>-checkDb-<Name>-<stamp>.log`; the project is the nearest folder above the database holding a build script or RepoFiles.txt. A database outside any project still logs beside itself. The log is opened for appending, so two checks in the same second no longer overwrite each other.
+- **Four more help estates in makeHarvester:** edX (its learner and business help centres, one volume), Skillshare, MasterClass (each of its product sections) and The Great Courses Plus (its one FAQ page). Every seed was seen answering before it was written, and each fence is tested against addresses it must take and refuse, its own seeds included.
 
 ## 1.72.1 -- 11 October 2026
 
