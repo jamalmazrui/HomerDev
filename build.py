@@ -485,7 +485,10 @@ def sampleInputs(sName, sScript):
     files and the kit's code it compiles in. Its program is not an input, so a build never changes its own print."""
     # A C# sample compiles in the kit's C# code only; a Python sample bundles the kit's Python and loads Homer.dll,
     # which is built from the C# code, so it depends on both.
-    lsInputs = ["Templates/samples/" + sScript, "Templates/samples/version.txt", "Templates/samples/version.py", "exec/CSharp"]
+    # NOT version.py (12 October 2026): each Python sample's build writes it, naming its own build script on the first
+    # line, and checkHomerDev's clean deletes it -- so it held whichever sample built last, and FruitBasketPy rebuilt
+    # every cycle with nothing changed. version.txt is what it is made from, and that is the input.
+    lsInputs = ["Templates/samples/" + sScript, "Templates/samples/version.txt", "exec/CSharp"]
     if sName.endswith("Py"): lsInputs.append("exec/Python")
     for sExt in (".cs", ".py", ".spec"):
         if os.path.isfile(os.path.join(sScriptDir, "Templates", "samples", sName + sExt)): lsInputs.append("Templates/samples/" + sName + sExt)

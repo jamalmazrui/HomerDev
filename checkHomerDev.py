@@ -204,7 +204,7 @@ def checkKit():
 
 # --- 2. clean ---------------------------------------------------------------
 
-def cleanSamples(bDeep):
+def cleanSamples(bDeep, setBuilding=None):
     """Remove what previous builds wrote, so nothing passes on a stale file.
 
     This is the part that makes the answer mean something. A build that is not
@@ -212,7 +212,10 @@ def cleanSamples(bDeep):
     check would call that a pass.
     """
     iRemoved = 0
-    lsGone = list(c_lsBuildProducts) + [sExe for sName, sScript, sExe in c_lSamples]
+    # Only what is about to be built (12 October 2026): a sample the cache calls current keeps its program, and the
+    # shared build products go only when something will be built to make them again.
+    lSamples = [t for t in c_lSamples if setBuilding is None or t[0] in setBuilding]
+    lsGone = (list(c_lsBuildProducts) if lSamples else []) + [sExe for sName, sScript, sExe in lSamples]
     if bDeep: lsGone.append(".venv")
     for sName in lsGone:
         sPath = os.path.join(c_sSamples, sName)
@@ -284,6 +287,26 @@ def recordSample(sName, sScript, sExe):
     except Exception as oError:
         logLine("sample %s not recorded, so the next build builds it again: %s" % (sName, oError))
     return True
+
+
+def currentSamples():
+    """The samples the shared cache calls current: built from exactly these inputs, and their programs untouched since
+    that build passed. Their names, and when each was built. (12 October 2026: this check rebuilt all four from clean
+    every cycle -- the ordinary build bumps the kit's version, so the check's own pass never matched -- although the
+    build had just confirmed each one.)"""
+    dCurrent = {}
+    try:
+        sys.path.insert(0, c_sKit)
+        sys.path.insert(0, os.path.join(c_sKit, "scripts"))
+        import build, fingerprint
+        oCache = fingerprint.Cache(c_sKit, logLine)
+        for sName, sScript, sExe in c_lSamples:
+            sPrint = oCache.fingerprint(build.sampleInputs(sName, sScript))
+            if oCache.isCurrent("sample " + sName, sPrint, ["Templates/samples/" + sExe]):
+                dCurrent[sName] = oCache.d["jobs"]["sample " + sName].get("when", "?")
+    except Exception as oError:
+        logLine("the sample cache could not be read, so every sample is built: %s" % oError)
+    return dCurrent
 
 
 # --- 4b. the environment and the shared tools -------------------------------
@@ -565,7 +588,11 @@ def main():
         return 0
 
     sayLine("Checking the kit in %s" % c_sKit)
-    sayLine("This builds all %s, which takes a few minutes." % countNoun(len(c_lSamples), "sample"))
+    # --fresh and --deep build every sample from clean; otherwise a sample the cache calls current is not built again.
+    dCurrent = {} if (dArguments.fresh or dArguments.deep) else currentSamples()
+    setBuilding = set(t[0] for t in c_lSamples) - set(dCurrent)
+    if setBuilding: sayLine("This builds %s, which takes a few minutes." % countNoun(len(setBuilding), "sample"))
+    else: sayLine("Every sample is unchanged since its last build passed; none is built again.")
     sayLine()
 
     checkEnvironment()
@@ -575,8 +602,11 @@ def main():
     if dArguments.no_clean:
         finding("clean", "skip", "asked not to; a stale file could make a build look like a pass")
     else:
-        cleanSamples(dArguments.deep)
+        cleanSamples(dArguments.deep, setBuilding)
     for sName, sScript, sExe in c_lSamples:
+        if sName in dCurrent:
+            finding("build " + sName, "pass", "unchanged since its build passed at %s: the same sources and kit code, and %s is the program that build made" % (dCurrent[sName], sExe))
+            continue
         sayLine("Building %s..." % sName)
         buildSample(sName, sScript, sExe)
 
@@ -593,7 +623,8 @@ def main():
     for sName, sVerdict, sEvidence in lsFindings:
         if sVerdict == "fail": sayLine("  failed: %s -- %s" % (sName, sEvidence))
     sayLine("The report is %s." % os.path.basename(sReport))
-    if not iFailed and bReusable: oCache.record("checkHomerDev pass", sPrint, [])
+    # Recorded for the files as this check left them: its builds rewrite version.py and Version.cs (12 October 2026).
+    if not iFailed and bReusable: oCache.record("checkHomerDev pass", oCache.fingerprint(lsInputs, [platform.python_version()], bSkipProducts=True), [])
     if iFailed: oCache.forget("checkHomerDev pass")
     logLine("checkHomerDev end")
     return 1 if iFailed else 0

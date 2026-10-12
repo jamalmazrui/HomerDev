@@ -1542,7 +1542,12 @@ def main():
         sayLine("The report is %s." % os.path.basename(sReport))
     if oCache is not None:
         if iFailed: oCache.forget("check pass")
-        elif bReusable: oCache.record("check pass", sPrint, [])
+        elif bReusable:
+            # THE PASS IS RECORDED FOR THE FILES AS THE CHECK LEFT THEM (12 October 2026). The print taken before the
+            # checks was recorded, but a passing check runs the app's acceptance build, which rewrites the program, the
+            # installer and generated pages; so release's check, a minute after push's, found "its inputs changed" and
+            # built DbDo a third time. The files as they stand after a pass are the ones that passed.
+            oCache.record("check pass", oCache.fingerprint([sRoot], [sKind, platform.python_version()]), [])
     logLine("check end")
     return 1 if iFailed else 0
 

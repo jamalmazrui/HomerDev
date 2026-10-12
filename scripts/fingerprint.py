@@ -56,6 +56,8 @@ class Cache:
             self.fnLog("fingerprint store unreadable, so every job runs: %s" % oError)
             self.d = {}
         self.d.setdefault("jobs", {}); self.d.setdefault("files", {}); self.d.setdefault("checks", {})
+        # What this object changed, so a save writes only that and keeps what other processes wrote meanwhile.
+        self.setChanged = set()
 
     # ---- hashing ----
     def fileHash(self, sPath):
@@ -70,6 +72,7 @@ class Cache:
             for binChunk in iter(lambda: f.read(1 << 20), b""): oSha.update(binChunk)
         sSha = oSha.hexdigest()
         self.d["files"][sKey] = {"size": oStat.st_size, "mtime": oStat.st_mtime_ns, "sha": sSha}
+        self.setChanged.add(("files", sKey))
         return sSha
 
     def expand(self, lsInputs, bSkipProducts=False):
@@ -126,11 +129,14 @@ class Cache:
             sPath = sOutput if os.path.isabs(sOutput) else os.path.join(self.sProject, sOutput)
             if os.path.isfile(sPath): dOutputs[os.path.relpath(sPath, self.sProject)] = self.fileHash(sPath)
         self.d["jobs"][sKey] = {"print": sPrint, "outputs": dOutputs, "when": datetime.datetime.now().isoformat(timespec="seconds")}
+        self.setChanged.add(("jobs", sKey))
         self.save()
 
     def forget(self, sKey):
         """Drops a job's record, so it runs next time."""
-        if self.d["jobs"].pop(sKey, None) is not None: self.save()
+        if self.d["jobs"].pop(sKey, None) is not None:
+            self.setChanged.add(("jobs", sKey))
+            self.save()
 
     # ---- version checks on the web ----
     def checkDue(self, sTool, fDays):
@@ -145,18 +151,34 @@ class Cache:
 
     def noteChecked(self, sTool, sVersion):
         self.d["checks"][sTool] = {"version": sVersion or "", "checked": time.time()}
+        self.setChanged.add(("checks", sTool))
         self.save()
 
     def checkedVersion(self, sTool):
         return self.d["checks"].get(sTool, {}).get("version", "")
 
     def save(self):
-        """Written to a temporary file and moved into place, so a crash never leaves half a store."""
+        """Written to a temporary file and moved into place, so a crash never leaves half a store.
+
+        ONLY WHAT THIS OBJECT CHANGED IS WRITTEN (12 October 2026). A save once wrote back the whole store as it stood
+        when this object read it, so a process opened earlier and saved later erased everything recorded in between:
+        checkHomerDev opened the store, built the four samples and recorded each through other objects, then saved its
+        pass over them, and the next build rebuilt all four, finding programs it had no record of. The store is now
+        read again here, and only the entries this object added, changed or removed are put into it."""
         try:
             os.makedirs(os.path.dirname(self.sStore), exist_ok=True)
+            dDisk = {}
+            if os.path.isfile(self.sStore):
+                try: dDisk = json.loads(open(self.sStore, encoding="utf-8").read())
+                except Exception as oError: self.fnLog("fingerprint store unreadable while saving; rewritten from this run: %s" % oError)
+            for sSection in ("jobs", "files", "checks"): dDisk.setdefault(sSection, {})
+            for sSection, sKey in self.setChanged:
+                if sKey in self.d[sSection]: dDisk[sSection][sKey] = self.d[sSection][sKey]
+                else: dDisk[sSection].pop(sKey, None)
             sTemp = self.sStore + ".tmp"
-            with open(sTemp, "w", encoding="utf-8") as f: f.write(json.dumps(self.d, indent=1, sort_keys=True))
+            with open(sTemp, "w", encoding="utf-8") as f: f.write(json.dumps(dDisk, indent=1, sort_keys=True))
             os.replace(sTemp, self.sStore)
+            self.d, self.setChanged = dDisk, set()
         except Exception as oError:
             self.fnLog("fingerprint store not written, so this work runs again next time: %s" % oError)
 

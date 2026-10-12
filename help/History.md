@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.4 -- 12 October 2026
+
+The cache that lets a cycle skip unchanged work had three faults, found from the logs of the day's cycles, where the four sample programs were built four times with none of their sources changed.
+
+- **A save no longer erases what others recorded.** fingerprint.py wrote back the whole store as it stood when it was opened, so a process opened earlier and saved later erased every record made in between. checkHomerDev opened the store, recorded each sample it built, then saved its own pass over them; the next build found four programs it had no record of and rebuilt them all. A save now rereads the store and writes only the entries it changed. Every script that uses the cache gains this, in every Homer project.
+- **A pass is recorded for the files as the check left them.** check and checkHomerDev recorded the fingerprint taken before they ran, but a passing check runs builds that rewrite programs and generated files, so the next check, a minute later in release, found the files changed and ran in full: DbDo was compiled three times a cycle. Now release reuses push's pass.
+- **A build product is not an input, and a check rebuilds only what changed.** FruitBasketPy rebuilt every cycle because version.py, which each Python sample's build writes naming itself, was counted as one of its sources; version.txt is the source. And checkHomerDev cleaned and rebuilt all four samples whenever it ran; it now builds only those the cache does not call current, and cleans only what it will build. --fresh and --deep still build everything from clean.
+
 ## 1.72.3 -- 12 October 2026
 
 - **The chat no longer vanishes after a spoken question.** Two faults together. Lbc's runWithButtons replaced a dialog's own default button with its first footer button, so Enter in the question box pressed Close, not Send; and when the chat closed while Whisper was still writing down a question, the transcription thread reached for the closed dialog, and the error ended HomerDev on the spot. The log stopped right after Whisper's line, with no session end. Now a default the dialog sets is kept, for Enter and Control+Enter (Lbc, so every Homer app gains it on its next build); both chat workers are guarded and set aside anything that arrives after the chat closed; and closing the chat stops the listening and the recorder, and is logged.
