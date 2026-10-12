@@ -171,14 +171,14 @@ def savePage(sFolder, sUrl, binBody, lManifest):
     fHandle.write(binBody)
     fHandle.close()
     g_dSeenFingerprints[sFingerprint] = sUrl
-    lManifest.append(sUrl + "\\t" + sName + "\\t" + str(len(binBody)))
+    lManifest.append(sUrl + "\t" + sName + "\t" + str(len(binBody)))
     return True
 
 
 def belongs(sUrl):
     """The positive fence: an address is followed only if it is inside the help estate."""
     if not isEnglish(sUrl): return False
-    if re.search(r"\\.(css|js|png|jpe?g|gif|svg|ico|woff2?|ttf|eot|pdf|zip)(\\?|$)", sUrl, re.I): return False
+    if re.search(r"\.(css|js|png|jpe?g|gif|svg|ico|woff2?|ttf|eot|pdf|zip)(\?|$)", sUrl, re.I): return False
     return bool(re.search(r"{sFencePattern}", sUrl, re.I))
 
 
@@ -268,14 +268,14 @@ def findLinks(sUrl, binBody):
     lFound = []
     sText = binBody.decode("utf-8", "replace")
 {sExtraLinks}
-    for oMatch in re.finditer(r'href\\s*=\\s*["\\\']([^"\\\']+)["\\\']', sText, re.I):
+    for oMatch in re.finditer(r'href\s*=\s*["\']([^"\']+)["\']', sText, re.I):
         sHref = html.unescape(oMatch.group(1)).strip()
         if sHref.startswith(("mailto:", "javascript:", "#", "tel:")): continue
         lFound.append(urllib.parse.urljoin(sUrl, sHref))
     # A FRAMESET NAMES ITS PAGES WITH src, NOT href. An older help system built
     # in frames therefore looks empty to a crawler that reads only href, which is
     # exactly how EndNote's manual measured as 241 words with one link.
-    for oMatch in re.finditer(r'<(?:frame|iframe)[^>]*\\ssrc\\s*=\\s*["\\\']([^"\\\']+)["\\\']', sText, re.I):
+    for oMatch in re.finditer(r'<(?:frame|iframe)[^>]*\ssrc\s*=\s*["\']([^"\']+)["\']', sText, re.I):
         sHref = html.unescape(oMatch.group(1)).strip()
         if sHref.startswith(("mailto:", "javascript:", "#", "tel:", "data:", "about:")): continue
         lFound.append(urllib.parse.urljoin(sUrl, sHref))
@@ -324,9 +324,9 @@ def main():
     # console traceback and a log that simply stopped in mid air. It is inside now,
     # and the log always ends with a RUN ENDED line saying how the run finished.
     try:
-        fHandle = io.open(os.path.join(sFolder, "manifest.txt"), "w", encoding="utf-8-sig", newline="\\r\\n")
-        fHandle.write("address\\tfile\\tbytes\\r\\n")
-        for sLine in lManifest: fHandle.write(sLine + "\\r\\n")
+        fHandle = io.open(os.path.join(sFolder, "manifest.txt"), "w", encoding="utf-8-sig", newline="\r\n")
+        fHandle.write("address\tfile\tbytes\r\n")
+        for sLine in lManifest: fHandle.write(sLine + "\r\n")
         fHandle.close()
     except BaseException as oError:
         logging.exception("the manifest could not be written: %s: %s", type(oError).__name__, oError)
@@ -2738,10 +2738,42 @@ def writeScripts(sOutputFolder):
     return lPaths
 
 
+def selfTest(sPath):
+    """Proves a written harvester can do the two things a doubled backslash once silently broke in every one of them
+    (12 October 2026): find the links on a page, and write its manifest. The test runs on the GENERATED file, not on
+    the chassis, since the fault lives in the gap between the two. Returns '' or a sentence saying what failed."""
+    import importlib.util, tempfile
+    try:
+        oSpec = importlib.util.spec_from_file_location("harvesterUnderTest", sPath)
+        oModule = importlib.util.module_from_spec(oSpec)
+        oSpec.loader.exec_module(oModule)
+    except Exception as oError:
+        return "it does not load: " + str(oError)
+    lFound = oModule.findLinks("https://example.com/help/", b'<a href="/help/a">a</a> <A HREF = \'b.htm\'>b</A> <frame src="c.htm">')
+    for sWant in ("https://example.com/help/a", "https://example.com/help/b.htm", "https://example.com/help/c.htm"):
+        if sWant not in lFound: return "findLinks missed " + sWant + "; it found " + repr(lFound)
+    sText = io.open(sPath, encoding="utf-8-sig").read()
+    for sLine in sText.splitlines():
+        if "manifest.txt" in sLine and "newline=" in sLine:
+            try:
+                sManifest = os.path.join(tempfile.mkdtemp(), "manifest.txt")
+                exec(compile(sLine.strip().replace("os.path.join(sFolder, \"manifest.txt\")", repr(sManifest)) + "\nfHandle.close()", sPath, "exec"), {"io": io, "os": os})
+            except Exception as oError:
+                return "its manifest cannot be written: " + str(oError)
+    return ""
+
+
 def main():
-    """Writes one harvester per estate into the folder named on the command line."""
+    """Writes one harvester per estate into the folder named on the command line, and tests each one written."""
     sOutputFolder = sys.argv[1] if len(sys.argv) > 1 else "."
-    for sPath in writeScripts(sOutputFolder): print("wrote " + sPath)
+    lFailed = []
+    for sPath in writeScripts(sOutputFolder):
+        sFault = selfTest(sPath)
+        if sFault: lFailed.append(os.path.basename(sPath) + ": " + sFault)
+        print(("FAILED " if sFault else "wrote ") + sPath + ((": " + sFault) if sFault else ""))
+    if lFailed:
+        print(str(len(lFailed)) + " harvester" + ("" if len(lFailed) == 1 else "s") + " failed the self-test; do not send them.")
+        return 1
     return 0
 
 

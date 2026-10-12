@@ -208,6 +208,18 @@ learner and business help centres, one volume), Skillshare, MasterClass
 page). Every seed was seen answering before it was written, and each
 fence is tested against addresses it must take and refuse, its own seeds
 included.</li>
+<li><strong>makeHarvester’s chassis had every backslash
+doubled,</strong> so each harvester it wrote found no links on any page
+and crashed writing its manifest: a pattern read <code>href\\s*=</code>
+and matched nothing, and a line ending read as the four characters
+backslash-r-backslash-n. The four learning-platform harvesters showed it
+on their first run. All seven lines are corrected, and makeHarvester now
+TESTS EVERY HARVESTER IT WRITES – loading it, finding links in a sample
+page, and writing a manifest – and refuses to call one written that
+fails. All 122 pass; today’s broken ones fail it.</li>
+<li><strong>buildGuide’s bare-address gate skipped the front
+matter.</strong> It flagged each guide’s own license address, which the
+builder itself writes, so every guide built here failed that gate.</li>
 </ul>
 <h2 id="october-2026-1">1.72.1 – 11 October 2026</h2>
 <ul>

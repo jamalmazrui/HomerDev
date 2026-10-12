@@ -2486,7 +2486,13 @@ def runGates(sProduct, sPath, sText):
     if iMedian < 25: lFailures.append("the median article holds only %d words" % iMedian)
     bInCode = False
     lBare = []
-    for sLine in sText.split(c_sNewLine):
+    # THE FRONT MATTER IS NOT PROSE (12 October 2026): the guide's own license_url, written by this builder since
+    # 2 October, failed this gate in every guide built here. Lines before the closing "---" are left out.
+    lLines = sText.split(c_sNewLine)
+    if lLines and lLines[0].strip().lstrip("\ufeff") == "---":
+        iEnd = next((i for i in range(1, len(lLines)) if lLines[i].strip() == "---"), 0)
+        lLines = lLines[iEnd + 1:]
+    for sLine in lLines:
         if sLine.strip().startswith("```"):
             bInCode = not bInCode
             continue
