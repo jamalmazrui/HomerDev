@@ -34,7 +34,7 @@ Hear=
 [step]
 Say=Now the dialog, from anywhere in Windows: Alt plus Control plus Shift plus D. D for development.
 Key=Alt+Control+Shift+D
-Hear=HomerDev, dialog
+Hear=HomerDev 1.71.0, dialog
 Hear=Kit contents, list box, Document: AGENTS, HomerDev is a development kit for building Windows programs, documents, books, databases, installers and spoken tutorials for people who use screen readers, 1 of 130
 
 [step]
@@ -68,7 +68,7 @@ Hear=Help, Fields in this dialog, Fruit, type the name of a fruit
 [step]
 Say=I close the basket with Alt plus F4, and the HomerDev dialog is where I left it.
 Key=Alt+F4
-Hear=HomerDev, dialog
+Hear=HomerDev 1.71.0, dialog
 Hear=Kit contents, list box, Sample: FruitBasketCs, 23 of 130
 Note=Confirm the wording with a live run: buildTutorials -live.
 
@@ -79,7 +79,7 @@ Hear=Sample: FruitBasketMdiCs, C sharp, several windows inside one: the same bas
 Note=Confirm the wording with a live run: buildTutorials -live.
 
 [step]
-Say=Tab moves to the buttons. Play tutorials opens these ten walks in the Homer Player, Inix explained and Layout by Code show how settings and dialogs are written, Ask the local AI answers questions about the kit, typed or spoken, and Connect AI tools comes back in walk eight.
+Say=Tab moves to the buttons. Play tutorials opens these ten walks in the Homer Player, Inix explained and Layout by Code show how settings and dialogs are written, Ask an AI answers questions about the kit, typed or spoken, from the AI on this computer or Claude Code, and Connect AI tools comes back in walk eight.
 Key=Tab
 Hear=Open, button
 Note=Confirm the wording with a live run: buildTutorials -live.

@@ -1290,6 +1290,39 @@ def removeMoved():
         except Exception as oError:
             logLine("COULD NOT REMOVE %s: %s" % (sOldPath, oError))
 
+    # A FILE THE REPOSITORY CARRIES, MISSING FROM THE FOLDER, IS RESTORED FROM GIT (1.70.1). exec\\conversions.inix,
+    # the conversion engine's route table, went missing on 11 October, and every build after failed its conversion
+    # test with "no conversions.inix beside exec\\Python". Each single file named in RepoFiles.txt that is not on disk
+    # is taken back from the last commit, and the log names it; one git does not have either is named as missing.
+    sRepoList = os.path.join(sScriptDir, "RepoFiles.txt")
+    if os.path.isfile(sRepoList) and os.path.isdir(os.path.join(sScriptDir, ".git")):
+        for sLine in open(sRepoList, encoding="utf-8-sig").read().splitlines():
+            sRel = sLine.strip()
+            if not sRel or sRel[0] in "#;" or sRel.endswith("/") or any(c in sRel for c in "*?"): continue
+            sPath = os.path.join(sScriptDir, sRel.replace("/", os.sep))
+            if os.path.exists(sPath): continue
+            try:
+                oDone = subprocess.run(["git", "-C", sScriptDir, "checkout", "HEAD", "--", sRel], capture_output=True, text=True, timeout=120)
+                if oDone.returncode == 0 and os.path.exists(sPath):
+                    logLine("RESTORED FROM GIT: %s was missing from the folder" % sRel)
+                    sayLine("Restored %s, which was missing, from the repository." % sRel)
+                else:
+                    logLine("WARN: missing, and not in git either: %s (%s)" % (sRel, (oDone.stderr or "").strip()))
+            except Exception as oError:
+                logLine("COULD NOT RESTORE %s: %s" % (sRel, oError))
+
+    # RETIRED FOLDERS (1.69.2): a Samples folder at the kit's root, left from an older layout -- the samples live in
+    # Templates\\samples -- held PyInstaller's work folders, and the setup program installed them into Program Files.
+    for sFolder in ("Samples",):
+        sPath = os.path.join(sScriptDir, sFolder)
+        if os.path.isdir(sPath) and not os.path.samefile(sPath, os.path.join(sScriptDir, "Templates", "samples")):
+            try:
+                shutil.rmtree(sPath)
+                iRemoved += 1
+                logLine("RETIRED FOLDER: %s removed; the samples live in Templates\\samples" % sFolder)
+            except Exception as oError:
+                logLine("COULD NOT REMOVE %s: %s" % (sPath, oError))
+
     for sRetired in c_lsRetired:
         sPath = os.path.join(sScriptDir, sRetired.replace("/", os.sep))
         if not os.path.isfile(sPath): continue
@@ -1475,6 +1508,15 @@ def checkKit():
     """Report anything wrong with the kit. Returns a list of problems."""
     lsProblems = []
     checkAgentRoutes(lsProblems)
+    # EVERY SCRIPT THE SETUP PROGRAM NAMES IS IN THE KIT (1.69.1). HomerDev_setup.iss named scripts\\installModels.cmd
+    # from 1.66.0 on, which was never here, and its "skip if it does not exist" flag hid that: the model entry did
+    # nothing, in silence, for four versions.
+    sIss = os.path.join(sScriptDir, "HomerDev_setup.iss")
+    if os.path.isfile(sIss):
+        sIssText = open(sIss, "rb").read().decode("utf-8-sig", "replace")
+        for sName in sorted(set(re.findall(r"\{app\}\\scripts\\([\w.-]+\.cmd)", sIssText))):
+            if not os.path.isfile(os.path.join(sScriptDir, "scripts", sName)):
+                lsProblems.append("HomerDev_setup.iss runs scripts\\%s, which is not in the kit" % sName)
 
     for sRelative in c_lsExpected:
         sPath = os.path.join(sScriptDir, sRelative.replace("/", os.sep))
@@ -1746,6 +1788,12 @@ def main():
                 oDone = subprocess.run([sys.executable, os.path.join(sScriptDir, "scripts", "testConversion.py")],
                                        capture_output=True, text=True, timeout=1800)
                 for sLine in (oDone.stdout or "").strip().splitlines(): sayLine(sLine)
+                # ITS ERRORS TOO (1.69.2): a test that crashed wrote its traceback to stderr, which was captured and
+                # dropped, so two failing builds on 11 October said only "exit 1". Every line goes to the log, and
+                # the last -- the error itself -- is said.
+                lsErr = (oDone.stderr or "").strip().splitlines()
+                for sLine in lsErr: logLine("testConversion stderr: " + sLine)
+                if oDone.returncode != 0 and lsErr: sayLine("The conversion test stopped with: " + lsErr[-1])
                 logLine("testConversion exit %d" % oDone.returncode)
                 if oDone.returncode == 0: oCache.record("conversion test", sPrint, [])
             if oDone is not None and oDone.returncode != 0:

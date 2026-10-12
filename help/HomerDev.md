@@ -61,8 +61,12 @@ holding the keyboard knows what a good program is before the AI writes one.
   assemblies the build needs.
 - The Visual Studio Build Tools, free, for the Roslyn C# compiler.
 - Python 3, for the kit's own scripts.
-- Inno Setup 6, if you want an installer.
+- Inno Setup 6, if you want an installer; the kit's build fetches it.
 - Git and the GitHub CLI (`gh`), if you want to publish.
+- Node.js, for Ace by DAISY and other JavaScript tools.
+
+HomerDev's setup program offers Python, Git, the GitHub CLI and Node.js on its
+last page, with every other tool, each checked against what is installed.
 
 ### Install the kit
 
@@ -72,8 +76,9 @@ There are two ways, and the kit works the same either way.
   release. It installs the kit to `C:\Program Files\HomerDev`, the standard
   place for programs, and puts a HomerDev shortcut on the desktop with the
   hotkey **Alt+Control+Shift+D**. Its last page offers every tool any Homer
-  program uses -- ExifTool, ffmpeg, ImageMagick, mpv, Ollama, Pandoc, PDF tools,
-  Tesseract, Whisper and yt-dlp -- and a local AI model, each worded Install,
+  program or the kit uses -- Ace by DAISY, EPUBCheck, ExifTool, ffmpeg, Git,
+  GitHub CLI, ImageMagick, Java, mpv, Node.js, Ollama, Pandoc, PDF tools,
+  Python, Tesseract, Whisper and yt-dlp -- and a local AI model, each worded Install,
   Update or Reinstall by what is already there, so pressing Enter sets the
   computer up for all of them at once. It also sets the `HomerDev` environment
   variable for the whole computer, unless one is already set, so every app's
@@ -161,16 +166,20 @@ The controls, in tab order:
 - **Layout by Code** explains how every Homer dialog is made, shows the whole
   code of a small dialog, and then opens that dialog, so you can tab through it
   and hear that the order is the order of the lines.
-- **Ask the local AI** opens a chat with the AI model on this computer, through
-  Ollama. Nothing leaves the computer. Before your first question, the model is
-  given the kit's own maps for AI agents (`llms.txt` and `AGENTS.md`) and the
-  list of everything in the kit with each file's path, including the skills,
-  subagents and plugin, so it can say where things are. Type a question and
-  press Enter. While it thinks, the dialog says every ten seconds how long it
-  has waited, so you know it has not stopped; the first question takes longest,
-  while the model loads. The answer is added to the conversation as plain text,
-  focus goes to where it begins, and the dialog says how long it took.
-  You can also ask by voice; see "Asking by voice" below.
+- **Ask an AI** opens a chat about the kit, with a choice of who answers.
+  The local AI, through Ollama, runs on this computer and nothing leaves it;
+  before your first question it is given the kit's own maps for AI agents
+  (`llms.txt` and `AGENTS.md`) and the list of everything in the kit. Claude
+  Code, offered when it is installed, reads the kit itself: it runs in the kit's
+  folder in plan mode, so it reads files and changes none, and the dialog is
+  one conversation with it. Type a question and press Enter, or ask by voice;
+  see "Asking by voice" below. While it thinks, a soft tick sounds and the
+  dialog says every ten seconds how long it has waited. The answer is added to
+  the conversation as plain text, focus goes to where it begins, and the dialog
+  says how long it took. An answer is also spoken when you asked by voice, or
+  when Speak answers is ticked. Control+Period stops waiting, Control+Shift+R
+  says the last answer again, and Control+Shift+C copies it -- keys borrowed
+  from The Chat Place, Kelly Ford's accessible companion for Claude Code.
 - **Connect AI tools** tells the AI tools you work with -- Claude Code, OpenAI
   Codex, Gemini CLI and Antigravity -- where the kit is, once. The next chapter
   says what it does and what to tell your AI afterwards.

@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -402,86 +403,222 @@ private static string kitContext()
     return sb.ToString();
 }
 
+// ---- the chat: the local AI, or Claude Code when it is installed (11 October 2026) ----
+//
+// TWO ENGINES. The local AI (Ollama) answers on this computer from the kit's own summary. Claude Code, when it is
+// installed, answers from the kit itself: it runs headless (claude -p) in the kit's folder, where CLAUDE.md and the
+// skills tell it what HomerDev is, in plan mode, so it reads and never changes a file. One dialog is one
+// conversation: Claude Code's is named with --session-id at the first question and continued with --resume.
+//
+// ASKED BY VOICE, ANSWERED BY VOICE. An answer is always written into the conversation box; it is also spoken when
+// the question was asked by voice and sent as heard, or when Speak answers is ticked.
+//
+// KEYS, after The Chat Place's (Kelly Ford's accessible companion for Claude Code): Control+Period stops waiting,
+// Control+Shift+R says the last answer again, Control+Shift+C copies it. Enter sends, as before.
+//
+// PROGRESS. Every ten seconds a soft tick sounds and the wait is said and logged, so a log shows it ran even if
+// speech was lost.
+
+private static readonly HashSet<string> setStrippedVariables = new HashSet<string> {
+    "CLAUDECODE", "CLAUDE_PID", "CLAUDE_EFFORT", "CLAUDE_AGENT_SDK_VERSION", "CLAUDE_PREVIEW_CLASSIFIER_FLOOR",
+    "CLAUDE_CODE_ENTRYPOINT", "CLAUDE_CODE_SESSION_ID", "CLAUDE_CODE_HOST_SESSION_ID", "CLAUDE_CODE_CHILD_SESSION",
+    "CLAUDE_CODE_SESSION_ATTENDED", "CLAUDE_CODE_SDK_HAS_HOST_AUTH_REFRESH", "CLAUDE_CODE_OAUTH_TOKEN",
+    "CLAUDE_CODE_OAUTH_REFRESH_TOKEN", "CLAUDE_CODE_OAUTH_SCOPES", "CLAUDE_CODE_ACCOUNT_UUID",
+    "CLAUDE_CODE_ORGANIZATION_UUID", "CLAUDE_CODE_USER_EMAIL", "CLAUDE_CODE_MESSAGING_SOCKET",
+    "CLAUDE_CODE_MESSAGING_TOKEN", "CLAUDE_CODE_DESKTOP_APP_VERSION", "CLAUDE_CODE_EXECPATH",
+    "ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_BASE_URL", "ANTHROPIC_CUSTOM_HEADERS",
+    "ANTHROPIC_BEDROCK_BASE_URL", "ANTHROPIC_VERTEX_BASE_URL", "ANTHROPIC_VERTEX_PROJECT_ID",
+    "ANTHROPIC_FOUNDRY_API_KEY", "ANTHROPIC_FOUNDRY_BASE_URL", "ANTHROPIC_FOUNDRY_RESOURCE",
+    "CLAUDE_CODE_USE_BEDROCK", "CLAUDE_CODE_USE_VERTEX", "CLAUDE_CODE_USE_FOUNDRY" };
+
+private static string claudeProgram()
+{
+    string sFound = "";
+    foreach (string sDir in (Environment.GetEnvironmentVariable("PATH") ?? "").Split(';'))
+    {
+        if (sDir.Trim().Length == 0) continue;
+        foreach (string sName in new string[] { "claude.exe", "claude.cmd" })
+        {
+            try { string sPath = Path.Combine(sDir.Trim(), sName); if (File.Exists(sPath)) return sPath; } catch { }
+        }
+    }
+    foreach (string sPath in new string[] {
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".local", "bin", "claude.exe"),
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "npm", "claude.cmd") })
+        if (File.Exists(sPath)) { sFound = sPath; break; }
+    return sFound;
+}
+
+// One question to Claude Code, the question on its standard input. The process is handed out through oRunning so
+// Control+Period can end it.
+private static string askClaude(string sProgram, string sQuestion, string sSession, bool bFirst, Process[] aRunning, out string sError)
+{
+    sError = "";
+    // NAMED ON EVERY TURN, as The Chat Place does, so Claude's own session list shows it as HomerDev's.
+    string sArgs = "-p --output-format text --permission-mode plan --name \"HomerDev questions\" " + (bFirst ? "--session-id " : "--resume ") + sSession;
+    ProcessStartInfo oStart = new ProcessStartInfo();
+    if (sProgram.EndsWith(".cmd", StringComparison.OrdinalIgnoreCase)) { oStart.FileName = "cmd.exe"; oStart.Arguments = "/c \"\"" + sProgram + "\" " + sArgs + "\""; }
+    else { oStart.FileName = sProgram; oStart.Arguments = sArgs; }
+    oStart.WorkingDirectory = sKit;
+    oStart.UseShellExecute = false;
+    oStart.CreateNoWindow = true;
+    oStart.RedirectStandardInput = true;
+    oStart.RedirectStandardOutput = true;
+    oStart.RedirectStandardError = true;
+    oStart.StandardOutputEncoding = Encoding.UTF8;
+    oStart.StandardErrorEncoding = Encoding.UTF8;
+    // A CLEAN ENVIRONMENT (from The Chat Place, Kelly Ford's AIChat): variables a host Claude Code session sets
+    // describe that session, and some make a child wait for it; billing variables would move the turn off the
+    // subscription to per-use charges or another endpoint. Each is removed, by name and by family.
+    foreach (string sName in new List<string>(oStart.EnvironmentVariables.Keys.Cast<string>()))
+    {
+        string sUpper = sName.ToUpperInvariant();
+        if (setStrippedVariables.Contains(sUpper) || sUpper.StartsWith("CLAUDE_CODE_SDK_") || sUpper.StartsWith("CLAUDE_CODE_HOST_") || sUpper.StartsWith("CLAUDE_CODE_MESSAGING_"))
+        { oStart.EnvironmentVariables.Remove(sName); Log.info("Claude Code: left out the variable " + sName); }
+    }
+    Log.info("Claude Code: " + oStart.FileName + " " + oStart.Arguments + " in " + sKit);
+    try
+    {
+        using (Process oProcess = Process.Start(oStart))
+        {
+            aRunning[0] = oProcess;
+            var oOut = oProcess.StandardOutput.ReadToEndAsync();
+            var oErr = oProcess.StandardError.ReadToEndAsync();
+            oProcess.StandardInput.Write(sQuestion);
+            oProcess.StandardInput.Close();
+            if (!oProcess.WaitForExit(c_iAiTimeoutMs))
+            {
+                try { oProcess.Kill(); } catch { }
+                sError = "no answer in " + (c_iAiTimeoutMs / 60000) + " minutes";
+                return "";
+            }
+            oProcess.WaitForExit();
+            string sOut = oOut.Result.Trim(), sErr = oErr.Result.Trim();
+            Log.info("Claude Code exit " + oProcess.ExitCode + ", " + sOut.Length + " characters" + (sErr.Length > 0 ? "; stderr: " + sErr : ""));
+            if (oProcess.ExitCode != 0 && sOut.Length == 0) sError = sErr.Length > 0 ? sErr : "Claude Code stopped with exit code " + oProcess.ExitCode;
+            return sOut;
+        }
+    }
+    catch (Exception oError)
+    {
+        sError = oError.Message;
+        return "";
+    }
+    finally
+    {
+        aRunning[0] = null;
+    }
+}
+
 private static bool runChat(IWin32Window owner)
 {
-    string sContext, sModel;
+    string sContext = "", sModel, sClaude;
     sModel = chooseModel();
-    if (sModel.Length == 0)
+    sClaude = claudeProgram();
+    Log.keyValue("Chat model", sModel.Length > 0 ? sModel : "(none)");
+    Log.keyValue("Claude Code", sClaude.Length > 0 ? sClaude : "(not installed)");
+    if (sModel.Length == 0 && sClaude.Length == 0)
     {
-        MessageBox.Show(owner, "The local AI is not answering: Ollama is not running, or it has no model. HomerDev's setup program offers Ollama and a model; run it again and leave those boxes ticked.", c_sAppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        MessageBox.Show(owner, "No AI is ready to answer: Ollama is not running or has no model, and Claude Code is not installed. HomerDev's setup program offers Ollama and a model; run it again and leave those boxes ticked.", c_sAppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
         return false;
     }
-    sContext = kitContext();
-    Log.keyValue("Chat model", sModel);
-    Log.keyValue("Chat context characters", "" + sContext.Length);
+    if (sModel.Length > 0) { sContext = kitContext(); Log.keyValue("Chat context characters", "" + sContext.Length); }
+    string sLocalName = "The local AI, " + sModel + ", on this computer", sClaudeName = "Claude Code, reading the kit itself";
+    List<string> lsEngines = new List<string>();
+    if (sModel.Length > 0) lsEngines.Add(sLocalName);
+    if (sClaude.Length > 0) lsEngines.Add(sClaudeName);
     StringBuilder sbHistory = new StringBuilder();
-    using (LbcDialog dlg = new LbcDialog("Ask the local AI about HomerDev", owner))
+    string sSession = Guid.NewGuid().ToString(), sLastAnswer = "", sHeard = "";
+    bool bClaudeStarted = false;
+    int iAsk = 0;
+    Process[] aRunning = new Process[1];
+    System.Windows.Forms.Timer oTicker = null;
+    using (LbcDialog dlg = new LbcDialog("Ask about HomerDev", owner))
     {
-        TextBox txtConversation = dlg.addMemoBox("&Conversation:", "", "Your questions and " + sModel + "'s answers, newest last. It runs on this computer; nothing leaves it.");
+        ComboBox cboEngine = dlg.addComboPickBox("Ask &with:", lsEngines, lsEngines[0], "Which AI answers. The local AI runs on this computer and nothing leaves it. Claude Code, when installed, reads the kit itself, in plan mode, so it changes nothing.");
+        TextBox txtConversation = dlg.addMemoBox("&Conversation:", "", "Your questions and the answers, newest last. Control+Shift+R says the last answer again; Control+Shift+C copies it.");
         txtConversation.ReadOnly = true;
         dlg.addBand();
-        TextBox txtQuestion = dlg.addInputBox("&Question:", "", "Ask about HomerDev: what a skill does, where a template is, how to start an app. Enter sends it.");
-        Button btnSend = dlg.addButton("&Send", "Ask the local AI the question.");
+        TextBox txtQuestion = dlg.addInputBox("&Question:", "", "Ask about HomerDev: what a skill does, where a template is, how to start an app. Enter sends it; Control+Period stops waiting.");
+        Button btnSend = dlg.addButton("&Send", "Ask the question.");
         Button btnVoice = dlg.addButton("&Voice", "Ask by voice: a rising tone, then speak; press Voice again, or simply stop talking, and Whisper writes what you said into the question. Escape throws a recording away. Everything stays on this computer.");
         dlg.endBand();
-        CheckBox chkSendHeard = dlg.addCheckBox("Send &when heard", false, "Send a spoken question as soon as it is written, instead of letting you check it first.");
+        CheckBox chkSendHeard = dlg.addCheckBox("Send &when heard", true, "Send a spoken question as soon as it is written. The answer to a question sent as heard is spoken too.");
+        CheckBox chkSpeak = dlg.addCheckBox("Spea&k answers", false, "Speak every answer as well as writing it in the conversation, whether the question was typed or spoken.");
+        MethodInvoker fnStopTicker = delegate()
+        {
+            if (oTicker == null) return;
+            oTicker.Stop();
+            oTicker.Dispose();
+            oTicker = null;
+        };
         btnSend.Click += delegate(object oSender, EventArgs evArgs)
         {
             string sQuestion = txtQuestion.Text.Trim();
-            if (sQuestion.Length == 0) return;
+            if (sQuestion.Length == 0 || !btnSend.Enabled) return;
+            bool bByVoice = sHeard.Length > 0 && sQuestion == sHeard.Trim();
+            sHeard = "";
+            bool bSpeak = chkSpeak.Checked || bByVoice;
+            bool bClaude = cboEngine.Text == sClaudeName;
+            string sEngine = bClaude ? "Claude Code" : sModel;
+            int iThis = ++iAsk;
             btnSend.Enabled = false;
             txtQuestion.ReadOnly = true;
-            // PROGRESS WHILE IT THINKS (11 October 2026): a local model can take a minute or more, and the first question
-            // longer while the model loads, so silence sounded like a hang. Every ten seconds the dialog says how long it
-            // has waited -- briefly, the one thing the reader cannot know -- and the status line says the same.
             int iWaited = 0;
-            System.Windows.Forms.Timer oTicker = new System.Windows.Forms.Timer();
+            oTicker = new System.Windows.Forms.Timer();
             oTicker.Interval = 10000;
             oTicker.Tick += delegate(object oTickSender, EventArgs evTick)
             {
                 iWaited += 10;
-                dlg.setStatusText("Waiting for " + sModel + ", " + iWaited + " seconds");
+                Log.info("Progress: waiting for " + sEngine + ", " + iWaited + " seconds");
+                dlg.setStatusText("Waiting for " + sEngine + ", " + iWaited + " seconds");
+                Console.Beep(880, 40);
                 Say.say(iWaited + " seconds");
             };
-            Say.say("Asking " + sModel + "; it may take a minute");
-            dlg.setStatusText("Waiting for " + sModel);
+            Say.say("Asking " + sEngine + "; it may take a minute");
+            dlg.setStatusText("Waiting for " + sEngine);
             DateTime dtAsked = DateTime.Now;
             oTicker.Start();
-            string sPrompt = sContext + "\r\n" + sbHistory.ToString() + "Question: " + sQuestion + "\r\nAnswer:";
-            Log.info("Chat question: " + sQuestion);
+            Log.info("Chat question (" + sEngine + (bByVoice ? ", by voice" : "") + "): " + sQuestion);
+            bool bFirst = !bClaudeStarted;
+            if (bClaude) bClaudeStarted = true;
+            string sPrompt = bClaude ? sQuestion : sContext + "\r\n" + sbHistory.ToString() + "Question: " + sQuestion + "\r\nAnswer:";
             Thread oWorker = new Thread(delegate()
             {
                 string sError;
-                string sAnswer = Ollama.generate(sModel, sPrompt, c_iAiTimeoutMs, out sError);
-                dlg.form.BeginInvoke((MethodInvoker) delegate()
+                string sAnswer = bClaude ? askClaude(sClaude, sPrompt, sSession, bFirst, aRunning, out sError) : Ollama.generate(sModel, sPrompt, c_iAiTimeoutMs, out sError);
+                try
                 {
-                    oTicker.Stop();
-                    oTicker.Dispose();
-                    if (string.IsNullOrEmpty(sAnswer)) sAnswer = "No answer came back" + (string.IsNullOrEmpty(sError) ? "." : ": " + sError);
-                    sAnswer = plainText(sAnswer);
-                    Log.info("Chat answer: " + sAnswer.Length + " characters" + (string.IsNullOrEmpty(sError) ? "" : "; error " + sError));
-                    sbHistory.Append("Question: ").Append(sQuestion).Append("\r\nAnswer: ").Append(sAnswer).Append("\r\n");
-                    int iStart = txtConversation.TextLength;
-                    txtConversation.AppendText((iStart > 0 ? "\r\n" : "") + "You: " + sQuestion + "\r\n" + sModel + ": " + sAnswer.Replace("\n", "\r\n").Replace("\r\r\n", "\r\n") + "\r\n");
-                    txtQuestion.Text = "";
-                    txtQuestion.ReadOnly = false;
-                    btnSend.Enabled = true;
-                    // The answer is read where it begins: focus goes to its first line, so Down Arrow reads it.
-                    txtConversation.Focus();
-                    txtConversation.SelectionStart = iStart + (iStart > 0 ? 2 : 0);
-                    txtConversation.SelectionLength = 0;
-                    txtConversation.ScrollToCaret();
-                    int iTook = (int) Math.Round((DateTime.Now - dtAsked).TotalSeconds);
-                    dlg.setStatusText("Answered in " + iTook + (iTook == 1 ? " second" : " seconds"));
-                    Say.say("Answered in " + iTook + (iTook == 1 ? " second" : " seconds"));
-                });
+                    dlg.form.BeginInvoke((MethodInvoker) delegate()
+                    {
+                        if (iThis != iAsk) { Log.info("An answer came after Stop, and was set aside"); return; }
+                        fnStopTicker();
+                        if (string.IsNullOrEmpty(sAnswer)) sAnswer = "No answer came back" + (string.IsNullOrEmpty(sError) ? "." : ": " + sError);
+                        sAnswer = plainText(sAnswer);
+                        sLastAnswer = sAnswer;
+                        Log.info("Chat answer: " + sAnswer.Length + " characters" + (string.IsNullOrEmpty(sError) ? "" : "; error " + sError));
+                        if (!bClaude) sbHistory.Append("Question: ").Append(sQuestion).Append("\r\nAnswer: ").Append(sAnswer).Append("\r\n");
+                        int iStart = txtConversation.TextLength;
+                        txtConversation.AppendText((iStart > 0 ? "\r\n" : "") + "You: " + sQuestion + "\r\n" + sEngine + ": " + sAnswer.Replace("\n", "\r\n").Replace("\r\r\n", "\r\n") + "\r\n");
+                        txtQuestion.Text = "";
+                        txtQuestion.ReadOnly = false;
+                        btnSend.Enabled = true;
+                        txtConversation.Focus();
+                        txtConversation.SelectionStart = iStart + (iStart > 0 ? 2 : 0);
+                        txtConversation.SelectionLength = 0;
+                        txtConversation.ScrollToCaret();
+                        int iTook = (int) Math.Round((DateTime.Now - dtAsked).TotalSeconds);
+                        dlg.setStatusText("Answered in " + iTook + (iTook == 1 ? " second" : " seconds"));
+                        Say.say("Answered in " + iTook + (iTook == 1 ? " second" : " seconds"));
+                        if (bSpeak) Say.sayForced(sAnswer);
+                    });
+                }
+                catch (Exception) { }
             });
             oWorker.IsBackground = true;
             oWorker.Start();
         };
-        // ---- VOICE (11 October 2026) ----
-        // The convention of Windows+H: one key starts and stops; silence after speech also stops; Escape cancels.
-        // Tones, not speech, mark the start and the end, so the screen reader is not recorded into the question.
+        // ---- VOICE: the convention of Windows+H; tones mark the start and the end ----
         VoiceRecorder oRecorder = null;
         System.Windows.Forms.Timer oListen = new System.Windows.Forms.Timer();
         oListen.Interval = 100;
@@ -521,6 +658,7 @@ private static bool runChat(IWin32Window owner)
                         btnVoice.Focus();
                         return;
                     }
+                    sHeard = sText;
                     txtQuestion.Text = sText;
                     txtQuestion.Focus();
                     txtQuestion.SelectionStart = sText.Length;
@@ -556,22 +694,55 @@ private static bool runChat(IWin32Window owner)
             dlg.setStatusText("Listening; press Voice again or stop talking to finish, Escape to cancel");
             oListen.Start();
         };
-        // Escape while listening throws the recording away and keeps the dialog open; otherwise it closes, as ever.
         dlg.commandKey = delegate(Keys keys)
         {
-            if (keys != Keys.Escape || oRecorder == null) return false;
-            oListen.Stop();
-            oRecorder.cancel();
-            oRecorder.Dispose();
-            oRecorder = null;
-            Console.Beep(330, 150);
-            dlg.setStatusText("Recording thrown away");
-            Say.say("Cancelled");
-            return true;
+            // Escape while listening throws the recording away and keeps the dialog open; otherwise it closes.
+            if (keys == Keys.Escape && oRecorder != null)
+            {
+                oListen.Stop();
+                oRecorder.cancel();
+                oRecorder.Dispose();
+                oRecorder = null;
+                Console.Beep(330, 150);
+                dlg.setStatusText("Recording thrown away");
+                Say.say("Cancelled");
+                return true;
+            }
+            // Control+Period: stop waiting. A late answer is set aside, and Claude Code is ended.
+            if (keys == (Keys.Control | Keys.OemPeriod))
+            {
+                if (btnSend.Enabled) { Say.say("Nothing is waiting"); return true; }
+                iAsk++;
+                fnStopTicker();
+                try { if (aRunning[0] != null && !aRunning[0].HasExited) aRunning[0].Kill(); } catch { }
+                txtQuestion.ReadOnly = false;
+                btnSend.Enabled = true;
+                txtQuestion.Focus();
+                dlg.setStatusText("Stopped");
+                Say.say("Stopped");
+                Log.info("Chat: stopped by the user");
+                return true;
+            }
+            if (keys == (Keys.Control | Keys.Shift | Keys.R))
+            {
+                Say.sayForced(sLastAnswer.Length > 0 ? sLastAnswer : "No answer yet");
+                return true;
+            }
+            if (keys == (Keys.Control | Keys.Shift | Keys.C))
+            {
+                if (sLastAnswer.Length == 0) { Say.say("No answer yet"); return true; }
+                try { Clipboard.SetText(sLastAnswer); Say.say("Copied the last answer"); }
+                catch (Exception oError) { Say.say("Could not copy: " + oError.Message); }
+                return true;
+            }
+            return false;
         };
         dlg.form.AcceptButton = btnSend;
         dlg.setInitialFocus(txtQuestion);
         dlg.runWithButtons(new string[] { "Close" });
+        iAsk++;
+        fnStopTicker();
+        try { if (aRunning[0] != null && !aRunning[0].HasExited) aRunning[0].Kill(); } catch { }
     }
     return true;
 }
@@ -616,7 +787,10 @@ private static bool runDialog()
     List<string> lsLines = new List<string>();
     loadItems();
     foreach (KitItem oItem in lsItems) lsLines.Add(oItem.ToString());
-    using (LbcDialog dlg = new LbcDialog(c_sAppName, null))
+    // THE VERSION IN THE TITLE (11 October 2026): the desktop hotkey opens the copy setup installed, which can lag the
+    // kit -- 1.66.0 was heard after 1.68.0 was released, so neither its progress updates nor its Voice button were
+    // there. The title, which the screen reader says as the dialog opens, now names the version.
+    using (LbcDialog dlg = new LbcDialog(c_sAppName + " " + sVersion, null))
     {
         lbItems = dlg.addPickBox("&Kit contents:", lsLines, lsLines.Count > 0 ? lsLines[0] : "",
             "Everything the kit holds, by kind and then by name: documents open in your browser, samples run, and every other file opens in a window you read line by line. Enter opens the one you are on.");
@@ -627,7 +801,7 @@ private static bool runDialog()
         dlg.addBand();
         Button btnInix = dlg.addButton("&Inix explained", "What the inix format is, with an example read by the kit's own reader.");
         Button btnLayout = dlg.addButton("&Layout by Code", "How every Homer dialog is made, then a dialog that code builds.");
-        Button btnAsk = dlg.addButton("&Ask the local AI", "Ask the AI on this computer what the kit can do and how, with a map of the kit as its context.");
+        Button btnAsk = dlg.addButton("&Ask an AI", "Ask what the kit can do and how: the AI on this computer, or Claude Code when it is installed, typed or by voice.");
         Button btnConnect = dlg.addButton("Connect AI &tools", "Tell Claude Code, Codex, Gemini CLI and Antigravity where the kit is, once, so in any project they find its skills and code when you mention Homer.");
         dlg.endBand();
 

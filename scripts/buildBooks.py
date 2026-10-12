@@ -451,6 +451,27 @@ def ensureJava():
 def ensureEpubcheck():
     """EPUBCheck, the W3C's EPUB validator, from its latest GitHub release; checked for a newer release every few days."""
     if not ensureJava(): return False
+    # THE MACHINE-WIDE COPY FIRST (HomerDev 1.69.0). HomerDev's setup program installs EPUBCheck in
+    # %ProgramFiles%\EPUBCheck, shared by every project and out of reach of a kit upgrade; scripts\installEpubCheck
+    # keeps it current. When it is there it is used, and still compared with GitHub's latest release every
+    # toolRefreshDays, so a newer one is reported; this build cannot write to Program Files, so it says what updates it.
+    sMachine = os.path.join(os.environ.get("ProgramFiles", r"C:\Program Files"), "EPUBCheck")
+    if os.path.isfile(os.path.join(sMachine, "epubcheck.jar")):
+        sHave = open(os.path.join(sMachine, "version.txt"), encoding="utf-8").read().strip() if os.path.isfile(os.path.join(sMachine, "version.txt")) else ""
+        dTools["epubcheck"], dTools["epubcheckVersion"] = os.path.join(sMachine, "epubcheck.jar"), sHave
+        dKnown = cachedTool("epubcheckLatest")
+        sLatest = dKnown.get("version", "") if dKnown else ""
+        if not dKnown:
+            try:
+                oRequest = urllib.request.Request(c_sEpubcheckApi, headers={"User-Agent": dSettings["userAgent"], "Accept": "application/vnd.github+json"})
+                with urllib.request.urlopen(oRequest, timeout=60) as oResponse: sLatest = json.loads(oResponse.read().decode("utf-8")).get("tag_name", "").lstrip("v")
+                rememberTool("epubcheckLatest", [os.path.join(sMachine, "epubcheck.jar")], sLatest)
+            except Exception as oError:
+                log("EPUBCheck: GitHub could not be asked for the latest release: " + str(oError))
+        log("EPUBCheck machine-wide, version %s, latest %s: %s" % (sHave or "unknown", sLatest or "unknown", sMachine))
+        if sLatest and sHave and versionTuple(sLatest) > versionTuple(sHave):
+            say("EPUBCheck %s is out; %s is installed. HomerDev's setup program updates it, or run scripts\\installEpubCheck as administrator." % (sLatest, sHave))
+        return True
     sHome = os.path.join(dTools["kit"], "exec", "epubcheck")
     sStampFile = os.path.join(sHome, "version.txt")
     lJars = glob.glob(os.path.join(sHome, "**", "epubcheck.jar"), recursive=True)

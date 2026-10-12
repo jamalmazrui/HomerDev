@@ -32,7 +32,8 @@ Each skill holds the rules for one kind of work. Claude loads a skill by its des
 - **homer-build-release** -- run or troubleshoot build, tidy, push and release, with the checks inside them, and read their logs. `.claude/skills/homer-build-release/SKILL.md`
 - **homer-code** -- write or review code in Camel Type with the kit's shared classes. `.claude/skills/homer-code/SKILL.md`
 - **homer-convert** -- convert documents and data between formats, writing the Homer encoding. `.claude/skills/homer-convert/SKILL.md`
-- **homer-db** -- design or check a SQLite database the way DbDo opens it. `.claude/skills/homer-db/SKILL.md`
+- **homer-db** -- design or check a SQLite database the way DbDo opens it. `.claude/skills/homer-db/SKILL.md`
+- **homer-library-source** -- add a book library, such as Apple Books, to bookFido, or a source to any harvester. `.claude/skills/homer-library-source/SKILL.md`
 - **homer-docs** -- write or review an app's documents at a ninth-grade reading level. `.claude/skills/homer-docs/SKILL.md`
 - **homer-elevate** -- add or fix F11, Elevate Version, the update check. `.claude/skills/homer-elevate/SKILL.md`
 - **homer-installer** -- write or fix an Inno Setup installer and its finish page. `.claude/skills/homer-installer/SKILL.md`

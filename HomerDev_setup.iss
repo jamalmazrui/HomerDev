@@ -3,7 +3,7 @@
 ;
 ; WHAT IS HOMERDEV'S OWN HERE, against FileDir's: the whole kit is the file list, so a person has every template,
 ; skill, script, sample and document in a standard place; every component any Homer app offers is on the finish page
-; -- ten, alphabetical, plus the local AI model the HomerDev dialog's chat uses -- so one install sets a computer up
+; -- seventeen, alphabetical, the book tools and the developer's own tools included, plus the local AI model the HomerDev dialog's chat uses -- so one install sets a computer up
 ; for all of them; there are no JAWS scripts or NVDA add-on, since the kit has none of its own; and the HomerDev
 ; variable is set for the whole machine when it is not set already, so app builds find the kit in Program Files.
 ; Someone who works at the command line may install to C:\HomerDev instead, so the paths are shorter to type.
@@ -123,7 +123,7 @@ WelcomeLabel2=This will install [name/ver] on your computer.%n%n[name] -- the Ho
 ; samples' programs, the tutorials' audio. Left out: what is never shipped -- logs, notes, git's own folder,
 ; Python's virtual environments and caches, PyInstaller's work folders, the fingerprint store -- and this setup
 ; program itself. Each folder keeps its place, so a skill finds its references and a build finds the kit's code.
-Source: "*"; DestDir: "{app}"; Excludes: "\logs\*,\notes\*,.git,.venv,venv,__pycache__,*.pyc,\HomerDev_setup.exe,\HomerDev_setup.building.exe,\build_release.bat,\Templates\samples\build,\Templates\samples\dist,\exec\fingerprints.json,\exec\fingerprints.json.tmp"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "*"; DestDir: "{app}"; Excludes: "\logs\*,\notes\*,.git,.venv,venv,__pycache__,*.pyc,\HomerDev_setup.exe,\HomerDev_setup.building.exe,\build_release.bat,\Templates\samples\build,\Templates\samples\dist,\Samples,warn-*.txt,xref-*.html,*.toc,*.pyz,*.pkg,\exec\fingerprints.json,\exec\fingerprints.json.tmp"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Registry]
 ; HomerDev, FOR THE WHOLE MACHINE, ONLY WHEN IT IS NOT SET: every app's build looks for the kit by this variable
@@ -163,6 +163,19 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\exec\{#AppExeName}"; WorkingD
 
 ; ---- 1. Install, ticked --------------------------------------------------------
 ; Alphabetical by name; each worded Install, Update or Reinstall by its state (help\FinishPage.md).
+FileName: "{app}\scripts\installAce.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelAce}"; \
+  Check: isInstallAce; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+
+FileName: "{app}\scripts\installEpubCheck.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelEpubCheck}"; \
+  Check: isInstallEpubCheck; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installExifTool.cmd"; \
   Parameters: "noPause"; \
@@ -178,6 +191,20 @@ FileName: "{app}\scripts\installFfmpeg.cmd"; \
   Check: isInstallFfmpeg; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
+FileName: "{app}\scripts\installGit.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelGit}"; \
+  Check: isInstallGit; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+
+FileName: "{app}\scripts\installGitHubCli.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelGitHubCli}"; \
+  Check: isInstallGitHubCli; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+
 FileName: "{app}\scripts\installImageMagick.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
@@ -185,11 +212,25 @@ FileName: "{app}\scripts\installImageMagick.cmd"; \
   Check: isInstallImageMagick; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
+FileName: "{app}\scripts\installJava.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelJava}"; \
+  Check: isInstallJava; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+
 FileName: "{app}\scripts\installMpv.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelMpv}"; \
   Check: isInstallMpv; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+
+FileName: "{app}\scripts\installNode.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelNode}"; \
+  Check: isInstallNode; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installOllama.cmd"; \
@@ -211,6 +252,13 @@ FileName: "{app}\scripts\installPdfTools.cmd"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelPdfTools}"; \
   Check: isInstallPdfTools; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+
+FileName: "{app}\scripts\installPython.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelPython}"; \
+  Check: isInstallPython; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installTesseract.cmd"; \
@@ -242,6 +290,19 @@ FileName: "{app}\scripts\installModels.cmd"; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
 ; ---- 2. Update, ticked ---------------------------------------------------------
+FileName: "{app}\scripts\installAce.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelAce}"; \
+  Check: isUpdateAce; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+
+FileName: "{app}\scripts\installEpubCheck.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelEpubCheck}"; \
+  Check: isUpdateEpubCheck; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installExifTool.cmd"; \
   Parameters: "noPause"; \
@@ -257,6 +318,20 @@ FileName: "{app}\scripts\installFfmpeg.cmd"; \
   Check: isUpdateFfmpeg; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
+FileName: "{app}\scripts\installGit.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelGit}"; \
+  Check: isUpdateGit; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+
+FileName: "{app}\scripts\installGitHubCli.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelGitHubCli}"; \
+  Check: isUpdateGitHubCli; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+
 FileName: "{app}\scripts\installImageMagick.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
@@ -264,11 +339,25 @@ FileName: "{app}\scripts\installImageMagick.cmd"; \
   Check: isUpdateImageMagick; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
+FileName: "{app}\scripts\installJava.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelJava}"; \
+  Check: isUpdateJava; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+
 FileName: "{app}\scripts\installMpv.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelMpv}"; \
   Check: isUpdateMpv; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+
+FileName: "{app}\scripts\installNode.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelNode}"; \
+  Check: isUpdateNode; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installOllama.cmd"; \
@@ -290,6 +379,13 @@ FileName: "{app}\scripts\installPdfTools.cmd"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelPdfTools}"; \
   Check: isUpdatePdfTools; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+
+FileName: "{app}\scripts\installPython.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelPython}"; \
+  Check: isUpdatePython; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installTesseract.cmd"; \
@@ -314,6 +410,19 @@ FileName: "{app}\scripts\installYtDlp.cmd"; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
 
 ; ---- 3. Reinstall, unticked -----------------------------------------------------
+FileName: "{app}\scripts\installAce.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelAce}"; \
+  Check: isReinstallAce; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+
+FileName: "{app}\scripts\installEpubCheck.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelEpubCheck}"; \
+  Check: isReinstallEpubCheck; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installExifTool.cmd"; \
   Parameters: "noPause"; \
@@ -329,6 +438,20 @@ FileName: "{app}\scripts\installFfmpeg.cmd"; \
   Check: isReinstallFfmpeg; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
+FileName: "{app}\scripts\installGit.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelGit}"; \
+  Check: isReinstallGit; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+
+FileName: "{app}\scripts\installGitHubCli.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelGitHubCli}"; \
+  Check: isReinstallGitHubCli; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+
 FileName: "{app}\scripts\installImageMagick.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
@@ -336,11 +459,25 @@ FileName: "{app}\scripts\installImageMagick.cmd"; \
   Check: isReinstallImageMagick; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
+FileName: "{app}\scripts\installJava.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelJava}"; \
+  Check: isReinstallJava; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+
 FileName: "{app}\scripts\installMpv.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelMpv}"; \
   Check: isReinstallMpv; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+
+FileName: "{app}\scripts\installNode.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelNode}"; \
+  Check: isReinstallNode; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installOllama.cmd"; \
@@ -362,6 +499,13 @@ FileName: "{app}\scripts\installPdfTools.cmd"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelPdfTools}"; \
   Check: isReinstallPdfTools; \
+  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+
+FileName: "{app}\scripts\installPython.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelPython}"; \
+  Check: isReinstallPython; \
   Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installTesseract.cmd"; \
@@ -440,7 +584,7 @@ Type: filesandordirs; Name: "{localappdata}\{#AppName}\logs"
 #include HomerDev + "\Templates\HomerComponents.iss"
 
 var
-  iExifTool, iFfmpeg, iImageMagick, iMpv, iOllama, iPandoc, iPdfTools, iTesseract, iWhisper, iYtDlp: Integer;
+  iAce, iEpubCheck, iExifTool, iFfmpeg, iGit, iGitHubCli, iImageMagick, iJava, iMpv, iNode, iOllama, iPandoc, iPdfTools, iPython, iTesseract, iWhisper, iYtDlp: Integer;
   sActions: String;
   sPriorVersion: String;
 
@@ -454,20 +598,34 @@ begin
   //  proves it, what it is for in a few words, and the uninstall key name.
   //  Machine-wide tools go to their own default folders; an app upgrade must
   //  never remove them, so none is under {app}.
+  iAce := homerAdd('Ace by DAISY', '', 'ace',
+    '{userappdata}\npm\ace.cmd', 'checks the accessibility of EPUB books', '');
+  iEpubCheck := homerAdd('EPUBCheck', '', '',
+    '{pf}\EPUBCheck\epubcheck.jar', 'validates EPUB books', '');
   iExifTool := homerAdd('ExifTool', 'OliverBetz.ExifTool;PhilHarvey.ExifTool', 'exiftool',
     '', 'reads what a recording or photo knows about itself', 'ExifTool');
   iFfmpeg := homerAdd('ffmpeg', 'Gyan.FFmpeg', 'ffmpeg',
     '', 'converts audio and video, with ffprobe', '');
+  iGit := homerAdd('Git', 'Git.Git', 'git',
+    '{pf}\Git\cmd\git.exe', 'keeps each project''s history', 'Git_is1');
+  iGitHubCli := homerAdd('GitHub CLI', 'GitHub.cli', 'gh',
+    '{pf}\GitHub CLI\gh.exe', 'publishes projects and releases to GitHub', '');
   iImageMagick := homerAdd('ImageMagick', 'ImageMagick.ImageMagick', 'magick',
     '', 'converts and resizes images', 'ImageMagick');
+  iJava := homerAdd('Java', 'Microsoft.OpenJDK.21', '',
+    '', 'runs EPUBCheck', '');
   iMpv := homerAdd('mpv', 'shinchiro.mpv', 'mpv',
     '{pf}\MPV Player\mpv.exe', 'plays audio and video, including the tutorials', 'mpv');
+  iNode := homerAdd('Node.js', 'OpenJS.NodeJS.LTS;OpenJS.NodeJS', 'node',
+    '{pf}\nodejs\node.exe', 'runs Ace by DAISY and other JavaScript tools', '');
   iOllama := homerAdd('Ollama', 'Ollama.Ollama', 'ollama',
     '{localappdata}\Programs\Ollama\ollama.exe', 'runs the local AI model', 'Ollama');
   iPandoc := homerAdd('Pandoc', 'JohnMacFarlane.Pandoc', 'pandoc',
     '{pf}\Pandoc\pandoc.exe', 'converts documents between formats', 'Pandoc');
   iPdfTools := homerAdd('PDF tools', 'Python.Python.3.13', 'python',
     '', 'reads PDF files as text, through Python', 'Python 3.13');
+  iPython := homerAdd('Python', 'Python.Python.3.14;Python.Python.3.13', 'python',
+    '', 'runs the kit''s scripts', '');
   iTesseract := homerAdd('Tesseract', 'UB-Mannheim.TesseractOCR', 'tesseract',
     '{pf}\Tesseract-OCR\tesseract.exe', 'reads scanned pages', 'Tesseract-OCR');
   iWhisper := homerAdd('Whisper', '', '"{pf}\Whisper\whisper-cli.exe"',
@@ -549,6 +707,14 @@ end;
 //  ---- checkbox wording and visibility, one line each ----------------------
 //  AI NOTE FOR CUSTOMIZING: three functions per component, one per verb, and
 //  a label function; two per model. Name the model as installModels.cmd does.
+function labelAce(sParam: String): String;  begin Result := homerLabel(iAce); end;
+function isInstallAce(): Boolean;           begin Result := homerIs(iAce, 0); end;
+function isUpdateAce(): Boolean;            begin Result := homerIs(iAce, 1); end;
+function isReinstallAce(): Boolean;         begin Result := homerIs(iAce, 2); end;
+function labelEpubCheck(sParam: String): String;  begin Result := homerLabel(iEpubCheck); end;
+function isInstallEpubCheck(): Boolean;           begin Result := homerIs(iEpubCheck, 0); end;
+function isUpdateEpubCheck(): Boolean;            begin Result := homerIs(iEpubCheck, 1); end;
+function isReinstallEpubCheck(): Boolean;         begin Result := homerIs(iEpubCheck, 2); end;
 function labelExifTool(sParam: String): String;  begin Result := homerLabel(iExifTool); end;
 function isInstallExifTool(): Boolean;           begin Result := homerIs(iExifTool, 0); end;
 function isUpdateExifTool(): Boolean;            begin Result := homerIs(iExifTool, 1); end;
@@ -557,14 +723,30 @@ function labelFfmpeg(sParam: String): String;  begin Result := homerLabel(iFfmpe
 function isInstallFfmpeg(): Boolean;           begin Result := homerIs(iFfmpeg, 0); end;
 function isUpdateFfmpeg(): Boolean;            begin Result := homerIs(iFfmpeg, 1); end;
 function isReinstallFfmpeg(): Boolean;         begin Result := homerIs(iFfmpeg, 2); end;
+function labelGit(sParam: String): String;  begin Result := homerLabel(iGit); end;
+function isInstallGit(): Boolean;           begin Result := homerIs(iGit, 0); end;
+function isUpdateGit(): Boolean;            begin Result := homerIs(iGit, 1); end;
+function isReinstallGit(): Boolean;         begin Result := homerIs(iGit, 2); end;
+function labelGitHubCli(sParam: String): String;  begin Result := homerLabel(iGitHubCli); end;
+function isInstallGitHubCli(): Boolean;           begin Result := homerIs(iGitHubCli, 0); end;
+function isUpdateGitHubCli(): Boolean;            begin Result := homerIs(iGitHubCli, 1); end;
+function isReinstallGitHubCli(): Boolean;         begin Result := homerIs(iGitHubCli, 2); end;
 function labelImageMagick(sParam: String): String;  begin Result := homerLabel(iImageMagick); end;
 function isInstallImageMagick(): Boolean;           begin Result := homerIs(iImageMagick, 0); end;
 function isUpdateImageMagick(): Boolean;            begin Result := homerIs(iImageMagick, 1); end;
 function isReinstallImageMagick(): Boolean;         begin Result := homerIs(iImageMagick, 2); end;
+function labelJava(sParam: String): String;  begin Result := homerLabel(iJava); end;
+function isInstallJava(): Boolean;           begin Result := homerIs(iJava, 0); end;
+function isUpdateJava(): Boolean;            begin Result := homerIs(iJava, 1); end;
+function isReinstallJava(): Boolean;         begin Result := homerIs(iJava, 2); end;
 function labelMpv(sParam: String): String;  begin Result := homerLabel(iMpv); end;
 function isInstallMpv(): Boolean;           begin Result := homerIs(iMpv, 0); end;
 function isUpdateMpv(): Boolean;            begin Result := homerIs(iMpv, 1); end;
 function isReinstallMpv(): Boolean;         begin Result := homerIs(iMpv, 2); end;
+function labelNode(sParam: String): String;  begin Result := homerLabel(iNode); end;
+function isInstallNode(): Boolean;           begin Result := homerIs(iNode, 0); end;
+function isUpdateNode(): Boolean;            begin Result := homerIs(iNode, 1); end;
+function isReinstallNode(): Boolean;         begin Result := homerIs(iNode, 2); end;
 function labelOllama(sParam: String): String;  begin Result := homerLabel(iOllama); end;
 function isInstallOllama(): Boolean;           begin Result := homerIs(iOllama, 0); end;
 function isUpdateOllama(): Boolean;            begin Result := homerIs(iOllama, 1); end;
@@ -577,6 +759,10 @@ function labelPdfTools(sParam: String): String;  begin Result := homerLabel(iPdf
 function isInstallPdfTools(): Boolean;           begin Result := homerIs(iPdfTools, 0); end;
 function isUpdatePdfTools(): Boolean;            begin Result := homerIs(iPdfTools, 1); end;
 function isReinstallPdfTools(): Boolean;         begin Result := homerIs(iPdfTools, 2); end;
+function labelPython(sParam: String): String;  begin Result := homerLabel(iPython); end;
+function isInstallPython(): Boolean;           begin Result := homerIs(iPython, 0); end;
+function isUpdatePython(): Boolean;            begin Result := homerIs(iPython, 1); end;
+function isReinstallPython(): Boolean;         begin Result := homerIs(iPython, 2); end;
 function labelTesseract(sParam: String): String;  begin Result := homerLabel(iTesseract); end;
 function isInstallTesseract(): Boolean;           begin Result := homerIs(iTesseract, 0); end;
 function isUpdateTesseract(): Boolean;            begin Result := homerIs(iTesseract, 1); end;

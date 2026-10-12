@@ -262,8 +262,28 @@ def buildSample(sName, sScript, sExe):
         return finding("build " + sName, "fail",
                        "%s returned 0 but produced no %s" % (sScript, sExe))
     iBytes = os.path.getsize(sExePath)
+    recordSample(sName, sScript, sExe)
     return finding("build " + sName, "pass",
                    "%s returned 0 and wrote %s (%d bytes)" % (sScript, sExe, iBytes))
+
+
+def recordSample(sName, sScript, sExe):
+    """THE CHECK'S BUILDS COUNT AS BUILDS (1.68.2). This check builds every sample from clean, and a compiler stamps
+    each program with the time, so the program it leaves differs byte for byte from the one the build recorded. The
+    build then saw "FruitBasketCs.exe changed since it was made" and rebuilt all four, every cycle, with nothing
+    changed. A sample this check builds is now recorded in the same cache, with the build's own list of what a sample
+    is made from, so the build and the check agree on what is current."""
+    try:
+        sys.path.insert(0, c_sKit)
+        sys.path.insert(0, os.path.join(c_sKit, "scripts"))
+        import build, fingerprint
+        oCache = fingerprint.Cache(c_sKit, logLine)
+        sPrint = oCache.fingerprint(build.sampleInputs(sName, sScript))
+        oCache.record("sample " + sName, sPrint, ["Templates/samples/" + sExe])
+        logLine("recorded sample %s as built, so the next build need not build it again" % sName)
+    except Exception as oError:
+        logLine("sample %s not recorded, so the next build builds it again: %s" % (sName, oError))
+    return True
 
 
 # --- 4b. the environment and the shared tools -------------------------------

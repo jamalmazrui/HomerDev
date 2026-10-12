@@ -962,7 +962,7 @@ Now the dialog, from anywhere in Windows: Alt plus Control plus Shift plus D. D 
 
 Screen reader:
 
-- HomerDev, dialog
+- HomerDev 1.71.0, dialog
 - Kit contents, list box, Document: AGENTS, HomerDev is a development kit for building Windows programs, documents, books, databases, installers and spoken tutorials for people who use screen readers, 1 of 130
 
 ### Step 7: Control+J
@@ -1016,7 +1016,7 @@ I close the basket with Alt plus F4, and the HomerDev dialog is where I left it.
 
 Screen reader:
 
-- HomerDev, dialog
+- HomerDev 1.71.0, dialog
 - Kit contents, list box, Sample: FruitBasketCs, 23 of 130
 
 Confirm the wording with a live run: buildTutorials -live.
@@ -1033,7 +1033,7 @@ Confirm the wording with a live run: buildTutorials -live.
 
 ### Step 14: Tab
 
-Tab moves to the buttons. Play tutorials opens these ten walks in the Homer Player, Inix explained and Layout by Code show how settings and dialogs are written, Ask the local AI answers questions about the kit, typed or spoken, and Connect AI tools comes back in walk eight.
+Tab moves to the buttons. Play tutorials opens these ten walks in the Homer Player, Inix explained and Layout by Code show how settings and dialogs are written, Ask an AI answers questions about the kit, typed or spoken, from the AI on this computer or Claude Code, and Connect AI tools comes back in walk eight.
 
 Screen reader:
 
