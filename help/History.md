@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.21 -- 13 October 2026
+
+- **A readable-text skill.** .claude/skills/readable-text guides an AI tool in editing machine text -- caption files, transcripts, OCR output, hard-wrapped or escaped text -- into readable, faithful prose: paragraphs joined at real boundaries, recognition errors corrected only on evidence, doubtful words marked rather than guessed, nothing summarized, and the source and its limits stated. It was written with ChatGPT, kept under its MIT license, and given a section on Homer: HomerScribe's provenance lines, Homer document rules, and preferring captions a person uploaded. connectAI links it into Claude Code and Gemini with the other skills.
+- **Whisper large-v3 turbo by default.** installWhisper fetches ggml-large-v3-turbo-q5_0.bin, 547 MB and near large-v3's accuracy, unless a model is named.
+- **A large push is tried again.** When git push fails -- DbDo's 60 files, with the walks' audio and the 67 MB RadioTrail.db, ended "HTTP 408 ... the remote end hung up" -- push tries once more with a 500 MB buffer over HTTP/1.1, the usual remedy for a large push to GitHub timing out.
+
 ## 1.72.20 -- 13 October 2026
 
 - **Node.js was offered as Update on every install, and the update never happened.** Setup's comparison was right -- Node.js 25.9.0 installed, 26.8.1 the newest long-term release -- but installNode decided which winget package owned Node.js from winget list's exit code, which is 0 on some machines while it prints "No installed package found". It took the long-term package as installed, winget upgrade found nothing, and the script said Node.js was "already the newest winget offers" and succeeded. Nothing changed, so the next install offered Update again. Now a package counts as installed only when winget lists its id; Node.js installed outside winget is updated by installing the long-term package over it, as Node's installers allow; and the version before and after is logged.

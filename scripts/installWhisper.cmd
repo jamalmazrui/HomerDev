@@ -42,7 +42,9 @@ if not exist "%~dp0installCommon.cmd" (
 )
 call "%~dp0installCommon.cmd" setup "%~f0" %*
 
-set "model=small"
+rem LARGE-V3 TURBO BY DEFAULT (13 October 2026): quantized to five bits it is 547 MB, about the size of small (466 MB),
+rem and hears nearly as well as large-v3 (2.9 GB). A model named on the command line still wins.
+set "model=large-v3-turbo-q5_0"
 set "noPause="
 for %%A in (%*) do (
   if /i "%%A"=="noPause" (set "noPause=1") else (set "model=%%A")
@@ -188,7 +190,7 @@ rem same as checking that the command succeeded, and this script was doing the
 rem second while claiming the first.
 if not exist "%whisperDir%\whisper-cli.exe" goto :notReady
 if not exist "%whisperDir%\ggml-%model%.bin" goto :notReady
-echo Whisper is ready. the program uses it to transcribe speech, and to find
+echo Whisper is ready. The program uses it to transcribe speech, and to find
 echo where descriptions can be spoken without covering the dialogue.
 echo(
 rem No key press when the installer runs this hidden.
