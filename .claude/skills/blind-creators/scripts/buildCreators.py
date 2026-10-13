@@ -165,7 +165,9 @@ def render(lPeople, sVersion):
     w = L.append
     w("---")
     w('title: "Blind Creators"')
-    w('subtitle: "' + sSubtitle + '"')
+    # A COUNTED SUBTITLE (13 October 2026): every directory's subtitle begins "A Directory of <count>", computed here,
+    # so it can never go stale the way a typed count did.
+    w('subtitle: "A Directory of ' + str(iTotal) + ' People ' + sSubtitle + '"')
     w('author: "Jamal Mazrui"')
     w('date: "' + datetime.date.today().strftime("%B %Y") + '"')
     if sVersion: w('version: "' + sVersion + '"')
@@ -214,8 +216,15 @@ def render(lPeople, sVersion):
     w("## Table of Contents {#table-of-contents}")
     w("")
     w("- [Introduction](#introduction)")
+    w("- [By the Numbers](#by-the-numbers)")
     for p in lPeople: w("- [" + p["name"] + "](#" + p["anchor"] + ")")
     w("- [Conclusion](#conclusion)")
+    w("")
+    # BY THE NUMBERS (13 October 2026): a few observations computed from the same lists, never typed.
+    w("## By the Numbers {#by-the-numbers}")
+    w("")
+    w("- " + plural(iTotal, "creator", "creators") + ": " + str(dCat["Books"]) + " authors, " + str(dCat["Apps"]) + " developers and " + str(dCat["Presentations"]) + " presenters.")
+    w("- " + plural(len(lTwo), "person works", "people work") + " in two of the three ways, and " + plural(len(lThree), "person", "people") + " in all three.")
     w("")
     for p in lPeople:
         w("## " + p["name"] + " {#" + p["anchor"] + "}")

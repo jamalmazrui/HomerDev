@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.17 -- 13 October 2026
+
+- **Blind Creators states its size in its subtitle, and its numbers.** buildCreators writes the subtitle as "A Directory of <count> People ...", computed from the people it lists, and a short By the Numbers section after the contents: the authors, developers and presenters, and how many people work in two or three of those ways. Both are computed each run, so neither can go stale the way a typed count did.
+
 ## 1.72.16 -- 13 October 2026
 
 - **The development kit comes before the installed one, everywhere.** The installer sets the HomerDev variable to the installed kit, which lags the development kit until it is installed, and several finders looked at the variable first. So MyBooks' kdpSubmit.cmd copied in the installed kdpSubmit, version 38, over version 39, and kdpSubmit stopped at once, looking for the single answers file version 39 replaced with one per book. kdpSubmit, kdpBooks, kdpUpdate and buildBooks (their launchers and buildBooks.locateKit), kind.findKit, and the kind.py check.py imports now look beside and above the project, then at the top of each drive, and use the variable last. The book launchers write the kit they chose, and its version, to their setup log.
