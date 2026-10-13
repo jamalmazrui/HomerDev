@@ -20,7 +20,7 @@ title), --brief (one-sentence summaries), --nosummary, --noappendix.
 """
 import argparse, csv, datetime, html, os, re, shutil, subprocess, sys
 
-c_lMonths = ["January", "February", "March", "April", "May", "June", "July",
+lMonths = ["January", "February", "March", "April", "May", "June", "July",
              "August", "September", "October", "November", "December"]
 oLog = None
 
@@ -164,7 +164,7 @@ def build(cfg, rows):
         if lk and lk != au and not lk.lower().endswith(".mp3") and linkcount.get(lk, 0) == 1 \
            and len(re.sub(r"^https?://[^/]+", "", lk).strip("/").split("/")) >= 2:
             w("[Episode page](" + lk + ")"); w()
-        if r["_dt"]: w("**Date:** " + c_lMonths[r["_dt"].month - 1] + " " + str(r["_dt"].day) + ", " + str(r["_dt"].year)); w()
+        if r["_dt"]: w("**Date:** " + lMonths[r["_dt"].month - 1] + " " + str(r["_dt"].day) + ", " + str(r["_dt"].year)); w()
         if (r.get("duration") or "").strip(): w("**Duration:** " + r["duration"].strip()); w()
         if (r.get("episode") or "").strip(): w("**Episode:** " + r["episode"].strip()); w()
         if g_guest and r["_guest"]: w("**Guest:** " + r["_guest"]); w()
@@ -183,7 +183,7 @@ def build(cfg, rows):
     for y in sorted(years, reverse=True):
         w("### " + str(y)); w()
         for r in sorted(yrep[y], key=lambda r: r["_dt"], reverse=True):
-            w("- [" + r["_title"] + "](#" + r["_anchor"] + ") \u2014 " + c_lMonths[r["_dt"].month - 1] + " " + str(r["_dt"].day))
+            w("- [" + r["_title"] + "](#" + r["_anchor"] + ") \u2014 " + lMonths[r["_dt"].month - 1] + " " + str(r["_dt"].day))
         w()
     w("## Appendix B: Episodes by Title {#appendix-b-episodes-by-title}"); w()
     w('Every episode in order by title, ignoring a leading "A", "An", or "The".'); w()

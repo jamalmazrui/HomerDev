@@ -26,10 +26,10 @@ import datetime, glob, html, os, platform, re, sys, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import kdpSubmit as k
 
-c_iSignInMinutes = 20
-c_lFlags = ["--apply", "--asin", "--categories", "--dry-run", "--export", "--no-publish"]  # --apply is accepted and means nothing now: applying is what the script does
-c_sAsinPattern = r"\b(B0[A-Z0-9]{8}|\d{9}[\dX])\b"
-c_sVersion = "2026-10-05 version 14: a description that differs from KDP's only in its bullet markers (KDP shows a bullet character, the file writes a dash) no longer counts as a change, so a matching book is not resubmitted; was version 13, from the 08:13 categories run, which walked all 32 top-level categories in 26 minutes but read four of them wrongly (Science & Math came out as a copy of Romance, Parenting & Relationships as another tree, Foreign Languages and Nonfiction as empty), because KDP adds and removes picker menus as the chain changes and the walk counted menus from a fixed starting point: the chain's top menu is now found afresh at every step as the last menu holding the top-level list, every pick is checked by reading the menu's chosen option back, a level that shows the top-level list again or repeats the previous category's sub-menus is retried, and a category not read after two tries is left for the next run instead of being marked done; a plain run now checks each proposed category path against the walked list before the picker opens, drops a path KDP does not offer and says so, and leaves alone paths under a top-level category not yet walked; was version 12, from the 07:36 categories run, which walked four top-level categories in ten minutes and crashed when the Details page reloaded under it: the walk now writes data\\kdpCategories.inix and .md after every top-level category and skips, on the next run, the ones already walked; when the picker's menus vanish it reopens the picker, replays the path and goes on, trying each branch twice before skipping it; a top-level category that reads empty is retried the same way; was version 11: --categories walks KDP's whole category picker once, through one book's Details page, and writes every menu and placement to data\\kdpCategories.inix and .md, pressing Cancel at the end so nothing is saved; with that list the proposed paths can be ones KDP offers, and General is chosen only on purpose; was version 10, from the 16:46 run: the Content tab's accuracy confirmation boxes are ticked before Save and Continue, and a refusal for either box brings one more look; the picker fixes are in kdpSubmit version 29; was version 9, from the 15:15 run, which published 13 of 22 books: when KDP still asks for the DRM consent after the box was looked for, the Content tab's controls are logged and the box is looked for once more before giving up; KDP's Categories update notice is closed before the picker opens; the picker, DRM and placement fixes are in kdpSubmit version 28; was version 8: applying is the default: each book is read and then, when its file proposes something KDP does not hold, changed and published in the same pass, with --export for a read-only run; the Adult-only question is answered No where KDP has no answer (three older books had none, and the category picker refused to open); DRM is set to No with KDP's consent box ticked on every book, so each can be bought as a DRM-free EPUB; a book already matching its file is left alone; was version 7: a single-dash option such as -apply is read as --apply (the 14:12 run typed one dash and got a plain export); each Bookshelf row's cover image id is read, for matching Author Central's title-less cards; was version 6: the book files live in data\\books\\, which is kept across sessions, not data\\books\\; categories are read as paths from KDP's own list; --apply sends each file's [proposed] values to KDP through kdpSubmit's description, keyword, category and pricing routines and presses Publish, with --no-publish to stop at the saved draft; was version 5, from the 13:36 run, which logged the Bookshelf's controls at last: a 10, 25 or 50 Per Page drop-down and page links 1, 2, 3 and next. The drop-down is set to 50 Per Page first, so every book is on one page, and the page links are followed by number when it is not; rows are compared as sets of ids, since scrolling doubles the title spans; was version 4, from the 13:22 run: the Bookshelf loop is rebuilt so that scrolling, the foot-of-page control dump and the Next control are all reached (version 3 stopped before them when scrolling only doubled the title spans); the Next control is the last visible one of several candidates, since a carousel at the top has its own; was version 3, from the 13:12 run: the Bookshelf showed ten rows and no paging control at all, so the page is scrolled to its end and any Load more or Show more button pressed until the rows stop growing, and the controls at the foot of the page are logged; the series block is read whole; was version 2, from the 12:41 and 12:42 runs: the title id comes from the row's own title-setup link, or from clicking the title, not from the row's span id, which is a different code (every Details page opened as a 404); the Bookshelf's Next link is pressed only after the page has fully loaded, since its handler is not attached at domcontentloaded (page 1 was read twice); an interrupted navigation no longer crashes the run; was version 1: reads every published book's KDP metadata into data\\books\\<Title>.inix; nothing is changed on KDP"
+iSignInMinutes = 20
+lFlags = ["--apply", "--asin", "--categories", "--dry-run", "--export", "--no-publish"]  # --apply is accepted and means nothing now: applying is what the script does
+sAsinPattern = r"\b(B0[A-Z0-9]{8}|\d{9}[\dX])\b"
+sVersion = "2026-10-05 version 14: a description that differs from KDP's only in its bullet markers (KDP shows a bullet character, the file writes a dash) no longer counts as a change, so a matching book is not resubmitted; was version 13, from the 08:13 categories run, which walked all 32 top-level categories in 26 minutes but read four of them wrongly (Science & Math came out as a copy of Romance, Parenting & Relationships as another tree, Foreign Languages and Nonfiction as empty), because KDP adds and removes picker menus as the chain changes and the walk counted menus from a fixed starting point: the chain's top menu is now found afresh at every step as the last menu holding the top-level list, every pick is checked by reading the menu's chosen option back, a level that shows the top-level list again or repeats the previous category's sub-menus is retried, and a category not read after two tries is left for the next run instead of being marked done; a plain run now checks each proposed category path against the walked list before the picker opens, drops a path KDP does not offer and says so, and leaves alone paths under a top-level category not yet walked; was version 12, from the 07:36 categories run, which walked four top-level categories in ten minutes and crashed when the Details page reloaded under it: the walk now writes data\\kdpCategories.inix and .md after every top-level category and skips, on the next run, the ones already walked; when the picker's menus vanish it reopens the picker, replays the path and goes on, trying each branch twice before skipping it; a top-level category that reads empty is retried the same way; was version 11: --categories walks KDP's whole category picker once, through one book's Details page, and writes every menu and placement to data\\kdpCategories.inix and .md, pressing Cancel at the end so nothing is saved; with that list the proposed paths can be ones KDP offers, and General is chosen only on purpose; was version 10, from the 16:46 run: the Content tab's accuracy confirmation boxes are ticked before Save and Continue, and a refusal for either box brings one more look; the picker fixes are in kdpSubmit version 29; was version 9, from the 15:15 run, which published 13 of 22 books: when KDP still asks for the DRM consent after the box was looked for, the Content tab's controls are logged and the box is looked for once more before giving up; KDP's Categories update notice is closed before the picker opens; the picker, DRM and placement fixes are in kdpSubmit version 28; was version 8: applying is the default: each book is read and then, when its file proposes something KDP does not hold, changed and published in the same pass, with --export for a read-only run; the Adult-only question is answered No where KDP has no answer (three older books had none, and the category picker refused to open); DRM is set to No with KDP's consent box ticked on every book, so each can be bought as a DRM-free EPUB; a book already matching its file is left alone; was version 7: a single-dash option such as -apply is read as --apply (the 14:12 run typed one dash and got a plain export); each Bookshelf row's cover image id is read, for matching Author Central's title-less cards; was version 6: the book files live in data\\books\\, which is kept across sessions, not data\\books\\; categories are read as paths from KDP's own list; --apply sends each file's [proposed] values to KDP through kdpSubmit's description, keyword, category and pricing routines and presses Publish, with --no-publish to stop at the saved draft; was version 5, from the 13:36 run, which logged the Bookshelf's controls at last: a 10, 25 or 50 Per Page drop-down and page links 1, 2, 3 and next. The drop-down is set to 50 Per Page first, so every book is on one page, and the page links are followed by number when it is not; rows are compared as sets of ids, since scrolling doubles the title spans; was version 4, from the 13:22 run: the Bookshelf loop is rebuilt so that scrolling, the foot-of-page control dump and the Next control are all reached (version 3 stopped before them when scrolling only doubled the title spans); the Next control is the last visible one of several candidates, since a carousel at the top has its own; was version 3, from the 13:12 run: the Bookshelf showed ten rows and no paging control at all, so the page is scrolled to its end and any Load more or Show more button pressed until the rows stop growing, and the controls at the foot of the page are logged; the series block is read whole; was version 2, from the 12:41 and 12:42 runs: the title id comes from the row's own title-setup link, or from clicking the title, not from the row's span id, which is a different code (every Details page opened as a 404); the Bookshelf's Next link is pressed only after the page has fully loaded, since its handler is not attached at domcontentloaded (page 1 was read twice); an interrupted navigation no longer crashes the run; was version 1: reads every published book's KDP metadata into data\\books\\<Title>.inix; nothing is changed on KDP"
 
 
 def log(sText): return k.log(sText)
@@ -64,12 +64,12 @@ def htmlToText(sHtml):
 
 def bookshelfRows(page, dSettings=None):
     """Every title row on every page of the KDP Bookshelf: dictionaries with id, title, asin, status. Series rows (Book in ...) are skipped."""
-    sUrl = (dSettings or {}).get("bookshelfUrl", k.c_sBookshelfUrl)
+    sUrl = (dSettings or {}).get("bookshelfUrl", k.sBookshelfUrl)
     page.goto(sUrl, wait_until="domcontentloaded")
     time.sleep(1)
     if "kdp.amazon.com" not in page.url or "/ap/" in page.url:
-        say("KDP wants its own sign-in. Sign in in the window; I am waiting up to " + str(c_iSignInMinutes) + " minutes.")
-        dtEnd = datetime.datetime.now() + datetime.timedelta(minutes=c_iSignInMinutes)
+        say("KDP wants its own sign-in. Sign in in the window; I am waiting up to " + str(iSignInMinutes) + " minutes.")
+        dtEnd = datetime.datetime.now() + datetime.timedelta(minutes=iSignInMinutes)
         while datetime.datetime.now() < dtEnd and ("kdp.amazon.com" not in page.url or "/ap/" in page.url): time.sleep(3)
         if "kdp.amazon.com" not in page.url or "/ap/" in page.url: return None
     lRows = []
@@ -96,7 +96,7 @@ def bookshelfRows(page, dSettings=None):
                 lOut.push({id: sSetup, cover: sCover, spanId: (t.id || "").split("-").pop(), hrefs: e ? Array.from(e.querySelectorAll("a[href]")).map(a => a.getAttribute("href")).slice(0, 6) : [], title: sMine, asin: m ? m[1].toUpperCase() : "", status: /\\bLive\\b/i.test(sRow) ? "Live" : (/In Review|Publishing/i.test(sRow) ? "In Review" : (/Draft/i.test(sRow) ? "Draft" : "")), review: /updates in review/i.test(sRow)});
             }
             return lOut;
-        }""", c_sAsinPattern)
+        }""", sAsinPattern)
 
     def addRows(lHere):
         lNew = [r for r in lHere if not any(r["spanId"] == x["spanId"] and r["asin"] == x["asin"] and r["title"] == x["title"] for x in lRows)]
@@ -195,7 +195,7 @@ def bookshelfRows(page, dSettings=None):
 
 def titleIdByClicking(page, r):
     """Opens the book's setup page by clicking its title on the Bookshelf, as kdpSubmit does, and returns the title id from the URL."""
-    page.goto(k.c_sBookshelfUrl, wait_until="domcontentloaded")
+    page.goto(k.sBookshelfUrl, wait_until="domcontentloaded")
     try:
         page.wait_for_load_state("load", timeout=15000)
     except Exception:
@@ -219,7 +219,7 @@ def titleIdByClicking(page, r):
 def readDetails(page, sId):
     """Reads the Details page of one title. Returns a dictionary, or None when KDP would not open the page."""
     try:
-        page.goto(k.c_sTitleSetup + sId + "/details", wait_until="domcontentloaded")
+        page.goto(k.sTitleSetup + sId + "/details", wait_until="domcontentloaded")
     except Exception as oError:  # KDP interrupts the navigation with its own redirect for a locked or unknown title
         log("Opening the Details page of " + sId + " was interrupted: " + str(oError).splitlines()[0][:160])
     for iTick in range(30):
@@ -288,7 +288,7 @@ def categoriesFromText(sText):
 
 def readPricing(page, sId):
     try:
-        page.goto(k.c_sTitleSetup + sId + "/pricing", wait_until="domcontentloaded")
+        page.goto(k.sTitleSetup + sId + "/pricing", wait_until="domcontentloaded")
     except Exception as oError:
         log("Opening the Pricing page of " + sId + " was interrupted: " + str(oError).splitlines()[0][:160])
     for iTick in range(30):
@@ -350,8 +350,8 @@ def changesWanted(dFile):
     if sDescription and not sameText(sDescription, dKdp.get("description", "")): lWanted.append("description")
     lKeywords = k.inixList(dProposed.get("keywords", ""))
     if lKeywords and [w.lower() for w in lKeywords] != [w.lower() for w in k.inixList(dKdp.get("keywords", ""))]: lWanted.append("keywords")
-    lCategories = [k.c_dCategoryFixes.get(c, c) for c in k.inixList(dProposed.get("categories", ""))]
-    lHeld = [k.c_dCategoryFixes.get(c, c) for c in k.inixList(dKdp.get("categories", ""))]
+    lCategories = [k.dCategoryFixes.get(c, c) for c in k.inixList(dProposed.get("categories", ""))]
+    lHeld = [k.dCategoryFixes.get(c, c) for c in k.inixList(dKdp.get("categories", ""))]
     if lCategories and sorted(c.lower() for c in lCategories) != sorted(c.lower() for c in lHeld): lWanted.append("categories")
     sPrice = dProposed.get("priceUsd", "").strip()
     if sPrice and ("%.2f" % float(sPrice)) != ("%.2f" % float(dKdp.get("priceUsd") or 0)): lWanted.append("price $" + sPrice)
@@ -400,7 +400,7 @@ def applyBook(page, sPath):
                   "description": sDescription or dKdp.get("description", ""), "keywords": lKeywords or k.inixList(dKdp.get("keywords", "")), "categories": lCategories or k.inixList(dKdp.get("categories", "")),
                   "drm": "No", "kdpSelect": dKdp.get("kdpSelect", "No"), "royalty": royaltyFor(sPrice, dKdp.get("royalty", "")), "priceUsd": sPrice or dKdp.get("priceUsd", ""), "territories": "All"}
     try:
-        page.goto(k.c_sTitleSetup + sId + "/details", wait_until="domcontentloaded")
+        page.goto(k.sTitleSetup + sId + "/details", wait_until="domcontentloaded")
     except Exception as oError:
         log("Opening the Details page was interrupted: " + str(oError).splitlines()[0][:160])
     for iTick in range(30):
@@ -464,7 +464,7 @@ class PickerLost(Exception):
 def openPicker(page, sId):
     """Opens one book's Details page and its category picker; returns True when the picker's menus can be reached."""
     try:
-        page.goto(k.c_sTitleSetup + sId + "/details", wait_until="domcontentloaded")
+        page.goto(k.sTitleSetup + sId + "/details", wait_until="domcontentloaded")
     except Exception as oError:
         log("Opening the Details page was interrupted: " + str(oError).splitlines()[0][:160])
     for iTick in range(30):
@@ -713,15 +713,15 @@ def walkPicker(page, sId=""):
 
 def main():
     sys.argv = [("-" + a) if re.match(r"^-[a-z]", a) else a for a in sys.argv]  # -export means --export; the 14:12 run typed one dash and was misread
-    if any(a.startswith("--") and a not in c_lFlags for a in sys.argv[1:]):
-        print("Unknown option. Allowed: " + " ".join(c_lFlags) + ". Nothing was done.")
+    if any(a.startswith("--") and a not in lFlags for a in sys.argv[1:]):
+        print("Unknown option. Allowed: " + " ".join(lFlags) + ". Nothing was done.")
         return 2
     os.makedirs(os.path.join(k.sProject, "logs"), exist_ok=True)
     sStem = os.path.basename(k.sProject)  # the project's own name: one copy of the kit's tools serves every project
     k.sLogPath = os.path.join(k.sProject, "logs", sStem + "-kdpBooks-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + ".log")
-    log("kdpBooks.py started; " + c_sVersion + "; script " + os.path.abspath(__file__))
+    log("kdpBooks.py started; " + sVersion + "; script " + os.path.abspath(__file__))
     log("Python " + sys.version.split()[0] + " on " + platform.platform() + "; project " + k.sProject + "; command line " + " ".join(sys.argv))
-    print("kdpBooks " + c_sVersion.split(":")[0])
+    print("kdpBooks " + sVersion.split(":")[0])
     sOnly = k.argValue("--asin").upper()
     bExport = "--export" in sys.argv
     try:

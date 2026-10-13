@@ -162,7 +162,7 @@ first; a large file that must not go up needs one line in the second.
    base class library, WinForms, and each other, and nothing else. A module
    that would need a package belongs to the app that needs it, or to the
    conversion engine, whose packages are fetched when they are used.
-3. Add it to `c_lsExpected` in `build.py`.
+3. Add it to `lsExpected` in `build.py`.
 4. Add a commented line for it in `Templates\build_APP_.cmd`, so a new app can
    switch it on by uncommenting.
 5. Describe it in HomerDev.md.

@@ -14,7 +14,7 @@
 // The script reads only the rows in the current view, so the filter and
 // sort you set beforehand decide exactly what lands in the file.
 
-var c_sOut = "MySchedule.html";
+var sOut = "MySchedule.html";
 
 // esc: minimal HTML escaping for any field value that might contain
 // an ampersand or angle bracket (event titles sometimes do).
@@ -46,7 +46,7 @@ while (!db.eof) {
 }
 if (sLastDate != null) sb.AppendLine("</tbody></table>");
 sb.AppendLine("</body></html>");
-System.IO.File.WriteAllText(c_sOut, sb.ToString());
+System.IO.File.WriteAllText(sOut, sb.ToString());
 
 // The final expression is what Invoke Script reports back to you.
-"Wrote " + iCount + " events to " + c_sOut + ".";
+"Wrote " + iCount + " events to " + sOut + ".";

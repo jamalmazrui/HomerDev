@@ -23,7 +23,7 @@
 // organizations rather than people are written with the organization name as
 // the card name.
 
-var c_sOut = "MyContacts.vcf";
+var sOut = "MyContacts.vcf";
 
 // vcText: escape a vCard TEXT value -- backslash first, then semicolon,
 // comma, and any line break collapsed to a literal \n. Structured values
@@ -108,7 +108,7 @@ while (!db.eof) {
   db.moveNext();
 }
 
-System.IO.File.WriteAllText(c_sOut, sb.ToString());
+System.IO.File.WriteAllText(sOut, sb.ToString());
 
 // The final expression is what Invoke Script reports back to you.
-"Wrote " + iCount + " contact card(s) to " + c_sOut + ". Import it into your phone or contacts app to add the people you marked.";
+"Wrote " + iCount + " contact card(s) to " + sOut + ". Import it into your phone or contacts app to add the people you marked.";

@@ -75,7 +75,7 @@ namespace Homer {
 public static class Log
 {
     // How many session logs to keep. Thirty reaches back through a few weeks.
-    public const int c_iKeepLogs = 30;
+    public const int iKeepLogs = 30;
 
     public static bool bWorking = false;
     private static bool bCrashWatch = false;
@@ -394,11 +394,11 @@ public static class Log
                 new DirectoryInfo(sFolder).GetFiles(sAppName + "-*.log"));
             loLogs.Sort(delegate(FileInfo oOne, FileInfo oTwo)
             { return oTwo.LastWriteTime.CompareTo(oOne.LastWriteTime); });
-            for (int i = c_iKeepLogs; i < loLogs.Count; i++)
+            for (int i = iKeepLogs; i < loLogs.Count; i++)
             {
                 try { loLogs[i].Delete(); iRemoved++; } catch (Exception) { }
             }
-            if (iRemoved > 0) info("prune removed=" + iRemoved + " kept=" + c_iKeepLogs);
+            if (iRemoved > 0) info("prune removed=" + iRemoved + " kept=" + iKeepLogs);
         }
         catch (Exception)
         {

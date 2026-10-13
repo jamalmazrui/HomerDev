@@ -18,8 +18,8 @@ not be read.
 
 import io, os, re, sys, tempfile, zipfile
 
-c_iMaxErrors = 3  # enough to show where a failure began without flooding
-c_reName = re.compile(r"^(?P<app>[A-Za-z0-9]+)-(?:(?P<task>[a-z][A-Za-z-]*?)-)?(?P<stamp>\d{8}-\d{6})(?:-\d+)*\.(?:log|md)$")
+iMaxErrors = 3  # enough to show where a failure began without flooding
+reName = re.compile(r"^(?P<app>[A-Za-z0-9]+)-(?:(?P<task>[a-z][A-Za-z-]*?)-)?(?P<stamp>\d{8}-\d{6})(?:-\d+)*\.(?:log|md)$")
 
 
 def readText(sPath):
@@ -41,7 +41,7 @@ def firstMatch(sText, sPattern):
 def errorLines(sText):
     lsErrors = [s.strip() for s in sText.splitlines()
                 if re.search(r"\bERROR\b|\bFAILED\b|Traceback", s)]
-    return lsErrors[:c_iMaxErrors]
+    return lsErrors[:iMaxErrors]
 
 
 def summarizeBuild(sText):
@@ -64,7 +64,7 @@ def summarizeBuild(sText):
     # build names the apps whose build script is stale this way.
     lsWarn = [re.sub(r"^\S+ WARN\s+", "", s.strip()) for s in sText.splitlines()
               if re.match(r"^\S+ WARN ", s) and "CONSOLE:" not in s]
-    lsOut += ["WARN " + s[:120] for s in lsWarn[:c_iMaxErrors]]
+    lsOut += ["WARN " + s[:120] for s in lsWarn[:iMaxErrors]]
     # UNFINISHED IS NOT FAILED (8 October 2026): a build still speaking its walks,
     # queued behind another project's, has written no end line yet; three such
     # builds were reported FAILED while they waited their turn.
@@ -169,7 +169,7 @@ def summarizeKdpUpdate(sText):
     return lsFacts, bFailed
 
 
-c_dSummarizers = {"build": summarizeBuild, "buildBooks": summarizeBuildBooks, "kdpUpdate": summarizeKdpUpdate, "check": summarizeCheck, "release": summarizeRelease,
+dSummarizers = {"build": summarizeBuild, "buildBooks": summarizeBuildBooks, "kdpUpdate": summarizeKdpUpdate, "check": summarizeCheck, "release": summarizeRelease,
                   "tidy": summarizeTidy, "push": summarizePush, "": summarizeSession}
 
 
@@ -179,7 +179,7 @@ def collect(sFolder):
     iSkipped = 0
     for sDir, lsDirs, lsFiles in os.walk(sFolder):
         for sName in lsFiles:
-            oMatch = c_reName.match(sName)
+            oMatch = reName.match(sName)
             if not oMatch or not sName.endswith(".log"):
                 iSkipped += 1
                 continue
@@ -212,7 +212,7 @@ def main():
         for sTask in sorted(set(s[1] for s in dRuns if s[0] == sApp)):
             lRuns = dRuns[(sApp, sTask)]
             for sStamp, sPath in (lRuns if bAll else lRuns[:1]):
-                fnSummarize = c_dSummarizers.get(sTask, summarizeOther)
+                fnSummarize = dSummarizers.get(sTask, summarizeOther)
                 try:
                     lsFacts, bFailed = fnSummarize(readText(sPath))
                 except Exception as oError:

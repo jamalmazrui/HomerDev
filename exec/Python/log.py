@@ -61,7 +61,7 @@ import traceback
 
 import paths
 # How many session logs to keep. Thirty reaches back through a few weeks.
-c_iKeepLogs = 30
+iKeepLogs = 30
 
 bWorking = False
 dtStarted = datetime.datetime.now()
@@ -286,7 +286,7 @@ def _appVersion():
 
 # --- housekeeping -----------------------------------------------------------
 
-def prune(iKeep=c_iKeepLogs):
+def prune(iKeep=iKeepLogs):
     """Keep the most recent logs and remove the rest, silently."""
     iRemoved = 0
     try:

@@ -44,13 +44,13 @@ public static class Ollama {
 // The local server. Ollama binds this by default and every program on the
 // machine shares it, which is why one installation serves EdSharp, DbDo and
 // FileDir alike.
-public const string c_sHost = "http://localhost:11434";
+public const string sHost = "http://localhost:11434";
 
 // Models in the order FileDir prefers them for translation. qwen2.5:7b is
 // markedly better at languages; llama3.2 is smaller, quicker, and good enough
 // to try the feature with. Naming them matters: "a stronger model" tells
 // nobody what they are getting or what to look for in Ollama afterwards.
-public static readonly string[] c_aTranslateModels = {"qwen2.5:7b", "llama3.2"};
+public static readonly string[] aTranslateModels = {"qwen2.5:7b", "llama3.2"};
 
 private static string sModelListCache = null;
 
@@ -101,7 +101,7 @@ public static string bestTranslateModel() {
 // The best installed model for translation, or an empty string when none of
 // the known ones is there. The caller decides what to say about that; this
 // never invents a name.
-foreach (string sModel in c_aTranslateModels) if (hasModel(sModel)) return sModel;
+foreach (string sModel in aTranslateModels) if (hasModel(sModel)) return sModel;
 return "";
 } // bestTranslateModel method
 
@@ -200,7 +200,7 @@ private static string get(string sPath, int iTimeoutMs) {
 // as "Ollama is not running", which is the only thing a failed /api/tags can
 // mean that the person can act on.
 try {
-HttpWebRequest request = (HttpWebRequest) WebRequest.Create(c_sHost + sPath);
+HttpWebRequest request = (HttpWebRequest) WebRequest.Create(sHost + sPath);
 request.Method = "GET";
 request.Timeout = iTimeoutMs;
 request.ReadWriteTimeout = iTimeoutMs;
@@ -216,7 +216,7 @@ return "";
 private static string post(string sPath, string sBody, int iTimeoutMs, out string sError) {
 sError = "";
 try {
-HttpWebRequest request = (HttpWebRequest) WebRequest.Create(c_sHost + sPath);
+HttpWebRequest request = (HttpWebRequest) WebRequest.Create(sHost + sPath);
 request.Method = "POST";
 request.ContentType = "application/json";
 request.Timeout = iTimeoutMs;

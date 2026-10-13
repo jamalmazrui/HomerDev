@@ -34,14 +34,14 @@ namespace Homer {
 
 public class VoiceRecorder : IDisposable {
 
-private const int c_iBitsPerSample = 16;
-private const int c_iBufferCount = 10;
-private const int c_iBufferMilliseconds = 100;
-private const int c_iChannels = 1;
-private const int c_iFloorMilliseconds = 200;
-private const int c_iSampleRate = 16000;
-private const int c_iWaveMapper = -1;
-private const int c_iWhdrDone = 1;
+private const int iBitsPerSample = 16;
+private const int iBufferCount = 10;
+private const int iBufferMilliseconds = 100;
+private const int iChannels = 1;
+private const int iFloorMilliseconds = 200;
+private const int iSampleRate = 16000;
+private const int iWaveMapper = -1;
+private const int iWhdrDone = 1;
 
 public int MaxMilliseconds = 60000;
 public int SilenceMilliseconds = 1500;
@@ -95,17 +95,17 @@ public string start() {
     WaveFormatEx oFormat = new WaveFormatEx();
     int iBytes, iCode;
     oFormat.wFormatTag = 1;
-    oFormat.nChannels = c_iChannels;
-    oFormat.nSamplesPerSec = c_iSampleRate;
-    oFormat.wBitsPerSample = c_iBitsPerSample;
-    oFormat.nBlockAlign = (short) (c_iChannels * c_iBitsPerSample / 8);
-    oFormat.nAvgBytesPerSec = c_iSampleRate * oFormat.nBlockAlign;
+    oFormat.nChannels = iChannels;
+    oFormat.nSamplesPerSec = iSampleRate;
+    oFormat.wBitsPerSample = iBitsPerSample;
+    oFormat.nBlockAlign = (short) (iChannels * iBitsPerSample / 8);
+    oFormat.nAvgBytesPerSec = iSampleRate * oFormat.nBlockAlign;
     oFormat.cbSize = 0;
-    iCode = waveInOpen(out hWaveIn, c_iWaveMapper, ref oFormat, IntPtr.Zero, IntPtr.Zero, 0);
+    iCode = waveInOpen(out hWaveIn, iWaveMapper, ref oFormat, IntPtr.Zero, IntPtr.Zero, 0);
     if (iCode != 0) return "the microphone could not be opened (waveInOpen error " + iCode + "); check that one is connected and that Windows lets apps use it";
     iHdrSize = Marshal.SizeOf(typeof(WaveHdr));
-    iBytes = oFormat.nAvgBytesPerSec * c_iBufferMilliseconds / 1000;
-    for (int i = 0; i < c_iBufferCount; i++) {
+    iBytes = oFormat.nAvgBytesPerSec * iBufferMilliseconds / 1000;
+    for (int i = 0; i < iBufferCount; i++) {
         IntPtr pData = Marshal.AllocHGlobal(iBytes);
         IntPtr pHdr = Marshal.AllocHGlobal(iHdrSize);
         lpData.Add(pData);
@@ -115,7 +115,7 @@ public string start() {
     iCode = waveInStart(hWaveIn);
     if (iCode != 0) { freeAll(); return "recording could not start (waveInStart error " + iCode + ")"; }
     bOpen = true;
-    Log.info("Voice: recording started, " + c_iSampleRate + " Hz mono, silence ends it after " + SilenceMilliseconds + " ms");
+    Log.info("Voice: recording started, " + iSampleRate + " Hz mono, silence ends it after " + SilenceMilliseconds + " ms");
     return "";
 }
 
@@ -146,13 +146,13 @@ private bool harvest(bool bRequeue) {
     int iRecordedAt = (int) Marshal.OffsetOf(typeof(WaveHdr), "dwBytesRecorded");
     for (int i = 0; i < lpHdr.Count; i++) {
         IntPtr pHdr = lpHdr[i];
-        if ((Marshal.ReadInt32(pHdr, iFlagsAt) & c_iWhdrDone) == 0) continue;
+        if ((Marshal.ReadInt32(pHdr, iFlagsAt) & iWhdrDone) == 0) continue;
         int iGot = Marshal.ReadInt32(pHdr, iRecordedAt);
         byte[] aChunk = new byte[iGot];
         if (iGot > 0) Marshal.Copy(lpData[i], aChunk, 0, iGot);
         oPcm.Write(aChunk, 0, iGot);
         judge(aChunk);
-        Marshal.WriteInt32(pHdr, iFlagsAt, Marshal.ReadInt32(pHdr, iFlagsAt) & ~c_iWhdrDone);
+        Marshal.WriteInt32(pHdr, iFlagsAt, Marshal.ReadInt32(pHdr, iFlagsAt) & ~iWhdrDone);
         if (!bRequeue) continue;
         int iLength = Marshal.ReadInt32(pHdr, (int) Marshal.OffsetOf(typeof(WaveHdr), "dwBufferLength"));
         waveInUnprepareHeader(hWaveIn, pHdr, iHdrSize);
@@ -171,9 +171,9 @@ private bool judge(byte[] aChunk) {
         nSum += (double) iValue * iValue;
     }
     double nRms = Math.Sqrt(nSum / iSamples);
-    int iMs = iSamples * 1000 / c_iSampleRate;
+    int iMs = iSamples * 1000 / iSampleRate;
     iElapsedMs += iMs;
-    if (iFloorSamples < c_iFloorMilliseconds) { nFloor = Math.Max(nFloor, nRms); iFloorSamples += iMs; return false; }
+    if (iFloorSamples < iFloorMilliseconds) { nFloor = Math.Max(nFloor, nRms); iFloorSamples += iMs; return false; }
     bool bLoud = nRms > Math.Max(nFloor * 3, 500);
     if (bLoud) { if (!bHeardSpeech) Log.info("Voice: speech heard at " + iElapsedMs + " ms"); bHeardSpeech = true; iQuietMs = 0; }
     else if (bHeardSpeech) iQuietMs += iMs;
@@ -223,10 +223,10 @@ private bool freeAll() {
 
 private static bool writeWave(string sPath, byte[] aPcm) {
     using (BinaryWriter w = new BinaryWriter(File.Create(sPath))) {
-        int iBlock = c_iChannels * c_iBitsPerSample / 8;
+        int iBlock = iChannels * iBitsPerSample / 8;
         w.Write(Encoding.ASCII.GetBytes("RIFF")); w.Write(36 + aPcm.Length); w.Write(Encoding.ASCII.GetBytes("WAVE"));
-        w.Write(Encoding.ASCII.GetBytes("fmt ")); w.Write(16); w.Write((short) 1); w.Write((short) c_iChannels);
-        w.Write(c_iSampleRate); w.Write(c_iSampleRate * iBlock); w.Write((short) iBlock); w.Write((short) c_iBitsPerSample);
+        w.Write(Encoding.ASCII.GetBytes("fmt ")); w.Write(16); w.Write((short) 1); w.Write((short) iChannels);
+        w.Write(iSampleRate); w.Write(iSampleRate * iBlock); w.Write((short) iBlock); w.Write((short) iBitsPerSample);
         w.Write(Encoding.ASCII.GetBytes("data")); w.Write(aPcm.Length); w.Write(aPcm);
     }
     return true;
@@ -239,7 +239,7 @@ public void Dispose() { if (bOpen) cancel(); }
 public static class Voice {
 
 // The Whisper models tried, smallest good one first; any other ggml model in Whisper's folder is used when none is.
-private static readonly string[] c_asModels = { "ggml-small.bin", "ggml-small.en.bin", "ggml-base.bin", "ggml-base.en.bin", "ggml-medium.bin", "ggml-large-v3-turbo.bin" };
+private static readonly string[] asModels = { "ggml-small.bin", "ggml-small.en.bin", "ggml-base.bin", "ggml-base.en.bin", "ggml-medium.bin", "ggml-large-v3-turbo.bin" };
 
 // whisperProgram: whisper-cli.exe from Whisper's own machine-wide folder, where the Homer installers put it, or on
 // the PATH. "" when it is not installed.
@@ -252,12 +252,12 @@ public static string whisperProgram() {
     return "";
 }
 
-// whisperModel: a speech model beside whisper-cli, preferring the ones in c_asModels. "" when there is none.
+// whisperModel: a speech model beside whisper-cli, preferring the ones in asModels. "" when there is none.
 public static string whisperModel() {
     string sProgram = whisperProgram();
     if (sProgram.Length == 0) return "";
     string sDir = Path.GetDirectoryName(sProgram);
-    foreach (string sName in c_asModels) { string sPath = Path.Combine(sDir, sName); if (File.Exists(sPath)) return sPath; }
+    foreach (string sName in asModels) { string sPath = Path.Combine(sDir, sName); if (File.Exists(sPath)) return sPath; }
     string[] aAny = Directory.GetFiles(sDir, "ggml-*.bin");
     foreach (string sPath in aAny) if (Path.GetFileName(sPath).IndexOf("silero", StringComparison.OrdinalIgnoreCase) < 0) return sPath;
     return "";

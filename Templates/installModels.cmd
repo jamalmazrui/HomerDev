@@ -8,15 +8,15 @@ rem somebody with neither should not have to run two things. The installer
 rem offers Ollama-and-model as the checked box and this one unchecked beside it.
 rem
 rem AI NOTE FOR CUSTOMIZING THIS FILE: put every model this app needs on the
-rem c_sModels line, separated by spaces, and say in c_sModelNote what they are
+rem sModels line, separated by spaces, and say in sModelNote what they are
 rem for. Nothing else here is app-specific.
 rem
 rem LOG: %LOCALAPPDATA%\<App>\logs\<App>_setup.log, with the app name taken from
 rem the folder this script is installed into.
 setlocal EnableExtensions EnableDelayedExpansion
 
-set "c_sModels=llama3.2"
-set "c_sModelNote=the model that reads and summarizes text"
+set "sModels=llama3.2"
+set "sModelNote=the model that reads and summarizes text"
 
 rem The app name comes from the folder this script is installed into. That is
 rem exec in an installed copy, so climb one level when it is.
@@ -29,7 +29,7 @@ if not exist "%sLogDir%" mkdir "%sLogDir%" >nul 2>&1
 call :logLine "installModels started %DATE% %TIME%"
 call :logLine "Script: %~f0"
 call :logLine "App: %sApp%"
-call :logLine "Models wanted: %c_sModels% (%c_sModelNote%)"
+call :logLine "Models wanted: %sModels% (%sModelNote%)"
 
 where ollama >nul 2>&1
 if errorlevel 1 (
@@ -38,7 +38,7 @@ if errorlevel 1 (
   goto :done
 )
 
-for %%m in (%c_sModels%) do (
+for %%m in (%sModels%) do (
   echo Fetching %%m.
   call :logLine "Pulling %%m"
   ollama pull %%m >> "%sLog%" 2>&1

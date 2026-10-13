@@ -389,7 +389,9 @@ declaration.
 - **Lower camel case for names you define** -- functions, methods, variables,
   properties. Avoid upper camel case and snake case except where the language
   or an API demands them.
-- **A constant is a variable with `c_` in front**: `c_sFormat`, `c_iMaximum`.
+- **A constant is named like a variable**, type prefix and all: `sFormat`,
+  `iMaximum`. It is set apart by being declared as a constant, at the top, before
+  the variables. The old `c_` prefix is obsolete.
 - **Functions, not subprocedures.** If a routine is needed, make it a function,
   even when the result is ignored.
 - **A simple if-then goes on one line**, condition and consequence together.

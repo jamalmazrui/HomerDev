@@ -41,7 +41,7 @@ import os
 import sys
 
 import log
-c_sDllName = "Homer.dll"
+sDllName = "Homer.dll"
 
 oHomer = None
 sLoadedFrom = ""
@@ -58,7 +58,7 @@ def candidates():
     # The kit's exec folder, which holds this package (exec\\homer) and the
     # Homer.dll compiled beside it (1.43.22).
     lsFolders.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    return [os.path.join(sFolder, c_sDllName) for sFolder in lsFolders]
+    return [os.path.join(sFolder, sDllName) for sFolder in lsFolders]
 
 
 def load():

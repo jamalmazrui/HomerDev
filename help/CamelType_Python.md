@@ -1,6 +1,6 @@
 ﻿# Camel Type: Python Coding Guidelines
 
-Camel Type is a coding style optimized for screen reader productivity and systematic readability. The following rules apply to Python 3. Equivalent documents in this folder cover C# (`CamelType_CSharp.md`) and JAWS scripting (`CamelType_JAWSScript.md`).
+Camel Type is a coding style optimized for screen reader productivity and systematic readability. The following rules apply to Python 3. The rules every language shares are in `CamelType.md`; equivalent documents in this folder cover C#, JavaScript, JAWS scripting, PowerShell and VBScript.
 
 This is the kit's copy. An app does not carry one of its own; urlCheck's copy moved here in HomerDev 1.43.0.
 
@@ -61,11 +61,11 @@ This convention extends naturally: a `pathlib.Path` is `path` or `pathInput`; a 
 
 ## 2. Constant Naming
 
-A constant is named like a variable, Hungarian type prefix included, with **`c_` in front**: `c` for constant, then an underscore. The prefix is what tells a listener, at the point of use, that the value never changes.
+A constant is named **exactly like a variable**: the Hungarian type prefix, then lower camel case. The earlier `c_` prefix is obsolete; a Homer program has none, and the kit's tidy renames any it finds.
 
-Examples: `c_sDefaultEncoding = "utf-8"`, `c_iTimeoutSec = 60`
+Examples: `sDefaultEncoding = "utf-8"`, `iTimeoutSec = 60`
 
-Programs written before this rule (urlCheck among them) name their constants without `c_`. New constants in those programs take the prefix; the old ones are renamed only when a file is being reworked anyway.
+Python has no keyword for a constant, so a constant is set apart by **where it is defined and what happens to it**: it is assigned once, at the top of the module, before any function, and nothing assigns it again. A value a function changes is a variable, however it is named. When a constant and a variable derived from it would share a name -- a list of every sample, and the samples being built this time -- the constant takes a word that says what it holds: `lAllSamples`, and the variable `lSamples`.
 
 ---
 
@@ -100,10 +100,10 @@ Define constants at the **top of the module**, before any function definitions, 
 
 Example:
 ```python
-c_iTimeoutSec = 60
-c_sEncoding = "utf-8"
-c_sFallbackTitle = "untitled-page"
-c_sResultsDir = "results"
+iTimeoutSec = 60
+sEncoding = "utf-8"
+sFallbackTitle = "untitled-page"
+sResultsDir = "results"
 ```
 
 ---

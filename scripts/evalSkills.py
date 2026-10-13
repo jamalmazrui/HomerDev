@@ -40,12 +40,12 @@ sessions. --dry-run costs nothing and shows every command first.
 """
 import argparse, datetime, json, os, platform, re, shutil, subprocess, sys, tempfile, time
 
-c_iMaxTurns = 40
-c_iRuns = 3
-c_iTimeoutSeconds = 1800
-c_sApp = "FruitBasketCs"
+iMaxTurns = 40
+iRunsPlanned = 3
+iTimeoutSeconds = 1800
+sApp = "FruitBasketCs"
 
-c_sTask = ("Write a Windows desktop program in C#, in one source file named FruitBasketCs.cs in this folder. "
+sTask = ("Write a Windows desktop program in C#, in one source file named FruitBasketCs.cs in this folder. "
            "It must compile with the Roslyn C# compiler against the .NET Framework 4.8 as a Windows Forms "
            "program; the build will add references to System.Windows.Forms, System.Drawing and the other "
            "Framework assemblies. The program shows one window titled Fruit Basket. It has a text box for the "
@@ -55,12 +55,12 @@ c_sTask = ("Write a Windows desktop program in C#, in one source file named Frui
            "control must be reachable with the Tab key and must have a name a screen reader can speak. Write "
            "only the source file; do not compile or run it.")
 
-c_sThreeSentences = ("Use the Homer classes in {kit}\\exec\\CSharp; build the dialog with Lbc, in the order the "
+sThreeSentences = ("Use the Homer classes in {kit}\\exec\\CSharp; build the dialog with Lbc, in the order the "
                      "user should tab. Write in Camel Type, as {kit}\\help\\CamelType_CSharp.md describes. Follow "
                      "{kit}\\help\\HomerDev.md: speak only what the screen reader cannot know, save each answer when "
                      "it is given, match nouns to counts. The Homer skills in .claude\\skills apply.")
 
-c_sUiTest = """; uiTest.inix for evalSkills: only what the task asked for.
+sUiTest = """; uiTest.inix for evalSkills: only what the task asked for.
 FileTask = uiTest
 
 [test]
@@ -83,8 +83,8 @@ Wants = Basket
 Note = the list has the name Basket, which a screen reader speaks
 """
 
-c_lsConventionChecks = ["encoding", "logging", "naming"]
-c_lsNeutralChecks = ["keys"]
+lsConventionChecks = ["encoding", "logging", "naming"]
+lsNeutralChecks = ["keys"]
 
 sScriptDir = os.path.dirname(os.path.abspath(__file__))
 sStamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -144,12 +144,12 @@ def runCommand(lsArgs, sCwd, iTimeout=600, dEnv=None):
 
 def prepareRun(sKit, sBase, sCondition, iRun):
     """Makes the run's folder and everything the build and uiCheck need."""
-    sFolder = os.path.join(sBase, "%s-%d" % (sCondition, iRun), c_sApp)
+    sFolder = os.path.join(sBase, "%s-%d" % (sCondition, iRun), sApp)
     os.makedirs(sFolder)
-    shutil.copyfile(os.path.join(sKit, "Templates", "samples", "build%s.cmd" % c_sApp),
-                    os.path.join(sFolder, "build%s.cmd" % c_sApp))
+    shutil.copyfile(os.path.join(sKit, "Templates", "samples", "build%s.cmd" % sApp),
+                    os.path.join(sFolder, "build%s.cmd" % sApp))
     shutil.copyfile(os.path.join(sKit, "Templates", "samples", "version.txt"), os.path.join(sFolder, "version.txt"))
-    open(os.path.join(sFolder, "uiTest.inix"), "w", encoding="utf-8-sig", newline="\r\n").write(c_sUiTest)
+    open(os.path.join(sFolder, "uiTest.inix"), "w", encoding="utf-8-sig", newline="\r\n").write(sUiTest)
     if sCondition == "homer":
         shutil.copytree(os.path.join(sKit, ".claude", "skills"), os.path.join(sFolder, ".claude", "skills"))
     logLine("prepared condition=%s run=%d folder=\"%s\"" % (sCondition, iRun, sFolder))
@@ -158,12 +158,12 @@ def prepareRun(sKit, sBase, sCondition, iRun):
 
 def askClaude(sClaude, sKit, sFolder, sCondition, sModel):
     """One headless Claude Code session in the run's folder."""
-    lsArgs = [sClaude, "-p", c_sTask, "--output-format", "json", "--permission-mode", "acceptEdits",
-              "--max-turns", str(c_iMaxTurns)]
+    lsArgs = [sClaude, "-p", sTask, "--output-format", "json", "--permission-mode", "acceptEdits",
+              "--max-turns", str(iMaxTurns)]
     if sModel: lsArgs += ["--model", sModel]
     if sCondition == "homer":
-        lsArgs += ["--add-dir", sKit, "--append-system-prompt", c_sThreeSentences.format(kit=sKit)]
-    iCode, sOut = runCommand(lsArgs, sFolder, c_iTimeoutSeconds)
+        lsArgs += ["--add-dir", sKit, "--append-system-prompt", sThreeSentences.format(kit=sKit)]
+    iCode, sOut = runCommand(lsArgs, sFolder, iTimeoutSeconds)
     dResult = {"exit": iCode}
     try:
         dJson = json.loads(sOut[sOut.index("{"):sOut.rindex("}") + 1])
@@ -200,14 +200,14 @@ def checkFindings(sFolder):
 
 def scoreRun(sKit, sFolder):
     """Source, build, check and uiCheck results for one run."""
-    dScore = {"source": os.path.isfile(os.path.join(sFolder, c_sApp + ".cs"))}
+    dScore = {"source": os.path.isfile(os.path.join(sFolder, sApp + ".cs"))}
     dEnv = dict(os.environ, HomerDev=sKit)
     if dScore["source"]:
-        sText = open(os.path.join(sFolder, c_sApp + ".cs"), encoding="utf-8-sig", errors="replace").read()
+        sText = open(os.path.join(sFolder, sApp + ".cs"), encoding="utf-8-sig", errors="replace").read()
         dScore["usesKit"] = bool(re.search(r"\busing\s+Homer\b|\bHomer\.", sText))
         dScore["lines"] = sText.count("\n") + 1
-        runCommand(["cmd", "/c", "build%s.cmd" % c_sApp, "nobump"], sFolder, 900, dEnv)
-    dScore["built"] = os.path.isfile(os.path.join(sFolder, c_sApp + ".exe"))
+        runCommand(["cmd", "/c", "build%s.cmd" % sApp, "nobump"], sFolder, 900, dEnv)
+    dScore["built"] = os.path.isfile(os.path.join(sFolder, sApp + ".exe"))
     iCode, sOut = runCommand([sys.executable, os.path.join(sScriptDir, "check.py"), "--path", sFolder, "--quiet"],
                              sFolder, 900, dEnv)
     dScore["check"] = checkFindings(sFolder)
@@ -241,9 +241,9 @@ def writeReport(sKit, sBase, dRuns, sModel, bDry):
                            sum(1 for d in lsScores if d["built"]),
                            sum(1 for d in lsScores if d["built"] and d["uiFailed"] == 0 and d["uiPassed"] > 0),
                            sum(d["uiPassed"] for d in lsScores), sum(d["uiFailed"] for d in lsScores)))
-        for sName in c_lsNeutralChecks + c_lsConventionChecks:
+        for sName in lsNeutralChecks + lsConventionChecks:
             iPass = sum(1 for d in lsScores if d["check"].get(sName) == "pass")
-            sNote = " (partly a Homer convention)" if sName in c_lsConventionChecks else ""
+            sNote = " (partly a Homer convention)" if sName in lsConventionChecks else ""
             lsLines.append("  - check's %s finding passed in %d of %s%s." % (sName, iPass, countNoun(iRuns, "run"), sNote))
         lsCosts = [d["claude"].get("total_cost_usd") for d in dRuns[sCondition] if d.get("claude", {}).get("total_cost_usd") is not None]
         if lsCosts: lsLines.append("  - reported cost: %.2f US dollars in all." % sum(lsCosts))
@@ -272,7 +272,7 @@ def main():
     oParser = argparse.ArgumentParser(description="Measure whether the Homer skills improve an AI's program.")
     oParser.add_argument("--dry-run", action="store_true", help="prepare the run folders and stop")
     oParser.add_argument("--model", default="", help="the model Claude Code should use")
-    oParser.add_argument("--runs", type=int, default=c_iRuns, help="runs of each condition")
+    oParser.add_argument("--runs", type=int, default=iRunsPlanned, help="runs of each condition")
     dArguments = oParser.parse_args()
 
     sKit = findKit()
@@ -287,7 +287,7 @@ def main():
         os.path.abspath(__file__), platform.python_version(), platform.platform(), os.getcwd()))
     logLine("arguments %s" % " ".join(sys.argv[1:]))
     logLine("settings kit=\"%s\" runs=%d model=\"%s\" dryRun=%s maxTurns=%d timeoutSeconds=%d" % (
-        sKit, dArguments.runs, dArguments.model, dArguments.dry_run, c_iMaxTurns, c_iTimeoutSeconds))
+        sKit, dArguments.runs, dArguments.model, dArguments.dry_run, iMaxTurns, iTimeoutSeconds))
     sUserSkills = os.path.join(os.path.expanduser("~"), ".claude", "skills")
     logLine("user skills present in both conditions: %s" % (", ".join(sorted(os.listdir(sUserSkills))) if os.path.isdir(sUserSkills) else "none"))
 

@@ -16,8 +16,8 @@ sKit = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(sKit, "exec", "Python"))
 import conversion
 
-c_sMarker = "Harborlight"
-c_sSample = """# The Harborlight Report
+sMarker = "Harborlight"
+sSample = """# The Harborlight Report
 
 ## First findings
 
@@ -59,7 +59,7 @@ def makePdf(sPath):
 def makeXlsx(sPath):
     """A one-sheet workbook written as its XML, with the marker word in a cell."""
     import zipfile
-    llRows = [["Pier", "Boats"], ["North", "12"], ["South", "9"], [c_sMarker, "1"]]
+    llRows = [["Pier", "Boats"], ["North", "12"], ["South", "9"], [sMarker, "1"]]
     sRows = ""
     for i, lsRow in enumerate(llRows, 1):
         sRows += '<row r="%d">' % i + "".join('<c t="inlineStr"><is><t>%s</t></is></c>' % s for s in lsRow) + "</row>"
@@ -92,8 +92,8 @@ def make(sDir):
     """The sample files this computer can make, by type, with approved tools only:
     Pandoc, Python, and the PyPI packages pypdfium2 and Pillow for the scanned page."""
     dMade = {}
-    sMd = os.path.join(sDir, "sample.md"); open(sMd, "w", encoding="utf-8").write(c_sSample); dMade["md"] = sMd
-    sTxt = os.path.join(sDir, "sample.txt"); open(sTxt, "w", encoding="utf-8").write(c_sSample); dMade["txt"] = sTxt
+    sMd = os.path.join(sDir, "sample.md"); open(sMd, "w", encoding="utf-8").write(sSample); dMade["md"] = sMd
+    sTxt = os.path.join(sDir, "sample.txt"); open(sTxt, "w", encoding="utf-8").write(sSample); dMade["txt"] = sTxt
     for sTo in ("docx", "odt", "pptx", "epub", "htm", "rtf"):
         try:
             sOut = os.path.join(sDir, "sample." + sTo); conversion.convert(sMd, sOut); dMade[sTo] = sOut
@@ -133,7 +133,7 @@ def main():
                     dDone = conversion.convert(sSource, sOut)
                     sText = conversion.toText(sOut) if sTo not in ("txt", "md", "htm", "html", "csv") else open(sOut, encoding="utf-8-sig", errors="replace").read()
                     lsWrong = []
-                    if c_sMarker.lower() not in sText.lower(): lsWrong.append("no marker word")
+                    if sMarker.lower() not in sText.lower(): lsWrong.append("no marker word")
                     # RECOGNITION HAS NO HEADINGS TO KEEP (1.65.29): text read from a picture of a page carries no
                     # structure, so the ocr route is held to the marker word alone. On 11 October it was the route
                     # taken for pdf > md because pdfminer.six, which pdfstructure needs, was not fetched; it is now.
@@ -145,7 +145,7 @@ def main():
         if "scanned" in dMade:
             try:
                 sText = conversion.toText(dMade["scanned"])
-                if c_sMarker.lower() in sText.lower(): iPass += 1; logLine("pass scanned pdf > txt, falling back to recognition")
+                if sMarker.lower() in sText.lower(): iPass += 1; logLine("pass scanned pdf > txt, falling back to recognition")
                 else: iFail += 1; logLine("FAIL scanned pdf > txt: the marker word was not recognised")
             except Exception as oError: iFail += 1; logLine("FAIL scanned pdf > txt: %s" % oError)
     finally:

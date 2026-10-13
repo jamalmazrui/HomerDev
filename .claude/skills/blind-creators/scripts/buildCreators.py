@@ -18,9 +18,9 @@ this script.
 """
 import argparse, datetime, os, re, subprocess, sys, unicodedata
 
-c_lCategories = ["Apps", "Books", "Presentations"]
-c_dSources = {"BlindDevelopers.md": "Apps", "BlindAuthors.md": "Books", "BlindPresenters.md": "Presentations"}
-c_sSubtitle = "Authoring Books, Developing Apps, or Making Presentations While Blind or Low Vision"
+lCategories = ["Apps", "Books", "Presentations"]
+dSourceFiles = {"BlindDevelopers.md": "Apps", "BlindAuthors.md": "Books", "BlindPresenters.md": "Presentations"}
+sSubtitle = "Authoring Books, Developing Apps, or Making Presentations While Blind or Low Vision"
 oLog = None
 
 
@@ -122,7 +122,7 @@ def readSource(sPath):
 
 def mergePeople(dSources):
     dPeople = {}
-    for sFile, sCat in c_dSources.items():
+    for sFile, sCat in dSourceFiles.items():
         for sName, dEntry in dSources.get(sFile, {}).items():
             sKey = foldName(re.sub(r"\s*\(.*?\)\s*$", "", sName))
             p = dPeople.setdefault(sKey, {"name": sName, "bio": "", "profiles": {}, "works": {}})
@@ -157,7 +157,7 @@ def nextVersion(sDir, sGiven):
 
 def render(lPeople, sVersion):
     iTotal = len(lPeople)
-    dCat = {c: sum(1 for p in lPeople if c in p["works"]) for c in c_lCategories}
+    dCat = {c: sum(1 for p in lPeople if c in p["works"]) for c in lCategories}
     lMulti = [p for p in lPeople if len(p["works"]) > 1]
     lTwo = [p for p in lPeople if len(p["works"]) == 2]
     lThree = [p for p in lPeople if len(p["works"]) == 3]
@@ -165,7 +165,7 @@ def render(lPeople, sVersion):
     w = L.append
     w("---")
     w('title: "Blind Creators"')
-    w('subtitle: "' + c_sSubtitle + '"')
+    w('subtitle: "' + sSubtitle + '"')
     w('author: "Jamal Mazrui"')
     w('date: "' + datetime.date.today().strftime("%B %Y") + '"')
     if sVersion: w('version: "' + sVersion + '"')
@@ -226,7 +226,7 @@ def render(lPeople, sVersion):
             w("Profiles:"); w("")
             for sLabel, sUrl in sorted(p["profiles"].values(), key=lambda t: t[0].lower()): w("- [" + sLabel + "](" + sUrl + ")")
             w("")
-        for sCat in c_lCategories:
+        for sCat in lCategories:
             if sCat not in p["works"]: continue
             w("### " + sCat); w("")
             for sTitle, sDesc in p["works"][sCat]:
@@ -280,7 +280,7 @@ def main():
     logLine("dir: " + sDir)
     dSources = {}
     lMissing = []
-    for sFile in c_dSources:
+    for sFile in dSourceFiles:
         sPath = os.path.join(sDir, sFile)
         if os.path.isfile(sPath): dSources[sFile] = readSource(sPath)
         else: lMissing.append(sFile)

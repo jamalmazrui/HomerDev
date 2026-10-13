@@ -17,12 +17,12 @@ database outside any project still logs beside itself, in <folder>\logs.
 """
 import datetime, glob, os, platform, re, sqlite3, sys
 
-c_lsFieldTypes = ["BLOB", "BOOLEAN", "INTEGER", "NUMERIC", "REAL", "TEXT", "TEXTLINE", "TEXTMARKDOWN", "TEXTMEMO", "TEXTTIME"]
-c_lsOwnTables = ["lookups", "maps", "views"]
-c_dOwnColumns = {"lookups": ["tbl", "fld", "val", "ordinal", "src"], "maps": ["tbl1", "prime1", "kind", "tbl2", "prime2"],
+lsFieldTypes = ["BLOB", "BOOLEAN", "INTEGER", "NUMERIC", "REAL", "TEXT", "TEXTLINE", "TEXTMARKDOWN", "TEXTMEMO", "TEXTTIME"]
+lsOwnTables = ["lookups", "maps", "views"]
+dOwnColumns = {"lookups": ["tbl", "fld", "val", "ordinal", "src"], "maps": ["tbl1", "prime1", "kind", "tbl2", "prime2"],
                  "views": ["tbl", "fld", "val"]}
-c_lsProjectMarks = ["build.cmd", "build.py", "build_release.bat", "RepoFiles.txt"]
-c_sStamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+lsProjectMarks = ["build.cmd", "build.py", "build_release.bat", "RepoFiles.txt"]
+sStamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
 
 def projectHolding(sPath):
@@ -30,7 +30,7 @@ def projectHolding(sPath):
     when none does. Only the folder's own markers decide, never a drive or a depth."""
     sDir = os.path.dirname(os.path.abspath(sPath))
     while True:
-        if any(os.path.isfile(os.path.join(sDir, s)) for s in c_lsProjectMarks): return sDir
+        if any(os.path.isfile(os.path.join(sDir, s)) for s in lsProjectMarks): return sDir
         sUp = os.path.dirname(sDir)
         if sUp == sDir: return ""
         sDir = sUp
@@ -41,8 +41,8 @@ def logPathFor(sPath):
     outside any project, a logs folder beside the database."""
     sName = os.path.splitext(os.path.basename(sPath))[0]
     sProject = projectHolding(sPath)
-    if sProject: return os.path.join(sProject, "logs", "%s-checkDb-%s-%s.log" % (os.path.basename(sProject.rstrip("\\/")), sName, c_sStamp))
-    return os.path.join(os.path.dirname(sPath), "logs", "%s-checkDb-%s.log" % (sName, c_sStamp))
+    if sProject: return os.path.join(sProject, "logs", "%s-checkDb-%s-%s.log" % (os.path.basename(sProject.rstrip("\\/")), sName, sStamp))
+    return os.path.join(os.path.dirname(sPath), "logs", "%s-checkDb-%s.log" % (sName, sStamp))
 
 
 def singular(sTable):
@@ -74,7 +74,7 @@ def checkDatabase(sPath):
     lsTables = [r[0] for r in oCon.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
                 if not isSystemTable(r[0])]
     lsTriggers = [r[0].lower() for r in oCon.execute("SELECT name FROM sqlite_master WHERE type='trigger'")]
-    lsUser = [s for s in lsTables if s.lower() not in c_lsOwnTables]
+    lsUser = [s for s in lsTables if s.lower() not in lsOwnTables]
     dPrimes = {}
     for sTable in lsTables:
         lsCols = oCon.execute('PRAGMA table_xinfo("%s")' % sTable).fetchall()   # cid, name, type, notnull, dflt, pk, hidden
@@ -82,7 +82,7 @@ def checkDatabase(sPath):
         dCol = {c[1]: c for c in lsCols}
         sLower = sTable.lower()
         if sLower == "views":
-            bOk = all(s in lsNames for s in c_dOwnColumns["views"])
+            bOk = all(s in lsNames for s in dOwnColumns["views"])
             note("pass" if bOk else "fail", "views", "holds tbl, fld and val" if bOk else "lacks tbl, fld or val")
             continue
         sSub = sTable
@@ -116,7 +116,7 @@ def checkDatabase(sPath):
         for oCol in lsCols:
             sType = (oCol[2] or "").upper().split("(")[0].strip()
             if oCol[6] in (2, 3): continue
-            if sType and sType not in c_lsFieldTypes:
+            if sType and sType not in lsFieldTypes:
                 note("warn", sSub, "%s has type %s, not one of DbDo's field types" % (oCol[1], oCol[2]))
         lsIdx = oCon.execute('PRAGMA index_list("%s")' % sTable).fetchall()
         bPrimeIdx, bUnique = False, False
@@ -130,7 +130,7 @@ def checkDatabase(sPath):
         else: note("warn", sSub, "prime has no index")
         if ("trg_%s_edited" % sTable).lower() in lsTriggers: note("pass", sSub, "trg_%s_edited keeps edited current" % sTable)
         else: note("warn", sSub, "no trg_%s_edited trigger, so edited changes only when DbDo itself edits" % sTable)
-        if "maps" in [t.lower() for t in lsTables] and sLower not in c_lsOwnTables and "prime" in lsNames:
+        if "maps" in [t.lower() for t in lsTables] and sLower not in lsOwnTables and "prime" in lsNames:
             for sTrig, sWhat in (("trg_%s_maps" % sTable, "edit"), ("trg_%s_maps_delete" % sTable, "deletion")):
                 if sTrig.lower() in lsTriggers: note("pass", sSub, "%s keeps maps links whole after an %s" % (sTrig, sWhat))
                 else: note("warn", sSub, "no %s trigger, so a record's maps links break on its %s" % (sTrig, sWhat))
@@ -142,9 +142,9 @@ def checkDatabase(sPath):
                 else: note("warn", sSub, "%s names no table %s" % (sName, plurals(sName[:-3])[0]))
         if "prime" in lsNames:
             dPrimes[sTable] = set(r[0] for r in oCon.execute('SELECT prime FROM "%s"' % sTable))
-        if sLower in c_dOwnColumns:
-            lsMissing = [s for s in c_dOwnColumns[sLower] if s not in lsNames]
-            note("fail" if lsMissing else "pass", sSub, ("lacks " + ", ".join(lsMissing)) if lsMissing else "holds " + ", ".join(c_dOwnColumns[sLower]))
+        if sLower in dOwnColumns:
+            lsMissing = [s for s in dOwnColumns[sLower] if s not in lsNames]
+            note("fail" if lsMissing else "pass", sSub, ("lacks " + ", ".join(lsMissing)) if lsMissing else "holds " + ", ".join(dOwnColumns[sLower]))
     dLetters = {}
     for sTable in lsUser: dLetters.setdefault(sTable[0].lower(), []).append(sTable)
     lsShared = [", ".join(v) for v in dLetters.values() if len(v) > 1]
@@ -156,7 +156,7 @@ def checkDatabase(sPath):
             if sTbl not in lsTables: note("warn", "lookups", "%d values for %s.%s, but there is no table %s" % (iCount, sTbl, sFld, sTbl)); continue
             lsCols = [c[1] for c in oCon.execute('PRAGMA table_xinfo("%s")' % sTbl)]
             if sFld not in lsCols: note("warn", "lookups", "%d values for %s.%s, but %s has no field %s" % (iCount, sTbl, sFld, sTbl, sFld))
-    if "maps" in lsTables and all(s in [c[1] for c in oCon.execute('PRAGMA table_xinfo("maps")')] for s in c_dOwnColumns["maps"]):
+    if "maps" in lsTables and all(s in [c[1] for c in oCon.execute('PRAGMA table_xinfo("maps")')] for s in dOwnColumns["maps"]):
         iLinks, iDangling = 0, 0
         for sTbl1, sPrime1, sTbl2, sPrime2 in oCon.execute("SELECT tbl1, prime1, tbl2, prime2 FROM maps"):
             iLinks += 1

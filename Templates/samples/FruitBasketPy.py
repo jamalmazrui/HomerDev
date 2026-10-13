@@ -71,13 +71,13 @@ import inix, lbc, log, paths, say, util
 #
 # Constants carry c_ and their type letter, as Camel Type has it, and they sit
 # together at the top where a reader can find them.
-c_sAppName = "FruitBasketPy"
-c_sSection = "Basket"
-c_sSettingsFile = "FruitBasketPy.inix"
+sAppName = "FruitBasketPy"
+sSection = "Basket"
+sSettingsFile = "FruitBasketPy.inix"
 
 # The two ways the basket can be ordered. Alphabetical, as every list in Homer
 # code is unless another order is clearly more logical.
-c_lSortOrders = ["added", "name"]
+lSortOrders = ["added", "name"]
 
 
 # ---- BLOCK 3: where the basket is kept ----
@@ -91,7 +91,7 @@ c_lSortOrders = ["added", "name"]
 # results, samples, temp and templates all start differently, so a screen reader
 # user reaches any of them with one keystroke.
 def settingsPath():
-    return paths.configFile(c_sSettingsFile)
+    return paths.configFile(sSettingsFile)
 
 
 # The settings file is .inix, which is .ini with the corners knocked off: a
@@ -100,7 +100,7 @@ def settingsPath():
 # a missing section, a missing key and an empty value alike, because a caller
 # asking for a setting wants an answer rather than four ways of saying no.
 def loadBasket():
-    return [s.strip() for s in inix.getValue(settingsPath(), c_sSection, "Fruit", "").split(",")
+    return [s.strip() for s in inix.getValue(settingsPath(), sSection, "Fruit", "").split(",")
             if s.strip()]
 
 
@@ -156,14 +156,14 @@ class fruitDialog(lbc.Dialog):
         # anything else, which is what a setting wants. Type-ahead works, and a
         # screen reader announces each value as the arrow keys pass it.
         self.addBand()
-        self.cboSort = self.addComboPickBox("&Sort by:", c_lSortOrders,
-            inix.getValue(settingsPath(), c_sSection, "Sort", "added"), "cboSort",
+        self.cboSort = self.addComboPickBox("&Sort by:", lSortOrders,
+            inix.getValue(settingsPath(), sSection, "Sort", "added"), "cboSort",
             sTip="added keeps the basket in the order fruit went in; name sorts it alphabetically.")
         self.cboSort.Bind(wx.EVT_COMBOBOX, lambda oEvent: self.sortBasket())
 
         self.addBand()
         self.cbSpeak = self.addCheckBox("Spea&k each change",
-            inix.getValue(settingsPath(), c_sSection, "Speak", "1") == "1", "cbSpeak")
+            inix.getValue(settingsPath(), sSection, "Speak", "1") == "1", "cbSpeak")
         self.dTips[self.cbSpeak] = \
             "When this is off, the program stays silent and the screen reader does all the talking."
 
@@ -318,9 +318,9 @@ class fruitDialog(lbc.Dialog):
     # person who loses it is the one who just typed twenty fruits.
     def saveBasket(self):
         lFruit = [self.lbBasket.GetString(i) for i in range(self.lbBasket.GetCount())]
-        inix.setValue(settingsPath(), c_sSection, "Fruit", ", ".join(lFruit))
-        inix.setValue(settingsPath(), c_sSection, "Sort", self.cboSort.GetValue())
-        inix.setValue(settingsPath(), c_sSection, "Speak", "1" if self.cbSpeak.GetValue() else "0")
+        inix.setValue(settingsPath(), sSection, "Fruit", ", ".join(lFruit))
+        inix.setValue(settingsPath(), sSection, "Sort", self.cboSort.GetValue())
+        inix.setValue(settingsPath(), sSection, "Speak", "1" if self.cbSpeak.GetValue() else "0")
         log.info("Saved %d to %s" % (len(lFruit), settingsPath()))
         return True
 
@@ -345,8 +345,8 @@ def main():
     # One file per session, in %LOCALAPPDATA%\\FruitBasketPy\\logs, pruned to the
     # most recent thirty. Writing a line costs microseconds; not having the line
     # costs an evening.
-    paths.start(c_sAppName)
-    log.start(c_sAppName)
+    paths.start(sAppName)
+    log.start(sAppName)
     log.keyValue("Settings file", settingsPath())
     log.keyValue("Results folder", paths.results())
     log.info("Cleared %d leftover temporary items" % paths.clearTemp())

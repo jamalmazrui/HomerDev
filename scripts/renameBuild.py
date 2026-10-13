@@ -30,8 +30,8 @@ Exit codes: 0 done, 1 something could not be renamed (the log says what).
 """
 import datetime, os, platform, re, subprocess, sys
 
-c_lsTextExtensions = (".cmd", ".bat", ".ps1", ".py", ".iss", ".txt", ".inix", ".md", ".cs", ".js", ".json", ".yml", ".gitattributes", ".gitignore", ".htm")
-c_lsSkipFolders = (".git", "exec", "logs", "configs", "data", "node_modules", "__pycache__", "templates")
+lsTextExtensions = (".cmd", ".bat", ".ps1", ".py", ".iss", ".txt", ".inix", ".md", ".cs", ".js", ".json", ".yml", ".gitattributes", ".gitignore", ".htm")
+lsSkipFolders = (".git", "exec", "logs", "configs", "data", "node_modules", "__pycache__", "templates")
 
 oLog = None
 
@@ -91,10 +91,10 @@ def rewriteReferences(sAppDir, sApp):
     oPattern = re.compile(r"(?<![A-Za-z_])([Bb])uild" + re.escape(sApp) + r"(?![A-Za-z0-9_])", re.IGNORECASE)
     iFiles = 0
     for sDir, lsDirs, lsNames in os.walk(sAppDir):
-        lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders]
+        lsDirs[:] = [s for s in lsDirs if s.lower() not in lsSkipFolders]
         for sName in lsNames:
             if sName.lower() in ("history.md", "history.htm"): continue
-            if not sName.lower().endswith(c_lsTextExtensions) and sName.lower() not in (".gitattributes", ".gitignore"): continue
+            if not sName.lower().endswith(lsTextExtensions) and sName.lower() not in (".gitattributes", ".gitignore"): continue
             sPath = os.path.join(sDir, sName)
             try:
                 binData = open(sPath, "rb").read()

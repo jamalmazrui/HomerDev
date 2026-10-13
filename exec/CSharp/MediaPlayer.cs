@@ -147,8 +147,8 @@ return sText.ToLower();
 // Empty values, and the words programs use to mean empty, are not kept; nor are
 // the fields that describe the file as a file rather than the recording as a
 // recording, which is most of what ExifTool has to say about an audio file.
-private static readonly string[] c_asEmptyWords = { "unknown", "n/a", "none", "null", "0" };
-private static readonly string[] c_asDullFields = {
+private static readonly string[] asEmptyWords = { "unknown", "n/a", "none", "null", "0" };
+private static readonly string[] asDullFields = {
 "ExifTool Version Number", "ExifToolVersion", "File Name", "FileName", "Directory",
 "File Permissions", "FilePermissions", "File Access Date/Time", "FileAccessDate",
 "File Inode Change Date/Time", "File Modification Date/Time", "FileModifyDate",
@@ -160,9 +160,9 @@ public void addFact(string sField, string sValue) {
 if (string.IsNullOrEmpty(sField) || string.IsNullOrEmpty(sValue)) return;
 string sTidy = sValue.Trim();
 if (sTidy.Length == 0) return;
-foreach (string sEmpty in c_asEmptyWords)
+foreach (string sEmpty in asEmptyWords)
 if (string.Equals(sTidy, sEmpty, StringComparison.OrdinalIgnoreCase)) return;
-foreach (string sDull in c_asDullFields)
+foreach (string sDull in asDullFields)
 if (string.Equals(sField, sDull, StringComparison.OrdinalIgnoreCase)) return;
 if (!dFacts.ContainsKey(sField)) dFacts[sField] = sTidy;
 }
@@ -284,20 +284,20 @@ return (sClean.Length > 0) ? sClean : "Queue";
 
 // How the Tracks list can be ordered. The first is the order the queue
 // arrived in, which is what a play list is FOR: somebody chose that order.
-private static readonly string[] c_asOrders = new string[] {
+private static readonly string[] asOrders = new string[] {
 "Play list order", "Title", "Presenter", "Length, shortest first", "Length, longest first" };
 
 // How far Forward and Backward move. In increasing order, because that is the
 // order the sizes have -- alphabetical would put 15 minutes before 15 seconds.
 // A list rather than a slider: a slider announces its position, so a person
 // hears "4" where they need to hear "3 minutes".
-private static readonly int[] c_aiSteps = new int[] { 15, 30, 60, 180, 300, 600, 900, 1800, 3600 };
-private static readonly string[] c_asSteps = new string[] {
+private static readonly int[] aiSteps = new int[] { 15, 30, 60, 180, 300, 600, 900, 1800, 3600 };
+private static readonly string[] asSteps = new string[] {
 "15 seconds", "30 seconds", "1 minute", "3 minutes", "5 minutes",
 "10 minutes", "15 minutes", "30 minutes", "1 hour" };
-private const int c_iDefaultStep = 2;   // 1 minute
-private const int c_iDefaultRate = 100;
-private const int c_iDefaultOrder = 0;
+private const int iDefaultStep = 2;   // 1 minute
+private const int iDefaultRate = 100;
+private const int iDefaultOrder = 0;
 
 // playTutorials: THE WALKS PLAY IN THE HOMER PLAYER (1.64.5). An app's Play
 // Tutorials handed its playlist to Windows, so the walks opened in whatever
@@ -348,10 +348,10 @@ return;
 }
 
 string sSettings = sectionFor(sSource, lsTracks);
-int iVolume = readNumber(sSettings, "volume", Homer.Mpv.c_iDefaultVolume, 0, 130);
-int iRate = readNumber(sSettings, "rate", c_iDefaultRate, 25, 400);
-int iStep = readNumber(sSettings, "step", c_iDefaultStep, 0, c_aiSteps.Length - 1);
-int iOrder = readNumber(sSettings, "order", c_iDefaultOrder, 0, c_asOrders.Length - 1);
+int iVolume = readNumber(sSettings, "volume", Homer.Mpv.iDefaultVolume, 0, 130);
+int iRate = readNumber(sSettings, "rate", iDefaultRate, 25, 400);
+int iStep = readNumber(sSettings, "step", iDefaultStep, 0, aiSteps.Length - 1);
+int iOrder = readNumber(sSettings, "order", iDefaultOrder, 0, asOrders.Length - 1);
 
 Homer.Mpv player = new Homer.Mpv(sMpv, Homer.Media.findInstalled("yt-dlp"));
 string sError;
@@ -413,7 +413,7 @@ dlg.endBand();
 // ---- Order, Next, Previous ----
 
 dlg.addBand();
-ListBox lstOrder = dlg.addPickBox("&Order of list:", new List<string>(c_asOrders), c_asOrders[iOrder],
+ListBox lstOrder = dlg.addPickBox("&Order of list:", new List<string>(asOrders), asOrders[iOrder],
 "How the list above is arranged. Sorting moves the rows only; the queue keeps playing in the order it was given.");
 Button btnNext = dlg.addButton("&Next track", "Play the next track in the queue.");
 Button btnPrevious = dlg.addButton("&Previous track", "Play the previous track in the queue.");
@@ -424,7 +424,7 @@ dlg.endBand();
 dlg.addBand();
 Button btnForward = dlg.addButton("&Forward in track", "Jump forward inside the current track by the increment.");
 Button btnBackward = dlg.addButton("&Backward in track", "Jump backward inside the current track by the increment.");
-ListBox lstIncrement = dlg.addPickBox("&Increment of jump:", new List<string>(c_asSteps), c_asSteps[iStep],
+ListBox lstIncrement = dlg.addPickBox("&Increment of jump:", new List<string>(asSteps), asSteps[iStep],
 "How far Forward and Backward move. One minute to begin with. Choosing here changes nothing else: the next Forward or Backward uses whatever is chosen.");
 dlg.endBand();
 
@@ -508,7 +508,7 @@ iOrderNow = iWantOrder;
 sortQueue(lsRef, aOrder, iWantOrder);
 refillTracks(dlg, lstTracks, lsRef, aOrder);
 writeValue(sSettings, "order", iWantOrder.ToString(CultureInfo.InvariantCulture));
-say(dlg, "Ordered by " + c_asOrders[iWantOrder]);
+say(dlg, "Ordered by " + asOrders[iWantOrder]);
 }
 goOrResume(dlg, oPlayer, lsRef, lstTracks, aOrder);
 };
@@ -573,12 +573,12 @@ forgetSettings(sSettings);
 bMovingTimeline = true;
 try { barTimeline.Value = 0; }
 finally { bMovingTimeline = false; }
-lstIncrement.SelectedIndex = c_iDefaultStep;
-barRate.Value = c_iDefaultRate;
-barVolume.Value = Homer.Mpv.c_iDefaultVolume;
-lstOrder.SelectedIndex = c_iDefaultOrder;
-iOrderNow = c_iDefaultOrder;
-sortQueue(lsRef, aOrder, c_iDefaultOrder);
+lstIncrement.SelectedIndex = iDefaultStep;
+barRate.Value = iDefaultRate;
+barVolume.Value = Homer.Mpv.iDefaultVolume;
+lstOrder.SelectedIndex = iDefaultOrder;
+iOrderNow = iDefaultOrder;
+sortQueue(lsRef, aOrder, iDefaultOrder);
 refillTracks(dlg, lstTracks, lsRef, aOrder);
 say(dlg, "Defaults restored");
 };
@@ -974,8 +974,8 @@ return "unknown";
 // pressed rather than watched for changes.
 private static int stepSeconds(ListBox lstIncrement) {
 int iPick = lstIncrement.SelectedIndex;
-if (iPick < 0 || iPick >= c_aiSteps.Length) iPick = c_iDefaultStep;
-return c_aiSteps[iPick];
+if (iPick < 0 || iPick >= aiSteps.Length) iPick = iDefaultStep;
+return aiSteps[iPick];
 }
 
 private static void goOrResume(Homer.LbcDialog dlg, Homer.Mpv player, List<MediaTrack> lsTracks,

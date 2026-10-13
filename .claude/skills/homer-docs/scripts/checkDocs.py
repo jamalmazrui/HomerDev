@@ -18,12 +18,12 @@ Exit code 0 with no findings, 1 with findings, 2 when the folder is missing.
 
 import os, re, sys
 
-c_iContentsLines = 150  # a document this long needs a contents list
-c_iContentsHeadings = 5  # ...when it also has this many H2 sections
-c_nMaxGrade = 9.0
-c_lsVagueLinks = ["click here", "here", "learn more", "link", "more", "read more", "this", "this link"]
-c_lsHelpSet = ["Announce.md", "Developer.md", "History.md", "Hotkeys.md"]
-c_lsTopSet = ["License.md", "ReadMe.md"]
+iContentsLines = 150  # a document this long needs a contents list
+iContentsHeadings = 5  # ...when it also has this many H2 sections
+nMaxGrade = 9.0
+lsVagueLinks = ["click here", "here", "learn more", "link", "more", "read more", "this", "this link"]
+lsHelpSet = ["Announce.md", "Developer.md", "History.md", "Hotkeys.md"]
+lsTopSet = ["License.md", "ReadMe.md"]
 
 
 def readText(sPath):
@@ -96,19 +96,19 @@ def checkDocument(sPath, bUserDocument):
     # LINK TEXT THAT SAYS WHERE IT GOES (1.50.1). A screen reader user often
     # lists a page's links out of context, where "click here" says nothing.
     for sLinkText in re.findall(r"(?<!!)\[([^\]\n]+)\]\s*[\[(]", sBody):
-        if sLinkText.strip().lower().strip(".") in c_lsVagueLinks:
+        if sLinkText.strip().lower().strip(".") in lsVagueLinks:
             lsFindings.append("vague link text: \"%s\"; say where the link goes" % sLinkText.strip())
     # AN IMAGE SAYS WHAT IT SHOWS. Empty alternative text leaves a picture
     # silent for a screen reader user.
     for sImage in re.findall(r"!\[\s*\]\(([^)\s]+)", sBody):
         lsFindings.append("image with no text alternative: %s" % sImage[:80])
     iH2 = sum(1 for iLevel, s in lsHeadings if iLevel == 2)
-    if len(sText.split("\n")) > c_iContentsLines and iH2 >= c_iContentsHeadings and not re.search(r"(?mi)^#+ contents|^\[TOC\]|^## Table of Contents", sText):
+    if len(sText.split("\n")) > iContentsLines and iH2 >= iContentsHeadings and not re.search(r"(?mi)^#+ contents|^\[TOC\]|^## Table of Contents", sText):
         lsFindings.append("%d lines and %d sections with no contents list" % (len(sText.split("\n")), iH2))
     nGrade = readingGrade(sText)
     sGrade = "grade n/a" if nGrade is None else "grade %.1f" % nGrade
-    if bUserDocument and nGrade is not None and nGrade > c_nMaxGrade:
-        lsFindings.append("reading grade %.1f, above %d" % (nGrade, c_nMaxGrade))
+    if bUserDocument and nGrade is not None and nGrade > nMaxGrade:
+        lsFindings.append("reading grade %.1f, above %d" % (nGrade, nMaxGrade))
     sHtm = sPath[:-3] + ".htm"
     if not os.path.isfile(sHtm): lsFindings.append("no .htm beside it")
     elif os.path.getmtime(sHtm) + 1 < os.path.getmtime(sPath): lsFindings.append(".htm is older than the .md; rebuild it")
@@ -126,7 +126,7 @@ def main():
         return 2
     sApp = lsArgs[lsArgs.index("--app") + 1] if "--app" in lsArgs else os.path.basename(sRoot.rstrip("\\/"))
     sHelp = os.path.join(sRoot, "help")
-    lsExpected = [os.path.join(sRoot, s) for s in c_lsTopSet] + [os.path.join(sHelp, s) for s in c_lsHelpSet + [sApp + ".md"]]
+    lsExpected = [os.path.join(sRoot, s) for s in lsTopSet] + [os.path.join(sHelp, s) for s in lsHelpSet + [sApp + ".md"]]
     iFindings = 0
     for sPath in lsExpected:
         if not os.path.isfile(sPath):

@@ -31,7 +31,7 @@ import wx
 
 import inix, log, mdi, paths, say, util
 
-c_sAppName = "FruitBasketMdiPy"
+sAppName = "FruitBasketMdiPy"
 
 
 # ---- MDI 1: the frame owns the app name, the child owns the subject ----
@@ -43,7 +43,7 @@ c_sAppName = "FruitBasketMdiPy"
 class fruitFrame(mdi.MdiFrame):
 
     def __init__(self):
-        mdi.MdiFrame.__init__(self, c_sAppName)
+        mdi.MdiFrame.__init__(self, sAppName)
         self.iBaskets = 0
 
         # ---- MDI 2: commands are named sentences, not control ids ----
@@ -209,8 +209,8 @@ class fruitChild(mdi.MdiChild):
 # A frame with no children has no menu bar and nothing to tab to, which is a
 # dead end for a keyboard user.
 def main():
-    paths.start(c_sAppName)
-    log.start(c_sAppName)
+    paths.start(sAppName)
+    log.start(sAppName)
     try:
         oApp = wx.App(False)
         frame = fruitFrame()

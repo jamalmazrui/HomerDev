@@ -83,15 +83,15 @@ for _sKitScripts in [os.path.join(os.environ.get("HomerDev", ""), "scripts"), r"
 
 # The standard document set. ReadMe and License sit at the top of the project;
 # everything else lives in help, which is where the Homer layout puts documents.
-c_lsDocumentsTop = ["License", "ReadMe"]
+lsDocumentsTop = ["License", "ReadMe"]
 # THE DEFAULT DOCUMENT SET (22 Aug 2026): ReadMe and License at the top; the
 # app's own guide, Developer, History and Hotkeys in help. Tutorials only when
 # the app has tutorial scripts. Announce and FAQ are welcome, never required:
 # a check that demanded FAQ refused a release on 25 Sep 2026.
-c_lsDocumentsHelp = ["Developer", "History", "Hotkeys"]
-c_lsSkipFolders = [".git", ".venv", "__pycache__", "build", "dist", "notes", "venv"]
-c_lsGeneratedFiles = ["version.py", "version.cs"]   # written by every build
-c_lsTextExt = (".cs", ".py", ".ps1", ".md", ".htm", ".inix", ".txt", ".iss", ".cmd", ".bat")
+lsDocumentsHelp = ["Developer", "History", "Hotkeys"]
+lsSkipFolders = [".git", ".venv", "__pycache__", "build", "dist", "notes", "venv"]
+lsGeneratedFiles = ["version.py", "version.cs"]   # written by every build
+lsTextExtensions = (".cs", ".py", ".ps1", ".md", ".htm", ".inix", ".txt", ".iss", ".cmd", ".bat")
 
 sScriptDir = os.path.dirname(os.path.abspath(__file__))
 
@@ -344,7 +344,7 @@ def sourceFiles():
     lsNamed = namedByProject()
     lsFiles = []
     for sDirPath, lsDirs, lsNames in os.walk(sRoot):
-        lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders]
+        lsDirs[:] = [s for s in lsDirs if s.lower() not in lsSkipFolders]
         for sName in sorted(lsNames):
             if sName.lower().endswith((".cs", ".py")):
                 sPath = os.path.join(sDirPath, sName)
@@ -391,9 +391,9 @@ def readText(sPath):
 
 def checkDocuments():
     sApp = appName()
-    lsHelp = sorted(c_lsDocumentsHelp + [sApp])
+    lsHelp = sorted(lsDocumentsHelp + [sApp])
     if glob.glob(os.path.join(sRoot, "help", "Tutorial_*.inix")): lsHelp.append("Tutorials")
-    lsWanted = ([(sRoot, s) for s in c_lsDocumentsTop] +
+    lsWanted = ([(sRoot, s) for s in lsDocumentsTop] +
                 [(os.path.join(sRoot, "help"), s) for s in lsHelp])
     lsMissing = [s for sFolder, s in lsWanted
                  if not os.path.exists(os.path.join(sFolder, s + ".md"))]
@@ -444,10 +444,10 @@ def checkEncoding():
     lsWrong = []
     iChecked = 0
     for sDirPath, lsDirs, lsNames in os.walk(sRoot):
-        lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders]
+        lsDirs[:] = [s for s in lsDirs if s.lower() not in lsSkipFolders]
         for sName in sorted(lsNames):
-            if sName.lower() in c_lsGeneratedFiles: continue
-            if not sName.lower().endswith(c_lsTextExt): continue
+            if sName.lower() in lsGeneratedFiles: continue
+            if not sName.lower().endswith(lsTextExtensions): continue
             sPath = os.path.join(sDirPath, sName)
             if lsNamed is not None and not isNamed(os.path.relpath(sPath, sRoot), lsNamed): continue
             if lsKeep and isNamed(os.path.relpath(sPath, sRoot), lsKeep): continue
@@ -484,7 +484,7 @@ def checkBatchBlocks():
     except Exception as oError:
         return finding("batch", "skip", "the kit's fixEncoding.py, which holds the rule, could not be loaded: %s" % oError)
     for sDirPath, lsDirs, lsNames in os.walk(sRoot):
-        lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders and s.lower() not in ("logs", "notes")]
+        lsDirs[:] = [s for s in lsDirs if s.lower() not in lsSkipFolders and s.lower() not in ("logs", "notes")]
         for sName in sorted(lsNames):
             if not sName.lower().endswith((".cmd", ".bat")): continue
             sPath = os.path.join(sDirPath, sName)
@@ -502,7 +502,7 @@ def checkEmpty():
     refused over three empty logs; tidy deletes those."""
     lsEmpty = []
     for sDirPath, lsDirs, lsNames in os.walk(sRoot):
-        lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders and s.lower() != "logs"]
+        lsDirs[:] = [s for s in lsDirs if s.lower() not in lsSkipFolders and s.lower() != "logs"]
         for sName in sorted(lsNames):
             sPath = os.path.join(sDirPath, sName)
             try:
@@ -704,7 +704,7 @@ def desktopShortcut():
 
 
 # Words that can stand where a declaration's type does but begin a statement.
-c_lsNotTypes = ("await", "case", "catch", "else", "for", "foreach", "if", "lock", "new", "return",
+lsNotTypes = ("await", "case", "catch", "else", "for", "foreach", "if", "lock", "new", "return",
                 "sizeof", "switch", "throw", "typeof", "using", "while", "yield")
 
 
@@ -721,7 +721,7 @@ def checkLocal():
     lsNamed = namedByProject()
     lsBad = []
     for sDirPath, lsDirs, lsNames in os.walk(sRoot):
-        lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders]
+        lsDirs[:] = [s for s in lsDirs if s.lower() not in lsSkipFolders]
         for sName in sorted(lsNames):
             if not sName.lower().endswith((".cs", ".py", ".iss", ".ps1", ".cmd", ".js")): continue
             sPath = os.path.join(sDirPath, sName)
@@ -831,7 +831,7 @@ def checkKeys():
         # Up or Page Down moves a cursor inside a window and takes nothing from
         # the desktop, which uses letters. A desktop shortcut's own letter --
         # Alt+Control+D opens DbDo -- is the sanctioned use and is not in source.
-        c_lsNavigation = ("arrow", "arrows", "up", "down", "left", "right", "home", "end",
+        lsNavigation = ("arrow", "arrows", "up", "down", "left", "right", "home", "end",
                           "pageup", "pagedown", "uparrow", "downarrow", "leftarrow", "rightarrow")
         # THE WHOLE COMBINATION IS READ (1.43.18): Alt+Control+Shift+H, not
         # "Alt+Control+Shift" with Shift taken for the key. And in Python the
@@ -845,7 +845,7 @@ def checkKeys():
         else:
             lsCombos = re.findall(r"\b(?:Alt\+Control|Control\+Alt)(?:\+Shift)?\+\w+", sText)
         for sKey in lsCombos:
-            if sKey.rsplit("+", 1)[1].lower() in c_lsNavigation: continue
+            if sKey.rsplit("+", 1)[1].lower() in lsNavigation: continue
             # The app's own desktop shortcut, as its installer declares it,
             # is the sanctioned use: FileDir's Hotkeys.inix lists Alt+Control+F
             # because that is how FileDir is opened, and HomerView's NVDA
@@ -883,7 +883,7 @@ def checkKeys():
             # statement keyword, is a declaration.
             if not oDef:
                 oDecl = re.match(r"\s{0,8}([\w<>\[\],\.]+)\s+(\w+)\s*\(", sLine)
-                if oDecl and oDecl.group(1) not in c_lsNotTypes and "=" not in sLine[:oDecl.end()]:
+                if oDecl and oDecl.group(1) not in lsNotTypes and "=" not in sLine[:oDecl.end()]:
                     oDef = re.match(r"\s{0,8}[\w<>\[\],\.]+\s+(\w+)\s*\(", sLine)
             if oDef: sMethod = oDef.group(1)
             # A CAPTION IS SHORT. An ampersand inside a sentence of help text is
@@ -1074,7 +1074,7 @@ def checkLayout(sKind):
     return finding("layout", "pass", "every top-level folder is a standard one" + ("" if not lsDeclaredExtra else "; declared besides: " + ", ".join(lsDeclaredExtra)))
 
 
-c_nCopyThreshold = 0.5
+nCopyThreshold = 0.5
 
 
 def sharedFraction(sPathA, sPathB):
@@ -1227,7 +1227,7 @@ def checkSharedCode():
                 # module with a clashing name -- logged, not failed as a copy.
                 # HomerView's own paths.py and elevate.py were first reported as copies.
                 nShared = sharedFraction(sPath, dKitFiles[sLower])
-                if nShared >= c_nCopyThreshold:
+                if nShared >= nCopyThreshold:
                     lsBad.append((sRel.replace(os.sep, "/").lower(), "%s is a copy of the kit's %s that has drifted (%d%% of its lines shared)" % (sRel, sName, round(nShared * 100))))
                 else:
                     logLine("NAME: %s has the name of the kit's %s but different code (%d%% of lines shared); a different name would avoid confusion" % (sRel, sName, round(nShared * 100)))
@@ -1245,7 +1245,7 @@ def checkSharedCode():
                     setKit = classMembers(classBody(readText(os.path.join(sKit, "exec", "CSharp", dKitClasses[sClass])), sClass))
                     iSmaller = min(len(setApp), len(setKit))
                     nShared = (len(setApp & setKit) / float(iSmaller)) if iSmaller else 0.0
-                    if nShared >= c_nCopyThreshold:
+                    if nShared >= nCopyThreshold:
                         lsBad.append(((sRel.replace(os.sep, "/") + ":" + sClass).lower(), "%s defines class %s, a drifted copy of the kit's %s (%d%% of members shared)" % (sRel, sClass, dKitClasses[sClass], round(nShared * 100))))
                     else:
                         logLine("NAME: %s defines class %s, a different class from the kit's %s (%d%% of members shared); a different name would avoid confusion" % (sRel, sClass, dKitClasses[sClass], round(nShared * 100)))

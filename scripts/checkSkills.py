@@ -34,15 +34,15 @@ skills folder.
 
 import datetime, os, platform, re, sys
 
-c_iBodyLines = 500
-c_iBodyNotice = 3000
-c_iBodyWords = 5000
-c_iCompatibilityChars = 500
-c_iDescriptionChars = 1024
-c_iNameChars = 64
-c_lsAllowedKeys = ["allowed-tools", "compatibility", "description", "license", "metadata", "name"]
-c_lsReservedWords = ["anthropic", "claude"]
-c_sWhenPattern = r"\b(use (this skill |it )?(when|whenever|for|if)|load (this skill )?whenever|when (the user|a user|someone|you|asked)|trigger)"
+iBodyLines = 500
+iBodyNotice = 3000
+iBodyWords = 5000
+iCompatibilityChars = 500
+iDescriptionChars = 1024
+iNameChars = 64
+lsAllowedKeys = ["allowed-tools", "compatibility", "description", "license", "metadata", "name"]
+lsReservedWords = ["anthropic", "claude"]
+sWhenPattern = r"\b(use (this skill |it )?(when|whenever|for|if)|load (this skill )?whenever|when (the user|a user|someone|you|asked)|trigger)"
 
 lsLog = []
 sLogPath = ""
@@ -103,25 +103,25 @@ def checkSkill(sSkillsDir, sName, lProblems, lNotices):
     dValues = frontmatterValues(oFront.group(1))
     sBody = oFront.group(2)
     sNameValue = dValues.get("name", "")
-    if len(sNameValue) > c_iNameChars: problem("name: is %d characters; the limit is %d" % (len(sNameValue), c_iNameChars))
+    if len(sNameValue) > iNameChars: problem("name: is %d characters; the limit is %d" % (len(sNameValue), iNameChars))
     if sNameValue.startswith("-") or sNameValue.endswith("-") or "--" in sNameValue: problem("name: may not start or end with a hyphen, or hold two hyphens together")
-    lUnknown = sorted(k for k in re.findall(r"(?m)^([A-Za-z][\w-]*):", oFront.group(1)) if k not in c_lsAllowedKeys)
-    if lUnknown: problem("the frontmatter holds keys the standard does not allow: " + ", ".join(lUnknown) + " (allowed: " + ", ".join(c_lsAllowedKeys) + "); put custom values under metadata:")
+    lUnknown = sorted(k for k in re.findall(r"(?m)^([A-Za-z][\w-]*):", oFront.group(1)) if k not in lsAllowedKeys)
+    if lUnknown: problem("the frontmatter holds keys the standard does not allow: " + ", ".join(lUnknown) + " (allowed: " + ", ".join(lsAllowedKeys) + "); put custom values under metadata:")
     if dValues.get("name", "") != sName: problem("name: is \"" + dValues.get("name", "") + "\"; it must equal the folder name")
-    for sWord in c_lsReservedWords:
+    for sWord in lsReservedWords:
         if sWord in dValues.get("name", "").lower(): problem("name: holds \"" + sWord + "\", which is reserved")
     sDescription = dValues.get("description", "")
     if not sDescription: problem("no description:")
-    elif len(sDescription) > c_iDescriptionChars: problem("description: is %d characters; the limit is %d" % (len(sDescription), c_iDescriptionChars))
-    if sDescription and not re.search(c_sWhenPattern, sDescription, re.I): notice("the description does not say when to use the skill (\"Use when ...\")")
+    elif len(sDescription) > iDescriptionChars: problem("description: is %d characters; the limit is %d" % (len(sDescription), iDescriptionChars))
+    if sDescription and not re.search(sWhenPattern, sDescription, re.I): notice("the description does not say when to use the skill (\"Use when ...\")")
     for sKey, sValue in dValues.items():
         if re.search(r"[<>]", sValue): problem(sKey + ": holds an angle bracket (" + re.search(r".{0,20}[<>].{0,20}", sValue).group(0) + "); the frontmatter may hold none")
-    if len(dValues.get("compatibility", "")) > c_iCompatibilityChars: problem("compatibility: is over %d characters" % c_iCompatibilityChars)
+    if len(dValues.get("compatibility", "")) > iCompatibilityChars: problem("compatibility: is over %d characters" % iCompatibilityChars)
     iWords = len(sBody.split())
     iLines = sBody.count("\n") + 1
-    if iWords > c_iBodyWords: notice("SKILL.md's body is %d words, past the guide's advice of %d; move detail into references" % (iWords, c_iBodyWords))
-    elif iWords > c_iBodyNotice: notice("SKILL.md's body is %d words, on its way to the guide's %d" % (iWords, c_iBodyWords))
-    if iLines > c_iBodyLines: notice("SKILL.md's body is %d lines; the skill-creator's ideal is %d, with detail in references" % (iLines, c_iBodyLines))
+    if iWords > iBodyWords: notice("SKILL.md's body is %d words, past the guide's advice of %d; move detail into references" % (iWords, iBodyWords))
+    elif iWords > iBodyNotice: notice("SKILL.md's body is %d words, on its way to the guide's %d" % (iWords, iBodyWords))
+    if iLines > iBodyLines: notice("SKILL.md's body is %d lines; the skill-creator's ideal is %d, with detail in references" % (iLines, iBodyLines))
     for sLink in re.findall(r"\]\(([^)#\s]+)\)", sBody):
         if re.match(r"^[a-z]+:", sLink, re.I): continue
         if not os.path.exists(os.path.join(sDir, sLink)): notice("links to " + sLink + ", which is not there (a copy the kit's build makes, or a broken link)")

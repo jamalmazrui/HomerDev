@@ -251,10 +251,10 @@
 <h1 id="camel-type-python-coding-guidelines">Camel Type: Python Coding
 Guidelines</h1>
 <p>Camel Type is a coding style optimized for screen reader productivity
-and systematic readability. The following rules apply to Python 3.
-Equivalent documents in this folder cover C#
-(<code>CamelType_CSharp.md</code>) and JAWS scripting
-(<code>CamelType_JAWSScript.md</code>).</p>
+and systematic readability. The following rules apply to Python 3. The
+rules every language shares are in <code>CamelType.md</code>; equivalent
+documents in this folder cover C#, JavaScript, JAWS scripting,
+PowerShell and VBScript.</p>
 <p>This is the kit’s copy. An app does not carry one of its own;
 urlCheck’s copy moved here in HomerDev 1.43.0.</p>
 <hr />
@@ -327,16 +327,20 @@ the class-name prefix: <code>stringIoOut</code>,
 <code>stringIoErr</code>.</p>
 <hr />
 <h2 id="constant-naming">2. Constant Naming</h2>
-<p>A constant is named like a variable, Hungarian type prefix included,
-with <strong><code>c_</code> in front</strong>: <code>c</code> for
-constant, then an underscore. The prefix is what tells a listener, at
-the point of use, that the value never changes.</p>
-<p>Examples: <code>c_sDefaultEncoding = "utf-8"</code>,
-<code>c_iTimeoutSec = 60</code></p>
-<p>Programs written before this rule (urlCheck among them) name their
-constants without <code>c_</code>. New constants in those programs take
-the prefix; the old ones are renamed only when a file is being reworked
-anyway.</p>
+<p>A constant is named <strong>exactly like a variable</strong>: the
+Hungarian type prefix, then lower camel case. The earlier
+<code>c_</code> prefix is obsolete; a Homer program has none, and the
+kit’s tidy renames any it finds.</p>
+<p>Examples: <code>sDefaultEncoding = "utf-8"</code>,
+<code>iTimeoutSec = 60</code></p>
+<p>Python has no keyword for a constant, so a constant is set apart by
+<strong>where it is defined and what happens to it</strong>: it is
+assigned once, at the top of the module, before any function, and
+nothing assigns it again. A value a function changes is a variable,
+however it is named. When a constant and a variable derived from it
+would share a name – a list of every sample, and the samples being built
+this time – the constant takes a word that says what it holds:
+<code>lAllSamples</code>, and the variable <code>lSamples</code>.</p>
 <hr />
 <h2 id="capitalization">3. Capitalization</h2>
 <p>Use <strong>lower camel case</strong> for all custom names:
@@ -370,10 +374,10 @@ any function definitions, grouped by type, each group in alphabetical
 order, constants within each group in alphabetical order.</p>
 <p>Example:</p>
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb2-1">c_iTimeoutSec <span class="op">=</span> <span class="dv">60</span></span>
-<span id="cb2-2">c_sEncoding <span class="op">=</span> <span class="st">&quot;utf-8&quot;</span></span>
-<span id="cb2-3">c_sFallbackTitle <span class="op">=</span> <span class="st">&quot;untitled-page&quot;</span></span>
-<span id="cb2-4">c_sResultsDir <span class="op">=</span> <span class="st">&quot;results&quot;</span></span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1">iTimeoutSec <span class="op">=</span> <span class="dv">60</span></span>
+<span id="cb2-2">sEncoding <span class="op">=</span> <span class="st">&quot;utf-8&quot;</span></span>
+<span id="cb2-3">sFallbackTitle <span class="op">=</span> <span class="st">&quot;untitled-page&quot;</span></span>
+<span id="cb2-4">sResultsDir <span class="op">=</span> <span class="st">&quot;results&quot;</span></span></code></pre></div>
 <hr />
 <h2 id="script-structure-and-entry-point">6. Script Structure and Entry
 Point</h2>

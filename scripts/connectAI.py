@@ -24,9 +24,9 @@ kit in Program Files is read-only to a person), as HomerDev-connectAI-<stamp>.lo
 
 import datetime, os, platform, shutil, subprocess, sys
 
-c_sBegin = "<!-- HomerDev begin: written by the Homer Development Kit's connectAI; connectAI --remove takes it out -->"
-c_sEnd = "<!-- HomerDev end -->"
-c_dTools = {  # tool: (profile folder, instruction file, [skills folders]) -- all relative to the user profile
+sBegin = "<!-- HomerDev begin: written by the Homer Development Kit's connectAI; connectAI --remove takes it out -->"
+sEnd = "<!-- HomerDev end -->"
+dTools = {  # tool: (profile folder, instruction file, [skills folders]) -- all relative to the user profile
     "claude": (".claude", ".claude\\CLAUDE.md", [".claude\\skills"]),
     "codex": (".codex", ".codex\\AGENTS.md", [".agents\\skills", ".codex\\skills"]),
     "gemini": (".gemini", ".gemini\\GEMINI.md", [".gemini\\config\\skills", ".gemini\\antigravity\\skills", ".agents\\skills"]),
@@ -49,7 +49,7 @@ def say(sText):
 
 
 def inProfile(sHome, sRelative):
-    """A path under the profile, from the Windows-style relative path in c_dTools."""
+    """A path under the profile, from the Windows-style relative path in dTools."""
     return os.path.join(sHome, *sRelative.split("\\"))
 
 
@@ -61,7 +61,7 @@ def kitFolder():
 def pointerText(sKit):
     """The block each instruction file gets: where the kit is, and what to read first. Short, since it is always on."""
     return "\r\n".join([
-        c_sBegin,
+        sBegin,
         "## The Homer Development Kit (HomerDev)",
         "",
         "The Homer Development Kit is installed at %s (the HomerDev environment variable names it too)." % sKit,
@@ -75,7 +75,7 @@ def pointerText(sKit):
             os.path.join(sKit, "exec", "CSharp"), os.path.join(sKit, "exec", "Python"), os.path.join(sKit, "Templates")),
         "4. The cycle in a project folder is build_release: build, tidy, push and release. Read the logs it writes in",
         "   the project's logs folder before suggesting a fix.",
-        c_sEnd, ""])
+        sEnd, ""])
 
 
 def setBlock(sPath, sBlock):
@@ -83,8 +83,8 @@ def setBlock(sPath, sBlock):
     sText = ""
     if os.path.isfile(sPath):
         sText = open(sPath, "rb").read().decode("utf-8-sig", errors="replace")
-    iStart, iEnd = sText.find(c_sBegin), sText.find(c_sEnd)
-    sBefore, sAfter = (sText[:iStart], sText[iEnd + len(c_sEnd):]) if iStart >= 0 and iEnd > iStart else (sText, "")
+    iStart, iEnd = sText.find(sBegin), sText.find(sEnd)
+    sBefore, sAfter = (sText[:iStart], sText[iEnd + len(sEnd):]) if iStart >= 0 and iEnd > iStart else (sText, "")
     sAfter = sAfter.lstrip("\r\n")
     if not sBlock:
         if iStart < 0: return "nothing to remove"
@@ -153,8 +153,8 @@ def main(lsArgs):
     lsConnected = []
     dFailed = {}
     lsDoneFolders = set()
-    for sTool in sorted(c_dTools):
-        sProfile, sInstructions, lsSkillDirs = c_dTools[sTool]
+    for sTool in sorted(dTools):
+        sProfile, sInstructions, lsSkillDirs = dTools[sTool]
         if not os.path.isdir(inProfile(sHome, sProfile)):
             logLine("%s: no %s folder in the profile, so it is not installed or never run; skipped" % (sTool, sProfile)); continue
         iFound += 1
@@ -164,7 +164,7 @@ def main(lsArgs):
         dFailed[sToolName] = 0
         sFile = inProfile(sHome, sInstructions)
         if bCheck:
-            bHas = os.path.isfile(sFile) and c_sBegin in open(sFile, "rb").read().decode("utf-8-sig", errors="replace")
+            bHas = os.path.isfile(sFile) and sBegin in open(sFile, "rb").read().decode("utf-8-sig", errors="replace")
             say("%s: %s %s the kit's pointer." % (sTool, sFile, "holds" if bHas else "does not hold"))
         else:
             sDid = setBlock(sFile, "" if bRemove else pointerText(sKit))

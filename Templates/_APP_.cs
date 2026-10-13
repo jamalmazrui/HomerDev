@@ -67,9 +67,9 @@ namespace _APP_
 public static class Program
 {
     // ---- constants --------------------------------------------------------
-    private const string c_sAppName = "_APP_";
-    private const string c_sSettingsFile = "_APP_.inix";
-    private const string c_sSection = "Settings";
+    private const string sAppName = "_APP_";
+    private const string sSettingsFile = "_APP_.inix";
+    private const string sSection = "Settings";
 
     // ---- settings, each saved the moment it is answered --------------------
     private static bool bUseConfig = false;
@@ -101,7 +101,7 @@ public static class Program
     // in Program Files cannot write beside its own .exe.
     private static string settingsPath()
     {
-        string sBeside = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, c_sSettingsFile);
+        string sBeside = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, sSettingsFile);
         try
         {
             if (File.Exists(sBeside)) return sBeside;
@@ -112,18 +112,18 @@ public static class Program
         {
         }
         string sLocal = Path.Combine(Environment.GetFolderPath(
-            Environment.SpecialFolder.LocalApplicationData), c_sAppName);
+            Environment.SpecialFolder.LocalApplicationData), sAppName);
         try { Directory.CreateDirectory(sLocal); } catch (Exception) { }
-        return Path.Combine(sLocal, c_sSettingsFile);
+        return Path.Combine(sLocal, sSettingsFile);
     }
 
     private static bool loadSettings()
     {
         string sPath = settingsPath();
-        sSource = InixCodec.readValue(sPath, c_sSection, "Source", "");
-        sOutput = InixCodec.readValue(sPath, c_sSection, "Output", "");
-        bUseConfig = InixCodec.readValue(sPath, c_sSection, "UseConfig", "0") == "1";
-        bViewOutput = InixCodec.readValue(sPath, c_sSection, "ViewOutput", "1") == "1";
+        sSource = InixCodec.readValue(sPath, sSection, "Source", "");
+        sOutput = InixCodec.readValue(sPath, sSection, "Output", "");
+        bUseConfig = InixCodec.readValue(sPath, sSection, "UseConfig", "0") == "1";
+        bViewOutput = InixCodec.readValue(sPath, sSection, "ViewOutput", "1") == "1";
         return true;
     }
 
@@ -131,13 +131,13 @@ public static class Program
     // rather than once at the end, so nothing is lost if the program is killed.
     private static bool saveSetting(string sKey, string sValue)
     {
-        return InixCodec.writeValue(settingsPath(), c_sSection, sKey, sValue);
+        return InixCodec.writeValue(settingsPath(), sSection, sKey, sValue);
     }
 
     // ---- the dialog -------------------------------------------------------
     private static int runFromDialog()
     {
-        using (LbcDialog dlg = new LbcDialog(c_sAppName, null))
+        using (LbcDialog dlg = new LbcDialog(sAppName, null))
         {
             dlg.addBand();
             TextBox tbSource = dlg.addInputBox("&Source:", sSource,
@@ -168,7 +168,7 @@ public static class Program
             dlg.endBand();
 
             CheckBox cbUseConfig = dlg.addCheckBox("&Use configuration", bUseConfig,
-                "Take the settings from " + c_sSettingsFile + " instead of asking again next time.");
+                "Take the settings from " + sSettingsFile + " instead of asking again next time.");
             CheckBox cbViewOutput = dlg.addCheckBox("&View output", bViewOutput,
                 "Open the result when the work finishes.");
 
@@ -280,14 +280,14 @@ public static class Program
     {
         StringBuilder sbText = new StringBuilder();
         foreach (string sLine in lsReport) sbText.AppendLine(sLine);
-        HelpDialog.show(null, c_sAppName + " results", sbText.ToString());
+        HelpDialog.show(null, sAppName + " results", sbText.ToString());
         return true;
     }
 
     private static string helpText()
     {
         StringBuilder sbText = new StringBuilder();
-        sbText.AppendLine(c_sAppName + " -- one dialog, one job, one result.");
+        sbText.AppendLine(sAppName + " -- one dialog, one job, one result.");
         sbText.AppendLine("");
         sbText.AppendLine("Fields");
         sbText.AppendLine("  Source: the file or folder to work on.");
@@ -302,9 +302,9 @@ public static class Program
         sbText.AppendLine("  Help shows this. F1 does the same.");
         sbText.AppendLine("");
         sbText.AppendLine("Command line, which does everything the dialog does");
-        sbText.AppendLine("  " + c_sAppName + " --source <path> [--output <path>] [--config] [--view]");
-        sbText.AppendLine("  " + c_sAppName + " --defaults");
-        sbText.AppendLine("  " + c_sAppName + " --help");
+        sbText.AppendLine("  " + sAppName + " --source <path> [--output <path>] [--config] [--view]");
+        sbText.AppendLine("  " + sAppName + " --defaults");
+        sbText.AppendLine("  " + sAppName + " --help");
         return sbText.ToString();
     }
 

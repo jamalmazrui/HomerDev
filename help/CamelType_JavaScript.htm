@@ -1,0 +1,419 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.12.1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>CamelType_JavaScript</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      color: light-dark(#1a1a1a, #fdfdfd);
+      background-color: #fdfdfd;
+      background-color: light-dark(#fdfdfd, #1a1a1a);
+      color-scheme: light dark;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a, a:visited {
+      color: inherit;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid;
+      border-color: #e6e6e6;
+      border-color: light-dark(#e6e6e6, #4c4c4c);
+      color: #606060;
+      color: light-dark(#606060, #b6b6b6);
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid currentColor;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+    }
+    th {
+      border-top: 1px solid currentColor;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+</head>
+<body>
+<main>
+<h1 id="camel-type-javascript-coding-guidelines">Camel Type: JavaScript
+Coding Guidelines</h1>
+<p>Camel Type is a coding style optimized for screen reader productivity
+and systematic readability. The following rules apply to JavaScript (ES
+module, Node.js context).</p>
+<hr />
+<h2 id="strict-mode">1. Strict Mode</h2>
+<p>ES modules enforce strict mode automatically, so no
+<code>"use strict"</code> declaration is needed when using
+<code>import</code>/<code>export</code> syntax. If writing a CommonJS
+script (not recommended), add <code>"use strict";</code> as the very
+first line.</p>
+<hr />
+<h2 id="variable-and-argument-naming">2. Variable and Argument
+Naming</h2>
+<p>Use Hungarian prefix notation to indicate type. Prefix rules:</p>
+<ul>
+<li><code>a</code> — array</li>
+<li><code>b</code> — boolean</li>
+<li><code>bin</code> — binary buffer</li>
+<li><code>dt</code> — date-time</li>
+<li><code>f</code> — file</li>
+<li><code>h</code> — window or OS handle (not used for JavaScript
+objects)</li>
+<li><code>i</code> — integer</li>
+<li><code>l</code> — list</li>
+<li><code>n</code> — real number (float)</li>
+<li><code>s</code> — string</li>
+<li><code>d</code> — dictionary (plain key-value object)</li>
+<li><code>v</code> — variant (unknown or mixed type)</li>
+</ul>
+<p>For <strong>JavaScript object instances</strong> (class instances,
+library objects), use the <strong>lowercase class name</strong> as the
+prefix. If there is only one instance of that class in scope, the class
+name prefix is the entire variable name — no additional suffix is
+added.</p>
+<p>Examples: - One Playwright <code>Browser</code> instance:
+<code>browser</code> - One Playwright <code>Page</code> instance:
+<code>page</code> - One <code>AxeBuilder</code> instance:
+<code>axeBuilder</code> - One <code>URL</code> instance:
+<code>urlParsed</code> (two <code>URL</code> instances would need
+distinguishing suffixes) - A caught error: <code>error</code></p>
+<hr />
+<h2 id="constant-naming">3. Constant Naming</h2>
+<p>Constants use the <strong>same lower camel case naming convention as
+variables</strong>, including the Hungarian type prefix. They are
+distinguished only by being declared with <code>const</code> rather than
+<code>let</code>, not by any difference in capitalization or
+formatting.</p>
+<p>Examples: <code>const sDefaultEncoding = "utf-8";</code>,
+<code>const iTimeoutMs = 60000;</code></p>
+<hr />
+<h2 id="capitalization">4. Capitalization</h2>
+<p>Use <strong>lower camel case</strong> for all custom names:
+variables, constants, functions, parameters. Avoid upper camel case and
+snake case except where a language API or external library requires
+it.</p>
+<hr />
+<h2 id="variable-and-constant-declarations">5. Variable and Constant
+Declarations</h2>
+<ul>
+<li>Declare constants with <code>const</code> and variables with
+<code>let</code> at the <strong>top of their scope</strong>, before any
+logic.</li>
+<li>Group declarations by type, one statement per type group, names
+listed <strong>alphabetically</strong> within the group.</li>
+<li>Type groups appear in <strong>alphabetical order</strong> by prefix
+letter.</li>
+<li>Constants are declared before variables.</li>
+<li>Explicitly initialize <code>let</code> variables on the lines
+immediately following the declarations.</li>
+</ul>
+<p>Example:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb1-1"><span class="kw">const</span> iMaxRetries <span class="op">=</span> <span class="dv">3</span><span class="op">;</span></span>
+<span id="cb1-2"><span class="kw">const</span> sEncoding <span class="op">=</span> <span class="st">&quot;utf-8&quot;</span><span class="op">;</span></span>
+<span id="cb1-3"><span class="kw">const</span> sFallbackTitle <span class="op">=</span> <span class="st">&quot;untitled-page&quot;</span><span class="op">;</span></span>
+<span id="cb1-4"></span>
+<span id="cb1-5"><span class="kw">let</span> iCount<span class="op">;</span></span>
+<span id="cb1-6"><span class="kw">let</span> sDir<span class="op">,</span> sTitle<span class="op">,</span> sUrl<span class="op">;</span></span>
+<span id="cb1-7"></span>
+<span id="cb1-8">iCount <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb1-9">sDir <span class="op">=</span> <span class="st">&quot;&quot;</span><span class="op">;</span></span>
+<span id="cb1-10">sTitle <span class="op">=</span> <span class="st">&quot;&quot;</span><span class="op">;</span></span>
+<span id="cb1-11">sUrl <span class="op">=</span> <span class="st">&quot;&quot;</span><span class="op">;</span></span></code></pre></div>
+<hr />
+<h2 id="script-structure-and-entry-point">6. Script Structure and Entry
+Point</h2>
+<p>Prefer <strong>top-level script code with no indentation</strong>
+rather than wrapping everything in a <code>main</code> function. Write
+the main logic directly at the module’s top level so a screen reader
+user can navigate to the bottom of the file to find the most recently
+written code.</p>
+<p>The exception is when top-level <code>await</code> is required
+(Node.js ES modules support this natively), in which case
+<code>await</code> expressions may appear at the top level without a
+wrapper function.</p>
+<p>When a <code>main</code> function is truly necessary (e.g., to create
+an explicit async scope in an environment that does not support
+top-level <code>await</code>), place it <strong>last</strong> in the
+file, after all other functions, and invoke it with <code>main()</code>
+or <code>await main()</code> on the line immediately before the
+<code>main</code> function definition.</p>
+<hr />
+<h2 id="function-order">7. Function Order</h2>
+<p>All functions other than <code>main</code> are listed in
+<strong>strict alphabetical order</strong>. If a <code>main</code>
+function is used, it appears <strong>last</strong>. There are no
+organizational sections or divider comments grouping functions — strict
+alphabetical order is sufficient.</p>
+<hr />
+<h2 id="functions">8. Functions</h2>
+<ul>
+<li><p>Define all routines as <strong>functions</strong>, never as
+subprocedures. Every function returns a value, even if the return value
+is not always used.</p></li>
+<li><p>Use <code>async</code>/<code>await</code> throughout; avoid
+<code>.then()</code> chains.</p></li>
+<li><p>Use <strong>single-line syntax</strong> for simple
+one-consequence conditionals:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb2-1"><span class="cf">if</span> (<span class="op">!</span>sUrl) <span class="cf">throw</span> <span class="kw">new</span> <span class="bu">Error</span>(sUsage)<span class="op">;</span></span>
+<span id="cb2-2"><span class="cf">if</span> (bReady) <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span></code></pre></div></li>
+</ul>
+<hr />
+<h2 id="loops">9. Loops</h2>
+<p>Prefer <strong>for-of</strong> (for-each) loops over index-based
+loops whenever iterating a collection.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb3-1"><span class="cf">for</span> (<span class="kw">const</span> item <span class="kw">of</span> aItems) <span class="bu">process</span>(item)<span class="op">;</span></span></code></pre></div>
+<p>Use index-based loops only when the index itself is needed.</p>
+<hr />
+<h2 id="imports">10. Imports</h2>
+<p>Use one <code>import</code> statement per module, listed in
+<strong>alphabetical order</strong>. Place Node.js built-in imports
+(with <code>node:</code> prefix) first, then third-party package
+imports, separated by a blank line.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb4-1"><span class="im">import</span> { createRequire } <span class="im">from</span> <span class="st">&quot;node:module&quot;</span><span class="op">;</span></span>
+<span id="cb4-2"><span class="im">import</span> { dirname<span class="op">,</span> resolve <span class="im">as</span> resolvePath } <span class="im">from</span> <span class="st">&quot;node:path&quot;</span><span class="op">;</span></span>
+<span id="cb4-3"><span class="im">import</span> { mkdir<span class="op">,</span> writeFile } <span class="im">from</span> <span class="st">&quot;node:fs/promises&quot;</span><span class="op">;</span></span>
+<span id="cb4-4"></span>
+<span id="cb4-5"><span class="im">import</span> { AxeBuilder } <span class="im">from</span> <span class="st">&quot;@axe-core/playwright&quot;</span><span class="op">;</span></span>
+<span id="cb4-6"><span class="im">import</span> { chromium } <span class="im">from</span> <span class="st">&quot;playwright&quot;</span><span class="op">;</span></span></code></pre></div>
+<hr />
+<h2 id="string-delimiters">11. String Delimiters</h2>
+<p>Use <strong>double quotes</strong> for all strings. Use template
+literals (backticks) when embedding expressions.</p>
+<hr />
+<h2 id="magic-numbers">12. Magic Numbers</h2>
+<p>Never use literal numeric or string values in logic. Assign them to
+named constants and reference the constant name.</p>
+<hr />
+<h2 id="object-and-array-literals">13. Object and Array Literals</h2>
+<p>Keep short object and array literals on a <strong>single
+line</strong> where practical. This maximizes information density per
+line, which benefits screen reader review.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb5-1">browser <span class="op">=</span> <span class="cf">await</span> chromium<span class="op">.</span><span class="fu">launch</span>({ <span class="dt">channel</span><span class="op">:</span> <span class="st">&quot;msedge&quot;</span><span class="op">,</span> <span class="dt">headless</span><span class="op">:</span> <span class="kw">true</span> })<span class="op">;</span></span>
+<span id="cb5-2"><span class="cf">return</span> { <span class="dt">sAlfaPath</span><span class="op">:</span> <span class="fu">resolvePath</span>(sDir<span class="op">,</span> sAlfaFileName)<span class="op">,</span> <span class="dt">sAxePath</span><span class="op">:</span> <span class="fu">resolvePath</span>(sDir<span class="op">,</span> sAxeFileName) }<span class="op">;</span></span></code></pre></div>
+<hr />
+<h2 id="file-and-module-conventions">14. File and Module
+Conventions</h2>
+<ul>
+<li>Use ES module syntax (<code>import</code>/<code>export</code>), not
+CommonJS (<code>require</code>).</li>
+<li>Set <code>"type": "module"</code> in <code>package.json</code>.</li>
+<li>Use the <code>node:</code> prefix for all Node.js built-in module
+imports.</li>
+</ul>
+</main>
+</body>
+</html>

@@ -55,7 +55,7 @@ From a Command Prompt, for checking a machine by hand:
 
 import glob, os, re, subprocess, sys
 
-c_dOfficialFolders = {
+dOfficialFolders = {
     "exiftool": ["ExifTool"],
     "ffmpeg": ["ffmpeg"],
     "ffprobe": ["ffmpeg"],
@@ -67,10 +67,10 @@ c_dOfficialFolders = {
     "pandoc": ["Pandoc"],
     "yt-dlp": ["yt-dlp"],
 }
-c_dUserFolders = {"pandoc": ["Pandoc"]}
-c_iVersionTimeout = 30
-c_lsPrograms = [".exe", ".com"]
-c_lsRunnable = [".exe", ".com", ".cmd", ".bat"]
+dUserFolders = {"pandoc": ["Pandoc"]}
+iVersionTimeout = 30
+lsPrograms = [".exe", ".com"]
+lsRunnable = [".exe", ".com", ".cmd", ".bat"]
 
 bWindows = os.name == "nt"
 dLast = {}
@@ -98,7 +98,7 @@ def pathCopies(sName, lsExtensions=None):
     for sDir in os.environ.get("PATH", "").split(os.pathsep):
         sDir = sDir.strip().strip('"')
         if not sDir: continue
-        for sExt in extensionsFor(lsExtensions or c_lsRunnable):
+        for sExt in extensionsFor(lsExtensions or lsRunnable):
             sTry = os.path.join(sDir, sName + sExt)
             if os.path.isfile(sTry) and (bWindows or os.access(sTry, os.X_OK)): lsFound.append(sTry)
     return lsFound
@@ -119,11 +119,11 @@ def placeCopies(sName, lsExtensions):
     sLocal = os.environ.get("LOCALAPPDATA", "")
     lsPatterns = []
     for sRoot in lsRoots:
-        for sFolder in c_dOfficialFolders.get(sName.lower(), []) + [sName]:
+        for sFolder in dOfficialFolders.get(sName.lower(), []) + [sName]:
             for sExt in extensionsFor(lsExtensions):
                 lsPatterns += [os.path.join(sRoot, sFolder, sName + sExt), os.path.join(sRoot, sFolder, "bin", sName + sExt)]
     if sLocal:
-        for sFolder in c_dUserFolders.get(sName.lower(), []) + [os.path.join("Programs", sName)]:
+        for sFolder in dUserFolders.get(sName.lower(), []) + [os.path.join("Programs", sName)]:
             for sExt in extensionsFor(lsExtensions): lsPatterns.append(os.path.join(sLocal, sFolder, sName + sExt))
         for sExt in extensionsFor(lsExtensions): lsPatterns.append(os.path.join(sLocal, "Microsoft", "WinGet", "Links", sName + sExt))
         for sExt in extensionsFor(lsExtensions): lsPatterns.append(os.path.join(sLocal, "Microsoft", "WinGet", "Packages", "*" + sName + "*", "**", sName + sExt))
@@ -148,7 +148,7 @@ def findInstalled(sName):
     """The first working place for a tool in Media.cs's order -- official folders before the PATH -- trying real
     programs before wrappers."""
     global sSearchLog
-    for lsExtensions in (c_lsPrograms, c_lsRunnable):
+    for lsExtensions in (lsPrograms, lsRunnable):
         lsFound = unique(placeCopies(sName, lsExtensions) + pathCopies(sName, lsExtensions))
         if lsFound:
             sSearchLog = "Looking for %s: found %s" % (sName, lsFound[0])
@@ -167,7 +167,7 @@ def versionTuple(sText):
 def versionOf(sProgram, lsArgs):
     """(version tuple, first line of output) from running a copy, or ((), reason) when it will not run."""
     try:
-        oResult = subprocess.run([sProgram] + list(lsArgs), capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=c_iVersionTimeout, shell=needsShell(sProgram))
+        oResult = subprocess.run([sProgram] + list(lsArgs), capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=iVersionTimeout, shell=needsShell(sProgram))
         sOut = ((oResult.stdout or "") + (oResult.stderr or "")).strip()
         sFirst = sOut.splitlines()[0].strip() if sOut else ""
         if oResult.returncode != 0 and not versionTuple(sFirst): return (), "exit code %d" % oResult.returncode
@@ -185,7 +185,7 @@ def newestInstalled(sName, lsVersionArgs=None, sMinimum="", lsExtraPatterns=None
     lsExtra = []
     for sPattern in lsExtraPatterns or []: lsExtra += sorted(glob.glob(os.path.expandvars(sPattern), recursive=True))
     lsPath = pathCopies(sName)
-    lsAll = unique(placeCopies(sName, c_lsRunnable) + lsExtra + lsPath)
+    lsAll = unique(placeCopies(sName, lsRunnable) + lsExtra + lsPath)
     lsSeen, sBest, tBest = [], "", ()
     lsLines = ["Looking for every copy of %s%s:" % (sName, " at %s or later" % sMinimum if sMinimum else "")]
     for sOne in lsAll:

@@ -23,7 +23,7 @@ THE LOG is logs\\<Collection>-fixPages-<date>-<time>.log in the collection, with
 
 import datetime, importlib.util, io, os, platform, re, shutil, subprocess, sys
 
-c_sVersion = "2026-10-12 version 4: the kit's finisher; language, landmark, IDs, links; titles from the page itself"
+sVersion = "2026-10-12 version 4: the kit's finisher; language, landmark, IDs, links; titles from the page itself"
 sLogPath = ""
 
 
@@ -124,7 +124,7 @@ def main(lsArgs):
     sCollection = os.path.basename(sFolder.rstrip("\\/")) or "Pages"
     os.makedirs(os.path.join(sFolder, "logs"), exist_ok=True)
     sLogPath = os.path.join(sFolder, "logs", "%s-fixPages-%s.log" % (sCollection, datetime.datetime.now().strftime("%Y%m%d-%H%M%S")))
-    log("fixPages.py started; %s; script %s" % (c_sVersion, os.path.abspath(__file__)))
+    log("fixPages.py started; %s; script %s" % (sVersion, os.path.abspath(__file__)))
     log("Python %s at %s on %s; cwd %s; command line %s" % (platform.python_version(), sys.executable, platform.platform(), os.getcwd(), " ".join(sys.argv)))
     log("Settings: folder %s; pages only %s" % (sFolder, bPagesOnly))
     oRules = loadRules()
@@ -148,7 +148,7 @@ def main(lsArgs):
             sHtm = sMd[:-3] + ".htm"
             sTitle = titleOf(readText(sMd), sName[:-3])
             lsCommand = [sPandoc, sMd, "-f", "markdown", "-t", "html5", "--standalone", "--toc", "--toc-depth=2",
-                         "-M", "pagetitle=" + sTitle, "-M", "lang=" + oRules.c_sLang, "-o", sHtm]
+                         "-M", "pagetitle=" + sTitle, "-M", "lang=" + oRules.sLang, "-o", sHtm]
             oRun = subprocess.run(lsCommand, capture_output=True)
             log("RUN %s: exit %d %s" % (" ".join(lsCommand), oRun.returncode, oRun.stderr.decode("utf-8", "replace")[-300:]))
             if oRun.returncode != 0:

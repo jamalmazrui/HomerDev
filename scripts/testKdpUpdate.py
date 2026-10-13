@@ -13,8 +13,8 @@ import kdpBooks as kb
 import kdpSubmit as k
 import kdpUpdate as u
 
-c_lAllowedTexts = ["None", "Some sections, with minimal or no editing", "Some sections, with extensive editing", "Entire work, with minimal or no editing", "Entire work, with extensive editing"]
-c_lAllowedImages = ["None", "One or a few, with minimal or no editing", "One or a few, with extensive editing", "Many, with minimal or no editing", "Many, with extensive editing"]
+lAllowedTexts = ["None", "Some sections, with minimal or no editing", "Some sections, with extensive editing", "Entire work, with minimal or no editing", "Entire work, with extensive editing"]
+lAllowedImages = ["None", "One or a few, with minimal or no editing", "One or a few, with extensive editing", "Many, with minimal or no editing", "Many, with extensive editing"]
 
 lFailures = []
 iPassed = 0
@@ -48,7 +48,7 @@ def testAiAnswers():
     check("catalog: 22 books, Blind Vibe Coding included", len(lBooks) == 22, str(len(lBooks)))
     for sRoot, dBook in lBooks:
         d = u.aiAnswers(dBook)
-        bShape = d["texts"] in c_lAllowedTexts and d["images"] in c_lAllowedImages and d["translations"] == "None"
+        bShape = d["texts"] in lAllowedTexts and d["images"] in lAllowedImages and d["translations"] == "None"
         bUsed = (d["used"] == "Yes") == (d["texts"] != "None" or d["images"] != "None")
         bTools = (d["used"] == "No") or bool(d["tools"])
         # A book marked aiFromKdp (Blind Vibe Coding) leaves its extents at None on purpose: the answers its author gave KDP

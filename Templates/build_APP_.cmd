@@ -174,6 +174,23 @@ if errorlevel 1 (
 )
 echo Kit !homerVer! at !homerDev!
 
+rem ---- the kit's tools this app uses, refreshed on every build ----------
+if not exist "scripts" mkdir "scripts"
+for %%F in (!kitTools!) do (
+  if exist "!homerDev!\scripts\%%F" (
+    rem Copied only when it differs, so a tool that has not changed is left as it is.
+    fc /b "!homerDev!\scripts\%%F" "scripts\%%F" >nul 2>&1 || (copy /y "!homerDev!\scripts\%%F" "scripts\" >nul && >> "%log%" echo Refreshed scripts\%%F)
+  ) else (
+    >> "%log%" echo NOT IN THE KIT: scripts\%%F
+    echo The kit has no scripts\%%F. Update HomerDev to !kitNeeded! or later.
+  )
+)
+for %%F in (!retiredTools!) do (
+  if exist "scripts\%%F" del /q "scripts\%%F" && >> "%log%" echo Removed retired scripts\%%F
+)
+rem THE TOOLS COME FIRST (12 October 2026): refreshed before the decision below, so a
+rem kit update to them counts as a change this build, not the next.
+
 rem ---- NOTHING CHANGED, NOTHING BUILT (12 October 2026) --------------
 rem A cycle with nothing to change made a new program, a new installer and a new
 rem release every time. Now the build asks first whether anything it ships has
@@ -438,21 +455,6 @@ rem The program at the top, from the layout before exec: removed now that the
 rem new one exists. It is build output, never anything a person made.
 if exist "%app%.exe" del /q "%app%.exe" && >> "%log%" echo Removed the old top-level %app%.exe
 :programReady
-
-rem ---- the kit's tools this app uses, refreshed on every build ----------
-if not exist "scripts" mkdir "scripts"
-for %%F in (!kitTools!) do (
-  if exist "!homerDev!\scripts\%%F" (
-    rem Copied only when it differs, so a tool that has not changed is left as it is.
-    fc /b "!homerDev!\scripts\%%F" "scripts\%%F" >nul 2>&1 || (copy /y "!homerDev!\scripts\%%F" "scripts\" >nul && >> "%log%" echo Refreshed scripts\%%F)
-  ) else (
-    >> "%log%" echo NOT IN THE KIT: scripts\%%F
-    echo The kit has no scripts\%%F. Update HomerDev to !kitNeeded! or later.
-  )
-)
-for %%F in (!retiredTools!) do (
-  if exist "scripts\%%F" del /q "scripts\%%F" && >> "%log%" echo Removed retired scripts\%%F
-)
 
 rem ---- documents ----------------------------------------------------------
 if not defined useDocs goto :docsDone

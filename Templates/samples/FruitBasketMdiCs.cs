@@ -38,7 +38,7 @@ namespace FruitBasketMdiCs
 public static class Program
 {
 
-private const string c_sAppName = "FruitBasketMdiCs";
+private const string sAppName = "FruitBasketMdiCs";
 
 private static fruitFrame frmMain;
 
@@ -57,7 +57,7 @@ public class fruitFrame : MdiFrame
 {
     private int iBaskets = 0;
 
-    public fruitFrame() : base(c_sAppName)
+    public fruitFrame() : base(sAppName)
     {
         // ---- MDI 2: commands are named sentences, not control ids ----
         //
@@ -224,8 +224,8 @@ public static int Main(string[] aArguments)
 {
     Application.EnableVisualStyles();
     Application.SetCompatibleTextRenderingDefault(false);
-    Paths.start(c_sAppName);
-    Log.start(c_sAppName);
+    Paths.start(sAppName);
+    Log.start(sAppName);
     try
     {
         frmMain = new fruitFrame();

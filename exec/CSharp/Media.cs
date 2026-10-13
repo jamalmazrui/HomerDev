@@ -53,7 +53,7 @@ private static string sExifToolLog = "";
 // c:\bin\mpv.cmd on the machine where this went wrong -- but a batch file
 // cannot be started directly by the process object, so callers must send one
 // through the command interpreter. needsShell says which is which.
-public static readonly string[] c_aRunnable = {".exe", ".com", ".cmd", ".bat"};
+public static readonly string[] aRunnable = {".exe", ".com", ".cmd", ".bat"};
 
 public static bool needsShell(string sProgram) {
 string sExt = Path.GetExtension(sProgram).ToLower();
@@ -61,7 +61,7 @@ return sExt == ".cmd" || sExt == ".bat";
 } // needsShell method
 
 public static string findTool(string sName) {
-return findToolOfKind(sName, c_aRunnable);
+return findToolOfKind(sName, aRunnable);
 } // findTool method
 
 public static string findToolOfKind(string sName, string[] aExtensions) {
@@ -213,7 +213,7 @@ return findInstalled("ffmpeg");
 // Where each installer actually puts its program, when the folder is not
 // simply the command's own name. Read before the PATH, because these are
 // certain and the PATH is not.
-private static readonly string[,] c_aOfficialFolders = {
+private static readonly string[,] aOfficialFolders = {
 // "MPV Player" is what shinchiro's installer actually creates. It was guessed
 // as "MPV Media Player", which is close, wrong, and finds nothing. Guessing a
 // folder name is how this went round three times; the others below are read
@@ -252,13 +252,13 @@ public static string findInstalled(string sName) {
 // So the whole search runs twice. The first pass accepts only .exe and .com,
 // which are programs. Only if that finds nothing does the second pass accept
 // .cmd and .bat, because a wrapper is better than no player at all.
-string sReal = findInstalledOfKind(sName, c_aPrograms);
+string sReal = findInstalledOfKind(sName, aPrograms);
 if (sReal.Length > 0) return sReal;
-return findInstalledOfKind(sName, c_aRunnable);
+return findInstalledOfKind(sName, aRunnable);
 } // findInstalled method
 
 // Things that are programs, as against things that describe how to run one.
-public static readonly string[] c_aPrograms = {".exe", ".com"};
+public static readonly string[] aPrograms = {".exe", ".com"};
 
 private static string findInstalledOfKind(string sName, string[] aExtensions) {
 // A tool anywhere it might plausibly be, not merely on this process's PATH.
@@ -317,11 +317,11 @@ Environment.GetEnvironmentVariable("ProgramFiles"),
 Environment.GetEnvironmentVariable("ProgramFiles(x86)"),
 Environment.GetEnvironmentVariable("ProgramW6432")}) {
 if (sRoot == null || sRoot.Length == 0) continue;
-for (int i = 0; i < c_aOfficialFolders.GetLength(0); i++) {
-if (!String.Equals(c_aOfficialFolders[i, 0], sName, StringComparison.OrdinalIgnoreCase)) continue;
+for (int i = 0; i < aOfficialFolders.GetLength(0); i++) {
+if (!String.Equals(aOfficialFolders[i, 0], sName, StringComparison.OrdinalIgnoreCase)) continue;
 foreach (string sExt in aExtensions) {
-lsWhere.Add(Path.Combine(sRoot, Path.Combine(c_aOfficialFolders[i, 1], sName + sExt)));
-lsWhere.Add(Path.Combine(sRoot, Path.Combine(c_aOfficialFolders[i, 1], Path.Combine("bin", sName + sExt))));
+lsWhere.Add(Path.Combine(sRoot, Path.Combine(aOfficialFolders[i, 1], sName + sExt)));
+lsWhere.Add(Path.Combine(sRoot, Path.Combine(aOfficialFolders[i, 1], Path.Combine("bin", sName + sExt))));
 }
 }
 }
@@ -474,7 +474,7 @@ return lsPairs;
 //
 // So the name is matched rather than listed. Anything whose field name contains
 // one of these words is a candidate, and the best candidate wins.
-private static readonly string[] c_aTitleWords = {
+private static readonly string[] aTitleWords = {
 "title", "headline", "caption", "objectname", "bookname", "songname",
 "trackname", "documentname", "displayname", "description", "subject",
 "episode", "movie", "name"
@@ -485,11 +485,11 @@ private static readonly string[] c_aTitleWords = {
 // against a real MP3, "Al Green Greatest Hits" beat "Let's Stay Together" on
 // length alone, and named the song after the record it came from. Longest wins
 // only among things that describe THIS file.
-private static readonly string[] c_aCollectionWords = {"album", "show", "product"};
+private static readonly string[] aCollectionWords = {"album", "show", "product"};
 
 // Field names that CONTAIN a title word but are never a title. Without this
 // list, a photograph gets named after its lens and a PDF after its software.
-private static readonly string[] c_aNotTitles = {
+private static readonly string[] aNotTitles = {
 "file name", "filename", "directory", "source file", "base name",
 "software", "creator tool", "producer", "encoder", "handler",
 "lens", "camera", "make", "model", "profile", "color", "colour",
@@ -533,16 +533,16 @@ if (iColon >= 0) sName = sName.Substring(iColon + 1);
 string sLowerName = sName.Trim().ToLower();
 
 bool bTitleLike = false;
-foreach (string sWord in c_aTitleWords)
+foreach (string sWord in aTitleWords)
 if (sLowerName.IndexOf(sWord, StringComparison.Ordinal) >= 0) bTitleLike = true;
 if (!bTitleLike) continue;
 bool bCollection = false;
-foreach (string sWord in c_aCollectionWords)
+foreach (string sWord in aCollectionWords)
 if (sLowerName.IndexOf(sWord, StringComparison.Ordinal) >= 0) bCollection = true;
 if (bCollection) continue;
 
 bool bExcluded = false;
-foreach (string sNot in c_aNotTitles)
+foreach (string sNot in aNotTitles)
 if (sLowerName.IndexOf(sNot, StringComparison.Ordinal) >= 0) bExcluded = true;
 if (bExcluded) continue;
 

@@ -60,18 +60,18 @@ public class Mpv : IDisposable {
 
 // The property numbers mpv is asked to report. Any number would do; these are
 // fixed so the reader can tell one answer from another.
-private const int c_iIdDuration = 2;
-private const int c_iIdIdle = 6;
-private const int c_iIdPause = 3;
-private const int c_iIdPlaylistPos = 5;
-private const int c_iIdTitle = 4;
-private const int c_iIdTimePos = 1;
-private const int c_iIdChapters = 7;
-private const int c_iIdChapter = 8;
+private const int iIdDuration = 2;
+private const int iIdIdle = 6;
+private const int iIdPause = 3;
+private const int iIdPlaylistPos = 5;
+private const int iIdTitle = 4;
+private const int iIdTimePos = 1;
+private const int iIdChapters = 7;
+private const int iIdChapter = 8;
 
 // A volume below full by default, so the media does not drown the screen
 // reader. Able Player sets 7 out of 10 for exactly this reason.
-public const int c_iDefaultVolume = 70;
+public const int iDefaultVolume = 70;
 
 // ---- state --------------------------------------------------------------
 
@@ -183,7 +183,7 @@ return "";
 
 // Extensions mpv plays. Not a complete list of what it CAN read -- that depends
 // on how it was built -- but a list of what it is asked to read here.
-private static readonly string[] c_asPlayable = {
+private static readonly string[] asPlayable = {
 ".mp3", ".m4a", ".aac", ".flac", ".wav", ".ogg", ".oga", ".opus", ".wma",
 ".aiff", ".aif", ".ape", ".mka", ".mid", ".midi", ".cda", ".ac3", ".dts",
 ".mp4", ".m4v", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm", ".mpg",
@@ -194,7 +194,7 @@ private static readonly string[] c_asPlayable = {
 // Sites yt-dlp can be relied on to turn into something playable. Not a
 // complete list of what it supports -- that runs to a thousand -- but the ones
 // worth guessing about without asking it.
-private static readonly string[] c_asMediaSites = {
+private static readonly string[] asMediaSites = {
 "youtube.com", "youtu.be", "vimeo.com", "soundcloud.com", "mixcloud.com",
 "bandcamp.com", "archive.org", "dailymotion.com", "twitch.tv", "podbean.com",
 "libsyn.com", "buzzsprout.com", "megaphone.fm", "simplecast.com", "anchor.fm",
@@ -224,10 +224,10 @@ string sLower = sTarget.Trim().ToLowerInvariant();
 if (sLower.StartsWith("http://") || sLower.StartsWith("https://")) {
 // The extension may sit anywhere in the path, since a podcast address is
 // often a chain of redirects ending in the real file name.
-foreach (string sExt in c_asPlayable) {
+foreach (string sExt in asPlayable) {
 if (sLower.Contains(sExt + "?") || sLower.EndsWith(sExt) || sLower.Contains(sExt + "&")) return true;
 }
-foreach (string sSite in c_asMediaSites) {
+foreach (string sSite in asMediaSites) {
 if (sLower.Contains("//" + sSite) || sLower.Contains("." + sSite)) return true;
 }
 return false;
@@ -235,7 +235,7 @@ return false;
 try {
 string sExtension = Path.GetExtension(sLower);
 if (string.IsNullOrEmpty(sExtension)) return false;
-return Array.IndexOf(c_asPlayable, sExtension) >= 0;
+return Array.IndexOf(asPlayable, sExtension) >= 0;
 }
 catch (Exception) { return false; }
 }
@@ -263,7 +263,7 @@ sPipeName = "homerMpv-" + Process.GetCurrentProcess().Id.ToString(CultureInfo.In
 + "-" + Guid.NewGuid().ToString("N").Substring(0, 8);
 StringBuilder sbArgs = new StringBuilder();
 sbArgs.Append("--idle=yes --no-terminal --force-window=no --video=no ");
-sbArgs.Append("--volume=" + c_iDefaultVolume.ToString(CultureInfo.InvariantCulture) + " ");
+sbArgs.Append("--volume=" + iDefaultVolume.ToString(CultureInfo.InvariantCulture) + " ");
 if (sYtDlp.Length > 0) {
 sbArgs.Append("--script-opts=ytdl_hook-ytdl_path=\"");
 sbArgs.Append(sYtDlp);
@@ -316,14 +316,14 @@ threadWriter.Start();
 
 // Ask once for the handful of properties worth knowing, so nothing later
 // has to wait for an answer.
-sendRaw("{\"command\": [\"observe_property\", " + c_iIdTimePos + ", \"time-pos\"]}");
-sendRaw("{\"command\": [\"observe_property\", " + c_iIdDuration + ", \"duration\"]}");
-sendRaw("{\"command\": [\"observe_property\", " + c_iIdPause + ", \"pause\"]}");
-sendRaw("{\"command\": [\"observe_property\", " + c_iIdTitle + ", \"media-title\"]}");
-sendRaw("{\"command\": [\"observe_property\", " + c_iIdPlaylistPos + ", \"playlist-pos\"]}");
-sendRaw("{\"command\": [\"observe_property\", " + c_iIdIdle + ", \"idle-active\"]}");
-sendRaw("{\"command\": [\"observe_property\", " + c_iIdChapters + ", \"chapters\"]}");
-sendRaw("{\"command\": [\"observe_property\", " + c_iIdChapter + ", \"chapter\"]}");
+sendRaw("{\"command\": [\"observe_property\", " + iIdTimePos + ", \"time-pos\"]}");
+sendRaw("{\"command\": [\"observe_property\", " + iIdDuration + ", \"duration\"]}");
+sendRaw("{\"command\": [\"observe_property\", " + iIdPause + ", \"pause\"]}");
+sendRaw("{\"command\": [\"observe_property\", " + iIdTitle + ", \"media-title\"]}");
+sendRaw("{\"command\": [\"observe_property\", " + iIdPlaylistPos + ", \"playlist-pos\"]}");
+sendRaw("{\"command\": [\"observe_property\", " + iIdIdle + ", \"idle-active\"]}");
+sendRaw("{\"command\": [\"observe_property\", " + iIdChapters + ", \"chapters\"]}");
+sendRaw("{\"command\": [\"observe_property\", " + iIdChapter + ", \"chapter\"]}");
 return true;
 }
 catch (Exception ex) {

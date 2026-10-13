@@ -19,10 +19,10 @@ arguments.
 
 import glob, html, os, re, sys
 
-c_lsNoMark = (".bat", ".cmd")
+lsNoMark = (".bat", ".cmd")
 # The same rules as the kit's scripts\\fixEncoding.py, their authoritative home;
 # the kit's build fails if the two ever differ (1.64.0, don't repeat yourself).
-c_lsTextExt = (".bat", ".cmd", ".cs", ".css", ".csv", ".htm", ".html", ".inix", ".iss", ".js", ".json", ".lua",
+lsTextExtensions = (".bat", ".cmd", ".cs", ".css", ".csv", ".htm", ".html", ".inix", ".iss", ".js", ".json", ".lua",
                ".m3u", ".md", ".ps1", ".py", ".spec", ".tsv", ".txt", ".xml")
 
 
@@ -94,7 +94,7 @@ def convert(sPath):
     sText = sText.replace("\r\n", "\n").replace("\r", "\n").replace("\n", "\r\n")
     sName = os.path.basename(sPath)
     # version.txt is read by build scripts and Inno, which want the number alone.
-    bMark = not (sName.lower().endswith(c_lsNoMark) or sName in ("SKILL.md", "version.txt"))
+    bMark = not (sName.lower().endswith(lsNoMark) or sName in ("SKILL.md", "version.txt"))
     binNew = (b"\xef\xbb\xbf" if bMark else b"") + sText.encode("utf-8")
     if binNew == binData: return "same"
     open(sPath, "wb").write(binNew)
@@ -107,7 +107,7 @@ def expand(sArgument):
         lsPaths = []
         for sDir, lsDirs, lsFiles in os.walk(sArgument):
             lsDirs[:] = [s for s in lsDirs if s not in (".git", "__pycache__")]
-            lsPaths += [os.path.join(sDir, s) for s in lsFiles if s.lower().endswith(c_lsTextExt)]
+            lsPaths += [os.path.join(sDir, s) for s in lsFiles if s.lower().endswith(lsTextExtensions)]
         return sorted(lsPaths)
     return sorted(glob.glob(sArgument)) or [sArgument]
 

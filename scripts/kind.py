@@ -40,16 +40,16 @@ folder at the top of any ready fixed drive. "kind --kit" prints it.
 """
 import glob, os, re, sys
 
-c_lsStandardDocs = ["announce", "developer", "faq", "history", "hotkeys", "index", "license",
+lsStandardDocs = ["announce", "developer", "faq", "history", "hotkeys", "index", "license",
                     "readme", "self", "tutorials"]
-c_lsKinds = ["app", "collection", "kit", "page", "unknown"]
+lsKinds = ["app", "collection", "kit", "page", "unknown"]
 
 # THE HOMER TREE (1.65.0), in one place: the folders a project of each kind may
 # have at its top. A folder outside these is either declared in the project's
 # RepoFiles.txt or LocalFiles.txt, and listed for the author to confirm, or it
 # fails check -- nobody, the AI included, adds a folder to a Homer tree unasked.
-c_lsHiddenFolders = [".claude", ".git", ".github", ".vs", ".vscode"]
-c_dStandardFolders = {
+lsHiddenFolders = [".claude", ".git", ".github", ".vs", ".vscode"]
+dStandardFolders = {
     "app": ["configs", "data", "exec", "help", "logs", "notes", "results", "scripts", "templates"],
     "kit": ["configs", "data", "exec", "help", "logs", "notes", "results", "scripts", "templates"],
     "page": ["_data", "_includes", "_layouts", "assets", "configs", "data", "help", "logs", "notes", "results", "scripts", "templates"],
@@ -59,7 +59,7 @@ c_dStandardFolders = {
 
 def standardFolders(sKind):
     """The folder names a project of this kind may have at its top, lowercased."""
-    return set(c_dStandardFolders.get(sKind, c_dStandardFolders["unknown"]) + c_lsHiddenFolders)
+    return set(dStandardFolders.get(sKind, dStandardFolders["unknown"]) + lsHiddenFolders)
 
 
 # THE LICENSE FOR EACH KIND (1.48.0). Code is MIT, the license the Homer apps
@@ -69,7 +69,7 @@ def standardFolders(sKind):
 # 2023. Material gathered from others (a publisher's help text, a show's
 # episode summaries, a skill's full text) stays under its owners' terms, and a
 # document that holds such material says so in one sentence.
-c_dLicenses = {
+dLicenses = {
     "app": ("MIT License", "MIT", "License.htm"),
     "kit": ("MIT License", "MIT", "License.htm"),
     "page": ("Creative Commons Attribution-ShareAlike 4.0 International", "CC BY-SA 4.0",
@@ -82,7 +82,7 @@ c_dLicenses = {
 def licenseFor(sKind):
     """(full name, short name, link) of the license a resource of this kind
     carries, or None for an unknown kind."""
-    return c_dLicenses.get(sKind)
+    return dLicenses.get(sKind)
 
 
 def projectRoot(sStart):
@@ -100,7 +100,7 @@ def documentStems(sFolder):
     dStems = {}
     for sName in sorted(os.listdir(sFolder)):
         sStem, sExt = os.path.splitext(sName)
-        if sExt.lower() in (".md", ".htm") and sStem.lower() not in c_lsStandardDocs:
+        if sExt.lower() in (".md", ".htm") and sStem.lower() not in lsStandardDocs:
             dStems.setdefault(sStem.lower(), sStem)
     return [dStems[s] for s in sorted(dStems)]
 

@@ -31,7 +31,7 @@ import sys
 import time
 import traceback
 
-c_lsExpected = [
+lsExpected = [
     "exec/CSharp/Elevate.cs", "exec/CSharp/Inix.cs", "exec/CSharp/KeyName.cs", "exec/CSharp/KeyMap.cs", "exec/CSharp/Lbc.cs",
     "exec/CSharp/Log.cs", "exec/CSharp/Mdi.cs", "exec/CSharp/Media.cs", "exec/CSharp/MediaPlayer.cs", "exec/CSharp/Mpv.cs", "exec/CSharp/Paths.cs",
     "exec/CSharp/Say.cs", "exec/CSharp/Util.cs", "exec/CSharp/Web.cs",
@@ -69,40 +69,41 @@ c_lsExpected = [
     "Templates/makeHotkeys.py",
     "Templates/LocalFiles.txt",
     "Templates/_APP_.cmd",
-    "help/CamelType_CSharp.md", "help/CamelType_CSharp_Reference.md",
-    "help/CamelType_JAWSScript.md", "help/CamelType_Python.md",
+    "help/CamelType.md", "help/CamelType_CSharp.md", "help/CamelType_CSharp_Reference.md",
+    "help/CamelType_JAWSScript.md", "help/CamelType_JavaScript.md", "help/CamelType_PowerShell.md",
+    "help/CamelType_Python.md", "help/CamelType_VBScript.md",
     "ReadMe.md", "License.md",
     "help/Announce.md", "help/Developer.md", "help/History.md", "help/HomerDev.md",
     "help/FAQ.md", "help/FinishPage.md", "help/HomerDev_update.md", "help/Hotkeys.md", "help/Logging.md", "help/TutorialLearnings.md", "help/Tutorials.md",
     "License.md", "version.txt",
 ]
 
-c_sLogName = "HomerDev-build-%s.log" % datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+sLogName = "HomerDev-build-%s.log" % datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
 # Folders a build makes, which are none of the kit's business. Walking into one
 # means auditing thousands of somebody else's files: a virtual environment alone
 # holds the whole of PyInstaller. Lowercase alphabetical, as every list in Homer
 # code is.
-c_lsSkipFolders = [".git", ".venv", "__pycache__", "build", "dist", "exec", "notes", "venv"]
+lsSkipFolders = [".git", ".venv", "__pycache__", "build", "dist", "exec", "notes", "venv"]
 
 # How many problems to print before saying how many more there are. The log
 # always holds every one of them.
-c_iShowProblems = 20
+iShowProblems = 20
 
 # Files a build writes. They are generated on every build, they are in the
 # never-pushed list, and auditing their encoding says nothing about the kit.
-c_lsGeneratedFiles = ["version.py", "version.cs"]
+lsGeneratedFiles = ["version.py", "version.cs"]
 
 # Reports a check writes; they are dated, disposable and not part of the kit.
-c_sEvidencePrefix = "evidence-"
+sEvidencePrefix = "evidence-"
 
 # The standard document set. ReadMe and License sit at the top of the project;
 # every other document lives in help, which is where the Homer layout puts them.
-c_lsDocumentsTop = ["License", "ReadMe"]
+lsDocumentsTop = ["License", "ReadMe"]
 
 # The samples, and the script that builds each. One command builds everything,
 # so a problem anywhere is found by running one thing rather than four.
-c_lsSampleScripts = [
+lsSampleScripts = [
     "buildFruitBasketCs.cmd",
     "buildFruitBasketMdiCs.cmd",
     "buildFruitBasketMdiPy.cmd",
@@ -123,7 +124,7 @@ c_lsSampleScripts = [
 #
 # Add a pair here whenever a file moves. Old entries can be dropped once nobody
 # could still be carrying that version.
-c_lMoved = [
+lMoved = [
     # PYTHON IS NAMED FOR ITS PLATFORM, AS C# IS (1.43.22): exec\\Python beside
     # exec\\CSharp, its modules imported by their own names ("import log"), not
     # through a homer package.
@@ -299,7 +300,7 @@ c_lMoved = [
 # C:\bin, where they went stale, and every app refreshes its scripts from the
 # kit on each build instead. A retired file is deleted when the build finds
 # it, and the log says so. One tool per job.
-c_lsRetired = [
+lsRetired = [
     # 1.47.0: the gathered accessibility skills live in their own repository,
     # A11ySkills, linked from the kit's documents rather than copied into it.
     # 33 of the 175 are under the GNU Affero GPL, which a copy inside an MIT
@@ -330,14 +331,14 @@ c_lsRetired = [
 
 # Folders that existed in an earlier layout and hold nothing the kit wants now.
 # Removed only when empty, which they are once the pairs above have been applied.
-c_lsOldFolders = ["skills/app-help-guide/references", "skills/app-help-guide/scripts", "skills/app-help-guide",
+lsOldFolders = ["skills/app-help-guide/references", "skills/app-help-guide/scripts", "skills/app-help-guide",
                   "skills/blind-creators/references", "skills/blind-creators/scripts", "skills/blind-creators",
                   "skills/homer-tutorial", "skills/podcast-directory/scripts", "skills/podcast-directory", "skills",
                   "Templates/skills/homer-tutorial", "Templates/skills", "CSharp", "exec/homer", "homer", "Docs", "Inno", "Python/homer", "Python", "Samples/FruitBasketCs", "Samples/FruitBasketPy",
                   "Templates/samples/FruitBasketCs",
                   "Templates/samples/FruitBasketMdi", "Templates/samples/FruitBasketPy", "Samples", "Style", "Tools"]
 sScriptDir = os.path.dirname(os.path.abspath(__file__))
-sLogPath = os.path.join(sScriptDir, "logs", c_sLogName)
+sLogPath = os.path.join(sScriptDir, "logs", sLogName)
 oLog = None
 
 
@@ -507,7 +508,7 @@ def sampleInputs(sName, sScript):
         lsChain = kitPythonChain(lsModules + [sName])
         lsInputs += ["exec/Python/" + sModule + ".py" for sModule in lsChain]
         if "lbcnet" in lsChain or any("Homer.dll" in open(os.path.join(sScriptDir, "exec", "Python", sModule + ".py"), encoding="utf-8-sig", errors="replace").read() for sModule in lsChain):
-            lsInputs += ["exec/CSharp/" + sClass + ".cs" for sClass in c_lsHomerDllClasses]
+            lsInputs += ["exec/CSharp/" + sClass + ".cs" for sClass in lsHomerDllClasses]
         return lsInputs
     if not lsClasses: return lsInputs + ["exec/CSharp"]
     return lsInputs + ["exec/CSharp/" + sClass + ".cs" for sClass in lsClasses]
@@ -554,7 +555,7 @@ def buildSamples():
     sSamples = os.path.join(sScriptDir, "Templates", "samples")
     if not os.path.isdir(sSamples): return 0
     iFailed = 0
-    for sScript in c_lsSampleScripts:
+    for sScript in lsSampleScripts:
         if not os.path.isfile(os.path.join(sSamples, sScript)): continue
         sName = sScript[5:-4] if sScript.lower().startswith("build") else sScript
         # A SAMPLE IS BUILT WHEN IT CHANGED (1.65.34): its source, its build script, the version files or the kit's
@@ -592,7 +593,7 @@ def buildSamples():
 # dialog gets the same focus order, keys, Help box and F11 by construction
 # rather than by a second implementation kept in step by hand. The list is
 # what LbcDialog needs, the set every C# app with a dialog compiles.
-c_lsHomerDllClasses = ["Elevate", "Inix", "Lbc", "Log", "Paths", "Say", "Util", "Web"]
+lsHomerDllClasses = ["Elevate", "Inix", "Lbc", "Log", "Paths", "Say", "Util", "Web"]
 
 
 def findRoslyn():
@@ -645,12 +646,12 @@ def buildHomerDll():
     sExec = os.path.join(sScriptDir, "exec")
     if not os.path.isdir(sExec): os.makedirs(sExec)
     sOut = os.path.join(sExec, "Homer.dll")
-    lsSources = [os.path.join(sScriptDir, "exec", "CSharp", sClass + ".cs") for sClass in c_lsHomerDllClasses]
+    lsSources = [os.path.join(sScriptDir, "exec", "CSharp", sClass + ".cs") for sClass in lsHomerDllClasses]
     for sSource in lsSources:
         if not os.path.isfile(sSource): return "exec\\Homer.dll was not built: %s is missing" % sSource
     # BUILT WHEN ITS CLASSES CHANGED (12 October 2026): it was compiled on every build.
     oCache = kitCache()
-    sPrint = oCache.fingerprint(["exec/CSharp/" + sClass + ".cs" for sClass in c_lsHomerDllClasses])
+    sPrint = oCache.fingerprint(["exec/CSharp/" + sClass + ".cs" for sClass in lsHomerDllClasses])
     if oCache.isCurrent("Homer.dll", sPrint, ["exec/Homer.dll"]):
         sayLine("exec\\Homer.dll is unchanged since its last build; not built again.")
         return ""
@@ -659,13 +660,13 @@ def buildHomerDll():
     if iCode != 0 or not os.path.isfile(sOut):
         return "exec\\Homer.dll did not compile; the log has the compiler's messages"
     oCache.record("Homer.dll", sPrint, ["exec/Homer.dll"])
-    sayLine("Built exec\\Homer.dll for Python apps (%s)." % ", ".join(c_lsHomerDllClasses))
+    sayLine("Built exec\\Homer.dll for Python apps (%s)." % ", ".join(lsHomerDllClasses))
     return ""
 
 
 # THE HOMERDEV DIALOG (1.66.0): exec\\HomerDev.exe, opened by Alt+Control+Shift+D after setup, compiled from
 # HomerDev.cs and the kit's own classes -- the ones an app with a player and the local AI compiles, as DbDo does.
-c_lsHomerDevAppClasses = ["Elevate", "Inix", "KeyMap", "KeyName", "Lbc", "Log", "Media", "MediaPlayer", "Mpv", "Ollama", "Paths", "Say", "Util", "Voice", "Web"]
+lsHomerDevAppClasses = ["Elevate", "Inix", "KeyMap", "KeyName", "Lbc", "Log", "Media", "MediaPlayer", "Mpv", "Ollama", "Paths", "Say", "Util", "Voice", "Web"]
 
 
 def buildHomerDevApp():
@@ -677,7 +678,7 @@ def buildHomerDevApp():
     oCache = kitCache()
     # Its own classes, not the whole of exec\\CSharp (12 October 2026), so a change to a class it does not compile
     # leaves it alone.
-    sPrint = oCache.fingerprint(["HomerDev.cs", "HomerDev.ico"] + ["exec/CSharp/" + sClass + ".cs" for sClass in c_lsHomerDevAppClasses])
+    sPrint = oCache.fingerprint(["HomerDev.cs", "HomerDev.ico"] + ["exec/CSharp/" + sClass + ".cs" for sClass in lsHomerDevAppClasses])
     if oCache.isCurrent("HomerDev.exe", sPrint, ["exec/HomerDev.exe"]):
         sayLine("exec\\HomerDev.exe is unchanged since its last build; not built again.")
         return ""
@@ -692,7 +693,7 @@ def buildHomerDevApp():
                   "System.Web.dll", "System.Web.Extensions.dll", "System.Net.Http.dll", "System.Xml.dll",
                   "System.IO.Compression.dll", "System.IO.Compression.FileSystem.dll", "Microsoft.VisualBasic.dll"):
         lsRefs.append("/reference:" + sName)
-    lsSources = [sSource] + [os.path.join(sScriptDir, "exec", "CSharp", sClass + ".cs") for sClass in c_lsHomerDevAppClasses]
+    lsSources = [sSource] + [os.path.join(sScriptDir, "exec", "CSharp", sClass + ".cs") for sClass in lsHomerDevAppClasses]
     for sPath in lsSources:
         if not os.path.isfile(sPath): return "exec\\HomerDev.exe was not built: %s is missing" % sPath
     sOut = os.path.join(sScriptDir, "exec", "HomerDev.exe")
@@ -759,12 +760,13 @@ def buildHomerDevSetup():
 # help at every build keeps one source of truth -- the kit's own documents --
 # instead of hand copies that drift. The copies are named in LocalFiles.txt:
 # git carries the originals, and a build makes the copies again.
-c_dSkillDocuments = {
+dSkillDocuments = {
     "homer-installer": ["help/FinishPage.md"],
     "homer-screen-reader": ["help/CamelType_JAWSScript.md"],
     "homer-tutorial": ["help/Tutorials.md"],
-    "homer-code": ["help/CamelType_CSharp.md", "help/CamelType_CSharp_Reference.md",
-                   "help/CamelType_JAWSScript.md", "help/CamelType_Python.md", "help/Logging.md"],
+    "homer-code": ["help/CamelType.md", "help/CamelType_CSharp.md", "help/CamelType_CSharp_Reference.md",
+                   "help/CamelType_JAWSScript.md", "help/CamelType_JavaScript.md", "help/CamelType_PowerShell.md",
+                   "help/CamelType_Python.md", "help/CamelType_VBScript.md", "help/Logging.md"],
 }
 
 
@@ -773,7 +775,7 @@ c_dSkillDocuments = {
 # document, its chapters (## headings) to take, in the order given, and the
 # reference file they make, which opens with a contents list, as Anthropic's
 # guidance asks of any reference over a hundred lines.
-c_lSkillSections = [
+lSkillSections = [
     ("homer-ui", "help/HomerDev.md",
      ["Lbc: building a dialog", "Keys and key names", "Direct speech across screen readers",
       "Three kinds of Homer app"],
@@ -786,7 +788,7 @@ def extractSkillSections():
     the number written."""
     import re
     iWritten = 0
-    for sSkill, sDocument, lsChapters, sTarget, sTitle in c_lSkillSections:
+    for sSkill, sDocument, lsChapters, sTarget, sTitle in lSkillSections:
         sSkillDir = os.path.join(sScriptDir, ".claude", "skills", sSkill)
         sSource = os.path.join(sScriptDir, sDocument.replace("/", os.sep))
         if not (os.path.isdir(sSkillDir) and os.path.isfile(sSource)):
@@ -822,7 +824,7 @@ def copySkillDocuments():
     the number copied."""
     import shutil
     iCopied = 0
-    for sSkill, lsDocuments in sorted(c_dSkillDocuments.items()):
+    for sSkill, lsDocuments in sorted(dSkillDocuments.items()):
         sReferences = os.path.join(sScriptDir, ".claude", "skills", sSkill, "references")
         if not os.path.isdir(os.path.dirname(sReferences)): continue
         os.makedirs(sReferences, exist_ok=True)
@@ -1011,7 +1013,7 @@ def buildTutorials():
 # file is renamed where it lies, keeping whatever it holds, and the old names
 # are rewritten in the kit's own text files. Both steps do nothing on a second
 # run, so this can stay in the build indefinitely.
-c_lRenamedScripts = [
+lRenamedScripts = [
     ("checkHomerApp.cmd", "check.cmd"), ("checkHomerApp.py", "check.py"),
     ("gitPush.cmd", "push.cmd"),
     ("gitUnpushed.cmd", "unpushed.cmd"), ("gitUnpushed.py", "unpushed.py"),
@@ -1024,7 +1026,7 @@ c_lRenamedScripts = [
 # The same renames as words, for rewriting references. A name is replaced only
 # as a whole word, so tagRelease_README, which names a file of the separate
 # tagRelease project, is left alone.
-c_lRenamedWords = [
+lRenamedWords = [
     ("checkHomerApp", "check"), ("gitUnpushed", "unpushed"), ("gitPush", "push"),
     ("homerFinish", "finish"), ("homerInstall", "installCommon"),
     ("homerTidy", "tidy"), ("tagRelease", "release"),
@@ -1034,11 +1036,11 @@ c_lRenamedWords = [
 # what was true that day, and the briefing names the old scripts on purpose so
 # a reader can recognise them in an old log. This file is here too -- it holds
 # the old names as data.
-c_lsKeepOldNames = ["build.py", "History.md", "History.htm",
+lsKeepOldNames = ["build.py", "History.md", "History.htm",
                     "HomerDev_update.md", "HomerDev_update.htm"]
-c_sKeepOldPrefixes = ("Kit-Findings-", "Rulings-")
+sKeepOldPrefixes = ("Kit-Findings-", "Rulings-")
 
-c_lsRewriteExtensions = (".bat", ".cmd", ".cs", ".htm", ".inix", ".iss", ".jss", ".md",
+lsRewriteExtensions = (".bat", ".cmd", ".cs", ".htm", ".inix", ".iss", ".jss", ".md",
                          ".ps1", ".py", ".txt", ".gitignore")
 
 
@@ -1052,7 +1054,7 @@ def renameScripts():
     """
     sScripts = os.path.join(sScriptDir, "scripts")
     iRenamed = iRemoved = iRewritten = 0
-    for sOld, sNew in c_lRenamedScripts:
+    for sOld, sNew in lRenamedScripts:
         sOldPath = os.path.join(sScripts, sOld)
         sNewPath = os.path.join(sScripts, sNew)
         if not os.path.isfile(sOldPath): continue
@@ -1110,7 +1112,7 @@ def renameScripts():
     # and the ones left here were committed by accident.
     if os.path.isdir(sScripts):
         for sName in os.listdir(sScripts):
-            if sName.lower().startswith(c_sEvidencePrefix):
+            if sName.lower().startswith(sEvidencePrefix):
                 try:
                     os.remove(os.path.join(sScripts, sName))
                     iRemoved += 1
@@ -1123,16 +1125,16 @@ def renameScripts():
     # rewritten until 1.43.8 -- tidy.cmd went on running homerTidy.py, push
     # skipped the whitelist, and check ran a file that was no longer there.
     lPatterns = [(re.compile(r"(?<![A-Za-z_])%s(?![A-Za-z0-9_])" % re.escape(sOld)), sNew)
-                 for sOld, sNew in c_lRenamedWords]
+                 for sOld, sNew in lRenamedWords]
     for sRoot, lsDirs, lsFiles in os.walk(sScriptDir):
         # NOT .claude (1.43.30): a skill that names the old script names does
         # so on purpose -- homer-build-release's failures.md lists them as what
         # an old build script calls -- and rewriting them there emptied the
         # sentence of its meaning.
-        lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders and s.lower() not in ("logs", ".claude")]
+        lsDirs[:] = [s for s in lsDirs if s.lower() not in lsSkipFolders and s.lower() not in ("logs", ".claude")]
         for sName in lsFiles:
-            if sName in c_lsKeepOldNames or sName.startswith(c_sKeepOldPrefixes): continue
-            if not sName.lower().endswith(c_lsRewriteExtensions) and sName != ".gitignore": continue
+            if sName in lsKeepOldNames or sName.startswith(sKeepOldPrefixes): continue
+            if not sName.lower().endswith(lsRewriteExtensions) and sName != ".gitignore": continue
             sPath = os.path.join(sRoot, sName)
             try:
                 yRaw = open(sPath, "rb").read()
@@ -1181,7 +1183,7 @@ def renameScripts():
             iEnd = sText.find(")", iAt)
             sList = sText[iAt + len("for %%F in ("):iEnd]
             lsHave = sList.split()
-            lsAdd = [sOld for sOld, sNew in c_lRenamedScripts if sOld not in lsHave]
+            lsAdd = [sOld for sOld, sNew in lRenamedScripts if sOld not in lsHave]
             if lsAdd:
                 sText = sText[:iAt] + "for %%F in (" + " ".join(lsHave + lsAdd) + sText[iEnd:]
                 open(sTemplate, "wb").write(sText.encode("utf-8"))
@@ -1251,7 +1253,7 @@ def renameScripts():
 # has asked its questions through System.Diagnostics.Process since 1.43.8, so
 # the line the patch looked for no longer exists, and every kit build logged
 # that it could not apply it.
-c_lPatches = [
+lPatches = [
     # AFTER THE FAILURE CHECK, NOT AFTER THE PUSH. The line after `git push`
     # is `if errorlevel 1`, and anything run between them resets errorlevel:
     # the first version of this patch sat there and would have reported every
@@ -1272,7 +1274,7 @@ c_lPatches = [
 def patchScripts():
     """Apply each patch once, in place, keeping everything else in the file."""
     iApplied = 0
-    for sRelative, sMarker, sFind, sNew, sMode in c_lPatches:
+    for sRelative, sMarker, sFind, sNew, sMode in lPatches:
         sPath = os.path.join(sScriptDir, sRelative.replace("/", os.sep))
         if not os.path.isfile(sPath): continue
         yRaw = open(sPath, "rb").read()
@@ -1326,7 +1328,7 @@ def removeMoved():
     file is never deleted without its replacement already in place.
     """
     iRemoved = 0
-    for sOld, sNew in c_lMoved:
+    for sOld, sNew in lMoved:
         sOldPath = os.path.join(sScriptDir, sOld.replace("/", os.sep))
         sNewPath = os.path.join(sScriptDir, sNew.replace("/", os.sep))
         # NEVER WHEN BOTH SIDES ARE THE SAME FILE. Windows does not tell
@@ -1375,7 +1377,7 @@ def removeMoved():
             except Exception as oError:
                 logLine("COULD NOT REMOVE %s: %s" % (sPath, oError))
 
-    for sRetired in c_lsRetired:
+    for sRetired in lsRetired:
         sPath = os.path.join(sScriptDir, sRetired.replace("/", os.sep))
         if not os.path.isfile(sPath): continue
         try:
@@ -1385,7 +1387,7 @@ def removeMoved():
         except Exception as oError:
             logLine("COULD NOT REMOVE %s: %s" % (sPath, oError))
 
-    for sFolder in c_lsOldFolders:
+    for sFolder in lsOldFolders:
         sPath = os.path.join(sScriptDir, sFolder.replace("/", os.sep))
         try:
             # A folder Python ran from keeps __pycache__, which would keep it
@@ -1412,7 +1414,7 @@ def convertDocs(sPandoc):
     """Write a .htm beside every .md in the kit. Returns the number converted."""
     iDone = 0
     for sRoot, lsDirs, lsFiles in os.walk(sScriptDir):
-        lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders]
+        lsDirs[:] = [s for s in lsDirs if s.lower() not in lsSkipFolders]
         # Templates are not documents: a template is a starter for a new
         # app, and converting it would leave a stray .htm in the kit.
         if os.path.basename(sRoot).lower() == "templates": continue
@@ -1446,7 +1448,7 @@ def convertDocs(sPandoc):
 # THE ROUTES FOR AI AGENTS (1.65.24): AGENTS.md is what any agent reads, CLAUDE.md, GEMINI.md and Copilot's file point
 # to it, llms.txt indexes the documents, and .claude-plugin makes the kit a Claude Code plugin whose skills are the
 # ones in .claude/skills. The build keeps the plugin's version the kit's; the check keeps every route true.
-c_lsAgentRoutes = ["AGENTS.md", "CLAUDE.md", "GEMINI.md", "llms.txt", ".github/copilot-instructions.md",
+lsAgentRoutes = ["AGENTS.md", "CLAUDE.md", "GEMINI.md", "llms.txt", ".github/copilot-instructions.md",
                    ".claude-plugin/plugin.json", ".claude-plugin/marketplace.json",
                    ".claude/agents/homer-auditor.md", ".claude/agents/homer-listener.md"]
 
@@ -1541,7 +1543,7 @@ def checkAgentRoutes(lsProblems):
     AGENTS.md and llms.txt, and every subagent's front matter names it."""
     import json
     sVersion = open(os.path.join(sScriptDir, "version.txt"), "rb").read().decode("utf-8-sig").strip()
-    for sRelative in c_lsAgentRoutes:
+    for sRelative in lsAgentRoutes:
         if not os.path.isfile(os.path.join(sScriptDir, sRelative.replace("/", os.sep))): lsProblems.append("missing: " + sRelative)
     for sRelative, bMarket in ((".claude-plugin/plugin.json", False), (".claude-plugin/marketplace.json", True)):
         sPath = os.path.join(sScriptDir, sRelative.replace("/", os.sep))
@@ -1583,7 +1585,7 @@ def checkKit():
             if not os.path.isfile(os.path.join(sScriptDir, "scripts", sName)):
                 lsProblems.append("HomerDev_setup.iss runs scripts\\%s, which is not in the kit" % sName)
 
-    for sRelative in c_lsExpected:
+    for sRelative in lsExpected:
         sPath = os.path.join(sScriptDir, sRelative.replace("/", os.sep))
         if not os.path.exists(sPath):
             lsProblems.append("missing: " + sRelative)
@@ -1613,11 +1615,11 @@ def checkKit():
         if os.path.normcase(sRoot) == os.path.normcase(sExecDir):
             lsDirs[:] = [s for s in lsDirs if s in ("CSharp", "Python")]
             continue
-        lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders or
+        lsDirs[:] = [s for s in lsDirs if s.lower() not in lsSkipFolders or
                      (os.path.normcase(sRoot) == os.path.normcase(sScriptDir) and s.lower() == "exec")]
         for sName in sorted(lsFiles):
-            if sName.lower() in c_lsGeneratedFiles: continue
-            if sName.lower().startswith(c_sEvidencePrefix): continue
+            if sName.lower() in lsGeneratedFiles: continue
+            if sName.lower().startswith(sEvidencePrefix): continue
             if not sName.lower().endswith(lsTextExt): continue
             sPath = os.path.join(sRoot, sName)
             sShown = os.path.relpath(sPath, sScriptDir).replace(os.sep, "/")
@@ -1701,8 +1703,8 @@ def checkKit():
                 if isinstance(oNode, astModule.Assign) and isinstance(oNode.targets[0], astModule.Name) and oNode.targets[0].id in dNames:
                     dFound[dNames[oNode.targets[0].id]] = set(s.lower() for s in astModule.literal_eval(oNode.value))
             return dFound
-        dKit = ruleSets(os.path.join(sScriptDir, "scripts", "fixEncoding.py"), {"c_lsTextExt": "text types", "c_lsNoBom": "no-mark types"})
-        dSkill = ruleSets(os.path.join(sScriptDir, ".claude", "skills", "homer-convert", "scripts", "toHomerEncoding.py"), {"c_lsTextExt": "text types", "c_lsNoMark": "no-mark types"})
+        dKit = ruleSets(os.path.join(sScriptDir, "scripts", "fixEncoding.py"), {"lsTextExtensions": "text types", "lsNoBom": "no-mark types"})
+        dSkill = ruleSets(os.path.join(sScriptDir, ".claude", "skills", "homer-convert", "scripts", "toHomerEncoding.py"), {"lsTextExtensions": "text types", "lsNoMark": "no-mark types"})
         for sRule in dKit:
             if dKit[sRule] != dSkill.get(sRule, set()):
                 lsProblems.append("toHomerEncoding.py and fixEncoding.py differ in %s: %s" % (sRule, ", ".join(sorted(dKit[sRule] ^ dSkill.get(sRule, set())))))
@@ -1926,13 +1928,13 @@ def main():
     sayLine("%d problem%s found:" % (len(lsProblems), "" if len(lsProblems) == 1 else "s"))
     # The console gets the first few; the log gets all of them. A console that
     # scrolls for a minute tells a screen reader user nothing at all.
-    for sProblem in lsProblems[:c_iShowProblems]:
+    for sProblem in lsProblems[:iShowProblems]:
         sayLine("  " + sProblem)
-    for sProblem in lsProblems[c_iShowProblems:]:
+    for sProblem in lsProblems[iShowProblems:]:
         logLine("PROBLEM: " + sProblem)
-    if len(lsProblems) > c_iShowProblems:
+    if len(lsProblems) > iShowProblems:
         sayLine("  and %d more, all of them in %s." %
-                (len(lsProblems) - c_iShowProblems, c_sLogName))
+                (len(lsProblems) - iShowProblems, sLogName))
     logLine("build end result=problems")
     return 1
 

@@ -46,8 +46,8 @@ import platform
 import sys
 import traceback
 
-c_sToken = "_APP_"
-c_sLogName = "newHomerApp.log"
+sToken = "_APP_"
+sLogName = "newHomerApp.log"
 
 sScriptDir = os.path.dirname(os.path.abspath(__file__))
 sLogPath = os.path.join(sScriptDir, "logs", "HomerDev-newHomerApp-%s.log" % datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
@@ -140,7 +140,7 @@ def writeHomer(sPath, sText):
     return True
 
 
-c_sMitLicense = """# License
+sMitLicense = """# License
 
 MIT License
 
@@ -186,7 +186,7 @@ def newProjectFiles(sApp, bPython):
         (".gitattributes", "* -text\n"),
         ("RepoFiles.txt", "\n".join(lsRepo)),
         ("LocalFiles.txt", "\n".join(lsLocal) + "\n"),
-        ("License.md", c_sMitLicense.replace("{year}", str(datetime.date.today().year)).replace("{app}", sApp)),
+        ("License.md", sMitLicense.replace("{year}", str(datetime.date.today().year)).replace("{app}", sApp)),
         ("ReadMe.md", "# %s\n\n%s is a Homer Tools app. This ReadMe is its quick start; the full guide\n"
                       "is help\\%s.htm. It is free and open source under the [MIT License](License.htm).\n" % (sApp, sApp, sApp)),
         ("help/%s.md" % sApp, "# %s\n\nThe full guide to %s, in topics by heading.\n" % (sApp, sApp)),
@@ -298,8 +298,8 @@ def main():
     # EVERY TEMPLATE CHECKED BEFORE ANYTHING IS WRITTEN (1.62.5, from an audit by another AI): a template found missing
     # part-way left a half-made project. The new-repository templates are local-only by the author's rule, from a
     # project of their own, so a fresh copy of the kit lacks them; they are skipped with a note, not treated as missing.
-    c_lsLocalOnly = ["create_APP_Repo.cmd", "create_APP_Repo.ps1"]
-    lsMissing = [sFrom for sFrom, sTo in lsScripts if not os.path.exists(os.path.join(sTemplates, sFrom)) and sFrom not in c_lsLocalOnly]
+    lsLocalOnly = ["create_APP_Repo.cmd", "create_APP_Repo.ps1"]
+    lsMissing = [sFrom for sFrom, sTo in lsScripts if not os.path.exists(os.path.join(sTemplates, sFrom)) and sFrom not in lsLocalOnly]
     if lsMissing:
         sayLine("Template missing: %s. Nothing was written." % ", ".join(lsMissing))
         logLine("ERROR: templates missing %s" % ", ".join(lsMissing))
@@ -318,7 +318,7 @@ def main():
             iSkipped += 1
             logLine("SKIPPED, already there: %s" % sToPath)
             continue
-        writeHomer(sToPath, readTemplate(sFromPath).replace(c_sToken, sApp))
+        writeHomer(sToPath, readTemplate(sFromPath).replace(sToken, sApp))
         iWritten += 1
 
     # THE TUTORIAL SKELETONS (1.62.0): one walk per part of the pattern of ten,
@@ -332,7 +332,7 @@ def main():
             logLine("SKIPPED, already there: %s" % sToPath)
             continue
         os.makedirs(os.path.dirname(sToPath), exist_ok=True)
-        writeHomer(sToPath, readTemplate(sFromPath).replace(c_sToken, sApp))
+        writeHomer(sToPath, readTemplate(sFromPath).replace(sToken, sApp))
         iWritten += 1
 
     # THE REST OF A NEW PROJECT (1.43.31). newHomerApp used to copy install

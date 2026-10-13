@@ -36,10 +36,10 @@ report to list what it WOULD remove and change nothing.
 
 import io, logging, os, platform, re, shutil, subprocess, sys
 
-c_iAnswerWindow = 3
-c_lAnswers = ["yes", "no", "yes no", "disappointed", "neutral", "smiley",
+iAnswerWindow = 3
+lAnswers = ["yes", "no", "yes no", "disappointed", "neutral", "smiley",
               "still need help", "share", "thumbs up", "thumbs down"]
-c_lQuestions = [
+lQuestions = [
     ("Amazon", "was this information helpful"),
     ("Atlassian", "provide feedback about this article"),
     ("Document360", "was this page helpful"),
@@ -56,7 +56,7 @@ c_lQuestions = [
     ("Verizon", "is this helpful"),
     ("Zendesk", "was this article helpful"),
 ]
-c_lAfterwards = [
+lAfterwards = [
     ("Amazon", "thanks while were unable to respond directly to your feedback"),
     ("Amazon", "thank you for your feedback"),
     ("Freshdesk", "sorry we couldnt be helpful help us improve this article with your feedback"),
@@ -66,19 +66,19 @@ c_lAfterwards = [
     ("HelpDocs", "thats great"),
     ("HelpDocs", "we appreciate your effort and will try to fix the article"),
 ]
-c_lCounts = [r"^\d+ out of \d+ found this helpful$", r"^\d+ of \d+ people found this helpful$"]
-c_sLogName = "cleanFeedback.log"
+lCounts = [r"^\d+ out of \d+ found this helpful$", r"^\d+ of \d+ people found this helpful$"]
+sLogName = "cleanFeedback.log"
 
 
 def startLog():
     sHere = os.path.dirname(os.path.abspath(__file__))
-    sPath = os.path.join(sHere, c_sLogName)
+    sPath = os.path.join(sHere, sLogName)
     logging.basicConfig(filename=sPath, filemode="w", level=logging.INFO,
                         format="%(asctime)s %(levelname)s %(message)s", encoding="utf-8", errors="backslashreplace")
     logging.info("cleanFeedback.py running under Python %s on %s", platform.python_version(), platform.platform())
     logging.info("script at %s, working directory %s", os.path.abspath(__file__), os.getcwd())
     logging.info("command line: %s", " ".join(sys.argv))
-    logging.info("%d feedback questions and %d answer words are on the list", len(c_lQuestions), len(c_lAnswers))
+    logging.info("%d feedback questions and %d answer words are on the list", len(lQuestions), len(lAnswers))
     return sPath
 
 
@@ -110,7 +110,7 @@ def questionFor(sLine):
     answer word."""
     sPlain = plainOf(sLine)
     if not sPlain: return ""
-    for sPlatform, sPhrase in c_lQuestions:
+    for sPlatform, sPhrase in lQuestions:
         if sPlain == sPhrase:
             return sPlatform
         if sPlain.startswith(sPhrase + " "):
@@ -132,7 +132,7 @@ def afterwardsFor(sLine):
     if sLine.strip().startswith("#") or sLine.strip().startswith("- ["): return ""
     sPlain = plainOf(sLine)
     if not sPlain: return ""
-    for sPlatform, sPhrase in c_lAfterwards:
+    for sPlatform, sPhrase in lAfterwards:
         if sPlain == sPhrase: return sPlatform
         if len(sPhrase) > 45 and sPlain.startswith(sPhrase): return sPlatform
     return ""
@@ -141,8 +141,8 @@ def afterwardsFor(sLine):
 def isAnswer(sLine):
     sPlain = plainOf(sLine)
     if not sPlain: return False
-    if sPlain in c_lAnswers: return True
-    return any(re.match(sPattern, sPlain) for sPattern in c_lCounts)
+    if sPlain in lAnswers: return True
+    return any(re.match(sPattern, sPlain) for sPattern in lCounts)
 
 
 def cleanLines(lLines, sName):
@@ -154,7 +154,7 @@ def cleanLines(lLines, sName):
         # A count line is furniture wherever it stands: no article says "3 out of
         # 7 found this helpful" about anything but itself, and Zendesk prints it
         # ABOVE its question as often as below.
-        if any(re.match(sPattern, plainOf(sLine)) for sPattern in c_lCounts):
+        if any(re.match(sPattern, plainOf(sLine)) for sPattern in lCounts):
             lRemoved.append(("Zendesk, count", sLine))
             iIndex += 1
             continue
@@ -171,7 +171,7 @@ def cleanLines(lLines, sName):
         lRemoved.append((sPlatform, sLine))
         iIndex += 1
         iTaken = 0
-        while iIndex < len(lLines) and iTaken < c_iAnswerWindow:
+        while iIndex < len(lLines) and iTaken < iAnswerWindow:
             sNext = lLines[iIndex]
             if sNext.strip() == "":
                 iIndex += 1

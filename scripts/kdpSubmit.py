@@ -41,17 +41,17 @@ Values of password, code, card and tax fields are never written to the log.
 import datetime, glob, json, os, platform, re, shutil, subprocess, sys, time, traceback
 PlaywrightTimeout, sync_playwright = TimeoutError, None  # set by loadPlaywright() once the log is open, so an import failure is logged
 
-c_iProcessingMinutes, c_iSaveWaitSeconds, c_iSettleSeconds, c_iSignInMinutes = 20, 45, 20, 15
-c_sVersion = "2026-10-12 version 39: a book is named with --book whenever more than one is on file; the answers may keep KDP's cover (coverFile = Keep KDP's cover) and its AI-generated content answers (aiContent used = Keep), so a live book's manuscript is replaced without touching what KDP already holds right; was version 38: DRM that cannot be confirmed off blocks Publish; version 37: an upload is judged only by what KDP says after it, praise and recommendations are not problems, and done means KDP names the file just sent; version 36, from the 11:39 run: KDP took 33 seconds to leave the Details tab after the second Save and Continue, the page was still changing when its messages were read, and the third press landed on the Content tab's own Save and Continue, which moved to Pricing and skipped the EPUB upload, then crashed the control dump; now Save and Continue is never pressed again once the page has left its tab, a run whose messages cannot be read waits for the page to settle before deciding, the Content and Pricing steps open their own tab address when the browser is elsewhere, and a control dump interrupted by a navigation is read again; was version 35: before touching KDP, the EPUB is rebuilt with build.py when it is missing or older than the manuscript or its build files (the 6 October edition added Blind Apps passages), so a run always submits the latest text and a failed build stops the run with exit code 2; was version 34, from the 13:42 run of kdpBooks on 5 October, from the 13:42 run of kdpBooks, which finished twelve books and left four at two categories: Add another category does add a chain, but KDP pre-fills the new chain's top menu with the last chain's first step, so the script saw no empty top menu, pressed Add again, found it disabled and gave up; a chain that appears after Add another category is now used for the next path whether or not it is pre-filled, and the save-and-reopen fallback presses Add another category once the picker is open again; the Remove existing categories? dialog was answered with Continue on the four older books and their categories verified; was version 33, from the 10:43 run of kdpBooks, which chose all three categories on nine books but lost them on three older ones and stopped at two on two more: after Save categories, KDP asks Remove existing categories? on a book whose categories predate the picker, and closeNotice pressed that dialog's Close, throwing the choices away, so the dialog is now answered with its continue button and the buttons seen are logged; and when Add another category is disabled after a finished chain (Self-Help > Memory Improvement), the chosen categories are saved and the picker reopened, which gives a fresh chain for the next path; was version 32, from the 09:15 run of kdpBooks, which chose none or one of three categories on seven books: KDP keeps the menus of saved and reset chains on the page, so a path's first step was looked for after the last filled menu and found a sub-menu instead, where a containing name (Art for Arts & Photography) was taken and the real top menu never used; now the top-level menus are found by content, a new path starts in the last empty one (Add another category is pressed again when there is none), a menu is checked to have taken its option, only an exact name is accepted anywhere, and the wait after a pick is for the menu below to show new options or new boxes to appear, up to 10 seconds, with 15 seconds for the placement box; was version 31: no category is ever replaced by General or by an unrelated name; a path KDP does not offer is dropped and reported with the placements KDP offers there, a path whose placement name is already chosen for the book is skipped as a duplicate (Tennis twice, 19:10 run), and General is ticked only when no proposed path can be chosen at all, since KDP needs one category to save; the console names each category by its whole path; was version 30, from the 17:38 run of kdpBooks: a picker menu is used whether or not it is visible, since KDP hides its native menus behind styled drop-downs (version 29 required visibility and found no first step on three books); a Content tab that KDP leaves by itself no longer waits 30 seconds for DRM radios; was version 29, from the 16:46 run of kdpBooks: the picker's placement boxes are read as they are (KDP reuses the same box elements with new labels when a menu changes, so marking them as seen hid every placement and three books were published with one category); a step is looked for only in menus after the one the last step used; a chain that ends without a placement is dropped and its menus reused after Reset, since Add another category is disabled until the chain is complete; the Content tab's accuracy confirmation boxes are ticked when KDP asks (Confirm your answers are accurate and check the box), and that message now stops Save and Continue instead of being pressed through; a navigation aborted by a hand on the browser no longer crashes the run; DRM is left alone when KDP has already moved past the Content tab; was version 28, from the 15:15 run of kdpBooks: the picker's Reset clears only the newest chain of menus, so the saved chains are removed one by one through their Remove links (they had counted toward the three and hidden Add another category on nine books); the DRM consent box is found by its words (version 27 looked for a literal backslash) after waiting for the Content tab to draw; KDP's Categories update notice is closed before Save as Draft, and a button the ordinary click cannot reach is clicked by script; a path ending above a placement takes General or a placement sharing a word with the path, never an unrelated first one (Gun & Firearm Policy was ticked for Communication Policy); was version 27: the category picker uses only its newest menu and waits for the next menu to draw (on 4 October a History step was matched in the top menu and saved History > General instead of Mathematics > History); a step KDP does not offer is replaced by the nearest offered name, then the General placement, then the first placement, so every path ends on a placement and the book keeps three categories, with the paths chosen reported; the DRM No choice also ticks KDP's new consent box (Consent is required when not applying Digital Rights Management); page messages read during a navigation no longer crash the run; was version 26: the Bookshelf row's labels are all read, so Live followed by Updates in review stops the run before the setup page, and an aborted navigation to that page is treated as the same lock rather than a crash (the 16:42 run); was version 25: a live book with updates in review is reported as such and left alone until the update is live; was version 24: publishes unless KDP refused a save or a file failed to upload; everything else unconfirmed is listed to check afterwards; was version 23: the royalty radio selector is quoted (the 15:05 run crashed on it one step before Publish); a submission acknowledged by KDP counts as submitted even when the Bookshelf label cannot be read; was version 22: the accessibility radio is chosen by its label, since KDP briefly gives all four the same value after an upload; the release option and a missing Bookshelf status no longer count as problems; a processed upload is recognized by file name; was version 21: the Draft2Digital section no longer leaks into KDP's ISBN and publisher; saved categories are kept without opening the picker; KDP's spelling notice is not treated as a refusal; was version 20: .inix answers, Homer layout"
-c_lProfileSkip = ["Cache", "Code Cache", "GPUCache", "Service Worker", "DawnCache", "GrShaderCache", "ShaderCache", "blob_storage", "File System", "IndexedDB", "Session Storage", "Storage", "Extensions", "Extension State", "Extension Rules", "optimization_guide_hint_cache_store", "Platform Notifications"]
-c_lListKeys = ["afterPublishing", "categories", "contributors", "keywords", "priceReasoning", "recommended"]  # .inix keys whose value is a list: one item per line, or comma-separated on one line
-c_lNestedSections = ["accessibility", "aiContent", "draft2digital", "notes"]  # .inix sections kept as dictionaries under their own name; every other section is flattened into the answers. draft2digital holds another store's answers (its isbn and publisher once overrode KDP's and KDP refused the save)
-c_sBookshelfUrl, c_sTitleSetup = "https://kdp.amazon.com/en_US/bookshelf", "https://kdp.amazon.com/en_US/title-setup/kindle/"
+iProcessingMinutes, iSaveWaitSeconds, iSettleSeconds, iSignInMinutes = 20, 45, 20, 15
+sVersion = "2026-10-12 version 39: a book is named with --book whenever more than one is on file; the answers may keep KDP's cover (coverFile = Keep KDP's cover) and its AI-generated content answers (aiContent used = Keep), so a live book's manuscript is replaced without touching what KDP already holds right; was version 38: DRM that cannot be confirmed off blocks Publish; version 37: an upload is judged only by what KDP says after it, praise and recommendations are not problems, and done means KDP names the file just sent; version 36, from the 11:39 run: KDP took 33 seconds to leave the Details tab after the second Save and Continue, the page was still changing when its messages were read, and the third press landed on the Content tab's own Save and Continue, which moved to Pricing and skipped the EPUB upload, then crashed the control dump; now Save and Continue is never pressed again once the page has left its tab, a run whose messages cannot be read waits for the page to settle before deciding, the Content and Pricing steps open their own tab address when the browser is elsewhere, and a control dump interrupted by a navigation is read again; was version 35: before touching KDP, the EPUB is rebuilt with build.py when it is missing or older than the manuscript or its build files (the 6 October edition added Blind Apps passages), so a run always submits the latest text and a failed build stops the run with exit code 2; was version 34, from the 13:42 run of kdpBooks on 5 October, from the 13:42 run of kdpBooks, which finished twelve books and left four at two categories: Add another category does add a chain, but KDP pre-fills the new chain's top menu with the last chain's first step, so the script saw no empty top menu, pressed Add again, found it disabled and gave up; a chain that appears after Add another category is now used for the next path whether or not it is pre-filled, and the save-and-reopen fallback presses Add another category once the picker is open again; the Remove existing categories? dialog was answered with Continue on the four older books and their categories verified; was version 33, from the 10:43 run of kdpBooks, which chose all three categories on nine books but lost them on three older ones and stopped at two on two more: after Save categories, KDP asks Remove existing categories? on a book whose categories predate the picker, and closeNotice pressed that dialog's Close, throwing the choices away, so the dialog is now answered with its continue button and the buttons seen are logged; and when Add another category is disabled after a finished chain (Self-Help > Memory Improvement), the chosen categories are saved and the picker reopened, which gives a fresh chain for the next path; was version 32, from the 09:15 run of kdpBooks, which chose none or one of three categories on seven books: KDP keeps the menus of saved and reset chains on the page, so a path's first step was looked for after the last filled menu and found a sub-menu instead, where a containing name (Art for Arts & Photography) was taken and the real top menu never used; now the top-level menus are found by content, a new path starts in the last empty one (Add another category is pressed again when there is none), a menu is checked to have taken its option, only an exact name is accepted anywhere, and the wait after a pick is for the menu below to show new options or new boxes to appear, up to 10 seconds, with 15 seconds for the placement box; was version 31: no category is ever replaced by General or by an unrelated name; a path KDP does not offer is dropped and reported with the placements KDP offers there, a path whose placement name is already chosen for the book is skipped as a duplicate (Tennis twice, 19:10 run), and General is ticked only when no proposed path can be chosen at all, since KDP needs one category to save; the console names each category by its whole path; was version 30, from the 17:38 run of kdpBooks: a picker menu is used whether or not it is visible, since KDP hides its native menus behind styled drop-downs (version 29 required visibility and found no first step on three books); a Content tab that KDP leaves by itself no longer waits 30 seconds for DRM radios; was version 29, from the 16:46 run of kdpBooks: the picker's placement boxes are read as they are (KDP reuses the same box elements with new labels when a menu changes, so marking them as seen hid every placement and three books were published with one category); a step is looked for only in menus after the one the last step used; a chain that ends without a placement is dropped and its menus reused after Reset, since Add another category is disabled until the chain is complete; the Content tab's accuracy confirmation boxes are ticked when KDP asks (Confirm your answers are accurate and check the box), and that message now stops Save and Continue instead of being pressed through; a navigation aborted by a hand on the browser no longer crashes the run; DRM is left alone when KDP has already moved past the Content tab; was version 28, from the 15:15 run of kdpBooks: the picker's Reset clears only the newest chain of menus, so the saved chains are removed one by one through their Remove links (they had counted toward the three and hidden Add another category on nine books); the DRM consent box is found by its words (version 27 looked for a literal backslash) after waiting for the Content tab to draw; KDP's Categories update notice is closed before Save as Draft, and a button the ordinary click cannot reach is clicked by script; a path ending above a placement takes General or a placement sharing a word with the path, never an unrelated first one (Gun & Firearm Policy was ticked for Communication Policy); was version 27: the category picker uses only its newest menu and waits for the next menu to draw (on 4 October a History step was matched in the top menu and saved History > General instead of Mathematics > History); a step KDP does not offer is replaced by the nearest offered name, then the General placement, then the first placement, so every path ends on a placement and the book keeps three categories, with the paths chosen reported; the DRM No choice also ticks KDP's new consent box (Consent is required when not applying Digital Rights Management); page messages read during a navigation no longer crash the run; was version 26: the Bookshelf row's labels are all read, so Live followed by Updates in review stops the run before the setup page, and an aborted navigation to that page is treated as the same lock rather than a crash (the 16:42 run); was version 25: a live book with updates in review is reported as such and left alone until the update is live; was version 24: publishes unless KDP refused a save or a file failed to upload; everything else unconfirmed is listed to check afterwards; was version 23: the royalty radio selector is quoted (the 15:05 run crashed on it one step before Publish); a submission acknowledged by KDP counts as submitted even when the Bookshelf label cannot be read; was version 22: the accessibility radio is chosen by its label, since KDP briefly gives all four the same value after an upload; the release option and a missing Bookshelf status no longer count as problems; a processed upload is recognized by file name; was version 21: the Draft2Digital section no longer leaks into KDP's ISBN and publisher; saved categories are kept without opening the picker; KDP's spelling notice is not treated as a refusal; was version 20: .inix answers, Homer layout"
+lProfileSkip = ["Cache", "Code Cache", "GPUCache", "Service Worker", "DawnCache", "GrShaderCache", "ShaderCache", "blob_storage", "File System", "IndexedDB", "Session Storage", "Storage", "Extensions", "Extension State", "Extension Rules", "optimization_guide_hint_cache_store", "Platform Notifications"]
+lListKeys = ["afterPublishing", "categories", "contributors", "keywords", "priceReasoning", "recommended"]  # .inix keys whose value is a list: one item per line, or comma-separated on one line
+lNestedSections = ["accessibility", "aiContent", "draft2digital", "notes"]  # .inix sections kept as dictionaries under their own name; every other section is flattened into the answers. draft2digital holds another store's answers (its isbn and publisher once overrode KDP's and KDP refused the save)
+sBookshelfUrl, sTitleSetup = "https://kdp.amazon.com/en_US/bookshelf", "https://kdp.amazon.com/en_US/title-setup/kindle/"
 # NO BOOK OF ITS OWN (8 October 2026, when these tools moved into the HomerDev kit): the answers file, its JSON
 # predecessor, the log's name and the draft's title ID come from the project and the book, never from the script.
-c_sKnownTitleId = ""
-# c_dCategoryFixes corrects paths from an older JSON to the names KDP's picker used on 2 October 2026 (the JSON itself now carries the new names).
-c_dCategoryFixes = {"Kindle eBooks > Computers & Technology > Computer Science > Artificial Intelligence": "Kindle eBooks > Computers & Technology > Computer Science > Artificial Intelligence > Generative AI", "Kindle eBooks > Computers & Technology > Web Development & Design > User Experience & Usability": "Kindle eBooks > Computers & Technology > Web Development > User Experience & Usability"}
+sKnownTitleId = ""
+# dCategoryFixes corrects paths from an older JSON to the names KDP's picker used on 2 October 2026 (the JSON itself now carries the new names).
+dCategoryFixes = {"Kindle eBooks > Computers & Technology > Computer Science > Artificial Intelligence": "Kindle eBooks > Computers & Technology > Computer Science > Artificial Intelligence > Generative AI", "Kindle eBooks > Computers & Technology > Web Development & Design > User Experience & Usability": "Kindle eBooks > Computers & Technology > Web Development > User Experience & Usability"}
 
 bYes = "--ask" not in sys.argv  # questions are asked only with --ask; the JSON answers stand otherwise
 dAnswers = {}
@@ -109,8 +109,8 @@ oKitInix = None
 # writes into the folder itself are left out, so a rebuild changes nothing. No file name or time is trusted.
 # buildBooks records it in each book's audit and kdpUpdate in each submission, so a book that has not changed is not
 # sent to KDP again.
-c_lsSourceText = [".md", ".markdown", ".txt", ".bib", ".csl", ".css", ".yaml", ".yml", ".inix", ".json", ".lua", ".htm", ".html", ".svg"]
-c_lsNotSources = ["found.inix", "thumbs.db", "desktop.ini"]
+lsSourceText = [".md", ".markdown", ".txt", ".bib", ".csl", ".css", ".yaml", ".yml", ".inix", ".json", ".lua", ".htm", ".html", ".svg"]
+lsNotSources = ["found.inix", "thumbs.db", "desktop.ini"]
 
 
 def bookSourcesSha(sFolder):
@@ -122,12 +122,12 @@ def bookSourcesSha(sFolder):
     for sDir, lsDirs, lsNames in os.walk(sFolder):
         lsDirs[:] = [s for s in lsDirs if s.lower() not in ("logs", "temp", "__pycache__") and not s.startswith(".")]
         for sName in lsNames:
-            if sName.lower() in c_lsNotSources or sName.startswith((".", "~$")) or sName.endswith(".writing"): continue
+            if sName.lower() in lsNotSources or sName.startswith((".", "~$")) or sName.endswith(".writing"): continue
             lsFiles.append(os.path.join(sDir, sName))
     for sFile in sorted(lsFiles, key=lambda s: os.path.relpath(s, sFolder).replace("\\", "/").lower()):
         oHash.update(os.path.relpath(sFile, sFolder).replace("\\", "/").lower().encode("utf-8") + b"\n")
         with open(sFile, "rb") as f: bData = f.read()
-        if os.path.splitext(sFile)[1].lower() in c_lsSourceText:
+        if os.path.splitext(sFile)[1].lower() in lsSourceText:
             bData = bData[3:] if bData.startswith(b"\xef\xbb\xbf") else bData
             bData = bData.replace(b"\r\n", b"\n")
         oHash.update(hashlib.sha256(bData).digest())
@@ -223,11 +223,11 @@ def answersFromInix(dSections):
     except the nested sections (aiContent, accessibility, notes), with list keys parsed into lists."""
     dOut = {}
     for sSection, dKeys in dSections.items():
-        if sSection in c_lNestedSections:
+        if sSection in lNestedSections:
             dOut[sSection] = dict(dKeys)
             continue
         for sKey, sValue in dKeys.items():
-            dOut[sKey] = inixList(sValue) if sKey in c_lListKeys else sValue
+            dOut[sKey] = inixList(sValue) if sKey in lListKeys else sValue
     if "priceUsd" in dOut:
         try: dOut["priceUsd"] = float(dOut["priceUsd"])
         except ValueError: pass
@@ -337,16 +337,16 @@ def unresolved(sWhat, sWhy):
     return False
 
 
-c_sDeepAll = """(sSelector) => { const lOut = []; const walk = (root) => { for (const e of root.querySelectorAll("*")) { if (e.matches(sSelector)) lOut.push(e); if (e.shadowRoot) walk(e.shadowRoot); } }; walk(document); return lOut; }"""
-c_sDeepText = """() => { const l = []; const walk = (n) => { for (const c of n.childNodes) { if (c.nodeType === 3) l.push(c.textContent); else if (c.nodeType === 1 && !/^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE)$/.test(c.tagName)) { if (c.shadowRoot) walk(c.shadowRoot); walk(c); } } }; if (document.body) walk(document.body); return l.join(" ").replace(/\\s+/g, " ").trim(); }"""
-c_sDeepHtml = """() => { const ser = (n) => { let s = ""; for (const c of n.childNodes) { if (c.nodeType === 3) s += c.textContent; else if (c.nodeType === 1) { const sTag = c.tagName.toLowerCase(); let sAttr = ""; for (const a of c.attributes) sAttr += " " + a.name + "='" + String(a.value).replace(/'/g, "&#39;") + "'"; s += "<" + sTag + sAttr + ">"; if (c.shadowRoot) s += "<template shadowrootmode='open'>" + ser(c.shadowRoot) + "</template>"; s += ser(c) + "</" + sTag + ">"; } } return s; }; return "<!DOCTYPE html>" + ser(document.documentElement.parentNode); }"""
+sDeepAll = """(sSelector) => { const lOut = []; const walk = (root) => { for (const e of root.querySelectorAll("*")) { if (e.matches(sSelector)) lOut.push(e); if (e.shadowRoot) walk(e.shadowRoot); } }; walk(document); return lOut; }"""
+sDeepText = """() => { const l = []; const walk = (n) => { for (const c of n.childNodes) { if (c.nodeType === 3) l.push(c.textContent); else if (c.nodeType === 1 && !/^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE)$/.test(c.tagName)) { if (c.shadowRoot) walk(c.shadowRoot); walk(c); } } }; if (document.body) walk(document.body); return l.join(" ").replace(/\\s+/g, " ").trim(); }"""
+sDeepHtml = """() => { const ser = (n) => { let s = ""; for (const c of n.childNodes) { if (c.nodeType === 3) s += c.textContent; else if (c.nodeType === 1) { const sTag = c.tagName.toLowerCase(); let sAttr = ""; for (const a of c.attributes) sAttr += " " + a.name + "='" + String(a.value).replace(/'/g, "&#39;") + "'"; s += "<" + sTag + sAttr + ">"; if (c.shadowRoot) s += "<template shadowrootmode='open'>" + ser(c.shadowRoot) + "</template>"; s += ser(c) + "</" + sTag + ">"; } } return s; }; return "<!DOCTYPE html>" + ser(document.documentElement.parentNode); }"""
 
 
 def deepText(page):
     """The page's text including the text inside shadow roots, which innerText and page.content() leave out; Author Central draws its
     book cards and buttons inside such roots, which is why the 11:56 run saw '1 EDITIONS' and 'ADDED' but no titles and no buttons."""
     try:
-        return page.evaluate(c_sDeepText) or ""
+        return page.evaluate(sDeepText) or ""
     except Exception as oError:
         log("deepText raised " + str(oError)[:100])
         return ""
@@ -355,7 +355,7 @@ def deepText(page):
 def deepHtml(page):
     """The page's HTML with every shadow root written out as a template element, for saving."""
     try:
-        return page.evaluate(c_sDeepHtml) or page.content()
+        return page.evaluate(sDeepHtml) or page.content()
     except Exception as oError:
         log("deepHtml raised " + str(oError)[:100])
         return page.content()
@@ -499,7 +499,7 @@ def clickRadio(page, sWhat, lSelectors):
     return unresolved(sWhat, "no radio matched " + " or ".join(lSelectors))
 
 
-c_sDrmBoxesScript = """() => {
+sDrmBoxesScript = """() => {
   const lOut = [];
   const lBoxes = Array.from(document.querySelectorAll("input[type=checkbox], [role=checkbox]"));
   lBoxes.forEach((o, i) => {
@@ -533,7 +533,7 @@ def setDrm(page, bNoDrm):
     if not bNoDrm: return True
     time.sleep(2)
     try:
-        lBoxes = page.evaluate(c_sDrmBoxesScript)
+        lBoxes = page.evaluate(sDrmBoxesScript)
     except Exception as oError:
         log("The check boxes could not be read: " + str(oError).splitlines()[0][:120])
         return True
@@ -752,7 +752,7 @@ def saveAndContinue(page, sExpected):
             log("The page has already left " + sBefore.split("/")[-1] + " (URL now " + page.url + "); Save and Continue is not pressed again")
             break
         clickButton(page, "Save and Continue (attempt " + str(iAttempt) + ")", ["#save-and-continue-announce", "Save and Continue"])
-        for iTick in range(c_iSaveWaitSeconds):
+        for iTick in range(iSaveWaitSeconds):
             if "/" + sExpected in page.url: break
             time.sleep(1)
         lTexts = logMessages(page, "after Save and Continue, attempt " + str(iAttempt))
@@ -763,7 +763,7 @@ def saveAndContinue(page, sExpected):
                 page.wait_for_load_state("domcontentloaded", timeout=20000)
             except Exception as oError:
                 log("Waiting for the page to settle raised " + str(oError).splitlines()[0][:120])
-            for iTick in range(c_iSettleSeconds):
+            for iTick in range(iSettleSeconds):
                 if "/" + sExpected in page.url: break
                 time.sleep(1)
         log("URL now " + page.url)
@@ -776,7 +776,7 @@ def saveAndContinue(page, sExpected):
         log("KDP stayed on " + sBefore.split("/")[-1] + " without an error message (" + " | ".join(lTexts)[:200] + "); pressing Save and Continue again")
         time.sleep(3)
     if "/" + sExpected not in page.url and sTitleId:
-        sTarget = c_sTitleSetup + sTitleId + "/" + sExpected
+        sTarget = sTitleSetup + sTitleId + "/" + sExpected
         log("Save and Continue did not move on; the draft is saved (KDP said Save Successful), so opening the " + sExpected + " tab directly at " + sTarget)
         try:
             page.goto(sTarget)
@@ -813,8 +813,8 @@ def waitForSignIn(page):
     except Exception as oError:
         log("bring_to_front raised " + str(oError)[:120])
     say("KDP wants a sign-in. The automated browser window is on the Amazon sign-in page and is the window Alt+Tab reaches first. Sign in there, not in another browser window, then come back here. I never type passwords or codes.")
-    say("Waiting up to " + str(c_iSignInMinutes) + " minutes. Every 30 seconds I quietly check whether the sign-in has taken, without touching the page you are typing in.")
-    dtEnd = datetime.datetime.now() + datetime.timedelta(minutes=c_iSignInMinutes)
+    say("Waiting up to " + str(iSignInMinutes) + " minutes. Every 30 seconds I quietly check whether the sign-in has taken, without touching the page you are typing in.")
+    dtEnd = datetime.datetime.now() + datetime.timedelta(minutes=iSignInMinutes)
     iTick = 0
     while datetime.datetime.now() < dtEnd:
         time.sleep(3)
@@ -829,10 +829,10 @@ def waitForSignIn(page):
         if iTick % 30 == 0:
             log("Still waiting; URLs " + str([o.url[:100] for o in page.context.pages]))
             try:
-                oResponse = page.context.request.get(c_sBookshelfUrl, max_redirects=5)
+                oResponse = page.context.request.get(sBookshelfUrl, max_redirects=5)
                 log("Quiet Bookshelf check: status " + str(oResponse.status) + ", landed on " + oResponse.url[:100])
                 if "kdp.amazon.com" in oResponse.url and "signin" not in oResponse.url and "/ap/" not in oResponse.url:
-                    page.goto(c_sBookshelfUrl)
+                    page.goto(sBookshelfUrl)
                     page.wait_for_load_state("domcontentloaded")
                     time.sleep(2)
                     if signedIn(page):
@@ -840,11 +840,11 @@ def waitForSignIn(page):
                         return True
             except Exception as oError:
                 log("quiet check raised " + str(oError)[:120])
-    say("No sign-in after " + str(c_iSignInMinutes) + " minutes. Stopping; run the script again when ready.")
+    say("No sign-in after " + str(iSignInMinutes) + " minutes. Stopping; run the script again when ready.")
     return False
 
 
-c_sWatchScript = """(() => {
+sWatchScript = """(() => {
   if (window.__homerWatching) return; window.__homerWatching = true;
   const sLabel = (o) => { if (!o || !o.tagName) return ""; const s = (o.getAttribute && (o.getAttribute("aria-label") || "")) || (o.labels && o.labels[0] ? o.labels[0].innerText : "") || o.innerText || o.value || o.placeholder || ""; return (o.tagName.toLowerCase() + (o.type ? "[" + o.type + "]" : "") + " " + String(s).replace(/\\s+/g, " ").trim().slice(0, 60)).trim(); };
   const bField = (o) => o && (/^(INPUT|TEXTAREA|SELECT)$/.test(o.tagName) || o.isContentEditable);
@@ -887,8 +887,8 @@ def watchBrowser(page):
         oCdp.on("Network.loadingFailed", lambda d: log("BROWSER request failed: " + d.get("errorText", "") + (" (" + d.get("type", "") + ")" if d.get("type") else "")) if not d.get("canceled") else None)
         dMain["id"] = oCdp.send("Page.getFrameTree").get("frameTree", {}).get("frame", {}).get("id", "")
         page.context.expose_binding("homerEvent", lambda oSource, sText: log("BROWSER " + str(sText)[:200]))
-        page.context.add_init_script(c_sWatchScript)
-        page.evaluate(c_sWatchScript)
+        page.context.add_init_script(sWatchScript)
+        page.evaluate(sWatchScript)
         log("Browser watching is on: navigations with reasons, page lifecycle, console errors, failed requests, named keys, clicks and focus")
     except Exception as oError:
         log("watchBrowser could not start: " + str(oError)[:160])
@@ -938,7 +938,7 @@ def copyProfile(sSource, sTarget, sExeName):
         if os.path.exists(sFrom): shutil.copy2(sFrom, os.path.join(sTarget, "Local State")); iCopied += 1
         sDefaultFrom, sDefaultTo = os.path.join(sSource, "Default"), os.path.join(sTarget, "Default")
         for sName in os.listdir(sDefaultFrom):
-            if sName in c_lProfileSkip or sName.lower().startswith("lock"): continue
+            if sName in lProfileSkip or sName.lower().startswith("lock"): continue
             sItemFrom, sItemTo = os.path.join(sDefaultFrom, sName), os.path.join(sDefaultTo, sName)
             try:
                 if os.path.isdir(sItemFrom):
@@ -1019,7 +1019,7 @@ def bookshelfStatus(page, sWhen):
 def findDraft(page):
     """Returns the id of the existing draft of this book, verified by its title; "" when none, "AMBIGUOUS" for several, "STOP" when sign-in failed.
     The id comes from the JSON (kdpTitleId) or the built-in constant; the Bookshelf is searched only when that id does not open this book."""
-    page.goto(c_sBookshelfUrl)
+    page.goto(sBookshelfUrl)
     page.wait_for_load_state("domcontentloaded")
     time.sleep(3)
     if not waitForSignIn(page): return "STOP"
@@ -1030,10 +1030,10 @@ def findDraft(page):
         say("KDP is still reviewing the last submission" + (", the update of the live book" if "updates in review" in sStatusText else "") + ". It does not allow edits until that is done, usually within 72 hours. Nothing was changed; run this again once the Bookshelf shows Live alone.")
         log("Stopped: the book is " + sStatus + "; KDP locks the title setup pages during review")
         return "STOP"
-    sKnown = str(dAnswers.get("kdpTitleId", "") or c_sKnownTitleId)
+    sKnown = str(dAnswers.get("kdpTitleId", "") or sKnownTitleId)
     if sKnown:
         try:
-            page.goto(c_sTitleSetup + sKnown + "/details")
+            page.goto(sTitleSetup + sKnown + "/details")
             page.wait_for_load_state("domcontentloaded")
         except Exception as oError:  # KDP aborts the navigation (net::ERR_ABORTED) and sends the browser to the Bookshelf while an update is in review; the 16:42 run on 3 October crashed here
             log("Opening the setup page was interrupted: " + str(oError).splitlines()[0][:160])
@@ -1053,7 +1053,7 @@ def findDraft(page):
             say("The draft id in the JSON belongs to a different book, '" + sHeld + "'. Nothing was changed.")
             return "AMBIGUOUS"
         log("The known draft id " + sKnown + " did not open a Details page (URL " + page.url + "); looking on the Bookshelf instead")
-        page.goto(c_sBookshelfUrl)
+        page.goto(sBookshelfUrl)
         page.wait_for_load_state("domcontentloaded")
         time.sleep(3)
     try:
@@ -1126,7 +1126,7 @@ def chooseCategories(page):
     When the Details page already lists every wanted path, the picker is left closed: on a published book it opened empty on 3 October 2026.
     A path that KDP's menus do not offer exactly is completed as near as the menus allow (the step's closest offered name, then the
     General placement, then the first placement offered), said and logged as 'chosen instead', so every book still gets three categories."""
-    lSaved = [c_dCategoryFixes.get(sPath, sPath) for sPath in dAnswers["categories"]]
+    lSaved = [dCategoryFixes.get(sPath, sPath) for sPath in dAnswers["categories"]]
     sShown = page.evaluate("""() => { const o = document.querySelector(".react-categories"); return o ? o.innerText.replace(/\\s+/g, " ") : ""; }""")
     if sShown and all(pathShown(sShown, sPath) for sPath in lSaved):
         say("Categories already saved as the answers file wants; leaving them.")
@@ -1620,7 +1620,7 @@ def uploadFile(page, sWhat, sPath, sButtonId, sDonePattern):
     sSentName = os.path.basename(sPath).lower()
     setBefore = set(lBefore)
     bSeenChange = False
-    dtEnd = datetime.datetime.now() + datetime.timedelta(minutes=c_iProcessingMinutes)
+    dtEnd = datetime.datetime.now() + datetime.timedelta(minutes=iProcessingMinutes)
     while datetime.datetime.now() < dtEnd:
         lTexts = pageMessages(page)
         if lTexts != lBefore: bSeenChange = True
@@ -1641,7 +1641,7 @@ def uploadFile(page, sWhat, sPath, sButtonId, sDonePattern):
             log("Receipt written for " + sWhat.lower() + " (a local record of what was sent, not a server-side check)")
             return True
         time.sleep(10)
-    return unresolved(sWhat, "KDP did not confirm the " + sWhat.lower() + " within " + str(c_iProcessingMinutes) + " minutes")
+    return unresolved(sWhat, "KDP did not confirm the " + sWhat.lower() + " within " + str(iProcessingMinutes) + " minutes")
 
 
 def setSelectByWords(page, sWhat, oSelect, lWords):
@@ -1791,7 +1791,7 @@ def onTab(page, sTab):
         if "/" + sTab in page.url and tabLooksReady(page, sTab): return True
         sTitleId = titleIdFrom(page.url)
         if iTry == 1 or not sTitleId: break
-        sTarget = c_sTitleSetup + sTitleId + "/" + sTab
+        sTarget = sTitleSetup + sTitleId + "/" + sTab
         log("Not on the " + sTab + " tab (URL " + page.url + "); opening it directly at " + sTarget)
         try:
             page.goto(sTarget)
@@ -1826,7 +1826,7 @@ def fillContent(page):
     else:
         say("The cover is already uploaded; not uploading it again.")
     say("Waiting for KDP to finish processing the files.")
-    dtEnd = datetime.datetime.now() + datetime.timedelta(minutes=c_iProcessingMinutes)
+    dtEnd = datetime.datetime.now() + datetime.timedelta(minutes=iProcessingMinutes)
     while datetime.datetime.now() < dtEnd:
         bManuscript, bCover, sJoined = uploadsDone(page)
         if bManuscript and bCover: break
@@ -1835,7 +1835,7 @@ def fillContent(page):
     if bManuscript and bCover:
         say("Processing finished.")
     else:
-        unresolved("File processing", "KDP had not finished processing the " + ("manuscript" if not bManuscript else "cover") + " after " + str(c_iProcessingMinutes) + " minutes")
+        unresolved("File processing", "KDP had not finished processing the " + ("manuscript" if not bManuscript else "cover") + " after " + str(iProcessingMinutes) + " minutes")
         say("Processing is still running; this blocks publishing until it finishes.")
     if keepsAi(d):
         say("AI-generated content: kept exactly as KDP holds it, as the answers say.")
@@ -1950,10 +1950,10 @@ def finalReview(page):
         say("Description, categories and keywords: kept as KDP holds them.")
     else:
         say("First sentence of the description: " + d["description"].split(".")[0] + ".")
-        say("Categories: " + "; ".join(c_dCategoryFixes.get(sPath, sPath) for sPath in d["categories"]) + ".")
+        say("Categories: " + "; ".join(dCategoryFixes.get(sPath, sPath) for sPath in d["categories"]) + ".")
         say("Keywords: " + "; ".join(d["keywords"]) + ".")
     say("DRM: " + d["drm"] + ". " + ("Pricing: kept as KDP holds it." if keepsPricing(d) else "KDP Select: " + d["kdpSelect"] + ". Royalty: " + d["royalty"] + " at $" + str(d["priceUsd"]) + "."))
-    lBlocking = [u for u in lUnresolved if u.split(":")[0].strip() in c_lBlocking]
+    lBlocking = [u for u in lUnresolved if u.split(":")[0].strip() in lBlockingNames]
     lAdvisory = [u for u in lUnresolved if u not in lBlocking]
     if lBlocking:
         say(str(len(lBlocking)) + " item" + ("" if len(lBlocking) == 1 else "s") + " stop" + ("s" if len(lBlocking) == 1 else "") + " publishing, because KDP refused it or a file did not upload:")
@@ -2005,7 +2005,7 @@ def finalReview(page):
     lTexts = logMessages(page, "after Publish")
     say("Page now: " + page.title() + ", at " + page.url)
     if sOutcome == "submitted":
-        page.goto(c_sBookshelfUrl)
+        page.goto(sBookshelfUrl)
         time.sleep(5)
         sStatus = bookshelfStatus(page, "after publishing")
         say("Submitted. KDP's Bookshelf now shows the book as: " + sStatus + ". KDP said: " + (" | ".join(t for t in lTexts if oAck.search(t)) or "see the log") + ".")
@@ -2024,9 +2024,9 @@ def finalReview(page):
     return "unknown"
 
 
-c_lFlags = ["--ask", "--book", "--chrome", "--copy-profile", "--create-new", "--inspect", "--no-publish", "--reupload", "--start-at", "--stop-after", "--title-id"]
-c_dExit = {"submitted": 0, "draft": 5, "blocked": 5, "unknown": 6}
-c_lBlocking = ["DRM", "Manuscript", "Cover", "Confirmation that the answers are accurate", "Save as Draft", "Save and Continue to content", "Save and Continue to pricing", "Pricing tab", "Publish"]  # only these stop Publish: a refused save, a failed upload, or the confirmation box; everything else is read out afterwards
+lFlags = ["--ask", "--book", "--chrome", "--copy-profile", "--create-new", "--inspect", "--no-publish", "--reupload", "--start-at", "--stop-after", "--title-id"]
+dExit = {"submitted": 0, "draft": 5, "blocked": 5, "unknown": 6}
+lBlockingNames = ["DRM", "Manuscript", "Cover", "Confirmation that the answers are accurate", "Save as Draft", "Save and Continue to content", "Save and Continue to pricing", "Pricing tab", "Publish"]  # only these stop Publish: a refused save, a failed upload, or the confirmation box; everything else is read out afterwards
 
 
 def checkOptions():
@@ -2035,7 +2035,7 @@ def checkOptions():
     iIndex = 0
     while iIndex < len(lArgs):
         sArg = lArgs[iIndex]
-        if sArg not in c_lFlags: return "Unknown option " + sArg + ". Allowed: " + " ".join(c_lFlags)
+        if sArg not in lFlags: return "Unknown option " + sArg + ". Allowed: " + " ".join(lFlags)
         if sArg in ("--book", "--start-at", "--stop-after", "--title-id"):
             if iIndex + 1 >= len(lArgs) or lArgs[iIndex + 1].startswith("--"): return sArg + " needs a value"
             sValue = lArgs[iIndex + 1]
@@ -2124,13 +2124,13 @@ def finish(page, browser, sState, sNote):
     """Reports the run's outcome, keeps the browser open for checking, and returns the exit code for that state."""
     say(sNote + " Log: " + sLogPath)
     if sState == "submitted": say("Follow-ups: listen to the book's Amazon page when it goes live; add the book to your Amazon author page; with DRM off, download the published ebook and spot-check notes and links.")
-    log("RUN OUTCOME: " + sState + " (exit code " + str(c_dExit.get(sState, 1)) + ")")
+    log("RUN OUTCOME: " + sState + " (exit code " + str(dExit.get(sState, 1)) + ")")
     pause("The browser window stays open so you can check anything. Close it yourself when done.")
     try:
         browser.close()
     except Exception as oError:
         log("Browser already closed: " + str(oError)[:80])
-    return c_dExit.get(sState, 1)
+    return dExit.get(sState, 1)
 
 
 def loadPlaywright():
@@ -2190,8 +2190,8 @@ def main():
     global dAnswers, sLogPath
     os.makedirs(os.path.join(sProject, "logs"), exist_ok=True)
     sLogPath = os.path.join(sProject, "logs", logStem() + "-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + ".log")
-    log("kdpSubmit.py started; " + c_sVersion + "; script " + os.path.abspath(__file__))
-    print("kdpSubmit " + c_sVersion.split(":")[0])
+    log("kdpSubmit.py started; " + sVersion + "; script " + os.path.abspath(__file__))
+    print("kdpSubmit " + sVersion.split(":")[0])
     log("Python " + sys.version.split()[0] + " on " + platform.platform() + "; script folder " + sFolder + "; project folder " + sProject + "; command line " + " ".join(sys.argv))
     sBad = checkOptions()
     if sBad:
@@ -2255,7 +2255,7 @@ def main():
         watchBrowser(page)
         say("Opening KDP in " + ("Chrome" if bChrome else "Edge") + ".")
         if "--inspect" in sys.argv:
-            page.goto(c_sBookshelfUrl)
+            page.goto(sBookshelfUrl)
             time.sleep(3)
             if not waitForSignIn(page): return 1
             pause("Inspect mode. In the browser window, move to the KDP page you want recorded, then come back here.")
@@ -2271,7 +2271,7 @@ def main():
         if not sTitleId and "--create-new" not in sys.argv:
             return finish(page, browser, "blocked", "No draft of " + dAnswers["title"] + " was found and --create-new was not given, so no title was created.")
         if sTitleId and sStartAt:
-            page.goto(c_sTitleSetup + sTitleId + "/" + sStartAt)
+            page.goto(sTitleSetup + sTitleId + "/" + sStartAt)
             log("Opened draft " + sTitleId + " at the " + sStartAt + " tab, as asked")
             if "signin" in page.url and not waitForSignIn(page): return 1
             if sStartAt == "content":
@@ -2285,10 +2285,10 @@ def main():
             sState = finalReview(page)
             return finish(page, browser, sState, "Finished with outcome: " + sState + ".")
         if sTitleId:
-            page.goto(c_sTitleSetup + sTitleId + "/details")
+            page.goto(sTitleSetup + sTitleId + "/details")
             log("Opened draft " + sTitleId)
         else:
-            page.goto(c_sBookshelfUrl)
+            page.goto(sBookshelfUrl)
             time.sleep(2)
             clickButton(page, "Create new title", ["Create new title", "Create"])
             clickButton(page, "Create eBook", ["Create eBook", "Kindle eBook"], False)

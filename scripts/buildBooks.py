@@ -42,20 +42,20 @@ Every run writes logs\\MyBooks-buildBooks-<date>-<time>.log in the project folde
 import collections, datetime, glob, hashlib, html, json, os, platform, posixpath, re, shutil, subprocess, sys, time, traceback, unicodedata, urllib.parse, urllib.request, uuid, zipfile
 
 # The way an EPUB is made: raised when buildBooks changes what it puts in a book, so every book is built again once.
-c_sBuildFormat = "2026-10-09"
-c_dDefaults = {"author": "", "ownTemplates": "", "imageMaxBytes": "150000", "imageMaxEdge": "1000", "jpegQuality": "75", "pandocMinimum": "3.1", "searchDepth": "6", "toolRefreshDays": "7", "userAgent": "HomerBooksBuild/1"}
-c_dSeriesSections = {"Strange Truths": ["Copyright", "Table of Contents", "Introduction", "Conclusion", "Key Terms", "Further Reading", "Also in the Strange Truths Series", "About the Author"]}
-c_iLongSentence = 30
-c_iWordDiffPercent = 5
-c_lCoverExtensions = [".jpg", ".jpeg", ".png"]
-c_lSourceExtensions = [".docx", ".epub", ".htm", ".html", ".pdf"]
-c_lImageExtensions = ["png", "jpg", "jpeg", "gif", "svg", "webp", "tif", "tiff", "bmp"]
-c_lSkipFolders = ["$recycle.bin", ".git", "appdata", "node_modules", "system volume information", "windows"]
-c_nDeliveryFeePerMb = 0.15
-c_sAceVersionCheck = "@daisy/ace"
-c_sBrowserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36"
-c_sKitNeeded = "1.63.0"
-c_sEpubcheckApi = "https://api.github.com/repos/w3c/epubcheck/releases/latest"
+sBuildFormat = "2026-10-09"
+dDefaults = {"author": "", "ownTemplates": "", "imageMaxBytes": "150000", "imageMaxEdge": "1000", "jpegQuality": "75", "pandocMinimum": "3.1", "searchDepth": "6", "toolRefreshDays": "7", "userAgent": "HomerBooksBuild/1"}
+dSeriesSections = {"Strange Truths": ["Copyright", "Table of Contents", "Introduction", "Conclusion", "Key Terms", "Further Reading", "Also in the Strange Truths Series", "About the Author"]}
+iLongSentence = 30
+iWordDiffPercent = 5
+lCoverExtensions = [".jpg", ".jpeg", ".png"]
+lSourceExtensions = [".docx", ".epub", ".htm", ".html", ".pdf"]
+lImageExtensions = ["png", "jpg", "jpeg", "gif", "svg", "webp", "tif", "tiff", "bmp"]
+lSkipFolders = ["$recycle.bin", ".git", "appdata", "node_modules", "system volume information", "windows"]
+nDeliveryFeePerMb = 0.15
+sAceVersionCheck = "@daisy/ace"
+sBrowserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36"
+sKitNeeded = "1.63.0"
+sEpubcheckApi = "https://api.github.com/repos/w3c/epubcheck/releases/latest"
 
 lLog = []
 sFolder = os.path.dirname(os.path.abspath(__file__))
@@ -159,18 +159,18 @@ def download(sUrl, sPath):
     lTries = [(sUrl, dSettings["userAgent"])]
     oThumb = re.match(r"^(https?://upload\.wikimedia\.org/wikipedia/[^/]+)/thumb/(.+?)/[^/]+$", sUrl)
     if oThumb: lTries.append((oThumb.group(1) + "/" + oThumb.group(2), dSettings["userAgent"]))
-    if "wikimedia.org" not in sUrl: lTries.append((sUrl, c_sBrowserAgent))
+    if "wikimedia.org" not in sUrl: lTries.append((sUrl, sBrowserAgent))
     sLast = ""
     for sTry, sAgent in lTries:
         try:
             binData = fetchBytes(sTry, sAgent)
             os.makedirs(os.path.dirname(sPath), exist_ok=True)
             with open(sPath, "wb") as f: f.write(binData)
-            log("  saved " + format(len(binData), ",") + " bytes from " + sTry + (" as a browser" if sAgent == c_sBrowserAgent else ""))
+            log("  saved " + format(len(binData), ",") + " bytes from " + sTry + (" as a browser" if sAgent == sBrowserAgent else ""))
             return ""
         except Exception as oError:
             sLast = str(oError)
-            log("  failed: " + sTry + (" as a browser" if sAgent == c_sBrowserAgent else "") + ": " + sLast)
+            log("  failed: " + sTry + (" as a browser" if sAgent == sBrowserAgent else "") + ": " + sLast)
     return sLast
 
 
@@ -308,8 +308,8 @@ def loadKit():
     if not sKit: return "The HomerDev kit was not found. buildBooks uses its exec\\Python\\media.py and inix.py. Unzip HomerDev.zip into C:\\HomerDev, or set the HomerDev environment variable to the kit's folder."
     sVersionFile = os.path.join(sKit, "version.txt")
     sVersion = open(sVersionFile, "rb").read().decode("utf-8-sig").strip() if os.path.isfile(sVersionFile) else ""
-    log("HomerDev kit " + (sVersion or "of unknown version") + " at " + sKit + "; this script needs " + c_sKitNeeded + " or later")
-    if versionTuple(sVersion) < versionTuple(c_sKitNeeded): return "The HomerDev kit at " + sKit + " is version " + (sVersion or "unknown") + "; buildBooks needs " + c_sKitNeeded + " or later. Unzip the newest HomerDev.zip there and run its build."
+    log("HomerDev kit " + (sVersion or "of unknown version") + " at " + sKit + "; this script needs " + sKitNeeded + " or later")
+    if versionTuple(sVersion) < versionTuple(sKitNeeded): return "The HomerDev kit at " + sKit + " is version " + (sVersion or "unknown") + "; buildBooks needs " + sKitNeeded + " or later. Unzip the newest HomerDev.zip there and run its build."
     sPython = os.path.join(sKit, "exec", "Python")
     if sPython not in sys.path: sys.path.insert(0, sPython)
     import inix as oInix, kdpEpub as oKdpEpub, media as oMedia, paths as oPaths
@@ -463,7 +463,7 @@ def ensureEpubcheck():
         sLatest = dKnown.get("version", "") if dKnown else ""
         if not dKnown:
             try:
-                oRequest = urllib.request.Request(c_sEpubcheckApi, headers={"User-Agent": dSettings["userAgent"], "Accept": "application/vnd.github+json"})
+                oRequest = urllib.request.Request(sEpubcheckApi, headers={"User-Agent": dSettings["userAgent"], "Accept": "application/vnd.github+json"})
                 with urllib.request.urlopen(oRequest, timeout=60) as oResponse: sLatest = json.loads(oResponse.read().decode("utf-8")).get("tag_name", "").lstrip("v")
                 rememberTool("epubcheckLatest", [os.path.join(sMachine, "epubcheck.jar")], sLatest)
             except Exception as oError:
@@ -480,7 +480,7 @@ def ensureEpubcheck():
         dTools["epubcheckVersion"] = open(sStampFile, encoding="utf-8").read().strip()
         return True
     try:
-        oRequest = urllib.request.Request(c_sEpubcheckApi, headers={"User-Agent": dSettings["userAgent"], "Accept": "application/vnd.github+json"})
+        oRequest = urllib.request.Request(sEpubcheckApi, headers={"User-Agent": dSettings["userAgent"], "Accept": "application/vnd.github+json"})
         with urllib.request.urlopen(oRequest, timeout=60) as oResponse: dRelease = json.loads(oResponse.read().decode("utf-8"))
         sTag = dRelease.get("tag_name", "")
         sInstalled = open(sStampFile, encoding="utf-8").read().strip() if os.path.exists(sStampFile) else ""
@@ -541,12 +541,12 @@ def ensureAce():
     if sAce:
         iCode, sOut = run([sAce, "--version"])
         sInstalled = sOut.strip().splitlines()[-1].strip() if iCode == 0 and sOut.strip() else ""
-    iCode, sOut = run([sNpm, "view", c_sAceVersionCheck, "version"])
+    iCode, sOut = run([sNpm, "view", sAceVersionCheck, "version"])
     sLatest = sOut.strip().splitlines()[-1].strip() if iCode == 0 and sOut.strip() else ""
     log("Ace by DAISY: installed %s, latest on npm %s" % (sInstalled or "none", sLatest or "unknown (npm could not be asked)"))
     if not sAce or (sLatest and versionTuple(sLatest) > versionTuple(sInstalled)):
         say(("Updating Ace by DAISY from %s to %s" % (sInstalled, sLatest) if sAce else "Installing Ace by DAISY") + " with npm. This downloads a copy of Chromium and takes a few minutes.")
-        iCode, _ = run([sNpm, "install", "--global", c_sAceVersionCheck + "@" + (sLatest or "latest")], iTimeout=3600)
+        iCode, _ = run([sNpm, "install", "--global", sAceVersionCheck + "@" + (sLatest or "latest")], iTimeout=3600)
         sAce = media.findInstalled("ace")
         if sAce:
             iCode, sOut = run([sAce, "--version"])
@@ -584,10 +584,10 @@ def searchIndex():
                     lDirs[:] = []
                     continue
             if sDir.count(os.sep) - iTopDepth >= iDepth: lDirs[:] = []
-            lDirs[:] = [s for s in lDirs if s.lower() not in c_lSkipFolders]
+            lDirs[:] = [s for s in lDirs if s.lower() not in lSkipFolders]
             for sName in lFiles:
                 sStem, sExt = os.path.splitext(sName)
-                if sExt.lower() not in c_lSourceExtensions + [".md"] + c_lCoverExtensions: continue
+                if sExt.lower() not in lSourceExtensions + [".md"] + lCoverExtensions: continue
                 if os.path.basename(sDir).lower() == "images": continue
                 dIndex.setdefault(simpleStem(sStem), []).append(os.path.join(sDir, sName))
     log("search index holds " + plural(len(dIndex), "name"))
@@ -635,10 +635,10 @@ def gatherBook(dBook, dIndex):
     # The manuscript sources, best first: a Word file is the author's own manuscript; an EPUB is a finished book;
     # a PDF is a printed page, read back with the most guesswork. Only the best kind found is taken.
     lDocx = []
-    for sExt in c_lSourceExtensions:
+    for sExt in lSourceExtensions:
         lDocx = [s for s in lHits if s.lower().endswith(sExt) and not os.path.basename(s).startswith("~$")]
         if lDocx: break
-    lCovers = [s for s in lHits if os.path.splitext(s)[1].lower() in c_lCoverExtensions]
+    lCovers = [s for s in lHits if os.path.splitext(s)[1].lower() in lCoverExtensions]
     lImageDirs = []
     for sHit in lHits:
         if os.path.splitext(sHit)[1].lower() not in (".md", ".docx"): continue
@@ -653,7 +653,7 @@ def gatherBook(dBook, dIndex):
             if not copyFound(sNewest, sTarget): sNewest = ""
             log(sRoot + ": copied Word file " + sNewest)
         dFound["docx"] = sNewest
-    bHaveCover = any(os.path.exists(os.path.join(sBookDir, sRoot + s)) for s in c_lCoverExtensions)
+    bHaveCover = any(os.path.exists(os.path.join(sBookDir, sRoot + s)) for s in lCoverExtensions)
     if lCovers and not bHaveCover:
         sNewest = max(lCovers, key=safeTime)
         if not copyFound(sNewest, os.path.join(sBookDir, sRoot + os.path.splitext(sNewest)[1].lower())): sNewest = ""
@@ -693,7 +693,7 @@ def retireFormer(dBook):
 
 def bookSource(dBook):
     """The book's best source beside its manuscript folder: a Word file, else an EPUB, else a PDF; "" when none."""
-    for sExt in c_lSourceExtensions:
+    for sExt in lSourceExtensions:
         lFound = sorted(glob.glob(os.path.join(sProject, "books", dBook["root"], "*" + sExt)), key=safeTime)
         if lFound: return lFound[-1]
     return ""
@@ -1108,13 +1108,13 @@ def headingList(sBody):
     return lOut
 
 
-c_sImagePattern = r"!\[(?P<alt>(?:[^\[\]]|\[[^\]]*\])*)\]\((?P<url><[^>]+>|[^)\s]+)(?P<title>\s+\"[^\"]*\")?\)(?P<attr>\{[^}]*\})?"
+sImagePattern = r"!\[(?P<alt>(?:[^\[\]]|\[[^\]]*\])*)\]\((?P<url><[^>]+>|[^)\s]+)(?P<title>\s+\"[^\"]*\")?\)(?P<attr>\{[^}]*\})?"
 
 
 def imageList(sBody):
     """Every picture in the manuscript: its match, text alternative and address."""
     lOut = []
-    for oMatch in re.finditer(c_sImagePattern, sBody):
+    for oMatch in re.finditer(sImagePattern, sBody):
         sAlt = oMatch.group("alt").strip()
         oAttrAlt = re.search(r"alt=\"([^\"]*)\"", oMatch.group("attr") or "")
         if not sAlt and oAttrAlt: sAlt = oAttrAlt.group(1).strip()
@@ -1176,7 +1176,7 @@ def lookupNamed(dNamed, sName):
 def findInFolders(lFolders, sName):
     """A picture by name in any of the given folders, case-insensitively, with the double-extension fallback."""
     lNames = [sName]
-    oDouble = re.match(r"^(.*\.(?:" + "|".join(c_lImageExtensions) + r"))\.(?:" + "|".join(c_lImageExtensions) + r")$", sName, re.I)
+    oDouble = re.match(r"^(.*\.(?:" + "|".join(lImageExtensions) + r"))\.(?:" + "|".join(lImageExtensions) + r")$", sName, re.I)
     if oDouble: lNames.append(oDouble.group(1))
     for sDir in lFolders:
         if not os.path.isdir(sDir): continue
@@ -1279,7 +1279,7 @@ def resolvePictures(dBook, sBody, sWork, dFound):
             # stays valid; the manuscript keeps the reference, so the picture returns when its source is found.
             return ("*[" + dRecord["alt"] + "]*") if dRecord.get("alt") else ""
         return oMatch.group(0).replace(oMatch.group("url"), "media/" + dRecord["epubName"], 1)
-    return re.sub(c_sImagePattern, replace, sBody), lRecords, lErrors
+    return re.sub(sImagePattern, replace, sBody), lRecords, lErrors
 
 
 def preparePicture(sPath, sWork, iNumber):
@@ -1584,7 +1584,7 @@ def buildEpub(dBook, dKdp, dAudit, dEdition=None):
         sCsl = os.path.join(sBookDir, sRoot + ".csl")
         if os.path.exists(sCsl): lCommand += ["--csl", sCsl]
         log(sRoot + ": citations from " + os.path.basename(sBib) + (" in the style of " + os.path.basename(sCsl) if os.path.exists(sCsl) else ""))
-    lCovers = [os.path.join(sBookDir, sRoot + s) for s in c_lCoverExtensions if os.path.exists(os.path.join(sBookDir, sRoot + s))]
+    lCovers = [os.path.join(sBookDir, sRoot + s) for s in lCoverExtensions if os.path.exists(os.path.join(sBookDir, sRoot + s))]
     if lCovers:
         lCommand += ["--epub-cover-image", lCovers[0]]
         dAudit["cover"] = os.path.basename(lCovers[0])
@@ -1996,7 +1996,7 @@ def readingLevel(sBody):
     if not lSentences or not lWords: return None
     iSyllables = sum(syllables(s) for s in lWords)
     nGrade = 0.39 * len(lWords) / len(lSentences) + 11.8 * iSyllables / len(lWords) - 15.59
-    iLong = sum(1 for x in lSentences if len(re.findall(r"[A-Za-z][A-Za-z'\u2019-]*", x)) > c_iLongSentence)
+    iLong = sum(1 for x in lSentences if len(re.findall(r"[A-Za-z][A-Za-z'\u2019-]*", x)) > iLongSentence)
     return {"grade": round(nGrade, 1), "sentences": len(lSentences), "words": len(lWords), "long": iLong}
 
 
@@ -2034,7 +2034,7 @@ def auditManuscript(dBook, dAudit, dCatalog):
     bPublicDomain = not ownBook(dBook)
     lMissing = [s for s in ["Copyright"] if s not in lNames and not bPublicDomain]
     if ownBook(dBook) and "About the Author" not in lNames: lMissing.append("About the Author")
-    for sSection in c_dSeriesSections.get(dBook["series"], []):
+    for sSection in dSeriesSections.get(dBook["series"], []):
         if dBook["root"] == "Strange_Truths": break
         if sSection not in lNames and sSection not in lMissing: lMissing.append(sSection)
     if lMissing: lWarnings.append("Sections the house pattern calls for but this book lacks: " + ", ".join(lMissing) + ".")
@@ -2071,14 +2071,14 @@ def auditManuscript(dBook, dAudit, dCatalog):
     dAudit["readingLevel"] = readingLevel(sBody)
     dLevel = dAudit["readingLevel"]
     if dLevel and dBook["readingGrade"] and dLevel["grade"] > dBook["readingGrade"]:
-        lWarnings.append("Reading level is grade " + str(dLevel["grade"]) + " by the Flesch-Kincaid formula, above the target of grade " + str(dBook["readingGrade"]) + "; " + plural(dLevel["long"], "sentence") + " of " + str(dLevel["sentences"]) + " run past " + str(c_iLongSentence) + " words.")
+        lWarnings.append("Reading level is grade " + str(dLevel["grade"]) + " by the Flesch-Kincaid formula, above the target of grade " + str(dBook["readingGrade"]) + "; " + plural(dLevel["long"], "sentence") + " of " + str(dLevel["sentences"]) + " run past " + str(iLongSentence) + " words.")
     lDocx = bookDocx(dBook)
     if lDocx:
         iCodeA, sMd = run([dTools["pandoc"], os.path.join(sProject, "books", dBook["root"], dBook["root"] + ".md"), "-t", "plain", "--wrap=none"])
         iCodeB, sDocx = run([dTools["pandoc"], lDocx[-1], "-t", "plain", "--wrap=none"])
         iMd, iDocx = len(sMd.split()), len(sDocx.split())
         dAudit["wordCompare"] = (iMd, iDocx, os.path.basename(lDocx[-1]))
-        if iCodeA == 0 and iCodeB == 0 and iMd and abs(iMd - iDocx) * 100 > c_iWordDiffPercent * iMd:
+        if iCodeA == 0 and iCodeB == 0 and iMd and abs(iMd - iDocx) * 100 > iWordDiffPercent * iMd:
             lWarnings.append("The Word file " + os.path.basename(lDocx[-1]) + " has " + format(iDocx, ",") + " words and the manuscript " + format(iMd, ",") + "; check which holds the latest edits before submitting.")
     return True
 
@@ -2117,7 +2117,7 @@ def auditEpub(sEpub, dAudit, dKdp):
     nMb = iBytes / 1048576.0
     dAudit["size"] = iBytes
     sRoyalty = dKdp.get("kdp", {}).get("royalty", "")
-    dAudit["deliveryFee"] = round(nMb * c_nDeliveryFeePerMb, 2)
+    dAudit["deliveryFee"] = round(nMb * nDeliveryFeePerMb, 2)
     dAudit["royalty"] = sRoyalty
     return True
 
@@ -2156,7 +2156,7 @@ def writeAudit(dBook, dAudit):
             log("the sources fingerprint could not be taken: " + str(oError))
     if dAudit.get("wordCompare"): l.append("- Words: " + format(dAudit["wordCompare"][0], ",") + " in the manuscript, " + format(dAudit["wordCompare"][1], ",") + " in " + mdEscape(dAudit["wordCompare"][2]))
     dLevel = dAudit.get("readingLevel")
-    if dLevel: l.append("- Reading level: grade " + str(dLevel["grade"]) + (" (target " + str(dBook["readingGrade"]) + ")" if dBook["readingGrade"] else " (no target for this book)") + "; " + plural(dLevel["long"], "sentence") + " of " + format(dLevel["sentences"], ",") + " over " + str(c_iLongSentence) + " words")
+    if dLevel: l.append("- Reading level: grade " + str(dLevel["grade"]) + (" (target " + str(dBook["readingGrade"]) + ")" if dBook["readingGrade"] else " (no target for this book)") + "; " + plural(dLevel["long"], "sentence") + " of " + format(dLevel["sentences"], ",") + " over " + str(iLongSentence) + " words")
     l.append("")
     l += ["## Errors", ""] + (["- " + mdEscape(s) for s in lErrors] or ["None."]) + [""]
     l += ["## Warnings", ""] + (["- " + mdEscape(s) for s in lWarnings] or ["None."]) + [""]
@@ -2187,7 +2187,7 @@ def buildKey(dBook, sBookDir, dKdp):
     # THE PROJECT'S OWN TEMPLATES ARE WHERE bookTemplate READS THEM (11 October 2026, from an audit): directly in
     # templates, used when ownTemplates = yes. This looked in templates\\books, so a changed project stylesheet or filter
     # did not rebuild the book. The builder's own code is deliberately not hashed: kdpUpdate compares this fingerprint,
-    # and an edit to buildBooks.py that changes nothing in a book would resend every book to KDP; c_sBuildFormat is raised
+    # and an edit to buildBooks.py that changes nothing in a book would resend every book to KDP; sBuildFormat is raised
     # instead when a change to the builder changes what goes into a book.
     lsDirs = [os.path.join(dTools.get("kit", ""), "Templates", "books")]
     if dSettings.get("ownTemplates", "").lower() == "yes": lsDirs.append(os.path.join(sProject, "templates"))
@@ -2197,7 +2197,7 @@ def buildKey(dBook, sBookDir, dKdp):
                 sPath = os.path.join(sDir, sName)
                 if os.path.isfile(sPath): lsTemplates.append(sName.lower() + ":" + hashlib.sha256(open(sPath, "rb").read()).hexdigest())
     lsEditions = [os.path.basename(s) + ":" + hashlib.sha256(open(s, "rb").read()).hexdigest() for s in sorted(glob.glob(os.path.join(sProject, "configs", "editions", dBook["root"] + "-*.inix")), key=str.lower)]
-    lParts = [c_sBuildFormat, kdpSubmit.bookSourcesSha(sBookDir), dBook, {s: dKdp.get(s, {}) for s in ("kdp", "proposed")}, lsTemplates, dTools.get("pandocVersion", ""), lsEditions]
+    lParts = [sBuildFormat, kdpSubmit.bookSourcesSha(sBookDir), dBook, {s: dKdp.get(s, {}) for s in ("kdp", "proposed")}, lsTemplates, dTools.get("pandocVersion", ""), lsEditions]
     return hashlib.sha256(json.dumps(lParts, sort_keys=True, default=str).encode("utf-8")).hexdigest()
 
 
@@ -2322,7 +2322,7 @@ def main():
         say(sKitProblem)
         return 3
     try:
-        dSettings = dict(c_dDefaults)
+        dSettings = dict(dDefaults)
         dSettings.update(readInix(os.path.join(sProject, "configs", "buildBooks.inix")).get("build", {}))
         dCatalog = loadCatalog()
     except Exception as oError:

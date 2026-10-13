@@ -72,9 +72,9 @@ param(
 $OutputEncoding = [System.Text.UTF8Encoding]::new()
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 
-$c_sJekyllTheme = "jekyll-theme-cayman"
-$c_iWaitTries = 36
-$c_iWaitSeconds = 5
+$sJekyllTheme = "jekyll-theme-cayman"
+$iWaitTries = 36
+$iWaitSeconds = 5
 
 $oUtf8NoBom = [System.Text.UTF8Encoding]::new($false)
 if ($Project -eq "") { $Project = (Get-Location).Path }
@@ -443,7 +443,7 @@ try {
 
     $sConfig = "title: " + (yamlQuote $sTitle) + "`ndescription: " + (yamlQuote $sDescription) + "`n"
     if ($sAuthor -ne "") { $sConfig += "author: " + (yamlQuote $sAuthor) + "`n" }
-    $sConfig += "theme: " + $c_sJekyllTheme + "`nlang: " + $sLanguage + "`nmarkdown: kramdown`nkramdown:`n  input: GFM`n  hard_wrap: false`n  auto_ids: true`n"
+    $sConfig += "theme: " + $sJekyllTheme + "`nlang: " + $sLanguage + "`nmarkdown: kramdown`nkramdown:`n  input: GFM`n  hard_wrap: false`n  auto_ids: true`n"
     writeCrlfNoBom (Join-Path $sStage "_config.yml") $sConfig | Out-Null
 
     if (-not $bAppRepo) {
@@ -514,8 +514,8 @@ try {
 
     # ---- wait for GitHub's build -----------------------------------------
     $sStatus = ""; $sBuildError = ""
-    for ($iTry = 0; $iTry -lt $c_iWaitTries; $iTry++) {
-        Start-Sleep -Seconds $c_iWaitSeconds
+    for ($iTry = 0; $iTry -lt $iWaitTries; $iTry++) {
+        Start-Sleep -Seconds $iWaitSeconds
         $sOut = (& gh api ("repos/" + $sOwner + "/" + $sRepo + "/pages/builds/latest") 2>&1 | Out-String)
         try {
             $oBuild = $sOut | ConvertFrom-Json

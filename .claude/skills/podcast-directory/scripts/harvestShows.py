@@ -24,7 +24,7 @@ import urllib.error, urllib.request
 import xml.etree.ElementTree as ET
 
 # name, slug, kind, ref, [wp rest base]
-c_lShows = [
+lAllShows = [
     ("Sword and Scale", "SwordAndScale", "podcast", "790487079"),
     ("The Poetry of Reality", "PoetryOfReality", "podcast", "1716337570"),
     ("Making Sense with Sam Harris", "MakingSense", "podcast", "733163012"),
@@ -117,23 +117,23 @@ c_lShows = [
     ("On a Mission", "OnAMission", "podcast", "https://www.nasa.gov/feeds/podcasts/on-a-mission"),
     ("The Invisible Network", "InvisibleNetwork", "podcast", "https://www.nasa.gov/feeds/podcasts/invisible-network"),
 ]
-c_sLookup = "https://itunes.apple.com/lookup?id="
-c_sUserAgent = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) ShowDirectoryHarvester/1.2")
-c_sLogName = "harvestShows.log"
-c_iPageCap = 60
-c_iWpPageCap = 12
-c_iMaxWorkers = 6
-c_nDelay = 0.4
-c_dNs = {"itunes": "http://www.itunes.com/dtds/podcast-1.0.dtd",
+sLookup = "https://itunes.apple.com/lookup?id="
+sUserAgent = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) ShowDirectoryHarvester/1.2")
+sLogName = "harvestShows.log"
+iPageCap = 60
+iWpPageCap = 12
+iMaxWorkers = 6
+nDelay = 0.4
+dNs = {"itunes": "http://www.itunes.com/dtds/podcast-1.0.dtd",
          "content": "http://purl.org/rss/1.0/modules/content/",
          "atom": "http://www.w3.org/2005/Atom"}
-c_lPodFields = ["guid", "date", "title", "link", "duration", "season", "episode",
+lPodFields = ["guid", "date", "title", "link", "duration", "season", "episode",
                 "type", "explicit", "author", "keywords", "audio_url", "summary"]
-c_lWpFields = ["slug", "date", "title", "link", "categories", "summary"]
+lWpFields = ["slug", "date", "title", "link", "categories", "summary"]
 
 oLog = None
 oLogLock = threading.Lock()
-g_iWpPages = c_iWpPageCap
+g_iWpPages = iWpPageCap
 
 
 def scriptDir(): return os.path.dirname(os.path.abspath(__file__))
@@ -152,7 +152,7 @@ def sCount(iN, sNoun): return str(iN) + " " + (sNoun if iN == 1 else sNoun + "s"
 
 
 def httpGet(sUrl):
-    oReq = urllib.request.Request(sUrl, headers={"User-Agent": c_sUserAgent})
+    oReq = urllib.request.Request(sUrl, headers={"User-Agent": sUserAgent})
     try:
         oResp = urllib.request.urlopen(oReq, timeout=60)
         sBody = oResp.read().decode("utf-8", "replace")
@@ -204,7 +204,7 @@ def writeTsv(sSlug, lFields, lRecords, sKeyField):
 # --- podcast ---------------------------------------------------------------
 def resolveFeed(sAppleId):
     if sAppleId.startswith("http"): return sAppleId
-    iStatus, sBody = httpGet(c_sLookup + sAppleId)
+    iStatus, sBody = httpGet(sLookup + sAppleId)
     if iStatus != 200 or not sBody: return ""
     try: dData = json.loads(sBody)
     except Exception: return ""
@@ -214,7 +214,7 @@ def resolveFeed(sAppleId):
 
 
 def itemText(oItem, sPath):
-    v = oItem.findtext(sPath, default="", namespaces=c_dNs)
+    v = oItem.findtext(sPath, default="", namespaces=dNs)
     return v.strip() if v else ""
 
 
@@ -225,7 +225,7 @@ def parseDate(sRaw):
 
 
 def parseItem(oItem):
-    d = {k: "" for k in c_lPodFields}
+    d = {k: "" for k in lPodFields}
     d["title"] = itemText(oItem, "title"); d["link"] = itemText(oItem, "link")
     d["guid"] = itemText(oItem, "guid"); d["date"] = parseDate(itemText(oItem, "pubDate"))
     d["duration"] = itemText(oItem, "itunes:duration"); d["season"] = itemText(oItem, "itunes:season")
@@ -246,7 +246,7 @@ def harvestPodcast(sName, sSlug, sAppleId):
         logLine(sName + ": could not resolve a feed"); return 0
     logLine(sName + " feed: " + sFeed)
     lRecords = []; sUrl = sFeed; iPage = 0
-    while sUrl and iPage < c_iPageCap:
+    while sUrl and iPage < iPageCap:
         iPage += 1
         iStatus, sBody = httpGet(sUrl)
         if iStatus != 200 or not sBody: break
@@ -261,12 +261,12 @@ def harvestPodcast(sName, sSlug, sAppleId):
         for oItem in lItems: lRecords.append(parseItem(oItem))
         logLine(sName + " page " + str(iPage) + ": " + sCount(len(lItems), "item") + "; total " + str(len(lRecords)))
         sNext = ""
-        for oL in oCh.findall("atom:link", c_dNs):
+        for oL in oCh.findall("atom:link", dNs):
             if oL.get("rel") == "next": sNext = oL.get("href", "")
         sUrl = sNext
-        if sUrl: time.sleep(c_nDelay)
+        if sUrl: time.sleep(nDelay)
     if not lRecords: return 0
-    return writeTsv(sSlug, c_lPodFields, lRecords, "guid")
+    return writeTsv(sSlug, lPodFields, lRecords, "guid")
 
 
 # --- wordpress -------------------------------------------------------------
@@ -281,7 +281,7 @@ def wpCategories(sSite):
         if not lItems: break
         for d in lItems: dMap[d.get("id")] = d.get("name", "")
         if len(lItems) < 100: break
-        iPage += 1; time.sleep(c_nDelay)
+        iPage += 1; time.sleep(nDelay)
     return dMap
 
 
@@ -306,9 +306,9 @@ def harvestWordpress(sName, sSlug, sSite, sBase):
                                  summary=cleanHtml((d.get("excerpt") or {}).get("rendered", ""))))
         logLine(sName + " page " + str(iPage) + ": " + sCount(len(lItems), "post") + "; total " + str(len(lRecords)))
         if len(lItems) < 100: break
-        iPage += 1; time.sleep(c_nDelay)
+        iPage += 1; time.sleep(nDelay)
     if not lRecords: return 0
-    return writeTsv(sSlug, c_lWpFields, lRecords, "slug")
+    return writeTsv(sSlug, lWpFields, lRecords, "slug")
 
 
 def harvestOne(tShow):
@@ -332,7 +332,7 @@ def main():
         elif sArg.startswith("--wppages="):
             try: g_iWpPages = int(sArg.split("=", 1)[1])
             except ValueError: pass
-    oLog = open(os.path.join(scriptDir(), c_sLogName), "w", encoding="utf-8", newline="")
+    oLog = open(os.path.join(scriptDir(), sLogName), "w", encoding="utf-8", newline="")
     logLine("harvestShows starting")
     logLine("script: " + os.path.abspath(__file__))
     logLine("python: " + sys.version.replace("\n", " "))
@@ -340,11 +340,11 @@ def main():
     logLine("working directory: " + os.getcwd())
     logLine("command line: " + " ".join(sys.argv))
     logLine("wordpress page cap: " + str(g_iWpPages))
-    lShows = [t for t in c_lShows if (not sOnly or t[1] == sOnly)]
+    lShows = [t for t in lAllShows if (not sOnly or t[1] == sOnly)]
     logLine("harvesting " + sCount(len(lShows), "target") + " with "
-            + sCount(min(len(lShows), c_iMaxWorkers), "worker"))
+            + sCount(min(len(lShows), iMaxWorkers), "worker"))
     iTotal = 0
-    with concurrent.futures.ThreadPoolExecutor(max_workers=min(len(lShows), c_iMaxWorkers)) as oPool:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=min(len(lShows), iMaxWorkers)) as oPool:
         lFut = [oPool.submit(harvestOne, t) for t in lShows]
         for oFut in concurrent.futures.as_completed(lFut):
             iTotal += oFut.result()[1]

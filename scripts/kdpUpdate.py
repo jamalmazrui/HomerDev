@@ -52,11 +52,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import kdpSubmit as k
 import kdpBooks as kb
 
-c_iProcessingMinutes = 20
-c_lFlags = ["--ask", "--book", "--except", "--limit", "--list", "--no-build", "--no-publish", "--record", "--republish", "--reupload", "--survey"]
-c_lValueFlags = ["--book", "--except", "--limit"]
-c_sContentButton = "data-assets-interior-file-upload-browse-button-announce"
-c_sVersion = "2026-10-09 version 11: a book is unchanged when its sources' and answers' fingerprints match its last submission, whatever its EPUB's build time; staleness is the audit's sources fingerprint, not file times; --record writes the current fingerprints without opening KDP; version 10: readiness requires the audited EPUB fingerprint, a book unchanged since its last submission is not sent, only a submission counts as one, DRM failure blocks Publish, royalty follows the $2.99-$12.99 band; version 9: an AI answer the author has confirmed (aiConfirmed) is given exactly, even below what KDP holds; version 8: a recent submission is also known from the upload receipt, which survives a replaced data file; version 7: a title that will not open within 72 hours of being submitted is reported as in review, not as a problem; version 6: a book built by its own project, such as Blind Vibe Coding, is read from there, and a title with no ASIN is found on the Bookshelf by its title ID; version 5: when KDP stays on the Content tab without naming a problem, the boxes are checked again and the step tried once more; a live title with an update in review is reported as such; version 4: a title KDP shows as Publishing is locked like one In Review, and is not opened; version 3: AI answers never disclose less than KDP already holds, read live before answering; version 2: a manuscript dated in the future, as an unzipped one can be, no longer counts as newer than its EPUB; version 1 was the first, built on kdpSubmit version 36 and kdpBooks version 14"
+iProcessingMinutes = 20
+lFlags = ["--ask", "--book", "--except", "--limit", "--list", "--no-build", "--no-publish", "--record", "--republish", "--reupload", "--survey"]
+lValueFlags = ["--book", "--except", "--limit"]
+sContentButton = "data-assets-interior-file-upload-browse-button-announce"
+sVersion = "2026-10-09 version 11: a book is unchanged when its sources' and answers' fingerprints match its last submission, whatever its EPUB's build time; staleness is the audit's sources fingerprint, not file times; --record writes the current fingerprints without opening KDP; version 10: readiness requires the audited EPUB fingerprint, a book unchanged since its last submission is not sent, only a submission counts as one, DRM failure blocks Publish, royalty follows the $2.99-$12.99 band; version 9: an AI answer the author has confirmed (aiConfirmed) is given exactly, even below what KDP holds; version 8: a recent submission is also known from the upload receipt, which survives a replaced data file; version 7: a title that will not open within 72 hours of being submitted is reported as in review, not as a problem; version 6: a book built by its own project, such as Blind Vibe Coding, is read from there, and a title with no ASIN is found on the Bookshelf by its title ID; version 5: when KDP stays on the Content tab without naming a problem, the boxes are checked again and the step tried once more; a live title with an update in review is reported as such; version 4: a title KDP shows as Publishing is locked like one In Review, and is not opened; version 3: AI answers never disclose less than KDP already holds, read live before answering; version 2: a manuscript dated in the future, as an unzipped one can be, no longer counts as newer than its EPUB; version 1 was the first, built on kdpSubmit version 36 and kdpBooks version 14"
 
 sProject = k.sProject
 
@@ -78,8 +78,8 @@ def optionValues(sFlag):
 def checkOptions():
     """Stops on an unknown option or a value flag with nothing after it, before anything is done."""
     for i, a in enumerate(sys.argv[1:], 1):
-        if a.startswith("--") and a not in c_lFlags: return "Unknown option " + a + ". Allowed: " + " ".join(c_lFlags) + "."
-        if a in c_lValueFlags and (i + 1 >= len(sys.argv) or sys.argv[i + 1].startswith("--")): return a + " needs a value after it."
+        if a.startswith("--") and a not in lFlags: return "Unknown option " + a + ". Allowed: " + " ".join(lFlags) + "."
+        if a in lValueFlags and (i + 1 >= len(sys.argv) or sys.argv[i + 1].startswith("--")): return a + " needs a value after it."
     if "--limit" in sys.argv and not optionValues("--limit")[0].isdigit(): return "--limit needs a whole number."
     return ""
 
@@ -365,7 +365,7 @@ def useReceiptOf(sRoot):
 def openTab(page, sId, sTab):
     """Opens one tab of an existing title and waits for it; False when KDP will not open it (an update in review locks it)."""
     try:
-        page.goto(k.c_sTitleSetup + sId + "/" + sTab, wait_until="domcontentloaded")
+        page.goto(k.sTitleSetup + sId + "/" + sTab, wait_until="domcontentloaded")
     except Exception as oError:
         log("Opening the " + sTab + " tab of " + sId + " was interrupted: " + str(oError).splitlines()[0][:160])
     for iTick in range(30):
@@ -409,12 +409,12 @@ def fillContentFor(page, dState, dBook, sAccessibility):
     bManuscript, bCover, sJoined = k.uploadsDone(page)
     sName = os.path.basename(dState["epub"])
     if k.assetNeedsUpload("Manuscript", dState["epub"], bManuscript and sName.lower() in sJoined):
-        if not k.uploadFile(page, "Manuscript", dState["epub"], c_sContentButton, r"manuscript .*uploaded successfully"): return False
+        if not k.uploadFile(page, "Manuscript", dState["epub"], sContentButton, r"manuscript .*uploaded successfully"): return False
     else:
         say("KDP already holds this EPUB; not uploading it again.")
-    dtEnd = datetime.datetime.now() + datetime.timedelta(minutes=c_iProcessingMinutes)
+    dtEnd = datetime.datetime.now() + datetime.timedelta(minutes=iProcessingMinutes)
     while datetime.datetime.now() < dtEnd and not k.uploadsDone(page)[0]: time.sleep(10)
-    if not k.uploadsDone(page)[0]: k.unresolved("Manuscript", "KDP had not finished processing the EPUB after " + str(c_iProcessingMinutes) + " minutes")
+    if not k.uploadsDone(page)[0]: k.unresolved("Manuscript", "KDP had not finished processing the EPUB after " + str(iProcessingMinutes) + " minutes")
     answerAiMerged(page, dBook)
     say("Accessibility: " + sAccessibility + " have a description.")
     k.chooseAccessibilityRadio(page, sAccessibility)
@@ -585,10 +585,10 @@ def main():
         return 2
     os.makedirs(os.path.join(sProject, "logs"), exist_ok=True)
     k.sLogPath = os.path.join(sProject, "logs", os.path.basename(sProject) + "-kdpUpdate-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + ".log")
-    log("kdpUpdate.py started; " + c_sVersion + "; script " + os.path.abspath(__file__) + "; kdpSubmit " + k.c_sVersion.split(":")[0] + "; kdpBooks " + kb.c_sVersion.split(":")[0])
+    log("kdpUpdate.py started; " + sVersion + "; script " + os.path.abspath(__file__) + "; kdpSubmit " + k.sVersion.split(":")[0] + "; kdpBooks " + kb.sVersion.split(":")[0])
     log("Python " + sys.version.split()[0] + " on " + platform.platform() + "; project " + sProject + "; cwd " + os.getcwd() + "; command line " + " ".join(sys.argv))
     log("inix reader: " + ("the kit's, " + k.kitInix().__file__ if k.kitInix() else "kdpSubmit's own"))
-    print("kdpUpdate " + c_sVersion.split(":")[0])
+    print("kdpUpdate " + sVersion.split(":")[0])
     buildFirst()
     dCatalog = dict(catalog())
     lStates = chosen([bookState(sRoot, dBook) for sRoot, dBook in dCatalog.items()])

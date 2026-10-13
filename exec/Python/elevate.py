@@ -51,23 +51,23 @@ import urllib.request
 
 # The outcome of a check, so callers can word themselves. The same numbers as
 # Elevate.cs.
-c_iCheckFailed = -1
-c_iCurrent = 0
-c_iNewer = 1
-c_iNotConfigured = -2
+iCheckFailed = -1
+iCurrent = 0
+iNewer = 1
+iNotConfigured = -2
 
-c_iTimeoutSeconds = 8
-c_sApiFormat = "https://api.github.com/repos/{0}/{1}/releases/latest"
-c_sPageFormat = "https://github.com/{0}/{1}/releases/latest"
-c_sUserAgent = "Homer (+version check)"
+iTimeoutSeconds = 8
+sApiFormat = "https://api.github.com/repos/{0}/{1}/releases/latest"
+sPageFormat = "https://github.com/{0}/{1}/releases/latest"
+sUserAgent = "Homer (+version check)"
 
 # Windows message box flags, named rather than numbered.
-c_iMbDefButton2 = 0x100
-c_iMbIconInformation = 0x40
-c_iMbIconQuestion = 0x20
-c_iMbOk = 0x0
-c_iMbYesNo = 0x4
-c_iIdYes = 6
+iMbDefButton2 = 0x100
+iMbIconInformation = 0x40
+iMbIconQuestion = 0x20
+iMbOk = 0x0
+iMbYesNo = 0x4
+iIdYes = 6
 
 sLatestFound = ""
 sOwner = ""
@@ -123,23 +123,23 @@ def isNewer(sRemote, sLocal):
 def fetch(sUrl, sAccept="application/vnd.github+json"):
     """The body at sUrl and the address it ended at, or two empty strings."""
     try:
-        request = urllib.request.Request(sUrl, headers={"Accept": sAccept, "User-Agent": c_sUserAgent})
-        with urllib.request.urlopen(request, timeout=c_iTimeoutSeconds) as response:
+        request = urllib.request.Request(sUrl, headers={"Accept": sAccept, "User-Agent": sUserAgent})
+        with urllib.request.urlopen(request, timeout=iTimeoutSeconds) as response:
             return response.read().decode("utf-8", errors="replace"), getattr(response, "url", "") or ""
     except Exception:
         return "", ""
 
 
 def check():
-    """Ask GitHub once. Returns one of the c_i outcomes.
+    """Ask GitHub once. Returns one of the outcome constants.
 
-    On c_iCurrent or c_iNewer, latestVersion() and setupUrl() are filled in.
+    On iCurrent or iNewer, latestVersion() and setupUrl() are filled in.
     """
     global sLatestFound, sSetupUrlFound
-    if not isConfigured(): return c_iNotConfigured
+    if not isConfigured(): return iNotConfigured
     sTag = ""
     sAsset = ""
-    sBody, sFinal = fetch(c_sApiFormat.format(sOwner, sRepo))
+    sBody, sFinal = fetch(sApiFormat.format(sOwner, sRepo))
     if sBody:
         try:
             dRelease = json.loads(sBody)
@@ -153,31 +153,31 @@ def check():
             sTag = ""
     if not sTag:
         # The page fallback: no rate limit, and it redirects to /tag/<tag>.
-        sBody, sFinal = fetch(c_sPageFormat.format(sOwner, sRepo), "text/html")
+        sBody, sFinal = fetch(sPageFormat.format(sOwner, sRepo), "text/html")
         match = re.search(r"/tag/([^/?#]+)/?$", sFinal or "")
         if match: sTag = match.group(1)
         if sTag:
             sAsset = "https://github.com/%s/%s/releases/download/%s/%s_setup.exe" % (sOwner, sRepo, sTag, sRepo)
-    if not sTag: return c_iCheckFailed
+    if not sTag: return iCheckFailed
     if sTag[:1] in ("v", "V"): sTag = sTag[1:]
     sLatestFound = sTag
     sSetupUrlFound = sAsset
-    return c_iNewer if isNewer(sLatestFound, sThisVersion) else c_iCurrent
+    return iNewer if isNewer(sLatestFound, sThisVersion) else iCurrent
 
 
 def describe(iOutcome):
     """The sentence a version box shows for an outcome of check()."""
-    if iOutcome == c_iNotConfigured: return ""
-    if iOutcome == c_iCheckFailed:
+    if iOutcome == iNotConfigured: return ""
+    if iOutcome == iCheckFailed:
         return "This is version %s. The web could not be checked for a newer one." % sThisVersion
-    if iOutcome == c_iNewer:
+    if iOutcome == iNewer:
         return "This is version %s. Version %s is on the web." % (sThisVersion, sLatestFound)
     return "This is version %s, the newest on the web." % sThisVersion
 
 
 def update():
     """Fetch the setup program found by check() and start it. False when nothing started."""
-    if sSetupUrlFound == "" and check() < c_iCurrent: return False
+    if sSetupUrlFound == "" and check() < iCurrent: return False
     if sSetupUrlFound == "": return False
     # Downloaded to a .part file and renamed only when complete, so a failed or partial download is never started
     # (kit 1.62.5, from an audit by another AI: an interrupted download went on to launch the partial installer).
@@ -186,7 +186,7 @@ def update():
     try:
         for sOld in (sFile, sPart):
             if os.path.exists(sOld): os.remove(sOld)
-        request = urllib.request.Request(sSetupUrlFound, headers={"User-Agent": c_sUserAgent})
+        request = urllib.request.Request(sSetupUrlFound, headers={"User-Agent": sUserAgent})
         with urllib.request.urlopen(request, timeout=120) as response, open(sPart, "wb") as fileOut:
             iExpected = int(response.headers.get("Content-Length") or 0)
             while True:
@@ -229,15 +229,15 @@ def offer(hOwner=0):
     when this one is current -- pressing Enter does the likely thing.
     """
     iOutcome = check()
-    if iOutcome == c_iNotConfigured: return False
-    if iOutcome == c_iCheckFailed:
-        messageBox(hOwner, describe(iOutcome), "Version", c_iMbOk | c_iMbIconInformation)
+    if iOutcome == iNotConfigured: return False
+    if iOutcome == iCheckFailed:
+        messageBox(hOwner, describe(iOutcome), "Version", iMbOk | iMbIconInformation)
         return False
-    iFlags = c_iMbYesNo | c_iMbIconQuestion
-    if iOutcome != c_iNewer: iFlags |= c_iMbDefButton2
-    if messageBox(hOwner, describe(iOutcome) + "\r\n\r\nUpdate to it now?", "Version", iFlags) != c_iIdYes:
+    iFlags = iMbYesNo | iMbIconQuestion
+    if iOutcome != iNewer: iFlags |= iMbDefButton2
+    if messageBox(hOwner, describe(iOutcome) + "\r\n\r\nUpdate to it now?", "Version", iFlags) != iIdYes:
         return False
     if update(): return True
     messageBox(hOwner, "The setup program could not be fetched. It is at %s/releases." % repoUrl(),
-               "Version", c_iMbOk | c_iMbIconInformation)
+               "Version", iMbOk | iMbIconInformation)
     return False

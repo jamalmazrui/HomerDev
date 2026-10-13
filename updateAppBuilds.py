@@ -31,9 +31,9 @@ beside the kit, on its drive and at its depth (1.46.0).
 
 import datetime, os, re, shutil, sys
 
-c_sStamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+sStamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 sKit = os.path.dirname(os.path.abspath(__file__))
-sLogPath = os.path.join(sKit, "logs", "HomerDev-updateAppBuilds-%s.log" % c_sStamp)
+sLogPath = os.path.join(sKit, "logs", "HomerDev-updateAppBuilds-%s.log" % sStamp)
 fileLog = None
 
 
@@ -87,7 +87,7 @@ def updateFile(sApp, sPath, fnUpdate):
     if sNew == sText: return False
     sNotes = os.path.join(os.path.dirname(sPath), "notes")
     os.makedirs(sNotes, exist_ok=True)
-    sBackup = os.path.join(sNotes, "%s.%s.bak" % (os.path.basename(sPath), c_sStamp))
+    sBackup = os.path.join(sNotes, "%s.%s.bak" % (os.path.basename(sPath), sStamp))
     shutil.copyfile(sPath, sBackup)
     open(sPath, "wb").write((b"\xef\xbb\xbf" if bBom else b"") + sNew.encode("utf-8"))
     iLines = sum(1 for a, b in zip(sText.split("\n"), sNew.split("\n")) if a != b) + abs(sText.count("\n") - sNew.count("\n"))

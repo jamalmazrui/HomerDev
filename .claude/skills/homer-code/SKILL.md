@@ -28,8 +28,12 @@ one complete statement per line; lists and names in alphabetical order.
   file, `h` handle, `i` integer, `ls` list, `n` real, `s` string, `v` variant.
   Another object takes its class name in lower camel case (`form`, `writer`)
   or a common abbreviation (`sb`, `pd`); in C#, `o` is for COM objects only.
-- **Constants** add `c_` in front: `c_sFormat`, `c_iMaxRetries`. No magic
-  numbers: use the language's own constant, or define one.
+- **Constants** are named like variables, type prefix and all: `sFormat`,
+  `iMaxRetries`. The old `c_` prefix is obsolete; a constant is set apart by
+  being declared as one, at the top, before the variables. When a constant and a
+  variable derived from it would share a name, the constant names what it holds
+  (`lAllSamples`, beside the variable `lSamples`). No magic numbers: use the
+  language's own constant, or define one.
 - **Lower camel case** for everything the program names, functions and
   methods included, wherever the language allows.
 - **Functions, never subroutines**: a routine returns something even when the
@@ -89,10 +93,14 @@ only a screen reader proves what a person hears.
 
 Read the one for the language at hand:
 
+- Every language: [references/CamelType.md](references/CamelType.md)
 - C#: [references/CamelType_CSharp.md](references/CamelType_CSharp.md), with
   the quick reference [references/CamelType_CSharp_Reference.md](references/CamelType_CSharp_Reference.md)
-- Python: [references/CamelType_Python.md](references/CamelType_Python.md)
+- JavaScript: [references/CamelType_JavaScript.md](references/CamelType_JavaScript.md)
 - JAWS script: [references/CamelType_JAWSScript.md](references/CamelType_JAWSScript.md)
+- PowerShell: [references/CamelType_PowerShell.md](references/CamelType_PowerShell.md)
+- Python: [references/CamelType_Python.md](references/CamelType_Python.md)
+- VBScript: [references/CamelType_VBScript.md](references/CamelType_VBScript.md)
 - Logging, where each log goes and what it is called:
   [references/Logging.md](references/Logging.md)
 

@@ -25,7 +25,7 @@ that before writing a new fence.
 
 import io, os, sys
 
-c_sChassis = r'''"""
+sChassis = r'''"""
 {sScriptName}
 
 Gathers the {sProduct} help estate ({sSystem}).
@@ -42,24 +42,24 @@ can be stopped and run again.
 
 import hashlib, html, http.client, io, json, logging, os, platform, re, socket, sys, time, urllib.error, urllib.parse, urllib.request, zipfile
 
-c_dHeaders = {{"Accept": "text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8",
+dDefaultHeaders = {{"Accept": "text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8",
              "Accept-Language": "en-US,en;q=0.9",
              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"}}
-c_iMaxPages = {iMaxPages}
-c_iMaxRepeatLines = 25
-c_iRetries = 3
-c_lLanguageCodes = ["af", "am", "ar", "az", "be", "bg", "bn", "bs", "ca", "cs", "cy", "da", "de", "el", "es", "et",
+iMaxPages = {iMaxPages}
+iMaxRepeatLines = 25
+iRetries = 3
+lLanguageCodes = ["af", "am", "ar", "az", "be", "bg", "bn", "bs", "ca", "cs", "cy", "da", "de", "el", "es", "et",
                     "eu", "fa", "fi", "fr", "ga", "gl", "gu", "ha", "he", "hi", "hr", "hu", "hy", "id", "is", "it",
                     "ja", "ka", "kk", "km", "kn", "ko", "lo", "lt", "lv", "mk", "ml", "mn", "mr", "ms", "mt", "my",
                     "nb", "ne", "nl", "nn", "no", "pa", "pl", "pt", "ro", "ru", "si", "sk", "sl", "sq", "sr", "sv",
                     "sw", "ta", "te", "th", "tl", "tr", "uk", "ur", "uz", "vi", "zh", "zu"]
-c_nDelay = {nDelay}
-c_nTimeout = 30
-c_sFolderName = "{sFolder}"
-c_sLogName = "{sLogName}"
-c_sProduct = "{sProduct}"
-c_sSubjectPattern = r"{sSubjectPattern}"
-c_sZipName = "{sZipName}"
+nDelay = {nDelay}
+nTimeout = 30
+sFolderName = "{sFolder}"
+sLogName = "{sLogName}"
+sProduct = "{sProduct}"
+sSubjectPattern = r"{sSubjectPattern}"
+sZipName = "{sZipName}"
 
 g_dRepeatCounts = {{}}
 g_dSeenFingerprints = {{}}
@@ -69,8 +69,8 @@ def logCapped(sKind, sMessage):
     """Logs a repeating kind of line up to a cap, then only tallies it."""
     iCount = g_dRepeatCounts.get(sKind, 0) + 1
     g_dRepeatCounts[sKind] = iCount
-    if iCount <= c_iMaxRepeatLines: logging.info(sMessage)
-    elif iCount == c_iMaxRepeatLines + 1: logging.info("further '%s' lines are tallied rather than written", sKind)
+    if iCount <= iMaxRepeatLines: logging.info(sMessage)
+    elif iCount == iMaxRepeatLines + 1: logging.info("further '%s' lines are tallied rather than written", sKind)
     return True
 
 
@@ -86,17 +86,17 @@ def fetchAddress(sUrl):
         logCapped("unfetchable address", "refused: it carries control characters")
         return 0, b"", "", sUrl
     """Fetches one address, returning status, body bytes, content type and the final address."""
-    for iAttempt in range(1, c_iRetries + 1):
+    for iAttempt in range(1, iRetries + 1):
         try:
             # Send a Referer naming the site's own front page. A browser always
             # sends one when following a link, and some defended sites answer 404
             # to a request that carries none — Rolling Stone's FAQ answered a
             # probe and then refused the harvester minutes later.
-            dHeaders = dict(c_dHeaders)
+            dHeaders = dict(dDefaultHeaders)
             oParts = urllib.parse.urlsplit(sUrl)
             dHeaders["Referer"] = oParts.scheme + "://" + oParts.netloc + "/"
             oRequest = urllib.request.Request(sUrl, headers=dHeaders)
-            with urllib.request.urlopen(oRequest, timeout=c_nTimeout) as oResponse:
+            with urllib.request.urlopen(oRequest, timeout=nTimeout) as oResponse:
                 binBody = oResponse.read()
                 return oResponse.status, binBody, oResponse.headers.get_content_type(), oResponse.geturl()
         except urllib.error.HTTPError as oError:
@@ -107,7 +107,7 @@ def fetchAddress(sUrl):
             if oError.code in (403, 404, 410): return oError.code, binBody, "", sUrl
         except (urllib.error.URLError, http.client.HTTPException, socket.timeout, ConnectionError) as oError:
             logging.warning("attempt %d for %s failed: %s", iAttempt, sUrl, oError)
-        time.sleep(c_nDelay * iAttempt)
+        time.sleep(nDelay * iAttempt)
     return 0, b"", "", sUrl
 
 
@@ -121,7 +121,7 @@ def isEnglish(sUrl):
     # segment let 128 translated pages into the calibre harvest.
     if lSegments:
         sFirst = lSegments[0].lower().replace("_", "-").split("-")[0]
-        if sFirst in c_lLanguageCodes and sFirst != "en": return False
+        if sFirst in lLanguageCodes and sFirst != "en": return False
     dQuery = urllib.parse.parse_qs(oParts.query)
     for sField in ("lang", "language", "locale", "setln", "hl"):
         for sValue in dQuery.get(sField, []):
@@ -192,10 +192,10 @@ def gatherEstate(sFolder, lManifest):
     for sSeed in lQueue:
         if not belongs(sSeed):
             logging.error("SEED REFUSED BY ITS OWN FENCE: %s — the fence pattern is wrong, nothing will be gathered", sSeed)
-            print("STOPPING: the seed " + sSeed + " fails this script's own fence. See " + c_sLogName)
+            print("STOPPING: the seed " + sSeed + " fails this script's own fence. See " + sLogName)
             return 0
     while lQueue:
-        if iSaved >= c_iMaxPages:
+        if iSaved >= iMaxPages:
             logging.warning("SAFETY VALVE: stopped at %d pages with %d addresses still queued", iSaved, len(lQueue))
             break
         sUrl = cleanAddress(lQueue.pop(0))
@@ -211,7 +211,7 @@ def gatherEstate(sFolder, lManifest):
             if subjectAllows(binBody): lQueue.extend(queueable(findLinks(sUrl, binBody), lSeen, lQueue))
             continue
         iStatus, binBody, sContentType, sFinal = fetchAddress(sUrl)
-        time.sleep(c_nDelay)
+        time.sleep(nDelay)
         if iStatus not in ({sOkStatuses}):
             logging.warning("%s answered %d and was not saved", sUrl, iStatus)
             continue
@@ -239,11 +239,11 @@ def subjectAllows(binBody):
     an address says nothing about its subject, so the gate reads THE PAGE'S OWN
     HEADING instead. This is the rule that stopped an earlier Kindle crawl from
     drowning in Echo devices and business accounts."""
-    if not c_sSubjectPattern: return True
+    if not sSubjectPattern: return True
     sText = binBody.decode("utf-8", "replace")
     lHeadings = re.findall(r"(?is)<h1[^>]*>(.*?)</h1>", sText) + re.findall(r"(?is)<title[^>]*>(.*?)</title>", sText)
     sHeading = " ".join(re.sub(r"(?s)<[^>]+>", " ", s) for s in lHeadings)
-    if re.search(c_sSubjectPattern, html.unescape(sHeading), re.I): return True
+    if re.search(sSubjectPattern, html.unescape(sHeading), re.I): return True
     logCapped("off subject", "kept, but its links were not followed: " + sHeading.strip()[:70])
     return False
 
@@ -298,18 +298,18 @@ def writeArchive(sFolder, sZipPath):
 def main():
     """Gathers the estate, writes the manifest and the archive, and says what to upload."""
     sScriptDir = os.path.dirname(os.path.abspath(__file__))
-    sFolder = os.path.join(sScriptDir, c_sFolderName)
+    sFolder = os.path.join(sScriptDir, sFolderName)
     if not os.path.isdir(sFolder): os.makedirs(sFolder)
-    logging.basicConfig(filename=os.path.join(sScriptDir, c_sLogName), filemode="w", level=logging.INFO,
+    logging.basicConfig(filename=os.path.join(sScriptDir, sLogName), filemode="w", level=logging.INFO,
                         format="%(asctime)s %(levelname)s %(message)s", encoding="utf-8", errors="backslashreplace")
     sys.excepthook = lambda oType, oValue, oTrace: logging.error(
         "UNCAUGHT %s: %s", oType.__name__, oValue, exc_info=(oType, oValue, oTrace))
-    logging.info("{sScriptName} version 1 for %s", c_sProduct)
+    logging.info("{sScriptName} version 1 for %s", sProduct)
     logging.info("script %s", os.path.abspath(__file__))
     logging.info("Python %s on %s", platform.python_version(), platform.platform())
     logging.info("working directory %s; command line %s", os.getcwd(), " ".join(sys.argv))
     logging.info("settings: maxPages %d, delay %.1f, timeout %d, retries %d, folder %s",
-                 c_iMaxPages, c_nDelay, c_nTimeout, c_iRetries, sFolder)
+                 iMaxPages, nDelay, nTimeout, iRetries, sFolder)
     lManifest = []
     iSaved = 0
     iResult = 0
@@ -333,7 +333,7 @@ def main():
         iResult = 1
     for sKind, iCount in sorted(g_dRepeatCounts.items()):
         logging.info("tally: %s occurred %d times", sKind, iCount)
-    sZipPath = os.path.join(sScriptDir, c_sZipName)
+    sZipPath = os.path.join(sScriptDir, sZipName)
     iFiles = 0
     try:
         iFiles = writeArchive(sFolder, sZipPath)
@@ -347,7 +347,7 @@ def main():
     print("Saved this run: %d" % iSaved)
     print("Files in the archive: %d" % iFiles)
     print("UPLOAD THIS FILE: " + sZipPath)
-    print("Log: " + os.path.join(sScriptDir, c_sLogName))
+    print("Log: " + os.path.join(sScriptDir, sLogName))
     if iResult: print("THE RUN ENDED WITH AN ERROR. Its reason is written in the log.")
     return iResult
 
@@ -355,7 +355,7 @@ def main():
 if __name__ == "__main__": sys.exit(main())
 '''
 
-c_lEstates = [
+lEstates = [
     {
         "sProduct": "Blinkist",
         "sScriptName": "getBlinkistHelp.py",
@@ -2728,8 +2728,8 @@ c_lEstates = [
 def writeScripts(sOutputFolder):
     """Writes one standalone harvester per estate and returns their paths."""
     lPaths = []
-    for dEstate in c_lEstates:
-        sText = c_sChassis.format(**dEstate)
+    for dEstate in lEstates:
+        sText = sChassis.format(**dEstate)
         sPath = os.path.join(sOutputFolder, dEstate["sScriptName"])
         fHandle = io.open(sPath, "w", encoding="utf-8-sig", newline="\r\n")
         fHandle.write(sText)

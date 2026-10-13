@@ -16,8 +16,8 @@ read. A detailed log is written beside this script.
 """
 import argparse, datetime, os, re, subprocess, sys, unicodedata
 
-c_iMaxWorks = 3
-c_sBom = "\ufeff"
+iMaxWorks = 3
+sBom = "\ufeff"
 oLog = None
 
 
@@ -144,12 +144,12 @@ def check(sPath):
                 m = re.search(r"^### " + sCat + r"\n(.*?)(?=^### |\Z)", sBlock, re.S | re.M)
                 if m:
                     iWorks = len(re.findall(r"^- ", m.group(1), re.M))
-                    if iWorks > c_iMaxWorks: lFail.append(sName + ": " + str(iWorks) + " " + sCat.lower() + " (max " + str(c_iMaxWorks) + ")")
+                    if iWorks > iMaxWorks: lFail.append(sName + ": " + str(iWorks) + " " + sCat.lower() + " (max " + str(iMaxWorks) + ")")
             m = re.search(r"^Profiles:\n\n((?:- .*\n?)+)", sBlock, re.M)
             lLabels = re.findall(r"^- \[(.+?)\]", m.group(1), re.M) if m else []
         else:
             iWorks = len(re.findall(r"^#### ", sBlock, re.M))
-            if iWorks > c_iMaxWorks: lFail.append(sName + ": " + str(iWorks) + " works (max " + str(c_iMaxWorks) + ")")
+            if iWorks > iMaxWorks: lFail.append(sName + ": " + str(iWorks) + " works (max " + str(iMaxWorks) + ")")
             m = re.search(r"^Profiles: (.*)$", sBlock, re.M)
             lLabels = re.findall(r"\[(.+?)\]\(", m.group(1)) if m else []
         if lLabels != sorted(lLabels, key=lambda s: s.lower()):

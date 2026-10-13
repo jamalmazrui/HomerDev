@@ -33,8 +33,8 @@ try:
 except ImportError:
     homerLog = None
 
-c_sTableName = "conversions.inix"
-c_iTimeoutSeconds = 600
+sTableName = "conversions.inix"
+iTimeoutSeconds = 600
 
 
 def say(sText):
@@ -49,9 +49,9 @@ def tablePath():
     """conversions.inix beside this module, or in the folder above it (the kit's exec)."""
     sHere = os.path.dirname(os.path.abspath(__file__))
     for sDir in (sHere, os.path.dirname(sHere)):
-        sPath = os.path.join(sDir, c_sTableName)
+        sPath = os.path.join(sDir, sTableName)
         if os.path.isfile(sPath): return sPath
-    raise FileNotFoundError("no %s beside %s or above it" % (c_sTableName, sHere))
+    raise FileNotFoundError("no %s beside %s or above it" % (sTableName, sHere))
 
 
 def loadTable():
@@ -119,7 +119,7 @@ def plan(sSource, sTargetType):
     """(route, lsSkipped): the first route whose engines are all present, and why each earlier one was passed over."""
     sFrom = typeOf(sSource); sTo = sTargetType.lstrip(".").lower()
     lRoutes = loadTable().get(sFrom, {}).get(sTo)
-    if not lRoutes: return None, ["no route from %s to %s in %s" % (sFrom or "a file with no type", sTo, c_sTableName)]
+    if not lRoutes: return None, ["no route from %s to %s in %s" % (sFrom or "a file with no type", sTo, sTableName)]
     lsSkipped = []
     for lSteps in lRoutes:
         lsMissing = [sEngine for sEngine, _ in lSteps if not engineAvailable(sEngine)]
@@ -131,7 +131,7 @@ def plan(sSource, sTargetType):
 # ---------- running each engine: (source path, target type, output path) ----------
 
 def run(lsCommand, sWhat):
-    oDone = subprocess.run(lsCommand, capture_output=True, timeout=c_iTimeoutSeconds)
+    oDone = subprocess.run(lsCommand, capture_output=True, timeout=iTimeoutSeconds)
     if oDone.returncode != 0:
         raise RuntimeError("%s failed (exit %d): %s" % (sWhat, oDone.returncode, oDone.stderr.decode("utf-8", "replace")[:400]))
 
@@ -140,14 +140,14 @@ def engineCopy(sSource, sTo, sOut):
     shutil.copyfile(sSource, sOut)
 
 
-c_dPandocWriter = {"md": "markdown", "htm": "html5", "html": "html5", "txt": "plain", "docx": "docx", "epub": "epub",
+dPandocWriter = {"md": "markdown", "htm": "html5", "html": "html5", "txt": "plain", "docx": "docx", "epub": "epub",
                    "odt": "odt", "pptx": "pptx", "rtf": "rtf"}
-c_dPandocReader = {"htm": "html", "md": "markdown", "txt": "markdown", "docx": "docx", "epub": "epub", "odt": "odt", "rtf": "rtf", "html": "html"}
+dPandocReader = {"htm": "html", "md": "markdown", "txt": "markdown", "docx": "docx", "epub": "epub", "odt": "odt", "rtf": "rtf", "html": "html"}
 
 
 def enginePandoc(sSource, sTo, sOut):
-    lsCommand = [programFor("pandoc"), sSource, "-f", c_dPandocReader.get(typeOf(sSource), typeOf(sSource)),
-                 "-t", c_dPandocWriter.get(sTo, sTo), "-o", sOut, "--wrap=none"]
+    lsCommand = [programFor("pandoc"), sSource, "-f", dPandocReader.get(typeOf(sSource), typeOf(sSource)),
+                 "-t", dPandocWriter.get(sTo, sTo), "-o", sOut, "--wrap=none"]
     if sTo in ("htm", "html", "docx", "epub", "odt", "rtf"): lsCommand.append("--standalone")
     run(lsCommand, "Pandoc")
 
@@ -194,7 +194,7 @@ def enginePdfStructure(sSource, sTo, sOut):
     open(sOut, "w", encoding="utf-8-sig", newline="\r\n").write("\n".join(lsOut).strip() + "\n")
 
 
-c_nOcrScale = 200 / 72   # pages drawn at 200 dots an inch, enough for Tesseract
+nOcrScale = 200 / 72   # pages drawn at 200 dots an inch, enough for Tesseract
 
 
 def engineOcr(sSource, sTo, sOut):
@@ -204,31 +204,31 @@ def engineOcr(sSource, sTo, sOut):
     try:
         oPdf = pypdfium2.PdfDocument(sSource)
         for iPage in range(len(oPdf)):
-            oPdf[iPage].render(scale=c_nOcrScale).to_pil().save(os.path.join(sDir, "page%04d.png" % iPage))
+            oPdf[iPage].render(scale=nOcrScale).to_pil().save(os.path.join(sDir, "page%04d.png" % iPage))
         oPdf.close()
         lsText = []
         for sImage in sorted(glob.glob(os.path.join(sDir, "page*.png"))):
-            oDone = subprocess.run([programFor("tesseract"), sImage, "stdout"], capture_output=True, timeout=c_iTimeoutSeconds)
+            oDone = subprocess.run([programFor("tesseract"), sImage, "stdout"], capture_output=True, timeout=iTimeoutSeconds)
             lsText.append(oDone.stdout.decode("utf-8", "replace").strip())
         open(sOut, "w", encoding="utf-8-sig", newline="\r\n").write("\n\n".join(lsText) + "\n")
     finally:
         shutil.rmtree(sDir, ignore_errors=True)
 
 
-c_sW = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
-c_sA = "{http://schemas.openxmlformats.org/drawingml/2006/main}"
-c_sS = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
-c_sText = "{urn:oasis:names:tc:opendocument:xmlns:text:1.0}"
+sW = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+sA = "{http://schemas.openxmlformats.org/drawingml/2006/main}"
+sS = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
+sTextNamespace = "{urn:oasis:names:tc:opendocument:xmlns:text:1.0}"
 
 
 def zipDocx(oZip, bMarkdown):
     oRoot = ET.fromstring(oZip.read("word/document.xml"))
     lsOut = []
-    for oPara in oRoot.iter(c_sW + "p"):
-        sText = "".join(o.text or "" for o in oPara.iter(c_sW + "t")).strip()
+    for oPara in oRoot.iter(sW + "p"):
+        sText = "".join(o.text or "" for o in oPara.iter(sW + "t")).strip()
         if not sText: continue
-        oStyle = oPara.find(c_sW + "pPr/" + c_sW + "pStyle")
-        oMatch = re.match(r"(?i)heading\s*(\d)", oStyle.get(c_sW + "val", "")) if oStyle is not None else None
+        oStyle = oPara.find(sW + "pPr/" + sW + "pStyle")
+        oMatch = re.match(r"(?i)heading\s*(\d)", oStyle.get(sW + "val", "")) if oStyle is not None else None
         lsOut.append(("#" * int(oMatch.group(1)) + " " + sText) if (bMarkdown and oMatch) else sText)
     return lsOut
 
@@ -236,20 +236,20 @@ def zipDocx(oZip, bMarkdown):
 def zipXlsx(oZip, bMarkdown, bCsv=False):
     lsShared = []
     if "xl/sharedStrings.xml" in oZip.namelist():
-        for oItem in ET.fromstring(oZip.read("xl/sharedStrings.xml")).iter(c_sS + "si"):
-            lsShared.append("".join(o.text or "" for o in oItem.iter(c_sS + "t")))
+        for oItem in ET.fromstring(oZip.read("xl/sharedStrings.xml")).iter(sS + "si"):
+            lsShared.append("".join(o.text or "" for o in oItem.iter(sS + "t")))
     oBook = ET.fromstring(oZip.read("xl/workbook.xml"))
-    lsNames = [o.get("name") for o in oBook.iter(c_sS + "sheet")]
+    lsNames = [o.get("name") for o in oBook.iter(sS + "sheet")]
     lsOut = []
     for iSheet, sName in enumerate(lsNames, 1):
         sPath = "xl/worksheets/sheet%d.xml" % iSheet
         if sPath not in oZip.namelist(): continue
         llRows = []
-        for oRow in ET.fromstring(oZip.read(sPath)).iter(c_sS + "row"):
+        for oRow in ET.fromstring(oZip.read(sPath)).iter(sS + "row"):
             lsCells = []
-            for oCell in oRow.iter(c_sS + "c"):
-                oValue = oCell.find(c_sS + "v"); oInline = oCell.find(c_sS + "is")
-                sValue = oValue.text if oValue is not None else ("".join(o.text or "" for o in oInline.iter(c_sS + "t")) if oInline is not None else "")
+            for oCell in oRow.iter(sS + "c"):
+                oValue = oCell.find(sS + "v"); oInline = oCell.find(sS + "is")
+                sValue = oValue.text if oValue is not None else ("".join(o.text or "" for o in oInline.iter(sS + "t")) if oInline is not None else "")
                 if oCell.get("t") == "s" and sValue: sValue = lsShared[int(sValue)]
                 lsCells.append(sValue or "")
             llRows.append(lsCells)
@@ -273,13 +273,13 @@ def zipXlsx(oZip, bMarkdown, bCsv=False):
 def zipPptx(oZip, bMarkdown):
     lsSlides = sorted([s for s in oZip.namelist() if re.match(r"ppt/slides/slide\d+\.xml$", s)], key=lambda s: int(re.findall(r"\d+", s)[-1]))
     lsOut = []
-    c_sP = "{http://schemas.openxmlformats.org/presentationml/2006/main}"
+    sP = "{http://schemas.openxmlformats.org/presentationml/2006/main}"
     for iSlide, sSlide in enumerate(lsSlides, 1):
         oRoot = ET.fromstring(oZip.read(sSlide))
         sTitle, lsBody = "", []
-        for oShape in oRoot.iter(c_sP + "sp"):
-            oPh = oShape.find(".//" + c_sP + "ph")
-            lsParas = ["".join(o.text or "" for o in oPara.iter(c_sA + "t")).strip() for oPara in oShape.iter(c_sA + "p")]
+        for oShape in oRoot.iter(sP + "sp"):
+            oPh = oShape.find(".//" + sP + "ph")
+            lsParas = ["".join(o.text or "" for o in oPara.iter(sA + "t")).strip() for oPara in oShape.iter(sA + "p")]
             lsParas = [s for s in lsParas if s]
             if oPh is not None and oPh.get("type") in ("title", "ctrTitle") and not sTitle: sTitle = " ".join(lsParas)
             else: lsBody += lsParas
@@ -295,28 +295,28 @@ def zipOdf(oZip, bMarkdown):
     oRoot = ET.fromstring(oZip.read("content.xml"))
     lsOut = []
     for oNode in oRoot.iter():
-        if oNode.tag in (c_sText + "p", c_sText + "h"):
+        if oNode.tag in (sTextNamespace + "p", sTextNamespace + "h"):
             sText = "".join(oNode.itertext()).strip()
             if not sText: continue
-            if bMarkdown and oNode.tag == c_sText + "h":
-                sText = "#" * int(oNode.get(c_sText + "outline-level", "1")) + " " + sText
+            if bMarkdown and oNode.tag == sTextNamespace + "h":
+                sText = "#" * int(oNode.get(sTextNamespace + "outline-level", "1")) + " " + sText
             lsOut.append(sText)
     return lsOut
 
 
-c_sDraw = "{urn:oasis:names:tc:opendocument:xmlns:drawing:1.0}"
-c_sPres = "{urn:oasis:names:tc:opendocument:xmlns:presentation:1.0}"
+sDraw = "{urn:oasis:names:tc:opendocument:xmlns:drawing:1.0}"
+sPres = "{urn:oasis:names:tc:opendocument:xmlns:presentation:1.0}"
 
 
 def zipOdp(oZip, bMarkdown):
     """OpenDocument slides: each draw:page is a slide, its title the frame of class title."""
     oRoot = ET.fromstring(oZip.read("content.xml"))
     lsOut = []
-    for iSlide, oPage in enumerate(oRoot.iter(c_sDraw + "page"), 1):
+    for iSlide, oPage in enumerate(oRoot.iter(sDraw + "page"), 1):
         sTitle, lsBody = "", []
-        for oFrame in oPage.iter(c_sDraw + "frame"):
-            lsParas = [s for s in ("".join(o.itertext()).strip() for o in oFrame.iter(c_sText + "p")) if s]
-            if oFrame.get(c_sPres + "class") == "title" and not sTitle: sTitle = " ".join(lsParas)
+        for oFrame in oPage.iter(sDraw + "frame"):
+            lsParas = [s for s in ("".join(o.itertext()).strip() for o in oFrame.iter(sTextNamespace + "p")) if s]
+            if oFrame.get(sPres + "class") == "title" and not sTitle: sTitle = " ".join(lsParas)
             else: lsBody += lsParas
         if bMarkdown:
             lsOut.append("## " + (sTitle or "Slide %d" % iSlide)); lsOut.append("")
@@ -339,7 +339,7 @@ def engineZipXml(sSource, sTo, sOut):
     open(sOut, "w", encoding="utf-8-sig", newline="\r\n").write(sJoin.join(lsOut).strip() + "\n")
 
 
-c_dOfficeFormat = {("word", "docx"): 16, ("word", "pdf"): 17, ("word", "htm"): 10, ("word", "txt"): 7,
+dOfficeFormat = {("word", "docx"): 16, ("word", "pdf"): 17, ("word", "htm"): 10, ("word", "txt"): 7,
                    ("excel", "xlsx"): 51, ("excel", "csv"): 6, ("excel", "htm"): 44,
                    ("powerpoint", "pptx"): 24, ("powerpoint", "pdf"): 32}
 
@@ -349,7 +349,7 @@ def engineOfficeCom(sSource, sTo, sOut):
     import win32com.client
     sFrom = typeOf(sSource)
     sApp = "word" if sFrom in ("doc", "docx", "rtf", "odt", "htm", "html") else ("excel" if sFrom in ("xls", "xlsx", "ods", "csv") else "powerpoint")
-    iFormat = c_dOfficeFormat.get((sApp, sTo))
+    iFormat = dOfficeFormat.get((sApp, sTo))
     if iFormat is None: raise RuntimeError("Office cannot write .%s from .%s here" % (sTo, sFrom))
     say("officecom: the last resort, for %s" % os.path.basename(sSource))
     # OFFICE WRITES ITS OWN NAME (9 October 2026): the engine hands every route a target ending in .part, renamed
@@ -391,7 +391,7 @@ def engineOfficeComSave(sApp, sSource, sOut, iFormat):
         finally: oApp.Quit()
 
 
-c_dEngines = {"copy": engineCopy, "ocr": engineOcr, "officecom": engineOfficeCom,
+dEngines = {"copy": engineCopy, "ocr": engineOcr, "officecom": engineOfficeCom,
               "pandoc": enginePandoc, "pdfstructure": enginePdfStructure, "pdftext": enginePdfText, "zipxml": engineZipXml}
 
 
@@ -420,7 +420,7 @@ def convert(sSource, sTarget, dOptions=None):
             for i, (sEngine, sHands) in enumerate(lSteps):
                 sStepTo = sHands if (i < len(lSteps) - 1 and sHands) else sTo
                 sStepOut = os.path.join(sDir, "step%d.%s" % (i, sStepTo)) if i < len(lSteps) - 1 else sOut + ".part"
-                c_dEngines[sEngine](sCurrent, sStepTo, sStepOut)
+                dEngines[sEngine](sCurrent, sStepTo, sStepOut)
                 sCurrent = sStepOut
             os.replace(sOut + ".part", sOut)
             iMs = int((time.time() - dtStart) * 1000)

@@ -7,6 +7,18 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.14 -- 12 October 2026
+
+**Camel Type throughout: constants without c_.** Camel Type names a constant exactly like a variable, type prefix and all -- sFormat, iMaxRetries -- set apart only by being declared as a constant. The c_ prefix is obsolete, yet the C# and JAWS guides said so while the Python guide and the homer-code skill still prescribed it, and the kit's own code used it 308 times.
+
+- **The kit's code is renamed:** 308 constants and 1,057 references in 66 files, Python, C#, PowerShell and JavaScript alike. Where a constant and a variable made from it shared a name, the constant now says what it holds: lAllSamples beside lSamples, dDefaultHeaders beside dHeaders, lAllShows, lBlockingNames, iRunsPlanned, dSourceFiles, sNotesName, sProjectName, sTextNamespace, lsTextExtensions, sHereFolder. Every Python file compiles, and the kit's self-tests pass: the 122 harvesters makeHarvester writes, tidy's, the KDP tests, fixPages and the fingerprint store.
+- **tidy renames them in every project.** scripts\\camelType.py renames each constant written with the old prefix, and every reference to it -- through a module or a class too -- and leaves, and names in the log, any whose plain name is already used beside it, for a person to name. Library names such as ctypes.c_int are never touched, nor are documents. push's check builds an app before staging, so a rename that broke a build would stop there.
+- **The guides agree.** A new CamelType.md gives the rules every language shares; guides for JavaScript, PowerShell and VBScript join those for C#, JAWS scripting and Python; the Python guide, HomerDev.md and the homer-code skill no longer prescribe c_. The build copies all of them into the homer-code skill, and the HomerDev dialog lists every one as a document.
+
+**A rebuild names what changed.** A job that ran because its inputs changed said only that; bookFido's installer was rebuilt with nothing edited, and the log gave no clue why. The fingerprint store keeps each input's hash, and a job that runs now names up to eight files changed, added or gone.
+
+**An app's kit tools are refreshed before the build decides.** The template refreshed them after deciding whether anything changed, so a kit update to them reached the installer one cycle late. DbDo's build already had the right order.
+
 ## 1.72.13 -- 12 October 2026
 
 - **The installer pattern check knows the /DEFAULTS entries.** It found the JAWS Install box by the exact words Check: isInstallJaws, so after 1.72.12 made that Check: homerFinishRuns and isInstallJaws, DbDo's check said the installer offered no Install box, and push refused to stage anything. Both forms now count. DbDo and bookFido had already compiled their installers with the 1.72.12 changes and published.

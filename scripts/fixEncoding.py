@@ -37,14 +37,14 @@ import datetime, glob, html, io, os, platform, re, sys, urllib.parse
 # fails if that copy states different rules. The two had drifted: the skill knew
 # SKILL.md takes no mark, read UTF-16 and Windows-1252, and knew .css, .csv, .js
 # and .tsv; this file knew .lua, .m3u and .spec. Each now has all of it.
-c_lsTextExt = (".bat", ".cmd", ".cs", ".css", ".csv", ".htm", ".html", ".inix", ".iss", ".js", ".json", ".lua",
+lsTextExtensions = (".bat", ".cmd", ".cs", ".css", ".csv", ".htm", ".html", ".inix", ".iss", ".js", ".json", ".lua",
                ".m3u", ".md", ".ps1", ".py", ".spec", ".tsv", ".txt", ".xml")
-c_lsNoBom = (".bat", ".cmd")
-c_lsNoBomNames = ("skill.md", "version.txt")
+lsNoBom = (".bat", ".cmd")
+lsNoBomNames = ("skill.md", "version.txt")
 # exec is walked, not pruned (1.43.22): the kit keeps its libraries in
 # exec\\CSharp and exec\\homer, and only what RepoFiles.txt names is touched, so
 # a build's binaries there are left alone either way.
-c_lsSkipFolders = ("logs", "notes", ".git", "packages", "work", "__pycache__")
+lsSkipFolders = ("logs", "notes", ".git", "packages", "work", "__pycache__")
 
 oLog = None
 
@@ -162,15 +162,15 @@ def ownFiles(sRoot, lsNamed):
         if sNamed.endswith("/"):
             sFolder = os.path.join(sRoot, sNamed.rstrip("/").replace("/", os.sep))
             for sDirPath, lsDirs, lsNames in os.walk(sFolder):
-                lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders]
+                lsDirs[:] = [s for s in lsDirs if s.lower() not in lsSkipFolders]
                 for sName in lsNames:
-                    if sName.lower().endswith(c_lsTextExt): lsFiles.append(os.path.join(sDirPath, sName))
+                    if sName.lower().endswith(lsTextExtensions): lsFiles.append(os.path.join(sDirPath, sName))
         elif "*" in sNamed:
             for sPath in glob.glob(os.path.join(sRoot, sNamed.replace("/", os.sep))):
-                if os.path.isfile(sPath) and sPath.lower().endswith(c_lsTextExt): lsFiles.append(sPath)
+                if os.path.isfile(sPath) and sPath.lower().endswith(lsTextExtensions): lsFiles.append(sPath)
         else:
             sPath = os.path.join(sRoot, sNamed.replace("/", os.sep))
-            if os.path.isfile(sPath) and sPath.lower().endswith(c_lsTextExt): lsFiles.append(sPath)
+            if os.path.isfile(sPath) and sPath.lower().endswith(lsTextExtensions): lsFiles.append(sPath)
     lsFiles = [sPath for sPath in lsFiles if not isKept(sRoot, sPath, lsKeep)]
     lsSeen = []
     for sPath in lsFiles:
@@ -197,8 +197,8 @@ def decodeText(binData):
 # .htm beside a .md is put right here, after the build has converted it, so each page has exactly one: a repeated
 # title keeps one copy, section headings below the title move down a level, and a page with none gets its own
 # <title> as its heading. Pages not built from Markdown are left as they are.
-c_reTitleH1 = re.compile(r'(<header id="title-block-header">\s*)<h1 class="title">(.*?)</h1>\s*', re.S)
-c_reHeading = re.compile(r"<h([1-6])(\b[^>]*)>(.*?)</h\1>", re.S)
+reTitleH1 = re.compile(r'(<header id="title-block-header">\s*)<h1 class="title">(.*?)</h1>\s*', re.S)
+reHeading = re.compile(r"<h([1-6])(\b[^>]*)>(.*?)</h\1>", re.S)
 
 
 def headingText(sHtml):
@@ -212,15 +212,15 @@ def shiftHeadings(sHtml, iStart):
     def shift(oMatch):
         iLevel = min(6, int(oMatch.group(1)) + 1)
         return "<h%d%s>%s</h%d>" % (iLevel, oMatch.group(2), oMatch.group(3), iLevel)
-    return sHtml[:iStart] + c_reHeading.sub(shift, sHtml[iStart:])
+    return sHtml[:iStart] + reHeading.sub(shift, sHtml[iStart:])
 
 
 def oneTitleHeading(sHtml):
     """The page with exactly one level-one heading (see above); unchanged when it already has one."""
     if len(re.findall(r"(?i)<h1\b", sHtml)) == 1: return sHtml
-    oTitle = c_reTitleH1.search(sHtml)
+    oTitle = reTitleH1.search(sHtml)
     iBody = oTitle.end() if oTitle else max(0, sHtml.find("<body"))
-    lBodyH1 = [m for m in c_reHeading.finditer(sHtml, iBody) if m.group(1) == "1"]
+    lBodyH1 = [m for m in reHeading.finditer(sHtml, iBody) if m.group(1) == "1"]
     if oTitle and lBodyH1:
         if len(lBodyH1) == 1 or headingText(lBodyH1[0].group(3)) == headingText(oTitle.group(2)):
             # The title twice, or the author's own single "# " heading: that heading stays the page's one level-one
@@ -228,7 +228,7 @@ def oneTitleHeading(sHtml):
             # block can be a bare file name, as the kit's build once passed ("ReadMe").
             sHtml = sHtml[:oTitle.start()] + oTitle.group(1) + sHtml[oTitle.end():]
             sHtml = re.sub(r'<header id="title-block-header">\s*</header>\s*', "", sHtml)
-            lBodyH1 = [m for m in c_reHeading.finditer(sHtml) if m.group(1) == "1"]
+            lBodyH1 = [m for m in reHeading.finditer(sHtml) if m.group(1) == "1"]
             # Only the extra level-one headings move down, each with the headings beneath it; what sits between
             # the kept heading and the first extra one is already in its right place.
             if len(lBodyH1) > 1: sHtml = shiftHeadings(sHtml, lBodyH1[1].start())
@@ -265,9 +265,9 @@ def oneTitleHeading(sHtml):
 #
 # It is safe to run again: a finished page comes back unchanged.
 
-c_sLang = "en-US"
-c_reAnchor = re.compile(r"<a\b([^>]*)>(.*?)</a>", re.S | re.I)
-c_reBareDomain = re.compile(r"^(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:ai|app|au|ca|co|com|de|dev|edu|fr|gov|info|io|me|net|org|tv|uk|us)(?:[/?#]|$)", re.I)
+sLang = "en-US"
+reAnchor = re.compile(r"<a\b([^>]*)>(.*?)</a>", re.S | re.I)
+reBareDomain = re.compile(r"^(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:ai|app|au|ca|co|com|de|dev|edu|fr|gov|info|io|me|net|org|tv|uk|us)(?:[/?#]|$)", re.I)
 
 
 def idKey(sId):
@@ -290,7 +290,7 @@ def finishPage(sHtml, setLocal=None, dFixes=None):
     # An empty lang="" declares nothing; Pandoc writes one when it is given no language.
     if oHtml and not re.search(r'\blang="[^"]+"', oHtml.group(0)):
         sTag = re.sub(r'\s(?:xml:)?lang=""', "", oHtml.group(0))
-        sHtml = sHtml[:oHtml.start()] + sTag[:-1] + ' lang="%s" xml:lang="%s"' % (c_sLang, c_sLang) + ">" + sHtml[oHtml.end():]
+        sHtml = sHtml[:oHtml.start()] + sTag[:-1] + ' lang="%s" xml:lang="%s"' % (sLang, sLang) + ">" + sHtml[oHtml.end():]
         note("language declared")
     oNav = re.search(r'<nav id="TOC"[^>]*>', sHtml)
     if oNav and "aria-label" not in oNav.group(0):
@@ -340,14 +340,14 @@ def finishPage(sHtml, setLocal=None, dFixes=None):
             note("addresses completed")
             return relink("https:" + sHref)
         if sHref.split("#")[0].split("?")[0].lower() in setLocal: return oMatch.group(0)
-        if c_reBareDomain.match(sDecoded) and not re.match(r"(?i)[^/]+\.(php|aspx?|html?|jsp)(?:[?#]|$)", sDecoded):
+        if reBareDomain.match(sDecoded) and not re.match(r"(?i)[^/]+\.(php|aspx?|html?|jsp)(?:[?#]|$)", sDecoded):
             note("addresses completed")
             return relink("https://" + sHref)
         note("site-relative links made plain text")
         return sInner
     oBody = re.search(r"<body\b[^>]*>", sHtml)
     iBody = oBody.end() if oBody else 0
-    sHtml = sHtml[:iBody] + c_reAnchor.sub(fnAnchor, sHtml[iBody:])
+    sHtml = sHtml[:iBody] + reAnchor.sub(fnAnchor, sHtml[iBody:])
     # The main landmark: after the contents list, or else after the title block, or else the whole body.
     if not re.search(r"<main\b", sHtml) and oBody:
         iEnd = sHtml.rfind("</body>")
@@ -400,7 +400,7 @@ def wantedBytes(sPath, binData):
         sText = oneTitleHeading(sText)
         sText = finishPage(sText, set(os.listdir(os.path.dirname(os.path.abspath(sPath)))))[0]
     sText = sText.replace("\n", "\r\n")
-    bBom = not sPath.lower().endswith(c_lsNoBom) and os.path.basename(sPath).lower() not in c_lsNoBomNames
+    bBom = not sPath.lower().endswith(lsNoBom) and os.path.basename(sPath).lower() not in lsNoBomNames
     return (("\ufeff" + sText) if bBom else sText).encode("utf-8")
 
 

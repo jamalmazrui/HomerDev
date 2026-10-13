@@ -601,8 +601,10 @@ Pandas, <code>browser</code> for a browser object.</li>
 <li><strong>Lower camel case for names you define</strong> – functions,
 methods, variables, properties. Avoid upper camel case and snake case
 except where the language or an API demands them.</li>
-<li><strong>A constant is a variable with <code>c_</code> in
-front</strong>: <code>c_sFormat</code>, <code>c_iMaximum</code>.</li>
+<li><strong>A constant is named like a variable</strong>, type prefix
+and all: <code>sFormat</code>, <code>iMaximum</code>. It is set apart by
+being declared as a constant, at the top, before the variables. The old
+<code>c_</code> prefix is obsolete.</li>
 <li><strong>Functions, not subprocedures.</strong> If a routine is
 needed, make it a function, even when the result is ignored.</li>
 <li><strong>A simple if-then goes on one line</strong>, condition and

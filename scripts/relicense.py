@@ -32,9 +32,9 @@ Exit codes: 0 done, 1 something could not be changed (the log says what).
 """
 import datetime, os, platform, re, subprocess, sys
 
-c_lsTextExtensions = (".cmd", ".htm", ".inix", ".ini", ".iss", ".jsh", ".jss", ".md", ".ps1", ".py", ".txt", ".cs")
-c_lsSkipFolders = (".git", "__pycache__", "exec", "logs", "node_modules", "notes")
-c_sGnu = r"(?:the\s+)?(?:modified\s+)?(?:GNU\s+)?(?:Lesser\s+|Affero\s+)?General\s+Public\s+License(?:\s*\((?:A|L)?GPL\))?(?:,?\s+version\s+[\d.]+)?(?:\s+or\s+later)?|(?:modified\s+)?\b(?:A|L)?GPL\b(?:\s*v?\d(?:\.\d)?\+?)?(?:\s+or\s+later)?(?:\s+License)?"
+lsTextExtensions = (".cmd", ".htm", ".inix", ".ini", ".iss", ".jsh", ".jss", ".md", ".ps1", ".py", ".txt", ".cs")
+lsSkipFolders = (".git", "__pycache__", "exec", "logs", "node_modules", "notes")
+sGnu = r"(?:the\s+)?(?:modified\s+)?(?:GNU\s+)?(?:Lesser\s+|Affero\s+)?General\s+Public\s+License(?:\s*\((?:A|L)?GPL\))?(?:,?\s+version\s+[\d.]+)?(?:\s+or\s+later)?|(?:modified\s+)?\b(?:A|L)?GPL\b(?:\s*v?\d(?:\.\d)?\+?)?(?:\s+or\s+later)?(?:\s+License)?"
 
 oLog = None
 
@@ -66,7 +66,7 @@ def mitText():
     """The kit's MIT text, as newHomerApp writes it."""
     sKit = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     sSource = open(os.path.join(sKit, "newHomerApp.py"), encoding="utf-8-sig").read()
-    oMatch = re.search(r'c_sMitLicense = """(.*?)"""', sSource, re.S)
+    oMatch = re.search(r'sMitLicense = """(.*?)"""', sSource, re.S)
     return oMatch.group(1).replace("{year}", str(datetime.date.today().year))
 
 
@@ -127,16 +127,16 @@ def rewriteClaims(sAppDir, sApp, bDryRun=False):
     """The app's own claims to another license become MIT. Returns files changed,
     or with bDryRun, a list of "file line N: text" for each claim, changing nothing."""
     lsClaims = []
-    oNamed = re.compile(r"(?i)(Jamal\s+Mazrui.*?)(" + c_sGnu + r")")
-    oApp = re.compile(r"(?i)(" + re.escape(sApp) + r"\s+is\s+(?:free\s+software\s+)?(?:distributed\s+|released\s+|licensed\s+)?under\s+)(" + c_sGnu + r")")
-    oAlone = re.compile(r"(?i)^(\W*)(" + c_sGnu + r")(\W*)$")
+    oNamed = re.compile(r"(?i)(Jamal\s+Mazrui.*?)(" + sGnu + r")")
+    oApp = re.compile(r"(?i)(" + re.escape(sApp) + r"\s+is\s+(?:free\s+software\s+)?(?:distributed\s+|released\s+|licensed\s+)?under\s+)(" + sGnu + r")")
+    oAlone = re.compile(r"(?i)^(\W*)(" + sGnu + r")(\W*)$")
     oCopyright = re.compile(r"(?i)copyright.*Jamal\s+Mazrui")
     iFiles = 0
     for sDir, lsDirs, lsFiles in os.walk(sAppDir):
-        lsDirs[:] = [s for s in lsDirs if s.lower() not in c_lsSkipFolders]
+        lsDirs[:] = [s for s in lsDirs if s.lower() not in lsSkipFolders]
         for sName in lsFiles:
             sLower = sName.lower()
-            if not sLower.endswith(c_lsTextExtensions): continue
+            if not sLower.endswith(lsTextExtensions): continue
             if sLower in ("history.md", "history.htm", "license.md", "license.htm"): continue
             sPath = os.path.join(sDir, sName)
             try:

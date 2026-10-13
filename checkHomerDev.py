@@ -67,7 +67,7 @@ import traceback
 
 # The three samples, and the script that builds each. Lowercase alphabetical by
 # sample name, as every list in Homer code is.
-c_lSamples = [
+lAllSamples = [
     ("FruitBasketCs", "buildFruitBasketCs.cmd", "FruitBasketCs.exe"),
     ("FruitBasketMdiCs", "buildFruitBasketMdiCs.cmd", "FruitBasketMdiCs.exe"),
     ("FruitBasketMdiPy", "buildFruitBasketMdiPy.cmd", "FruitBasketMdiPy.exe"),
@@ -77,14 +77,14 @@ c_lSamples = [
 # What a build writes and this script removes before building again. The virtual
 # environment is not here: rebuilding it costs minutes, so it goes only with
 # --deep.
-c_lsBuildProducts = ["Version.cs", "build", "dist", "version.py"]
+lsBuildProducts = ["Version.cs", "build", "dist", "version.py"]
 
-c_sKit = os.path.dirname(os.path.abspath(__file__))
-c_sSamples = os.path.join(c_sKit, "Templates", "samples")
+sKit = os.path.dirname(os.path.abspath(__file__))
+sSamples = os.path.join(sKit, "Templates", "samples")
 # THE LOG AND REPORT GO IN logs (1.65.26), like every other script's: written at the top of the kit, a zip of the
 # logs folder held nothing to say why the check had failed.
-c_sLogs = os.path.join(c_sKit, "logs")
-sLogPath = os.path.join(c_sLogs, "HomerDev-checkHomerDev-%s.log" % datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+sLogs = os.path.join(sKit, "logs")
+sLogPath = os.path.join(sLogs, "HomerDev-checkHomerDev-%s.log" % datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
 oLog = None
 lsFindings = []          # (sName, sVerdict, sEvidence)
 
@@ -191,7 +191,7 @@ def runHere(sCommand, sFolder):
 
 def checkKit():
     """build's own audit: every component present and encoded right."""
-    iCode, sOut = runHere("python build.py check", c_sKit)
+    iCode, sOut = runHere("python build.py check", sKit)
     if iCode == 0 and "0 problems" in sOut:
         return finding("kit audit", "pass", "build check found 0 problems")
     sFirst = ""
@@ -214,11 +214,11 @@ def cleanSamples(bDeep, setBuilding=None):
     iRemoved = 0
     # Only what is about to be built (12 October 2026): a sample the cache calls current keeps its program, and the
     # shared build products go only when something will be built to make them again.
-    lSamples = [t for t in c_lSamples if setBuilding is None or t[0] in setBuilding]
-    lsGone = (list(c_lsBuildProducts) if lSamples else []) + [sExe for sName, sScript, sExe in lSamples]
+    lSamples = [t for t in lAllSamples if setBuilding is None or t[0] in setBuilding]
+    lsGone = (list(lsBuildProducts) if lSamples else []) + [sExe for sName, sScript, sExe in lSamples]
     if bDeep: lsGone.append(".venv")
     for sName in lsGone:
-        sPath = os.path.join(c_sSamples, sName)
+        sPath = os.path.join(sSamples, sName)
         try:
             if os.path.isdir(sPath):
                 shutil.rmtree(sPath)
@@ -241,7 +241,7 @@ def compilerErrors(sName):
     """The error lines from a sample's own build log, which is where they are: the newest <Name>-build-<stamp>.log in the
     kit's logs (1.65.31). This read Templates\\samples\\build<Name>.log, a name no build writes any more, so a sample
     that failed to compile never had its errors reported."""
-    lsLogs = sorted(glob.glob(os.path.join(c_sKit, "logs", sName + "-build-*.log")))
+    lsLogs = sorted(glob.glob(os.path.join(sKit, "logs", sName + "-build-*.log")))
     sLog = lsLogs[-1] if lsLogs else ""
     lsErrors = []
     try:
@@ -253,8 +253,8 @@ def compilerErrors(sName):
 
 
 def buildSample(sName, sScript, sExe):
-    sExePath = os.path.join(c_sSamples, sExe)
-    iCode, sOut = runHere('"%s" nobump' % sScript, c_sSamples)
+    sExePath = os.path.join(sSamples, sExe)
+    iCode, sOut = runHere('"%s" nobump' % sScript, sSamples)
     lsErrors = compilerErrors(sName)
     for sError in lsErrors: logLine("ERROR LINE: " + sError)
 
@@ -277,10 +277,10 @@ def recordSample(sName, sScript, sExe):
     changed. A sample this check builds is now recorded in the same cache, with the build's own list of what a sample
     is made from, so the build and the check agree on what is current."""
     try:
-        sys.path.insert(0, c_sKit)
-        sys.path.insert(0, os.path.join(c_sKit, "scripts"))
+        sys.path.insert(0, sKit)
+        sys.path.insert(0, os.path.join(sKit, "scripts"))
         import build, fingerprint
-        oCache = fingerprint.Cache(c_sKit, logLine)
+        oCache = fingerprint.Cache(sKit, logLine)
         sPrint = oCache.fingerprint(build.sampleInputs(sName, sScript))
         oCache.record("sample " + sName, sPrint, ["Templates/samples/" + sExe])
         logLine("recorded sample %s as built, so the next build need not build it again" % sName)
@@ -296,11 +296,11 @@ def currentSamples():
     build had just confirmed each one.)"""
     dCurrent = {}
     try:
-        sys.path.insert(0, c_sKit)
-        sys.path.insert(0, os.path.join(c_sKit, "scripts"))
+        sys.path.insert(0, sKit)
+        sys.path.insert(0, os.path.join(sKit, "scripts"))
         import build, fingerprint
-        oCache = fingerprint.Cache(c_sKit, logLine)
-        for sName, sScript, sExe in c_lSamples:
+        oCache = fingerprint.Cache(sKit, logLine)
+        for sName, sScript, sExe in lAllSamples:
             sPrint = oCache.fingerprint(build.sampleInputs(sName, sScript))
             if oCache.isCurrent("sample " + sName, sPrint, ["Templates/samples/" + sExe]):
                 dCurrent[sName] = oCache.d["jobs"]["sample " + sName].get("when", "?")
@@ -349,7 +349,7 @@ def checkSharedTools():
     fix is to delete it.
     """
     lsStale = []
-    sScripts = os.path.join(c_sKit, "scripts")
+    sScripts = os.path.join(sKit, "scripts")
     for sName in sorted(os.listdir(sScripts)):
         if not sName.lower().endswith((".cmd", ".ps1", ".py")): continue
         sMine = os.path.join(sScripts, sName)
@@ -360,7 +360,7 @@ def checkSharedTools():
             lsPaths = []
         for sPath in lsPaths:
             if os.path.normcase(sPath) == os.path.normcase(sMine): continue
-            if os.path.normcase(sPath).startswith(os.path.normcase(c_sKit)): continue
+            if os.path.normcase(sPath).startswith(os.path.normcase(sKit)): continue
             lsStale.append("%s is on the PATH at %s" % (sName, sPath))
     for sLine in lsStale: logLine("COPY ON THE PATH: " + sLine)
     if lsStale:
@@ -378,13 +378,13 @@ def checkPrograms(bUi):
                        "run checkHomerDev --ui to drive them")
     # uiCheck moved to scripts with the rest of the kit's tools; looking in the retired Tools folder skipped this check
     # on every run (1.62.5, from an audit by another AI).
-    sUi = os.path.join(c_sKit, "scripts", "uiCheck.py")
+    sUi = os.path.join(sKit, "scripts", "uiCheck.py")
     if not os.path.isfile(sUi):
         return finding("programs", "fail", "uiCheck is not in scripts, so the sample programs were not driven")
     if not sys.platform.startswith("win"):
         return finding("programs", "skip",
                        "uiCheck drives Windows programs; this is %s" % sys.platform)
-    iCode, sOut = runHere('"%s" "%s" --path "%s"' % (sys.executable, sUi, c_sSamples), c_sKit)
+    iCode, sOut = runHere('"%s" "%s" --path "%s"' % (sys.executable, sUi, sSamples), sKit)
     sSummary = ""
     for sLine in sOut.splitlines():
         if "passed," in sLine: sSummary = sLine.strip()
@@ -406,7 +406,7 @@ def moduleAssemblies():
     exactly that on its first build against the kit.
     """
     dNeeds = {}
-    for sPath in sorted(glob.glob(os.path.join(c_sKit, "exec", "CSharp", "*.cs"))):
+    for sPath in sorted(glob.glob(os.path.join(sKit, "exec", "CSharp", "*.cs"))):
         sText = open(sPath, "rb").read().decode("utf-8-sig", "replace")
         oMatch = re.search(r"//\s*ASSEMBLIES:\s*([^\n\r]+)", sText)
         if not oMatch: continue
@@ -423,7 +423,7 @@ def moduleRequirements():
     needs another is invisible until a build script leaves one out.
     """
     dNeeds = {}
-    for sPath in sorted(glob.glob(os.path.join(c_sKit, "exec", "CSharp", "*.cs"))):
+    for sPath in sorted(glob.glob(os.path.join(sKit, "exec", "CSharp", "*.cs"))):
         sText = open(sPath, "rb").read().decode("utf-8-sig", "replace")
         oMatch = re.search(r"//\s*REQUIRES:\s*([^\n\r]+)", sText)
         if not oMatch: continue
@@ -438,8 +438,8 @@ def checkDependencies():
         return finding("dependencies", "skip", "0 modules declare a REQUIRES line")
 
     lsBroken = []
-    lsScripts = sorted(glob.glob(os.path.join(c_sSamples, "build*.cmd")) +
-                       glob.glob(os.path.join(c_sKit, "Templates", "build*.cmd")))
+    lsScripts = sorted(glob.glob(os.path.join(sSamples, "build*.cmd")) +
+                       glob.glob(os.path.join(sKit, "Templates", "build*.cmd")))
     for sScript in lsScripts:
         sText = open(sScript, "rb").read().decode("utf-8-sig", "replace")
         # Only the lines that actually compile something: a commented line is a
@@ -482,7 +482,7 @@ def checkDependencies():
 
 def writeReport(bDeep, bCleaned):
     sStamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    sPath = os.path.join(c_sLogs, "HomerDev-evidence-%s.md" % sStamp)
+    sPath = os.path.join(sLogs, "HomerDev-evidence-%s.md" % sStamp)
     lsPassed = [t for t in lsFindings if t[1] == "pass"]
     lsFailed = [t for t in lsFindings if t[1] == "fail"]
     lsSkipped = [t for t in lsFindings if t[1] == "skip"]
@@ -556,14 +556,14 @@ def main():
                          help="build over what is there instead of cleaning first")
     dArguments = oParser.parse_args()
 
-    os.makedirs(c_sLogs, exist_ok=True)
+    os.makedirs(sLogs, exist_ok=True)
     oLog = open(sLogPath, "w", encoding="utf-8")
     logLine("checkHomerDev start pid=%d" % os.getpid())
     logFact("script", os.path.abspath(__file__))
     logFact("python", platform.python_version())
     logFact("windows", logWindows())
-    logLine("Kit: %s" % c_sKit)
-    logLine("Samples: %s" % c_sSamples)
+    logLine("Kit: %s" % sKit)
+    logLine("Samples: %s" % sSamples)
     logFact("arguments", " ".join(sys.argv[1:]))
     logLine("settings deep=%s no-clean=%s" % (dArguments.deep, dArguments.no_clean))
 
@@ -572,9 +572,9 @@ def main():
     # inputs are fingerprinted (its templates, shared code, scripts, this checker and the version, build products
     # left out); a pass recorded with the same fingerprint is reused, and the report says so. --fresh, --ui, --deep
     # and --no-clean always run in full; a failure is never reused.
-    sys.path.insert(0, os.path.join(c_sKit, "scripts"))
+    sys.path.insert(0, os.path.join(sKit, "scripts"))
     import fingerprint
-    oCache = fingerprint.Cache(c_sKit, logLine)
+    oCache = fingerprint.Cache(sKit, logLine)
     lsInputs = ["Templates", "exec/CSharp", "exec/Python", "exec/conversions.inix", "scripts", "checkHomerDev.py", "build.py", "version.txt"]
     sPrint = oCache.fingerprint(lsInputs, [platform.python_version()], bSkipProducts=True)
     bReusable = not (dArguments.fresh or dArguments.ui or dArguments.deep or dArguments.no_clean)
@@ -587,10 +587,10 @@ def main():
         logLine("checkHomerDev end, reused")
         return 0
 
-    sayLine("Checking the kit in %s" % c_sKit)
+    sayLine("Checking the kit in %s" % sKit)
     # --fresh and --deep build every sample from clean; otherwise a sample the cache calls current is not built again.
     dCurrent = {} if (dArguments.fresh or dArguments.deep) else currentSamples()
-    setBuilding = set(t[0] for t in c_lSamples) - set(dCurrent)
+    setBuilding = set(t[0] for t in lAllSamples) - set(dCurrent)
     if setBuilding: sayLine("This builds %s, which takes a few minutes." % countNoun(len(setBuilding), "sample"))
     else: sayLine("Every sample is unchanged since its last build passed; none is built again.")
     sayLine()
@@ -603,7 +603,7 @@ def main():
         finding("clean", "skip", "asked not to; a stale file could make a build look like a pass")
     else:
         cleanSamples(dArguments.deep, setBuilding)
-    for sName, sScript, sExe in c_lSamples:
+    for sName, sScript, sExe in lAllSamples:
         if sName in dCurrent:
             finding("build " + sName, "pass", "unchanged since its build passed at %s: the same sources and kit code, and %s is the program that build made" % (dCurrent[sName], sExe))
             continue

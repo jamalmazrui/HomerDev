@@ -72,13 +72,13 @@ public static class Program
 //
 // Constants carry c_ and their type letter, as Camel Type has it, and they sit
 // together at the top where a reader can find them.
-private const string c_sAppName = "FruitBasketCs";
-private const string c_sSection = "Basket";
-private const string c_sSettingsFile = "FruitBasketCs.inix";
+private const string sAppName = "FruitBasketCs";
+private const string sSection = "Basket";
+private const string sSettingsFile = "FruitBasketCs.inix";
 
 // The two ways the basket can be ordered. Alphabetical, as every list in Homer
 // code is unless another order is clearly more logical.
-private static readonly string[] c_asSortOrders = { "added", "name" };
+private static readonly string[] asSortOrders = { "added", "name" };
 
 // The controls the handlers need after the dialog is built.
 private static CheckBox cbSpeak;
@@ -99,7 +99,7 @@ private static TextBox txtFruit;
 // reader user reaches any of them with one keystroke.
 private static string settingsPath()
 {
-    return Paths.configFile(c_sSettingsFile);
+    return Paths.configFile(sSettingsFile);
 }
 
 // The settings file is .inix, which is .ini with the corners knocked off: a
@@ -111,7 +111,7 @@ private static string settingsPath()
 private static List<string> loadBasket()
 {
     List<string> lsFruit = new List<string>();
-    foreach (string sOne in InixCodec.readValue(settingsPath(), c_sSection, "Fruit", "").Split(','))
+    foreach (string sOne in InixCodec.readValue(settingsPath(), sSection, "Fruit", "").Split(','))
     {
         string sTrimmed = sOne.Trim();
         if (sTrimmed != "") lsFruit.Add(sTrimmed);
@@ -126,10 +126,10 @@ private static bool saveBasket()
 {
     List<string> lsFruit = new List<string>();
     foreach (object oItem in lbBasket.Items) lsFruit.Add(("" + oItem).Trim());
-    InixCodec.writeValue(settingsPath(), c_sSection, "Fruit",
+    InixCodec.writeValue(settingsPath(), sSection, "Fruit",
                          string.Join(", ", lsFruit.ToArray()));
-    InixCodec.writeValue(settingsPath(), c_sSection, "Sort", ("" + cboSort.SelectedItem));
-    InixCodec.writeValue(settingsPath(), c_sSection, "Speak", cbSpeak.Checked ? "1" : "0");
+    InixCodec.writeValue(settingsPath(), sSection, "Sort", ("" + cboSort.SelectedItem));
+    InixCodec.writeValue(settingsPath(), sSection, "Speak", cbSpeak.Checked ? "1" : "0");
     Log.info("Saved " + lbBasket.Items.Count + " to " + settingsPath());
     return true;
 }
@@ -187,13 +187,13 @@ private static int runDialog()
         // A combo pick box offers a short list of legal values and refuses
         // anything else, which is what a setting wants. Type-ahead works, and a
         // screen reader announces each value as the arrow keys pass it.
-        cboSort = dlg.addComboPickBox("&Sort by:", c_asSortOrders,
-            InixCodec.readValue(settingsPath(), c_sSection, "Sort", "added"),
+        cboSort = dlg.addComboPickBox("&Sort by:", asSortOrders,
+            InixCodec.readValue(settingsPath(), sSection, "Sort", "added"),
             "added keeps the basket in the order fruit went in; name sorts it alphabetically.");
         cboSort.SelectedIndexChanged += delegate(object oSender, EventArgs evArgs) { sortBasket(); };
 
         cbSpeak = dlg.addCheckBox("Spea&k each change",
-            InixCodec.readValue(settingsPath(), c_sSection, "Speak", "1") == "1",
+            InixCodec.readValue(settingsPath(), sSection, "Speak", "1") == "1",
             "When this is off, the program stays silent and the screen reader does all the talking.");
 
         // ---- BLOCK 5: the buttons that act without closing ----
@@ -420,8 +420,8 @@ public static int Main(string[] aArguments)
     // One file per session, in %LOCALAPPDATA%\FruitBasketCs\logs, pruned to
     // the most recent thirty. Writing a line costs microseconds; not having the
     // line costs an evening.
-    Paths.start(c_sAppName);
-    Log.start(c_sAppName);
+    Paths.start(sAppName);
+    Log.start(sAppName);
     Log.keyValue("Settings file", settingsPath());
     Log.keyValue("Results folder", Paths.results());
     Log.info("Cleared " + Paths.clearTemp() + " leftover temporary items");

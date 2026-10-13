@@ -19,27 +19,27 @@ references/guide-format.md.
 
 import html, html.parser, io, json, logging, os, platform, re, sys, urllib.parse
 
-c_iMinCategory = 2
-c_sBom = "\ufeff"
-c_sEncoding = "utf-8-sig"
-c_sLogName = "buildMagazines.log"
-c_sMiscellaneous = "Miscellaneous"
-c_sNewLine = "\r\n"
+iMinCategory = 2
+sBom = "\ufeff"
+sEncoding = "utf-8-sig"
+sLogName = "buildMagazines.log"
+sMiscellaneous = "Miscellaneous"
+sNewLine = "\r\n"
 
-c_lLitterExact = ["print", "home", "sign in", "back to home", "all collections", "table of contents",
+lLitterExact = ["print", "home", "sign in", "back to home", "all collections", "table of contents",
                   "skip to main content", "powered by", "powered by intercom", "we run on fin",
                   "return to top", "related articles", "was this helpful", "submit a request"]
-c_lFeedback = ["was this article helpful", "was this page helpful", "was this helpful",
+lFeedback = ["was this article helpful", "was this page helpful", "was this helpful",
                "was this information helpful", "did this answer your question",
                "did you find it helpful", "how can we improve it",
                "how satisfied are you with this reply", "provide feedback about this article",
                "out of found this helpful", "of people found this helpful"]
-c_lFeedbackAnswers = ["yes", "no", "yes no", "disappointed", "neutral", "smiley", "share"]
-c_lLitterPrefix = ["did this answer your question", "was this article helpful", "still need help",
+lFeedbackAnswers = ["yes", "no", "yes no", "disappointed", "neutral", "smiley", "share"]
+lLitterPrefix = ["did this answer your question", "was this article helpful", "still need help",
                    "have more questions", "use of this site constitutes acceptance", "all rights reserved"]
 
 
-c_reBareDomain = re.compile(r"^(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:ai|app|au|ca|co|com|de|dev|edu|fr|gov|info|io|me|net|org|tv|uk|us)(?:[/?#]|$)", re.I)
+reBareDomain = re.compile(r"^(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:ai|app|au|ca|co|com|de|dev|edu|fr|gov|info|io|me|net|org|tv|uk|us)(?:[/?#]|$)", re.I)
 
 
 def normalizeHref(sUrl, sBaseUrl=""):
@@ -58,7 +58,7 @@ def normalizeHref(sUrl, sBaseUrl=""):
     if sUrl.startswith("//"): return "https:" + sUrl
     if sUrl.startswith("#"): return ""
     if sBaseUrl and re.match(r"(?i)https?://", sBaseUrl): return urllib.parse.urljoin(sBaseUrl, sUrl)
-    if c_reBareDomain.match(sUrl) and not re.match(r"(?i)[^/]+\.(php|aspx?|html?|jsp)(?:[?#]|$)", sUrl): return "https://" + sUrl
+    if reBareDomain.match(sUrl) and not re.match(r"(?i)[^/]+\.(php|aspx?|html?|jsp)(?:[?#]|$)", sUrl): return "https://" + sUrl
     return ""
 
 
@@ -207,7 +207,7 @@ def readText(sPath):
     fHandle = io.open(sPath, "r", encoding="utf-8", errors="replace")
     sText = fHandle.read()
     fHandle.close()
-    return sText.lstrip(c_sBom)
+    return sText.lstrip(sBom)
 
 
 def findBalanced(sMarkup, sPattern, sTag):
@@ -244,7 +244,7 @@ def dropLitter(lLines):
         # A line that is nothing but a link back to the top of the page is furniture
         # wherever the link happens to point.
         oOnlyLink = re.fullmatch(r"\s*\[([^\]]+)\]\([^\)]*\)\s*", sLine)
-        if oOnlyLink and re.sub(r"[^a-z ]", "", oOnlyLink.group(1).lower()).strip() in c_lLitterExact: continue
+        if oOnlyLink and re.sub(r"[^a-z ]", "", oOnlyLink.group(1).lower()).strip() in lLitterExact: continue
         # Collapse the spaces left where digits were removed: "3 out of 7 found
         # this helpful" becomes "out of  found this helpful" with a double space,
         # and no phrase on any list would ever match that.
@@ -268,12 +268,12 @@ def dropLitter(lLines):
         # A count line reads "3 out of 7 found this helpful"; stripping its digits
         # leaves "out of found this helpful", which is why that phrase is on the
         # list in that odd-looking form.
-        if sTest and any(sTest.startswith(sPhrase) for sPhrase in c_lFeedback):
+        if sTest and any(sTest.startswith(sPhrase) for sPhrase in lFeedback):
             iFeedbackAt[0] = len(lOut)
             continue
-        if sTest in c_lFeedbackAnswers and iFeedbackAt[0] >= 0 and len(lOut) - iFeedbackAt[0] <= 3: continue
-        if sTest and not bHeading and sTest in c_lLitterExact: continue
-        if sTest and not bHeading and any(sTest.startswith(sItem) for sItem in c_lLitterPrefix): continue
+        if sTest in lFeedbackAnswers and iFeedbackAt[0] >= 0 and len(lOut) - iFeedbackAt[0] <= 3: continue
+        if sTest and not bHeading and sTest in lLitterExact: continue
+        if sTest and not bHeading and any(sTest.startswith(sItem) for sItem in lLitterPrefix): continue
         if sLine.strip() == "" and lOut and lOut[-1].strip() == "": continue
         lOut.append(sLine.rstrip())
     while lOut and lOut[0].strip() == "": lOut.pop(0)
@@ -368,7 +368,7 @@ def sortKeyTitle(sTitle):
 
 def sortKeyCategory(sCategory):
     """Alphabetical, except that Miscellaneous always comes last."""
-    return "zzzz" if sCategory == c_sMiscellaneous else sortKeyTitle(sCategory)
+    return "zzzz" if sCategory == sMiscellaneous else sortKeyTitle(sCategory)
 
 
 def makeAnchor(sTitle):
@@ -401,10 +401,10 @@ def readZendesk(sFolder):
         dPayload = json.loads(readText(os.path.join(sFolder, sName)))
         for dArticle in dPayload.get("articles", []):
             tSection = dSections.get(dArticle.get("section_id"), ("", None))
-            sCategory = tSection[0] or dCategories.get(tSection[1], c_sMiscellaneous) or c_sMiscellaneous
+            sCategory = tSection[0] or dCategories.get(tSection[1], sMiscellaneous) or sMiscellaneous
             # A publisher may leave a section's name as a stray character —
             # iHeartRadio has one called "/". That is not a category name.
-            if not re.search(r"\w", sCategory): sCategory = c_sMiscellaneous
+            if not re.search(r"\w", sCategory): sCategory = sMiscellaneous
             lArticles.append((sCategory, dArticle["title"], toMarkdown(dArticle.get("body") or "", 0, dArticle.get("html_url") or "")))
     return lArticles
 
@@ -421,7 +421,7 @@ def readSnopes(sFolder):
     if not os.path.isfile(sPath): return []
     sMarkup = readText(sPath)
     lArticles = []
-    sCategory = c_sMiscellaneous
+    sCategory = sMiscellaneous
     lTokens = sorted([(oMatch.start(), "category", stripTags(oMatch.group(1)))
                       for oMatch in re.finditer(r'(?is)<span class="section_title[^"]*">(.*?)</span>', sMarkup)] +
                      [(oMatch.start(), "question", stripTags(oMatch.group(1)))
@@ -451,7 +451,7 @@ def readNewScientist(sFolder):
                      [(oMatch.start(), "question", "")
                       for oMatch in re.finditer(r'(?is)<a[^>]*class="faq-internal-link"[^>]*>(?:</a>)?', sMarkup)])
     lArticles = []
-    sCategory = c_sMiscellaneous
+    sCategory = sMiscellaneous
     for iIndex, (iStart, sKind, sText) in enumerate(lTokens):
         if sKind == "category":
             if sText: sCategory = sText
@@ -474,7 +474,7 @@ def readSciAm(sFolder):
     lTokens = [(oMatch.start(), oMatch.group(1), stripTags(oMatch.group(2)))
                for oMatch in re.finditer(r"(?is)<h([13])[^>]*>(.*?)</h\1>", sMarkup)]
     lArticles = []
-    sCategory = c_sMiscellaneous
+    sCategory = sMiscellaneous
     for iIndex, (iStart, sLevel, sText) in enumerate(lTokens):
         iEnd = lTokens[iIndex + 1][0] if iIndex + 1 < len(lTokens) else len(sMarkup)
         if sLevel == "1":
@@ -526,7 +526,7 @@ def readNature(sFolder):
                    re.findall(r'(?is)<a[^>]*href="([^"]*)"[^>]*>(.*?)</a>', sTrail)
                    if "/solutions" in sUrl]
         lCrumbs = [s for s in lCrumbs if s and s.lower() not in ("solution home", "nature support")]
-        sCategory = lCrumbs[-1] if lCrumbs else c_sMiscellaneous
+        sCategory = lCrumbs[-1] if lCrumbs else sMiscellaneous
         sBody = findBalanced(sMarkup, r'<article[^>]*class="[^"]*article[^"]*"', "article")
         if not sBody: continue
         if not sTitle: continue
@@ -559,7 +559,7 @@ def readJumpListFaq(sFolder, sFileName, sCategoryDefault=None):
         iEnd = lTerms[iIndex + 1][0] if iIndex + 1 < len(lTerms) else len(sMarkup)
         sTitle = stripTags(sTerm)
         oAnchor = re.search(r'(?is)name="([^"]+)"', sTerm)
-        sCategory = dGroups.get(oAnchor.group(1), sCategoryDefault or c_sMiscellaneous) if oAnchor else (sCategoryDefault or c_sMiscellaneous)
+        sCategory = dGroups.get(oAnchor.group(1), sCategoryDefault or sMiscellaneous) if oAnchor else (sCategoryDefault or sMiscellaneous)
         oAnswer = re.search(r"(?is)<dd[^>]*>(.*)", sMarkup[iAfter:iEnd])
         if not oAnswer or not sTitle: continue
         lArticles.append((sCategory, sTitle, toMarkdown(oAnswer.group(1), 0)))
@@ -608,7 +608,7 @@ def readPublicationFaqs(sFolder):
                 # in a guide covering six publications, so each carries its
                 # publication.
                 for sCategory, sTitle, lBody in readJumpListFaq(sFolder, sName, sPublication):
-                    lArticles.append((sPublication + ": " + sCategory if sCategory != c_sMiscellaneous else sPublication,
+                    lArticles.append((sPublication + ": " + sCategory if sCategory != sMiscellaneous else sPublication,
                                       sTitle, lBody))
             continue
         sPublication = dNames.get(sName)
@@ -664,7 +664,7 @@ def readCosmopolitan(sFolder):
         iEnd = lTerms[iIndex + 1][0] if iIndex + 1 < len(lTerms) else len(sMarkup)
         sTitle = stripTags(sTerm)
         oAnchor = re.search(r'(?is)name="([^"]+)"', sTerm)
-        sCategory = dGroups.get(oAnchor.group(1), c_sMiscellaneous) if oAnchor else c_sMiscellaneous
+        sCategory = dGroups.get(oAnchor.group(1), sMiscellaneous) if oAnchor else sMiscellaneous
         oAnswer = re.search(r"(?is)<dd[^>]*>(.*)", sMarkup[iAfter:iEnd])
         if not oAnswer or not sTitle: continue
         lArticles.append((sCategory, sTitle, toMarkdown(oAnswer.group(1), 0)))
@@ -756,7 +756,7 @@ def readFireTv(sFolder):
         sTitle = stripTags(oTitle.group(1))
         lCrumbs = [stripTags(sCrumb) for sCrumb in re.findall(r"(?is)<a[^>]*>(.*?)</a>", oTrail.group(1)[:3000])] if oTrail else []
         lCrumbs = [sCrumb for sCrumb in lCrumbs if sCrumb]
-        sCategory = lCrumbs[-1] if lCrumbs else c_sMiscellaneous
+        sCategory = lCrumbs[-1] if lCrumbs else sMiscellaneous
         sWhole = " ".join(lCrumbs) + " " + sTitle
         if not re.search(r"(fire tv|fire stick|firestick|recast)", sWhole, re.I):
             iSetAside += 1
@@ -816,7 +816,7 @@ def readAirbnb(sFolder):
         sTitle = stripTags(oTitle.group(1))
         if not sTitle: continue
         sBefore = sMarkup[:oTitle.start()]
-        sCategory = c_sMiscellaneous
+        sCategory = sMiscellaneous
         oAudience = re.search(r"(?is)•\s*([A-Za-z][A-Za-z ]{2,30})</div>", sBefore[-4000:])
         if oAudience: sCategory = oAudience.group(1).strip().title()
         sBody = sMarkup[oTitle.end():]
@@ -826,19 +826,19 @@ def readAirbnb(sFolder):
     return lArticles
 
 
-c_oVerizonDevice = re.compile(r"(apple|samsung|google|motorola|pixel|iphone|ipad|galaxy|watch|tablet|kyocera|nokia|orbic|tcl|razr|blackberry|sonim|schok|jitterbug|hotspot|inseego|moto|nighthawk|verizon jetpack)", re.I)
+oVerizonDevice = re.compile(r"(apple|samsung|google|motorola|pixel|iphone|ipad|galaxy|watch|tablet|kyocera|nokia|orbic|tcl|razr|blackberry|sonim|schok|jitterbug|hotspot|inseego|moto|nighthawk|verizon jetpack)", re.I)
 
 
 def readVerizonDevices(sFolder):
     """The per-handset half of Verizon's knowledge base."""
-    return [tArticle for tArticle in readVerizon(sFolder) if c_oVerizonDevice.search(tArticle[0])]
+    return [tArticle for tArticle in readVerizon(sFolder) if oVerizonDevice.search(tArticle[0])]
 
 
 def readVerizonService(sFolder):
     """Everything in Verizon's knowledge base that is NOT about one handset:
     plans, billing, accounts, home internet, the network, international use and
     accessibility."""
-    return [tArticle for tArticle in readVerizon(sFolder) if not c_oVerizonDevice.search(tArticle[0])]
+    return [tArticle for tArticle in readVerizon(sFolder) if not oVerizonDevice.search(tArticle[0])]
 
 
 def readVerizon(sFolder):
@@ -855,7 +855,7 @@ def readVerizon(sFolder):
         sBody = (findBalanced(sMarkup, r'<div[^>]*class="BodyContentSection"', "div")
                  or findBalanced(sMarkup, r"<main[^>]*>", "main"))
         if not sBody or not sTitle: continue
-        sCategory = c_sMiscellaneous
+        sCategory = sMiscellaneous
         oTrail = re.search(r'(?is)<(nav|ol|ul)[^>]*breadcrumb[^>]*>(.*?)</\1>', sMarkup)
         if oTrail:
             lCrumbs = [stripTags(sCrumb) for sCrumb in re.findall(r"(?is)<a[^>]*>(.*?)</a>", oTrail.group(2))]
@@ -884,12 +884,12 @@ def readGoogleMeet(sFolder):
         if not sTitle: continue
         lCrumbs = [stripTags(sCrumb) for sCrumb in re.findall(r'(?is)<li[^>]*breadcrumb[^>]*>(.*?)</li>', sMarkup)]
         lCrumbs = [sCrumb for sCrumb in lCrumbs if sCrumb and sCrumb.lower() != sTitle.lower()]
-        sCategory = lCrumbs[0] if lCrumbs else c_sMiscellaneous
+        sCategory = lCrumbs[0] if lCrumbs else sMiscellaneous
         # Google leaves 53 of these articles with no topic crumb at all, which
         # buries Lookout, Live Transcribe, braille and the display settings in
         # Miscellaneous. Where the trail says nothing, the article's own title
         # does: it names its subject in its first words.
-        if sCategory == c_sMiscellaneous:
+        if sCategory == sMiscellaneous:
             for sWords, sLabel in [
                     (r"lookout", "Lookout: Explore your surroundings"),
                     (r"braille|brailleback", "Braille"),
@@ -912,7 +912,7 @@ def readGoogleMeet(sFolder):
     return lArticles
 
 
-c_lMpvProgrammer = ["lua scripting", "javascript", "json ipc", "c plugins",
+lMpvProgrammer = ["lua scripting", "javascript", "json ipc", "c plugins",
                     "embedding into other programs (libmpv)", "changelog",
                     "using mpv from other programs or scripts", "hooks",
                     "commands specified as arrays", "asynchronous command details",
@@ -928,7 +928,7 @@ def isMpvProgrammer(sCategory, sTitle):
     header or a JSON protocol for controlling mpv from another program is not.
     """
     sWhole = (sCategory + " " + sTitle).lower()
-    if any(sName in sWhole for sName in c_lMpvProgrammer): return True
+    if any(sName in sWhole for sName in lMpvProgrammer): return True
     return bool(re.search(r"(\bapi\b|libmpv|\bipc\b|scripting|\bplugin\b|mpv_[a-z_]+\(|\bcallback\b)", sWhole))
 
 
@@ -955,7 +955,7 @@ def readMpv(sFolder):
                           for oMatch in re.finditer(r"(?is)<h1[^>]*>(.*?)</h1>", sMarkup)] +
                          [(oMatch.start(), oMatch.end(), 2, stripTags(oMatch.group(1)))
                           for oMatch in re.finditer(r"(?is)<h2[^>]*>(.*?)</h2>", sMarkup)])
-        sCategory = c_sMiscellaneous
+        sCategory = sMiscellaneous
         for iIndex, (iStart, iAfter, iLevel, sTitle) in enumerate(lTokens):
             iEnd = lTokens[iIndex + 1][0] if iIndex + 1 < len(lTokens) else len(sMarkup)
             if not sTitle: continue
@@ -1008,7 +1008,7 @@ def readEndNote(sFolder):
         # letter: hsrt, hsr, hsc. A non-greedy match took "h" from every name and
         # filed 127 of 129 articles under General.
         oPrefix = re.search(r"ENW_([a-z]+)[_.]", sName)
-        sCategory = c_sMiscellaneous
+        sCategory = sMiscellaneous
         if oPrefix:
             for sKey in sorted(dPrefixes, key=len, reverse=True):
                 if oPrefix.group(1).startswith(sKey):
@@ -1300,7 +1300,7 @@ def readUdio(sFolder):
         if not oTitle: continue
         sTitle = stripTags(oTitle.group(1))
         if not sTitle: continue
-        sCategory = c_sMiscellaneous
+        sCategory = sMiscellaneous
         for oBlock in re.finditer(r'(?is)<script[^>]*type="application/ld\+json"[^>]*>(.*?)</script>', sMarkup):
             try:
                 dPayload = json.loads(oBlock.group(1))
@@ -1332,7 +1332,7 @@ def readSuno(sFolder):
         if not oTitle: continue
         sTitle = stripTags(oTitle.group(1))
         if not sTitle: continue
-        sCategory = c_sMiscellaneous
+        sCategory = sMiscellaneous
         # The trail's own div holds nested divs for its separator icons, so a
         # match that stops at the first closing div ends before the collection
         # name and leaves every article in Miscellaneous. It is read from the
@@ -1370,12 +1370,12 @@ def readAndroidAccessibility(sFolder):
         if not sTitle: continue
         lCrumbs = [stripTags(sCrumb) for sCrumb in re.findall(r'(?is)<li[^>]*breadcrumb[^>]*>(.*?)</li>', sMarkup)]
         lCrumbs = [sCrumb for sCrumb in lCrumbs if sCrumb and sCrumb.lower() != sTitle.lower()]
-        sCategory = lCrumbs[0] if lCrumbs else c_sMiscellaneous
+        sCategory = lCrumbs[0] if lCrumbs else sMiscellaneous
         # Google leaves 53 of these articles with no topic crumb at all, which
         # buries Lookout, Live Transcribe, braille and the display settings in
         # Miscellaneous. Where the trail says nothing, the article's own title
         # does: it names its subject in its first words.
-        if sCategory == c_sMiscellaneous:
+        if sCategory == sMiscellaneous:
             for sWords, sLabel in [
                     (r"lookout", "Lookout: Explore your surroundings"),
                     (r"braille|brailleback", "Braille"),
@@ -1459,7 +1459,7 @@ def readDocsSite(sFolder, sCategoryRule=None, sSkipPattern=""):
         if not sBody: continue
         lBody = toMarkdown(sBody, 0)
         if len(" ".join(lBody).split()) < 40: continue
-        sCategory = sCategoryRule(sName, sTitle) if sCategoryRule else c_sMiscellaneous
+        sCategory = sCategoryRule(sName, sTitle) if sCategoryRule else sMiscellaneous
         lArticles.append((sCategory, sTitle, lBody))
     return lArticles
 
@@ -1469,7 +1469,7 @@ def readQuarto(sFolder):
     guide, computations, authoring, output-formats, dashboards and the rest."""
     def category(sName, sTitle):
         oSection = re.search(r"quarto\.org_docs_([a-z0-9-]+)", sName)
-        if not oSection: return c_sMiscellaneous
+        if not oSection: return sMiscellaneous
         sWord = oSection.group(1).replace("-", " ")
         return {"get started": "Getting started", "output formats": "Output formats",
                 "authoring": "Authoring", "computations": "Computations",
@@ -1493,7 +1493,7 @@ def readReveal(sFolder):
             return "What a slide can do"
         if re.search(r"revealjs\.com_(api|events|plugins|internal-links|keyboard|speaker-view|pdf-export)", sName):
             return "Controlling a presentation"
-        return c_sMiscellaneous
+        return sMiscellaneous
     return readDocsSite(sFolder, category)
 
 
@@ -1517,7 +1517,7 @@ def readMediaWiki(sFolder):
         if oAdministrator.search(sName):
             iAdmin += 1
             continue
-        sCategory = c_sMiscellaneous
+        sCategory = sMiscellaneous
         for sPattern, sLabel in [
                 (r"(?i)(edit|format|wikitext|link|image|table|template|list|section|preview|revert|undo|move|redirect)",
                  "Writing and editing pages"),
@@ -1992,7 +1992,7 @@ def readTodoist(sFolder):
         if not oTitle: continue
         sTitle = stripTags(oTitle.group(1))
         if not sTitle: continue
-        sCategory = c_sMiscellaneous
+        sCategory = sMiscellaneous
         oTrail = re.search(r'(?is)<nav[^>]*aria-label="Breadcrumb"[^>]*>(.*?)</nav>', sMarkup)
         if oTrail:
             lCrumbs = [stripTags(sCrumb) for sCrumb in re.findall(r"(?is)<a[^>]*>(.*?)</a>", oTrail.group(1))]
@@ -2045,7 +2045,7 @@ def readInternetArchive(sFolder):
         # one: "Reporting problems or errors" rather than the broad "Archive.org".
         # Reading the category from the FILE NAME instead put 124 of 159 articles
         # in one bucket.
-        sCategory = c_sMiscellaneous
+        sCategory = sMiscellaneous
         oTrail = re.search(r'(?is)<nav[^>]*class="breadcrumb[^"]*"[^>]*>(.*?)</nav>', sMarkup)
         if oTrail:
             lCrumbs = [stripTags(sCrumb) for sUrl, sCrumb in
@@ -2082,7 +2082,7 @@ def readTMobile(sFolder):
         lCrumbs = [stripTags(sCrumb).split(">")[-1].strip()
                    for sCrumb in re.findall(r"(?is)<a[^>]*>(.*?)</a>", sAttributes)]
         lCrumbs = [sCrumb for sCrumb in lCrumbs if sCrumb and sCrumb.lower() != "support"]
-        sCategory = lCrumbs[-1] if lCrumbs else c_sMiscellaneous
+        sCategory = lCrumbs[-1] if lCrumbs else sMiscellaneous
         sBody = findBalanced(sMarkup, r'<div[^>]*class="[^"]*page_content', "div") or findBalanced(sMarkup, r"<main[^>]*>", "main")
         if not sBody or not sTitle: continue
         lArticles.append((sCategory, sTitle, toMarkdown(sBody, 0)))
@@ -2106,7 +2106,7 @@ def readAtt(sFolder):
         oTrail = re.search(r'(?is)<ol[^>]*aria-label="Breadcrumb"[^>]*>(.*?)</ol>', sMarkup)
         lCrumbs = [stripTags(sCrumb) for sCrumb in re.findall(r"(?is)<a[^>]*>(.*?)</a>", oTrail.group(1))] if oTrail else []
         lCrumbs = [sCrumb for sCrumb in lCrumbs if sCrumb and sCrumb.lower() not in ("home", "support")]
-        sCategory = lCrumbs[-1] if lCrumbs else c_sMiscellaneous
+        sCategory = lCrumbs[-1] if lCrumbs else sMiscellaneous
         lArticles.append((sCategory, sTitle, toMarkdown(sBody, 0)))
     return lArticles
 
@@ -2151,7 +2151,7 @@ def readFreedomScientific(sFolder):
                  or findBalanced(sMarkup, r"<main[^>]*>", "main")
                  or findBalanced(sMarkup, r"<body[^>]*>", "body"))
         if not sBody: continue
-        sCategory = c_sMiscellaneous
+        sCategory = sMiscellaneous
         for sKey, sLabel in dNames.items():
             if re.search(r"[_/.]" + sKey, sName, re.I): 
                 sCategory = sLabel
@@ -2182,7 +2182,7 @@ def readSwordAndScale(sFolder):
         lTitles = [s for s in lTitles if s and s.lower() not in ("support", "sword and scale")]
         if not lTitles: continue
         oId = re.search(r"_articles_(\d+)", sName)
-        sCategory = dFolders.get(oId.group(1) if oId else "", c_sMiscellaneous)
+        sCategory = dFolders.get(oId.group(1) if oId else "", sMiscellaneous)
         sBody = findBalanced(sMarkup, r'<[a-z]+[^>]*id="article-body"', "div") or findBalanced(sMarkup, r"<article[^>]*>", "article")
         if not sBody: continue
         lArticles.append((sCategory, lTitles[0], toMarkdown(sBody, 0)))
@@ -2231,7 +2231,7 @@ def readAtlassian(sFolder):
         oTrail = re.search(r'(?is)<nav aria-label="Breadcrumbs".*?</nav>', sMarkup)
         lCrumbs = [stripTags(sCrumb) for sCrumb in re.findall(r"(?is)<li[^>]*>(.*?)</li>", oTrail.group(0))] if oTrail else []
         lCrumbs = [sCrumb for sCrumb in lCrumbs if sCrumb]
-        sCategory = lCrumbs[-1] if lCrumbs else c_sMiscellaneous
+        sCategory = lCrumbs[-1] if lCrumbs else sMiscellaneous
         sTitle = stripTags(oTitle.group(1))
         # A few pages never close their heading, so the "title" swallows the whole
         # article. A title that long is not a title: fall back to the page's own
@@ -2260,7 +2260,7 @@ def readMoth(sFolder):
                      [(oMatch.start(), "question", stripTags(oMatch.group(2)))
                       for oMatch in re.finditer(r'(?is)<button[^>]*id="accordion-heading-(\d+)"[^>]*>(.*?)</button>', sMarkup)])
     lArticles = []
-    sCategory = c_sMiscellaneous
+    sCategory = sMiscellaneous
     for iIndex, (iStart, sKind, sText) in enumerate(lTokens):
         if sKind == "category":
             if sText and sText.lower() not in ("about", "your queue", "extras"): sCategory = sText
@@ -2290,7 +2290,7 @@ def readCrimeCon(sFolder):
             logging.warning("a structured data block was not readable: %s", oError)
             continue
         if not isinstance(dPayload, dict) or dPayload.get("@type") != "FAQPage": continue
-        sCategory = lNames[iBlock] if iBlock < len(lNames) else c_sMiscellaneous
+        sCategory = lNames[iBlock] if iBlock < len(lNames) else sMiscellaneous
         iBlock += 1
         for dQuestion in dPayload.get("mainEntity", []):
             sTitle = stripTags(str(dQuestion.get("name") or ""))
@@ -2376,7 +2376,7 @@ def foldSmallCategories(lArticles):
     """A category holding fewer than two articles is not a category."""
     dCounts = {}
     for sCategory, sTitle, lBody in lArticles: dCounts[sCategory] = dCounts.get(sCategory, 0) + 1
-    return [((sCategory if dCounts[sCategory] >= c_iMinCategory else c_sMiscellaneous), sTitle, lBody)
+    return [((sCategory if dCounts[sCategory] >= iMinCategory else sMiscellaneous), sTitle, lBody)
             for sCategory, sTitle, lBody in lArticles]
 
 
@@ -2417,7 +2417,7 @@ def disambiguate(lArticles):
 # options, configuration files, even a code-shaped feature met in the product's
 # own interface — but nothing that assumes the reader writes code against an
 # interface meant for programmers. Named one by one so the decision is auditable.
-c_dDeveloperCategories = {
+dDeveloperCategories = {
     "Handshake.md": ["API"],
     "Reddit.md": ["Developer Platform & Data API Usage"],
     "Todoist.md": ["Developers"],
@@ -2426,7 +2426,7 @@ c_dDeveloperCategories = {
 
 def dropDeveloperMaterial(lArticles, sOutputPath):
     """Removes the developer categories named for this guide, and says how many."""
-    lNames = c_dDeveloperCategories.get(os.path.basename(sOutputPath), [])
+    lNames = dDeveloperCategories.get(os.path.basename(sOutputPath), [])
     if not lNames: return lArticles
     lKept = [tArticle for tArticle in lArticles if tArticle[0].strip() not in lNames]
     logging.info("%s: %d articles left out as developer material (%s)",
@@ -2471,8 +2471,8 @@ def buildGuide(sProduct, sTitle, sPreamble, lArticles, sOutputPath):
             lLines.append("")
     lFlat = []
     for sLine in dropLitter(lLines): lFlat.extend(sLine.replace("\r\n", "\n").split("\n"))
-    sText = c_sNewLine.join(lFlat) + c_sNewLine
-    fHandle = io.open(sOutputPath, "w", encoding=c_sEncoding, newline="")
+    sText = sNewLine.join(lFlat) + sNewLine
+    fHandle = io.open(sOutputPath, "w", encoding=sEncoding, newline="")
     fHandle.write(sText)
     fHandle.close()
     iWords = len(sText.split())
@@ -2497,7 +2497,7 @@ def runGates(sProduct, sPath, sText):
     # own example contains three, and treating that inner three as a close puts
     # the rest of the article outside the block.
     lOutside, iFence = [], 0
-    for sLine in sText.split(c_sNewLine):
+    for sLine in sText.split(sNewLine):
         oFence = re.match(r"\s*(`{3,})", sLine)
         if oFence:
             iRun = len(oFence.group(1))
@@ -2505,9 +2505,9 @@ def runGates(sProduct, sPath, sText):
             elif iRun >= iFence: iFence = 0
             continue
         if not iFence: lOutside.append(sLine)
-    sBare = c_sNewLine.join(lOutside)
+    sBare = sNewLine.join(lOutside)
     iArticles = len(re.findall(r"^### ", sBare, re.M))
-    sContents = sBare.split("## Contents", 1)[-1].split(c_sNewLine + "## ", 1)[0]
+    sContents = sBare.split("## Contents", 1)[-1].split(sNewLine + "## ", 1)[0]
     iContents = len(re.findall(r"^    - \[", sContents, re.M))
     if iArticles != iContents: lFailures.append("contents lists %d entries against %d articles" % (iContents, iArticles))
     if iArticles < 3: lFailures.append("fewer than three articles")
@@ -2519,7 +2519,7 @@ def runGates(sProduct, sPath, sText):
     lBare = []
     # THE FRONT MATTER IS NOT PROSE (12 October 2026): the guide's own license_url, written by this builder since
     # 2 October, failed this gate in every guide built here. Lines before the closing "---" are left out.
-    lLines = sText.split(c_sNewLine)
+    lLines = sText.split(sNewLine)
     if lLines and lLines[0].strip().lstrip("\ufeff") == "---":
         iEnd = next((i for i in range(1, len(lLines)) if lLines[i].strip() == "---"), 0)
         lLines = lLines[iEnd + 1:]

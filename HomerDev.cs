@@ -51,14 +51,14 @@ public class KitItem
 public static class Program
 {
 
-private const int c_iAiTimeoutMs = 300000;
-private const int c_iContextCharsMost = 24000;
-private const int c_iDescriptionCharsMost = 140;
-private const string c_sAppName = "HomerDev";
-private const string c_sOwner = "JamalMazrui";
+private const int iAiTimeoutMs = 300000;
+private const int iContextCharsMost = 24000;
+private const int iDescriptionCharsMost = 140;
+private const string sAppName = "HomerDev";
+private const string sOwner = "JamalMazrui";
 
 // The models tried first for the chat, in order; any other installed model is used when none of these is there.
-private static readonly string[] c_asPreferredModels = { "qwen2.5:7b", "llama3.1:8b", "llama3.2", "gemma2:9b", "mistral" };
+private static readonly string[] asPreferredModels = { "qwen2.5:7b", "llama3.1:8b", "llama3.2", "gemma2:9b", "mistral" };
 
 private static List<KitItem> lsItems = new List<KitItem>();
 private static string sKit = "";
@@ -93,7 +93,7 @@ private static string firstSentence(string sText)
     sClean = Regex.Replace(sClean, @"\s+", " ").Trim();
     int iEnd = sClean.IndexOf(". ");
     if (iEnd > 0) sClean = sClean.Substring(0, iEnd + 1);
-    if (sClean.Length > c_iDescriptionCharsMost) sClean = sClean.Substring(0, c_iDescriptionCharsMost - 3).TrimEnd() + "...";
+    if (sClean.Length > iDescriptionCharsMost) sClean = sClean.Substring(0, iDescriptionCharsMost - 3).TrimEnd() + "...";
     return sClean;
 }
 
@@ -249,14 +249,14 @@ private static bool openItem(IWin32Window owner, KitItem oItem)
     catch (Exception oError)
     {
         Log.exception(oError);
-        MessageBox.Show(owner, "Could not open " + oItem.sName + ": " + oError.Message, c_sAppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        MessageBox.Show(owner, "Could not open " + oItem.sName + ": " + oError.Message, sAppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
     }
     return true;
 }
 
 // ---- the inix format, explained and read live ----
 
-private const string c_sInixExample =
+private const string sInixExample =
     "; A comment line starts with a semicolon.\r\n" +
     "[Basket]\r\n" +
     "owner = Jamal\r\n" +
@@ -286,11 +286,11 @@ private static bool showInix(IWin32Window owner)
     sb.AppendLine();
     sb.AppendLine("An example file:");
     sb.AppendLine();
-    sb.Append(c_sInixExample);
+    sb.Append(sInixExample);
     sb.AppendLine();
     sb.AppendLine("What the kit's own reader, InixCodec, made of it just now:");
     sb.AppendLine();
-    List<InixCodec.Section> lsSections = InixCodec.parseLines(c_sInixExample.Replace("\r\n", "\n").Split('\n'));
+    List<InixCodec.Section> lsSections = InixCodec.parseLines(sInixExample.Replace("\r\n", "\n").Split('\n'));
     foreach (InixCodec.Section oSection in lsSections)
     {
         if (oSection.Name.Length == 0 && oSection.Pairs.Count == 0) continue;
@@ -309,7 +309,7 @@ private static bool showInix(IWin32Window owner)
 
 // ---- Layout by Code, explained and then shown ----
 
-private const string c_sLayoutCode =
+private const string sLayoutCode =
     "using (LbcDialog dlg = new LbcDialog(\"Layout by Code demonstration\", null))\r\n" +
     "{\r\n" +
     "    dlg.addInputBox(\"&Name:\", \"\", \"Your name; it goes nowhere.\");\r\n" +
@@ -332,7 +332,7 @@ private static bool showLayout(IWin32Window owner)
     sb.AppendLine();
     sb.AppendLine("Here is the whole code of a small dialog. When you close this window, that dialog opens, so you can tab through it and hear that the order is the order of the lines:");
     sb.AppendLine();
-    sb.Append(c_sLayoutCode);
+    sb.Append(sLayoutCode);
     HelpDialog.show(owner, "Layout by Code", sb.ToString());
     // THE DEMONSTRATION IS THE CODE ABOVE, line for line, so what is heard is what was read.
     using (LbcDialog dlg = new LbcDialog("Layout by Code demonstration", owner))
@@ -353,7 +353,7 @@ private static bool showLayout(IWin32Window owner)
 // chooseModel: the first preferred model installed, else any installed model, else "".
 private static string chooseModel()
 {
-    foreach (string sModel in c_asPreferredModels) if (Ollama.hasModel(sModel)) return sModel;
+    foreach (string sModel in asPreferredModels) if (Ollama.hasModel(sModel)) return sModel;
     string[] aNames = Ollama.modelList(false).Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
     foreach (string sName in aNames) if (sName.IndexOf("embed", StringComparison.OrdinalIgnoreCase) < 0) return sName;
     return "";
@@ -397,7 +397,7 @@ private static string kitContext()
     sb.AppendLine("Everything the kit holds, as kind: name, description, path:");
     foreach (KitItem oItem in lsItems)
     {
-        if (sb.Length > c_iContextCharsMost) { sb.AppendLine("[the list continues]"); break; }
+        if (sb.Length > iContextCharsMost) { sb.AppendLine("[the list continues]"); break; }
         sb.AppendLine(oItem.ToString() + " -- " + oItem.sPath.Substring(Math.Min(sKit.Length, oItem.sPath.Length)).TrimStart('\\'));
     }
     return sb.ToString();
@@ -486,10 +486,10 @@ private static string askClaude(string sProgram, string sQuestion, string sSessi
             var oErr = oProcess.StandardError.ReadToEndAsync();
             oProcess.StandardInput.Write(sQuestion);
             oProcess.StandardInput.Close();
-            if (!oProcess.WaitForExit(c_iAiTimeoutMs))
+            if (!oProcess.WaitForExit(iAiTimeoutMs))
             {
                 try { oProcess.Kill(); } catch { }
-                sError = "no answer in " + (c_iAiTimeoutMs / 60000) + " minutes";
+                sError = "no answer in " + (iAiTimeoutMs / 60000) + " minutes";
                 return "";
             }
             oProcess.WaitForExit();
@@ -519,7 +519,7 @@ private static bool runChat(IWin32Window owner)
     Log.keyValue("Claude Code", sClaude.Length > 0 ? sClaude : "(not installed)");
     if (sModel.Length == 0 && sClaude.Length == 0)
     {
-        MessageBox.Show(owner, "No AI is ready to answer: Ollama is not running or has no model, and Claude Code is not installed. HomerDev's setup program offers Ollama and a model; run it again and leave those boxes ticked.", c_sAppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        MessageBox.Show(owner, "No AI is ready to answer: Ollama is not running or has no model, and Claude Code is not installed. HomerDev's setup program offers Ollama and a model; run it again and leave those boxes ticked.", sAppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
         return false;
     }
     if (sModel.Length > 0) { sContext = kitContext(); Log.keyValue("Chat context characters", "" + sContext.Length); }
@@ -588,7 +588,7 @@ private static bool runChat(IWin32Window owner)
                 string sError = "";
                 string sAnswer = "";
                 // An error asking is an answer that did not come, never a crash.
-                try { sAnswer = bClaude ? askClaude(sClaude, sPrompt, sSession, bFirst, aRunning, out sError) : Ollama.generate(sModel, sPrompt, c_iAiTimeoutMs, out sError); }
+                try { sAnswer = bClaude ? askClaude(sClaude, sPrompt, sSession, bFirst, aRunning, out sError) : Ollama.generate(sModel, sPrompt, iAiTimeoutMs, out sError); }
                 catch (Exception oError) { Log.exception(oError); sError = oError.Message; }
                 try
                 {
@@ -691,7 +691,7 @@ private static bool runChat(IWin32Window owner)
             if (oRecorder != null) { fnFinish(); return; }
             if (Voice.whisperProgram().Length == 0 || Voice.whisperModel().Length == 0)
             {
-                MessageBox.Show(dlg.form, "Asking by voice needs Whisper, which turns speech into text on this computer. HomerDev's setup program offers it: run it again and leave Whisper ticked.", c_sAppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(dlg.form, "Asking by voice needs Whisper, which turns speech into text on this computer. HomerDev's setup program offers it: run it again and leave Whisper ticked.", sAppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
             oRecorder = new VoiceRecorder();
@@ -700,7 +700,7 @@ private static bool runChat(IWin32Window owner)
             if (sProblem.Length > 0)
             {
                 oRecorder = null;
-                MessageBox.Show(dlg.form, "Could not listen: " + sProblem + ".", c_sAppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(dlg.form, "Could not listen: " + sProblem + ".", sAppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
             dlg.setStatusText("Listening; press Voice again or stop talking to finish, Escape to cancel");
@@ -777,7 +777,7 @@ private static bool runDialog()
     // THE VERSION IN THE TITLE (11 October 2026): the desktop hotkey opens the copy setup installed, which can lag the
     // kit -- 1.66.0 was heard after 1.68.0 was released, so neither its progress updates nor its Voice button were
     // there. The title, which the screen reader says as the dialog opens, now names the version.
-    using (LbcDialog dlg = new LbcDialog(c_sAppName + " " + sVersion, null))
+    using (LbcDialog dlg = new LbcDialog(sAppName + " " + sVersion, null))
     {
         lbItems = dlg.addPickBox("&Kit contents:", lsLines, lsLines.Count > 0 ? lsLines[0] : "",
             "Everything the kit holds, by kind and then by name: documents open in your browser, samples run, and every other file opens in a window you read line by line. Enter opens the one you are on.");
@@ -798,8 +798,8 @@ private static bool runDialog()
         };
         btnPlay.Click += delegate(object oSender, EventArgs evArgs)
         {
-            if (!MediaPlayer.playTutorials(dlg.form, c_sAppName, Path.Combine(sKit, "help")))
-                MessageBox.Show(dlg.form, "No tutorial is installed in " + Path.Combine(sKit, "help", "tutorials") + ".", c_sAppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (!MediaPlayer.playTutorials(dlg.form, sAppName, Path.Combine(sKit, "help")))
+                MessageBox.Show(dlg.form, "No tutorial is installed in " + Path.Combine(sKit, "help", "tutorials") + ".", sAppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
         };
         btnInix.Click += delegate(object oSender, EventArgs evArgs) { showInix(dlg.form); };
         btnLayout.Click += delegate(object oSender, EventArgs evArgs) { showLayout(dlg.form); };
@@ -827,15 +827,15 @@ public static int Main(string[] aArguments)
 {
     Application.EnableVisualStyles();
     Application.SetCompatibleTextRenderingDefault(false);
-    Paths.start(c_sAppName);
-    Log.start(c_sAppName);
+    Paths.start(sAppName);
+    Log.start(sAppName);
     sKit = kitFolder();
     sVersion = readVersion();
     Log.keyValue("Kit folder", sKit);
     Log.keyValue("Version", sVersion);
     try
     {
-        Elevate.configure(c_sOwner, c_sAppName, sVersion);
+        Elevate.configure(sOwner, sAppName, sVersion);
         runDialog();
         Log.close();
         return 0;
@@ -844,7 +844,7 @@ public static int Main(string[] aArguments)
     {
         Log.exception(oError);
         Log.close();
-        MessageBox.Show("HomerDev stopped: " + oError.Message + "\r\nThe log in %LOCALAPPDATA%\\HomerDev\\logs has the details.", c_sAppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        MessageBox.Show("HomerDev stopped: " + oError.Message + "\r\nThe log in %LOCALAPPDATA%\\HomerDev\\logs has the details.", sAppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
         return 1;
     }
 }

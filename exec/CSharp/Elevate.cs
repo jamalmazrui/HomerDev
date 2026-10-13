@@ -37,13 +37,13 @@ namespace Homer
     public static class Elevate
     {
         // The outcome of a check, so callers can word themselves.
-        public const int c_iNotConfigured = -2;
-        public const int c_iCheckFailed = -1;
-        public const int c_iCurrent = 0;
-        public const int c_iNewer = 1;
+        public const int iNotConfigured = -2;
+        public const int iCheckFailed = -1;
+        public const int iCurrent = 0;
+        public const int iNewer = 1;
 
-        const int c_iTimeoutMs = 8000;
-        const string c_sApiFormat = "https://api.github.com/repos/{0}/{1}/releases/latest";
+        const int iTimeoutMs = 8000;
+        const string sApiFormat = "https://api.github.com/repos/{0}/{1}/releases/latest";
 
         static string sLatestFound = "";
         static string sOwner = "";
@@ -77,15 +77,15 @@ namespace Homer
 
         public static int check()
         {
-            // Asks GitHub once. Returns one of the c_i outcomes; on c_iCurrent
-            // or c_iNewer, latestVersion and setupUrl are filled in.
+            // Asks GitHub once. Returns one of the c_i outcomes; on iCurrent
+            // or iNewer, latestVersion and setupUrl are filled in.
             Match oAsset, oTag;
             string sBody, sJsonTag, sJsonUrl;
-            if (!isConfigured) return c_iNotConfigured;
-            sBody = fetch(string.Format(c_sApiFormat, sOwner, sRepo));
-            if (sBody == "") return c_iCheckFailed;
+            if (!isConfigured) return iNotConfigured;
+            sBody = fetch(string.Format(sApiFormat, sOwner, sRepo));
+            if (sBody == "") return iCheckFailed;
             oTag = Regex.Match(sBody, "\"tag_name\"\\s*:\\s*\"([^\"]+)\"");
-            if (!oTag.Success) return c_iCheckFailed;
+            if (!oTag.Success) return iCheckFailed;
             sJsonTag = oTag.Groups[1].Value.Trim();
             if (sJsonTag.StartsWith("v") || sJsonTag.StartsWith("V")) sJsonTag = sJsonTag.Substring(1);
             sLatestFound = sJsonTag;
@@ -93,7 +93,7 @@ namespace Homer
             oAsset = Regex.Match(sBody, "\"browser_download_url\"\\s*:\\s*\"([^\"]*" + Regex.Escape(sRepo) + "_setup\\.exe)\"", RegexOptions.IgnoreCase);
             sJsonUrl = oAsset.Success ? oAsset.Groups[1].Value : "";
             sSetupUrlFound = sJsonUrl;
-            return isNewer(sLatestFound, sThisVersion) ? c_iNewer : c_iCurrent;
+            return isNewer(sLatestFound, sThisVersion) ? iNewer : iCurrent;
         }
 
         public static bool isNewer(string sRemote, string sLocal)
@@ -108,9 +108,9 @@ namespace Homer
         public static string describe(int iOutcome)
         {
             // The sentence the Help box shows for an outcome of check().
-            if (iOutcome == c_iNotConfigured) return "";
-            if (iOutcome == c_iCheckFailed) return "This is version " + sThisVersion + ". The web could not be checked for a newer one.";
-            if (iOutcome == c_iNewer) return "This is version " + sThisVersion + ". Version " + sLatestFound + " is on the web.";
+            if (iOutcome == iNotConfigured) return "";
+            if (iOutcome == iCheckFailed) return "This is version " + sThisVersion + ". The web could not be checked for a newer one.";
+            if (iOutcome == iNewer) return "This is version " + sThisVersion + ". Version " + sLatestFound + " is on the web.";
             return "This is version " + sThisVersion + ", the newest on the web.";
         }
 
@@ -121,7 +121,7 @@ namespace Homer
             // and closes this program when it needs to. Returns false when
             // nothing could be started; the caller says so.
             string sFile;
-            if (sSetupUrlFound == "" && check() < c_iCurrent) return false;
+            if (sSetupUrlFound == "" && check() < iCurrent) return false;
             if (sSetupUrlFound == "") return false;
             sFile = Path.Combine(Path.GetTempPath(), sRepo + "_setup.exe");
             try
@@ -147,15 +147,15 @@ namespace Homer
             DialogResult oAnswer;
             int iOutcome;
             iOutcome = check();
-            if (iOutcome == c_iNotConfigured) return false;
-            if (iOutcome == c_iCheckFailed)
+            if (iOutcome == iNotConfigured) return false;
+            if (iOutcome == iCheckFailed)
             {
                 MessageBox.Show(oOwner, describe(iOutcome), "Version", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return false;
             }
             oAnswer = MessageBox.Show(oOwner, describe(iOutcome) + "\r\n\r\nUpdate to it now?", "Version",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question,
-                iOutcome == c_iNewer ? MessageBoxDefaultButton.Button1 : MessageBoxDefaultButton.Button2);
+                iOutcome == iNewer ? MessageBoxDefaultButton.Button1 : MessageBoxDefaultButton.Button2);
             if (oAnswer != DialogResult.Yes) return false;
             if (update()) return true;
             MessageBox.Show(oOwner, "The setup program could not be fetched. It is at " + repoUrl + "/releases.", "Version",
@@ -174,8 +174,8 @@ namespace Homer
                 oRequest.Method = "GET";
                 oRequest.UserAgent = Web.userAgent();
                 oRequest.Accept = "application/vnd.github+json";
-                oRequest.Timeout = c_iTimeoutMs;
-                oRequest.ReadWriteTimeout = c_iTimeoutMs;
+                oRequest.Timeout = iTimeoutMs;
+                oRequest.ReadWriteTimeout = iTimeoutMs;
                 using (HttpWebResponse oResponse = (HttpWebResponse)oRequest.GetResponse())
                 using (StreamReader oReader = new StreamReader(oResponse.GetResponseStream()))
                 {

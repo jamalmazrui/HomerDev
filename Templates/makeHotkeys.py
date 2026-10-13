@@ -43,7 +43,7 @@ sLogPath = os.path.join(sLogDir, os.path.basename(os.path.dirname(sScriptDir)) +
 
 # Keys whose association comes from Windows, the suite, or long convention,
 # rather than from a letter. Said plainly, without apology.
-c_dNamed = {
+dNamed = {
     # Each function key is a family, from Windows and Office habits, extended.
     "F1": "F1 is help: this guide.",
     "Shift+F1": "F1 is help; Shift+F1 is the history of changes.",
@@ -93,14 +93,14 @@ c_dNamed = {
 
 # One line for a group whose keys share their reason, written once above them
 # instead of on every item.
-c_dMenuNotes = {
+dMenuNotes = {
     "Query, Say": "Shift and a letter asks. Nothing here changes anything; each answers a question about where you are, in one short line.",
     "Edit, Bulk Marking": "F8 starts a run and Shift completes it; Alt makes the run an unmark instead of a mark.",
 }
 
 # Where each menu is, as the menu bar says it. Submenus are named with their
 # parent, since that is the path somebody walks to reach them.
-c_dMenuNames = {
+dMenuNames = {
     "BulkMark": "Edit, Bulk Marking", "Edit": "Edit", "File": "File", "Help": "Help",
     "Misc": "Misc", "Navigate": "Navigate", "Query": "Query", "Say": "Query, Say",
     "Tools": "Misc, Tools", "Window": "Window",
@@ -133,8 +133,8 @@ def keyName(sExpr):
 
 def association(sKey, sCaption, sCommand):
     """One sentence saying why this key, in the plainest terms available."""
-    if sKey in c_dNamed:
-        return c_dNamed[sKey]
+    if sKey in dNamed:
+        return dNamed[sKey]
     sLetter = sKey.split("+")[-1]
     if len(sLetter) != 1 or not sLetter.isalpha():
         return ""
@@ -166,7 +166,7 @@ def main():
         sKey = keyName(sExpr)
         sDesc = dSummary.get(sCommand, "").strip()
         if sDesc and not sDesc.endswith("."): sDesc += "."
-        lsItems.append({"menu": c_dMenuNames.get(sMenu, sMenu), "name": sName, "key": sKey, "desc": sDesc,
+        lsItems.append({"menu": dMenuNames.get(sMenu, sMenu), "name": sName, "key": sKey, "desc": sDesc,
                         "assoc": association(sKey, sCaption.replace("&", ""), sCommand)})
     # SHIFT REVERSES, said where it applies: a key whose unshifted twin is also
     # bound gets that pairing named, so the two are learned as one.
@@ -202,8 +202,8 @@ def main():
 
     for sMenu in sorted(set(i["menu"] for i in lsItems), key=str.lower):
         lsOut += ["### " + sMenu, ""]
-        if sMenu in c_dMenuNotes:
-            lsOut += [c_dMenuNotes[sMenu], ""]
+        if sMenu in dMenuNotes:
+            lsOut += [dMenuNotes[sMenu], ""]
         for i in sorted((i for i in lsItems if i["menu"] == sMenu), key=lambda i: i["name"].lower()):
             sDesc = " ".join(s for s in (i["desc"], i["assoc"]) if s)
             lsOut.append(entry(i["name"], sDesc, i["key"]))

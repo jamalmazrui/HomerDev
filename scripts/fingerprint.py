@@ -36,11 +36,11 @@ Every decision is logged by the caller through the log function passed in, or pr
 
 import datetime, hashlib, json, os, sys, time
 
-c_sStoreName = "fingerprints.json"
-c_setSkipFolders = {".git", ".venv", "__pycache__", "logs", "notes", "node_modules"}
+sStoreName = "fingerprints.json"
+setSkipFolders = {".git", ".venv", "__pycache__", "logs", "notes", "node_modules"}
 # Build products inside an input folder are outputs, never inputs: a build that wrote one would change its own print.
-c_setProductFolders = {"build", "dist"}
-c_setProductExts = {".dll", ".exe", ".pdb", ".pyc", ".pyo", ".tmp"}
+setProductFolders = {"build", "dist"}
+setProductExts = {".dll", ".exe", ".pdb", ".pyc", ".pyo", ".tmp"}
 
 
 class Cache:
@@ -48,7 +48,7 @@ class Cache:
 
     def __init__(self, sProject, fnLog=None):
         self.sProject = os.path.abspath(sProject)
-        self.sStore = os.path.join(self.sProject, "exec", c_sStoreName)
+        self.sStore = os.path.join(self.sProject, "exec", sStoreName)
         self.fnLog = fnLog or (lambda s: None)
         try:
             self.d = json.loads(open(self.sStore, encoding="utf-8").read()) if os.path.isfile(self.sStore) else {}
@@ -84,10 +84,10 @@ class Cache:
             if os.path.isfile(sPath): lsFiles.append(sPath)
             elif os.path.isdir(sPath):
                 for sDir, lsDirs, lsNames in os.walk(sPath):
-                    lsDirs[:] = sorted(s for s in lsDirs if s not in c_setSkipFolders and not (bSkipProducts and s in c_setProductFolders))
+                    lsDirs[:] = sorted(s for s in lsDirs if s not in setSkipFolders and not (bSkipProducts and s in setProductFolders))
                     lsFiles += [os.path.join(sDir, s) for s in sorted(lsNames)
-                                if not s.endswith((".pyc", ".pyo")) and not s.startswith(c_sStoreName)
-                                and not (bSkipProducts and os.path.splitext(s)[1].lower() in c_setProductExts)]
+                                if not s.endswith((".pyc", ".pyo")) and not s.startswith(sStoreName)
+                                and not (bSkipProducts and os.path.splitext(s)[1].lower() in setProductExts)]
             else:
                 lsFiles.append(sPath)  # a missing input is part of the fingerprint, as missing
         return lsFiles
@@ -95,13 +95,16 @@ class Cache:
     def fingerprint(self, lsInputs, lsExtra=None, bSkipProducts=False):
         """One SHA-256 over every input file's relative path and content, and the extra text given."""
         oSha = hashlib.sha256()
+        self.dLastFiles = {}
         for sFile in self.expand(lsInputs, bSkipProducts):
             # AN INPUT ON ANOTHER DRIVE (12 October 2026): an app's build names the kit's classes, and the kit may sit on
             # another drive, where a relative path cannot be made; its whole path stands in.
             try: sRelative = os.path.relpath(sFile, self.sProject).replace("\\", "/").lower()
             except ValueError: sRelative = os.path.normcase(os.path.abspath(sFile)).replace("\\", "/")
             oSha.update(sRelative.encode("utf-8") + b"\0")
-            oSha.update((self.fileHash(sFile) if os.path.isfile(sFile) else "missing").encode("ascii") + b"\n")
+            sHash = self.fileHash(sFile) if os.path.isfile(sFile) else "missing"
+            self.dLastFiles[sRelative] = sHash[:16]
+            oSha.update(sHash.encode("ascii") + b"\n")
         for sExtra in (lsExtra or []): oSha.update(b"extra\0" + str(sExtra).encode("utf-8") + b"\n")
         return oSha.hexdigest()
 
@@ -112,7 +115,7 @@ class Cache:
         if not dJob:
             self.fnLog("%s: runs, no record of a successful run" % sKey); return False
         if dJob.get("print") != sPrint:
-            self.fnLog("%s: runs, its inputs changed since %s" % (sKey, dJob.get("when", "?"))); return False
+            self.fnLog("%s: runs, its inputs changed since %s%s" % (sKey, dJob.get("when", "?"), self.changesSince(dJob))); return False
         for sOutput, sSha in dJob.get("outputs", {}).items():
             sPath = os.path.join(self.sProject, sOutput)
             if not os.path.isfile(sPath):
@@ -125,13 +128,28 @@ class Cache:
         self.fnLog("%s: skipped, unchanged since %s" % (sKey, dJob.get("when", "?")))
         return True
 
+    def changesSince(self, dJob):
+        """WHICH INPUTS CHANGED (12 October 2026): a job that ran because its inputs changed said only that, so a build
+        that rebuilt with nothing edited gave no clue why. The record keeps each input's hash, and the difference is
+        named: up to eight files changed, added or gone. An older record without them says nothing more."""
+        dBefore, dNow = dJob.get("files") or {}, getattr(self, "dLastFiles", {}) or {}
+        if not dBefore or not dNow: return ""
+        lsChanged = sorted(s for s in dNow if s in dBefore and dNow[s] != dBefore[s])
+        lsAdded = sorted(s for s in dNow if s not in dBefore)
+        lsGone = sorted(s for s in dBefore if s not in dNow)
+        lsParts = []
+        for sWord, lsFiles in (("changed", lsChanged), ("added", lsAdded), ("gone", lsGone)):
+            if lsFiles: lsParts.append("%s %s%s" % (sWord, ", ".join(lsFiles[:8]), " and %d more" % (len(lsFiles) - 8) if len(lsFiles) > 8 else ""))
+        return (": " + "; ".join(lsParts)) if lsParts else ""
+
     def record(self, sKey, sPrint, lsOutputs):
         """Notes a successful run: its fingerprint and the hash of each output. Saved at once."""
         dOutputs = {}
         for sOutput in lsOutputs:
             sPath = sOutput if os.path.isabs(sOutput) else os.path.join(self.sProject, sOutput)
             if os.path.isfile(sPath): dOutputs[os.path.relpath(sPath, self.sProject)] = self.fileHash(sPath)
-        self.d["jobs"][sKey] = {"print": sPrint, "outputs": dOutputs, "when": datetime.datetime.now().isoformat(timespec="seconds")}
+        self.d["jobs"][sKey] = {"print": sPrint, "outputs": dOutputs, "when": datetime.datetime.now().isoformat(timespec="seconds"),
+                                "files": dict(getattr(self, "dLastFiles", {}))}
         self.setChanged.add(("jobs", sKey))
         self.save()
 

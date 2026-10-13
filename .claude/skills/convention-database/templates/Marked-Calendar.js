@@ -25,7 +25,7 @@
 // an iCalendar file is plain text assembled by hand, which is all the format
 // requires, and .NET Framework has no higher-level calendar writer to lean on.
 
-var c_sOut = "MySchedule.ics";
+var sOut = "MySchedule.ics";
 var ci = System.Globalization.CultureInfo.InvariantCulture;
 
 // icalText: escape a TEXT value per RFC 5545 -- backslash first, then
@@ -112,7 +112,7 @@ while (!db.eof) {
 }
 
 addFolded(sb, "END:VCALENDAR");
-System.IO.File.WriteAllText(c_sOut, sb.ToString());
+System.IO.File.WriteAllText(sOut, sb.ToString());
 
 // The final expression is what Invoke Script reports back to you.
-"Wrote " + iCount + " event(s) to " + c_sOut + ". Import it into your calendar app (Google Calendar, Outlook, or Apple Calendar) to add the sessions you marked.";
+"Wrote " + iCount + " event(s) to " + sOut + ". Import it into your calendar app (Google Calendar, Outlook, or Apple Calendar) to add the sessions you marked.";

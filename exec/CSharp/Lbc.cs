@@ -1449,7 +1449,7 @@ public class LbcDialog : IDisposable
     public static Func<string, List<string>> historyRead;
     public static Action<string, List<string>> historyWrite;
 
-    private const int c_iHistoryDepth = 10;
+    private const int iHistoryDepth = 10;
     private static Dictionary<string, List<string>> dHistorySession = new Dictionary<string, List<string>>();
 
     private static List<string> historyFor(string sKey)
@@ -1477,7 +1477,7 @@ public class LbcDialog : IDisposable
         for (int i = lsNow.Count - 1; i >= 0; i--)
             if (string.Equals(lsNow[i], sValue, StringComparison.OrdinalIgnoreCase)) lsNow.RemoveAt(i);
         lsNow.Insert(0, sValue);
-        while (lsNow.Count > c_iHistoryDepth) lsNow.RemoveAt(lsNow.Count - 1);
+        while (lsNow.Count > iHistoryDepth) lsNow.RemoveAt(lsNow.Count - 1);
         dHistorySession[sKey] = lsNow;
         if (historyWrite != null)
         {
@@ -2454,9 +2454,9 @@ public class LbcDialog : IDisposable
         // Yes is the default when a newer version exists, No when this is
         // the newest. When the web could not be checked, OK alone, as
         // before. Yes fetches the setup program and starts it.
-        int iVersionOutcome = Elevate.isConfigured ? Elevate.check() : Elevate.c_iNotConfigured;
+        int iVersionOutcome = Elevate.isConfigured ? Elevate.check() : Elevate.iNotConfigured;
         string sVersionLine = Elevate.describe(iVersionOutcome);
-        bool bOfferUpdate = iVersionOutcome == Elevate.c_iNewer || iVersionOutcome == Elevate.c_iCurrent;
+        bool bOfferUpdate = iVersionOutcome == Elevate.iNewer || iVersionOutcome == Elevate.iCurrent;
         if (sVersionLine != "")
         {
             sbHelp.AppendLine();
@@ -2474,7 +2474,7 @@ public class LbcDialog : IDisposable
                 return;
             }
             string sAnswer = dlgHelp.runWithButtons(new string[] { "Yes", "No" }, false,
-                iVersionOutcome == Elevate.c_iNewer ? "Yes" : "No");
+                iVersionOutcome == Elevate.iNewer ? "Yes" : "No");
             if (!string.Equals(sAnswer, "Yes", StringComparison.OrdinalIgnoreCase)) return;
             if (!Elevate.update())
                 MessageBox.Show(frm, "The setup program could not be fetched. It is at " + Elevate.repoUrl + "/releases.", "Version", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -4417,10 +4417,10 @@ public class LbcListView : ListView
     // on first open. Sending LVM_SETITEMSTATE with LVIS_SELECTED |
     // LVIS_FOCUSED reproduces exactly what Space does, so the row
     // reads as selected immediately and on every programmatic move.
-    private const int c_iLvmFirst = 0x1000;
-    private const int c_iLvmSetItemState = c_iLvmFirst + 43;
-    private const int c_iLvisFocused = 0x0001;
-    private const int c_iLvisSelected = 0x0002;
+    private const int iLvmFirst = 0x1000;
+    private const int iLvmSetItemState = iLvmFirst + 43;
+    private const int iLvisFocused = 0x0001;
+    private const int iLvisSelected = 0x0002;
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
     private struct LVITEM
@@ -4455,9 +4455,9 @@ public class LbcListView : ListView
         try
         {
             LVITEM lvi = new LVITEM();
-            lvi.stateMask = c_iLvisSelected | c_iLvisFocused;
-            lvi.state = c_iLvisSelected | c_iLvisFocused;
-            SendMessage(this.Handle, c_iLvmSetItemState, (IntPtr)iIndex, ref lvi);
+            lvi.stateMask = iLvisSelected | iLvisFocused;
+            lvi.state = iLvisSelected | iLvisFocused;
+            SendMessage(this.Handle, iLvmSetItemState, (IntPtr)iIndex, ref lvi);
         }
         catch { }
     }

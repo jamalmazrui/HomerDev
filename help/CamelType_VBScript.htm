@@ -1,0 +1,373 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.12.1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>CamelType_VBScript</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      color: light-dark(#1a1a1a, #fdfdfd);
+      background-color: #fdfdfd;
+      background-color: light-dark(#fdfdfd, #1a1a1a);
+      color-scheme: light dark;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a, a:visited {
+      color: inherit;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid;
+      border-color: #e6e6e6;
+      border-color: light-dark(#e6e6e6, #4c4c4c);
+      color: #606060;
+      color: light-dark(#606060, #b6b6b6);
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid currentColor;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+    }
+    th {
+      border-top: 1px solid currentColor;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+<main>
+<h1 id="camel-type-vbscript-coding-guidelines">Camel Type: VBScript
+Coding Guidelines</h1>
+<p>Camel Type is a coding style optimized for screen reader productivity
+and systematic readability. The following rules apply to VBScript as
+used in Windows Script Host (WSH) <code>.vbs</code> files or Classic
+ASP.</p>
+<hr />
+<h2 id="option-explicit">1. Option Explicit</h2>
+<p>Always place <code>Option Explicit</code> as the very first line of
+every VBScript file. This requires all variables to be declared before
+use and catches typographical errors in variable names at runtime.</p>
+<pre class="vbscript"><code>Option Explicit</code></pre>
+<hr />
+<h2 id="variable-and-argument-naming">2. Variable and Argument
+Naming</h2>
+<p>Use Hungarian prefix notation to indicate type. Prefix rules:</p>
+<ul>
+<li><code>a</code> — array</li>
+<li><code>b</code> — boolean</li>
+<li><code>bin</code> — binary buffer</li>
+<li><code>dt</code> — date-time</li>
+<li><code>f</code> — file object</li>
+<li><code>h</code> — window or OS handle</li>
+<li><code>i</code> — integer</li>
+<li><code>l</code> — list (typically an array used as a list)</li>
+<li><code>n</code> — real number (float/double)</li>
+<li><code>s</code> — string</li>
+<li><code>d</code> — dictionary (<code>Scripting.Dictionary</code>
+object)</li>
+<li><code>o</code> — generic object (use <code>o</code> for all
+non-specific COM or VBScript object instances)</li>
+<li><code>v</code> — variant (unknown or mixed type; also the default
+VBScript type)</li>
+</ul>
+<p>For <strong>named COM or WSH object types</strong>, use a prefix that
+reflects the object class or a well-known abbreviation. If there is only
+one instance of that object type in scope, the abbreviation is the
+entire variable name.</p>
+<p>Common abbreviations: - <code>fso</code> —
+<code>Scripting.FileSystemObject</code> - <code>wsh</code> —
+<code>WScript.Shell</code> - <code>rs</code> —
+<code>ADODB.Recordset</code> - <code>conn</code> —
+<code>ADODB.Connection</code> - <code>re</code> —
+<code>VBScript.RegExp</code> - <code>xml</code> —
+<code>MSXML2.DOMDocument</code></p>
+<hr />
+<h2 id="constant-naming">3. Constant Naming</h2>
+<p>Constants use the <strong>same lower camel case naming convention as
+variables</strong>, including the Hungarian type prefix. They are
+distinguished only by being declared with <code>Const</code> rather than
+<code>Dim</code>, not by any difference in capitalization or
+formatting.</p>
+<p>Examples: <code>Const sDefaultEncoding = "utf-8"</code>,
+<code>Const iTimeoutMs = 60000</code></p>
+<p>VBScript built-in constants (e.g., <code>vbCrLf</code>,
+<code>vbTrue</code>, <code>True</code>, <code>False</code>,
+<code>ForReading</code>) should always be used by their built-in name,
+never by their underlying numeric value.</p>
+<hr />
+<h2 id="capitalization">4. Capitalization</h2>
+<p>Use <strong>lower camel case</strong> for all custom names:
+variables, constants, and function names. VBScript is case-insensitive,
+but Camel Type enforces lower camel case as a discipline for
+readability.</p>
+<p>When calling built-in VBScript functions or properties (e.g.,
+<code>MsgBox</code>, <code>WScript.Echo</code>, <code>Len</code>,
+<code>UCase</code>), use the capitalization that VBScript documentation
+specifies, as these are not custom names.</p>
+<hr />
+<h2 id="variable-and-constant-declarations">5. Variable and Constant
+Declarations</h2>
+<ul>
+<li>Always declare variables with <code>Dim</code> and constants with
+<code>Const</code>.</li>
+<li>Declare constants and variables at the <strong>top of the
+script</strong> (global scope) or at the <strong>top of each
+function</strong> (local scope), before any logic.</li>
+<li>Group <code>Const</code> statements by type first, then
+<code>Dim</code> statements by type.</li>
+<li>One <code>Const</code> or <code>Dim</code> statement per type group,
+names listed <strong>alphabetically</strong> and
+<strong>comma-separated</strong> on a single line.</li>
+<li>Type groups appear in <strong>alphabetical order</strong> by prefix
+letter.</li>
+</ul>
+<p>Example:</p>
+<pre class="vbscript"><code>Const iMaxRetries = 3
+Const sEncoding = &quot;utf-8&quot;
+Const sFallbackTitle = &quot;untitled-page&quot;
+
+Dim iCount, iMax
+Dim sDir, sTitle, sUrl</code></pre>
+<hr />
+<h2 id="script-structure-and-entry-point">6. Script Structure and Entry
+Point</h2>
+<p>Prefer <strong>top-level script code with no indentation</strong>
+rather than wrapping everything in a <code>main</code> function. Write
+the main logic directly at the script’s top level (after
+<code>Option Explicit</code>, constants, and global variable
+declarations) so a screen reader user can navigate to the bottom of the
+file to find the most recently written code.</p>
+<p>When a <code>main</code> function is used, place it
+<strong>last</strong> in the file, after all other functions, and call
+it near the top of the script body:</p>
+<pre class="vbscript"><code>Option Explicit
+
+Const sResultsDir = &quot;results&quot;
+
+Dim sUrl
+sUrl = &quot;&quot;
+
+main()
+
+Function alphabeticallyFirstFunction()
+  &#39; ...
+End Function
+
+Function main()
+  &#39; ...
+End Function</code></pre>
+<hr />
+<h2 id="function-order">7. Function Order</h2>
+<p>All functions other than <code>main</code> are listed in
+<strong>strict alphabetical order</strong>. If a <code>main</code>
+function is used, it appears <strong>last</strong>. There are no
+organizational sections or divider comments grouping functions — strict
+alphabetical order is sufficient.</p>
+<hr />
+<h2 id="functions">8. Functions</h2>
+<ul>
+<li><p>Define all routines as <strong>Functions</strong>, not
+<code>Sub</code> procedures. Every <code>Function</code> should return a
+value, even if it is not always used.</p></li>
+<li><p>Use <strong>single-line <code>If</code> syntax</strong> for
+simple one-consequence conditionals:</p>
+<pre class="vbscript"><code>If sUrl = &quot;&quot; Then WScript.Quit 1
+If bReady Then getResult = True</code></pre></li>
+</ul>
+<hr />
+<h2 id="loops">9. Loops</h2>
+<p>Prefer <strong>For Each</strong> loops over index-based
+<code>For i = 0 To n</code> loops whenever iterating a collection or
+array.</p>
+<pre class="vbscript"><code>For Each sItem In aItems
+  processItem(sItem)
+Next</code></pre>
+<p>Use index-based <code>For</code> loops only when the index itself is
+needed.</p>
+<hr />
+<h2 id="string-delimiters">10. String Delimiters</h2>
+<p>VBScript uses only <strong>double quotes</strong> for string literals
+— there is no alternative. Use <code>&amp;</code> for string
+concatenation.</p>
+<pre class="vbscript"><code>sPath = sResultsDir &amp; &quot;\&quot; &amp; sTitle</code></pre>
+<hr />
+<h2 id="magic-numbers">11. Magic Numbers</h2>
+<p>Never use literal numeric or string values in logic. Assign them to
+named <code>Const</code> constants and reference the constant name.
+Always use VBScript’s built-in named constants (e.g.,
+<code>vbCrLf</code>, <code>vbOKCancel</code>, <code>ForReading</code>)
+rather than their numeric equivalents.</p>
+<hr />
+<h2 id="object-creation">12. Object Creation</h2>
+<p>Use <code>CreateObject</code> with the full ProgID string. Assign the
+result to a variable named with the object’s prefix convention. Release
+objects explicitly when done.</p>
+<pre class="vbscript"><code>Const sFsoProgId = &quot;Scripting.FileSystemObject&quot;
+Set fso = CreateObject(sFsoProgId)
+&#39; ... use fso ...
+Set fso = Nothing</code></pre>
+<hr />
+<h2 id="error-handling">13. Error Handling</h2>
+<p>VBScript does not support structured
+<code>try</code>/<code>catch</code>. Use
+<code>On Error Resume Next</code> followed by an immediate
+<code>Err</code> check after any statement that may fail. Re-enable
+error trapping with <code>On Error GoTo 0</code> as soon as the guarded
+section ends.</p>
+<pre class="vbscript"><code>On Error Resume Next
+fso.DeleteFile sPath
+If Err.Number &lt;&gt; 0 Then
+  WScript.Echo &quot;Error deleting file: &quot; &amp; Err.Description
+  Err.Clear
+End If
+On Error GoTo 0</code></pre>
+</main>
+</body>
+</html>
