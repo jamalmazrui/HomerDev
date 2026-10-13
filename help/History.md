@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.22 -- 13 October 2026
+
+- **kdpSubmit decides for itself which books to submit.** Version 39 made a run without --book do nothing when several books had answers files: it stopped the wrong book by stopping every book. Version 40 runs buildBooks first, which rebuilds only books whose sources changed, then compares each book's manuscript, cover (unless the answers keep KDP's) and answers file with that book's receipt, and submits only the books where something differs, each through the single-book path. A book kdpSubmit has never submitted has no receipt, so it is named, never submitted on a guess, and --book submits it the first time. Before anything is sent, the books and the reason for each are listed and Y submits them; --yes answers for an unattended run.
+- **The receipt is kept per book.** It held one manuscript and one cover entry, so with several books each upload overwrote another book's record. Entries are now <Book>.manuscript, <Book>.cover and <Book>.answers; an older shared entry still counts for the book whose file it names.
+
 ## 1.72.21 -- 13 October 2026
 
 - **A readable-text skill.** .claude/skills/readable-text guides an AI tool in editing machine text -- caption files, transcripts, OCR output, hard-wrapped or escaped text -- into readable, faithful prose: paragraphs joined at real boundaries, recognition errors corrected only on evidence, doubtful words marked rather than guessed, nothing summarized, and the source and its limits stated. It was written with ChatGPT, kept under its MIT license, and given a section on Homer: HomerScribe's provenance lines, Homer document rules, and preferring captions a person uploaded. connectAI links it into Claude Code and Gemini with the other skills.
