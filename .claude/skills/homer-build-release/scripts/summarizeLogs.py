@@ -2,7 +2,7 @@
 summarizeLogs.py -- one report from a folder (or zip) of Homer logs.
 
 Usage:
-    python summarizeLogs.py <folder-or-zip> [--all]
+    python summarizeLogs.py <folder-or-zip> [--all] [--review]
 
 Reads every <App>-<task>-yyyyMMdd-HHmmss.log (an upload may add numeric
 suffixes, which are ignored) and prints, per app, the newest run of each task:
@@ -11,6 +11,12 @@ outcome with its version and whether GitHub confirmed it as latest, tidy's
 changes, push's outcome, and the first ERROR lines of anything else. Files
 that are not Homer logs are counted and skipped. --all reports every run,
 not only the newest of each task.
+
+--review then reads EVERY text file, evidence reports and setup logs included, and lists what a quick reading
+misses: every caution in any wording (skipped, unknown, possible, could not, flagged, partial, a rate limit, a
+compiler warning, each distinct page message), every skipped check, and every claim another file contradicts -- a
+report that says the samples were built clean beside a log that says they were reused, or a success stated in the
+same log as a fact it could not confirm. Run it on logs someone sends before writing any conclusion about them.
 
 Exit code 0 when nothing failed, 1 when a run failed, 2 when the input could
 not be read.
@@ -189,6 +195,76 @@ def collect(sFolder):
     return dRuns, iSkipped
 
 
+# REVIEW: WHAT A KEYWORD SEARCH MISSES (13 October 2026). Reading a day of logs for "warn" and "error", Claude missed
+# what another AI found in the same files: sixteen possible spelling errors KDP reported, two checks DbDo's audit
+# skipped on every run, a report claiming a clean build of samples its own log said were reused, and a known warning
+# set aside unexamined. Each was there, in words no chosen keyword matched. These lists are made mechanically, so
+# that what is noticed does not depend on which words someone thought to search for.
+reCaution = re.compile(r"\b(skip|skipped|not checked|not run|unknown|could not|cannot|can't|unable|possible|flagged|unverified|"
+                       r"unconfirmed|incomplete|partial|refused|rejected|denied|429|408|timed out|timeout|deprecated|obsolete|"
+                       r"not shown|not found|missing|retry|retrying|falling back|fallback|left in|doubt|loop|stale|mismatch)\b"
+                       r"|warning [A-Z]{2,}\d+|KDP RECOMMENDS|KDP SPELLING|\bMESSAGE: ", re.I)
+reNoise = re.compile(r"no errors|0 checks? failed|0 failures|^\s*(a|button|input|select|h5|span|div) \||not a Homer log|"
+                     r"no-skip|--skip|Learn more|BROWSER (lifecycle|frame|document request|navigated|PAGE)", re.I)
+
+
+def plainLine(sLine):
+    """A line without its leading timestamp and level, for comparing one occurrence with another."""
+    sLine = re.sub(r"^\ufeff?\S*\d{4}-\d\d-\d\d[T ]\S+\s+(?:(?:INFO|WARN|WARNING|ERROR|DEBUG|CMD)\s+)?", "", sLine.strip())
+    return re.sub(r"^\w{3} \d\d/\d\d/\d{4} \S+\s+", "", sLine)
+
+
+def review(sFolder):
+    """Prints the cautions, skips and contradictions in every text file under sFolder. Returns the number of lines listed."""
+    dTexts = {}
+    for sDir, lsDirs, lsFiles in os.walk(sFolder):
+        for sName in lsFiles:
+            if os.path.splitext(sName)[1].lower() in (".log", ".md", ".txt"):
+                try: dTexts[os.path.relpath(os.path.join(sDir, sName), sFolder)] = readText(os.path.join(sDir, sName))
+                except Exception: pass
+    iListed = 0
+    print()
+    print("== REVIEW: cautions, in any wording (each distinct line once, with how often it appears)")
+    dSeen = {}
+    for sFile in sorted(dTexts):
+        for sLine in dTexts[sFile].splitlines():
+            if not reCaution.search(sLine) or reNoise.search(sLine): continue
+            sPlain = plainLine(sLine)[:220]
+            sKey = re.sub(r"\d+", "#", sPlain.lower())
+            if sKey in dSeen: dSeen[sKey][2] += 1
+            else: dSeen[sKey] = [sFile, sPlain, 1]
+    for sFile, sPlain, iCount in sorted(dSeen.values()):
+        print("  %s: %s%s" % (sFile, sPlain, "  (x%d)" % iCount if iCount > 1 else ""))
+        iListed += 1
+    print()
+    print("== REVIEW: skipped checks")
+    for sFile in sorted(dTexts):
+        for sLine in dTexts[sFile].splitlines():
+            if re.search(r"\bSKIP\b|\bskip\b --| -- not run|not checked:|\(in the run reused here\)", sLine) and not reNoise.search(sLine):
+                print("  %s: %s" % (sFile, plainLine(sLine)[:200]))
+                iListed += 1
+    print()
+    print("== REVIEW: claims another line contradicts")
+    lsChecks = [f for f in dTexts if "checkHomerDev-" in f and f.endswith(".log")]
+    for sFile in sorted(f for f in dTexts if "evidence" in f):
+        if "built from a clean start" in dTexts[sFile]:
+            sStamp = re.search(r"(\d{8}-\d{6})", sFile).group(1) if re.search(r"(\d{8}-\d{6})", sFile) else ""
+            lsBefore = sorted(f for f in lsChecks if re.search(r"(\d{8}-\d{6})", f) and re.search(r"(\d{8}-\d{6})", f).group(1) <= sStamp)
+            if lsBefore and "skipped, unchanged since" in dTexts[lsBefore[-1]]:
+                print("  %s says the samples were built from a clean start; %s says they were skipped, unchanged" % (sFile, lsBefore[-1]))
+                iListed += 1
+    for sFile in sorted(dTexts):
+        sText = dTexts[sFile]
+        oSuccess = re.search(r"(outcome[: ]+submitted|\bsubmitted\b.*exit code 0|One source done|every step passed)", sText, re.I)
+        oDoubt = re.search(r"(status not shown|could not be read|outcome unknown|unconfirmed|PARTIAL|no words for)", sText, re.I)
+        if oSuccess and oDoubt:
+            print("  %s states \"%s\" and also \"%s\"" % (sFile, oSuccess.group(1), oDoubt.group(1)))
+            iListed += 1
+    print()
+    print("REVIEW: %d line%s to account for before any conclusion." % (iListed, "" if iListed == 1 else "s"))
+    return iListed
+
+
 def main():
     lsArgs = [s for s in sys.argv[1:] if not s.startswith("--")]
     bAll = "--all" in sys.argv[1:]
@@ -229,6 +305,7 @@ def main():
                         if lsLast: lsFacts = lsFacts + ["tutorials, last: " + re.sub(r"^\S+ \S+\s+", "", lsLast[-1])[:120]]
                 print("  %s%s %s: %s" % (sMark, sTask or "session", sStamp, "; ".join(lsFacts)))
     print("%d file%s skipped: not a Homer log name." % (iSkipped, "" if iSkipped == 1 else "s"))
+    if "--review" in sys.argv[1:]: review(sFolder)
     return 1 if bAnyFailed else 0
 
 

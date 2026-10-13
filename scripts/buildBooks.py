@@ -385,19 +385,50 @@ def isStale(sStampFile):
 # A RECORD OF EACH TOOL, TRUSTED FIRST (1.65.25). Each build searched the disk for Java, ran every Java it found to
 # read its version, searched for npm, started Node to ask npm where global packages go, and searched for Ace -- all
 # before reading the stamp that said Ace had been checked days ago -- so a book build paused for no reason. Each
-# tool's path, version and the time it was checked are now kept in toolCache.json in the per-user data folder. While
+# tool's path, version and the time it was checked are now kept in toolCache.inix in the per-user data folder. While
 # the record is younger than toolRefreshDays and its files still exist, the tool is used at once: no search, no
 # process started. Only an old or broken record sends the build to look again, and to ask the web whether something
 # newer exists; and a check is recorded even when the web cannot be reached, so a failure waits for the next period
 # instead of costing every build.
 def toolCachePath():
-    return os.path.join(paths.data(), "toolCache.json")
+    return os.path.join(paths.data(), "toolCache.inix")
+
+
+# A HOMER RECORD IS AN .INIX FILE (13 October 2026): readable by a person, and enough for a record like this. The
+# record was toolCache.json; one left from before is read once, then replaced by the .inix file and removed.
+def readToolCache():
+    """{tool: {files: [paths], version, checked (seconds), and any extras}} from the record, or {} when there is none."""
+    sOld = toolCachePath()[:-len(".inix")] + ".json"
+    if os.path.exists(toolCachePath()):
+        dAll = {}
+        for sName, dKeys in inix.readInix(toolCachePath()).items():
+            dTool = dict(dKeys)
+            dTool["files"] = inix.inixList(dKeys.get("files", ""))
+            dTool["checked"] = float(dKeys.get("checked", "0") or 0)
+            dAll[sName] = dTool
+        return dAll
+    if os.path.exists(sOld):
+        log("tool record read from the older " + sOld + "; it becomes " + toolCachePath())
+        return json.loads(open(sOld, encoding="utf-8").read())
+    return {}
+
+
+def writeToolCache(dAll):
+    dSections = {}
+    for sName, dTool in dAll.items():
+        dKeys = {sKey: vValue for sKey, vValue in dTool.items() if sKey not in ("files", "checked")}
+        dSections[sName] = dict([("files", list(dTool.get("files", []))), ("version", dTool.get("version", "")), ("checked", "%.0f" % float(dTool.get("checked", 0)))] + list(dKeys.items()))
+    inix.writeInix(toolCachePath(), dSections)
+    sOld = toolCachePath()[:-len(".inix")] + ".json"
+    if os.path.exists(sOld):
+        os.remove(sOld)
+        log("removed the older " + sOld + ", now that the record is " + toolCachePath())
 
 
 def cachedTool(sName):
     """The record of a tool when it is fresh and its files still exist, else None. Logged either way."""
     try:
-        dAll = json.loads(open(toolCachePath(), encoding="utf-8").read()) if os.path.exists(toolCachePath()) else {}
+        dAll = readToolCache()
     except Exception as oError:
         log("tool record unreadable, so every tool is looked for again: " + str(oError))
         return None
@@ -419,14 +450,14 @@ def cachedTool(sName):
 def rememberTool(sName, lFiles, sVersion, **dExtra):
     """Records where a tool is, its version and that it was checked now."""
     try:
-        dAll = json.loads(open(toolCachePath(), encoding="utf-8").read()) if os.path.exists(toolCachePath()) else {}
+        dAll = readToolCache()
     except Exception:
         dAll = {}
     dTool = {"files": [s for s in lFiles if s], "version": sVersion or "", "checked": time.time()}
     dTool.update(dExtra)
     dAll[sName] = dTool
     try:
-        writeText(toolCachePath(), json.dumps(dAll, indent=2), False)
+        writeToolCache(dAll)
         log("%s %s recorded in %s; not looked for or checked on the web again for %s days" % (sName, sVersion or "", toolCachePath(), dSettings.get("toolRefreshDays", "?")))
     except Exception as oError:
         log("tool record not written, so %s is looked for again next build: %s" % (sName, oError))

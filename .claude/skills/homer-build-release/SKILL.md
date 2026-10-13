@@ -89,11 +89,30 @@ inputs and outputs, check before the work, record after success.
 
 ## Reading uploaded logs
 
-Run the summary first, then read only the logs it points at:
+Run the summary with its review first. The summary says what each run did; the review lists what a quick reading
+misses:
 
 ```bash
-python scripts/summarizeLogs.py /path/to/unzipped/logs
+python scripts/summarizeLogs.py /path/to/logs-or-zip --review
 ```
+
+**Every line the review lists is accounted for in the answer**: explained, fixed, or named as open. None is skimmed
+past. This replaced "read only the logs the summary points at" on 13 October 2026, after a reading for "warn" and
+"error" missed what another AI found in the same files: sixteen possible spelling errors KDP reported, two audit
+checks skipped on every run, fourteen evidence reports claiming a clean build of samples their own logs said were
+reused, and a known warning set aside unexamined. Each was there in words nobody searched for.
+
+The review is the floor, not the ceiling. In reviewing anything someone sends:
+
+1. **Read each output document whole,** not an extracted section, and quote samples from its body to show it was
+   read. A section pulled out by pattern hides the sentence beside it.
+2. **Test every claim against another file.** A report against the log written the same minute; a success against
+   the page messages around it; a count against what the count is of.
+3. **Verify a fix everywhere it applies.** Seen working in one project's report, look in each other project's.
+4. **List known warnings; never filter them unseen.** Say why each is harmless, from current evidence, not from
+   memory.
+5. **When another AI reviews the same files,** list what it found that this review did not, say why it was missed,
+   and extend `--review` so the next one is found mechanically.
 
 It reports, per app and task: build result, check counts and failures,
 release outcome with version and whether GitHub confirmed it as latest, tidy

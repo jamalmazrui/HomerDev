@@ -7,6 +7,19 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.27 -- 13 October 2026
+
+From comparing Claude's reading of a day's logs with ChatGPT's reading of the same files.
+
+- **summarizeLogs --review finds what a keyword search misses.** It reads every text file, evidence reports and setup logs included, and lists each caution in any wording (skipped, unknown, possible, could not, flagged, partial, rate limits, compiler warnings, page messages), every skipped check, and every claim another file contradicts. Run on the day's logs, it found all that ChatGPT had and Claude had not, and more: all fourteen of the day's kit evidence reports, not one, claimed a clean build of reused samples. The homer-build-release skill now says to run it first, account for every line it lists, read each output whole, test claims against other files, verify a fix in every project it touches, and never filter a known warning unseen.
+- **The kit's evidence report says whether the samples were built.** It said "The samples were built from a clean start" on every run, including runs that reused samples built the day before. It now says none, some or all were built, and when the reused ones last passed.
+- **kdpSubmit keeps KDP's spelling list, not only its count.** KDP said "We found 16 possible spelling errors" for Blind Vibe Coding's new manuscript, and the log kept only that sentence. kdpSubmit now opens KDP's spelling review, logs each flagged line as KDP SPELLING, and closes it; it cannot stop a submission.
+
+## 1.72.26 -- 13 October 2026
+
+- **The book tools speak of the answers file, not of JSON.** The answers have been an .inix file for some time, yet kdpSubmit still said "as the JSON says", "Review of the answers the JSON asked for" and "the draft id in the JSON". Every such message now says the answers file. Reading an answers file or receipt saved in the older format still works.
+- **buildBooks keeps its record of tools in toolCache.inix.** A Homer record is an .inix file, readable by a person and enough for what it holds; toolCache.json is read once, replaced, and removed by the next build. JSON written or read for other tools -- pandoc's metadata, EPUBCheck's and Ace's reports, GitHub's release data -- is their format and stays.
+
 ## 1.72.25 -- 13 October 2026
 
 - **kdpSubmit no longer mistakes KDP's name for its acknowledgement.** After Publish was pressed, the test for success searched the page's messages and its title for words such as "publishing", and the title of every KDP page ends "Amazon Kindle Direct Publishing". So each publish was judged submitted five seconds after the press, on no evidence, and the run went at once to the Bookshelf, possibly before KDP had finished. Blind Vibe Coding's update of 13 October was reported submitted this way. Now only a specific phrase in a message that was not on the page before the press counts, or KDP leaving the pricing page; otherwise, after two minutes, the outcome is unknown (exit code 6), and a bare run does not record that book's answers as sent.

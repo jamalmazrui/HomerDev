@@ -480,6 +480,25 @@ def checkDependencies():
 
 # --- 5. the report ----------------------------------------------------------
 
+# The samples this run did not build, with when their last build passed: the report says what happened, not what a
+# fresh run would have done (13 October 2026, from an audit: it said "built from a clean start" about samples reused
+# from the day before).
+dReusedSamples = {}
+
+
+def samplesSentence(bDeep):
+    iAll, iReused = len(lAllSamples), len(dReusedSamples)
+    sEarliest = min(dReusedSamples.values())[:10] if dReusedSamples else ""
+    if iReused == 0:
+        return ("The samples were built from a clean start%s, so nothing here passed on a file an earlier build had left behind."
+                % (" including the Python virtual environment" if bDeep else ""))
+    if iReused == iAll:
+        return ("No sample was built in this run: each is unchanged since its last clean build passed, the earliest on %s. "
+                "checkHomerDev --fresh builds them all again." % sEarliest)
+    return ("%s built from a clean start in this run; %s not, being unchanged since %s last clean build passed, the earliest on %s."
+            % (countNoun(iAll - iReused, "sample was", "samples were"), countNoun(iReused, "was", "were"), "its" if iReused == 1 else "their", sEarliest))
+
+
 def writeReport(bDeep, bCleaned):
     sStamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     sPath = os.path.join(sLogs, "HomerDev-evidence-%s.md" % sStamp)
@@ -498,9 +517,7 @@ def writeReport(bDeep, bCleaned):
         "Written by checkHomerDev. Every line below rests on a command that ran,",
         "and the command and its exit code are in %s." % os.path.basename(sLogPath),
         "",
-        ("The samples were built from a clean start%s, so nothing here passed on a "
-         "file an earlier build had left behind."
-         % (" including the Python virtual environment" if bDeep else ""))
+        samplesSentence(bDeep)
         if bCleaned else
         ("The samples were NOT cleaned before building, because --no-clean was "
          "given. A build that did not run leaves its earlier program in place, "
@@ -612,6 +629,7 @@ def main():
         cleanSamples(dArguments.deep, setBuilding)
     for sName, sScript, sExe in lAllSamples:
         if sName in dCurrent:
+            dReusedSamples[sName] = str(dCurrent[sName])
             finding("build " + sName, "pass", "unchanged since its build passed at %s: the same sources and kit code, and %s is the program that build made" % (dCurrent[sName], sExe))
             continue
         sayLine("Building %s..." % sName)

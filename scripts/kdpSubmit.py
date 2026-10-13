@@ -17,7 +17,7 @@ Publish Your Kindle eBook and waits for KDP's acknowledgement. Nothing is report
 unless the page showed it.
 
 USAGE
-  kdpSubmit.cmd                        every answer from the JSON; publishes when nothing is left to check
+  kdpSubmit.cmd                        every answer from the answers file; publishes when nothing is left to check
   kdpSubmit.cmd --ask                  ask before the permanent Details fields, the Content tab, the Pricing tab, and Publish
   kdpSubmit.cmd --no-publish           do everything but stop with the draft saved
   kdpSubmit.cmd --stop-after details   stop after that tab, draft saved; also content or pricing
@@ -32,7 +32,7 @@ USAGE
   kdpSubmit.cmd --chrome               use Google Chrome instead of Microsoft Edge
 Unknown options stop the script before it does anything.
 
-EXIT CODES  0 submitted and the Bookshelf no longer shows Draft; 2 options, JSON or files wrong;
+EXIT CODES  0 submitted and the Bookshelf no longer shows Draft; 2 options, answers or files wrong;
 3 a page timed out; 4 crash; 5 draft kept (asked for, or items left to check); 6 Publish pressed but outcome unknown.
 
 The console is short. Every step, value, question, warning and page message goes to
@@ -49,13 +49,13 @@ lProfileSkip = ["Cache", "Code Cache", "GPUCache", "Service Worker", "DawnCache"
 lListKeys = ["afterPublishing", "categories", "contributors", "keywords", "priceReasoning", "recommended"]  # .inix keys whose value is a list: one item per line, or comma-separated on one line
 lNestedSections = ["accessibility", "aiContent", "draft2digital", "notes"]  # .inix sections kept as dictionaries under their own name; every other section is flattened into the answers. draft2digital holds another store's answers (its isbn and publisher once overrode KDP's and KDP refused the save)
 sBookshelfUrl, sTitleSetup = "https://kdp.amazon.com/en_US/bookshelf", "https://kdp.amazon.com/en_US/title-setup/kindle/"
-# NO BOOK OF ITS OWN (8 October 2026, when these tools moved into the HomerDev kit): the answers file, its JSON
+# NO BOOK OF ITS OWN (8 October 2026, when these tools moved into the HomerDev kit): the answers file, its older format
 # predecessor, the log's name and the draft's title ID come from the project and the book, never from the script.
 sKnownTitleId = ""
-# dCategoryFixes corrects paths from an older JSON to the names KDP's picker used on 2 October 2026 (the JSON itself now carries the new names).
+# dCategoryFixes corrects paths from older answers to the names KDP's picker used on 2 October 2026 (the answers file itself now carries the new names).
 dCategoryFixes = {"Kindle eBooks > Computers & Technology > Computer Science > Artificial Intelligence": "Kindle eBooks > Computers & Technology > Computer Science > Artificial Intelligence > Generative AI", "Kindle eBooks > Computers & Technology > Web Development & Design > User Experience & Usability": "Kindle eBooks > Computers & Technology > Web Development > User Experience & Usability"}
 
-bYes = "--ask" not in sys.argv  # questions are asked only with --ask; the JSON answers stand otherwise
+bYes = "--ask" not in sys.argv  # questions are asked only with --ask; the answers file's answers stand otherwise
 dAnswers = {}
 lLog = []
 lUnresolved = []
@@ -286,7 +286,7 @@ def logStem():
 
 
 def loadAnswers():
-    """Reads configs\\<Book>_KDP.inix (preferred), or the older JSON beside the script or the project, into dAnswers. Returns the path used or ''."""
+    """Reads configs\\<Book>_KDP.inix (preferred), or an answers file in the older format beside the script or the project, into dAnswers. Returns the path used or ''."""
     global dAnswers
     for sPath in [os.path.join(sProject, "configs", answersName()), os.path.join(sProject, answersName()), os.path.join(sFolder, answersName())]:
         if os.path.exists(sPath):
@@ -337,7 +337,7 @@ def say(sText):
 
 
 def ask(sQuestion):
-    """Yes/no question on the console. Without --ask every question is answered yes from the JSON and logged as AUTO-YES."""
+    """Yes/no question on the console. Without --ask every question is answered yes from the answers file and logged as AUTO-YES."""
     if bYes:
         log("AUTO-YES: " + sQuestion)
         return True
@@ -457,7 +457,45 @@ def logMessages(page, sWhen):
     lPageMessages.extend(lTexts)
     log("PAGE MESSAGES " + sWhen + ": " + (str(len(lTexts)) if lTexts else "none"))
     for sText in lTexts: log("  MESSAGE: " + sText.replace("\n", " / "))
+    if any(re.search(r"possible spelling error", t, re.I) for t in lTexts): captureSpelling(page)
     return lTexts
+
+
+bSpellingCaptured = False
+
+
+def captureSpelling(page):
+    """THE WORDS, NOT ONLY THE COUNT (13 October 2026, from an audit). KDP said "We found 16 possible spelling errors" for
+    Blind Vibe Coding and the log kept only that sentence, so nobody could tell which words. Once per run, KDP's spelling
+    review is opened, every flagged word or passage is logged as KDP SPELLING, and it is closed again. Nothing here can
+    stop a submission: a failure is logged and the run goes on."""
+    global bSpellingCaptured
+    if bSpellingCaptured: return False
+    bSpellingCaptured = True
+    try:
+        oOpen = None
+        for sRole in ("button", "link"):
+            oFound = page.get_by_role(sRole, name=re.compile(r"spelling", re.I))
+            if oFound.count() and oFound.first.is_visible(): oOpen = oFound.first; break
+        if oOpen is None:
+            log("KDP SPELLING: KDP reported possible spelling errors, but no control to review them was found; review them in Kindle Previewer or KDP's content tab")
+            return False
+        log("KDP SPELLING: opening KDP's review, by '" + (oOpen.inner_text() or "").strip()[:60] + "'")
+        oOpen.click()
+        time.sleep(3)
+        oDialog = page.get_by_role("dialog")
+        sText = oDialog.first.inner_text() if oDialog.count() else ""
+        lLines = [s.strip() for s in sText.split("\n") if s.strip()]
+        for sLine in lLines[:200]: log("KDP SPELLING: " + sLine)
+        say("KDP flagged possible spelling errors; " + ("the " + str(len(lLines)) + " lines of its review are in the log, marked KDP SPELLING." if lLines else "its review could not be read; check KDP's content tab."))
+        page.keyboard.press("Escape")
+        time.sleep(1)
+        return bool(lLines)
+    except Exception as oError:
+        log("KDP SPELLING: the review could not be read: " + str(oError)[:200])
+        try: page.keyboard.press("Escape")
+        except Exception: pass
+        return False
 
 
 def firstVisible(page, lSelectors):
@@ -988,7 +1026,7 @@ def copyProfile(sSource, sTarget, sExeName):
 
 
 def titleMatches(sHeld):
-    """True when a saved title equals the JSON title, ignoring case and a subtitle after a colon."""
+    """True when a saved title equals the answers file's title, ignoring case and a subtitle after a colon."""
     return sHeld.split(":")[0].strip().lower() == dAnswers["title"].strip().lower()
 
 
@@ -1047,7 +1085,7 @@ def bookshelfStatus(page, sWhen):
 
 def findDraft(page):
     """Returns the id of the existing draft of this book, verified by its title; "" when none, "AMBIGUOUS" for several, "STOP" when sign-in failed.
-    The id comes from the JSON (kdpTitleId) or the built-in constant; the Bookshelf is searched only when that id does not open this book."""
+    The id comes from the answers file (kdpTitleId) or the built-in constant; the Bookshelf is searched only when that id does not open this book."""
     page.goto(sBookshelfUrl)
     page.wait_for_load_state("domcontentloaded")
     time.sleep(3)
@@ -1075,11 +1113,11 @@ def findDraft(page):
             sHeld = page.locator("#data-title").first.input_value()
             sAuthor = (page.locator("#data-primary-author-first-name").first.input_value() + " " + page.locator("#data-primary-author-last-name").first.input_value()).strip() if page.locator("#data-primary-author-first-name").count() else ""
             if titleMatches(sHeld) or not sHeld.strip():
-                say("Opened your existing draft, id " + sKnown + ", currently titled '" + sHeld + "' by " + (sAuthor or "no author yet") + ". Your earlier entries stay unless the JSON says otherwise.")
+                say("Opened your existing draft, id " + sKnown + ", currently titled '" + sHeld + "' by " + (sAuthor or "no author yet") + ". Your earlier entries stay unless the answers file says otherwise.")
                 log("Using the known draft id " + sKnown + "; title '" + sHeld + "', author '" + sAuthor + "'")
                 return sKnown
             log("The known draft id " + sKnown + " holds a different book: '" + sHeld + "'. Not touching it.")
-            say("The draft id in the JSON belongs to a different book, '" + sHeld + "'. Nothing was changed.")
+            say("The draft id in the answers file belongs to a different book, '" + sHeld + "'. Nothing was changed.")
             return "AMBIGUOUS"
         log("The known draft id " + sKnown + " did not open a Details page (URL " + page.url + "); looking on the Bookshelf instead")
         page.goto(sBookshelfUrl)
@@ -1110,7 +1148,7 @@ def findDraft(page):
 
 
 def fillDescription(page):
-    """Sets the description through KDP's CKEditor, using the JSON's HTML version, which has only the tags KDP supports."""
+    """Sets the description through KDP's CKEditor, using the answers file's HTML version, which has only the tags KDP supports."""
     sHtml = dAnswers.get("descriptionHtml") or descriptionHtml(dAnswers["description"])
     sWanted = re.sub(r"\*\*", "", dAnswers["description"])
     fPlain = lambda sText: re.sub(r"\W+", " ", re.sub(r"<[^>]+>", " ", sText)).strip().lower()
@@ -1533,9 +1571,9 @@ def fillDetails(page):
     fillText(page, "Author first name", ["#data-primary-author-first-name"], sFirst)
     fillText(page, "Author last name", ["#data-primary-author-last-name"], sLast)
     if page.locator("#edit_series_description").count() and page.locator("#edit_series_description").first.is_visible():
-        unresolved("Series", "the draft is part of a series, but the JSON says it stands alone; remove it from the series in the browser window")
+        unresolved("Series", "the draft is part of a series, but the answers file says it stands alone; remove it from the series in the browser window")
     else:
-        log("Series: none, as the JSON says")
+        log("Series: none, as the answers file says")
     say("Description.")
     fillDescription(page)
     say("Publishing rights, adult content, marketplace.")
@@ -1545,8 +1583,8 @@ def fillDetails(page):
     for sAge in ["#data-reading-interest-age-start-input-native", "#data-reading-interest-age-end-input-native"]:
         sHeld = page.evaluate("(s) => { const l = Array.from(document.querySelectorAll(s)); const o = l.find(x => !x.disabled) || l[0]; return o ? (o.value || '') : ''; }", sAge)
         if sHeld.strip():
-            unresolved("Reading age", "the draft has a reading age set (" + sHeld + "), but the JSON says to leave it blank; clear it in the browser window")
-    log("Reading age: blank, as the JSON says") if not any(u.startswith("Reading age") for u in lUnresolved) else None
+            unresolved("Reading age", "the draft has a reading age set (" + sHeld + "), but the answers file says to leave it blank; clear it in the browser window")
+    log("Reading age: blank, as the answers file says") if not any(u.startswith("Reading age") for u in lUnresolved) else None
     setNativeSelect(page, "Primary marketplace", "select[name='data[digital][home_marketplace]']", "US" if d["primaryMarketplace"].lower() == "amazon.com" else d["primaryMarketplace"])
     lKeywords = (list(d["keywords"]) + [""] * 7)[:7]
     say(str(len(d["keywords"])) + " keyword" + ("" if len(d["keywords"]) == 1 else "s") + ".")
@@ -1564,7 +1602,7 @@ def fillDetails(page):
         if not clickButton(page, "Release now", ["I am ready to release my book now"], False):
             log("Release option: not shown on this Details page; KDP shows it only for a book that has never been published, so nothing to set")
     else:
-        unresolved("Release option", "the JSON asks for a pre-order, which this script does not set up")
+        unresolved("Release option", "the answers file asks for a pre-order, which this script does not set up")
     logMessages(page, "details filled")
     saveDraft(page)
     say("Details tab filled and saved as a draft." + ((" Items to check: " + str(len(lUnresolved))) if lUnresolved else ""))
@@ -1593,7 +1631,7 @@ def receiptPath():
 
 
 def readReceipt():
-    """The receipt is an .inix file with one section per asset (manuscript, cover) holding file, sha256 and uploaded. An older JSON receipt is read too."""
+    """The receipt is an .inix file with one section per asset (manuscript, cover) holding file, sha256 and uploaded. A receipt in the older format is read too."""
     try:
         if os.path.exists(receiptPath()): return readInix(receiptPath())
         sOld = receiptPath()[:-5] + ".json"
@@ -1686,14 +1724,14 @@ def setSelectByWords(page, sWhat, oSelect, lWords):
 
 
 def answerAiContent(page):
-    """Answers KDP's AI-generated content section from the JSON: Yes, then the extent of text, images and translations."""
+    """Answers KDP's AI-generated content section from the answers file: Yes, then the extent of text, images and translations."""
     dAi = dAnswers["aiContent"]
     if not clickAria(page, "AI-generated content used", "radio", "Yes"): return False
     time.sleep(2)
     dumpControls(page, "AI content section after Yes")
     lSelects = page.locator("select")
     def wordsFor(sAnswer):
-        """Turns a JSON answer such as 'Entire work, with extensive editing' into the words KDP's option must contain."""
+        """Turns an answer such as 'Entire work, with extensive editing' into the words KDP's option must contain."""
         sLower = sAnswer.lower()
         lWords = []
         for sPhrase in ["none", "entire work", "some sections", "one or a few", "many"]:
@@ -1702,7 +1740,7 @@ def answerAiContent(page):
         elif "minimal" in sLower or "no editing" in sLower: lWords.append("minimal")
         return lWords or [sAnswer]
     dWanted = {"text": wordsFor(dAi["texts"]), "image": wordsFor(dAi["images"]), "translation": wordsFor(dAi["translations"])}
-    log("AI extents wanted from the JSON: " + str(dWanted))
+    log("AI extents wanted by the answers file: " + str(dWanted))
     dDone = {}
     for iIndex in range(lSelects.count()):
         oSelect = lSelects.nth(iIndex)
@@ -1834,10 +1872,10 @@ def fillContent(page):
     d = dAnswers
     if not onTab(page, "content"): return unresolved("Content tab", "not on the Content page (URL " + page.url + ") and it could not be opened directly; nothing clicked there")
     dumpControls(page, "content, before filling")
-    if not ask("Content tab: DRM " + d["drm"] + "; upload " + d["manuscriptFile"] + " and " + d["coverFile"] + " if KDP does not already hold them; AI-generated content " + d["aiContent"]["used"] + " with the extents in the JSON, tool " + d["aiContent"]["tools"] + "; accessibility answer from the JSON. Proceed?"):
+    if not ask("Content tab: DRM " + d["drm"] + "; upload " + d["manuscriptFile"] + " and " + d["coverFile"] + " if KDP does not already hold them; AI-generated content " + d["aiContent"]["used"] + " with the extents in the answers file, tool " + d["aiContent"]["tools"] + "; accessibility answer from the answers file. Proceed?"):
         return unresolved("Content tab", "you chose not to proceed")
     bNoDrm = d["drm"].strip().lower().startswith("no")
-    say("DRM: " + ("no, as the JSON says." if bNoDrm else "yes, as the JSON says."))
+    say("DRM: " + ("no, as the answers file says." if bNoDrm else "yes, as the answers file says."))
     setDrm(page, bNoDrm)
     bManuscript, bCover, sJoined = uploadsDone(page)
     log("Before uploading, KDP shows manuscript done: " + str(bManuscript) + ", cover done: " + str(bCover))
@@ -1870,7 +1908,7 @@ def fillContent(page):
         say("AI-generated content: kept exactly as KDP holds it, as the answers say.")
         log("KEPT the AI-generated content section untouched (aiContent used = Keep)")
     else:
-        say("AI-generated content: yes; text, images and translations as the JSON says.")
+        say("AI-generated content: yes; text, images and translations as the answers file says.")
         answerAiContent(page)
     sAccess = str(d.get("accessibility", {}).get("imageReading", "All")).lower()
     sValue = "readable" if sAccess.startswith("all") else "partially_readable" if sAccess.startswith("some") else "not_readable" if sAccess.startswith("none") else "unknown"
@@ -1937,15 +1975,15 @@ def fillPricing(page):
         if oSelect.count() and oSelect.is_checked():
             oSelect.locator("xpath=ancestor::label[1]").first.click(force=True) if oSelect.locator("xpath=ancestor::label[1]").count() else oSelect.click(force=True)
             log("KDP Select box was ticked; unticked it (now " + str(oSelect.is_checked()) + ")")
-        say("KDP Select: not enrolling, as the JSON says.")
+        say("KDP Select: not enrolling, as the answers file says.")
     else:
         clickRadio(page, "KDP Select", ["#data-is-select"])
     bAll = d["territories"].lower().startswith("all")
-    say("Territories: " + ("all." if bAll else "individual, as the JSON says.") + " Royalty " + d["royalty"] + " at $" + str(d["priceUsd"]) + ".")
+    say("Territories: " + ("all." if bAll else "individual, as the answers file says.") + " Royalty " + d["royalty"] + " at $" + str(d["priceUsd"]) + ".")
     if bAll:
         clickButton(page, "All territories", ["All territories (worldwide rights)", "All territories"], True)
     else:
-        unresolved("Territories", "the JSON asks for individual territories, which this script does not fill; choose them in the browser window")
+        unresolved("Territories", "the answers file asks for individual territories, which this script does not fill; choose them in the browser window")
     sRate = "70_PERCENT" if d["royalty"].strip().startswith("70") else "35_PERCENT"
     clickRadio(page, "Royalty plan " + d["royalty"], ["input[name='data[digital][royalty_rate]-radio'][value='" + sRate + "']"])  # the value must be quoted: 70_PERCENT starts with a digit, and an unquoted one crashed the 15:05 run on 3 October
     sPrice = "%.2f" % float(d["priceUsd"])
@@ -1974,7 +2012,7 @@ def fillPricing(page):
 
 def finalReview(page):
     d = dAnswers
-    say("Review of the answers the JSON asked for. Title: " + d["title"] + ". Subtitle: " + d.get("subtitle", "kept as KDP holds it") + ". Author: " + d.get("author", "kept as KDP holds it") + ".")
+    say("Review of what the answers file asked for. Title: " + d["title"] + ". Subtitle: " + d.get("subtitle", "kept as KDP holds it") + ". Author: " + d.get("author", "kept as KDP holds it") + ".")
     if keepsDetails(d):
         say("Description, categories and keywords: kept as KDP holds them.")
     else:
@@ -2088,7 +2126,7 @@ def checkOptions():
 
 
 def checkAnswers(d):
-    """Makes sure the JSON holds every answer the script needs, with values it knows how to enter."""
+    """Makes sure the answers file holds every answer the script needs, with values it knows how to enter."""
     lProblems = []
     # A tab the answers keep as KDP holds it needs no answers of its own (12 October 2026).
     lDetails = [] if keepsDetails(d) else ["language", "title", "subtitle", "editionNumber", "author", "description", "publishingRights", "sexuallyExplicit", "primaryMarketplace", "categories", "keywords"]
