@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.12 -- 12 October 2026
+
+- **Every Homer installer takes /DEFAULTS:** what pressing Enter at every step would do -- install, run each finish-page entry ticked by default (Install and Update, not Reinstall, not the user guide), take the Results box as read, and launch the program when Launch is ticked. Alone, it starts setup again very silently with the same parameters, so one switch is enough. The pieces are in Templates\\HomerComponents.iss: homerDefaults, homerFinishRuns, which each finish-page entry's Check now includes in place of skipifsilent, and homerStartForDefaults, called first in InitializeSetup. help\\FinishPage.md explains it.
+- **A silent install no longer waits on a box nobody can see.** homerResultsBox drew the Results box with Windows' own MessageBox, which /SUPPRESSMSGBOXES does not reach, so a /VERYSILENT install of any app built from the template stopped at an invisible OK. Silent, the results now go to the setup log.
+
 ## 1.72.11 -- 12 October 2026
 
 - **A project's runner can no longer be stranded behind a stale lock.** Each project's build_release.bat is a copy of the kit's runner, and it replaces itself with the newer one only on its last line. bookFido's and DbDo's copies came from before the stale-lock rules; the locks their own dead cycles had left refused them at the start, so they exited before that last line, never updated, and were refused for hours -- the fix could never arrive. Now the kit's build replaces any project runner without those rules, unless that project's lock is under 30 minutes old (a cycle may be running it); so one kit cycle repairs every project beside it.

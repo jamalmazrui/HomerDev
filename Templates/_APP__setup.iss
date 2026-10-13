@@ -241,80 +241,80 @@ FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
   Parameters: "noPause jaws"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelJaws}"; \
-  Check: isInstallJaws; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isInstallJaws; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
   Parameters: "noPause nvda"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelNvda}"; \
-  Check: isInstallNvda; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isInstallNvda; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installOllama.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelOllama}"; \
-  Check: isInstallOllama; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isInstallOllama; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installModels.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelModel}"; \
-  Check: isModelInstall; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isModelInstall; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 ; ---- 2. Update, ticked ---------------------------------------------------------
 FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
   Parameters: "noPause jaws"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelJaws}"; \
-  Check: isUpdateJaws; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isUpdateJaws; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
   Parameters: "noPause nvda"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelNvda}"; \
-  Check: isUpdateNvda; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isUpdateNvda; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installOllama.cmd"; \
   Parameters: "noPause update"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelOllama}"; \
-  Check: isUpdateOllama; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isUpdateOllama; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 ; ---- 3. Reinstall, unticked ----------------------------------------------------
 FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
   Parameters: "noPause jaws"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelJaws}"; \
-  Check: isReinstallJaws; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated unchecked skipifdoesntexist
+  Check: homerFinishRuns and isReinstallJaws; \
+  Flags: postinstall runascurrentuser waituntilterminated unchecked skipifdoesntexist
 
 FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
   Parameters: "noPause nvda"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelNvda}"; \
-  Check: isReinstallNvda; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated unchecked skipifdoesntexist
+  Check: homerFinishRuns and isReinstallNvda; \
+  Flags: postinstall runascurrentuser waituntilterminated unchecked skipifdoesntexist
 
 FileName: "{app}\scripts\installOllama.cmd"; \
   Parameters: "noPause reinstall"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelOllama}"; \
-  Check: isReinstallOllama; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated unchecked skipifdoesntexist
+  Check: homerFinishRuns and isReinstallOllama; \
+  Flags: postinstall runascurrentuser waituntilterminated unchecked skipifdoesntexist
 
 FileName: "{app}\scripts\installModels.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelModel}"; \
-  Check: isModelReinstall; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated unchecked skipifdoesntexist
+  Check: homerFinishRuns and isModelReinstall; \
+  Flags: postinstall runascurrentuser waituntilterminated unchecked skipifdoesntexist
 
 ; ---- 4. Launch, ticked --------------------------------------------------------
 ; The entry only leaves a marker. The program starts from CurStepChanged(ssDone),
@@ -325,12 +325,12 @@ FileName: "{app}\scripts\installModels.cmd"; \
 FileName: "{cmd}"; \
   Parameters: "/c md ""{localappdata}\{#AppName}\logs"" 2>nul & echo launch > ""{localappdata}\{#AppName}\logs\{#AppName}_launch.flag"""; \
   Description: "Launch {#AppName} (desktop hotkey {#HotKeyDisplay})"; \
-  Flags: postinstall skipifsilent runhidden runasoriginaluser
+  Flags: postinstall runhidden runasoriginaluser; Check: homerFinishRuns
 
 ; ---- 5. Open the user guide, unticked -----------------------------------------
 FileName: "{app}\ReadMe.htm"; \
   Description: "Open the user guide (F1 in {#AppName})"; \
-  Flags: postinstall shellexec nowait skipifsilent skipifdoesntexist runasoriginaluser unchecked
+  Flags: postinstall shellexec nowait skipifdoesntexist runasoriginaluser unchecked; Check: homerFinishRuns
 
 [UninstallDelete]
 ; ONLY WHAT THIS PROGRAM WROTE. Never the whole {localappdata}\{#AppName}
@@ -387,6 +387,9 @@ end;
 //  use, and the uninstall registry key name (or ''). Add a var above for each.
 function InitializeSetup(): Boolean;
 begin
+  //  setup.exe /DEFAULTS: every Enter pressed for you (HomerComponents.iss). Alone,
+  //  it starts setup again very silently and this copy ends here.
+  if homerStartForDefaults() then begin Result := False; exit; end;
   iOllama := homerAdd('Ollama', 'Ollama.Ollama', 'ollama',
     '{localappdata}\Programs\Ollama\ollama.exe', 'runs the local AI model', 'Ollama');
   //  THE PREVIOUS INSTALL IS READ ONCE, HERE, before anything is installed

@@ -12,7 +12,7 @@
       "name": "homer-dev",
       "source": "./",
       "description": "The Homer Development Kit's skills and agents: build accessible Windows programs, documents, books, databases, installers and spoken tutorials for screen reader users, the Homer way.",
-      "version": "1.72.11"
+      "version": "1.72.12"
     }
   ]
 }

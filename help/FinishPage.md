@@ -185,6 +185,20 @@ before any script runs; homerOutcomeLine(i) and homerModelOutcomeLine(model,
 use, size) each return a line when that box was ticked and an empty string
 when it was not. The app adds each result to the box and skips the empty ones.
 
+## Installing with every default: /DEFAULTS
+
+Every Homer installer takes `/DEFAULTS`, which does what pressing Enter at every step would do: it installs, runs each finish-page entry whose box is ticked by default, takes the Results box as read, and starts the program when Launch is ticked. So an update needs one command, and nothing to answer:
+
+`DbDo_setup.exe /DEFAULTS`
+
+It still asks for administrator approval, as every Homer installer does, unless it is started from an elevated Command Prompt. Alone, it starts setup again very silently with the same parameters; it may also be given with `/SILENT` or `/VERYSILENT`.
+
+- **The ticks are the decision.** Install and Update entries run; Reinstall entries, ticked off by default, do not; nor does opening the user guide. Each entry's own test still decides whether it appears at all, as on the finish page.
+- **Plain `/SILENT` and `/VERYSILENT` are unchanged:** they install the program and run no finish-page entry.
+- **No box waits in a silent install.** The Results box goes to the setup log instead. Before kit 1.72.12 it appeared even in a `/VERYSILENT` install, where nobody could see it to press OK.
+
+In the `.iss`, each finish-page entry says `Check: homerFinishRuns`, or `Check: homerFinishRuns and` its own test, in place of the `skipifsilent` flag; `InitializeSetup` begins by calling `homerStartForDefaults`. Both live in HomerComponents.iss.
+
 ## Every verdict is logged
 
 `homerState` writes one line per component to the setup log: what was found,
