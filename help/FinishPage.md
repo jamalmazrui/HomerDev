@@ -185,19 +185,20 @@ before any script runs; homerOutcomeLine(i) and homerModelOutcomeLine(model,
 use, size) each return a line when that box was ticked and an empty string
 when it was not. The app adds each result to the box and skips the empty ones.
 
-## Installing with every default: /DEFAULTS
+## Installing with every default: /verysilent /defaults
 
-Every Homer installer takes `/DEFAULTS`, which does what pressing Enter at every step would do: it installs, runs each finish-page entry whose box is ticked by default, takes the Results box as read, and starts the program when Launch is ticked. So an update needs one command, and nothing to answer:
+Every Homer installer takes `/defaults` beside a silent switch, and then installs with no screens, doing what pressing Enter at every step would do: it runs each finish-page entry whose box is ticked by default, writes the Results box to the setup log, and starts the program when Launch is ticked.
 
-`DbDo_setup.exe /DEFAULTS`
+`DbDo_setup.exe /verysilent /defaults`
 
-It still asks for administrator approval, as every Homer installer does, unless it is started from an elevated Command Prompt. Alone, it starts setup again very silently with the same parameters; it may also be given with `/SILENT` or `/VERYSILENT`.
+`/silent /defaults` does the same with a progress window. Switches can be typed in any case. Administrator approval is still asked for, as by every Homer installer, unless setup is started from an elevated Command Prompt.
 
 - **The ticks are the decision.** Install and Update entries run; Reinstall entries, ticked off by default, do not; nor does opening the user guide. Each entry's own test still decides whether it appears at all, as on the finish page.
-- **Plain `/SILENT` and `/VERYSILENT` are unchanged:** they install the program and run no finish-page entry.
-- **No box waits in a silent install.** The Results box goes to the setup log instead. Before kit 1.72.12 it appeared even in a `/VERYSILENT` install, where nobody could see it to press OK.
+- **`/defaults` alone changes nothing.** Inno Setup decides whether to show screens from the command line, before any of the installer's code runs, so no code can turn them off for the run under way. The setup log says to add `/verysilent`. (Until 13 October 2026, `/defaults` alone started setup again with `/verysilent` added; that start failed on DbDo with no reason given, and two installers never tried it.)
+- **Plain `/silent` and `/verysilent` are unchanged:** they install the program and run no finish-page entry.
+- **No box waits in a silent install.** The Results box goes to the setup log instead.
 
-In the `.iss`, each finish-page entry says `Check: homerFinishRuns`, or `Check: homerFinishRuns and` its own test, in place of the `skipifsilent` flag; `InitializeSetup` begins by calling `homerStartForDefaults`. Both live in HomerComponents.iss.
+In the `.iss`, each finish-page entry says `Check: homerFinishRuns`, or `Check: homerFinishRuns and` its own test, in place of the `skipifsilent` flag. `homerFinishRuns` and `homerDefaults` live in HomerComponents.iss.
 
 ## Every verdict is logged
 

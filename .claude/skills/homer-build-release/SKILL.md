@@ -111,7 +111,10 @@ The review is the floor, not the ceiling. In reviewing anything someone sends:
 3. **Verify a fix everywhere it applies.** Seen working in one project's report, look in each other project's.
 4. **List known warnings; never filter them unseen.** Say why each is harmless, from current evidence, not from
    memory.
-5. **When another AI reviews the same files,** list what it found that this review did not, say why it was missed,
+5. **A narrow question does not excuse the review.** Answer what was asked first, then add a short "Also in these
+   logs" section for the review's other findings. On 13 October 2026 a question about one installer switch was
+   answered and the rest of a 236-line review set aside; another AI then reported four findings from those lines.
+6. **When another AI reviews the same files,** list what it found that this review did not, say why it was missed,
    and extend `--review` so the next one is found mechanically.
 
 It reports, per app and task: build result, check counts and failures,

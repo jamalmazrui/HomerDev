@@ -28,6 +28,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 import traceback
 
@@ -678,7 +679,7 @@ def buildHomerDevApp():
     oCache = kitCache()
     # Its own classes, not the whole of exec\\CSharp (12 October 2026), so a change to a class it does not compile
     # leaves it alone.
-    sPrint = oCache.fingerprint(["HomerDev.cs", "HomerDev.ico"] + ["exec/CSharp/" + sClass + ".cs" for sClass in lsHomerDevAppClasses])
+    sPrint = oCache.fingerprint(["HomerDev.cs", "HomerDev.ico", "version.txt"] + ["exec/CSharp/" + sClass + ".cs" for sClass in lsHomerDevAppClasses])
     if oCache.isCurrent("HomerDev.exe", sPrint, ["exec/HomerDev.exe"]):
         sayLine("exec\\HomerDev.exe is unchanged since its last build; not built again.")
         return ""
@@ -693,7 +694,15 @@ def buildHomerDevApp():
                   "System.Web.dll", "System.Web.Extensions.dll", "System.Net.Http.dll", "System.Xml.dll",
                   "System.IO.Compression.dll", "System.IO.Compression.FileSystem.dll", "Microsoft.VisualBasic.dll"):
         lsRefs.append("/reference:" + sName)
-    lsSources = [sSource] + [os.path.join(sScriptDir, "exec", "CSharp", sClass + ".cs") for sClass in lsHomerDevAppClasses]
+    # THE DIALOG KNOWS ITS VERSION (13 October 2026, from an audit): it was compiled without one, so its log began
+    # "version=0.0.0.0" and a later line said 1.72.27. The kit's version.txt is compiled in, as every app's is, and is
+    # part of the fingerprint above, so a new version builds the dialog again and the two can never disagree.
+    sKitVersion = open(os.path.join(sScriptDir, "version.txt"), encoding="utf-8-sig").read().strip()
+    sVersionCs = os.path.join(tempfile.gettempdir(), "HomerDevVersion.cs")
+    with open(sVersionCs, "w", encoding="utf-8") as fVersion:
+        fVersion.write('[assembly: System.Reflection.AssemblyVersion("%s.0")]\n[assembly: System.Reflection.AssemblyFileVersion("%s.0")]\n'
+                       '[assembly: System.Reflection.AssemblyInformationalVersion("%s")]\n' % (sKitVersion, sKitVersion, sKitVersion))
+    lsSources = [sSource, sVersionCs] + [os.path.join(sScriptDir, "exec", "CSharp", sClass + ".cs") for sClass in lsHomerDevAppClasses]
     for sPath in lsSources:
         if not os.path.isfile(sPath): return "exec\\HomerDev.exe was not built: %s is missing" % sPath
     sOut = os.path.join(sScriptDir, "exec", "HomerDev.exe")

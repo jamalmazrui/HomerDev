@@ -7,6 +7,18 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.29 -- 13 October 2026
+
+From another round of ChatGPT's audit, four of whose findings were in the review's own list, unanswered.
+
+- **Setup says "current" only when it compared.** mpv, Whisper, Ace by DAISY and EPUBCheck were logged "found, current; offered as Reinstall" with no version read. Reinstall, unticked, is still the offer; the log now says the version could not be read and whether a newer one exists is unknown, or that no newer version could be looked up, and "current" only beside the newest version it was compared with.
+- **The HomerDev dialog knows its version.** It was compiled without one, so its log began "version=0.0.0.0" while a later line said 1.72.27. The kit's version.txt is now compiled in, and part of what decides whether the dialog is built again.
+- **The review leads with what matters, and catches three more kinds of finding.** Contradictions come first, skips next, the long caution list last. New rules flag a component called current with no version, a version of 0.0.0.0, and one app named at two versions in one batch, as a stale results file is. Run again on the same logs, it put all four findings at the top. The build-release skill adds: a narrow question does not excuse the review; answer it, then report the rest.
+
+## 1.72.28 -- 13 October 2026
+
+- **Every default, with no screens: /verysilent /defaults.** Inno Setup decides whether to show screens from the command line, before any installer code runs, so /defaults alone used to start setup again with /verysilent added. On 13 October 2026 that start failed on DbDo with no reason given, and HomerDev's and HomerScribe's installers never tried it, so all three showed every screen. The restart is gone, and with it any need to press buttons for the user. /defaults now goes beside a silent switch, which is the installer's own decision to show no screens: /verysilent /defaults installs, runs each finish-page entry ticked by default, logs the Results box and launches the program; /silent /defaults shows a progress window. /defaults alone changes nothing, and the log says to add /verysilent. Switches are read in any case. HomerDev's own installer now honours /defaults: its 55 finish-page entries say Check: homerFinishRuns in place of skipifsilent. The guide's FinishPage.md says all this.
+
 ## 1.72.27 -- 13 October 2026
 
 From comparing Claude's reading of a day's logs with ChatGPT's reading of the same files.

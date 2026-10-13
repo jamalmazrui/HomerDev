@@ -224,26 +224,6 @@ def review(sFolder):
                 except Exception: pass
     iListed = 0
     print()
-    print("== REVIEW: cautions, in any wording (each distinct line once, with how often it appears)")
-    dSeen = {}
-    for sFile in sorted(dTexts):
-        for sLine in dTexts[sFile].splitlines():
-            if not reCaution.search(sLine) or reNoise.search(sLine): continue
-            sPlain = plainLine(sLine)[:220]
-            sKey = re.sub(r"\d+", "#", sPlain.lower())
-            if sKey in dSeen: dSeen[sKey][2] += 1
-            else: dSeen[sKey] = [sFile, sPlain, 1]
-    for sFile, sPlain, iCount in sorted(dSeen.values()):
-        print("  %s: %s%s" % (sFile, sPlain, "  (x%d)" % iCount if iCount > 1 else ""))
-        iListed += 1
-    print()
-    print("== REVIEW: skipped checks")
-    for sFile in sorted(dTexts):
-        for sLine in dTexts[sFile].splitlines():
-            if re.search(r"\bSKIP\b|\bskip\b --| -- not run|not checked:|\(in the run reused here\)", sLine) and not reNoise.search(sLine):
-                print("  %s: %s" % (sFile, plainLine(sLine)[:200]))
-                iListed += 1
-    print()
     print("== REVIEW: claims another line contradicts")
     lsChecks = [f for f in dTexts if "checkHomerDev-" in f and f.endswith(".log")]
     for sFile in sorted(f for f in dTexts if "evidence" in f):
@@ -260,6 +240,44 @@ def review(sFolder):
         if oSuccess and oDoubt:
             print("  %s states \"%s\" and also \"%s\"" % (sFile, oSuccess.group(1), oDoubt.group(1)))
             iListed += 1
+    # A VERSION CLAIM WITH NO VERSION, AND ONE APP'S VERSIONS DISAGREEING (13 October 2026, from an audit). Setup
+    # logged mpv and Whisper "found, current" with no version read; a results file said DbDo 1.0.270 beside a setup log
+    # of 1.0.272; a dialog's log began "version=0.0.0.0". Each was in the review's caution list, unanswered.
+    for sFile in sorted(dTexts):
+        for sLine in dTexts[sFile].splitlines():
+            if re.search(r"Component [^:]+:\s{2,}found, current", sLine):
+                print("  %s claims a component current with no version read: %s" % (sFile, plainLine(sLine)[:120])); iListed += 1
+            if re.search(r"\bversion[= ]0\.0\.0\.0\b", sLine):
+                print("  %s reports version 0.0.0.0, an unstamped build: %s" % (sFile, plainLine(sLine)[:120])); iListed += 1
+    dVersions = {}
+    for sFile in sorted(dTexts):
+        sApp = os.path.basename(sFile).split("-")[0].split("_")[0]
+        for oMatch in re.finditer(r"\b%s (\d+\.\d+\.\d+)\b" % re.escape(sApp), dTexts[sFile]):
+            dVersions.setdefault(sApp, {}).setdefault(oMatch.group(1), set()).add(sFile)
+    for sApp, dSeen in sorted(dVersions.items()):
+        lsResults = [f for v in dSeen for f in dSeen[v] if "setup_results" in f]
+        if lsResults and len(dSeen) > 1:
+            print("  %s names %s versions in this batch (%s); a results file may be from an earlier run" % (sApp, len(dSeen), ", ".join(sorted(dSeen)))); iListed += 1
+    print()
+    print("== REVIEW: skipped checks")
+    for sFile in sorted(dTexts):
+        for sLine in dTexts[sFile].splitlines():
+            if re.search(r"\bSKIP\b|\bskip\b --| -- not run|not checked:|\(in the run reused here\)", sLine) and not reNoise.search(sLine):
+                print("  %s: %s" % (sFile, plainLine(sLine)[:200]))
+                iListed += 1
+    print()
+    print("== REVIEW: cautions, in any wording (each distinct line once, with how often it appears)")
+    dSeen = {}
+    for sFile in sorted(dTexts):
+        for sLine in dTexts[sFile].splitlines():
+            if not reCaution.search(sLine) or reNoise.search(sLine): continue
+            sPlain = plainLine(sLine)[:220]
+            sKey = re.sub(r"\d+", "#", sPlain.lower())
+            if sKey in dSeen: dSeen[sKey][2] += 1
+            else: dSeen[sKey] = [sFile, sPlain, 1]
+    for sFile, sPlain, iCount in sorted(dSeen.values()):
+        print("  %s: %s%s" % (sFile, sPlain, "  (x%d)" % iCount if iCount > 1 else ""))
+        iListed += 1
     print()
     print("REVIEW: %d line%s to account for before any conclusion." % (iListed, "" if iListed == 1 else "s"))
     return iListed

@@ -176,374 +176,374 @@ FileName: "{app}\scripts\installAce.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelAce}"; \
-  Check: isInstallAce; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isInstallAce; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installEpubCheck.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelEpubCheck}"; \
-  Check: isInstallEpubCheck; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isInstallEpubCheck; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installExifTool.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelExifTool}"; \
-  Check: isInstallExifTool; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isInstallExifTool; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installFfmpeg.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelFfmpeg}"; \
-  Check: isInstallFfmpeg; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isInstallFfmpeg; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installGit.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelGit}"; \
-  Check: isInstallGit; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isInstallGit; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installGitHubCli.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelGitHubCli}"; \
-  Check: isInstallGitHubCli; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isInstallGitHubCli; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installImageMagick.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelImageMagick}"; \
-  Check: isInstallImageMagick; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isInstallImageMagick; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installJava.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelJava}"; \
-  Check: isInstallJava; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isInstallJava; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installMpv.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelMpv}"; \
-  Check: isInstallMpv; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isInstallMpv; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installNode.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelNode}"; \
-  Check: isInstallNode; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isInstallNode; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installOllama.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelOllama}"; \
-  Check: isInstallOllama; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isInstallOllama; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installPandoc.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelPandoc}"; \
-  Check: isInstallPandoc; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isInstallPandoc; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installPdfTools.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelPdfTools}"; \
-  Check: isInstallPdfTools; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isInstallPdfTools; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installPython.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelPython}"; \
-  Check: isInstallPython; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isInstallPython; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installTesseract.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelTesseract}"; \
-  Check: isInstallTesseract; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isInstallTesseract; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installWhisper.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelWhisper}"; \
-  Check: isInstallWhisper; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isInstallWhisper; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installYtDlp.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelYtDlp}"; \
-  Check: isInstallYtDlp; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isInstallYtDlp; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installModels.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelModel}"; \
-  Check: isModelInstall; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isModelInstall; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 ; ---- 2. Update, ticked ---------------------------------------------------------
 FileName: "{app}\scripts\installAce.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelAce}"; \
-  Check: isUpdateAce; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isUpdateAce; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installEpubCheck.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelEpubCheck}"; \
-  Check: isUpdateEpubCheck; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isUpdateEpubCheck; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installExifTool.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelExifTool}"; \
-  Check: isUpdateExifTool; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isUpdateExifTool; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installFfmpeg.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelFfmpeg}"; \
-  Check: isUpdateFfmpeg; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isUpdateFfmpeg; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installGit.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelGit}"; \
-  Check: isUpdateGit; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isUpdateGit; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installGitHubCli.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelGitHubCli}"; \
-  Check: isUpdateGitHubCli; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isUpdateGitHubCli; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installImageMagick.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelImageMagick}"; \
-  Check: isUpdateImageMagick; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isUpdateImageMagick; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installJava.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelJava}"; \
-  Check: isUpdateJava; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isUpdateJava; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installMpv.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelMpv}"; \
-  Check: isUpdateMpv; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isUpdateMpv; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installNode.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelNode}"; \
-  Check: isUpdateNode; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isUpdateNode; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installOllama.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelOllama}"; \
-  Check: isUpdateOllama; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isUpdateOllama; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installPandoc.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelPandoc}"; \
-  Check: isUpdatePandoc; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isUpdatePandoc; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installPdfTools.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelPdfTools}"; \
-  Check: isUpdatePdfTools; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isUpdatePdfTools; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installPython.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelPython}"; \
-  Check: isUpdatePython; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isUpdatePython; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installTesseract.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelTesseract}"; \
-  Check: isUpdateTesseract; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isUpdateTesseract; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installWhisper.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelWhisper}"; \
-  Check: isUpdateWhisper; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isUpdateWhisper; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installYtDlp.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelYtDlp}"; \
-  Check: isUpdateYtDlp; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist
+  Check: homerFinishRuns and isUpdateYtDlp; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 ; ---- 3. Reinstall, unticked -----------------------------------------------------
 FileName: "{app}\scripts\installAce.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelAce}"; \
-  Check: isReinstallAce; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+  Check: homerFinishRuns and isReinstallAce; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installEpubCheck.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelEpubCheck}"; \
-  Check: isReinstallEpubCheck; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+  Check: homerFinishRuns and isReinstallEpubCheck; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installExifTool.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelExifTool}"; \
-  Check: isReinstallExifTool; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+  Check: homerFinishRuns and isReinstallExifTool; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installFfmpeg.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelFfmpeg}"; \
-  Check: isReinstallFfmpeg; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+  Check: homerFinishRuns and isReinstallFfmpeg; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installGit.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelGit}"; \
-  Check: isReinstallGit; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+  Check: homerFinishRuns and isReinstallGit; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installGitHubCli.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelGitHubCli}"; \
-  Check: isReinstallGitHubCli; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+  Check: homerFinishRuns and isReinstallGitHubCli; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installImageMagick.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelImageMagick}"; \
-  Check: isReinstallImageMagick; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+  Check: homerFinishRuns and isReinstallImageMagick; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installJava.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelJava}"; \
-  Check: isReinstallJava; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+  Check: homerFinishRuns and isReinstallJava; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installMpv.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelMpv}"; \
-  Check: isReinstallMpv; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+  Check: homerFinishRuns and isReinstallMpv; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installNode.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelNode}"; \
-  Check: isReinstallNode; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+  Check: homerFinishRuns and isReinstallNode; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installOllama.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelOllama}"; \
-  Check: isReinstallOllama; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+  Check: homerFinishRuns and isReinstallOllama; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installPandoc.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelPandoc}"; \
-  Check: isReinstallPandoc; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+  Check: homerFinishRuns and isReinstallPandoc; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installPdfTools.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelPdfTools}"; \
-  Check: isReinstallPdfTools; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+  Check: homerFinishRuns and isReinstallPdfTools; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installPython.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelPython}"; \
-  Check: isReinstallPython; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+  Check: homerFinishRuns and isReinstallPython; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installTesseract.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelTesseract}"; \
-  Check: isReinstallTesseract; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+  Check: homerFinishRuns and isReinstallTesseract; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installWhisper.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelWhisper}"; \
-  Check: isReinstallWhisper; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+  Check: homerFinishRuns and isReinstallWhisper; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installYtDlp.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelYtDlp}"; \
-  Check: isReinstallYtDlp; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+  Check: homerFinishRuns and isReinstallYtDlp; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installModels.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelModel}"; \
-  Check: isModelReinstall; \
-  Flags: postinstall skipifsilent runascurrentuser waituntilterminated skipifdoesntexist unchecked
+  Check: homerFinishRuns and isModelReinstall; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 ; ---- 4. Launch, ticked --------------------------------------------------------
 ; The entry only leaves a marker. The program starts from CurStepChanged(ssDone),
@@ -554,12 +554,12 @@ FileName: "{app}\scripts\installModels.cmd"; \
 FileName: "{cmd}"; \
   Parameters: "/c md ""{localappdata}\{#AppName}\logs"" 2>nul & echo launch > ""{localappdata}\{#AppName}\logs\{#AppName}_launch.flag"""; \
   Description: "Launch {#AppName} (desktop hotkey {#HotKeyDisplay})"; \
-  Flags: postinstall skipifsilent runhidden runasoriginaluser
+  Flags: postinstall runhidden runasoriginaluser; Check: homerFinishRuns
 
 ; ---- 5. Open the user guide, unticked -----------------------------------------
 FileName: "{app}\help\HomerDev.htm"; \
   Description: "Open the user guide (F1 in {#AppName})"; \
-  Flags: postinstall shellexec nowait skipifsilent skipifdoesntexist runasoriginaluser unchecked
+  Flags: postinstall shellexec nowait skipifdoesntexist runasoriginaluser unchecked; Check: homerFinishRuns
 
 [UninstallDelete]
 ; ONLY WHAT THIS PROGRAM WROTE. Never the whole {localappdata}\{#AppName}

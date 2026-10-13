@@ -387,8 +387,8 @@ end;
 //  use, and the uninstall registry key name (or ''). Add a var above for each.
 function InitializeSetup(): Boolean;
 begin
-  //  setup.exe /DEFAULTS: every Enter pressed for you (HomerComponents.iss). Alone,
-  //  it starts setup again very silently and this copy ends here.
+  //  setup.exe /verysilent /defaults: every default taken, no screens (HomerComponents.iss).
+  //  Alone, /defaults changes nothing and the log says so.
   if homerStartForDefaults() then begin Result := False; exit; end;
   iOllama := homerAdd('Ollama', 'Ollama.Ollama', 'ollama',
     '{localappdata}\Programs\Ollama\ollama.exe', 'runs the local AI model', 'Ollama');

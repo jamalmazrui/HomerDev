@@ -271,7 +271,15 @@ begin
     1: Log('Component ' + gHomer[iAt].sName + ': ' + gHomer[iAt].sLocal + ' found, '
            + gHomer[iAt].sRemote + ' available; offered as Update');
   else
-    Log('Component ' + gHomer[iAt].sName + ': ' + gHomer[iAt].sLocal + ' found, current; offered as Reinstall');
+    // "CURRENT" ONLY WHEN COMPARED (13 October 2026, from an audit): mpv and Whisper were
+    // logged "found, current" with no version read at all. Reinstall is still the right
+    // offer, unticked, but the log says what is actually known.
+    if gHomer[iAt].sLocal = '' then
+      Log('Component ' + gHomer[iAt].sName + ': found; its version could not be read, so whether a newer one exists is unknown; offered as Reinstall')
+    else if gHomer[iAt].sRemote = '' then
+      Log('Component ' + gHomer[iAt].sName + ': ' + gHomer[iAt].sLocal + ' found; no newer version could be looked up; offered as Reinstall')
+    else
+      Log('Component ' + gHomer[iAt].sName + ': ' + gHomer[iAt].sLocal + ' found, current (' + gHomer[iAt].sRemote + ' is the newest); offered as Reinstall');
   end;
 end;
 
@@ -300,42 +308,42 @@ end;
 function homerMessageBox(hWnd: Integer; sText, sCaption: String; iType: Cardinal): Integer;
   external 'MessageBoxW@user32.dll stdcall';
 
-(* THE DEFAULTS SWITCH (kit 1.72.12). setup.exe /DEFAULTS does what pressing Enter
-   at every step would do: it installs, runs each finish-page entry whose box is
-   ticked by default -- Install and Update yes, Reinstall no, Launch yes, the user
-   guide no -- takes the Results box as read, and starts the program if Launch is
-   ticked. Given alone it starts this setup again very silently, with the same
-   parameters, so one switch is enough. Plain /SILENT and /VERYSILENT still
-   install the program alone and run no entry. Each [Run] finish-page entry says
-   Check: homerFinishRuns (and its own test) in place of skipifsilent; Inno itself
-   then runs a ticked entry in a silent install, leaves an unticked one, and
-   evaluates every entry's own Check as the finish page would. *)
+(* THE DEFAULTS SWITCH. setup.exe /verysilent /defaults installs with no screens
+   and takes every default the finish page would: it runs each finish-page entry
+   whose box is ticked by default -- Install and Update yes, Reinstall no, Launch
+   yes, the user guide no -- and writes the Results box to the setup log. /silent
+   /defaults does the same with a progress window. The switches are read without
+   regard to case.
+   ONLY WITH A SILENT SWITCH (13 October 2026). /defaults alone used to start
+   setup again with /verysilent added, since Inno decides whether to show screens
+   from the command line before any code runs and no code can change that for the
+   run under way. The second start failed on DbDo with no reason given, and two
+   installers never tried it, so all three showed every screen. That restart is
+   gone: given alone, /defaults changes nothing, and the log says to add
+   /verysilent. Plain /silent and /verysilent still install the program alone and
+   run no entry. Each [Run] finish-page entry says Check: homerFinishRuns (and its
+   own test) in place of skipifsilent; Inno itself then runs a ticked entry in a
+   silent install, leaves an unticked one, and evaluates each entry's own Check as
+   the finish page would. *)
 function homerDefaults(): Boolean;
 begin
   Result := Pos('/DEFAULTS', Uppercase(GetCmdTail)) > 0;
 end;
 
 function homerFinishRuns(): Boolean;
-(* A finish-page entry may run: the page is shown, or /DEFAULTS stands in for it. *)
+(* A finish-page entry may run: the page is shown, or /defaults stands in for it. *)
 begin
   Result := (not WizardSilent) or homerDefaults();
 end;
 
 function homerStartForDefaults(): Boolean;
-(* Called first in InitializeSetup. With /DEFAULTS and no /SILENT or /VERYSILENT,
-   this copy starts setup again very silently with the same parameters, waits for
-   it, and returns True so the caller ends this copy without a word. This copy is
-   already elevated, so the second asks nothing. If the start fails, False: the
-   install carries on with the wizard shown. *)
-var
-  iResult: Integer;
+(* Called first in InitializeSetup; it no longer starts anything. With /defaults
+   and no silent switch it only says, in the log, that the screens are shown as
+   usual and how to take every default without them. Always False, so setup goes on. *)
 begin
   Result := False;
-  if (not homerDefaults()) or WizardSilent then exit;
-  Log('/DEFAULTS without /SILENT: starting setup again with /VERYSILENT /SUPPRESSMSGBOXES /NORESTART');
-  Result := Exec(ExpandConstant('{srcexe}'), GetCmdTail + ' /VERYSILENT /SUPPRESSMSGBOXES /NORESTART', '',
-                 SW_HIDE, ewWaitUntilTerminated, iResult);
-  if not Result then Log('Could not start setup again; carrying on with the wizard');
+  if homerDefaults() and not WizardSilent then
+    Log('/defaults without /silent or /verysilent: the screens are shown as usual. For every default with no screens, run setup with /verysilent /defaults.');
 end;
 
 procedure homerResultsBox(sBody: String);
@@ -345,7 +353,7 @@ procedure homerResultsBox(sBody: String);
    caption, and is otherwise the same OK box: information icon, one button.
    NOT IN A SILENT INSTALL (kit 1.72.12): /SUPPRESSMSGBOXES reaches only Inno's
    own boxes, so a /VERYSILENT install stopped here, waiting for an OK nobody
-   could see. Silent, the results go to the setup log instead -- for /DEFAULTS,
+   could see. Silent, the results go to the setup log instead -- for /defaults,
    the box taken as read. *)
 begin
   if WizardSilent then
