@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.24 -- 13 October 2026
+
+- **kdpSubmit's questions are heard.** Python's input() writes its question to the error stream when run in a console, and kdpSubmit.cmd sends that stream to logs\\<project>-kdpSubmit-errors.txt. So every question kdpSubmit asks -- whether to submit what changed, the yes-or-no questions of --ask, whether to publish, and the waits for Enter -- went into that file while the console stayed silent. A run waited 22 minutes on a question nobody heard, then stopped with nothing submitted, and the launcher reported a Python error that was only the question. Each question now goes to the console and the log, and only the answer is read.
+- **A book without a receipt is described truly.** kdpSubmit said such books had never been submitted by it; they had been, before the receipt kept one record per book. It now says there is no receipt of what was last sent, and that --book submits the book once and starts its receipt.
+
 ## 1.72.23 -- 13 October 2026
 
 From a ChatGPT audit of the kit, DbDo and HomerScribe, each finding checked against the code before it was acted on.

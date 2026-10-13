@@ -319,6 +319,17 @@ def saveLog():
     return True
 
 
+def askLine(sPrompt):
+    """A question on the console, and the answer typed to it. THE QUESTION IS SPOKEN, NOT WRITTEN TO ERRORS (13 October
+    2026): input() writes its prompt to the error stream when run in a console, and kdpSubmit.cmd sends that stream to
+    logs\\...-kdpSubmit-errors.txt, so every question went into that file and the console was silent; a run waited 22
+    minutes for an answer to a question nobody heard. The question now goes out through say, to the console and the
+    log, and input() reads the answer with no prompt of its own."""
+    say(sPrompt.rstrip())
+    try: sys.stdout.flush()
+    except Exception: pass
+    return input()
+
 def say(sText):
     print(sText)
     log("CONSOLE: " + sText)
@@ -330,7 +341,7 @@ def ask(sQuestion):
     if bYes:
         log("AUTO-YES: " + sQuestion)
         return True
-    sAnswer = input(sQuestion + " Type yes or no, then Enter: ").strip().lower()
+    sAnswer = askLine(sQuestion + " Type yes or no, then Enter: ").strip().lower()
     log("ASKED: " + sQuestion + " ANSWER: " + sAnswer)
     return sAnswer in ("y", "yes")
 
@@ -338,7 +349,7 @@ def ask(sQuestion):
 def pause(sMessage):
     print(sMessage)
     log("PAUSE: " + sMessage)
-    input("Press Enter here when you are done: ")
+    askLine("Press Enter here when you are done: ")
     log("Resumed after pause.")
     return True
 
@@ -947,7 +958,7 @@ def copyProfile(sSource, sTarget, sExeName):
     for iAttempt in range(3):
         if browserRunning(sExeName):
             say(sExeName + " is running, and it locks the sign-in cookies while open. Please close every " + sExeName.replace(".exe", "") + " window, then press Enter here. The script reopens the browser itself.")
-            input("Press Enter when the browser is closed: ")
+            askLine("Press Enter when the browser is closed: ")
             log("User reports browser closed; running now: " + str(browserRunning(sExeName)))
         if os.path.isdir(sTarget): shutil.rmtree(sTarget, ignore_errors=True)
         os.makedirs(os.path.join(sTarget, "Default"), exist_ok=True)
@@ -1986,7 +1997,7 @@ def finalReview(page):
         say("Everything is saved as a draft. Not publishing, because --no-publish was given.")
         return "draft"
     if "--ask" in sys.argv:
-        sAnswer = input("Everything is saved as a draft. Publishing makes the book available for sale on Amazon, usually within 72 hours, and the title, subtitle, author and edition can no longer be changed. Type publish to press Publish Your Kindle eBook, or press Enter to keep the draft: ").strip().lower()
+        sAnswer = askLine("Everything is saved as a draft. Publishing makes the book available for sale on Amazon, usually within 72 hours, and the title, subtitle, author and edition can no longer be changed. Type publish to press Publish Your Kindle eBook, or press Enter to keep the draft: ").strip().lower()
         log("PUBLISH PROMPT ANSWER: " + sAnswer)
         if sAnswer != "publish":
             say("Draft kept. Nothing was published.")
@@ -2256,8 +2267,9 @@ def submitChanged(lBooks):
         log(sBook + ": " + (", ".join(lReasons) if lReasons else "nothing changed since its last submission"))
         (lDue if lReasons else lSame).append((sBook, lReasons))
     if bBaseline: writeReceipt(dReceipt)
-    if lNew: say(", ".join(lNew) + (" has" if len(lNew) == 1 else " have") + " not been submitted by kdpSubmit before, so " + ("it is" if len(lNew) == 1 else "they are")
-                 + " not submitted automatically. To submit one the first time: kdpSubmit --book <name>.")
+    if lNew: say(", ".join(lNew) + ": kdpSubmit has no receipt of what it last sent KDP for " + ("this book" if len(lNew) == 1 else "these books")
+                 + " (the receipt kept only one book's files until today), so nothing proves a change and " + ("it is" if len(lNew) == 1 else "they are")
+                 + " not submitted automatically. kdpSubmit --book <name> submits one and starts its receipt.")
     if lSame: say(", ".join(b for b, _ in lSame) + ": nothing changed since " + ("its" if len(lSame) == 1 else "their") + " last submission, so " + ("it is" if len(lSame) == 1 else "they are") + " left as " + ("it is" if len(lSame) == 1 else "they are") + ".")
     if not lDue:
         say("Nothing to submit.")
@@ -2267,7 +2279,7 @@ def submitChanged(lBooks):
     say("To submit:")
     for sBook, lReasons in lDue: say("  " + sBook + ": " + ", ".join(lReasons))
     if "--yes" not in sys.argv:
-        try: sAnswer = input("Type Y and press Enter to submit " + ("it" if len(lDue) == 1 else "them") + ", or press Enter to stop: ").strip().lower()
+        try: sAnswer = askLine("Type Y and press Enter to submit " + ("it" if len(lDue) == 1 else "them") + ", or press Enter to stop: ").strip().lower()
         except EOFError: sAnswer = ""
         log("Asked to submit " + ", ".join(b for b, _ in lDue) + "; answered " + repr(sAnswer))
         if sAnswer not in ("y", "yes"):
