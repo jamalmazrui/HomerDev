@@ -1515,6 +1515,18 @@ def refreshBuildRelease():
             if os.path.isfile(sTarget) and b"sRunner" not in open(sTarget, "rb").read():
                 open(sTarget, "wb").write(binNew); iWritten += 1
                 logLine("build_release: upgraded %s, which could not replace itself (one time)" % sTarget); continue
+            # A RUNNER THAT CANNOT GET PAST A STALE LOCK IS REPLACED HERE (12 October 2026). A copy replaces itself only on
+            # its last line, and a copy from before the stale-lock rules was refused by the locks its own dead cycles
+            # left, exited before that line, and so never updated: bookFido and DbDo were refused for hours. A copy
+            # without those rules (no pid.txt in it) is replaced now, unless its project has a lock under 30 minutes
+            # old, which may mean a cycle is running it this moment.
+            if os.path.isfile(sTarget) and b"pid.txt" not in open(sTarget, "rb").read():
+                sLock = os.path.join(os.environ.get("TEMP", os.environ.get("TMP", "")), "Homer-%s-cycle.lock" % os.path.basename(sDir))
+                fAge = (time.time() - os.path.getmtime(sLock)) / 60 if os.path.isdir(sLock) else None
+                if fAge is not None and fAge < 30:
+                    logLine("build_release: %s lacks the stale-lock rules, but its project's lock is %.0f minutes old; left for now" % (sTarget, fAge)); continue
+                open(sTarget, "wb").write(binNew); iWritten += 1
+                logLine("build_release: upgraded %s, which could not clear a stale lock%s" % (sTarget, "" if fAge is None else " (its lock is %.0f minutes old)" % fAge)); continue
             if os.path.isfile(sTarget):
                 logLine("build_release: %s is %s; it replaces itself at the end of its next cycle" % (sTarget, "current" if open(sTarget, "rb").read() == binNew else "older")); continue
             open(sTarget, "wb").write(binNew); iWritten += 1

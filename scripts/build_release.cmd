@@ -39,6 +39,13 @@ rem 11 October: an older cycle's release found an installer a newer, failed buil
 rem may still run side by side. The lock is a folder in %TEMP% named for the project, since making a folder succeeds
 rem for only one process; a lock older than four hours is the trace of a window that was closed, and is cleared.
 set "sLock=%TEMP%\Homer-%sName%-cycle.lock"
+rem build_release unlock: YOU KNOW NOTHING IS RUNNING (12 October 2026). A lock the rules below cannot prove stale
+rem refused every cycle until it was four hours old. Typed with unlock, the cycle clears it first and starts.
+if /i "%~1"=="unlock" (
+  if exist "!sLock!" rmdir /s /q "!sLock!" 2>nul
+  >> "%sLog%" echo Unlock asked: !sLock! removed before the cycle
+  echo The lock was cleared, as asked, and the cycle starts.
+)
 mkdir "!sLock!" 2>nul
 rem A LOCK WHOSE CYCLE IS GONE IS CLEARED AT ONCE (12 October 2026). A cycle whose window was closed left its lock for
 rem four hours, and every cycle of that project was refused meanwhile. The lock now records the process running the
@@ -74,6 +81,7 @@ if errorlevel 1 (
     echo If that cycle's Command Prompt window is still open, look there: it may be waiting for
     echo you, for instance at a sign-in window. Closing that window ends the cycle, and the
     echo next build_release then starts at once. A lock older than four hours is cleared by itself.
+    echo If you are sure no %sName% cycle is running, type: build_release unlock
     >> "%sLog%" echo Refused: another cycle holds !sLock!, made !iAge! minutes ago ^(holder process !iHolder!, alive: !sAlive!; !sHolderLog!^)
     exit /b 1
   )
@@ -93,8 +101,10 @@ rem runner, and each runner copies the kit's newest over itself on the line it e
 rem before running, so the bytes change only when no cycle is running them. The kit's own copy is its scripts copy.
 set "sRunner="
 if exist "releaseHomerDev.cmd" if exist "scripts\build_release.cmd" set "sRunner=%CD%\scripts\build_release.cmd"
-if not defined sRunner if defined HomerDev if exist "%HomerDev%\scripts\build_release.cmd" set "sRunner=%HomerDev%\scripts\build_release.cmd"
+rem THE DEVELOPMENT KIT FIRST (12 October 2026): the HomerDev variable points to the installed kit, which lags the kit
+rem beside the projects until it is installed, so a fix to this runner reached no project until then.
 if not defined sRunner if exist "..\HomerDev\scripts\build_release.cmd" for %%R in ("..\HomerDev\scripts\build_release.cmd") do set "sRunner=%%~fR"
+if not defined sRunner if defined HomerDev if exist "%HomerDev%\scripts\build_release.cmd" set "sRunner=%HomerDev%\scripts\build_release.cmd"
 >> "%sLog%" echo Settings: release=!sRelease! runner=!sRunner!
 set "sSummary="
 

@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.11 -- 12 October 2026
+
+- **A project's runner can no longer be stranded behind a stale lock.** Each project's build_release.bat is a copy of the kit's runner, and it replaces itself with the newer one only on its last line. bookFido's and DbDo's copies came from before the stale-lock rules; the locks their own dead cycles had left refused them at the start, so they exited before that last line, never updated, and were refused for hours -- the fix could never arrive. Now the kit's build replaces any project runner without those rules, unless that project's lock is under 30 minutes old (a cycle may be running it); so one kit cycle repairs every project beside it.
+- **The development kit's runner comes first.** A project took its runner from the HomerDev variable, which points to the installed kit and lags until it is installed; it now takes the kit beside the projects first.
+- **build_release unlock** clears a project's lock and starts the cycle, for when you know nothing is running; a refusal now says so.
+
 ## 1.72.10 -- 12 October 2026
 
 **Every push from 1.72.5 to here ended in a syntax error, and took its cycle with it.** push.cmd's size check held `echo ... RepoFiles.txt (under 100 MB).` inside an if block; Command Prompt reads a whole block before running it, so that bracket closed the block early and the line was a syntax error -- ". was unexpected at this time." -- whether or not anything was large. A syntax error in a called batch file ends every batch file above it, so push stopped right after its staged list, build_release stopped with it before releasing its lock, and neither log said why. The bracket is escaped; the kit's audit and every project's check now read each batch file for a bracket that closes its block early (one rule, in scripts\\fixEncoding.py); and a lock left by a runner older than this one, with no record of its holder, is stale once it is 30 minutes old, so the locks those cycles left no longer hold their projects back for four hours.
