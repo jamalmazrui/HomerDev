@@ -171,15 +171,19 @@ public static class InixCodec
             // a line that looks like a section header or a key=
             // line. The plain form requires that continuation lines
             // do NOT start with '[' or contain '=' as a meaningful
-            // separator. Comment lines (starting with ';') in plain-
-            // multi-line mode are treated as ordinary value content.
+            // separator. A SEMICOLON COMMENT ENDS A PLAIN VALUE (kit 1.72.9,
+            // 12 October 2026): an empty "asin =" followed by the comments
+            // describing the next book read those comments as its value. A
+            // line beginning with '#' stays value content, since a Markdown
+            // heading begins that way. Kept identical to inix.py.
             if (sPendingKey != null)
             {
                 bool bLooksLikeSection = sTrim.StartsWith("[") && sTrim.EndsWith("]");
+                bool bLooksLikeComment = sTrim.StartsWith(";");
                 bool bLooksLikeKey = !sTrim.StartsWith(";")
                                      && sTrim.IndexOf('=') > 0
                                      && !looksLikePartOfValue(sTrim);
-                if (bLooksLikeSection || bLooksLikeKey)
+                if (bLooksLikeSection || bLooksLikeComment || bLooksLikeKey)
                 {
                     commitPending();
                     // Fall through to process this line as the new

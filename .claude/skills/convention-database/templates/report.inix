@@ -1,0 +1,54 @@
+﻿; Sample report definitions for the convention database.
+; Run them with Run Report (Alt+Shift+R): DbDo finds this file beside the
+; database, offers a pick-list of the reports below, renders the chosen one
+; over the WHOLE events table to Markdown, and opens it in your editor.  A
+; report reads the physical table, not the current grid view, so it produces
+; the same document no matter how the grid is filtered or sorted.  Markdown
+; converts cleanly to HTML, Word, or plain text, so one definition serves
+; every format.
+;
+; Each section is one report.  $field inserts a column value; {{ ... }} is a
+; JScript expression; a footer band can use $count and, for a numeric column,
+; $sum_<field> / $avg_<field> / $min_<field> / $max_<field>.  Adding @group
+; sorts by that field and turns on the group_header / group_footer bands.
+; Optional @filter (a SQL WHERE fragment) and @sort (an ORDER BY fragment)
+; let a report scope and order itself without touching the grid.
+
+; The daily agenda, grouped by day with a session count per day. @sort keeps
+; each day's sessions in time order; @group then gathers the days.
+; FileTask marks this file's purpose so DbDo shows it only for the
+; matching command (here, Run Report / Alt+Shift+R).
+FileTask = report
+
+[daily_agenda]
+@table = events
+@group = event_date
+@sort = event_date, start_time, title
+group_header = """
+## $event_date
+"""
+detail = """
+**$start_time–$end_time** $title
+"""
+group_footer = """
+*$count session(s) on $event_date.*
+"""
+footer = """
+**$count sessions across the convention.**
+"""
+
+; A flat session list over the whole convention, ordered by date and time.
+; (@sort orders the physical read; to narrow it, add e.g. @filter = tags LIKE
+; '%friday%' -- a report is self-contained, independent of the grid view.)
+[session_list]
+@table = events
+@sort = event_date, start_time
+header = """
+# Convention Sessions
+"""
+detail = """
+**$event_date $start_time** $title
+"""
+footer = """
+**$count session(s) listed.**
+"""

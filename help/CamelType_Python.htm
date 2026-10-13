@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc 3.12.1" />
@@ -247,6 +247,7 @@
   </style>
 </head>
 <body>
+<main>
 <h1 id="camel-type-python-coding-guidelines">Camel Type: Python Coding
 Guidelines</h1>
 <p>Camel Type is a coding style optimized for screen reader productivity
@@ -357,11 +358,11 @@ zero-value: <code>0</code> for integers, <code>0.0</code> for floats,
 for dicts, <code>None</code> for objects.</p>
 <p>Example:</p>
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>iCount <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>iMax <span class="op">=</span> <span class="dv">100</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>sDir <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>sTitle <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>sUrl <span class="op">=</span> <span class="st">&quot;&quot;</span></span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1">iCount <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb1-2">iMax <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb1-3">sDir <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb1-4">sTitle <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb1-5">sUrl <span class="op">=</span> <span class="st">&quot;&quot;</span></span></code></pre></div>
 <hr />
 <h2 id="constants">5. Constants</h2>
 <p>Define constants at the <strong>top of the module</strong>, before
@@ -369,10 +370,10 @@ any function definitions, grouped by type, each group in alphabetical
 order, constants within each group in alphabetical order.</p>
 <p>Example:</p>
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>c_iTimeoutSec <span class="op">=</span> <span class="dv">60</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>c_sEncoding <span class="op">=</span> <span class="st">&quot;utf-8&quot;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>c_sFallbackTitle <span class="op">=</span> <span class="st">&quot;untitled-page&quot;</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>c_sResultsDir <span class="op">=</span> <span class="st">&quot;results&quot;</span></span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1">c_iTimeoutSec <span class="op">=</span> <span class="dv">60</span></span>
+<span id="cb2-2">c_sEncoding <span class="op">=</span> <span class="st">&quot;utf-8&quot;</span></span>
+<span id="cb2-3">c_sFallbackTitle <span class="op">=</span> <span class="st">&quot;untitled-page&quot;</span></span>
+<span id="cb2-4">c_sResultsDir <span class="op">=</span> <span class="st">&quot;results&quot;</span></span></code></pre></div>
 <hr />
 <h2 id="script-structure-and-entry-point">6. Script Structure and Entry
 Point</h2>
@@ -387,7 +388,7 @@ written code.</p>
 <code>if __name__ == "__main__":</code> block appears at the very
 bottom, calling <code>main()</code> on a single line.</p>
 <div class="sourceCode" id="cb3"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>: main()</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>: main()</span></code></pre></div>
 <hr />
 <h2 id="function-order">7. Function Order</h2>
 <p>All functions other than <code>main</code> are listed in
@@ -403,15 +404,15 @@ should return a value, even if <code>None</code>.</p></li>
 <li><p>Use simple <strong>single-line conditionals</strong> for
 one-consequence cases:</p>
 <div class="sourceCode" id="cb4"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> sUrl: <span class="cf">raise</span> <span class="pp">ValueError</span>(sUsage)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> bReady: <span class="cf">return</span> <span class="va">True</span></span></code></pre></div></li>
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><span class="cf">if</span> <span class="kw">not</span> sUrl: <span class="cf">raise</span> <span class="pp">ValueError</span>(sUsage)</span>
+<span id="cb4-2"><span class="cf">if</span> bReady: <span class="cf">return</span> <span class="va">True</span></span></code></pre></div></li>
 </ul>
 <hr />
 <h2 id="loops">9. Loops</h2>
 <p>Prefer <strong>for-each</strong> style loops over index-based loops
 whenever iterating a collection.</p>
 <div class="sourceCode" id="cb5"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> sItem <span class="kw">in</span> lItems: process(sItem)</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><span class="cf">for</span> sItem <span class="kw">in</span> lItems: process(sItem)</span></code></pre></div>
 <p>Use <code>enumerate()</code> only when the index itself is needed.
 Avoid <code>range(len(...))</code>.</p>
 <hr />
@@ -422,9 +423,9 @@ lists module names in <strong>alphabetical order</strong> on a single
 line, separated by commas. Place the built-in import first, then the
 third-party import, separated by a blank line.</p>
 <div class="sourceCode" id="cb6"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json, os, pathlib, re, sys</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> bs4, playwright, requests</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><span class="im">import</span> json, os, pathlib, re, sys</span>
+<span id="cb6-2"></span>
+<span id="cb6-3"><span class="im">import</span> bs4, playwright, requests</span></code></pre></div>
 <p>If <code>from X import Y</code> syntax is needed for specific names,
 place those lines after the two main import statements,
 alphabetized.</p>
@@ -433,13 +434,13 @@ are not copied into the app: the build puts <code>C:\HomerDev</code> on
 PyInstaller’s search path and names each module with
 <code>--hidden-import</code>.</p>
 <div class="sourceCode" id="cb7"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> homer <span class="im">import</span> elevate, inix, log, paths</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><span class="im">from</span> homer <span class="im">import</span> elevate, inix, log, paths</span></code></pre></div>
 <hr />
 <h2 id="string-delimiters">11. String Delimiters</h2>
 <p>Use <strong>double quotes</strong> for all strings. Use f-strings
 when embedding expressions.</p>
 <div class="sourceCode" id="cb8"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sPath <span class="op">=</span> <span class="ss">f&quot;</span><span class="sc">{</span>sResultsDir<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>sTitle<span class="sc">}</span><span class="ss">&quot;</span></span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1">sPath <span class="op">=</span> <span class="ss">f&quot;</span><span class="sc">{</span>sResultsDir<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>sTitle<span class="sc">}</span><span class="ss">&quot;</span></span></code></pre></div>
 <hr />
 <h2 id="magic-numbers">12. Magic Numbers</h2>
 <p>Never use literal numeric or string values in logic. Assign them to
@@ -450,8 +451,8 @@ named constants and reference the constant name.</p>
 where practical, to maximize information density per line for screen
 reader review.</p>
 <div class="sourceCode" id="cb9"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>dConfig <span class="op">=</span> {<span class="st">&quot;encoding&quot;</span>: sEncoding, <span class="st">&quot;timeout&quot;</span>: iTimeoutSec}</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>lEngines <span class="op">=</span> [<span class="st">&quot;axe&quot;</span>, <span class="st">&quot;ibm&quot;</span>, <span class="st">&quot;alfa&quot;</span>]</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1">dConfig <span class="op">=</span> {<span class="st">&quot;encoding&quot;</span>: sEncoding, <span class="st">&quot;timeout&quot;</span>: iTimeoutSec}</span>
+<span id="cb9-2">lEngines <span class="op">=</span> [<span class="st">&quot;axe&quot;</span>, <span class="st">&quot;ibm&quot;</span>, <span class="st">&quot;alfa&quot;</span>]</span></code></pre></div>
 <hr />
 <h2 id="error-handling">14. Error Handling</h2>
 <p>Use <code>try</code>/<code>except</code> with a named exception
@@ -461,11 +462,11 @@ abbreviation for caught exceptions (it is universally understood and
 avoids shadowing Python’s builtin <code>Exception</code> class
 name).</p>
 <div class="sourceCode" id="cb10"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> riskyOperation()</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">ValueError</span> <span class="im">as</span> ex:</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Validation error: </span><span class="sc">{</span>ex<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    sys.exit(<span class="dv">1</span>)</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><span class="cf">try</span>:</span>
+<span id="cb10-2">    result <span class="op">=</span> riskyOperation()</span>
+<span id="cb10-3"><span class="cf">except</span> <span class="pp">ValueError</span> <span class="im">as</span> ex:</span>
+<span id="cb10-4">    <span class="bu">print</span>(<span class="ss">f&quot;Validation error: </span><span class="sc">{</span>ex<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb10-5">    sys.exit(<span class="dv">1</span>)</span></code></pre></div>
 <p>If the same <code>try</code> block has multiple <code>except</code>
 handlers and you want to keep them distinguishable in nested or
 multi-catch contexts, use a role suffix: <code>exParse</code>,
@@ -637,5 +638,6 @@ plurals; browser-like HTTP</li>
 wx. A program whose windows are WinForms through pythonnet, as
 urlCheck’s are, uses the other modules and keeps its own dialog
 code.</p>
+</main>
 </body>
 </html>

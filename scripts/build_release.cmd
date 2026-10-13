@@ -40,22 +40,50 @@ rem may still run side by side. The lock is a folder in %TEMP% named for the pro
 rem for only one process; a lock older than four hours is the trace of a window that was closed, and is cleared.
 set "sLock=%TEMP%\Homer-%sName%-cycle.lock"
 mkdir "!sLock!" 2>nul
+rem A LOCK WHOSE CYCLE IS GONE IS CLEARED AT ONCE (12 October 2026). A cycle whose window was closed left its lock for
+rem four hours, and every cycle of that project was refused meanwhile. The lock now records the process running the
+rem cycle (pid.txt); when that process no longer exists, or the number now belongs to a process started after the lock
+rem was made, the lock is stale whatever its age. A holder that is still alive proves nothing -- a cycle stopped with
+rem Control+C leaves its Command Prompt running -- so it only keeps the refusal, which now names the holder's log, and
+rem the four-hour rule still applies.
 if errorlevel 1 (
   set "iAge=0"
   for /f %%a in ('powershell -NoProfile -Command "[int]((Get-Date)-(Get-Item -LiteralPath '!sLock!').CreationTime).TotalMinutes"') do set "iAge=%%a"
-  if !iAge! geq 240 (
-    >> "%sLog%" echo Lock !sLock! was !iAge! minutes old, from a cycle no longer running; cleared
+  set "sAlive=unknown"
+  set "iHolder="
+  if exist "!sLock!\pid.txt" set /p iHolder=<"!sLock!\pid.txt"
+  if defined iHolder (
+    for /f %%a in ('powershell -NoProfile -Command "$p = Get-Process -Id !iHolder! -ErrorAction SilentlyContinue; if ($p -and $p.StartTime -le (Get-Item -LiteralPath '!sLock!').CreationTime) { 'yes' } else { 'no' }"') do set "sAlive=%%a"
+  )
+  set "sHolderLog="
+  if exist "!sLock!\holder.txt" set /p sHolderLog=<"!sLock!\holder.txt"
+  set "bStale="
+  if !iAge! geq 240 set "bStale=1"
+  if "!sAlive!"=="no" set "bStale=1"
+  rem A LOCK WITH NO HOLDER RECORD, 30 MINUTES OLD OR MORE, IS STALE (12 October 2026). The runner before 1.72.10
+  rem recorded no process, and from 1.72.5 every one of its cycles ended in a syntax error at push, leaving its lock.
+  rem No cycle that is still running takes that long, so such a lock no longer holds a project back for four hours.
+  if not defined iHolder if !iAge! geq 30 set "bStale=1"
+  if defined bStale (
+    >> "%sLog%" echo Lock !sLock! was !iAge! minutes old, from a cycle no longer running ^(holder process !iHolder!, alive: !sAlive!^); cleared
     rmdir /s /q "!sLock!" 2>nul
     mkdir "!sLock!" 2>nul
   ) else (
     echo Another %sName% cycle started !iAge! minutes ago and is still running, so this one does not start.
-    echo Wait for it to finish. A lock older than four hours is cleared by itself.
-    >> "%sLog%" echo Refused: another cycle holds !sLock!, made !iAge! minutes ago
+    echo Its log: !sHolderLog!
+    echo If that cycle's Command Prompt window is still open, look there: it may be waiting for
+    echo you, for instance at a sign-in window. Closing that window ends the cycle, and the
+    echo next build_release then starts at once. A lock older than four hours is cleared by itself.
+    >> "%sLog%" echo Refused: another cycle holds !sLock!, made !iAge! minutes ago ^(holder process !iHolder!, alive: !sAlive!; !sHolderLog!^)
     exit /b 1
   )
 )
 > "!sLock!\holder.txt" echo %date% %time% %sLog%
->> "%sLog%" echo Lock: !sLock!
+rem The process running this cycle: the parent of the Command Prompt that for /f starts to run PowerShell.
+set "iMine="
+for /f %%p in ('powershell -NoProfile -Command "$c = Get-CimInstance Win32_Process -Filter ('ProcessId=' + $PID); $b = Get-CimInstance Win32_Process -Filter ('ProcessId=' + $c.ParentProcessId); $b.ParentProcessId"') do set "iMine=%%p"
+if defined iMine > "!sLock!\pid.txt" echo !iMine!
+>> "%sLog%" echo Lock: !sLock!, held by process !iMine!
 
 set "sRelease=scripts\release.cmd"
 rem EVERY RUNNER REPLACES ITSELF, AND ONLY AT ITS OWN END (1.65.32, from an audit). The kit's build overwrote every

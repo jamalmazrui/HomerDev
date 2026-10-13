@@ -113,9 +113,16 @@ def looksLikePartOfValue(sLine):
 
 
 def endsPlainValue(sLine):
-    """True when a line ends a plain multi-line value: a section line, or a name = value line."""
+    """True when a line ends a plain multi-line value: a section line, a name = value line, or a comment line.
+
+    A SEMICOLON COMMENT ENDS A PLAIN VALUE (kit 1.72.9, 12 October 2026). An empty asin = in MyBooks' books.inix,
+    followed by the comment lines that describe the next book, read as a plain value holding those comments, and
+    kdpReport printed them as Blind Vibe Coding's ASIN. A comment is a comment wherever it stands. A line beginning with
+    a number sign stays part of a plain value, since a Markdown heading begins that way; the writers never write the
+    plain form, so nothing they wrote reads differently. Kept identical to Inix.cs."""
     sTrim = sLine.strip()
     if sTrim.startswith("[") and sTrim.endswith("]"): return True
+    if sTrim.startswith(";"): return True
     return not sTrim.startswith(";") and sTrim.find("=") > 0 and not looksLikePartOfValue(sTrim)
 
 

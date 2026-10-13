@@ -1,0 +1,26 @@
+﻿# Daily-Schedule.dbdo
+# Build a schedule for one day of the event.
+#
+# How to use: open your convention database, switch to the events table,
+# then run this file with Invoke Script. Each line below is exactly what
+# you could type yourself at the dot prompt -- the script just runs them
+# in order. Change the date on the filter line to the day you want. Lines beginning with #
+# are comments and are skipped.
+
+# Keep only the events on the event's first day.
+filter event_date = '{{FIRST_DAY}}'
+
+# Put them in chronological order: by start time, then by title.
+order start_time, title
+
+# Announce how many events that day.
+count
+
+# Write the day's schedule to an HTML file you can open in any browser
+# or read with your screen reader. The headers carry table semantics, so
+# you can navigate it column by column.
+export First-Day-Schedule.htm
+
+# Return to the full, unsorted, unfiltered table.
+reset-filter
+reset-sort

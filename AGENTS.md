@@ -28,6 +28,7 @@ Each skill holds the rules for one kind of work. Claude loads a skill by its des
 
 - **app-help-guide** -- build a screen-reader-friendly help guide for a product from the publisher's own help pages. `.claude/skills/app-help-guide/SKILL.md`
 - **blind-creators** -- add, verify or remove a person or work in the Blind Authors, Developers, Presenters or Creators directories. `.claude/skills/blind-creators/SKILL.md`
+- **convention-database** -- build a DbDo database of any organization's convention or conference from its agenda: sessions, rooms, speakers and sponsors, linked. `.claude/skills/convention-database/SKILL.md`
 - **homer-books** -- build, audit and publish Kindle books with the kit's book tools. `.claude/skills/homer-books/SKILL.md`
 - **homer-build-release** -- run or troubleshoot build, tidy, push and release, with the checks inside them, and read their logs. `.claude/skills/homer-build-release/SKILL.md`
 - **homer-code** -- write or review code in Camel Type with the kit's shared classes. `.claude/skills/homer-code/SKILL.md`

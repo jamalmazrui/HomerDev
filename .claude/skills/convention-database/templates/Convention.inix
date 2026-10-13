@@ -1,0 +1,53 @@
+﻿; Convention.inix -- how this database opens, and how each table is heard.
+;
+; [Database] decides which table the window starts on. Each [Table:<name>]
+; decides which fields the row speaks, in what order, and how the rows are
+; sorted. DbDo writes these keys back whenever you change the columns, the sort
+; or the filter, so what you adjust is remembered here.
+;
+; A row is heard, not seen, so the field that decides whether to keep listening
+; comes first, and three fields is the target. The first field is also what
+; first-letter navigation searches.
+;
+; The window opens on events, because the first question at a convention is
+; what is on and when. locations, projects and contacts answer the rest.
+
+[Database]
+
+InitialTable = events
+
+[Table:events]
+
+SelectFields = event_date, start_time, title
+OrderFields = event_date, start_time
+WhereFilter =
+
+[Table:locations]
+
+SelectFields = name, level, hotel
+OrderFields = name
+WhereFilter =
+
+[Table:projects]
+
+SelectFields = name, kind
+OrderFields = name
+WhereFilter =
+
+[Table:contacts]
+
+SelectFields = last_name, first_name, enterprise
+OrderFields = last_name, first_name
+WhereFilter =
+
+[Table:lookups]
+
+SelectFields = fld, val
+OrderFields = fld, ordinal
+WhereFilter =
+
+[Table:maps]
+
+SelectFields = kind, prime1, prime2
+OrderFields = kind, prime1
+WhereFilter =

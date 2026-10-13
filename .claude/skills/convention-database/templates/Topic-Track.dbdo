@@ -1,0 +1,30 @@
+﻿# Topic-Track.dbdo
+# Pull every session on one topic into a single document -- a "track" you
+# can read end to end or hand to someone. This example builds a Braille
+# track; change the word on the filter line to any topic that appears in
+# session titles (Technology, Students, Veterans, Seniors, Employment, ...).
+#
+# How to use: open your convention database, switch to the events table, then
+# run this file with Invoke Script. Each line below is exactly what you
+# could type yourself at the dot prompt -- the script just runs them in
+# order. Lines beginning with # are comments and are skipped.
+
+# Keep only sessions whose title mentions the topic. The * characters are
+# ADO's filter-grammar wildcards, passed through verbatim; change the word
+# between them to retopic the track.
+filter title LIKE '*Braille*'
+
+# Read them in the order they happen across the week.
+order event_date, start_time
+
+# Say how many sessions are on this topic.
+count
+
+# Write the track to a Word document with a real heading and a navigable
+# table, ready to print or email. Swap the extension for .html, .md, .xlsx,
+# or .csv to get the same filtered, sorted view in another format.
+export Braille-Track.docx
+
+# Back to the whole, unsorted, unfiltered table.
+reset-filter
+reset-sort

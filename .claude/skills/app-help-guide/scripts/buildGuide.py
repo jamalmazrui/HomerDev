@@ -39,11 +39,35 @@ c_lLitterPrefix = ["did this answer your question", "was this article helpful", 
                    "have more questions", "use of this site constitutes acceptance", "all rights reserved"]
 
 
+c_reBareDomain = re.compile(r"^(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:ai|app|au|ca|co|com|de|dev|edu|fr|gov|info|io|me|net|org|tv|uk|us)(?:[/?#]|$)", re.I)
+
+
+def normalizeHref(sUrl, sBaseUrl=""):
+    """THE ADDRESS A LINK SHOULD CARRY, OR "" FOR NONE (12 October 2026, from an audit). A guide is read offline or
+    from GitHub Pages, where an address relative to the publisher's article resolves against the wrong site: 30,523
+    such links led nowhere across the collection. With the article's own address, a relative link is resolved exactly;
+    without it, the link is dropped and its words kept. A bare domain ("bbc.com/subscribe") gains https://, and an
+    address that carries Markdown inside it ("[angi.com](https://...)", even percent-encoded) yields the address inside.
+    Mail and phone links are kept as they are."""
+    sUrl = (sUrl or "").strip()
+    if not sUrl: return ""
+    sDecoded = urllib.parse.unquote(sUrl)
+    oInside = re.search(r"\]\((https?://[^)\s]+)\)", sDecoded)
+    if oInside: return oInside.group(1)
+    if re.match(r"(?i)(https?:|mailto:|tel:)", sUrl): return sUrl
+    if sUrl.startswith("//"): return "https:" + sUrl
+    if sUrl.startswith("#"): return ""
+    if sBaseUrl and re.match(r"(?i)https?://", sBaseUrl): return urllib.parse.urljoin(sBaseUrl, sUrl)
+    if c_reBareDomain.match(sUrl) and not re.match(r"(?i)[^/]+\.(php|aspx?|html?|jsp)(?:[?#]|$)", sUrl): return "https://" + sUrl
+    return ""
+
+
 class markdownParser(html.parser.HTMLParser):
     """Turns a fragment of help markup into Markdown lines."""
 
-    def __init__(self, iBaseLevel):
+    def __init__(self, iBaseLevel, sBaseUrl=""):
         super().__init__(convert_charrefs=True)
+        self.sBaseUrl = sBaseUrl
         self.iBaseLevel = iBaseLevel
         self.iHeading = 0
         self.iPre = 0
@@ -156,7 +180,8 @@ class markdownParser(html.parser.HTMLParser):
             sVisible = self.sBuffer[iStart:]
             sTrimmed = sVisible.strip()
             if not sUrl or not sTrimmed: return True
-            if sUrl.startswith(("#", "/", ".")): return True
+            sUrl = normalizeHref(sUrl, self.sBaseUrl)
+            if not sUrl: return True
             if sTrimmed.lower().startswith(("http://", "https://", "www.")): return True
             if "[" in sVisible or "]" in sVisible: return True
             iLead = len(sVisible) - len(sVisible.lstrip())
@@ -168,6 +193,11 @@ class markdownParser(html.parser.HTMLParser):
 
     def handle_data(self, sText):
         if self.lSkip: return True
+        # TEXT THAT NAMES A TAG STAYS TEXT (12 October 2026, from an audit). The parser decodes &lt;h1&gt; into "<h1>",
+        # and Markdown passes that on as markup: a publisher's sentence about heading tags gave Calibre five level-one
+        # headings and Org Mode a stray one. Outside a code block, a "<" that begins a tag is written as &lt;, which
+        # every reader shows as "<". Inside a code block it stays as it is, since there an entity would show literally.
+        if not self.iPre: sText = re.sub(r"<(?=[A-Za-z/!?])", "&lt;", sText)
         self.sBuffer += sText
         return True
 
@@ -192,9 +222,10 @@ def findBalanced(sMarkup, sPattern, sTag):
     return sMarkup[iStart:]
 
 
-def toMarkdown(sMarkup, iBaseLevel):
-    """Turns one article body into Markdown lines, furniture removed."""
-    oParser = markdownParser(iBaseLevel)
+def toMarkdown(sMarkup, iBaseLevel, sBaseUrl=""):
+    """Turns one article body into Markdown lines, furniture removed. sBaseUrl, the article's own address where the
+    reader knows it, resolves the publisher's relative links."""
+    oParser = markdownParser(iBaseLevel, sBaseUrl)
     oParser.feed(sMarkup)
     oParser.flush()
     return labelAddresses(dropLitter(oParser.lLines))
@@ -374,7 +405,7 @@ def readZendesk(sFolder):
             # A publisher may leave a section's name as a stray character —
             # iHeartRadio has one called "/". That is not a category name.
             if not re.search(r"\w", sCategory): sCategory = c_sMiscellaneous
-            lArticles.append((sCategory, dArticle["title"], toMarkdown(dArticle.get("body") or "", 0)))
+            lArticles.append((sCategory, dArticle["title"], toMarkdown(dArticle.get("body") or "", 0, dArticle.get("html_url") or "")))
     return lArticles
 
 

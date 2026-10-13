@@ -29,7 +29,7 @@ The log is logs\\<App>-encoding-yyyyMMdd-HHmmss.log; the console says how
 many files were fixed.
 """
 
-import datetime, glob, io, os, platform, re, sys
+import datetime, glob, html, io, os, platform, re, sys, urllib.parse
 
 # THE HOMER ENCODING RULES, IN ONE PLACE (1.64.0, don't repeat yourself): this
 # file is their authoritative home. The homer-convert skill's toHomerEncoding.py
@@ -246,12 +246,159 @@ def oneTitleHeading(sHtml):
     return sHtml
 
 
+# ---- a finished page (12 October 2026, from audits of the help guides and podcast directories) ----
+#
+# Pandoc's page carries no language, no main landmark and an unlabeled contents list; a page assembled from many
+# publisher articles also carries their duplicate IDs, links to anchors that never came with them, empty links and
+# addresses relative to the publisher's site. finishPage puts each right without touching what the page says:
+#
+#   language      lang="en-US" on <html>, so a screen reader speaks it in the right voice and pronunciation
+#   contents      the contents list labeled "Contents"
+#   main          the content after the contents list wrapped in <main>, the landmark a reader jumps to
+#   IDs           a repeated ID gets -2, -3 ..., so every target is unique; links still reach the first, as before
+#   in-page links a link to an ID the page lacks is repaired when exactly one ID matches it but for punctuation or a
+#                 numeric suffix; otherwise it becomes its own words, since a link that goes nowhere misleads
+#   empty links   a link with no words and no label is removed
+#   web links     a bare domain gains https://; Markdown inside an address yields the address inside; an address
+#                 relative to the publisher's site, which no reader of this page can reach, becomes its own words.
+#                 A link to a file beside the page (another page of the collection) is kept.
+#
+# It is safe to run again: a finished page comes back unchanged.
+
+c_sLang = "en-US"
+c_reAnchor = re.compile(r"<a\b([^>]*)>(.*?)</a>", re.S | re.I)
+c_reBareDomain = re.compile(r"^(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:ai|app|au|ca|co|com|de|dev|edu|fr|gov|info|io|me|net|org|tv|uk|us)(?:[/?#]|$)", re.I)
+
+
+def idKey(sId):
+    """An ID compared without case, punctuation or a numeric suffix."""
+    return re.sub(r"[^a-z0-9]+", "", re.sub(r"-\d+$", "", html.unescape(urllib.parse.unquote(sId)).lower()))
+
+
+def finishPage(sHtml, setLocal=None, dFixes=None):
+    """The page finished as described above, and a count of each change by kind. dFixes maps an address known to be
+    wrong to its verified replacement -- a collection's data\\linkFixes.inix -- and is applied first."""
+    dCounts = {}
+    for sOld, sNew in (dFixes or {}).items():
+        sAttr = 'href="' + sOld + '"'
+        if sAttr in sHtml:
+            dCounts["addresses corrected from linkFixes.inix"] = dCounts.get("addresses corrected from linkFixes.inix", 0) + sHtml.count(sAttr)
+            sHtml = sHtml.replace(sAttr, 'href="' + sNew + '"')
+    def note(sKind, iBy=1): dCounts[sKind] = dCounts.get(sKind, 0) + iBy
+    setLocal = {s.lower() for s in (setLocal or set())}
+    oHtml = re.search(r"<html\b[^>]*>", sHtml)
+    # An empty lang="" declares nothing; Pandoc writes one when it is given no language.
+    if oHtml and not re.search(r'\blang="[^"]+"', oHtml.group(0)):
+        sTag = re.sub(r'\s(?:xml:)?lang=""', "", oHtml.group(0))
+        sHtml = sHtml[:oHtml.start()] + sTag[:-1] + ' lang="%s" xml:lang="%s"' % (c_sLang, c_sLang) + ">" + sHtml[oHtml.end():]
+        note("language declared")
+    oNav = re.search(r'<nav id="TOC"[^>]*>', sHtml)
+    if oNav and "aria-label" not in oNav.group(0):
+        sHtml = sHtml[:oNav.end() - 1] + ' aria-label="Contents"' + sHtml[oNav.end() - 1:]
+        note("contents labeled")
+    # Unique IDs: the first keeps its name.
+    dSeen = {}
+    def fnId(oMatch):
+        sId = oMatch.group(1)
+        dSeen[sId] = dSeen.get(sId, 0) + 1
+        if dSeen[sId] == 1: return oMatch.group(0)
+        sNew = sId + "-" + str(dSeen[sId])
+        while sNew in dSeen: sNew += "x"
+        dSeen[sNew] = 1
+        note("duplicate IDs made unique")
+        return ' id="' + sNew + '"'
+    sHtml = re.sub(r'\sid="([^"]+)"', fnId, sHtml)
+    setIds = set(re.findall(r'\sid="([^"]+)"', sHtml))
+    dByKey = {}
+    for sId in setIds: dByKey.setdefault(idKey(sId), []).append(sId)
+    def fnAnchor(oMatch):
+        sAttrs, sInner = oMatch.group(1), oMatch.group(2)
+        oHref = re.search(r'\bhref="([^"]*)"', sAttrs)
+        if not oHref: return oMatch.group(0)
+        sHref = oHref.group(1)
+        bNamed = re.search(r'aria-label="[^"]+"|title="[^"]+"', sAttrs) or re.search(r"<img\b[^>]*\balt=\"[^\"]+\"", sInner)
+        if not re.sub(r"<[^>]+>", "", sInner).strip() and not bNamed:
+            note("empty links removed")
+            return ""
+        def relink(sNew): return "<a" + sAttrs[:oHref.start(1)] + sNew + sAttrs[oHref.end(1):] + ">" + sInner + "</a>"
+        if sHref.startswith("#"):
+            sTarget = html.unescape(urllib.parse.unquote(sHref[1:]))
+            if sTarget in setIds or sHref[1:] in setIds: return oMatch.group(0)
+            lCandidates = dByKey.get(idKey(sTarget), []) if sTarget else []
+            if len(lCandidates) == 1:
+                note("in-page links repaired")
+                return relink("#" + lCandidates[0])
+            note("in-page links to nothing made plain text")
+            return sInner
+        sDecoded = html.unescape(urllib.parse.unquote(sHref))
+        oInside = re.search(r"\]\((https?://[^)\s]+)\)", sDecoded)
+        if oInside:
+            note("addresses taken from Markdown")
+            return relink(html.escape(oInside.group(1), quote=True))
+        if re.match(r"(?i)(https?:|mailto:|tel:|ftp:|data:|javascript:)", sHref): return oMatch.group(0)
+        if sHref.startswith("//"):
+            note("addresses completed")
+            return relink("https:" + sHref)
+        if sHref.split("#")[0].split("?")[0].lower() in setLocal: return oMatch.group(0)
+        if c_reBareDomain.match(sDecoded) and not re.match(r"(?i)[^/]+\.(php|aspx?|html?|jsp)(?:[?#]|$)", sDecoded):
+            note("addresses completed")
+            return relink("https://" + sHref)
+        note("site-relative links made plain text")
+        return sInner
+    oBody = re.search(r"<body\b[^>]*>", sHtml)
+    iBody = oBody.end() if oBody else 0
+    sHtml = sHtml[:iBody] + c_reAnchor.sub(fnAnchor, sHtml[iBody:])
+    # The main landmark: after the contents list, or else after the title block, or else the whole body.
+    if not re.search(r"<main\b", sHtml) and oBody:
+        iEnd = sHtml.rfind("</body>")
+        oNavEnd = re.search(r"</nav>", sHtml)
+        oHeaderEnd = re.search(r'<header id="title-block-header">.*?</header>', sHtml, re.S)
+        iStart = oNavEnd.end() if oNavEnd else (oHeaderEnd.end() if oHeaderEnd else re.search(r"<body\b[^>]*>", sHtml).end())
+        if 0 < iStart < iEnd:
+            sHtml = sHtml[:iStart] + "\n<main>" + sHtml[iStart:iEnd].rstrip() + "\n</main>\n" + sHtml[iEnd:]
+            note("main landmark added")
+    return sHtml, dCounts
+
+
+def blockBreakers(sPath):
+    """The lines of a batch file whose unescaped ')' would close the parenthesized block they sit in: an echo of text
+    holding a bracket, as in echo ... (under 100 MB). Command Prompt reads the whole block before running it, so such a
+    line is a syntax error -- ". was unexpected at this time." -- whether or not its branch would run, and a syntax
+    error in a called batch file ends every batch file above it. Returns [(line number, text)]."""
+    lFound, iDepth = [], 0
+    try: sText = open(sPath, "rb").read().decode("utf-8-sig", errors="replace")
+    except OSError: return lFound
+    for iLine, sLine in enumerate(sText.replace("\r\n", "\n").split("\n"), 1):
+        sTrim = sLine.strip()
+        if not sTrim or re.match(r"(?i)^(rem(\s|$)|::)", sTrim): continue
+        oEcho = re.search(r"(?i)\becho[\s.:(]", sLine)
+        iEchoAt = oEcho.end() if oEcho and re.match(r'(?i)^\s*(?:>>?\s*"[^"]*"\s*)?echo[\s.:(]', sLine) else -1
+        bQuote, k = False, 0
+        while k < len(sLine):
+            ch = sLine[k]
+            if ch == '"': bQuote = not bQuote
+            elif ch == "^": k += 1
+            elif not bQuote:
+                bInEcho = iEchoAt >= 0 and k >= iEchoAt
+                if ch == "(" and not bInEcho: iDepth += 1
+                elif ch == ")":
+                    if bInEcho and iDepth > 0:
+                        sRest = sLine[k + 1:].strip()
+                        if sRest and not sRest.startswith(("&", "|", ">", "else")): lFound.append((iLine, sTrim[:100]))
+                        iDepth -= 1
+                    elif not bInEcho: iDepth -= 1
+            k += 1
+    return lFound
+
+
 def wantedBytes(sPath, binData):
     """What the file should hold; None when it is not text we can decode."""
     sText = decodeText(binData)
     if sText is None: return None
     sText = sText.replace("\r\n", "\n").replace("\r", "\n")
-    if sPath.lower().endswith(".htm") and os.path.isfile(sPath[:-4] + ".md"): sText = oneTitleHeading(sText)
+    if sPath.lower().endswith(".htm") and os.path.isfile(sPath[:-4] + ".md"):
+        sText = oneTitleHeading(sText)
+        sText = finishPage(sText, set(os.listdir(os.path.dirname(os.path.abspath(sPath)))))[0]
     sText = sText.replace("\n", "\r\n")
     bBom = not sPath.lower().endswith(c_lsNoBom) and os.path.basename(sPath).lower() not in c_lsNoBomNames
     return (("\ufeff" + sText) if bBom else sText).encode("utf-8")

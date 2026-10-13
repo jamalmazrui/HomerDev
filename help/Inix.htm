@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc 3.12.1" />
@@ -182,6 +182,7 @@
   </style>
 </head>
 <body>
+<main>
 <h1 id="the-.inix-format">The .inix format</h1>
 <p><em>How Homer programs keep settings, answers and small tables in
 plain text, and why they prefer it to JSON. For the Homer Development
@@ -211,10 +212,11 @@ ways:
 <li><strong>Plain</strong>, for a value with no equals sign in it. Write
 the name and the equals sign with nothing after them, and put the value
 on the lines below, with no marks around it. The value runs to the next
-line that reads as <code>name = value</code>, the next section line, or
-the end of the file, which is why it cannot itself contain an equals
-sign. Blank lines inside it are part of it; blank lines at its end are
-layout and are dropped.</li>
+line that reads as <code>name = value</code>, the next section line, the
+next line beginning with a semicolon (a comment), or the end of the
+file, which is why it cannot itself contain an equals sign or a line
+beginning with a semicolon. Blank lines inside it are part of it; blank
+lines at its end are layout and are dropped.</li>
 <li><strong>Backtick fence</strong>, for a value that contains an equals
 sign, or whenever a writer wants the more reliable form every time.
 Write <code>name = `</code> and then the value, and close it with a line
@@ -298,5 +300,6 @@ its settings (<code>EdSharp.inix</code>). Settings live in
 <code>configs\</code>; a record of what a run did lives in
 <code>logs\</code>.</li>
 </ul>
+</main>
 </body>
 </html>

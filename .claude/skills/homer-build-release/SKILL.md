@@ -46,7 +46,8 @@ cmd reads a forward slash as a switch):
    older than their `kitNeeded`.
 2. `build` (or `build nobump` to keep the version). Steps the version
    in `version.txt`, compiles into `exec`, builds `<App>_setup.exe` at the top
-   of the project, refreshes the kit's scripts into `scripts`.
+   of the project, refreshes the kit's scripts into `scripts` -- or, when
+   nothing the app ships has changed, keeps all of it as it is.
 3. A quick test of `exec\<App>.exe`.
 4. `scripts\tidy`: files into place, strays into `notes`, a whitelist
    `.gitignore` from RepoFiles.txt, untracks what the whitelist leaves out.
@@ -71,6 +72,20 @@ cycle stopped.
 
 When a change touches only build scripts, a build with `nobump` proves it; a
 release can wait for the app's next real change.
+
+NOTHING CHANGED, NOTHING DONE. Every step skips work whose inputs have not
+changed since it last succeeded, and never downloads what is already current:
+the kit's one fingerprint store (`scripts\fingerprint.py` in the kit, recorded in
+the project's `exec\fingerprints.json`) decides, and each decision is in the
+log. A job's inputs are exactly what it is made from -- a sample's own classes,
+not the whole of `exec\CSharp` -- and a job is current only while its outputs
+are the ones it last made. An app build that finds nothing it ships changed --
+the program's sources and kit classes, and everything the installer packs --
+compiles nothing, keeps its version number and keeps its installer, so release
+finds that version already published. When anything shipped changed, even a help
+page, the build is the full one with a new number, so the change reaches users.
+`build fresh` builds regardless. A new step follows the same rule: name its
+inputs and outputs, check before the work, record after success.
 
 ## Reading uploaded logs
 

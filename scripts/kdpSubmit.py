@@ -1,4 +1,4 @@
-﻿"""kdpSubmit.py -- fills in the Kindle Direct Publishing form for Blind Vibe Coding.
+﻿"""kdpSubmit.py -- fills in the Kindle Direct Publishing form for a book, from its answers file.
 
 HOW IT WORKS. The script drives a real Microsoft Edge window on this PC with Playwright
 (Google Chrome with --chrome), using its own browser profile under %LOCALAPPDATA%\\KdpSubmit.
@@ -21,7 +21,7 @@ USAGE
   kdpSubmit.cmd --ask                  ask before the permanent Details fields, the Content tab, the Pricing tab, and Publish
   kdpSubmit.cmd --no-publish           do everything but stop with the draft saved
   kdpSubmit.cmd --stop-after details   stop after that tab, draft saved; also content or pricing
-  kdpSubmit.cmd --book My_Book       the book whose answers are configs\\My_Book_KDP.inix
+  kdpSubmit.cmd --book My_Book       the book whose answers are configs\\My_Book_KDP.inix (required when more than one is on file)
   kdpSubmit.cmd --title-id ABCDE12345 --start-at content   restart at the Content (or pricing) tab of that draft
   kdpSubmit.cmd --reupload             upload the EPUB and cover again even if the receipt says KDP has them
   kdpSubmit.cmd --create-new           allow a new title to be created when no draft of the book is found
@@ -42,7 +42,7 @@ import datetime, glob, json, os, platform, re, shutil, subprocess, sys, time, tr
 PlaywrightTimeout, sync_playwright = TimeoutError, None  # set by loadPlaywright() once the log is open, so an import failure is logged
 
 c_iProcessingMinutes, c_iSaveWaitSeconds, c_iSettleSeconds, c_iSignInMinutes = 20, 45, 20, 15
-c_sVersion = "2026-10-08 version 38: DRM that cannot be confirmed off blocks Publish; version 37: an upload is judged only by what KDP says after it, praise and recommendations are not problems, and done means KDP names the file just sent; version 36, from the 11:39 run: KDP took 33 seconds to leave the Details tab after the second Save and Continue, the page was still changing when its messages were read, and the third press landed on the Content tab's own Save and Continue, which moved to Pricing and skipped the EPUB upload, then crashed the control dump; now Save and Continue is never pressed again once the page has left its tab, a run whose messages cannot be read waits for the page to settle before deciding, the Content and Pricing steps open their own tab address when the browser is elsewhere, and a control dump interrupted by a navigation is read again; was version 35: before touching KDP, the EPUB is rebuilt with build.py when it is missing or older than the manuscript or its build files (the 6 October edition added Blind Apps passages), so a run always submits the latest text and a failed build stops the run with exit code 2; was version 34, from the 13:42 run of kdpBooks on 5 October, from the 13:42 run of kdpBooks, which finished twelve books and left four at two categories: Add another category does add a chain, but KDP pre-fills the new chain's top menu with the last chain's first step, so the script saw no empty top menu, pressed Add again, found it disabled and gave up; a chain that appears after Add another category is now used for the next path whether or not it is pre-filled, and the save-and-reopen fallback presses Add another category once the picker is open again; the Remove existing categories? dialog was answered with Continue on the four older books and their categories verified; was version 33, from the 10:43 run of kdpBooks, which chose all three categories on nine books but lost them on three older ones and stopped at two on two more: after Save categories, KDP asks Remove existing categories? on a book whose categories predate the picker, and closeNotice pressed that dialog's Close, throwing the choices away, so the dialog is now answered with its continue button and the buttons seen are logged; and when Add another category is disabled after a finished chain (Self-Help > Memory Improvement), the chosen categories are saved and the picker reopened, which gives a fresh chain for the next path; was version 32, from the 09:15 run of kdpBooks, which chose none or one of three categories on seven books: KDP keeps the menus of saved and reset chains on the page, so a path's first step was looked for after the last filled menu and found a sub-menu instead, where a containing name (Art for Arts & Photography) was taken and the real top menu never used; now the top-level menus are found by content, a new path starts in the last empty one (Add another category is pressed again when there is none), a menu is checked to have taken its option, only an exact name is accepted anywhere, and the wait after a pick is for the menu below to show new options or new boxes to appear, up to 10 seconds, with 15 seconds for the placement box; was version 31: no category is ever replaced by General or by an unrelated name; a path KDP does not offer is dropped and reported with the placements KDP offers there, a path whose placement name is already chosen for the book is skipped as a duplicate (Tennis twice, 19:10 run), and General is ticked only when no proposed path can be chosen at all, since KDP needs one category to save; the console names each category by its whole path; was version 30, from the 17:38 run of kdpBooks: a picker menu is used whether or not it is visible, since KDP hides its native menus behind styled drop-downs (version 29 required visibility and found no first step on three books); a Content tab that KDP leaves by itself no longer waits 30 seconds for DRM radios; was version 29, from the 16:46 run of kdpBooks: the picker's placement boxes are read as they are (KDP reuses the same box elements with new labels when a menu changes, so marking them as seen hid every placement and three books were published with one category); a step is looked for only in menus after the one the last step used; a chain that ends without a placement is dropped and its menus reused after Reset, since Add another category is disabled until the chain is complete; the Content tab's accuracy confirmation boxes are ticked when KDP asks (Confirm your answers are accurate and check the box), and that message now stops Save and Continue instead of being pressed through; a navigation aborted by a hand on the browser no longer crashes the run; DRM is left alone when KDP has already moved past the Content tab; was version 28, from the 15:15 run of kdpBooks: the picker's Reset clears only the newest chain of menus, so the saved chains are removed one by one through their Remove links (they had counted toward the three and hidden Add another category on nine books); the DRM consent box is found by its words (version 27 looked for a literal backslash) after waiting for the Content tab to draw; KDP's Categories update notice is closed before Save as Draft, and a button the ordinary click cannot reach is clicked by script; a path ending above a placement takes General or a placement sharing a word with the path, never an unrelated first one (Gun & Firearm Policy was ticked for Communication Policy); was version 27: the category picker uses only its newest menu and waits for the next menu to draw (on 4 October a History step was matched in the top menu and saved History > General instead of Mathematics > History); a step KDP does not offer is replaced by the nearest offered name, then the General placement, then the first placement, so every path ends on a placement and the book keeps three categories, with the paths chosen reported; the DRM No choice also ticks KDP's new consent box (Consent is required when not applying Digital Rights Management); page messages read during a navigation no longer crash the run; was version 26: the Bookshelf row's labels are all read, so Live followed by Updates in review stops the run before the setup page, and an aborted navigation to that page is treated as the same lock rather than a crash (the 16:42 run); was version 25: a live book with updates in review is reported as such and left alone until the update is live; was version 24: publishes unless KDP refused a save or a file failed to upload; everything else unconfirmed is listed to check afterwards; was version 23: the royalty radio selector is quoted (the 15:05 run crashed on it one step before Publish); a submission acknowledged by KDP counts as submitted even when the Bookshelf label cannot be read; was version 22: the accessibility radio is chosen by its label, since KDP briefly gives all four the same value after an upload; the release option and a missing Bookshelf status no longer count as problems; a processed upload is recognized by file name; was version 21: the Draft2Digital section no longer leaks into KDP's ISBN and publisher; saved categories are kept without opening the picker; KDP's spelling notice is not treated as a refusal; was version 20: .inix answers, Homer layout"
+c_sVersion = "2026-10-12 version 39: a book is named with --book whenever more than one is on file; the answers may keep KDP's cover (coverFile = Keep KDP's cover) and its AI-generated content answers (aiContent used = Keep), so a live book's manuscript is replaced without touching what KDP already holds right; was version 38: DRM that cannot be confirmed off blocks Publish; version 37: an upload is judged only by what KDP says after it, praise and recommendations are not problems, and done means KDP names the file just sent; version 36, from the 11:39 run: KDP took 33 seconds to leave the Details tab after the second Save and Continue, the page was still changing when its messages were read, and the third press landed on the Content tab's own Save and Continue, which moved to Pricing and skipped the EPUB upload, then crashed the control dump; now Save and Continue is never pressed again once the page has left its tab, a run whose messages cannot be read waits for the page to settle before deciding, the Content and Pricing steps open their own tab address when the browser is elsewhere, and a control dump interrupted by a navigation is read again; was version 35: before touching KDP, the EPUB is rebuilt with build.py when it is missing or older than the manuscript or its build files (the 6 October edition added Blind Apps passages), so a run always submits the latest text and a failed build stops the run with exit code 2; was version 34, from the 13:42 run of kdpBooks on 5 October, from the 13:42 run of kdpBooks, which finished twelve books and left four at two categories: Add another category does add a chain, but KDP pre-fills the new chain's top menu with the last chain's first step, so the script saw no empty top menu, pressed Add again, found it disabled and gave up; a chain that appears after Add another category is now used for the next path whether or not it is pre-filled, and the save-and-reopen fallback presses Add another category once the picker is open again; the Remove existing categories? dialog was answered with Continue on the four older books and their categories verified; was version 33, from the 10:43 run of kdpBooks, which chose all three categories on nine books but lost them on three older ones and stopped at two on two more: after Save categories, KDP asks Remove existing categories? on a book whose categories predate the picker, and closeNotice pressed that dialog's Close, throwing the choices away, so the dialog is now answered with its continue button and the buttons seen are logged; and when Add another category is disabled after a finished chain (Self-Help > Memory Improvement), the chosen categories are saved and the picker reopened, which gives a fresh chain for the next path; was version 32, from the 09:15 run of kdpBooks, which chose none or one of three categories on seven books: KDP keeps the menus of saved and reset chains on the page, so a path's first step was looked for after the last filled menu and found a sub-menu instead, where a containing name (Art for Arts & Photography) was taken and the real top menu never used; now the top-level menus are found by content, a new path starts in the last empty one (Add another category is pressed again when there is none), a menu is checked to have taken its option, only an exact name is accepted anywhere, and the wait after a pick is for the menu below to show new options or new boxes to appear, up to 10 seconds, with 15 seconds for the placement box; was version 31: no category is ever replaced by General or by an unrelated name; a path KDP does not offer is dropped and reported with the placements KDP offers there, a path whose placement name is already chosen for the book is skipped as a duplicate (Tennis twice, 19:10 run), and General is ticked only when no proposed path can be chosen at all, since KDP needs one category to save; the console names each category by its whole path; was version 30, from the 17:38 run of kdpBooks: a picker menu is used whether or not it is visible, since KDP hides its native menus behind styled drop-downs (version 29 required visibility and found no first step on three books); a Content tab that KDP leaves by itself no longer waits 30 seconds for DRM radios; was version 29, from the 16:46 run of kdpBooks: the picker's placement boxes are read as they are (KDP reuses the same box elements with new labels when a menu changes, so marking them as seen hid every placement and three books were published with one category); a step is looked for only in menus after the one the last step used; a chain that ends without a placement is dropped and its menus reused after Reset, since Add another category is disabled until the chain is complete; the Content tab's accuracy confirmation boxes are ticked when KDP asks (Confirm your answers are accurate and check the box), and that message now stops Save and Continue instead of being pressed through; a navigation aborted by a hand on the browser no longer crashes the run; DRM is left alone when KDP has already moved past the Content tab; was version 28, from the 15:15 run of kdpBooks: the picker's Reset clears only the newest chain of menus, so the saved chains are removed one by one through their Remove links (they had counted toward the three and hidden Add another category on nine books); the DRM consent box is found by its words (version 27 looked for a literal backslash) after waiting for the Content tab to draw; KDP's Categories update notice is closed before Save as Draft, and a button the ordinary click cannot reach is clicked by script; a path ending above a placement takes General or a placement sharing a word with the path, never an unrelated first one (Gun & Firearm Policy was ticked for Communication Policy); was version 27: the category picker uses only its newest menu and waits for the next menu to draw (on 4 October a History step was matched in the top menu and saved History > General instead of Mathematics > History); a step KDP does not offer is replaced by the nearest offered name, then the General placement, then the first placement, so every path ends on a placement and the book keeps three categories, with the paths chosen reported; the DRM No choice also ticks KDP's new consent box (Consent is required when not applying Digital Rights Management); page messages read during a navigation no longer crash the run; was version 26: the Bookshelf row's labels are all read, so Live followed by Updates in review stops the run before the setup page, and an aborted navigation to that page is treated as the same lock rather than a crash (the 16:42 run); was version 25: a live book with updates in review is reported as such and left alone until the update is live; was version 24: publishes unless KDP refused a save or a file failed to upload; everything else unconfirmed is listed to check afterwards; was version 23: the royalty radio selector is quoted (the 15:05 run crashed on it one step before Publish); a submission acknowledged by KDP counts as submitted even when the Bookshelf label cannot be read; was version 22: the accessibility radio is chosen by its label, since KDP briefly gives all four the same value after an upload; the release option and a missing Bookshelf status no longer count as problems; a processed upload is recognized by file name; was version 21: the Draft2Digital section no longer leaks into KDP's ISBN and publisher; saved categories are kept without opening the picker; KDP's spelling notice is not treated as a refusal; was version 20: .inix answers, Homer layout"
 c_lProfileSkip = ["Cache", "Code Cache", "GPUCache", "Service Worker", "DawnCache", "GrShaderCache", "ShaderCache", "blob_storage", "File System", "IndexedDB", "Session Storage", "Storage", "Extensions", "Extension State", "Extension Rules", "optimization_guide_hint_cache_store", "Platform Notifications"]
 c_lListKeys = ["afterPublishing", "categories", "contributors", "keywords", "priceReasoning", "recommended"]  # .inix keys whose value is a list: one item per line, or comma-separated on one line
 c_lNestedSections = ["accessibility", "aiContent", "draft2digital", "notes"]  # .inix sections kept as dictionaries under their own name; every other section is flattened into the answers. draft2digital holds another store's answers (its isbn and publisher once overrode KDP's and KDP refused the save)
@@ -255,6 +255,11 @@ def answersName():
     if sBook: return sBook + "_KDP.inix"
     lFound = sorted(glob.glob(os.path.join(sProject, "configs", "*_KDP.inix")))
     return os.path.basename(lFound[0]) if len(lFound) == 1 else "Book_KDP.inix"
+
+
+def booksOnFile():
+    """Every book with an answers file: the <Book> of each configs\\<Book>_KDP.inix."""
+    return sorted(os.path.basename(s)[:-len("_KDP.inix")] for s in glob.glob(os.path.join(sProject, "configs", "*_KDP.inix")))
 
 
 def logStem():
@@ -1812,7 +1817,10 @@ def fillContent(page):
         uploadFile(page, "Manuscript", sManuscript, "data-assets-interior-file-upload-browse-button-announce", r"manuscript .*uploaded successfully")
     else:
         say("The manuscript " + d["manuscriptFile"] + " is already uploaded and processed; not uploading it again.")
-    if assetNeedsUpload("Cover", sCover, bCover):
+    if keepsCover(d):
+        say("The cover: kept as KDP holds it, as the answers say.")
+        if not bCover: unresolved("Cover", "the answers say to keep KDP's cover, but KDP shows no cover for this book")
+    elif assetNeedsUpload("Cover", sCover, bCover):
         clickButton(page, "Upload a cover you already have", ["Upload a cover you already have"], False)
         uploadFile(page, "Cover", sCover, "data-assets-cover-file-upload-browse-button-announce", r"cover uploaded successfully")
     else:
@@ -1829,8 +1837,12 @@ def fillContent(page):
     else:
         unresolved("File processing", "KDP had not finished processing the " + ("manuscript" if not bManuscript else "cover") + " after " + str(c_iProcessingMinutes) + " minutes")
         say("Processing is still running; this blocks publishing until it finishes.")
-    say("AI-generated content: yes; text, images and translations as the JSON says.")
-    answerAiContent(page)
+    if keepsAi(d):
+        say("AI-generated content: kept exactly as KDP holds it, as the answers say.")
+        log("KEPT the AI-generated content section untouched (aiContent used = Keep)")
+    else:
+        say("AI-generated content: yes; text, images and translations as the JSON says.")
+        answerAiContent(page)
     sAccess = str(d.get("accessibility", {}).get("imageReading", "All")).lower()
     sValue = "readable" if sAccess.startswith("all") else "partially_readable" if sAccess.startswith("some") else "not_readable" if sAccess.startswith("none") else "unknown"
     say("Accessibility: " + {"readable": "all informative images have alternative text.", "partially_readable": "some informative images have alternative text.", "not_readable": "no informative images have alternative text.", "unknown": "unknown."}[sValue])
@@ -1882,6 +1894,12 @@ def fillPricing(page):
     say("Pricing tab.")
     d = dAnswers
     if not onTab(page, "pricing"): return unresolved("Pricing tab", "not on the Pricing page (URL " + page.url + ") and it could not be opened directly; nothing clicked there")
+    if keepsPricing(d):
+        # Nothing is clicked: pressing All territories or the lending box would change a setting already right.
+        dumpControls(page, "pricing, kept as KDP holds it")
+        say("Pricing: kept exactly as KDP holds it, as the answers say; nothing on the tab was touched.")
+        log("KEPT the Pricing tab untouched (keepPricing = Yes)")
+        return True
     dumpControls(page, "pricing, before filling")
     if not ask("Pricing tab: KDP Select " + d["kdpSelect"] + "; territories " + d["territories"] + "; royalty " + d["royalty"] + "; US list price $" + str(d["priceUsd"]) + ". Proceed?"):
         return unresolved("Pricing tab", "you chose not to proceed")
@@ -1927,11 +1945,14 @@ def fillPricing(page):
 
 def finalReview(page):
     d = dAnswers
-    say("Review of the answers the JSON asked for. Title: " + d["title"] + ". Subtitle: " + d["subtitle"] + ". Author: " + d["author"] + ".")
-    say("First sentence of the description: " + d["description"].split(".")[0] + ".")
-    say("Categories: " + "; ".join(c_dCategoryFixes.get(sPath, sPath) for sPath in d["categories"]) + ".")
-    say("Keywords: " + "; ".join(d["keywords"]) + ".")
-    say("DRM: " + d["drm"] + ". KDP Select: " + d["kdpSelect"] + ". Royalty: " + d["royalty"] + " at $" + str(d["priceUsd"]) + ".")
+    say("Review of the answers the JSON asked for. Title: " + d["title"] + ". Subtitle: " + d.get("subtitle", "kept as KDP holds it") + ". Author: " + d.get("author", "kept as KDP holds it") + ".")
+    if keepsDetails(d):
+        say("Description, categories and keywords: kept as KDP holds them.")
+    else:
+        say("First sentence of the description: " + d["description"].split(".")[0] + ".")
+        say("Categories: " + "; ".join(c_dCategoryFixes.get(sPath, sPath) for sPath in d["categories"]) + ".")
+        say("Keywords: " + "; ".join(d["keywords"]) + ".")
+    say("DRM: " + d["drm"] + ". " + ("Pricing: kept as KDP holds it." if keepsPricing(d) else "KDP Select: " + d["kdpSelect"] + ". Royalty: " + d["royalty"] + " at $" + str(d["priceUsd"]) + "."))
     lBlocking = [u for u in lUnresolved if u.split(":")[0].strip() in c_lBlocking]
     lAdvisory = [u for u in lUnresolved if u not in lBlocking]
     if lBlocking:
@@ -2032,19 +2053,42 @@ def checkOptions():
 def checkAnswers(d):
     """Makes sure the JSON holds every answer the script needs, with values it knows how to enter."""
     lProblems = []
-    for sKey in ["language", "title", "subtitle", "editionNumber", "author", "description", "publishingRights", "sexuallyExplicit", "primaryMarketplace", "categories", "keywords", "manuscriptFile", "drm", "coverFile", "aiContent", "kdpSelect", "territories", "royalty", "priceUsd"]:
+    # A tab the answers keep as KDP holds it needs no answers of its own (12 October 2026).
+    lDetails = [] if keepsDetails(d) else ["language", "title", "subtitle", "editionNumber", "author", "description", "publishingRights", "sexuallyExplicit", "primaryMarketplace", "categories", "keywords"]
+    lPricing = [] if keepsPricing(d) else ["kdpSelect", "territories", "royalty", "priceUsd"]
+    # title is needed even when the Details are kept: the Bookshelf row is found, and its status checked, by it.
+    for sKey in sorted(set(lDetails + ["title"])) + ["manuscriptFile", "drm", "coverFile", "aiContent"] + lPricing:
         if sKey not in d: lProblems.append("missing " + sKey)
+    if keepsDetails(d) and not str(d.get("kdpTitleId", "")).strip(): lProblems.append("keepDetails needs the book's kdpTitleId, since only a book already on KDP has details to keep")
     if lProblems: return lProblems
+    if not keepsDetails(d): lProblems += checkDetailAnswers(d)
+    if not d["drm"].strip().lower().startswith(("yes", "no")): lProblems.append("drm must start with Yes or No")
+    return lProblems + checkRest(d)
+
+
+def checkDetailAnswers(d):
+    """The Details answers, checked only when the Details tab is to be filled."""
+    lProblems = []
     if len(d["author"].split()) < 2: lProblems.append("author needs a first and last name")
     if not d["publishingRights"].lower().startswith("i own"): lProblems.append("publishingRights: only 'I own the copyright...' is supported")
     if d["sexuallyExplicit"].strip().lower() not in ("yes", "no"): lProblems.append("sexuallyExplicit must be Yes or No")
     if d["primaryMarketplace"].lower() not in ("amazon.com", "us"): lProblems.append("primaryMarketplace: only Amazon.com is supported")
     if len(d["categories"]) != 3: lProblems.append("categories must list exactly 3 paths")
     if not (1 <= len(d["keywords"]) <= 7): lProblems.append("keywords must list 1 to 7 phrases")
-    if not d["drm"].strip().lower().startswith(("yes", "no")): lProblems.append("drm must start with Yes or No")
-    for sKey in ["used", "texts", "images", "translations", "tools"]:
-        if sKey not in d["aiContent"]: lProblems.append("aiContent." + sKey + " missing")
-    if d["aiContent"].get("used", "").lower() != "yes": lProblems.append("aiContent.used: only Yes is supported by this script")
+    return lProblems
+
+
+def checkRest(d):
+    """The AI-content and Pricing answers."""
+    lProblems = []
+    # KEEP (12 October 2026): a live book whose AI disclosure KDP already holds as it should be -- the music books name
+    # their text tools and their image tool separately, which this script's single tools answer cannot -- says
+    # used = Keep, and the section is left exactly as KDP has it.
+    if not keepsAi(d):
+        for sKey in ["used", "texts", "images", "translations", "tools"]:
+            if sKey not in d["aiContent"]: lProblems.append("aiContent." + sKey + " missing")
+        if d["aiContent"].get("used", "").lower() != "yes": lProblems.append("aiContent.used: only Yes or Keep is supported by this script")
+    if keepsPricing(d): return lProblems
     if not d["kdpSelect"].lower().startswith(("do not", "enroll")): lProblems.append("kdpSelect must start with 'Do not' or 'Enroll'")
     if not d["territories"].lower().startswith("all"): lProblems.append("territories: only 'All territories' is filled by this script")
     if not d["royalty"].strip().startswith(("35", "70")): lProblems.append("royalty must be 35% or 70%")
@@ -2054,6 +2098,26 @@ def checkAnswers(d):
     except Exception:
         lProblems.append("priceUsd must be a number")
     return lProblems
+
+
+def keepsDetails(d):
+    """True when the answers keep the Details tab as KDP holds it (keepDetails = Yes): the run starts at Content."""
+    return str(d.get("keepDetails", "")).strip().lower().startswith("y")
+
+
+def keepsPricing(d):
+    """True when the answers keep the Pricing tab as KDP holds it (keepPricing = Yes): nothing on it is touched."""
+    return str(d.get("keepPricing", "")).strip().lower().startswith("y")
+
+
+def keepsCover(d):
+    """True when the answers say to keep the cover KDP already holds (coverFile = Keep KDP's cover)."""
+    return str(d.get("coverFile", "")).strip().lower().startswith("keep")
+
+
+def keepsAi(d):
+    """True when the answers say to keep KDP's AI-generated content answers as they are (aiContent used = Keep)."""
+    return str(d.get("aiContent", {}).get("used", "")).strip().lower().startswith("keep")
 
 
 def finish(page, browser, sState, sNote):
@@ -2135,6 +2199,15 @@ def main():
         return 2
     if not loadPlaywright(): return 2
     sStopAfter, sTitleId, sStartAt = argValue("--stop-after"), argValue("--title-id"), argValue("--start-at")
+    # WHICH BOOK IS NAMED, NEVER GUESSED (12 October 2026). With one answers file, a bare run used it; corrected music
+    # manuscripts were then "republished" by a run that opened Blind Vibe Coding, the only book on file. With more
+    # than one book on file, a run without --book now does nothing and names the command for each.
+    lBooks = booksOnFile()
+    if "--book" not in sys.argv and len(lBooks) > 1:
+        log("Books on file: " + ", ".join(lBooks) + "; none named with --book, so nothing was done")
+        say("There are " + str(len(lBooks)) + " books with answers files, so name the one to submit:")
+        for sBook in lBooks: say("  kdpSubmit --book " + sBook)
+        return 2
     sAnswers = loadAnswers()
     if not sAnswers:
         say("Missing " + os.path.join(sProject, "configs", answersName()))
@@ -2144,11 +2217,18 @@ def main():
     if lProblems:
         say("The answers file cannot be used as it stands: " + "; ".join(lProblems) + ". Nothing was done.")
         return 2
+    if keepsDetails(dAnswers) and sStartAt != "pricing":
+        if sStartAt != "content": log("keepDetails = Yes: the Details tab is kept as KDP holds it, so the run starts at Content")
+        sStartAt = "content"
+        say("Details: kept exactly as KDP holds them, as the answers say; the run starts at the Content tab.")
     sBuildProblem = ensureEpub(os.path.join(sProject, dAnswers["manuscriptFile"]))
     if sBuildProblem:
         say("The EPUB could not be brought up to date: " + sBuildProblem + ". Nothing was sent to KDP.")
         return 2
     for sKey in ("manuscriptFile", "coverFile"):
+        if sKey == "coverFile" and keepsCover(dAnswers):
+            log("coverFile: keep the cover KDP already holds, as the answers say")
+            continue
         sPath = os.path.join(sProject, dAnswers[sKey])
         log(sKey + " " + sPath + (" exists, " + format(os.path.getsize(sPath), ",") + " bytes, sha256 " + fileSha256(sPath)[:16] if os.path.exists(sPath) else " MISSING"))
         if not os.path.exists(sPath):

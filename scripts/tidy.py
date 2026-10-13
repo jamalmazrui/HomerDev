@@ -359,7 +359,13 @@ def installerExcludes():
 
 
 def namedByRepoFiles():
-    """Every line of RepoFiles.txt that is not blank or a comment."""
+    """Every line of RepoFiles.txt that is not blank or a comment, and every app source build.cmd compiles.
+
+    A SOURCE THE BUILD COMPILES IS NEVER A STRAY (12 October 2026). bookFido's build.cmd compiles PdfStructure.cs
+    beside bookFido.cs (its appSources line), but RepoFiles.txt did not name it: tidy moved it into notes\\other as a
+    stray, the repository never carried it, and the next build stopped on "Source file PdfStructure.cs could not be
+    found". A file build.cmd lists in appSources is now named whether or not RepoFiles.txt says so, and the omission
+    is reported so the line gets added."""
     sPath = os.path.join(sRoot, "RepoFiles.txt")
     if not os.path.exists(sPath): return []
     lsNames = []
@@ -367,7 +373,27 @@ def namedByRepoFiles():
         sLine = sLine.strip()
         if sLine == "" or sLine.startswith("#") or sLine.startswith(";"): continue
         lsNames.append(sLine)
+    setLower = set(s.replace("\\", "/").lower() for s in lsNames)
+    for sSource in appSourcesOfBuild():
+        if sSource.replace("\\", "/").lower() in setLower: continue
+        lsNames.append(sSource)
+        if sSource not in lsReportedSources:
+            lsReportedSources.append(sSource)
+            sayLine("%s is compiled by build.cmd but not named in RepoFiles.txt; it is kept and pushed anyway. Add it to RepoFiles.txt." % sSource)
     return lsNames
+
+
+lsReportedSources = []
+
+
+def appSourcesOfBuild():
+    """The files build.cmd's appSources line names (set "appSources=A.cs B.cs"), or none."""
+    sBuild = os.path.join(sRoot, "build.cmd")
+    if not os.path.isfile(sBuild): return []
+    try: sText = open(sBuild, "rb").read().decode("utf-8-sig", errors="replace")
+    except Exception: return []
+    oLine = re.search(r'(?im)^\s*set\s+"appSources=([^"]*)"', sText)
+    return [s for s in (oLine.group(1).split() if oLine else []) if s and "%" not in s]
 
 
 def namedByLocalFiles():

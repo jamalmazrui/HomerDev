@@ -96,7 +96,10 @@ class Cache:
         """One SHA-256 over every input file's relative path and content, and the extra text given."""
         oSha = hashlib.sha256()
         for sFile in self.expand(lsInputs, bSkipProducts):
-            sRelative = os.path.relpath(sFile, self.sProject).replace("\\", "/").lower()
+            # AN INPUT ON ANOTHER DRIVE (12 October 2026): an app's build names the kit's classes, and the kit may sit on
+            # another drive, where a relative path cannot be made; its whole path stands in.
+            try: sRelative = os.path.relpath(sFile, self.sProject).replace("\\", "/").lower()
+            except ValueError: sRelative = os.path.normcase(os.path.abspath(sFile)).replace("\\", "/")
             oSha.update(sRelative.encode("utf-8") + b"\0")
             oSha.update((self.fileHash(sFile) if os.path.isfile(sFile) else "missing").encode("ascii") + b"\n")
         for sExtra in (lsExtra or []): oSha.update(b"extra\0" + str(sExtra).encode("utf-8") + b"\n")

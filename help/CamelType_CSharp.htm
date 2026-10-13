@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc 3.12.1" />
@@ -247,6 +247,7 @@
   </style>
 </head>
 <body>
+<main>
 <h1 id="camel-type-c-coding-guidelines">Camel Type: C# Coding
 Guidelines</h1>
 <p>Camel Type is a coding style designed for systematic readability,
@@ -294,10 +295,10 @@ abbreviation (<code>sb</code> for <code>StringBuilder</code>,
 <code>ex</code> for <code>Exception</code>). With one instance in scope
 the class-name prefix is the whole name:</p>
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode csharp"><code class="sourceCode cs"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>StreamWriter writer <span class="op">=</span> <span class="kw">new</span> <span class="fu">StreamWriter</span><span class="op">(</span>sPath<span class="op">);</span>   <span class="co">// not oWriter</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>Form form <span class="op">=</span> <span class="kw">new</span> <span class="fu">Form</span><span class="op">();</span>                           <span class="co">// not oForm</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>OpenFileDialog dialog <span class="op">=</span> <span class="kw">new</span> <span class="fu">OpenFileDialog</span><span class="op">();</span>     <span class="co">// not oDlg</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>dynamic oWord <span class="op">=</span> com<span class="op">.</span><span class="fu">createApp</span><span class="op">(</span><span class="st">&quot;Word.Application&quot;</span><span class="op">);</span> <span class="co">// COM -&gt; o is correct</span></span></code></pre></div>
+class="sourceCode csharp"><code class="sourceCode cs"><span id="cb1-1">StreamWriter writer <span class="op">=</span> <span class="kw">new</span> <span class="fu">StreamWriter</span><span class="op">(</span>sPath<span class="op">);</span>   <span class="co">// not oWriter</span></span>
+<span id="cb1-2">Form form <span class="op">=</span> <span class="kw">new</span> <span class="fu">Form</span><span class="op">();</span>                           <span class="co">// not oForm</span></span>
+<span id="cb1-3">OpenFileDialog dialog <span class="op">=</span> <span class="kw">new</span> <span class="fu">OpenFileDialog</span><span class="op">();</span>     <span class="co">// not oDlg</span></span>
+<span id="cb1-4">dynamic oWord <span class="op">=</span> com<span class="op">.</span><span class="fu">createApp</span><span class="op">(</span><span class="st">&quot;Word.Application&quot;</span><span class="op">);</span> <span class="co">// COM -&gt; o is correct</span></span></code></pre></div>
 <h2 id="constants">2. Constants</h2>
 <p>Constants follow the <strong>same naming rules as variables</strong>
 — the Hungarian type prefix and lower camel case, with <strong>no
@@ -306,10 +307,10 @@ earlier convention is obsolete). A constant is distinguished from a
 variable only by the <code>const</code> or <code>static readonly</code>
 keyword, never by its name.</p>
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode csharp"><code class="sourceCode cs"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="dt">string</span> sDefaultEncoding <span class="op">=</span> <span class="st">&quot;utf-8&quot;</span><span class="op">;</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="dt">int</span> iTimeoutMs <span class="op">=</span> <span class="dv">60000</span><span class="op">;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">static</span> <span class="kw">readonly</span> HashSet<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> hsSupportedExts <span class="op">=</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">new</span> HashSet<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> <span class="op">{</span> <span class="st">&quot;.docx&quot;</span><span class="op">,</span> <span class="st">&quot;.xlsx&quot;</span><span class="op">,</span> <span class="st">&quot;.pdf&quot;</span> <span class="op">};</span></span></code></pre></div>
+class="sourceCode csharp"><code class="sourceCode cs"><span id="cb2-1"><span class="dt">const</span> <span class="dt">string</span> sDefaultEncoding <span class="op">=</span> <span class="st">&quot;utf-8&quot;</span><span class="op">;</span></span>
+<span id="cb2-2"><span class="dt">const</span> <span class="dt">int</span> iTimeoutMs <span class="op">=</span> <span class="dv">60000</span><span class="op">;</span></span>
+<span id="cb2-3"><span class="kw">static</span> <span class="kw">readonly</span> HashSet<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> hsSupportedExts <span class="op">=</span></span>
+<span id="cb2-4">    <span class="kw">new</span> HashSet<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> <span class="op">{</span> <span class="st">&quot;.docx&quot;</span><span class="op">,</span> <span class="st">&quot;.xlsx&quot;</span><span class="op">,</span> <span class="st">&quot;.pdf&quot;</span> <span class="op">};</span></span></code></pre></div>
 <p>Two further points:</p>
 <ul>
 <li><strong>Constants are declared and initialized on their own lines,
@@ -372,5 +373,6 @@ user chose.</p>
 <h2 id="strings-and-double-quotes">7. Strings and double quotes</h2>
 <p>Use double-quoted string literals. Reserve single quotes for
 <code>char</code> literals.</p>
+</main>
 </body>
 </html>

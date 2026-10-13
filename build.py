@@ -488,11 +488,51 @@ def sampleInputs(sName, sScript):
     # NOT version.py (12 October 2026): each Python sample's build writes it, naming its own build script on the first
     # line, and checkHomerDev's clean deletes it -- so it held whichever sample built last, and FruitBasketPy rebuilt
     # every cycle with nothing changed. version.txt is what it is made from, and that is the input.
-    lsInputs = ["Templates/samples/" + sScript, "Templates/samples/version.txt", "exec/CSharp"]
-    if sName.endswith("Py"): lsInputs.append("exec/Python")
+    # ONLY WHAT IT IS MADE FROM (12 October 2026). The inputs were the whole of exec\\CSharp, and of exec\\Python for a
+    # Python sample, so any change to any kit class -- one no sample compiles -- rebuilt all four. Now they are what
+    # the sample's own build script names: a C# sample's homerSources lines (a line turned into a rem is not
+    # compiled), and a Python sample's --hidden-import modules with every kit module those import in turn, plus the
+    # classes of Homer.dll when that chain loads it. A script that names nothing readable keeps the whole folders, so a
+    # sample is never checked against less than it uses.
+    lsInputs = ["Templates/samples/" + sScript, "Templates/samples/version.txt"]
     for sExt in (".cs", ".py", ".spec"):
         if os.path.isfile(os.path.join(sScriptDir, "Templates", "samples", sName + sExt)): lsInputs.append("Templates/samples/" + sName + sExt)
-    return lsInputs
+    sText = ""
+    try: sText = open(os.path.join(sScriptDir, "Templates", "samples", sScript), "rb").read().decode("utf-8-sig", errors="replace")
+    except Exception: pass
+    lsClasses = [m.group(1) for m in re.finditer(r'(?im)^\s*set\s+"homerSources=[^\n]*?exec\\CSharp\\(\w+)\.cs', sText)]
+    lsModules = re.findall(r"--hidden-import\s+(\w+)", sText)
+    if sName.endswith("Py"):
+        if not lsModules: return lsInputs + ["exec/CSharp", "exec/Python"]
+        lsChain = kitPythonChain(lsModules + [sName])
+        lsInputs += ["exec/Python/" + sModule + ".py" for sModule in lsChain]
+        if "lbcnet" in lsChain or any("Homer.dll" in open(os.path.join(sScriptDir, "exec", "Python", sModule + ".py"), encoding="utf-8-sig", errors="replace").read() for sModule in lsChain):
+            lsInputs += ["exec/CSharp/" + sClass + ".cs" for sClass in c_lsHomerDllClasses]
+        return lsInputs
+    if not lsClasses: return lsInputs + ["exec/CSharp"]
+    return lsInputs + ["exec/CSharp/" + sClass + ".cs" for sClass in lsClasses]
+
+
+def kitPythonChain(lsStart):
+    """The kit's Python modules the named modules import, directly or through each other: the names of files in
+    exec\\Python, found by following import and from lines. A start name that is not a kit module (a sample's own
+    script) is read from Templates\\samples instead, and is not itself in the answer."""
+    sKitPython = os.path.join(sScriptDir, "exec", "Python")
+    setKit = set(os.path.splitext(s)[0] for s in os.listdir(sKitPython) if s.endswith(".py")) if os.path.isdir(sKitPython) else set()
+    lsQueue, setSeen = list(lsStart), set()
+    while lsQueue:
+        sModule = lsQueue.pop()
+        if sModule in setSeen: continue
+        setSeen.add(sModule)
+        sPath = os.path.join(sKitPython, sModule + ".py")
+        if not os.path.isfile(sPath): sPath = os.path.join(sScriptDir, "Templates", "samples", sModule + ".py")
+        if not os.path.isfile(sPath): continue
+        sCode = open(sPath, encoding="utf-8-sig", errors="replace").read()
+        for sName in re.findall(r"(?m)^\s*(?:from\s+(\w+)|import\s+([\w, ]+))", sCode):
+            for sPart in (sName[0] or sName[1]).split(","):
+                sPart = sPart.strip().split(" ")[0]
+                if sPart in setKit and sPart not in setSeen: lsQueue.append(sPart)
+    return sorted(s for s in setSeen if s in setKit)
 
 
 def kitCache():
@@ -608,10 +648,17 @@ def buildHomerDll():
     lsSources = [os.path.join(sScriptDir, "exec", "CSharp", sClass + ".cs") for sClass in c_lsHomerDllClasses]
     for sSource in lsSources:
         if not os.path.isfile(sSource): return "exec\\Homer.dll was not built: %s is missing" % sSource
+    # BUILT WHEN ITS CLASSES CHANGED (12 October 2026): it was compiled on every build.
+    oCache = kitCache()
+    sPrint = oCache.fingerprint(["exec/CSharp/" + sClass + ".cs" for sClass in c_lsHomerDllClasses])
+    if oCache.isCurrent("Homer.dll", sPrint, ["exec/Homer.dll"]):
+        sayLine("exec\\Homer.dll is unchanged since its last build; not built again.")
+        return ""
     iCode, sOutput = runCommand([sCsc, "/nologo", "/target:library", "/platform:x64", "/optimize+",
                                  "/out:" + sOut] + lsRefs + lsSources)
     if iCode != 0 or not os.path.isfile(sOut):
         return "exec\\Homer.dll did not compile; the log has the compiler's messages"
+    oCache.record("Homer.dll", sPrint, ["exec/Homer.dll"])
     sayLine("Built exec\\Homer.dll for Python apps (%s)." % ", ".join(c_lsHomerDllClasses))
     return ""
 
@@ -628,7 +675,9 @@ def buildHomerDevApp():
     sSource = os.path.join(sScriptDir, "HomerDev.cs")
     if not os.path.isfile(sSource): return ""
     oCache = kitCache()
-    sPrint = oCache.fingerprint(["HomerDev.cs", "HomerDev.ico", "exec/CSharp"])
+    # Its own classes, not the whole of exec\\CSharp (12 October 2026), so a change to a class it does not compile
+    # leaves it alone.
+    sPrint = oCache.fingerprint(["HomerDev.cs", "HomerDev.ico"] + ["exec/CSharp/" + sClass + ".cs" for sClass in c_lsHomerDevAppClasses])
     if oCache.isCurrent("HomerDev.exe", sPrint, ["exec/HomerDev.exe"]):
         sayLine("exec\\HomerDev.exe is unchanged since its last build; not built again.")
         return ""
@@ -1599,6 +1648,16 @@ def checkKit():
                 if sTarget != "eof" and sTarget not in lsLabels:
                     lsProblems.append("%s/%s: jumps to :%s, which is not defined" %
                                       (sFolder.replace(os.sep, "/"), sName, sTarget))
+            # A BRACKET IN AN ECHO THAT CLOSES ITS BLOCK (12 October 2026): push.cmd's "(under 100 MB)." inside an if
+            # block was a syntax error that ended every push, and the cycle around it, from 1.72.5 to 1.72.10.
+            try:
+                sys.path.insert(0, os.path.join(sScriptDir, "scripts"))
+                from fixEncoding import blockBreakers
+                for iLine, sLine in blockBreakers(os.path.join(sDir, sName)):
+                    lsProblems.append("%s/%s line %d: a bracket in an echo closes its block early (escape it as ^( ^)): %s" %
+                                      (sFolder.replace(os.sep, "/"), sName, iLine, sLine))
+            except ImportError:
+                pass
 
     # EVERY SCRIPT CALLS NEIGHBOURS THAT EXIST (1.43.8). After the renames of
     # 1.42, tidy.cmd still ran "%~dp0homerTidy.py", check.cmd
