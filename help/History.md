@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.18 -- 13 October 2026
+
+- **Connecting the AI tools no longer reports links that are fine as failures.** On a reinstall, connectAI said 19 of Claude Code's skill links and 57 of Gemini's had failed. They were linked all along: it learned whether an entry was a link by following it, and treated any failure to do so as "nothing here", so it tried to make each junction again and Windows answered that it already existed. It now asks Windows whether an entry is a reparse point and reads its target without following it. A link already pointing to the kit's skill is counted and left alone; a dead link, unreadable or pointing where nothing is any more, is replaced; a folder or link of anyone else's is never touched. Tested by linking, relinking, breaking a link and adding a folder of one's own.
+- **Logs stay in the logs folder.** buildCreators wrote its log beside itself, inside the blind-creators skill, so its runs left log files among the skill's files, and two were delivered with 1.72.17. It now logs to the kit's logs folder, and the kit's build removes any log left among a skill's files.
+
 ## 1.72.17 -- 13 October 2026
 
 - **Blind Creators states its size in its subtitle, and its numbers.** buildCreators writes the subtitle as "A Directory of <count> People ...", computed from the people it lists, and a short By the Numbers section after the contents: the authors, developers and presenters, and how many people work in two or three of those ways. Both are computed each run, so neither can go stale the way a typed count did.

@@ -38,7 +38,13 @@ def logLine(sMsg, bConsole=False):
 
 def openLog():
     global oLog
-    sPath = os.path.join(scriptDir(), "buildCreators-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + ".log")
+    # IN THE KIT'S LOGS FOLDER (13 October 2026). The log was written beside this script, inside the skill's folder, so
+    # runs left log files among the skill's own files, and two were packaged with the kit. Inside the kit it goes to
+    # the kit's logs folder, as every Homer script's does, named <project>-<task>-<stamp>; run on its own, beside it.
+    sKit = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(scriptDir()))))
+    sLogs = os.path.join(sKit, "logs") if os.path.isfile(os.path.join(sKit, "scripts", "kind.py")) else scriptDir()
+    os.makedirs(sLogs, exist_ok=True)
+    sPath = os.path.join(sLogs, ("HomerDev-buildCreators-" if sLogs != scriptDir() else "buildCreators-") + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + ".log")
     oLog = open(sPath, "w", encoding="utf-8-sig", newline="")
     logLine("script: " + os.path.abspath(__file__))
     logLine("python: " + sys.version.replace("\n", " "))

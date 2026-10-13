@@ -22,7 +22,7 @@ THE LOG goes to <kit>\\logs when the kit's folder can be written, else %LOCALAPP
 kit in Program Files is read-only to a person), as HomerDev-connectAI-<stamp>.log.
 """
 
-import datetime, os, platform, shutil, subprocess, sys
+import datetime, os, platform, shutil, stat, subprocess, sys
 
 sBegin = "<!-- HomerDev begin: written by the Homer Development Kit's connectAI; connectAI --remove takes it out -->"
 sEnd = "<!-- HomerDev end -->"
@@ -99,12 +99,23 @@ def setBlock(sPath, sBlock):
 
 
 def linkTarget(sPath):
-    """Where a junction or symbolic link points, or "" when sPath is an ordinary folder or absent."""
+    """Where a junction or symbolic link points; "?" for a link whose target cannot be read; "" for an ordinary folder
+    or nothing at all.
+    ASKED OF WINDOWS ITSELF (13 October 2026). This followed the link to learn whether it was one, and answered "not a
+    link" whenever that failed -- so on a reinstall every existing junction looked like nothing, mklink found it there,
+    and 76 skills were reported as failing to link when they were linked all along. A reparse point is a link whatever
+    it points to, and os.readlink reads a junction's target without following it."""
     try:
-        if os.path.islink(sPath) or (hasattr(os.path, "isjunction") and os.path.isjunction(sPath)): return os.path.realpath(sPath)
+        oStat = os.lstat(sPath)
     except OSError:
-        pass
-    return ""
+        return ""
+    if not (stat.S_ISLNK(oStat.st_mode) or (getattr(oStat, "st_file_attributes", 0) & 0x400)): return ""
+    try:
+        sTarget = os.readlink(sPath)
+    except OSError:
+        return "?"
+    if sTarget.startswith("\\\\?\\"): sTarget = sTarget[4:]
+    return sTarget
 
 
 def insideKit(sPath, sKit):
@@ -178,8 +189,23 @@ def main(lsArgs):
             for sSkill in lsSkills:
                 sLink, sTarget = os.path.join(sFolder, sSkill), os.path.join(sSkills, sSkill)
                 sNow = linkTarget(sLink)
+                bSame = bool(sNow) and sNow != "?" and os.path.normcase(os.path.abspath(sNow)) in (
+                    os.path.normcase(os.path.abspath(sTarget)), os.path.normcase(os.path.realpath(sTarget)))
                 if bCheck:
-                    if sNow and os.path.normcase(sNow) == os.path.normcase(os.path.realpath(sTarget)): iLinked += 1
+                    if bSame: iLinked += 1
+                    continue
+                if bSame and not bRemove:
+                    # Already linked to this kit's skill: counted, and left exactly as it is.
+                    iLinked += 1; logLine("already linked %s -> %s" % (sLink, sNow)); continue
+                if sNow == "?" or (sNow and not os.path.exists(sNow)):
+                    # A link nobody can follow -- unreadable, or pointing where nothing is any more -- is no one's skill;
+                    # it is replaced with the kit's.
+                    removeLink(sLink); logLine("removed a dead link %s (it pointed to %s)" % (sLink, sNow if sNow != "?" else "a target that could not be read"))
+                    if bRemove: iChanged += 1
+                    if bRemove: continue
+                    os.makedirs(sFolder, exist_ok=True)
+                    if makeLink(sLink, sTarget): iLinked += 1
+                    else: dFailed[sToolName] += 1
                     continue
                 if sNow:
                     # ONLY THE KIT'S OWN LINKS ARE TAKEN AWAY (12 October 2026, from an audit): --remove once removed
@@ -189,7 +215,7 @@ def main(lsArgs):
                         if bRemove: iChanged += 1
                     else:
                         iKept += 1; logLine("kept %s: a link to %s, not the kit" % (sLink, sNow)); continue
-                elif os.path.exists(sLink):
+                elif os.path.lexists(sLink):
                     iKept += 1; logLine("kept %s: a folder of the person's own, never replaced" % sLink); continue
                 if bRemove: continue
                 os.makedirs(sFolder, exist_ok=True)

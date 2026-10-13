@@ -1506,6 +1506,14 @@ def refreshBuildRelease():
             if os.path.normcase(sDir) != os.path.normcase(sScriptDir) and os.path.isfile(os.path.join(sDir, "build.cmd")): lsTargets.append(sDir)
     except OSError as oError:
         logLine("build_release: could not list %s: %s" % (sParent, oError))
+    # LOGS INSIDE A SKILL'S FOLDER ARE REMOVED (13 October 2026). buildCreators once wrote its log beside itself, in
+    # .claude\\skills\\blind-creators\\scripts, and two such logs were delivered with the kit. Its log now goes to the
+    # kit's logs folder; any left among a skill's files are removed here, each one logged.
+    for sSkillRoot, lsDirs, lsFiles in os.walk(os.path.join(sScriptDir, ".claude", "skills")):
+        for sName in lsFiles:
+            if sName.lower().endswith(".log"):
+                try: os.remove(os.path.join(sSkillRoot, sName)); logLine("removed a stray log among a skill's files: " + os.path.join(sSkillRoot, sName))
+                except OSError as oError: logLine("could not remove " + os.path.join(sSkillRoot, sName) + ": " + str(oError))
     # THE KIT'S OWN RUNNER IS CHECKED, NOT WRITTEN (12 October 2026). The kit's build runs inside it, so it cannot be
     # replaced here; and a runner from before the cycle lock never replaces itself. The kit's own copy stayed that old
     # all day, so two kit cycles ran at once and the second failed on the installer the first was writing. An
