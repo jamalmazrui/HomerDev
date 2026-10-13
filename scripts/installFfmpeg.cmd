@@ -36,12 +36,8 @@ echo ffmpeg is installed.
 goto :done
 
 :update
-echo ffmpeg is installed. Checking for a newer version.
-winget upgrade --id Gyan.FFmpeg --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%log%" 2>&1
-set "iCode=%ERRORLEVEL%"
-call "%~dp0installCommon.cmd" log "winget upgrade Gyan.FFmpeg exit code %iCode%"
-if "%iCode%"=="0" echo ffmpeg was updated.
-if not "%iCode%"=="0" echo ffmpeg is already the newest winget offers.
+call "%~dp0installCommon.cmd" wingetUpgrade Gyan.FFmpeg "ffmpeg"
+if errorlevel 1 goto :failed
 goto :done
 
 :failed

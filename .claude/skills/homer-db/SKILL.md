@@ -48,6 +48,26 @@ finding.
 A trigger `trg_<table>_edited` sets `edited` when a data field, `notes` or
 `tags` changes, and an index `idx_<table>_prime` makes `prime` unique.
 
+## A table of people: the contact pattern
+
+Any table of people -- contacts, a guest list, a staff roster -- uses Jamal's
+contact pattern from DbDialog, whose fields were named so that each has an Alt
+letter of its own on a record form built from the table. In this order, after
+the id, added and edited:
+
+title (T), first_name (F), middle_name (M), last_name (L), job (J),
+enterprise (E), address1 (A), address2 (2), city (C), state (S), zip (Z),
+nation (N), office_phone (O), home_phone (H), wireless_phone (W),
+business_email (B), personal_email (P), date_of_birth (D), gender (G)
+
+then the standard url (U), notes and tags. DbDialog's Extra Info is notes. A
+field a table needs beyond the pattern comes right after enterprise with a
+letter no other field holds: JobTrail's role (R). DbDo shows address1 and
+address2 as Address 1 and Address 2, so the digit of the second begins a word
+and Lbc gives it Alt+2. `scripts/contactPattern.py` holds the list and rebuilds
+an existing table into the pattern, keeping every row, value, computed field,
+index and trigger; ContactTrail, JobTrail and Convention.db were built with it.
+
 ## Names and types
 
 - Lower case with underscores; plural for a table, singular for its id.

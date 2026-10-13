@@ -69,7 +69,9 @@ db.moveFirst();
 while (!db.eof) {
   var sFirst = get("first_name"),  sMiddle = get("middle_name"), sLast = get("last_name");
   var sOrg   = get("enterprise"),  sJob    = get("job");
-  var sCell  = get("wireless_phone"), sHome = get("home_phone");
+  // The contact pattern's fields (DbDialog's): office phone, title, second address line and birthday too.
+  var sCell  = get("wireless_phone"), sHome = get("home_phone"), sOffice = get("office_phone");
+  var sTitle = get("title"), sAddr2 = get("address2"), sBirth = get("date_of_birth");
   var sPmail = get("personal_email"),  sBmail = get("business_email");
   var sAddr  = get("address1"), sCity = get("city"), sState = get("state"),
       sZip   = get("zip"), sNation = get("nation");
@@ -88,7 +90,7 @@ while (!db.eof) {
   addFolded(sb, "VERSION:3.0");
   if (nonEmpty(sId)) addFolded(sb, "UID:dbdo-contact-" + sId);
   if (sPerson != "")
-    addFolded(sb, "N:" + vcText(sLast) + ";" + vcText(sFirst) + ";" + vcText(sMiddle) + ";;");
+    addFolded(sb, "N:" + vcText(sLast) + ";" + vcText(sFirst) + ";" + vcText(sMiddle) + ";" + (nonEmpty(sTitle) ? vcText(sTitle) : "") + ";");
   else
     addFolded(sb, "N:" + vcText(sFn) + ";;;;");
   addFolded(sb, "FN:" + vcText(sFn));
@@ -96,10 +98,12 @@ while (!db.eof) {
   if (nonEmpty(sJob))   addFolded(sb, "TITLE:" + vcText(sJob));
   if (nonEmpty(sCell))  addFolded(sb, "TEL;TYPE=CELL:" + vcText(sCell));
   if (nonEmpty(sHome))  addFolded(sb, "TEL;TYPE=HOME:" + vcText(sHome));
+  if (nonEmpty(sOffice)) addFolded(sb, "TEL;TYPE=WORK:" + vcText(sOffice));
+  if (nonEmpty(sBirth)) addFolded(sb, "BDAY:" + vcText(sBirth));
   if (nonEmpty(sPmail)) addFolded(sb, "EMAIL;TYPE=HOME:" + vcText(sPmail));
   if (nonEmpty(sBmail)) addFolded(sb, "EMAIL;TYPE=WORK:" + vcText(sBmail));
   if (nonEmpty(sAddr) || nonEmpty(sCity) || nonEmpty(sState) || nonEmpty(sZip) || nonEmpty(sNation))
-    addFolded(sb, "ADR;TYPE=HOME:;;" + vcText(sAddr) + ";" + vcText(sCity) + ";"
+    addFolded(sb, "ADR;TYPE=HOME:;" + (nonEmpty(sAddr2) ? vcText(sAddr2) : "") + ";" + vcText(sAddr) + ";" + vcText(sCity) + ";"
       + vcText(sState) + ";" + vcText(sZip) + ";" + vcText(sNation));
   if (nonEmpty(sUrl))   addFolded(sb, "URL:" + vcUri(sUrl));
   if (nonEmpty(sNotes)) addFolded(sb, "NOTE:" + vcText(sNotes));

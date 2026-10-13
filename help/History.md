@@ -7,6 +7,17 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.20 -- 13 October 2026
+
+- **Node.js was offered as Update on every install, and the update never happened.** Setup's comparison was right -- Node.js 25.9.0 installed, 26.8.1 the newest long-term release -- but installNode decided which winget package owned Node.js from winget list's exit code, which is 0 on some machines while it prints "No installed package found". It took the long-term package as installed, winget upgrade found nothing, and the script said Node.js was "already the newest winget offers" and succeeded. Nothing changed, so the next install offered Update again. Now a package counts as installed only when winget lists its id; Node.js installed outside winget is updated by installing the long-term package over it, as Node's installers allow; and the version before and after is logged.
+- **No installer checks again what setup has decided.** Setup compares the installed version with the newest before the finish page and offers Install, Update or Reinstall accordingly, so the components no longer say "Checking for a newer version": an Update says "Updating <name> to the newest release".
+- **A failed update is reported as a failure.** Every component installer said "already the newest winget offers" whenever winget upgrade returned anything but 0. Only winget's own "no newer version" counts as current now; anything else is a failure, said and logged. The detection and the update live once, in installCommon (wingetHas, wingetUpgrade), used by the Node.js, Git, GitHub CLI, Java, Python, ffmpeg, ImageMagick, mpv and yt-dlp installers.
+- **The PDF tools no longer update Python.** They upgraded Python 3.13 by name, which on a machine with another Python found nothing; Python is its own component, installPython.
+
+## 1.72.19 -- 13 October 2026
+
+- **The contact pattern, from DbDialog, is a homer-db rule.** A table of people uses DbDialog's fields, named so that each has an Alt letter of its own -- title, first, middle and last name, job, enterprise, two address lines, city, state, zip, nation, office, home and wireless phone, business and personal email, date of birth, gender -- then url, notes and tags. The skill's new scripts/contactPattern.py holds the list and rebuilds a table into it, keeping every row, computed field, index and trigger. It writes each table's edited trigger from the table's own fields, since a copied trigger named only the old ones and a new field's change left edited stale. Convention.db gained Title and the pattern's order; the convention skill's vCard export writes the office phone, title, second address line and birthday.
+
 ## 1.72.18 -- 13 October 2026
 
 - **Connecting the AI tools no longer reports links that are fine as failures.** On a reinstall, connectAI said 19 of Claude Code's skill links and 57 of Gemini's had failed. They were linked all along: it learned whether an entry was a link by following it, and treated any failure to do so as "nothing here", so it tried to make each junction again and Windows answered that it already existed. It now asks Windows whether an entry is a reparse point and reads its target without following it. A link already pointing to the kit's skill is counted and left alone; a dead link, unreadable or pointing where nothing is any more, is replaced; a folder or link of anyone else's is never touched. Tested by linking, relinking, breaking a link and adding a folder of one's own.

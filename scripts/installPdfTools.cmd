@@ -54,12 +54,9 @@ set "iCode=%ERRORLEVEL%"
 call "%~dp0installCommon.cmd" log "pip install pymupdf4llm exit code %iCode%"
 if "%iCode%"=="0" echo The PDF reader is current.
 if not "%iCode%"=="0" echo The PDF reader could not be updated; the log says why.
-echo Checking for a newer Python.
-winget upgrade --id Python.Python.3.13 --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%log%" 2>&1
-set "iCode=%ERRORLEVEL%"
-call "%~dp0installCommon.cmd" log "winget upgrade Python.Python.3.13 exit code %iCode%"
-if "%iCode%"=="0" echo Python was updated.
-if not "%iCode%"=="0" echo Python is already the newest winget offers.
+rem PYTHON IS NOT THIS COMPONENT'S TO UPDATE (13 October 2026). It upgraded Python 3.13 by name, which on a machine
+rem with another Python found nothing and said Python was the newest; told the truth, it would have failed the PDF
+rem tools' update for a Python they do not own. Python has its own component, installPython; this updates the reader.
 goto :done
 
 :reinstall

@@ -36,12 +36,8 @@ echo yt-dlp is installed.
 goto :done
 
 :update
-echo yt-dlp is installed. Checking for a newer version.
-winget upgrade --id yt-dlp.yt-dlp --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%log%" 2>&1
-set "iCode=%ERRORLEVEL%"
-call "%~dp0installCommon.cmd" log "winget upgrade yt-dlp.yt-dlp exit code %iCode%"
-if "%iCode%"=="0" echo yt-dlp was updated.
-if not "%iCode%"=="0" echo yt-dlp is already the newest winget offers.
+call "%~dp0installCommon.cmd" wingetUpgrade yt-dlp.yt-dlp "yt-dlp"
+if errorlevel 1 goto :failed
 goto :done
 
 :failed

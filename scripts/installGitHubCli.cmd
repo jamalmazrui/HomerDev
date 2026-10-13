@@ -25,7 +25,7 @@ for %%A in (%*) do if /i "%%A"=="reinstall" set "bReinstall=1"
 set "sWhat=GitHub CLI"
 set "sFound="
 for %%I in (GitHub.cli) do if not defined sFound (
-  winget list --id %%I --exact --accept-source-agreements >nul 2>&1
+  call "%~dp0installCommon.cmd" wingetHas %%I
   if not errorlevel 1 set "sFound=%%I"
 )
 call "%~dp0installCommon.cmd" log "installed under: !sFound!"
@@ -45,12 +45,8 @@ echo GitHub CLI is installed.
 goto :done
 
 :update
-echo GitHub CLI is installed. Checking for a newer version.
-winget upgrade --id !sFound! --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%log%" 2>&1
-set "iCode=!ERRORLEVEL!"
-call "%~dp0installCommon.cmd" log "winget upgrade !sFound! exit code !iCode!"
-if "!iCode!"=="0" echo GitHub CLI was updated.
-if not "!iCode!"=="0" echo GitHub CLI is already the newest winget offers.
+call "%~dp0installCommon.cmd" wingetUpgrade !sFound! "GitHub CLI"
+if errorlevel 1 goto :failed
 goto :done
 
 :failed

@@ -23,7 +23,7 @@ set "bReinstall="
 for %%A in (%*) do if /i "%%A"=="reinstall" set "bReinstall=1"
 set "sWhat=Java"
 
-winget list --id Microsoft.OpenJDK.21 --exact --accept-source-agreements >nul 2>&1
+call "%~dp0installCommon.cmd" wingetHas Microsoft.OpenJDK.21
 if not errorlevel 1 if not defined bReinstall goto :update
 
 echo Installing Java. Nothing is asked of you while it runs.
@@ -35,12 +35,8 @@ echo Java is installed.
 goto :done
 
 :update
-echo Java is installed. Checking for a newer version.
-winget upgrade --id Microsoft.OpenJDK.21 --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%log%" 2>&1
-set "iCode=%ERRORLEVEL%"
-call "%~dp0installCommon.cmd" log "winget upgrade Microsoft.OpenJDK.21 exit code %iCode%"
-if "%iCode%"=="0" echo Java was updated.
-if not "%iCode%"=="0" echo Java is already the newest winget offers.
+call "%~dp0installCommon.cmd" wingetUpgrade Microsoft.OpenJDK.21 "Java"
+if errorlevel 1 goto :failed
 goto :done
 
 :failed

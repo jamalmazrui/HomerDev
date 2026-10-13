@@ -25,7 +25,7 @@ for %%A in (%*) do if /i "%%A"=="reinstall" set "bReinstall=1"
 set "sWhat=Python"
 set "sFound="
 for %%I in (Python.Python.3.14 Python.Python.3.13) do if not defined sFound (
-  winget list --id %%I --exact --accept-source-agreements >nul 2>&1
+  call "%~dp0installCommon.cmd" wingetHas %%I
   if not errorlevel 1 set "sFound=%%I"
 )
 call "%~dp0installCommon.cmd" log "installed under: !sFound!"
@@ -45,12 +45,8 @@ echo Python is installed.
 goto :done
 
 :update
-echo Python is installed. Checking for a newer version.
-winget upgrade --id !sFound! --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%log%" 2>&1
-set "iCode=!ERRORLEVEL!"
-call "%~dp0installCommon.cmd" log "winget upgrade !sFound! exit code !iCode!"
-if "!iCode!"=="0" echo Python was updated.
-if not "!iCode!"=="0" echo Python is already the newest winget offers.
+call "%~dp0installCommon.cmd" wingetUpgrade !sFound! "Python"
+if errorlevel 1 goto :failed
 goto :done
 
 :failed

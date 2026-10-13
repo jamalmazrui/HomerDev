@@ -6,7 +6,8 @@ rem It goes where its own installer puts it, never under a program's tree, so an
 rem it away. WHETHER IT IS INSTALLED IS ASKED OF WINGET, BY EACH PACKAGE ID IT IS KNOWN BY (OpenJS.NodeJS.LTS, OpenJS.NodeJS), not by a program
 rem on the PATH, which an older, unrelated copy can answer for; checking one id alone would install a second copy
 rem beside one registered under another. Installed: winget upgrade of the id found, which installs only something
-rem newer. Missing, or reinstall: winget install of the first id. Every command and exit code is in the log.
+rem newer. Missing, or reinstall: winget install of the first id. Installed outside winget: the long-term-support
+rem package over it. Every command, exit code and the version before and after are in the log.
 setlocal enabledelayedexpansion
 set "sScript=%~n0"
 if not exist "%~dp0installCommon.cmd" (
@@ -23,34 +24,55 @@ call "%~dp0installCommon.cmd" setup "%~f0" %*
 set "bReinstall="
 for %%A in (%*) do if /i "%%A"=="reinstall" set "bReinstall=1"
 set "sWhat=Node.js"
+rem WHICH PACKAGE OWNS NODE.JS IS READ FROM WINGET'S ANSWER, NOT ITS EXIT CODE (13 October 2026). winget list exits 0
+rem on some machines while printing "No installed package found", so the first id was taken as installed, winget
+rem upgrade then found nothing, and the update never happened: setup offered Update again on every install, since the
+rem installed 25.9.0 stayed older than the 26.8.1 it had found. A package is installed only when its id is in the list.
 set "sFound="
 for %%I in (OpenJS.NodeJS.LTS OpenJS.NodeJS) do if not defined sFound (
-  winget list --id %%I --exact --accept-source-agreements >nul 2>&1
+  call "%~dp0installCommon.cmd" wingetHas %%I
   if not errorlevel 1 set "sFound=%%I"
 )
-call "%~dp0installCommon.cmd" log "installed under: !sFound!"
-if defined sFound if not defined bReinstall goto :update
-rem A REINSTALL REINSTALLS WHAT IS THERE: the id it is registered under, forced, never a second copy beside it.
+set "sBefore="
+for /f "delims=" %%V in ('node --version 2^>nul') do set "sBefore=%%V"
+call "%~dp0installCommon.cmd" log "winget package: !sFound!; node.exe on the PATH reports: !sBefore!"
+if defined bReinstall goto :install
+if defined sFound goto :update
+if defined sBefore (
+  rem Installed, but not through winget -- the nodejs.org installer, most often. Node's installers upgrade an existing
+  rem installation in place, so the long-term-support package is installed over it.
+  call "%~dp0installCommon.cmd" log "Node.js !sBefore! is installed outside winget; installing OpenJS.NodeJS.LTS over it"
+  echo Updating Node.js to the newest long-term-support release. Nothing is asked of you while it runs.
+  set "sInstallId=OpenJS.NodeJS.LTS"
+  set "sForce="
+  goto :installRun
+)
+
+:install
 set "sInstallId=OpenJS.NodeJS.LTS"
 set "sForce="
 if defined sFound set "sInstallId=!sFound!"
 if defined bReinstall set "sForce=--force"
-
 echo Installing Node.js. Nothing is asked of you while it runs.
+
+:installRun
 winget install --id !sInstallId! !sForce! --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%log%" 2>&1
 set "iCode=!ERRORLEVEL!"
 call "%~dp0installCommon.cmd" log "winget install !sInstallId! !sForce! exit code !iCode!"
 if not "!iCode!"=="0" goto :failed
-echo Node.js is installed.
-goto :done
+goto :report
 
 :update
-echo Node.js is installed. Checking for a newer version.
-winget upgrade --id !sFound! --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%log%" 2>&1
-set "iCode=!ERRORLEVEL!"
-call "%~dp0installCommon.cmd" log "winget upgrade !sFound! exit code !iCode!"
-if "!iCode!"=="0" echo Node.js was updated.
-if not "!iCode!"=="0" echo Node.js is already the newest winget offers.
+rem SETUP HAS ALREADY DECIDED (13 October 2026): it compared the installed version with the newest and ticked Update only
+rem when a newer one exists, so this updates rather than checking again.
+call "%~dp0installCommon.cmd" wingetUpgrade !sFound! "Node.js"
+if errorlevel 1 goto :failed
+
+:report
+set "sAfter="
+for /f "delims=" %%V in ('node --version 2^>nul') do set "sAfter=%%V"
+call "%~dp0installCommon.cmd" log "node.exe now reports: !sAfter! (was: !sBefore!)"
+if defined sAfter (echo Node.js !sAfter! is installed.) else (echo Node.js is installed.)
 goto :done
 
 :failed
