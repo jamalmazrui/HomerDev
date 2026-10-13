@@ -75,7 +75,17 @@ import traceback
 # kind.py, which it imports, so their checks ran against an old kind.py and quietly skipped the layout and
 # installer findings ("kind.py has no standard folders", 9 October 2026). When the kit is on this computer, its
 # scripts folder comes first; an app's own copy is used only when there is no kit.
-for _sKitScripts in [os.path.join(os.environ.get("HomerDev", ""), "scripts"), r"C:\HomerDev\scripts"]:
+# The development kit first (13 October 2026): beside or above the project, then C:\HomerDev; the HomerDev variable,
+# which names the installed kit and lags it, last.
+_lsKitPlaces = []
+_sUp = os.getcwd()
+while True:
+    _lsKitPlaces.append(os.path.join(_sUp, "HomerDev", "scripts"))
+    if os.path.basename(_sUp).lower() == "homerdev": _lsKitPlaces.append(os.path.join(_sUp, "scripts"))
+    if os.path.dirname(_sUp) == _sUp: break
+    _sUp = os.path.dirname(_sUp)
+_lsKitPlaces += [r"C:\HomerDev\scripts", os.path.join(os.environ.get("HomerDev", ""), "scripts")]
+for _sKitScripts in _lsKitPlaces:
     if _sKitScripts.strip("\\/") and os.path.isfile(os.path.join(_sKitScripts, "kind.py")) \
             and os.path.abspath(_sKitScripts) != os.path.dirname(os.path.abspath(__file__)):
         sys.path.insert(0, os.path.abspath(_sKitScripts))

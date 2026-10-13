@@ -94,6 +94,11 @@ if defined iMine > "!sLock!\pid.txt" echo !iMine!
 >> "%sLog%" echo Lock: !sLock!, held by process !iMine!
 
 set "sRelease=scripts\release.cmd"
+rem THE KIT'S RELEASE SKIPS A SECOND CHECK (12 October 2026), as releaseHomerDev does: push's gate has just run
+rem checkHomerDev, and release.ps1's own check is the app check, not the kit's. Passed only when release.ps1 declares
+rem -SkipCheck; a copy without it runs as it is.
+set "sReleaseArgs="
+if exist "releaseHomerDev.cmd" findstr /i /c:"$SkipCheck" "scripts\release.ps1" >nul 2>&1 && set "sReleaseArgs=-SkipCheck"
 rem EVERY RUNNER REPLACES ITSELF, AND ONLY AT ITS OWN END (1.65.32, from an audit). The kit's build overwrote every
 rem sibling project's build_release.bat, including one running a cycle at that moment; Windows reads a running batch
 rem file a piece at a time, so the running copy could execute garbage. Now the kit's build only creates a missing
@@ -105,13 +110,13 @@ rem THE DEVELOPMENT KIT FIRST (12 October 2026): the HomerDev variable points to
 rem beside the projects until it is installed, so a fix to this runner reached no project until then.
 if not defined sRunner if exist "..\HomerDev\scripts\build_release.cmd" for %%R in ("..\HomerDev\scripts\build_release.cmd") do set "sRunner=%%~fR"
 if not defined sRunner if defined HomerDev if exist "%HomerDev%\scripts\build_release.cmd" set "sRunner=%HomerDev%\scripts\build_release.cmd"
->> "%sLog%" echo Settings: release=!sRelease! runner=!sRunner!
+>> "%sLog%" echo Settings: release=!sRelease! !sReleaseArgs! runner=!sRunner!
 set "sSummary="
 
 call :step build "build.cmd" || goto :stopped
 call :step tidy "scripts\tidy.cmd" || goto :stopped
 call :step push "scripts\push.cmd" || goto :stopped
-call :step release "!sRelease!" || goto :stopped
+call :step release "!sRelease!" !sReleaseArgs! || goto :stopped
 
 echo(
 set "sSummary=!sSummary:~0,-1!"
@@ -124,7 +129,7 @@ if defined sRunner copy /y "!sRunner!" "build_release.bat" >nul & exit /b 0
 exit /b 0
 
 :step
-rem %1 the step's name, %2 the script it runs.
+rem %1 the step's name, %2 the script it runs, %3 an argument for it (the kit's release: -SkipCheck).
 set "sStep=%~1"
 if not exist "%~2" (
   echo %~1: %~2 is not in this project, so the cycle stops here.
@@ -134,7 +139,7 @@ if not exist "%~2" (
 for /f %%t in ('powershell -NoProfile -Command "[int][double]::Parse((Get-Date -UFormat %%s))"') do set "iStart=%%t"
 >> "%sLog%" echo %~1: started %time%, running %~2
 echo %~1 ...
-call "%~2"
+call "%~2" %~3
 set "iCode=!errorlevel!"
 for /f %%t in ('powershell -NoProfile -Command "[int][double]::Parse((Get-Date -UFormat %%s))"') do set "iEnd=%%t"
 set /a "iSeconds=iEnd-iStart, iMin=iSeconds/60, iSec=iSeconds %% 60"

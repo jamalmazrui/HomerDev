@@ -1506,6 +1506,14 @@ def refreshBuildRelease():
             if os.path.normcase(sDir) != os.path.normcase(sScriptDir) and os.path.isfile(os.path.join(sDir, "build.cmd")): lsTargets.append(sDir)
     except OSError as oError:
         logLine("build_release: could not list %s: %s" % (sParent, oError))
+    # THE KIT'S OWN RUNNER IS CHECKED, NOT WRITTEN (12 October 2026). The kit's build runs inside it, so it cannot be
+    # replaced here; and a runner from before the cycle lock never replaces itself. The kit's own copy stayed that old
+    # all day, so two kit cycles ran at once and the second failed on the installer the first was writing. An
+    # outdated copy is now named in the console every build; HomerDev.zip carries the current one.
+    sOwn = os.path.join(sScriptDir, "build_release.bat")
+    if os.path.isfile(sOwn) and b"pid.txt" not in open(sOwn, "rb").read():
+        sayLine("C:\\HomerDev\\build_release.bat is an old runner without the one-cycle lock. Replace it with scripts\\build_release.cmd while no cycle is running.")
+        logLine("build_release: the kit's own %s predates the cycle lock" % sOwn)
     # ONLY A MISSING RUNNER IS WRITTEN (1.65.32, from an audit): a differing copy may be running a cycle this moment,
     # and overwriting a running batch file can make it execute garbage. Each runner replaces itself from the kit on
     # the line it exits by, so an existing copy catches up at the end of its next cycle.

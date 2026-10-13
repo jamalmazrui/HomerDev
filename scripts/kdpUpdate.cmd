@@ -16,9 +16,18 @@ if not exist "%sProject%\logs" mkdir "%sProject%\logs"
 set "sSetupLog=%sProject%\logs\kdpUpdate-setup.log"
 echo %date% %time% kdpUpdate.cmd started with arguments: %* >> "%sSetupLog%"
 set "sKit="
-if defined HomerDev if exist "%HomerDev%\scripts\buildBooks.py" set "sKit=%HomerDev%"
+rem THE DEVELOPMENT KIT FIRST (13 October 2026). The HomerDev variable names the installed kit, which lags the
+rem development kit until it is installed: looked at first, it copied in kdpSubmit version 38, which knew nothing of
+rem --book, over the newer one. The kit beside the project, then C:\HomerDev, then any drive; the variable last.
+for %%K in ("%sProject%\..\HomerDev") do if exist "%%~fK\scripts\buildBooks.py" set "sKit=%%~fK"
 if not defined sKit if exist "C:\HomerDev\scripts\buildBooks.py" set "sKit=C:\HomerDev"
 for %%D in (D E F G H I J K L M N O P Q R S T U V W X Y Z) do if not defined sKit if exist "%%D:\HomerDev\scripts\buildBooks.py" set "sKit=%%D:\HomerDev"
+if not defined sKit if defined HomerDev if exist "%HomerDev%\scripts\buildBooks.py" set "sKit=%HomerDev%"
+if defined sKit (
+  set "sKitVersion=unknown"
+  if exist "%sKit%\version.txt" set /p sKitVersion=<"%sKit%\version.txt"
+)
+if defined sKit call echo %%date%% %%time%% kit: %sKit%, version %%sKitVersion%% >> "%sSetupLog%"
 if not defined sKit goto noKit
 if /i "%sKit%\scripts\"=="%sHere%" goto noKit
 for %%F in (buildBooks.py kdpBooks.py kdpSubmit.py kdpUpdate.py testKdpUpdate.py) do copy /y "%sKit%\scripts\%%F" "%sHere%%%F" >nul 2>&1 && echo %date% %time% copied %%F from %sKit%\scripts >> "%sSetupLog%"

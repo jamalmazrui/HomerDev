@@ -268,8 +268,7 @@ def locateKit():
     """The HomerDev kit's folder, found as the kit's kind.findKit finds it: the HomerDev environment variable, then
     from the project upward, then a HomerDev folder at the top of any drive. Only Windows and the folder name HomerDev
     are assumed, never a drive or a depth."""
-    sEnv = os.environ.get("HomerDev", "")
-    if isKit(sEnv): return os.path.abspath(sEnv)
+    # The development kit first (13 October 2026), as kind.findKit: the variable names the installed kit, which lags.
     sDir = sProject
     while True:
         if isKit(sDir): return sDir
@@ -279,6 +278,8 @@ def locateKit():
         sDir = sUp
     for sLetter in "CDEFGHIJKLMNOPQRSTUVWXYZ":
         if isKit(sLetter + ":\\HomerDev"): return sLetter + ":\\HomerDev"
+    sEnv = os.environ.get("HomerDev", "")
+    if isKit(sEnv): return os.path.abspath(sEnv)
     return ""
 
 

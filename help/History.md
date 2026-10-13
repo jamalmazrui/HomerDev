@@ -7,6 +7,15 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.16 -- 13 October 2026
+
+- **The development kit comes before the installed one, everywhere.** The installer sets the HomerDev variable to the installed kit, which lags the development kit until it is installed, and several finders looked at the variable first. So MyBooks' kdpSubmit.cmd copied in the installed kdpSubmit, version 38, over version 39, and kdpSubmit stopped at once, looking for the single answers file version 39 replaced with one per book. kdpSubmit, kdpBooks, kdpUpdate and buildBooks (their launchers and buildBooks.locateKit), kind.findKit, and the kind.py check.py imports now look beside and above the project, then at the top of each drive, and use the variable last. The book launchers write the kit they chose, and its version, to their setup log.
+
+## 1.72.15 -- 12 October 2026
+
+- **The kit's own build_release.bat was an old runner all day.** Every project's runner was replaced by the kit's build, but the kit's own cannot be -- the build runs inside it -- and a runner from before the cycle lock never replaces itself. So the kit's cycle ran without the lock, and two kit cycles started two minutes apart ran at once: the second failed on HomerDev_setup.building.exe, which the first was writing. HomerDev.zip now carries the current runner as build_release.bat, which from then on replaces itself at the end of each cycle, and the kit's build names an outdated one in the console.
+- **The kit's release passes -SkipCheck,** as releaseHomerDev does: push's gate has just run checkHomerDev, and release.ps1's own check is the one for apps.
+
 ## 1.72.14 -- 12 October 2026
 
 **Camel Type throughout: constants without c_.** Camel Type names a constant exactly like a variable, type prefix and all -- sFormat, iMaxRetries -- set apart only by being declared as a constant. The c_ prefix is obsolete, yet the C# and JAWS guides said so while the Python guide and the homer-code skill still prescribed it, and the kit's own code used it 308 times.

@@ -214,8 +214,10 @@ def fixedDrives():
 def findKit(lsStarts=None):
     """The kit's folder, or "" when there is none. Only Windows and the folder
     name HomerDev are assumed, never a drive or a depth."""
-    sEnv = os.environ.get("HomerDev", "")
-    if isKit(sEnv): return os.path.abspath(sEnv)
+    # THE DEVELOPMENT KIT FIRST (13 October 2026). The HomerDev variable points to the installed kit, which lags the
+    # development kit until it is installed; looked at first, it gave MyBooks the installed kdpSubmit, version 38,
+    # which knew nothing of --book. The kit beside or above the project, then on any drive, comes first; the
+    # variable is the last resort, for a machine with no development kit.
     lsStarts = list(lsStarts or []) + [os.getcwd(), os.path.dirname(os.path.abspath(__file__))]
     for sStart in lsStarts:
         sDir = os.path.abspath(sStart)
@@ -227,6 +229,8 @@ def findKit(lsStarts=None):
             sDir = sUp
     for sRoot in fixedDrives():
         if isKit(os.path.join(sRoot, "HomerDev")): return os.path.join(sRoot, "HomerDev")
+    sEnv = os.environ.get("HomerDev", "")
+    if isKit(sEnv): return os.path.abspath(sEnv)
     return ""
 
 
