@@ -7,6 +7,19 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.31 -- 13 October 2026
+
+- **A book's manuscript is its Markdown, alone.** Compared paragraph by paragraph and fact by fact, the fifteen MyBooks titles that also had a Word file held the same content in their Markdown, revised and extended; one Word file carried an AI chat's "max length" message pasted mid-sentence, and one ".docx" was a downloaded web page. buildBooks now moves a Word file beside a manuscript to notes\\word\\<root>\\, never deleting it and still reading it to recover a named picture; gathering no longer copies a Word file for a book that has its manuscript; a Word file starts only a book with none; and the word-count comparison between the two is gone.
+- **A book with a missing component is not ready.** A missing cover was only a warning; it is an error now, unless the book's KDP answers keep the cover already on KDP. A file in a book's images folder whose bytes are not a picture -- twelve web pages in Legacy of Mazrui, saved by failed downloads -- is moved to notes\\not-pictures\\<root>\\, and a picture that could not be read as one makes the book not ready.
+- **kdpSubmit stops only for a failed build.** buildBooks exits 1 when any book is not ready, and that stopped every submission. Now only a failure (2 or more) stops it; each book is built again when submitted and must come back ready.
+
+## 1.72.30 -- 13 October 2026
+
+From ChatGPT's first audit of MyBooks.
+
+- **kdpSubmit needs more than a page change to call a book submitted.** Leaving the pricing page counted as acceptance, and a sign-in page or any other page also leaves it. Now only a new acknowledgement counts at once; leaving the page sends the run to the Bookshelf, and it counts as submitted only when the book shows In review, Publishing or Live; a sign-in, or a status that cannot be read, is unknown (exit code 6), with the reason said.
+- **buildBooks keeps the checkers' full reports with each edition.** Ace's report lived in a temporary folder until the next build. Ace's and EPUBCheck's reports now go to notes\\evidence\\<book>\\<first 12 of the EPUB's sha256>\\ with a record of the date, the checksum and the tool versions; the three newest editions of each book are kept, and the audit page points there.
+
 ## 1.72.29 -- 13 October 2026
 
 From another round of ChatGPT's audit, four of whose findings were in the review's own list, unanswered.

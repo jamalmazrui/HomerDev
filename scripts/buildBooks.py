@@ -199,8 +199,32 @@ def bookFile(dBook, sName):
 
 
 def bookDocx(dBook):
-    """The book's published Word files beside its manuscript, oldest first."""
-    return sorted(glob.glob(bookFile(dBook, "*.docx")), key=os.path.getmtime)
+    """The book's Word files, oldest first: any still beside its manuscript, and those retired to notes\\word\\<root>.
+    Read only to recover a picture the manuscript names; the manuscript itself is always the .md."""
+    lAll = glob.glob(bookFile(dBook, "*.docx")) + glob.glob(os.path.join(sProject, "notes", "word", dBook["root"], "*.docx"))
+    return sorted(lAll, key=os.path.getmtime)
+
+
+# THE MANUSCRIPT IS THE MARKDOWN (13 October 2026). Every book's source is books\\<root>\\<root>.md. Compared paragraph by
+# paragraph, all fifteen books that also had a Word file held the same content in the Markdown, revised and extended;
+# one Word file held an AI chat's "max length" message pasted mid-sentence, and one ".docx" was a downloaded web page.
+# A Word file beside a manuscript is moved to notes\\word\\<root>\\, never deleted, and still read for pictures.
+def retireWordSources(dBook):
+    """Moves each Word file beside the book's manuscript, and in its sources folder, to notes\\word\\<root>\\. Only once
+    the manuscript exists, since a new book is imported from its Word file first. Returns what was moved."""
+    if not os.path.exists(bookFile(dBook, dBook["root"] + ".md")): return []
+    sDest = os.path.join(sProject, "notes", "word", dBook["root"])
+    lMoved = []
+    for sFrom in glob.glob(bookFile(dBook, "*.docx")) + glob.glob(bookFile(dBook, "*.doc")) + glob.glob(os.path.join(sProject, "books", dBook["root"], "sources", "*.doc*")):
+        os.makedirs(sDest, exist_ok=True)
+        sTarget = os.path.join(sDest, os.path.basename(sFrom))
+        if os.path.exists(sTarget):
+            sTarget = os.path.splitext(sTarget)[0] + "-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + os.path.splitext(sTarget)[1]
+        bReal = zipfile.is_zipfile(sFrom) if sFrom.lower().endswith(".docx") else True
+        shutil.move(sFrom, sTarget)
+        lMoved.append(sTarget)
+        log(dBook["root"] + ": Word file retired, the manuscript being the Markdown: " + sTarget + ("" if bReal else " (not really a Word file: it is not a .docx package)"))
+    return lMoved
 
 
 def retireTo(sPath):
@@ -677,6 +701,9 @@ def gatherBook(dBook, dIndex):
         sImages = os.path.join(os.path.dirname(sHit), "images")
         if os.path.isdir(sImages) and sImages not in lImageDirs: lImageDirs.append(sImages)
     dFound = {"gatheredOn": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"), "docx": "", "cover": "", "imageFolders": "\n".join(lImageDirs)}
+    if lDocx and os.path.exists(os.path.join(sBookDir, sRoot + ".md")):
+        log(sRoot + ": a Word file was found, but the manuscript is the Markdown, so it is not copied: " + max(lDocx, key=safeTime))
+        lDocx = []
     if lDocx:
         sNewest = max(lDocx, key=safeTime)
         sTarget = os.path.join(sBookDir, os.path.basename(sNewest))
@@ -720,6 +747,42 @@ def retireFormer(dBook):
         elif os.path.isfile(sNewInix):
             lMoved.append("data\\books\\" + dBook["formerKdpInix"] + " -> " + retireTo(sOldInix))
     for s in lMoved: log(dBook["root"] + ": retired " + s)
+    lMoved += retireWordSources(dBook)
+    lMoved += quarantineNonPictures(dBook)
+    return lMoved
+
+
+def isPicture(sPath):
+    """True when the file's own bytes are a JPEG, PNG, GIF, WebP, BMP or SVG, whatever its name says."""
+    try:
+        with open(sPath, "rb") as f: bHead = f.read(512)
+    except OSError:
+        return False
+    if bHead.startswith(b"\xff\xd8\xff") or bHead.startswith(b"\x89PNG") or bHead[:4] in (b"GIF8",) or bHead.startswith(b"BM"): return True
+    if bHead[:4] == b"RIFF" and bHead[8:12] == b"WEBP": return True
+    return b"<svg" in bHead.lower()
+
+
+# A WEB PAGE IS NOT A PICTURE (13 October 2026, from an audit). Legacy of Mazrui's images folder held twelve web pages
+# -- error pages saved when downloads failed, named .shtml or .txt -- and two real pictures. A file whose bytes are not
+# a picture is moved to notes\\not-pictures\\<root>\\, never deleted, so the book reports the picture missing rather than
+# carrying a page it cannot show.
+def quarantineNonPictures(dBook):
+    sImages = os.path.join(sProject, "books", dBook["root"], "images")
+    if not os.path.isdir(sImages): return []
+    sDest = os.path.join(sProject, "notes", "not-pictures", dBook["root"])
+    lMoved = []
+    for sDir, lDirs, lFiles in os.walk(sImages):
+        for sName in lFiles:
+            sFrom = os.path.join(sDir, sName)
+            if isPicture(sFrom): continue
+            sTarget = os.path.join(sDest, os.path.relpath(sFrom, sImages))
+            os.makedirs(os.path.dirname(sTarget), exist_ok=True)
+            if os.path.exists(sTarget): sTarget += "-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+            shutil.move(sFrom, sTarget)
+            lMoved.append(sTarget)
+            log(dBook["root"] + ": not a picture, so set aside: images\\" + os.path.relpath(sFrom, sImages) + " -> " + sTarget)
+    if lMoved: say(dBook["title"] + ": " + plural(len(lMoved), "file") + " in its images folder " + ("was not a picture and was" if len(lMoved) == 1 else "were not pictures and were") + " set aside in notes\\not-pictures.")
     return lMoved
 
 
@@ -1226,7 +1289,8 @@ def resolvePictures(dBook, sBody, sWork, dFound):
     lPictures = imageList(sBody)
     dNamed, lOrdered, bDocxRead, dUsedDocx = {}, [], False, {}
     lRecords, lErrors, dDone = [], [], {}
-    lDocx = sorted(glob.glob(os.path.join(sBookDir, "*.docx")), key=os.path.getmtime)
+    lDocx = sorted(glob.glob(os.path.join(sBookDir, "*.docx")) + glob.glob(os.path.join(sProject, "notes", "word", os.path.basename(sBookDir.rstrip("\\/")), "*.docx")), key=os.path.getmtime)
+    lDocx = [s for s in lDocx if zipfile.is_zipfile(s)]
     lRemote = [d for d in lPictures if re.match(r"^https?://", d["url"], re.I)]
     for iIndex, dPicture in enumerate(lPictures):
         sUrl = dPicture["url"]
@@ -1578,6 +1642,13 @@ def buildEpub(dBook, dKdp, dAudit, dEdition=None):
     dFoundAll = readInix(os.path.join(sBookDir, "found.inix")) if os.path.exists(os.path.join(sBookDir, "found.inix")) else {}
     sBody, lRecords, lErrors = resolvePictures(dBook, sBody, sWork, dFoundAll.get("found", {}))
     dAudit["pictures"] = lRecords
+    # A FILE THAT IS NOT A PICTURE IS A MISSING PICTURE (13 October 2026, from an audit): Legacy of Mazrui was called
+    # ready with image files that could not be read as pictures, such as a downloaded web page saved as .shtml.
+    lUnreadable = [d for d in lRecords if str(d.get("note", "")).startswith("could not be read as a picture")]
+    if lUnreadable:
+        dAudit["warnings" if dBook.get("allowMissingPictures", "").lower() == "yes" else "errors"].append(
+            plural(len(lUnreadable), "picture file") + " could not be read as a picture, so " + ("it is" if len(lUnreadable) == 1 else "they are")
+            + " not in the book: " + ", ".join(os.path.basename(str(d.get("url", "?"))) for d in lUnreadable[:8]) + ". Replace each with the real image.")
     if lErrors:
         lAddresses = [s.split(": ", 1)[-1] for s in lErrors]
         # Not ready, unless the book's catalog entry says a text-only edition is intended (allowMissingPictures = yes):
@@ -1621,7 +1692,15 @@ def buildEpub(dBook, dKdp, dAudit, dEdition=None):
         lCommand += ["--epub-cover-image", lCovers[0]]
         dAudit["cover"] = os.path.basename(lCovers[0])
     else:
-        dAudit["warnings"].append("No cover in books\\" + sRoot + "\\; the EPUB has none. KDP uses the cover you uploaded there, but the EPUB copy buyers download and other stores need one inside. Put the cover there as " + sRoot + ".jpg.")
+        # A BOOK WITHOUT ITS COMPONENTS IS NOT READY (13 October 2026): a missing cover was only a warning. It is an
+        # error now, unless the book's KDP answers keep the cover already on KDP -- then KDP has the cover, and the
+        # warning says the editions that lack one.
+        sAnswers = os.path.join(sProject, "configs", sRoot + "_KDP.inix")
+        bKdpCover = os.path.exists(sAnswers) and any(str(dKeys.get("coverFile", "")).strip().lower().startswith("keep") for dKeys in readInix(sAnswers).values())
+        if bKdpCover:
+            dAudit["warnings"].append("No cover in books\\" + sRoot + "\\; KDP keeps the cover uploaded there, as the KDP answers say, but this EPUB has none, so the copy buyers download and other stores lack it. Put the cover there as " + sRoot + ".jpg.")
+        else:
+            dAudit["errors"].append("No cover: books\\" + sRoot + "\\ has no " + sRoot + ".jpg, and the KDP answers do not keep a cover already on KDP. Put the cover there as " + sRoot + ".jpg.")
     if os.path.exists(sEpub): os.remove(sEpub)
     iCode, sOut = run(lCommand, sCwd=sWork)
     for sLine in sOut.splitlines():
@@ -1971,6 +2050,33 @@ def runKindlePreviewer(sEpub, dAudit):
     return True
 
 
+def keepEvidence(sEpub, dAudit):
+    """THE CHECKERS' FULL REPORTS ARE KEPT WITH THE EDITION THEY JUDGED (13 October 2026, from an audit). Ace's report
+    lived in a temporary folder until the next build, so an audit could not be traced back to its evidence later. Now
+    Ace's report and EPUBCheck's are copied to notes\\evidence\\<book>\\<first 12 of the EPUB's sha256>\\ with a record of
+    when, which tools and the EPUB's full checksum. The three newest editions of each book are kept."""
+    try:
+        sSha = hashlib.sha256(open(sEpub, "rb").read()).hexdigest()
+        sBase = os.path.join(sProject, "notes", "evidence", dAudit["root"])
+        sDest = os.path.join(sBase, sSha[:12])
+        os.makedirs(sDest, exist_ok=True)
+        if dAudit.get("aceReport") and os.path.isdir(os.path.dirname(dAudit["aceReport"])):
+            shutil.copytree(os.path.dirname(dAudit["aceReport"]), os.path.join(sDest, "ace"), dirs_exist_ok=True)
+        sCheck = os.path.join(workFolder(dAudit["root"]), "epubcheck.json")
+        if os.path.exists(sCheck): shutil.copy2(sCheck, os.path.join(sDest, "epubcheck.json"))
+        inix.writeInix(os.path.join(sDest, "evidence.inix"), {"Evidence": {
+            "epub": os.path.basename(sEpub), "sha256": sSha, "checked": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "pandoc": dTools.get("pandocVersion", ""), "epubcheck": dTools.get("epubcheckVersion", ""), "ace": dTools.get("aceVersion", "")}})
+        dAudit["evidence"] = sDest
+        lKept = sorted((os.path.join(sBase, s) for s in os.listdir(sBase) if os.path.isdir(os.path.join(sBase, s))), key=os.path.getmtime, reverse=True)
+        for sOld in lKept[3:]:
+            shutil.rmtree(sOld, ignore_errors=True)
+            log(dAudit["root"] + ": older evidence removed, keeping the three newest editions: " + sOld)
+        log(dAudit["root"] + ": checkers' reports kept in " + sDest)
+    except Exception as oError:
+        log(dAudit["root"] + ": the checkers' reports could not be kept: " + str(oError))
+
+
 def runAce(sEpub, dAudit):
     """Ace by DAISY's verdict: critical and serious problems make the book not ready; moderate and minor ones are listed."""
     if "ace" not in dTools:
@@ -2104,14 +2210,6 @@ def auditManuscript(dBook, dAudit, dCatalog):
     dLevel = dAudit["readingLevel"]
     if dLevel and dBook["readingGrade"] and dLevel["grade"] > dBook["readingGrade"]:
         lWarnings.append("Reading level is grade " + str(dLevel["grade"]) + " by the Flesch-Kincaid formula, above the target of grade " + str(dBook["readingGrade"]) + "; " + plural(dLevel["long"], "sentence") + " of " + str(dLevel["sentences"]) + " run past " + str(iLongSentence) + " words.")
-    lDocx = bookDocx(dBook)
-    if lDocx:
-        iCodeA, sMd = run([dTools["pandoc"], os.path.join(sProject, "books", dBook["root"], dBook["root"] + ".md"), "-t", "plain", "--wrap=none"])
-        iCodeB, sDocx = run([dTools["pandoc"], lDocx[-1], "-t", "plain", "--wrap=none"])
-        iMd, iDocx = len(sMd.split()), len(sDocx.split())
-        dAudit["wordCompare"] = (iMd, iDocx, os.path.basename(lDocx[-1]))
-        if iCodeA == 0 and iCodeB == 0 and iMd and abs(iMd - iDocx) * 100 > iWordDiffPercent * iMd:
-            lWarnings.append("The Word file " + os.path.basename(lDocx[-1]) + " has " + format(iDocx, ",") + " words and the manuscript " + format(iMd, ",") + "; check which holds the latest edits before submitting.")
     return True
 
 
@@ -2202,7 +2300,7 @@ def writeAudit(dBook, dAudit):
         sLine += "; text alternative: " + (mdEscape("\u201c" + d["alt"] + "\u201d") if d["alt"] else "empty")
         l.append(sLine)
     l.append("")
-    l += ["## Tools", "", "- Pandoc " + dTools.get("pandocVersion", "not found"), "- EPUBCheck " + (dTools.get("epubcheckVersion", "") or ("installed" if "epubcheck" in dTools else "not available")), "- Ace by DAISY " + (dTools.get("aceVersion", "") or ("installed" if "ace" in dTools else "not available")) + (" (Ace's full report, until the next build: " + mdEscape(dAudit.get("aceReport", "")) + ")" if dAudit.get("aceReport") else ""), ""]
+    l += ["## Tools", "", "- Pandoc " + dTools.get("pandocVersion", "not found"), "- EPUBCheck " + (dTools.get("epubcheckVersion", "") or ("installed" if "epubcheck" in dTools else "not available")), "- Ace by DAISY " + (dTools.get("aceVersion", "") or ("installed" if "ace" in dTools else "not available")) + (" (the checkers' full reports are kept in " + mdEscape(dAudit.get("evidence", "")) + ")" if dAudit.get("evidence") else ""), ""]
     sMd = os.path.join(sProject, "results", dBook["root"] + "-audit.md")
     writeText(sMd, "\n".join(l))
     run([dTools["pandoc"], sMd, "-s", "-o", sMd[:-3] + ".htm"])
@@ -2395,6 +2493,7 @@ def main():
                     runEpubcheck(sEpub, dAudit)
                     runAce(sEpub, dAudit)
                     runKindlePreviewer(sEpub, dAudit)
+                    keepEvidence(sEpub, dAudit)
                 bReady = writeAudit(dBook, dAudit)
                 lAudits.append(dAudit)
                 say(dBook["title"] + ": " + ("ready" if bReady else "not ready") + ", " + plural(len(dAudit["errors"]), "error") + ", " + plural(len(dAudit["warnings"]), "warning") + ".")
@@ -2432,6 +2531,7 @@ def main():
                 runEpubcheck(sEpub, dAudit)
                 runAce(sEpub, dAudit)
                 runKindlePreviewer(sEpub, dAudit)
+                keepEvidence(sEpub, dAudit)
                 # EVERY EDITION, built from the same manuscript and checked by EPUBCheck; an edition that fails makes the
                 # book not ready, since what goes to another store must be as sound as what goes to KDP.
                 for dEdition in editionRules(dBook["root"]):

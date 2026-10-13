@@ -2067,9 +2067,18 @@ def finalReview(page):
         lTexts = pageMessages(page)
         lNew = [t for t in lTexts if t not in setBefore]
         oSaid = oAck.search(" | ".join(lNew))
-        if oSaid or ("/pricing" not in page.url and "kdp.amazon.com" in page.url):
+        if oSaid:
             sOutcome = "submitted"
-            sHow = ("KDP said: " + " | ".join(t for t in lNew if oAck.search(t))) if oSaid else ("KDP left the pricing page for " + page.url)
+            sHow = "KDP said: " + " | ".join(t for t in lNew if oAck.search(t))
+            break
+        # LEAVING THE PAGE IS A LEAD, NOT A RECEIPT (13 October 2026, audit MB-01): a sign-in page or any other page
+        # also leaves pricing. A sign-in is unknown at once; any other move is confirmed below by the Bookshelf.
+        if re.search(r"signin|/ap/|login", page.url, re.I):
+            sHow = "KDP sent the browser to sign in, at " + page.url
+            break
+        if "/pricing" not in page.url and "kdp.amazon.com" in page.url:
+            sOutcome = "left"
+            sHow = "KDP left the pricing page for " + page.url
             break
         if any(re.search(r"fix the highlighted|invalid|must be|is required", t, re.I) and not re.search(r"possible spelling errors", t, re.I) for t in lNew):
             sOutcome = "rejected"
@@ -2079,6 +2088,17 @@ def finalReview(page):
     dumpControls(page, "after Publish")
     lTexts = logMessages(page, "after Publish")
     say("Page now: " + page.title() + ", at " + page.url)
+    if sOutcome == "left":
+        page.goto(sBookshelfUrl)
+        time.sleep(5)
+        sStatus = bookshelfStatus(page, "after publishing")
+        if re.search(r"in review|publishing|live", sStatus, re.I):
+            sOutcome, sHow = "submitted", sHow + ", and the Bookshelf shows the book as " + sStatus
+        else:
+            say("Pressed Publish and KDP left the pricing page, but gave no acknowledgement, and the Bookshelf shows the book as "
+                + sStatus + ", so whether KDP took it is unknown. Check the Bookshelf before trying again.")
+            log("PUBLISH OUTCOME: unknown; " + sHow + "; Bookshelf status " + sStatus)
+            return "unknown"
     if sOutcome == "submitted":
         page.goto(sBookshelfUrl)
         time.sleep(5)
@@ -2095,7 +2115,8 @@ def finalReview(page):
         unresolved("Publish", "KDP refused: " + " | ".join(lTexts)[:300])
         return "draft"
     say("Pressed Publish, but KDP showed neither an acknowledgement nor an error within two minutes. Outcome unknown; check the Bookshelf before trying again.")
-    log("PUBLISH OUTCOME: unknown")
+    if sHow: say("What happened instead: " + sHow + ".")
+    log("PUBLISH OUTCOME: unknown" + ("; " + sHow if sHow else ""))
     return "unknown"
 
 
@@ -2281,9 +2302,14 @@ def submitChanged(lBooks):
     sBuild = os.path.join(sFolder, "buildBooks.py")
     oBuild = subprocess.run([sys.executable, sBuild], cwd=sProject)
     log("buildBooks exit code " + str(oBuild.returncode))
-    if oBuild.returncode != 0:
-        say("The build reported a problem (exit code " + str(oBuild.returncode) + "), so nothing was submitted. Its log says why.")
+    # NOT READY IS NOT A FAILURE (13 October 2026). buildBooks exits 1 when any book is not ready -- a missing cover is
+    # now enough -- and that stopped every submission, even of a finished book. Only a failed build (2 or more) stops
+    # here; each book is built again on its own when submitted, and must come back ready.
+    if oBuild.returncode >= 2:
+        say("The build failed (exit code " + str(oBuild.returncode) + "), so nothing was submitted. Its log says why.")
         return oBuild.returncode
+    if oBuild.returncode == 1:
+        say("Some books are not ready; results\\Audit_Summary.htm says why. A book that is not ready is not submitted.")
     dReceipt = readReceipt()
     lDue, lSame, lNew = [], [], []
     bBaseline = False
