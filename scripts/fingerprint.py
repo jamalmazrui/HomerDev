@@ -142,14 +142,17 @@ class Cache:
             if lsFiles: lsParts.append("%s %s%s" % (sWord, ", ".join(lsFiles[:8]), " and %d more" % (len(lsFiles) - 8) if len(lsFiles) > 8 else ""))
         return (": " + "; ".join(lsParts)) if lsParts else ""
 
-    def record(self, sKey, sPrint, lsOutputs):
-        """Notes a successful run: its fingerprint and the hash of each output. Saved at once."""
+    def record(self, sKey, sPrint, lsOutputs, lsFindings=None):
+        """Notes a successful run: its fingerprint, the hash of each output and, for a check, its findings. Saved at once.
+        THE FINDINGS ARE KEPT (13 October 2026, from an audit): a reused check restored none of them, so its report said
+        nothing went unchecked after a run that had skipped the build and smoke tests."""
         dOutputs = {}
         for sOutput in lsOutputs:
             sPath = sOutput if os.path.isabs(sOutput) else os.path.join(self.sProject, sOutput)
             if os.path.isfile(sPath): dOutputs[os.path.relpath(sPath, self.sProject)] = self.fileHash(sPath)
         self.d["jobs"][sKey] = {"print": sPrint, "outputs": dOutputs, "when": datetime.datetime.now().isoformat(timespec="seconds"),
                                 "files": dict(getattr(self, "dLastFiles", {}))}
+        if lsFindings is not None: self.d["jobs"][sKey]["findings"] = [list(t) for t in lsFindings]
         self.setChanged.add(("jobs", sKey))
         self.save()
 

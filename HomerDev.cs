@@ -581,7 +581,6 @@ private static bool runChat(IWin32Window owner)
             oTicker.Start();
             Log.info("Chat question (" + sEngine + (bByVoice ? ", by voice" : "") + "): " + sQuestion);
             bool bFirst = !bClaudeStarted;
-            if (bClaude) bClaudeStarted = true;
             string sPrompt = bClaude ? sQuestion : sContext + "\r\n" + sbHistory.ToString() + "Question: " + sQuestion + "\r\nAnswer:";
             Thread oWorker = new Thread(delegate()
             {
@@ -597,6 +596,10 @@ private static bool runChat(IWin32Window owner)
                     {
                         if (iThis != iAsk) { Log.info("An answer came after Stop, and was set aside"); return; }
                         fnStopTicker();
+                        // A SESSION EXISTS ONCE CLAUDE HAS ANSWERED (13 October 2026, from an audit). It was marked started
+                        // when the first question was sent, so a first request that failed left every later one trying
+                        // to resume a session that was never made. Now only a clean answer marks it.
+                        if (bClaude && bFirst && string.IsNullOrEmpty(sError) && !string.IsNullOrEmpty(sAnswer)) bClaudeStarted = true;
                         if (string.IsNullOrEmpty(sAnswer)) sAnswer = "No answer came back" + (string.IsNullOrEmpty(sError) ? "." : ": " + sError);
                         sAnswer = plainText(sAnswer);
                         sLastAnswer = sAnswer;

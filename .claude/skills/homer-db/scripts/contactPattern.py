@@ -24,6 +24,13 @@ import datetime, os, platform, re, sqlite3, sys
 lsContactFields = ["title", "first_name", "middle_name", "last_name", "job", "enterprise", "address1", "address2", "city",
                    "state", "zip", "nation", "office_phone", "home_phone", "wireless_phone", "business_email",
                    "personal_email", "date_of_birth", "gender"]
+# A CONTACT'S IDENTITY (13 October 2026): first|middle|last; the company when there is no last name; first|middle| when
+# there is neither, so people known only by a first name stay distinct -- the key was empty for all of them, and the
+# unique index let only one in. Every contact that had a last name or a company keeps its key, so no link moves.
+sPrimeDef = ('"prime" TEXT GENERATED ALWAYS AS (iif(last_name IS NOT NULL AND length(last_name)>0, '
+             "coalesce(first_name,'')||'|'||coalesce(middle_name,'')||'|'||coalesce(last_name,''), "
+             "iif(enterprise IS NOT NULL AND length(enterprise)>0, enterprise, "
+             "iif(length(coalesce(first_name,'')||coalesce(middle_name,''))>0, coalesce(first_name,'')||'|'||coalesce(middle_name,'')||'|', '')))) STORED")
 lsLeading = ["added", "edited"]                 # after the id, as in every Homer table
 lsTrailing = ["url", "notes", "tags"]           # the standard fields; notes is DbDialog's Extra Info
 
@@ -75,8 +82,9 @@ def applyPattern(sDb, sTable="contacts", fnLog=print):
         if sName == "enterprise": lsOrder += lsExtra
     lsOrder += [n for n in lsTrailing if n in dDefs] + lsGenerated + (["marked"] if "marked" in dDefs else [])
     lsAdded = [n for n in lsContactFields if n not in dDefs]
-    lsNewDefs = [dDefs.get(n, n + " TEXTLINE") for n in lsOrder]
-    if [n for n, _ in lDefs] == lsOrder:
+    lsNewDefs = [sPrimeDef if n == "prime" else dDefs.get(n, n + " TEXTLINE") for n in lsOrder]
+    bPrimeSame = dDefs.get("prime", sPrimeDef) == sPrimeDef
+    if [n for n, _ in lDefs] == lsOrder and bPrimeSame:
         bTrigger = editedTrigger(oDb, sTable, fnLog)
         fnLog("%s %s: already in the contact pattern%s" % (os.path.basename(sDb), sTable, "; its edited trigger was brought up to date" if bTrigger else ""))
         oDb.close(); return bTrigger

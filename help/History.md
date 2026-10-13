@@ -7,6 +7,15 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.23 -- 13 October 2026
+
+From a ChatGPT audit of the kit, DbDo and HomerScribe, each finding checked against the code before it was acted on.
+
+- **A reused check keeps what it did not check.** When nothing had changed, check and checkHomerDev reused the last pass but kept none of its findings, so the report said nothing went unchecked after a run that had skipped the build and smoke tests. The cache now keeps a pass's findings, and a reuse restores the skips, each marked "in the run reused here"; a pass recorded before this says its coverage is unknown.
+- **installWhisper proves Whisper is usable, not only present.** The model downloads to a .part file renamed when whole; a model already there is measured against the server's size and fetched again if short; whisper-cli is started once to prove it runs; and each step is written to the log, which used to hold only its header. Program and model both present no longer skips these checks.
+- **A contact known only by a first name has an identity.** The contact pattern's prime was empty for anyone with neither a last name nor a company, so the unique index let only one such person in; it is now first|middle| for them, and unchanged for everyone else.
+- **The chat starts a Claude session only once Claude answers.** A first question that failed marked the session started, and every later question tried to resume a session that was never made.
+
 ## 1.72.22 -- 13 October 2026
 
 - **kdpSubmit decides for itself which books to submit.** Version 39 made a run without --book do nothing when several books had answers files: it stopped the wrong book by stopping every book. Version 40 runs buildBooks first, which rebuilds only books whose sources changed, then compares each book's manuscript, cover (unless the answers keep KDP's) and answers file with that book's receipt, and submits only the books where something differs, each through the single-book path. A book kdpSubmit has never submitted has no receipt, so it is named, never submitted on a guess, and --book submits it the first time. Before anything is sent, the books and the reason for each are listed and Y submits them; --yes answers for an unattended run.

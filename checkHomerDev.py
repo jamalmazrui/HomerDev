@@ -581,6 +581,13 @@ def main():
     if bReusable and oCache.isCurrent("checkHomerDev pass", sPrint, []):
         sWhen = oCache.d["jobs"]["checkHomerDev pass"].get("when", "?")
         finding("reused", "pass", "the kit passed this check at %s with exactly these inputs (fingerprint %s); not run again. checkHomerDev --fresh runs it in full" % (sWhen, sPrint[:12]))
+        # WHAT THE REUSED RUN DID NOT CHECK STILL WAS NOT CHECKED (13 October 2026, from an audit). Its skips are restored
+        # with their reasons; a pass recorded before findings were kept says its coverage is unknown.
+        lsKept = oCache.d["jobs"]["checkHomerDev pass"].get("findings")
+        if lsKept is None: finding("original coverage", "skip", "this pass was recorded before findings were kept, so which checks it skipped is not known; checkHomerDev --fresh runs every check")
+        else:
+            for sKeptName, sKeptVerdict, sKeptEvidence in lsKept:
+                if sKeptVerdict == "skip": finding(sKeptName, "skip", sKeptEvidence + " (in the run reused here)")
         sReport = writeReport(False, True)
         sayLine("The kit passed this check at %s, and nothing it checks has changed since; not run again." % sWhen)
         sayLine("checkHomerDev --fresh runs every check anyway. The report is %s." % os.path.basename(sReport))
@@ -624,7 +631,7 @@ def main():
         if sVerdict == "fail": sayLine("  failed: %s -- %s" % (sName, sEvidence))
     sayLine("The report is %s." % os.path.basename(sReport))
     # Recorded for the files as this check left them: its builds rewrite version.py and Version.cs (12 October 2026).
-    if not iFailed and bReusable: oCache.record("checkHomerDev pass", oCache.fingerprint(lsInputs, [platform.python_version()], bSkipProducts=True), [])
+    if not iFailed and bReusable: oCache.record("checkHomerDev pass", oCache.fingerprint(lsInputs, [platform.python_version()], bSkipProducts=True), [], lsFindings)
     if iFailed: oCache.forget("checkHomerDev pass")
     logLine("checkHomerDev end")
     return 1 if iFailed else 0
