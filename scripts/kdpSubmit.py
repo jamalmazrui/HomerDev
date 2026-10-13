@@ -2005,6 +2005,7 @@ def finalReview(page):
     say("Everything is filled and saved. Pressing Publish Your Kindle eBook now, as instructed. For a new book this makes title, subtitle, author and edition permanent; for a published book it sends the update, which KDP usually makes live within 72 hours.")
     dumpControls(page, "pricing, before Publish")
     sBefore = page.url
+    setBefore = set(pageMessages(page))
     if not clickButton(page, "Publish Your Kindle eBook", ["#save-and-publish-announce", "Publish Your Kindle eBook"]):
         say("The Publish button was not found. The draft is saved; nothing was submitted.")
         return "draft"
@@ -2017,19 +2018,26 @@ def finalReview(page):
             time.sleep(5)
         else:
             break
-    oAck = re.compile(r"congratulations|has been submitted|submitted for publishing|is publishing|in review|publishing\b|will be available|successfully published", re.I)
-    sOutcome, lTexts = "unknown", []
+    # ONLY WHAT KDP SAYS AFTER THE PRESS COUNTS (13 October 2026). The test searched the page's messages and its title
+    # for words such as "publishing", and the title is "... | Amazon Kindle Direct Publishing": KDP's own name was taken
+    # for its acknowledgement five seconds after the press, every time, and the run went straight to the Bookshelf.
+    # Now an acknowledgement is a specific phrase in a message that was not on the page before Publish was pressed, or
+    # KDP leaving the pricing page, as it does once it takes a publish. Anything else, for two minutes, is unknown.
+    oAck = re.compile(r"congratulations|has been submitted|submitted for (publishing|review)|is publishing|in review|will be available|successfully published|being published", re.I)
+    sOutcome, lTexts, sHow = "unknown", [], ""
     for iTry in range(24):
         lTexts = pageMessages(page)
-        sAll = " | ".join(lTexts) + " | " + page.title()
-        if oAck.search(sAll) or ("/pricing" not in page.url and "kdp.amazon.com" in page.url):
+        lNew = [t for t in lTexts if t not in setBefore]
+        oSaid = oAck.search(" | ".join(lNew))
+        if oSaid or ("/pricing" not in page.url and "kdp.amazon.com" in page.url):
             sOutcome = "submitted"
+            sHow = ("KDP said: " + " | ".join(t for t in lNew if oAck.search(t))) if oSaid else ("KDP left the pricing page for " + page.url)
             break
-        if any(re.search(r"fix the highlighted|invalid|must be|is required", t, re.I) and not re.search(r"possible spelling errors", t, re.I) for t in lTexts):
+        if any(re.search(r"fix the highlighted|invalid|must be|is required", t, re.I) and not re.search(r"possible spelling errors", t, re.I) for t in lNew):
             sOutcome = "rejected"
             break
         time.sleep(5)
-    log("URL after Publish: " + page.url + "; outcome judged " + sOutcome)
+    log("URL after Publish: " + page.url + "; outcome judged " + sOutcome + ("; " + sHow if sHow else "") + "; after " + str(iTry * 5 + 5) + " seconds")
     dumpControls(page, "after Publish")
     lTexts = logMessages(page, "after Publish")
     say("Page now: " + page.title() + ", at " + page.url)
@@ -2037,12 +2045,12 @@ def finalReview(page):
         page.goto(sBookshelfUrl)
         time.sleep(5)
         sStatus = bookshelfStatus(page, "after publishing")
-        say("Submitted. KDP's Bookshelf now shows the book as: " + sStatus + ". KDP said: " + (" | ".join(t for t in lTexts if oAck.search(t)) or "see the log") + ".")
+        say("Submitted. " + sHow + ". The Bookshelf now shows the book as: " + sStatus + ".")
         log("PUBLISH OUTCOME: submitted; Bookshelf status " + sStatus)
         if sStatus == "Draft":
             say("The Bookshelf still says Draft, so KDP may not have taken the submission; check it before running again.")
             return "unknown"
-        if sStatus == "not shown": say("The Bookshelf's status label could not be read, which has happened on this account's page before; KDP's acknowledgement is the evidence that the submission was taken.")
+        if sStatus == "not shown": say("The Bookshelf's status label could not be read; the evidence that KDP took the submission is what is above: " + sHow + ". Check the Bookshelf to be sure.")
         return "submitted"
     if sOutcome == "rejected":
         say("KDP refused to publish. Its messages: " + " | ".join(lTexts)[:400])

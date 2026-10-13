@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.25 -- 13 October 2026
+
+- **kdpSubmit no longer mistakes KDP's name for its acknowledgement.** After Publish was pressed, the test for success searched the page's messages and its title for words such as "publishing", and the title of every KDP page ends "Amazon Kindle Direct Publishing". So each publish was judged submitted five seconds after the press, on no evidence, and the run went at once to the Bookshelf, possibly before KDP had finished. Blind Vibe Coding's update of 13 October was reported submitted this way. Now only a specific phrase in a message that was not on the page before the press counts, or KDP leaving the pricing page; otherwise, after two minutes, the outcome is unknown (exit code 6), and a bare run does not record that book's answers as sent.
+
 ## 1.72.24 -- 13 October 2026
 
 - **kdpSubmit's questions are heard.** Python's input() writes its question to the error stream when run in a console, and kdpSubmit.cmd sends that stream to logs\\<project>-kdpSubmit-errors.txt. So every question kdpSubmit asks -- whether to submit what changed, the yes-or-no questions of --ask, whether to publish, and the waits for Enter -- went into that file while the console stayed silent. A run waited 22 minutes on a question nobody heard, then stopped with nothing submitted, and the launcher reported a Python error that was only the question. Each question now goes to the console and the log, and only the answer is read.
