@@ -1151,7 +1151,7 @@ def installerFindings(sText):
         sScript = mScript.group(1) if mScript else "installScreenReaderSupport.cmd"
         mRunAll = re.search(r"(?ms)^\[Run\]\s*\n(.*?)(?=^\[[A-Za-z]+\]\s*$)", s)
         if not mRunAll or sScript not in mRunAll.group(1): lBad.append("never runs %s, the script whose state decides its screen reader boxes" % sScript)
-        if re.search(r"(?i)\b(jaws)\b", s) and not re.search(r"(?i)Check:\s*isInstallJaws", s): lBad.append("offers no Install box for the JAWS scripts")
+        if re.search(r"(?i)\b(jaws)\b", s) and not re.search(r"(?i)Check:\s*(?:homerFinishRuns\s+and\s+)?isInstallJaws", s): lBad.append("offers no Install box for the JAWS scripts")
     return lBad
 
 def checkInstaller():

@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.13 -- 12 October 2026
+
+- **The installer pattern check knows the /DEFAULTS entries.** It found the JAWS Install box by the exact words Check: isInstallJaws, so after 1.72.12 made that Check: homerFinishRuns and isInstallJaws, DbDo's check said the installer offered no Install box, and push refused to stage anything. Both forms now count. DbDo and bookFido had already compiled their installers with the 1.72.12 changes and published.
+
 ## 1.72.12 -- 12 October 2026
 
 - **Every Homer installer takes /DEFAULTS:** what pressing Enter at every step would do -- install, run each finish-page entry ticked by default (Install and Update, not Reinstall, not the user guide), take the Results box as read, and launch the program when Launch is ticked. Alone, it starts setup again very silently with the same parameters, so one switch is enough. The pieces are in Templates\\HomerComponents.iss: homerDefaults, homerFinishRuns, which each finish-page entry's Check now includes in place of skipifsilent, and homerStartForDefaults, called first in InitializeSetup. help\\FinishPage.md explains it.
