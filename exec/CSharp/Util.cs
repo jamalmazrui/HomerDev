@@ -343,49 +343,91 @@ if (!File.Exists(sTry) && !Directory.Exists(sTry)) return sTry;
 return sCandidate + "-" + Guid.NewGuid().ToString("N").Substring(0, 8);
 } // recoveryPath method
 
-public static void replaceFileSafely(string sStaged, string sTarget, string sBackup) {
-// sStaged must be complete. sBackup is where the target's previous content is kept, or "" for no backup. An earlier
-// file at sBackup is kept until the new backup exists. On failure the target is as it was and sStaged is not deleted.
+public static string replaceFileSafely(string sStaged, string sTarget, string sBackup) {
+// sStaged must be complete. sBackup is where the target's previous content is kept, or "" for no backup.
+//
+// TWO COMPLETE COPIES AT EVERY MOMENT (14 October 2026, from an audit by another AI). When File.Replace was refused, the
+// fallback copied the new file over the target, so a full disk or an interrupted copy could leave it truncated, and with
+// no backup asked for, no copy of the old content remained; and a backup that could not be rotated after the target was
+// replaced made the whole call throw, so a caller reported "unchanged" of a file that had changed. Now:
+//   - The fallback is two renames on one volume, each atomic: the old file aside to a recovery name, the new file into
+//     place. If the second fails, the old file is put back; if even that fails, the error names where both are.
+//   - This throws only when the target was NOT replaced; then the target holds its old content, or the message says
+//     where the old and new content are. sStaged is never deleted on a failure.
+//   - Once the target is replaced, a backup that cannot be rotated is not an error: the return value is a warning that
+//     names where the previous content is kept. "" means everything was done.
+//   - The backup is rotated by an atomic swap, so an earlier backup is kept until its successor is in place.
+// Tested before it was written here, by a simulation with every combination of failures: 256 runs, none losing a copy
+// or misreporting the result.
 if (!File.Exists(sStaged)) throw new FileNotFoundException("The staged file to commit is missing.", sStaged);
 if (!File.Exists(sTarget)) {
 File.Move(sStaged, sTarget);
-return;
+return "";
 }
 string sNewBackup = (sBackup == null || sBackup == "") ? null : stagingPath(sBackup);
+bool bReplaced = false;
 try {
 File.Replace(sStaged, sTarget, sNewBackup, true);
+bReplaced = true;
 }
-catch (PlatformNotSupportedException) {
-replaceByCopy(sStaged, sTarget, sNewBackup);
-}
+catch (PlatformNotSupportedException) { }
 catch (IOException oError) {
-// File.Replace refuses some volumes and network shares; a copy that keeps the backup first is the fallback.
-// A sharing violation (the target is open elsewhere) is not retried this way.
+// A sharing violation (the target is open elsewhere) is not worked around: renaming an open file fails the same way.
 if (oError.HResult == unchecked((int) 0x80070020)) throw;
-replaceByCopy(sStaged, sTarget, sNewBackup);
 }
-if (sNewBackup != null && File.Exists(sNewBackup)) {
-if (File.Exists(sBackup)) File.Delete(sBackup);
-File.Move(sNewBackup, sBackup);
+if (bReplaced) return (sNewBackup == null) ? "" : rotateBackup(sNewBackup, sBackup);
+string sHold = recoveryPath(sTarget);
+File.Move(sTarget, sHold);
+try {
+File.Move(sStaged, sTarget);
+}
+catch (Exception oError) {
+try {
+File.Move(sHold, sTarget);
+}
+catch (Exception) {
+throw new IOException("The new file could not be put in place, and the old one could not be put back. The old content is at "
++ sHold + "; the new content is at " + sStaged + ".", oError);
+}
+throw;
+}
+if (sNewBackup != null) return rotateBackup(sHold, sBackup);
+try {
+File.Delete(sHold);
+return "";
+}
+catch (Exception oError) {
+return "The file was replaced; its previous content could not be removed and is kept at " + sHold + " (" + oError.Message + ").";
 }
 } // replaceFileSafely method
 
-private static void replaceByCopy(string sStaged, string sTarget, string sNewBackup) {
-if (sNewBackup != null) File.Copy(sTarget, sNewBackup, false);
-File.Copy(sStaged, sTarget, true);
-File.Delete(sStaged);
-} // replaceByCopy method
+private static string rotateBackup(string sFrom, string sBackup) {
+// The previous content, at sFrom, becomes the backup by an atomic swap, so an earlier backup stays until this one is in
+// place. "" when done; otherwise a warning naming where the previous content is kept.
+if (sFrom == null || !File.Exists(sFrom)) return "";
+try {
+if (File.Exists(sBackup)) File.Replace(sFrom, sBackup, null, true);
+else File.Move(sFrom, sBackup);
+return "";
+}
+catch (Exception oError) {
+return "The file was replaced; its previous content could not become the backup " + sBackup + " and is kept at " + sFrom
++ " (" + oError.Message + ").";
+}
+} // rotateBackup method
 
-public static void writeTextSafely(string sTarget, string sText, Encoding encoding, string sBackup) {
+public static string writeTextSafely(string sTarget, string sText, Encoding encoding, string sBackup) {
+// Writes the text beside the target, then commits it with replaceFileSafely. Returns its warning, "" when everything
+// was done. On a failure the staged copy is removed while the target is still there, since the caller holds the text
+// and the target is as it was; it is kept only when the target is not there -- the old file moved aside and not put
+// back -- since the staged copy may then be the only complete new one, and the error names it.
 string sStaged = stagingPath(sTarget);
 try {
 File.WriteAllText(sStaged, sText, encoding);
-replaceFileSafely(sStaged, sTarget, sBackup);
+return replaceFileSafely(sStaged, sTarget, sBackup);
 }
 catch {
-// The staged copy holds nothing the caller still lacks (the text is in memory), so it is cleaned up; the target is
-// untouched.
-try { if (File.Exists(sStaged)) File.Delete(sStaged); } catch { }
+try { if (File.Exists(sTarget) && File.Exists(sStaged)) File.Delete(sStaged); } catch { }
 throw;
 }
 } // writeTextSafely method

@@ -125,6 +125,12 @@ def testConfirmed():
     check("confirmed: an unconfirmed text answer still never falls below KDP's", d["text"] == "Entire work, with minimal or no editing", str(d))
     d2 = u.aiWanted({"aiImages": "None"}, {"images": "MANY_AND_MINIMAL"})
     check("unconfirmed: a catalog None keeps KDP's Many", d2["images"] == "Many, with minimal or no editing", str(d2))
+    # THE AUTHOR'S OWN CATALOG ONLY WHERE IT IS (14 October 2026, from a second audit by another AI): this loop read
+    # configs\books.inix, which is personal and not in the repository, so in a clean checkout the suite stopped here
+    # after 24 checks. The rule itself is tested by the answers above; the catalog's books are checked when it is present.
+    if not os.path.isfile(os.path.join(u.sProject, "configs", "books.inix")):
+        print("SKIP confirmed: the author's own catalog is not here, so its books were not checked; the rule was, above")
+        return True
     for sRoot, dBook in u.catalog():
         if "images" in dBook.get("aiConfirmed", ""):
             check("confirmed images for " + sRoot + " are the cover only", dBook.get("aiImages", "").startswith("One or a few"), dBook.get("aiImages", ""))

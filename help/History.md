@@ -7,6 +7,13 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.48 -- 14 October 2026
+
+- **Replacing a file keeps two complete copies at every moment.** When File.Replace was refused, replaceFileSafely copied the new file over the old, so a full disk or an interrupted copy could leave it truncated, with no copy of the old content when no backup was asked for; and a backup that could not be rotated after the file was replaced made the call throw, so callers said "unchanged" of a changed file. Now the fallback is two renames, each atomic, putting the old file back if the second fails and naming both copies if even that fails; only a failed commit throws; a commit whose backup could not be rotated returns a warning naming where the previous content is; and the backup is swapped in atomically, so the earlier one stays until its successor exists. writeTextSafely keeps its staged copy when the target is missing, since it may then be the only complete one. Tested by a simulation of every combination of failures, 256 runs, before it was written here (from a second audit by another AI).
+- **FileDir builds again.** Web.cs's new percent decoding called Convert.ToByte, which inside namespace Homer is FileDir's own Homer.Convert class, so FileDir's build failed; it now says System.Convert.
+- **The KDP test suite runs in a clean checkout.** One test read the author's own catalog, which is not in the repository, so a fresh checkout stopped after 24 checks; it now says it skipped the catalog and goes on. That also showed kdpSubmit using its fallback reader where the kit was not at C:\HomerDev; it now looks first for the kit it is in. A checkout with no personal files and no HomerDev variable: 66 passed, 0 failed (from a second audit by another AI).
+
+
 ## 1.72.47 -- 14 October 2026
 
 - **help\AuditResponse.md answers the coordinated audit, finding by finding.** For each of its 72 findings across the kit and ten apps it says what was changed, where, and how it was tested -- separating tests run on the real code, or a line-for-line prototype, from changes that still await a build or a run on Windows -- so the next audit can verify rather than rediscover. 57 are done, one of them with a check still open; 1 is partly done; 14 are open, each needing Windows, Office, a clean machine or a screen reader. The count was taken from the entries themselves, and every finding of the audit appears once.

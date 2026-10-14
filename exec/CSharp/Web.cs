@@ -226,7 +226,8 @@ private static byte[] percentBytes(string sText) {
 List<byte> lBytes = new List<byte>();
 for (int i = 0; i < sText.Length; i++) {
 if (sText[i] == '%' && i + 2 < sText.Length && Uri.IsHexDigit(sText[i + 1]) && Uri.IsHexDigit(sText[i + 2])) {
-lBytes.Add(Convert.ToByte(sText.Substring(i + 1, 2), 16));
+// System.Convert in full: inside namespace Homer, Convert is FileDir's own Homer.Convert class (14 October 2026).
+lBytes.Add(System.Convert.ToByte(sText.Substring(i + 1, 2), 16));
 i += 2;
 continue;
 }

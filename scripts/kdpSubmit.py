@@ -90,7 +90,11 @@ def kitInix():
     global oKitInix
     if oKitInix is not None: return oKitInix or None
     oKitInix = False
-    for sDir in [os.environ.get("HomerDev", ""), os.environ.get("HOMERDEV", ""), r"C:\HomerDev"]:
+    # THE KIT THIS SCRIPT IS IN COMES FIRST (14 October 2026, from a second audit by another AI): with no HomerDev variable
+    # and the kit not at C:\HomerDev -- a fresh checkout, the audit's own test -- the fallback reader was used, and it misread
+    # a fenced list. This script lives in the kit's scripts folder, so the kit's reader is the one beside it.
+    sOwnKit = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    for sDir in [sOwnKit, os.environ.get("HomerDev", ""), os.environ.get("HOMERDEV", ""), r"C:\HomerDev"]:
         sPython = os.path.join(sDir, "exec", "Python") if sDir else ""
         if sPython and os.path.isfile(os.path.join(sPython, "inix.py")):
             if sPython not in sys.path: sys.path.insert(0, sPython)

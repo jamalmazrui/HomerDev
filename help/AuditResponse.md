@@ -114,6 +114,21 @@ This ledger answers each of the 72 findings of the coordinated audit of the Home
 - **urlFido-05, Content-Disposition. Done.** Both download paths use the kit's parser. Tested here on 12 headers and 5 device names.
 - **urlFido-06, Cancel. Done.** A transfer is copied a block at a time, the request is aborted the moment Cancel is pressed, and a cancelled file is not tried another way. Awaits a test on Windows with a slow download.
 
+## The second audit of 14 October
+
+That audit rechecked the current repositories and added these findings; each is answered here.
+
+- **2htm-07, a timed-out Office worker. Done.** If the worker has not ended 30 seconds after Office is ended, the run ends, which ends it; the same in extCheck.
+- **bookFido-07, markers alone. Done.** A PDF must open in PdfPig and have a page; an encrypted one is kept and logged as unchecked. Unrecorded files named for a title are no longer adopted.
+- **DbDo-08, a cleared unsaved mark. Done.** It stays while edits Save could not write remain, and closing asks about them by name.
+- **HomerDev-09, a destructive fallback. Done.** Two renames, never an overwrite; two complete copies at every moment. Tested here by a simulation of every combination of failures, 256 runs.
+- **HomerDev-10, commit and rotation. Done.** Only a failed commit throws; a rotation problem is a returned warning naming the copy kept; EdSharp and DbDo log and say it.
+- **HomerScribe-08, the last good cache. Done.** Only raw outputs are cleared before a hearing; the finished transcript and its identity are replaced only on success.
+- **urlCheck-07, an unrecorded folder claimed. Done.** Adopted only when its own results.json names the address; urlFido and bookFido no longer adopt such folders or files. Tested here on the real code with the audit's case.
+- **urlCheck-08, staging without a journal. Done.** Registered before the first move; a failed move puts back what moved. Tested here on the real code.
+- **The KDP suite in a clean checkout. Done.** 66 passed, 0 failed, with no personal files and no HomerDev variable.
+- **HomerView's metadata order and parity gaps.** Both were fixed on 14 October, but HomerView's build stopped on a naming check, so the repository the audit read did not have them; the naming check is answered (Yield Structure), and the next build carries them.
+
 ## In numbers
 
 Of the 72 findings, 57 are done, one of them with a check still open; 1 is partly done; and 14 are open, each of them needing a run on Windows, Office, a clean machine or a screen reader.
