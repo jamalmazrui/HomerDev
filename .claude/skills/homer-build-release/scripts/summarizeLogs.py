@@ -326,6 +326,14 @@ def main():
         return 2
 
     dRuns, iSkipped = collect(sFolder)
+    # A LOG STILL BEING WRITTEN IS LEFT OUT (14 October 2026, from a follow-up audit): check runs this summary over its own
+    # logs folder while its own log is open, so the summary reported that very check as UNFINISHED. --skip=<file name>
+    # leaves a log out, and the newest finished run of that task is reported instead.
+    lsSkip = [s.split("=", 1)[1].lower() for s in sys.argv[1:] if s.lower().startswith("--skip=")]
+    if lsSkip:
+        for oKey in list(dRuns):
+            dRuns[oKey] = [t for t in dRuns[oKey] if os.path.basename(t[1]).lower() not in lsSkip]
+            if not dRuns[oKey]: del dRuns[oKey]
     bAnyFailed = False
     for sApp in sorted(set(s[0] for s in dRuns), key=str.lower):
         print("== " + sApp)

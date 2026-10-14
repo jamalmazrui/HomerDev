@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.37 -- 14 October 2026
+
+- **A check no longer summarizes itself.** check runs the log summary over its own logs folder while its own log is still open, so the summary reported that very check as UNFINISHED. summarizeLogs takes `--skip=<file name>`, check names its own log, and the newest finished check is reported instead (from a follow-up audit by another AI).
+- **The last `c_` in the kit's shared code is gone:** a comment in Elevate.cs still spoke of "the c_i outcomes" after its constants were renamed. Constants follow the variable rules and never carry `c_`.
+
+
 ## 1.72.36 -- 14 October 2026
 
 From a follow-up audit by another AI, checked against the release logs.

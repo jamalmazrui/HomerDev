@@ -77,7 +77,7 @@ namespace Homer
 
         public static int check()
         {
-            // Asks GitHub once. Returns one of the c_i outcomes; on iCurrent
+            // Asks GitHub once. Returns one of the outcome constants (iCurrent, iNewer and the rest); on iCurrent
             // or iNewer, latestVersion and setupUrl are filled in.
             Match oAsset, oTag;
             string sBody, sJsonTag, sJsonUrl;
