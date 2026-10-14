@@ -23,7 +23,7 @@ the guides are written as <Name>.md and <Name>.htm beside it. The .htm is built 
 from the kit, so it has one level-one heading and the Homer encoding.
 """
 
-import datetime, hashlib, html, importlib.util, io, logging, os, platform, re, shutil, subprocess, sys, time, urllib.error, urllib.parse, urllib.request
+import datetime, hashlib, html, importlib.util, io, logging, os, platform, re, shutil, subprocess, sys, tempfile, time, urllib.error, urllib.parse, urllib.request
 
 iMinimumWords, iRetries, iTimeoutSeconds = 15, 3, 60
 nPauseSeconds = 1.0
@@ -37,7 +37,7 @@ sPlaceholder = "\u0001"
 sUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
 sVersion = "2"
 lPageFurniture = ["copy as markdown", "copy page", "edit on github", "edit this page", "next", "on this page", "previous",
-                  "was this page helpful?"]
+                  "view as markdown", "was this page helpful?"]
 # A code fence, as CommonMark defines one: a run of three or more backticks with no backtick after it on the line (so
 # ``` [details].tsx``matches``` is inline code, not a fence), or three or more tildes.
 reFence = re.compile(r"^\s*(`{3,}(?=[^`]*$)|~{3,})")
@@ -269,6 +269,7 @@ def gatherPages(dProduct, sFolder, lEntries, dRobots, bFresh):
         sReason = exclusionReason(dProduct, sKey, dEntry["sSection"])
         if sReason:
             logging.info("left out before fetching: %s (%s)", dEntry["sUrl"], sReason)
+            lRows.append((dEntry["sUrl"], "", "left out: " + sReason))
             continue
         lKept.append(dEntry)
     iTotal = len(lKept)
@@ -339,8 +340,9 @@ def gatherProduct(dProduct, sHere, dRobots, bFresh):
     writeText(os.path.join(sFolder, "manifest.txt"), "\n".join(lManifest) + "\n")
     iSaved = sum(1 for tRow in lRows if tRow[1])
     iRefused = sum(1 for tRow in lRows if tRow[2] == "refused by robots.txt")
-    logging.info("%s: %d files saved or kept, %d refused by robots.txt, %d failed", dProduct["sProduct"], iSaved, iRefused,
-                 len(lRows) - iSaved - iRefused)
+    iLeft = sum(1 for tRow in lRows if tRow[2].startswith("left out: "))
+    logging.info("%s: %d files saved or kept, %d left out, %d refused by robots.txt, %d failed", dProduct["sProduct"], iSaved, iLeft,
+                 iRefused, len(lRows) - iSaved - iRefused - iLeft)
     if iRefused: say("%s: robots.txt refused %d page%s (named in the log)" % (dProduct["sProduct"], iRefused, "" if iRefused == 1 else "s"))
     shutil.make_archive(sFolder, "zip", sFolder)
     return iSaved > 0
@@ -379,13 +381,38 @@ def gatherSitemap(dProduct, sFolder, dRobots, bFresh):
     lManifest = ["address\tfile\toutcome"] + ["\t".join(tRow) for tRow in lRows]
     writeText(os.path.join(sFolder, "manifest.txt"), "\n".join(lManifest) + "\n")
     iSaved = sum(1 for tRow in lRows if tRow[1])
-    logging.info("%s: %d pages saved or kept, %d not", dProduct["sProduct"], iSaved, len(lRows) - iSaved)
+    iLeft = sum(1 for tRow in lRows if tRow[2].startswith("left out: "))
+    logging.info("%s: %d pages saved or kept, %d left out, %d not gathered", dProduct["sProduct"], iSaved, iLeft, len(lRows) - iSaved - iLeft)
     shutil.make_archive(sFolder, "zip", sFolder)
     return iSaved > 0
 
 
+def resolveStreaming(sHtml):
+    """Puts each streamed block into its place, as the browser's script would. A site built with React streaming (Kiro)
+    sends a placeholder, <template id="B:1">, where the article goes, and the article itself later in a hidden
+    <div hidden id="S:1">; a streamed block may hold placeholders of its own."""
+    dBlocks = {}
+    for oStart in list(re.finditer(r'<div hidden id="S:(\d+)">', sHtml)):
+        iDepth, iAt = 1, oStart.end()
+        for oTag in re.finditer(r"<div\b|</div>", sHtml[oStart.end():]):
+            iDepth += 1 if oTag.group(0) == "<div" else -1
+            if not iDepth:
+                iAt = oStart.end() + oTag.start()
+                break
+        dBlocks[oStart.group(1)] = (oStart.start(), iAt + len("</div>"), sHtml[oStart.end():iAt])
+    if not dBlocks: return sHtml
+    for sId, (iStart, iEnd, sBlock) in sorted(dBlocks.items(), key=lambda tItem: -tItem[1][0]): sHtml = sHtml[:iStart] + sHtml[iEnd:]
+    for iPass in range(len(dBlocks) + 1):
+        sBefore = sHtml
+        sHtml = re.sub(r'(?s)<!--\$\?--><template id="B:(\d+)"></template>.*?<!--/\$-->',
+                       lambda oMatch: dBlocks[oMatch.group(1)][2] if oMatch.group(1) in dBlocks else "", sHtml)
+        if sHtml == sBefore: break
+    return sHtml
+
+
 def htmlToMarkdown(sPandoc, sHtml, sKey):
     """A documentation web page as (title, Markdown): its main region, without menus, scripts or page furniture."""
+    sHtml = resolveStreaming(sHtml)
     oRegion = re.search(r"(?is)<main\b[^>]*>(.*)</main>", sHtml) or re.search(r"(?is)<article\b[^>]*>(.*)</article>", sHtml) \
         or re.search(r"(?is)<body\b[^>]*>(.*)</body>", sHtml)
     sRegion = oRegion.group(1) if oRegion else sHtml
@@ -394,6 +421,13 @@ def htmlToMarkdown(sPandoc, sHtml, sKey):
         while sBefore != sRegion:
             sBefore = sRegion
             sRegion = re.sub(r"(?is)<%s\b[^>]*>(?:(?!<%s\b).)*?</%s>" % (sTag, sTag, sTag), "", sRegion)
+    # A code block is rebuilt as plain text in its language: Kiro wraps its code in styled layers that Pandoc would
+    # otherwise read as a block with no language, or name after a styling class.
+    def plainCode(oMatch):
+        oLanguage = re.search(r"language-([\w+#-]+)", oMatch.group(1))
+        sCode = html.unescape(re.sub(r"<[^>]+>", "", re.sub(r"(?i)<br\s*/?>", "\n", oMatch.group(1))))
+        return '<pre><code class="' + (oLanguage.group(1) if oLanguage else "text") + '">' + html.escape(sCode, quote=False) + "</code></pre>"
+    sRegion = re.sub(r"(?is)<pre\b[^>]*>(.*?)</pre>", plainCode, sRegion)
     oHeading = re.search(r"(?is)<h1\b[^>]*>(.*?)</h1>", sRegion)
     oTitle = re.search(r"(?is)<title>(.*?)</title>", sHtml)
     sTitle = re.sub(r"<[^>]+>", "", oHeading.group(1) if oHeading else (oTitle.group(1) if oTitle else ""))
@@ -405,7 +439,7 @@ def htmlToMarkdown(sPandoc, sHtml, sKey):
         return sTitle, ""
     lKept = []
     for sLine in oResult.stdout.decode("utf-8", "replace").replace("\r\n", "\n").split("\n"):
-        sBare = re.sub(r"[*_`\[\]]|\(#[^)]*\)", "", sLine).strip().lower()
+        sBare = re.sub(r"[*_`\[\]]", "", re.sub(r"\]\([^)]*\)", "]", sLine)).strip().lower()
         # Page furniture, named rather than guessed at: these lines are the site's, not the article's.
         if sBare in lPageFurniture: continue
         lKept.append(sLine)
@@ -572,6 +606,9 @@ def rewriteLinks(sText, sPageUrl, dAnchors, sSiteHost):
         lCode = [oSpan.span() for oSpan in re.finditer(r"`[^`]*`", sLine)]
         fnOutside = lambda oMatch, fnDo: oMatch.group(0) if any(iStart < oMatch.start() < iEnd for iStart, iEnd in lCode) else fnDo(oMatch)
         sLine = re.sub(r"!\[([^\]]*)\]\([^)]*\)", lambda oMatch: fnOutside(oMatch, replaceImage), sLine)
+        # A link with no words (a heading's link icon) says nothing to a reader.
+        lCode = [oSpan.span() for oSpan in re.finditer(r"`[^`]*`", sLine)]
+        sLine = re.sub(r"(?<!!)\[\s*\]\([^)]*\)", lambda oMatch: fnOutside(oMatch, lambda oInner: ""), sLine)
         lCode = [oSpan.span() for oSpan in re.finditer(r"`[^`]*`", sLine)]
         sLine = re.sub(r"(?<!!)\[([^\]]+)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)", lambda oMatch: fnOutside(oMatch, replaceLink), sLine)
         lOut.append(sLine)
@@ -690,6 +727,9 @@ def collectArticles(dProduct, sFolder, sPandoc):
         lRows = [sLine.split("\t") for sLine in readText(os.path.join(sFolder, "manifest.txt")).splitlines()[1:]]
         say("%s: Pandoc is reading %d web pages" % (dProduct["sProduct"], sum(1 for lRow in lRows if len(lRow) >= 2 and lRow[1])))
         for lRow in lRows:
+            if len(lRow) >= 3 and lRow[2].startswith("left out: "):
+                dLeftOut[lRow[2][10:]] = dLeftOut.get(lRow[2][10:], 0) + 1
+                continue
             if len(lRow) < 2 or not lRow[1]: continue
             sKey = keyOfUrl(lRow[0])
             sTitle, sText = htmlToMarkdown(sPandoc, readText(os.path.join(sFolder, lRow[1])), sKey)
@@ -795,11 +835,22 @@ def leftOutSentence(dLeftOut):
     return "Left out: " + "; ".join(lParts[:-1]) + "; and " + lParts[-1] + "."
 
 
+def codeFilterPath():
+    """A one-line Pandoc filter, written once, that labels a code block with no language as text. Pandoc writes a
+    labelled block between fences, which every check here reads correctly; an unlabelled one it would indent, and an
+    indented comment line or address then looks like prose."""
+    sPath = os.path.join(tempfile.gettempdir(), "getLlmsGuideCode.lua")
+    if not os.path.isfile(sPath):
+        # Written without a byte order mark, which Lua would read as code.
+        io.open(sPath, "w", encoding="utf-8").write("function CodeBlock(oBlock)\n  if #oBlock.classes == 0 then oBlock.classes = {\"text\"} end\n  return oBlock\nend\n")
+    return sPath
+
+
 def normalizeMarkdown(sPandoc, sText, sKey):
     """Reads an article as the publisher wrote it (GitHub-style Markdown) and writes it as Pandoc's Markdown, so a
     heading, a code block or a list means the same to this script as to Pandoc. Unchanged when Pandoc is not here."""
     if not sPandoc: return sText
-    lCommand = [sPandoc, "-f", "gfm-gfm_auto_identifiers", "-t",
+    lCommand = [sPandoc, "-f", "gfm-gfm_auto_identifiers", "--lua-filter", codeFilterPath(), "-t",
                 "markdown-smart-header_attributes-link_attributes-bracketed_spans-native_divs-native_spans-simple_tables-multiline_tables-grid_tables",
                 "--wrap=none"]
     oResult = subprocess.run(lCommand, input=sText.encode("utf-8"), capture_output=True)

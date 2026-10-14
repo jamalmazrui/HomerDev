@@ -7,6 +7,16 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.47 -- 14 October 2026
+
+- **help\AuditResponse.md answers the coordinated audit, finding by finding.** For each of its 72 findings across the kit and ten apps it says what was changed, where, and how it was tested -- separating tests run on the real code, or a line-for-line prototype, from changes that still await a build or a run on Windows -- so the next audit can verify rather than rediscover. 57 are done, one of them with a check still open; 1 is partly done; 14 are open, each needing Windows, Office, a clean machine or a screen reader. The count was taken from the entries themselves, and every finding of the audit appears once.
+
+## 1.72.46 -- 14 October 2026
+
+- **A download's name is read from its header as the standard writes it.** Web.fileFromDisposition read the Content-Disposition header with patterns: a quoted name stopped at its first semicolon, filename* was decoded as UTF-8 whatever character set it named, and a backslash escape was kept as written. The header is now split into its parameters with quotes respected, a quoted value is unescaped, filename* is decoded by the character set it names, UTF-8 or ISO-8859-1, and a path in the name is cut to its last part, so a header cannot direct a file into another folder. Tested on twelve headers before it was written here (from an audit by another AI).
+- **Web.sanitizeName keeps clear of Windows device names.** CON, PRN, AUX, NUL, COM1 to COM9 and LPT1 to LPT9 cannot be file names, with any extension, so a download called CON.pdf could not be saved; such a name now gets an underscore in front, while Console.pdf and COM10.txt keep theirs.
+
+
 ## 1.72.45 -- 14 October 2026
 
 - **connectAI keeps your own instructions byte for byte.** It puts a short pointer to the kit in each AI tool's personal instruction file, between two marker lines. It read the file with errors replaced, trimmed the line breaks around its block, and wrote the file in place, so text that was not UTF-8 came back changed and an interruption could lose instructions that had nothing to do with the kit. Now a file that is not UTF-8 is left exactly as it is, and the reason given; markers that do not pair are reported, not guessed at; only the block changes, in the file's own kind of line break; a dated copy is kept before the first change; and each write goes to a temporary file that is swapped in. Tested as the audit asked: with and without a byte order mark, CRLF and LF, an empty file and a file whose last line had no line break, connecting and then removing gave the file back as it was -- the last only gaining that line break, which removing cannot tell from the person's own -- and connecting twice changed nothing the second time; text that was not UTF-8, three kinds of unpaired markers, and a failure during the write all left the file untouched (from an audit by another AI).

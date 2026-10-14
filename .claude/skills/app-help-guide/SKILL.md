@@ -90,6 +90,14 @@ address with its status, and the reason for anything not kept.
   renumbered, every fence scanner follows CommonMark (a fence line holds no
   further backtick; a closing fence holds nothing else), and Pandoc itself is
   asked for the article identifiers rather than predicting them.
+- **A page that streams its article holds it out of place.** Kiro's pages
+  are React streaming: `<main>` holds a placeholder, `<template id="B:1">`,
+  and the article arrives later in `<div hidden id="S:1">`, itself holding a
+  further placeholder. 234 pages came back with "no article text" until the
+  reader put each block in its place as the browser's script would. Code is
+  rebuilt as plain text in its language, and a small Pandoc filter labels any
+  unlabelled code block "text", because Pandoc indents an unlabelled block and
+  an indented comment line then reads as a heading.
 - **Structured data beats drawn text.** Angi, CrimeCon and Udio all publish
   their own questions or trails as schema.org data in the page head; that is a
   better source than the prose, because it pairs each question with its answer.

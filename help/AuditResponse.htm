@@ -1,0 +1,448 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.12.1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Jamal Mazrui" />
+  <title>AuditResponse</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      color: light-dark(#1a1a1a, #fdfdfd);
+      background-color: #fdfdfd;
+      background-color: light-dark(#fdfdfd, #1a1a1a);
+      color-scheme: light dark;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a, a:visited {
+      color: inherit;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid;
+      border-color: #e6e6e6;
+      border-color: light-dark(#e6e6e6, #4c4c4c);
+      color: #606060;
+      color: light-dark(#606060, #b6b6b6);
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid currentColor;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+    }
+    th {
+      border-top: 1px solid currentColor;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<p class="author">Jamal Mazrui</p>
+</header>
+<main>
+<h1 id="homer-tools-response-to-the-coordinated-app-audit">Homer Tools:
+Response to the Coordinated App Audit</h1>
+<p>This ledger answers each of the 72 findings of the coordinated audit
+of the Homer apps and kit, as of 14 October 2026. <strong>Done</strong>
+means the change was made; the entry says how it was tested. Tests
+marked <em>here</em> were run without Windows, on the real code where it
+is Python and on a line-for-line prototype where it is C#; those marked
+<em>on Windows</em> await a build or a run on the author’s machine.
+<strong>Partly</strong> means some of it was done; <strong>open</strong>
+means it needs a run on Windows, Office, a clean machine or a screen
+reader, and no change was made. Each project’s History says more about
+each change.</p>
+<h2 id="htm">2htm</h2>
+<ul>
+<li><strong>2htm-01, launch marker folder. Done.</strong> The installer
+creates the log folder before writing its marker; the kit’s installer
+check requires it. Tested on Windows by installation.</li>
+<li><strong>2htm-02, installer elevation. Done.</strong> The program
+starts with ExecAsOriginalUser, as in every Homer installer; the
+installer check requires it.</li>
+<li><strong>2htm-03, fixed backup name. Done.</strong> Recovery copies
+get unique names from Homer.Util.recoveryPath.</li>
+<li><strong>2htm-04, Office deadline. Done.</strong> Each Office call
+runs on its own thread with a 10-minute deadline, and only processes
+2htm started are stopped (kit 1.72.38).</li>
+<li><strong>2htm-05, accessible HTML as a goal. Open.</strong> A small
+set of documents with expected headings, table headers, charts and slide
+order is to be built and checked on Windows, with Office.</li>
+<li><strong>2htm-06, old kit paths. Done.</strong> The developer guides
+of 2htm, bookFido, extCheck, FileDir and urlFido, and HomerView’s
+handover notes, now name C:; 2htm’s guide lists build, tidy, push and
+release in the order build_release runs them.</li>
+</ul>
+<h2 id="bookfido">bookFido</h2>
+<ul>
+<li><strong>bookFido-01, friendly names trusted. Done.</strong>
+bookFido-companions.txt records which book each companion file belongs
+to, with its address, size and SHA-256.</li>
+<li><strong>bookFido-02, title identity. Done.</strong> A companion is
+found by its book, not its title.</li>
+<li><strong>bookFido-03, PDF magic alone. Done.</strong> A PDF must have
+its end marker and the length the server gave.</li>
+<li><strong>bookFido-04, unbounded failure bodies. Done.</strong> The
+body of a failed reply is bounded while it is read.</li>
+<li><strong>bookFido-05, redirect credentials. Open.</strong></li>
+<li><strong>bookFido-06, BookTrail migration cases. Open.</strong></li>
+</ul>
+<h2 id="dbdo">DbDo</h2>
+<ul>
+<li><strong>DbDo-01, missing worksheet. Done.</strong> A named worksheet
+that is missing is refused; the first sheet is used only when no name
+was given.</li>
+<li><strong>DbDo-02, workbook overwrite. Done.</strong> The saved
+workbook is swapped in whole.</li>
+<li><strong>DbDo-03, delimited save. Done.</strong> The save is staged,
+and the files before it are kept as -previous-dbdo and
+-before-dbdo.</li>
+<li><strong>DbDo-04, CSV formula triggers. Done.</strong> CSV and TSV
+exports still hold values exactly; values a spreadsheet could run as
+formulas are counted, plain numbers like -5 excluded, and DbDo asks
+before opening such a file, No being the default; .xlsx, which keeps
+text as text, is named as the safe way into a spreadsheet. The test of
+what counts was tested here on 16 values; the C# awaits a build on
+Windows.</li>
+<li><strong>DbDo-05, rows a save leaves out. Done.</strong> A deleted
+row has its data cells cleared, new rows are counted, an edit to a
+formula cell is listed by row and column and kept only in DbDo, and only
+rows DbDo read can be taken for deleted. Awaits a build on Windows.</li>
+<li><strong>DbDo-06, SQL by prefix. Done.</strong> Statements are judged
+by their own words outside quotes, comments and brackets: WITH by the
+statement it leads into, PRAGMA with = as a setting, writes with
+RETURNING as giving rows. Tested here on 27 statements, by a prototype
+the C# follows line for line.</li>
+<li><strong>DbDo-07, template invariants. Done, with one open
+check.</strong> Every build now checks each template’s stored views, its
+.dbdo scripts and empty prime or look values, beside the links, kinds,
+triggers, SQL files, settings and reports it already checked. Tested
+here: all ten templates pass, and a copy with five faults put in on
+purpose failed on all five. Open: Update from Template on an edited
+older copy, on Windows.</li>
+</ul>
+<h2 id="edsharp">EdSharp</h2>
+<ul>
+<li><strong>EdSharp-01, saves that truncate. Done.</strong> Saves are
+written beside the file and swapped in.</li>
+<li><strong>EdSharp-02, backup rotation. Done.</strong> The .bak
+survives until its replacement exists.</li>
+<li><strong>EdSharp-03, editing behavior. Open.</strong> A Windows
+harness for opening, editing, saving and reloading.</li>
+<li><strong>EdSharp-04, encoding fidelity. Open.</strong></li>
+<li><strong>EdSharp-05, the installed tree. Open.</strong> A test on a
+machine with no source or package cache.</li>
+<li><strong>EdSharp-06, legacy writes. Done.</strong> Every one of the
+68 places EdSharp writes, moves or deletes a file is listed in its
+developer guide by kind; the text utilities and Export now write through
+the kit, and export through a converter sets the earlier file aside
+instead of deleting it. Awaits a build on Windows.</li>
+</ul>
+<h2 id="extcheck">extCheck</h2>
+<ul>
+<li><strong>extCheck-01, unavailable properties. Done.</strong> Where
+Office cannot report what a rule needs, a CouldNotInspect row names it,
+in the category Not checked, instead of a false problem or a silent
+skip. Awaits a test in Office: an unreadable chart title should give
+CouldNotInspect, not ChartMissingTitle.</li>
+<li><strong>extCheck-02, Source labels. Done.</strong> Source always
+says extCheck, and a new Modeled On column names the checker a rule
+follows.</li>
+<li><strong>extCheck-03, chart checks. Done.</strong> Charts without
+axes, such as pie charts, are not asked for axis titles; an untitled
+axis is filed as Chart axis title; and the advice says a chart’s figures
+or main point belong in text.</li>
+<li><strong>extCheck-04, Office deadline. Done.</strong> A 10-minute
+deadline per file, stopping only the Office processes extCheck started
+(kit 1.72.38).</li>
+<li><strong>extCheck-05, rule precision. Open.</strong> Documented
+heuristics and false-positive fixtures.</li>
+<li><strong>extCheck-06, whole reports. Done.</strong> Reports and the
+rule registry are written through Homer.Util.writeTextSafely.</li>
+</ul>
+<h2 id="filedir">FileDir</h2>
+<ul>
+<li><strong>FileDir-01, recovery files deleted. Done.</strong> Recovery
+copies get unique names.</li>
+<li><strong>FileDir-02, conversion rename. Done.</strong> The converted
+file is swapped in through Homer.Util.replaceFileSafely.</li>
+<li><strong>FileDir-03, silent rollback failure. Done.</strong> A failed
+restore is spoken and logged.</li>
+<li><strong>FileDir-04, converter deadline. Done.</strong> A 15-minute
+deadline (kit 1.72.38).</li>
+<li><strong>FileDir-05, installer elevation. Done.</strong>
+ExecAsOriginalUser, as in every Homer installer.</li>
+<li><strong>FileDir-06, old 2htm contract. Done.</strong> 2htm’s exit
+code is trusted first, as its source defines it; the message names the
+file and the task, explains a missing assembly as an older 2htm, asks
+for no hand repair, and 2htm’s full output goes to the log.</li>
+<li><strong>FileDir-07, path identity. Open.</strong> A test matrix of
+links, case and ancestry on Windows.</li>
+</ul>
+<h2 id="homerdev">HomerDev</h2>
+<ul>
+<li><strong>HomerDev-01, skill links. Done.</strong> The skill reference
+documents are published (kit 1.72.35).</li>
+<li><strong>HomerDev-02, conflicting conventions. Done.</strong> No c_
+prefix remains in any instruction file or code, and the build counts the
+skills (kits 1.72.35 and 1.72.37).</li>
+<li><strong>HomerDev-03, cached hashes. Done.</strong> build_release
+reads every file again before push and release, check –fresh does too,
+and fingerprint.py takes –verify. Tested here as the audit asked: after
+a same-size, same-time change the ordinary cache kept the old hash and
+the verifying one gave the true one (kit 1.72.44).</li>
+<li><strong>HomerDev-04, author-specific tests. Done.</strong> The KDP
+regression suite runs without a personal catalog: 66 tests pass (kit
+1.72.35).</li>
+<li><strong>HomerDev-05, chat exits. Done.</strong> Any failed exit is
+an error; the text is kept and introduced as possibly incomplete, and a
+failed first turn is not taken for a session to resume (kit
+1.72.45).</li>
+<li><strong>HomerDev-06, connectAI. Done.</strong> Files that are not
+UTF-8, and unpaired markers, are left alone and reported; only the block
+changes, in the file’s own line breaks; a dated copy is kept first; and
+writes are atomic. Tested here on the real code: byte-for-byte round
+trips with and without a byte order mark, CRLF and LF, and a failure
+during the write (kit 1.72.45).</li>
+<li><strong>HomerDev-07, shared installer defects. Done.</strong> One
+installer pattern, checked by the kit in every app.</li>
+<li><strong>HomerDev-08, discoverability on a clean install.
+Open.</strong></li>
+<li>Also, from this round: the kit’s Content-Disposition parser reads
+the header as the standard writes it, and Web.sanitizeName avoids
+Windows device names (kit 1.72.46); and Homer.Util.fileSha256 gives
+every app a file’s fingerprint by content (kit 1.72.43).</li>
+</ul>
+<h2 id="homerscribe">HomerScribe</h2>
+<ul>
+<li><strong>HomerScribe-01, raw transcript reused. Done.</strong> The
+finished transcript is kept as transcript.final.json and reused.</li>
+<li><strong>HomerScribe-02, reuse without Whisper. Done.</strong> Only
+for the same recording.</li>
+<li><strong>HomerScribe-03, leftover JSON. Done.</strong> The earlier
+transcript is cleared before Whisper runs.</li>
+<li><strong>HomerScribe-04, identity by metadata. Done.</strong> The
+recording and the model are known by the SHA-256 of their content.</li>
+<li><strong>HomerScribe-05, speaker labels. Done.</strong> Only the
+made-up label that opens half the stretches is taken off. Tested here
+with the audit’s case: two real speakers and a spoken Note kept.</li>
+<li><strong>HomerScribe-06, loops. Done.</strong> Lines are compared
+without case or punctuation, alternating pairs count, and 30 seconds is
+enough; a loop is only heard again, and what is heard is kept. A stretch
+that loops again is reported as uncertain, not empty. Tested here on
+eight cases.</li>
+<li><strong>HomerScribe-07, acceptance specification. Done.</strong>
+accept.inix runs scripts.py: the built program, with the real Whisper,
+four times on clips of its own tutorials, including a different
+recording of the same size and time. The test itself was tested here
+against stand-in programs: it passed one that judges by content and
+failed one that judges by size and time, at the step it should.</li>
+</ul>
+<h2 id="homerview">HomerView</h2>
+<ul>
+<li><strong>HomerView-01, parity gaps. Partly.</strong> Five commands
+came to JAWS; two gaps were the check’s own blind spots and are now
+counted; seven remain, each needing a helper command or a dialog of its
+own.</li>
+<li><strong>HomerView-02, attribute order. Done.</strong> A page’s head
+is read by an HTML parser. Tested here on 13 cases.</li>
+<li><strong>HomerView-03, sampled length. Done.</strong> A page longer
+than what was read is given as at least so many words, with the limit
+named; menus are not counted. Tested here against a local server.</li>
+<li><strong>HomerView-04, redirect cap. Done.</strong> The ninth
+redirect stops the fetch, naming the last address. Tested here against a
+local server with chains of eight and nine.</li>
+<li><strong>HomerView-05, acceptance rebuilds. Open.</strong></li>
+<li><strong>HomerView-06, active-tab fallback. Open.</strong></li>
+<li><strong>HomerView-07, cursor-to-DOM identity. Open.</strong></li>
+</ul>
+<h2 id="urlcheck">urlCheck</h2>
+<ul>
+<li><strong>urlCheck-01, one title, two pages. Done.</strong> A page is
+known by its address.</li>
+<li><strong>urlCheck-02, Force removes reports. Done.</strong> Earlier
+reports are set aside until the new scan succeeds.</li>
+<li><strong>urlCheck-03, ownership by filename. Done.</strong>
+urlCheck-source.txt names each folder’s address.</li>
+<li><strong>urlCheck-04, aggregation. Done.</strong> No criterion is
+marked Supports by automated checks; an automated pass is Not Evaluated
+with a note of what was found, and Supports is left to a reviewer.
+Tested here by generating a real ACR.docx with urlCheck’s own code.</li>
+<li><strong>urlCheck-05, local-file scans. Open.</strong></li>
+<li><strong>urlCheck-06, worst-case progress and cancel.
+Open.</strong></li>
+</ul>
+<h2 id="urlfido">urlFido</h2>
+<ul>
+<li><strong>urlFido-01, old collection deleted. Done.</strong> Only
+after a complete run.</li>
+<li><strong>urlFido-02, backup deleted on the next Force. Done.</strong>
+Recovery folders get unique names.</li>
+<li><strong>urlFido-03, identity by title. Done.</strong>
+urlFido-source.txt names each folder’s address.</li>
+<li><strong>urlFido-04, download receipt. Done.</strong> A file’s first
+bytes must fit its kind, a PDF must have its end, and a stated length
+must arrive; each folder’s urlFido-downloads.txt records every download
+with its SHA-256. The content check was tested here on 11 files.</li>
+<li><strong>urlFido-05, Content-Disposition. Done.</strong> Both
+download paths use the kit’s parser. Tested here on 12 headers and 5
+device names.</li>
+<li><strong>urlFido-06, Cancel. Done.</strong> A transfer is copied a
+block at a time, the request is aborted the moment Cancel is pressed,
+and a cancelled file is not tried another way. Awaits a test on Windows
+with a slow download.</li>
+</ul>
+<h2 id="in-numbers">In numbers</h2>
+<p>Of the 72 findings, 57 are done, one of them with a check still open;
+1 is partly done; and 14 are open, each of them needing a run on
+Windows, Office, a clean machine or a screen reader.</p>
+</main>
+</body>
+</html>

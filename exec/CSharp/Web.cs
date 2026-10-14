@@ -161,22 +161,79 @@ catch { return ""; }
 
 public static string fileFromDisposition(string sHeader) {
 // Pull a filename out of a Content-Disposition header. Prefers the RFC 5987
-// filename* form (which may be percent-encoded with a charset prefix) and
-// falls back to a plain filename. Returns "" when none is present.
+// filename* form (charset'language'percent-encoded) and falls back to a plain
+// filename. Returns "" when none is present, and only ever a bare name: a path
+// in the header is cut to its last part.
+//
+// READ AS THE STANDARD WRITES IT (14 October 2026, from an audit by another AI).
+// Patterns stopped a quoted name at its first semicolon, decoded every filename*
+// as UTF-8 whatever charset it named, and kept a backslash escape as written. The
+// header is now split into its parameters with quotes respected, a quoted value
+// is unescaped, and filename* is decoded by the charset it names, UTF-8 or
+// ISO-8859-1. Tested on twelve headers before it was written here.
 if (string.IsNullOrEmpty(sHeader)) return "";
-Match mStar = Regex.Match(sHeader, "filename\\*\\s*=\\s*([^;]+)", RegexOptions.IgnoreCase);
-if (mStar.Success) {
-string sVal = mStar.Groups[1].Value.Trim().Trim('"');
-int iTick = sVal.IndexOf("''");
-if (iTick >= 0) sVal = sVal.Substring(iTick + 2);
-try { sVal = Uri.UnescapeDataString(sVal); } catch {}
-sVal = Path.GetFileName(sVal.Trim());
-if (sVal.Length > 0) return sVal;
+Dictionary<string, string> dParams = new Dictionary<string, string>();
+List<string> lParts = dispositionParts(sHeader);
+for (int i = 1; i < lParts.Count; i++) {
+int iEquals = lParts[i].IndexOf('=');
+if (iEquals < 0) continue;
+string sKey = lParts[i].Substring(0, iEquals).Trim().ToLowerInvariant();
+if (!dParams.ContainsKey(sKey)) dParams[sKey] = lParts[i].Substring(iEquals + 1).Trim();
 }
-Match mPlain = Regex.Match(sHeader, "filename\\s*=\\s*\"?([^\";]+)\"?", RegexOptions.IgnoreCase);
-if (mPlain.Success) return Path.GetFileName(mPlain.Groups[1].Value.Trim());
-return "";
+string sName = "";
+if (dParams.ContainsKey("filename*")) {
+Match mStar = Regex.Match(dispositionUnquote(dParams["filename*"]), "^([^']*)'[^']*'(.*)$");
+if (mStar.Success) {
+string sCharset = mStar.Groups[1].Value.Trim().ToLowerInvariant();
+byte[] aBytes = percentBytes(mStar.Groups[2].Value);
+Encoding encoding = (sCharset == "iso-8859-1" || sCharset == "latin1") ? Encoding.GetEncoding("iso-8859-1") : new UTF8Encoding(false);
+sName = encoding.GetString(aBytes);
+}
+}
+if (sName.Trim().Length == 0 && dParams.ContainsKey("filename")) sName = dispositionUnquote(dParams["filename"]);
+sName = sName.Replace('\\', '/');
+int iSlash = sName.LastIndexOf('/');
+if (iSlash >= 0) sName = sName.Substring(iSlash + 1);
+return sName.Trim();
 } // fileFromDisposition method
+
+private static List<string> dispositionParts(string sHeader) {
+// The ;-separated parts of a header; a ; inside double quotes does not count, and a backslash inside them escapes.
+List<string> lParts = new List<string>();
+StringBuilder sb = new StringBuilder();
+bool bQuote = false;
+for (int i = 0; i < sHeader.Length; i++) {
+char c = sHeader[i];
+if (bQuote && c == '\\' && i + 1 < sHeader.Length) { sb.Append(c).Append(sHeader[i + 1]); i++; continue; }
+if (c == '"') bQuote = !bQuote;
+if (c == ';' && !bQuote) { lParts.Add(sb.ToString()); sb.Length = 0; continue; }
+sb.Append(c);
+}
+lParts.Add(sb.ToString());
+return lParts;
+} // dispositionParts method
+
+private static string dispositionUnquote(string sValue) {
+// A quoted value without its quotes, each backslash escape replaced by the character it escapes.
+sValue = sValue.Trim();
+if (sValue.Length >= 2 && sValue[0] == '"' && sValue[sValue.Length - 1] == '"')
+return Regex.Replace(sValue.Substring(1, sValue.Length - 2), @"\\(.)", "$1");
+return sValue;
+} // dispositionUnquote method
+
+private static byte[] percentBytes(string sText) {
+// %XX sequences as the bytes they stand for; any other character as its UTF-8 bytes.
+List<byte> lBytes = new List<byte>();
+for (int i = 0; i < sText.Length; i++) {
+if (sText[i] == '%' && i + 2 < sText.Length && Uri.IsHexDigit(sText[i + 1]) && Uri.IsHexDigit(sText[i + 2])) {
+lBytes.Add(Convert.ToByte(sText.Substring(i + 1, 2), 16));
+i += 2;
+continue;
+}
+lBytes.AddRange(Encoding.UTF8.GetBytes(sText[i].ToString()));
+}
+return lBytes.ToArray();
+} // percentBytes method
 
 public static string mimeToExt(string sMime) {
 // Map a content type to a file extension for URLs that carry none. Covers the
@@ -241,6 +298,11 @@ foreach (char c in new char[] {'&', '=', '@', '%', '+', '\''}) sName = sName.Rep
 while (sName.Contains("__")) sName = sName.Replace("__", "_");
 sName = sName.Trim().Trim('_', '.', ' ');
 if (sName.Length == 0) sName = "download";
+// A NAME WINDOWS KEEPS FOR A DEVICE (14 October 2026, from an audit by another AI): CON, PRN, AUX, NUL, COM1 to
+// COM9 and LPT1 to LPT9 cannot be files, with any extension, so a download called CON.pdf could not be saved.
+// Such a name gets an underscore in front; Console.pdf and COM10.txt are ordinary names and keep theirs.
+string sRoot = sName.Split('.')[0].Trim().ToUpperInvariant();
+if (Regex.IsMatch(sRoot, "^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$")) sName = "_" + sName;
 return sName;
 } // sanitizeName method
 
