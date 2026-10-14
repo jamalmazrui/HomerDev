@@ -79,6 +79,9 @@ def summarizeBuild(sText):
 
 def summarizeCheck(sText):
     sCounts = firstMatch(sText, r"(\d+ checks? passed, \d+ checks? failed[^\r\n]*)")
+    # A WARNING IS NOT A PASS (14 October 2026): each WARN line the check logs is listed, so the summary says what
+    # deserves a look.
+    lsWarned = re.findall(r"^\S+ \S+\s+(\w+)\s+WARN\s+(.*)$", sText, re.M)
     lsFailed = re.findall(r"^\S+ \S+\s+(\w+)\s+FAIL\s+(.*)$", sText, re.M)
     # THE KIT'S OWN CHECK IS NOT A FAILURE (1.50.1). Run in C:\\HomerDev, check
     # recognizes the kit and points to checkHomerDev, with no totals; that was
@@ -102,6 +105,7 @@ def summarizeCheck(sText):
     # A check still running that has already failed a finding says so plainly; "no totals" read as if it had broken.
     lsOut = [sCounts or ("no totals" if re.search(r"Traceback|TRACEBACK", sText) else "still running")]
     lsOut += ["FAIL %s: %s" % (sName, sWhy.strip()[:120]) for sName, sWhy in lsFailed]
+    lsOut += ["WARN %s: %s" % (sName, sWhy.strip()[:120]) for sName, sWhy in lsWarned]
     return lsOut, bool(lsFailed) or not sCounts
 
 

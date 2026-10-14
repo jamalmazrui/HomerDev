@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.36 -- 14 October 2026
+
+From a follow-up audit by another AI, checked against the release logs.
+
+- **Every app's Tutorials.md stops growing, and is repaired by its next build.** makeTutorials had two faults. It looked only at the first start and the first end marker, so one stray end marker ahead of the start made the markers seem absent, and every build inserted a whole new walkthrough above the old ones: DbDo's Tutorials.md held 80 copies, 3.7 MB, and its Tutorials.htm 6.3 MB, all shipped. And it removed only the contents entry for tutorial 0, so the entries for 1 to 9 were added again at every build: 16 to 78 copies of each in every app's contents list. Now every marked walkthrough and every stray marker is removed and exactly one is written, and every generated contents entry is removed before the current ones are added. Tested on DbDo's, 2htm's, HomerView's and urlFido's own files: DbDo's comes to 67 KB, every hand-written line is kept, and a second run changes nothing.
+- **A check that finds something is no longer a pass.** checkDocs exited 1 with findings while its stage said PASS and the run ended "21 checks passed, 0 checks failed". A fourth verdict, warn, means a check ran and found things worth reading that do not block a release: the documents now have their own line, "docs", a warning when checkDocs has findings and a failure when it could not finish. The totals name checks with warnings, each is listed on the console and in the evidence report's new section, "What deserves a look", a reused check keeps its warnings, and the log summary lists them.
+
+
 ## 1.72.35 -- 14 October 2026
 
 From a coordinated audit of every project by another AI (72 findings); the shared parts are here, each app's in its own History.
