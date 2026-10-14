@@ -7,6 +7,13 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.51 -- 14 October 2026
+
+- **setup /defaults takes the defaults, with one Enter.** Given alone, /defaults left the whole wizard showing, so "homerdev_setup /defaults" asked every question. Inno decides before any code runs whether a run is silent, so code cannot make it silent; but it can skip pages, and with /defaults every page Inno allows to be skipped now is, each keeping its default. The finish page stays, with its default boxes ticked, and Enter finishes. For no screens at all, /verysilent /defaults, as before. This is in the shared HomerComponents.iss, so every Homer installer has it (from an audit by another AI, HomerDev-11).
+- **help\AnnounceStandard.md announces the standardization:** ten apps on one tested foundation, written to be pasted unchanged into Facebook, LinkedIn and email lists, at grade 7.5 and under 2,300 characters, with one address.
+- **help\AuditResponse.md answers the audit of 14 October midday:** HomerScribe-11, HomerDev-11 and MyBooks-07.
+
+
 ## 1.72.50 -- 14 October 2026
 
 - **A build that builds nothing no longer sounds as if it builds.** The fingerprints were working -- Homer.dll, for one, was skipped in seven of ten builds on 13 and 14 October -- but every part found current was announced on its own: "exec\Homer.dll is unchanged since its last build; not built again", and five lines like it, every build. Each is now in the log, and one sentence says how many parts were current. (HomerDev.exe and the installer do build on every release: each carries the new version number.)

@@ -337,13 +337,26 @@ begin
 end;
 
 function homerStartForDefaults(): Boolean;
-(* Called first in InitializeSetup; it no longer starts anything. With /defaults
-   and no silent switch it only says, in the log, that the screens are shown as
-   usual and how to take every default without them. Always False, so setup goes on. *)
+(* Called first in InitializeSetup; it starts nothing. Always False, so setup goes on. *)
 begin
   Result := False;
   if homerDefaults() and not WizardSilent then
-    Log('/defaults without /silent or /verysilent: the screens are shown as usual. For every default with no screens, run setup with /verysilent /defaults.');
+    Log('/defaults: every page that can be skipped is skipped, each keeping its default; the finish page shows with its default boxes ticked, and Enter finishes. For no screens at all, run setup with /verysilent /defaults.');
+end;
+
+function ShouldSkipPage(PageID: Integer): Boolean;
+(* /DEFAULTS ALONE TAKES THE DEFAULTS (14 October 2026, from an audit by another
+   AI, after Jamal ran "setup /defaults" and got the whole wizard). Inno decides
+   before any code runs whether a run is silent, so this cannot make the run
+   silent; what it can do, from the command line and in Pascal, is skip every
+   page Inno allows to be skipped -- each keeps its default, as if Next had been
+   pressed on it. The finish page is kept: it is where the default boxes, ticked,
+   run when Enter finishes, and skipping it is not something this kit has seen
+   work. So /defaults alone is one Enter, not a wizard; /silent and /verysilent
+   with /defaults still show nothing. No installer here defines this event
+   itself; one that needs to must fold this rule into its own. *)
+begin
+  Result := homerDefaults() and (not WizardSilent) and (PageID <> wpFinished);
 end;
 
 procedure homerResultsBox(sBody: String);
