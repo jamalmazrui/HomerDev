@@ -91,6 +91,9 @@ def checkDocument(sPath, bUserDocument):
         iPrevious = iLevel
     # A reference-style link definition ("[name]: https://...") is not bare.
     sLinks = re.sub(r"(?m)^\s*\[[^\]]+\]:\s+\S+.*$", "", sBody)
+    # AN ADDRESS IN CODE IS AN EXAMPLE, NOT A LINK (14 October 2026): `https://example.com` and `http://localhost:8080`
+    # were reported as bare URLs in nine documents. Fenced code was already left out; inline code is now too.
+    sLinks = re.sub(r"`[^`\n]*`", "", sLinks)
     for sUrl in re.findall(r"(?<![(<\"'])\bhttps?://[^\s)>\]]+", sLinks):
         lsFindings.append("bare URL: %s" % sUrl[:80])
     # LINK TEXT THAT SAYS WHERE IT GOES (1.50.1). A screen reader user often
@@ -103,7 +106,17 @@ def checkDocument(sPath, bUserDocument):
     for sImage in re.findall(r"!\[\s*\]\(([^)\s]+)", sBody):
         lsFindings.append("image with no text alternative: %s" % sImage[:80])
     iH2 = sum(1 for iLevel, s in lsHeadings if iLevel == 2)
-    if len(sText.split("\n")) > iContentsLines and iH2 >= iContentsHeadings and not re.search(r"(?mi)^#+ contents|^\[TOC\]|^## Table of Contents", sText):
+    # THE PAGE THE READER OPENS COUNTS (14 October 2026): 25 long documents were reported for having no contents list
+    # in their Markdown although the .htm a reader opens carries one, the <nav id="TOC"> the kit's page finisher writes.
+    # A document passes when either has a contents list.
+    sHtmPath = sPath[:-3] + ".htm"
+    bPageHasContents = False
+    if os.path.isfile(sHtmPath):
+        try:
+            with open(sHtmPath, encoding="utf-8-sig", errors="replace") as fHtm: bPageHasContents = bool(re.search(r'<nav[^>]*\bid="TOC"', fHtm.read()))
+        except OSError:
+            bPageHasContents = False
+    if len(sText.split("\n")) > iContentsLines and iH2 >= iContentsHeadings and not bPageHasContents and not re.search(r"(?mi)^#+ contents|^\[TOC\]|^## Table of Contents", sText):
         lsFindings.append("%d lines and %d sections with no contents list" % (len(sText.split("\n")), iH2))
     nGrade = readingGrade(sText)
     sGrade = "grade n/a" if nGrade is None else "grade %.1f" % nGrade

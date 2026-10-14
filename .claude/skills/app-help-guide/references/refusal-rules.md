@@ -25,6 +25,10 @@ true about the product.
 - **An announcement is not help.** A newsroom post may be the fullest official
   description of a product and still belongs under a heading that says so.
 - **A programme archive is not help.** A television show publishes episodes.
+- **A model is not a product.** Gemini 4 Argon, announced on 30 September
+  2026 and first offered to cybersecurity partners, is a model that reaches
+  readers inside Gemini; its help, when there is any, belongs in the Gemini
+  guide. Coverage of the announcement is news, not help.
 - **A forum is not help.** Users answering each other is a different thing,
   however good the answers. Name the exception if you make one.
 - **Too thin to hold its own name.** MakeMKV's whole site came to 938 words,

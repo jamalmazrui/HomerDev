@@ -285,12 +285,30 @@ def review(sFolder):
         if lsResults and len(dSeen) > 1:
             print("  %s names %s versions in this batch (%s); a results file may be from an earlier run" % (sApp, len(dSeen), ", ".join(sorted(dSeen)))); iListed += 1
     print()
+    # A WARNING IS NOT A SKIP (14 October 2026): a reused check's warning carries "(in the run reused here)", so it was
+    # listed among the skipped checks. Warnings -- checks that ran and found something that does not block a release --
+    # have their own section, each distinct one once.
+    reWarning = re.compile(r"\sWARN\s|findings? in \d+ documents?")
     print("== REVIEW: skipped checks")
     for sFile in sorted(dTexts):
         for sLine in dTexts[sFile].splitlines():
-            if re.search(r"\bSKIP\b|\bskip\b --| -- not run|not checked:|\(in the run reused here\)", sLine) and not reNoise.search(sLine):
+            if re.search(r"\bSKIP\b|\bskip\b --| -- not run|not checked:|\(in the run reused here\)", sLine) and not reNoise.search(sLine) and not reWarning.search(sLine):
                 print("  %s: %s" % (sFile, plainLine(sLine)[:200]))
                 iListed += 1
+    print()
+    print("== REVIEW: warnings (checks that ran and found something; they do not block a release)")
+    dWarned = {}
+    for sFile in sorted(dTexts):
+        if not sFile.endswith(".log"): continue
+        for sLine in dTexts[sFile].splitlines():
+            oWarn = re.search(r"\s(\w+)\s+WARN\s+(.*)$", sLine)
+            if oWarn:
+                sApp = sFile.split("-")[0]
+                sKey = sApp + ": " + oWarn.group(1) + " -- " + oWarn.group(2).replace(" (in the run reused here)", "")
+                dWarned[sKey] = dWarned.get(sKey, 0) + 1
+    for sKey in sorted(dWarned):
+        print("  %s" % sKey[:200])
+        iListed += 1
     print()
     print("== REVIEW: cautions, in any wording (each distinct line once, with how often it appears)")
     dSeen = {}

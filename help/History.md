@@ -7,6 +7,15 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.39 -- 14 October 2026
+
+Learnings from the logs of 13 October evening.
+
+- **No file is dated in the future.** Deliveries were zipped on a clock running on UTC, and a zip records local time with no zone, so files unzipped about seven hours in the future: a page rebuilt moments before was still reported older than its .md. fixEncoding, which every build runs, now sets any file dated more than two minutes ahead to now and logs each; deliveries are now stamped in Pacific time.
+- **checkDocs reports fewer false findings.** An address in inline code, such as `https://example.com`, is an example, not a bare URL; fenced code was already left out. A long document whose .htm carries a contents list -- the `<nav id="TOC">` the page finisher writes -- has one, whatever its Markdown says; 25 such documents had been reported.
+- **The log review lists warnings on their own.** A reused check's warning carries "(in the run reused here)", so it appeared among the skipped checks; warnings now have their own section, one line each.
+
+
 ## 1.72.38 -- 14 October 2026
 
 - **A program that may hang can be given a deadline.** `Media.run` waited for a program with no limit, so a converter that hung held its caller with it. A new form takes a number of minutes: past it, the program and the processes it started are ended by their own id -- `Media.endProcessTree`, so no other copy of the program is touched -- and the call returns -2 with a plain message. The existing form is unchanged and has no limit, which is right for work that can take long, such as a download (from an audit by another AI).

@@ -18,10 +18,11 @@ with Pandoc. Nothing written here appears in the articles: the guide carries the
 publisher's words, arranged so a screen reader user can move through them by
 heading, search the whole product's help at once, and read it offline.
 
-Three scripts in `scripts/` do the work, each with a `.cmd` wrapper:
-`makeHarvester.py` writes a crawler for one estate, `buildGuide.py` turns the
-gathered pages into the guide and its pair, and `cleanFeedback.py` sweeps
-publisher feedback widgets out of guides already built.
+Four scripts in `scripts/` do the work, each with a `.cmd` wrapper:
+`buildGuide.py` turns gathered pages into the guide and its pair,
+`cleanFeedback.py` sweeps publisher feedback widgets out of guides already
+built, `getLlmsGuide.py` gathers and builds in one run from a publisher's own
+`llms.txt`, and `makeHarvester.py` writes a crawler for one estate.
 
 Read `references/fence-faults.md` before writing a fence,
 `references/guide-format.md` before building, and
@@ -55,6 +56,7 @@ Read `references/fence-faults.md` before writing a fence,
     buildGuide.cmd harvests guides builds each guide from its harvest folder
     cleanFeedback.cmd report       lists the furniture it would remove
     cleanFeedback.cmd              removes it and rebuilds each .htm
+    getLlmsGuide.cmd [products]    gathers from llms.txt and builds, in one run
 
 Each writes a debugging log beside itself: the environment, every setting, every
 address with its status, and the reason for anything not kept.
@@ -66,6 +68,15 @@ address with its status, and the reason for anything not kept.
   none, group by subject and **say so in the preamble**.
 - **Where a publisher offers a listing** — Zendesk's `articles.json` and its
   kin — take it. The article count is then known before a page is built.
+- **Where a publisher offers `llms.txt`, take it.** An index of every page by
+  section, with a plain Markdown copy of each page (or the whole manual in one
+  `llms-full.txt`), is the publisher's own text without the furniture, so no
+  crawler or page reader is needed. Add the product to `getLlmsGuide.py`'s list
+  with what it leaves out and why; the script reads robots.txt before fetching,
+  computes Pandoc's own heading identifiers so internal links survive repeated
+  titles, and checks every link in the built .htm. Expo, Hermes Agent and Kiro
+  were the first three (13 October 2026). Hermes renames its llms-full.txt with
+  a hash on every deploy, so use the stable /docs/llms-full.txt address.
 - **Structured data beats drawn text.** Angi, CrimeCon and Udio all publish
   their own questions or trails as schema.org data in the page head; that is a
   better source than the prose, because it pairs each question with its answer.
