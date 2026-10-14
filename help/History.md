@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.38 -- 14 October 2026
+
+- **A program that may hang can be given a deadline.** `Media.run` waited for a program with no limit, so a converter that hung held its caller with it. A new form takes a number of minutes: past it, the program and the processes it started are ended by their own id -- `Media.endProcessTree`, so no other copy of the program is touched -- and the call returns -2 with a plain message. The existing form is unchanged and has no limit, which is right for work that can take long, such as a download (from an audit by another AI).
+
+
 ## 1.72.37 -- 14 October 2026
 
 - **A check no longer summarizes itself.** check runs the log summary over its own logs folder while its own log is still open, so the summary reported that very check as UNFINISHED. summarizeLogs takes `--skip=<file name>`, check names its own log, and the newest finished check is reported instead (from a follow-up audit by another AI).

@@ -567,6 +567,15 @@ return sBest;
 } // bestTitle method
 
 public static int run(string sProgram, string sArguments, out string sOut, out string sErr) {
+return run(sProgram, sArguments, out sOut, out sErr, 0);
+} // run method
+
+// A DEADLINE FOR A PROGRAM THAT MAY HANG (14 October 2026, from an audit by another AI). run
+// waited with no limit, so a converter that hung held its caller with it. With iMinutes
+// above 0, a program still running after that long is ended, with the processes it started,
+// by its own id, so no other copy of the program is touched; the return is -2 and sErr says
+// what happened. 0 means no limit, for work that can rightly take long, such as a download.
+public static int run(string sProgram, string sArguments, out string sOut, out string sErr, int iMinutes) {
 // A process with NO WINDOW, with both streams read before the wait: a full
 // pipe buffer would otherwise deadlock it. The program and its arguments go
 // in separately, so no command interpreter quoting rule applies.
@@ -588,8 +597,15 @@ process.Start();
 // cannot block the other (kit 1.62.5, from an audit by another AI: reading one
 // to its end and then the other could deadlock).
 System.Threading.Tasks.Task<string> taskErr = process.StandardError.ReadToEndAsync();
-sOut = process.StandardOutput.ReadToEnd();
+System.Threading.Tasks.Task<string> taskOut = process.StandardOutput.ReadToEndAsync();
+if (iMinutes > 0 && !process.WaitForExit(iMinutes * 60 * 1000)) {
+endProcessTree(process.Id);
+sErr = Path.GetFileName(sProgram) + " was still running after " + iMinutes + " minutes, so it was stopped.";
+Homer.Log.warn("Stopped after " + iMinutes + " minutes: " + sProgram + " " + sArguments);
+return -2;
+}
 process.WaitForExit();
+sOut = taskOut.Result;
 sErr = taskErr.Result;
 Homer.Log.command(sProgram + " " + sArguments, process.ExitCode);
 if (!string.IsNullOrEmpty(sErr)) Homer.Log.info("  said: " + sErr.Trim());
@@ -601,6 +617,20 @@ Homer.Log.info("Could not start " + sProgram + ": " + ex.Message);
 return -1;
 }
 } // run method
+
+// Ends a process this program started, and the processes it started in turn, by its id.
+public static void endProcessTree(int iProcessId) {
+try {
+ProcessStartInfo info = new ProcessStartInfo("taskkill", "/t /f /pid " + iProcessId);
+info.UseShellExecute = false;
+info.CreateNoWindow = true;
+using (Process kill = Process.Start(info)) { kill.WaitForExit(30000); }
+Homer.Log.info("Ended process " + iProcessId + " and the processes it started.");
+}
+catch (Exception ex) {
+Homer.Log.warn("Could not end process " + iProcessId + ": " + ex.Message);
+}
+} // endProcessTree method
 
 } // Media class
 
