@@ -16,6 +16,12 @@ always retried.
 SPEED. Hashing a large tree on every run would cost what it saves, so each file's hash is remembered with its size
 and modification time, and read again only when either changes.
 
+VERIFYING (14 October 2026, from an audit by another AI). That shortcut is an optimization, not proof: a file replaced
+by different bytes of the same length, with its time put back, keeps its old hash, and its work is skipped. So where
+being right matters more than being quick, every file is read again: when the environment holds HomerVerify=1, which
+build_release sets before push and release; when check runs with --fresh; or when a caller passes bVerify=True, or
+--verify from a batch file. The fresh hash also replaces the remembered one, so a stale entry is corrected.
+
 WHERE. exec\\fingerprints.json in the project: beside the outputs it describes, never in git (exec is local), and
 deleting exec forces every job to run again. The caller passes the project folder; exec is made there if missing.
 
@@ -28,8 +34,8 @@ FROM PYTHON
     if oCache.checkDue("ace", 7): ask npm, then oCache.noteChecked("ace", "1.4.6")
 
 FROM A BATCH FILE (exit 0 means current, 1 means the work must run, 2 a problem)
-    python scripts\\fingerprint.py check  <project> <key> --in <path>... --out <path>... [--extra <text>...]
-    python scripts\\fingerprint.py record <project> <key> --in <path>... --out <path>... [--extra <text>...]
+    python scripts\\fingerprint.py check  <project> <key> --in <path>... --out <path>... [--extra <text>...] [--verify]
+    python scripts\\fingerprint.py record <project> <key> --in <path>... --out <path>... [--extra <text>...] [--verify]
 
 Every decision is logged by the caller through the log function passed in, or printed when there is none.
 """
@@ -46,8 +52,9 @@ setProductExts = {".dll", ".exe", ".pdb", ".pyc", ".pyo", ".tmp"}
 class Cache:
     """The fingerprints of one project, read from and written to exec\\fingerprints.json."""
 
-    def __init__(self, sProject, fnLog=None):
+    def __init__(self, sProject, fnLog=None, bVerify=None):
         self.sProject = os.path.abspath(sProject)
+        self.bVerify = bVerify if bVerify is not None else os.environ.get("HomerVerify", "") == "1"
         self.sStore = os.path.join(self.sProject, "exec", sStoreName)
         self.fnLog = fnLog or (lambda s: None)
         try:
@@ -58,6 +65,7 @@ class Cache:
         self.d.setdefault("jobs", {}); self.d.setdefault("files", {}); self.d.setdefault("checks", {})
         # What this object changed, so a save writes only that and keeps what other processes wrote meanwhile.
         self.setChanged = set()
+        if self.bVerify: self.fnLog("fingerprint: verifying, so every file is read again rather than trusted by its size and time")
 
     # ---- hashing ----
     def fileHash(self, sPath):
@@ -65,7 +73,7 @@ class Cache:
         oStat = os.stat(sPath)
         sKey = os.path.normcase(os.path.abspath(sPath))
         dKnown = self.d["files"].get(sKey)
-        if dKnown and dKnown.get("size") == oStat.st_size and dKnown.get("mtime") == oStat.st_mtime_ns:
+        if dKnown and not self.bVerify and dKnown.get("size") == oStat.st_size and dKnown.get("mtime") == oStat.st_mtime_ns:
             return dKnown["sha"]
         oSha = hashlib.sha256()
         with open(sPath, "rb") as f:
@@ -210,15 +218,16 @@ class Cache:
 def main(lsArgs):
     """The batch-file form: check or record a job. Exit 0 current (or recorded), 1 must run, 2 a problem."""
     if len(lsArgs) < 3 or lsArgs[0] not in ("check", "record"):
-        print("Usage: fingerprint.py check|record <project> <key> --in <path>... --out <path>... [--extra <text>...]")
+        print("Usage: fingerprint.py check|record <project> <key> --in <path>... --out <path>... [--extra <text>...] [--verify]")
         return 2
     sVerb, sProject, sKey = lsArgs[0], lsArgs[1], lsArgs[2]
-    dLists, sList = {"--in": [], "--out": [], "--extra": []}, ""
+    dLists, sList, bVerify = {"--in": [], "--out": [], "--extra": []}, "", False
     for sArg in lsArgs[3:]:
-        if sArg in dLists: sList = sArg; continue
+        if sArg.lower() == "--verify": bVerify = True; continue
+        if sArg.lower() in dLists: sList = sArg.lower(); continue
         if not sList: print("Expected --in, --out or --extra before %s" % sArg); return 2
         dLists[sList].append(sArg)
-    oCache = Cache(sProject, print)
+    oCache = Cache(sProject, print, True if bVerify else None)
     sPrint = oCache.fingerprint(dLists["--in"], dLists["--extra"])
     if sVerb == "check": return 0 if oCache.isCurrent(sKey, sPrint, dLists["--out"]) else 1
     oCache.record(sKey, sPrint, dLists["--out"])

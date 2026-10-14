@@ -79,22 +79,67 @@ def pointerText(sKit):
 
 
 def setBlock(sPath, sBlock):
-    """Puts sBlock in the file between the marker lines, replacing an earlier block; "" removes it. Returns what it did."""
-    sText = ""
-    if os.path.isfile(sPath):
-        sText = open(sPath, "rb").read().decode("utf-8-sig", errors="replace")
+    """Puts sBlock in the file between the marker lines, replacing an earlier block; "" removes it. Returns what it did.
+
+    THE PERSON'S OWN INSTRUCTIONS ARE KEPT BYTE FOR BYTE (14 October 2026, from an audit by another AI). The file was
+    decoded with errors="replace", so bytes that were not UTF-8 came back changed; the line breaks around the block
+    were trimmed; and the file was written in place, so an interruption could lose instructions that had nothing to do
+    with the kit. Now:
+      - a file that is not UTF-8 is left exactly as it is, and the reason is given;
+      - markers that do not pair -- a begin with no end, an end before its begin, two blocks -- are reported, not
+        guessed at, and the file is left alone;
+      - only the block between the markers changes, with the one blank line that set it apart, in the file's own
+        kind of line break, so connecting and then removing gives back the file as it was, its byte order mark
+        included -- except that a last line with no line break is given one, which removing cannot tell from the
+        person's own;
+      - before the first change a dated copy is kept beside the file, and every write goes to a temporary file that
+        is then swapped in, so the file is always either the old one or the new one.
+    """
+    binOld = open(sPath, "rb").read() if os.path.isfile(sPath) else b""
+    bBomOld = binOld.startswith(b"\xef\xbb\xbf")
+    try:
+        sText = binOld[3 if bBomOld else 0:].decode("utf-8")
+    except UnicodeDecodeError as oError:
+        return "left alone: it is not UTF-8 text (%s), and changing it could damage what is there" % oError.reason
+    # The file's own line break: CRLF unless it uses bare LF throughout. The block is written in it too.
+    sBreak = "\n" if ("\n" in sText and "\r\n" not in sText) else "\r\n"
+    sBlock = sBlock.replace("\r\n", "\n").replace("\n", sBreak)
+    iBegins, iEnds = sText.count(sBegin), sText.count(sEnd)
     iStart, iEnd = sText.find(sBegin), sText.find(sEnd)
-    sBefore, sAfter = (sText[:iStart], sText[iEnd + len(sEnd):]) if iStart >= 0 and iEnd > iStart else (sText, "")
-    sAfter = sAfter.lstrip("\r\n")
-    if not sBlock:
-        if iStart < 0: return "nothing to remove"
-        sNew = (sBefore.rstrip("\r\n") + "\r\n" if sBefore.strip() else "") + sAfter
+    if iBegins > 1 or iEnds > 1 or iBegins != iEnds or (iStart >= 0 and iEnd < iStart):
+        return "left alone: its HomerDev markers do not pair (%d begin, %d end); remove the stray one by hand" % (iBegins, iEnds)
+    if iStart >= 0:
+        # The block runs from its begin marker to the line break after its end marker, and with it goes the one blank
+        # line that was put before it, so taking it out leaves the text around it as it was.
+        iStop = iEnd + len(sEnd)
+        if sText.startswith(sBreak, iStop): iStop += len(sBreak)
+        sBefore, sAfter = sText[:iStart], sText[iStop:]
+        if sBefore.endswith(sBreak * 2): sBefore = sBefore[:-len(sBreak)]
     else:
-        sNew = (sBefore.rstrip("\r\n") + "\r\n\r\n" if sBefore.strip() else "") + sBlock + (("\r\n" + sAfter) if sAfter.strip() else "")
+        if not sBlock: return "nothing to remove"
+        sBefore, sAfter = sText, ""
+    if sBlock:
+        # Set apart by one blank line, after a line break of the person's own when their text did not end in one.
+        sJoin = "" if not sBefore else (sBreak if sBefore.endswith(sBreak) else sBreak * 2)
+        sNew = sBefore + sJoin + sBlock + sAfter
+    else:
+        sNew = sBefore + sAfter
     if sNew == sText: return "already current"
+    binNew = (b"\xef\xbb\xbf" if bBomOld else b"") + sNew.encode("utf-8")
     os.makedirs(os.path.dirname(sPath), exist_ok=True)
-    if sNew.strip(): open(sPath, "wb").write(sNew.encode("utf-8"))
-    elif os.path.exists(sPath): os.remove(sPath)
+    if binOld and not [s for s in os.listdir(os.path.dirname(sPath)) if s.startswith(os.path.basename(sPath) + ".before-HomerDev-")]:
+        sBackup = sPath + ".before-HomerDev-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        with open(sBackup, "wb") as oFile: oFile.write(binOld)
+        logLine("kept a copy of %s as it was, as %s" % (sPath, sBackup))
+    if not sNew.strip():
+        os.remove(sPath)
+        return "removed, and the file, which held nothing else, with it"
+    sTemp = sPath + ".homerdev-writing"
+    with open(sTemp, "wb") as oFile:
+        oFile.write(binNew)
+        oFile.flush()
+        os.fsync(oFile.fileno())
+    os.replace(sTemp, sPath)
     return ("updated" if iStart >= 0 else "added") if sBlock else "removed"
 
 

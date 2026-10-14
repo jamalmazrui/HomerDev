@@ -115,6 +115,11 @@ set "sSummary="
 
 call :step build "build.cmd" || goto :stopped
 call :step tidy "scripts\tidy.cmd" || goto :stopped
+rem PUSH AND RELEASE VERIFY (14 October 2026, from an audit by another AI). Build and tidy may trust a file's
+rem remembered hash while its size and time are unchanged, which keeps them quick; the checks before anything goes
+rem public read every file again, so a file changed without changing its size or time cannot pass on its old hash.
+set "HomerVerify=1"
+>> "%sLog%" echo Settings: HomerVerify=1 for push and release, so their checks read every file again
 call :step push "scripts\push.cmd" || goto :stopped
 call :step release "!sRelease!" !sReleaseArgs! || goto :stopped
 

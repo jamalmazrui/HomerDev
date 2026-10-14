@@ -7,6 +7,20 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.45 -- 14 October 2026
+
+- **connectAI keeps your own instructions byte for byte.** It puts a short pointer to the kit in each AI tool's personal instruction file, between two marker lines. It read the file with errors replaced, trimmed the line breaks around its block, and wrote the file in place, so text that was not UTF-8 came back changed and an interruption could lose instructions that had nothing to do with the kit. Now a file that is not UTF-8 is left exactly as it is, and the reason given; markers that do not pair are reported, not guessed at; only the block changes, in the file's own kind of line break; a dated copy is kept before the first change; and each write goes to a temporary file that is swapped in. Tested as the audit asked: with and without a byte order mark, CRLF and LF, an empty file and a file whose last line had no line break, connecting and then removing gave the file back as it was -- the last only gaining that line break, which removing cannot tell from the person's own -- and connecting twice changed nothing the second time; text that was not UTF-8, three kinds of unpaired markers, and a failure during the write all left the file untouched (from an audit by another AI).
+- **The chat says when an answer is incomplete.** A failed exit from Claude Code counted as an error only when nothing came out, so an answer cut off by a failure was shown as a whole one, with "Answered" spoken after it. Any failed exit is now an error: the text is kept, introduced as possibly incomplete with the error named, and the status and speech say "Incomplete answer, with an error". A failed first turn is still not taken for a session that can be resumed (from an audit by another AI).
+
+## 1.72.44 -- 14 October 2026
+
+- **Push and release read every file again.** The fingerprint cache trusts a file's remembered hash while its size and modification time are unchanged, which keeps build and tidy quick. But that is an optimization, not proof: a file replaced by different bytes of the same length, with its time put back, kept its old hash, and its work could be skipped. There is now a verifying mode that reads every file again and corrects the remembered hash. build_release turns it on before push and release, so nothing goes public on a stale hash; check --fresh uses it too, so "in full" means every file; and fingerprint.py takes --verify from a batch file. Tested as the audit asked: after a same-size, same-time swap the ordinary cache kept the old hash, and the verifying cache gave the true one (from an audit by another AI).
+
+## 1.72.43 -- 14 October 2026
+
+- **Homer.Util.fileSha256 gives any app a file's fingerprint by its content.** A file's size and time say only that nothing obvious changed: HomerScribe took a recording replaced by another of the same length, with its time kept, for the same file, and credited the old transcript to the new one. The kit had no shared way to fingerprint a file, so each app would have written its own; this one reads in one-megabyte blocks and shares the file for reading, so a file another program has open can still be fingerprinted (from an audit by another AI).
+
+
 ## 1.72.42 -- 14 October 2026
 
 - **checkDocs measures a list fairly.** The reading grade ends a sentence at a full stop or a blank line, and list markers were removed before that, so a list with no full stops counted as one long sentence: urlFido's fourteen editing keys, one per line, scored grade 14.3. Each list item now ends the sentence before it, as readability tools treat bullets; the same list scores 5.5, and prose without lists measures exactly as before. With lists measured fairly, DbDo's and urlFido's guides meet the ninth-grade target without a word changed; EdSharp's, at 10.3, is genuinely dense.

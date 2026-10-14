@@ -319,6 +319,18 @@ string sFull = Path.GetFullPath(sTarget);
 return Path.Combine(Path.GetDirectoryName(sFull), "~" + Path.GetFileName(sFull) + "." + Guid.NewGuid().ToString("N").Substring(0, 8) + ".tmp");
 } // stagingPath method
 
+// A FILE KNOWN BY WHAT IS IN IT (14 October 2026, from an audit by another AI). The SHA-256 of a file's bytes, in
+// lowercase hexadecimal. A file's size and time say only that nothing obvious changed: a recording replaced by another
+// of the same length, with its time kept, passed as the same file, and a transcript of the old one was credited to the
+// new. Read in one-megabyte blocks, shared for reading, so a file another program has open can still be fingerprinted.
+public static string fileSha256(string sPath) {
+using (System.Security.Cryptography.SHA256 oHash = System.Security.Cryptography.SHA256.Create())
+using (FileStream oStream = new FileStream(sPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 1048576)) {
+byte[] aHash = oHash.ComputeHash(oStream);
+return BitConverter.ToString(aHash).Replace("-", "").ToLowerInvariant();
+}
+} // fileSha256 method
+
 public static string recoveryPath(string sPath) {
 // A name that does not exist yet: the path, ".recovery-", the date and time, and a number if that is taken too.
 string sFull = Path.GetFullPath(sPath).TrimEnd(Path.DirectorySeparatorChar);

@@ -495,7 +495,11 @@ private static string askClaude(string sProgram, string sQuestion, string sSessi
             oProcess.WaitForExit();
             string sOut = oOut.Result.Trim(), sErr = oErr.Result.Trim();
             Log.info("Claude Code exit " + oProcess.ExitCode + ", " + sOut.Length + " characters" + (sErr.Length > 0 ? "; stderr: " + sErr : ""));
-            if (oProcess.ExitCode != 0 && sOut.Length == 0) sError = sErr.Length > 0 ? sErr : "Claude Code stopped with exit code " + oProcess.ExitCode;
+            // A FAILED EXIT IS AN ERROR, WHATEVER WAS WRITTEN (14 October 2026, from an audit by another AI). It counted
+            // as one only when nothing came out, so a run that wrote part of an answer and then failed was shown as a
+            // complete answer. Any nonzero exit is now an error; the text is still returned, and the chat says it is
+            // incomplete. An error also keeps a failed first turn from being taken for a session that can be resumed.
+            if (oProcess.ExitCode != 0) sError = (sErr.Length > 0 ? sErr + " (exit code " + oProcess.ExitCode + ")" : "Claude Code stopped with exit code " + oProcess.ExitCode);
             return sOut;
         }
     }
@@ -600,7 +604,10 @@ private static bool runChat(IWin32Window owner)
                         // when the first question was sent, so a first request that failed left every later one trying
                         // to resume a session that was never made. Now only a clean answer marks it.
                         if (bClaude && bFirst && string.IsNullOrEmpty(sError) && !string.IsNullOrEmpty(sAnswer)) bClaudeStarted = true;
+                        // TEXT WITH AN ERROR IS AN INCOMPLETE ANSWER, AND SAYS SO before the text, so it is not read as whole.
+                        bool bPartial = !string.IsNullOrEmpty(sAnswer) && !string.IsNullOrEmpty(sError);
                         if (string.IsNullOrEmpty(sAnswer)) sAnswer = "No answer came back" + (string.IsNullOrEmpty(sError) ? "." : ": " + sError);
+                        else if (bPartial) sAnswer = "This answer may be incomplete: " + sEngine + " stopped with an error, " + sError + ". What it wrote before stopping:\n" + sAnswer;
                         sAnswer = plainText(sAnswer);
                         sLastAnswer = sAnswer;
                         Log.info("Chat answer: " + sAnswer.Length + " characters" + (string.IsNullOrEmpty(sError) ? "" : "; error " + sError));
@@ -615,8 +622,9 @@ private static bool runChat(IWin32Window owner)
                         txtConversation.SelectionLength = 0;
                         txtConversation.ScrollToCaret();
                         int iTook = (int) Math.Round((DateTime.Now - dtAsked).TotalSeconds);
-                        dlg.setStatusText("Answered in " + iTook + (iTook == 1 ? " second" : " seconds"));
-                        Say.say("Answered in " + iTook + (iTook == 1 ? " second" : " seconds"));
+                        string sDone = (bPartial ? "Incomplete answer, with an error, in " : "Answered in ") + iTook + (iTook == 1 ? " second" : " seconds");
+                        dlg.setStatusText(sDone);
+                        Say.say(sDone);
                         if (bSpeak) Say.sayForced(sAnswer);
                     });
                 }
