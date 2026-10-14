@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.40 -- 14 October 2026
+
+- **makeTutorials proves its own output is settled.** After writing Tutorials.md it reads it back and applies the same walkthrough again in memory; if that would change anything, the build stops, and the log gives both fingerprints. Tested on DbDo's own files: the first run removed its 80 copies and wrote one, 3.7 MB to 70 KB, and a second run wrote the identical file; with the old duplicating splice put back on purpose, the build stopped as it should (from an audit by another AI, which asked for proof of two-run idempotence).
+
+
 ## 1.72.39 -- 14 October 2026
 
 Learnings from the logs of 13 October evening.
