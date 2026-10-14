@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.34 -- 13 October 2026
+
+- **A damaged found.inix is gathered again.** One book's found.inix held the text \\xef\\xbb\\xbf -- a byte order mark written out as characters -- before [found], so the section was invisible and the book lost its extra picture folders. The build gathered a book's sources only when found.inix was missing, so it would have stayed that way; a found.inix with no readable [found] section now counts as missing, and the log names the book.
+- **The log summary reads kdpFetch and a book project's tidy by their results.** kdpFetch's first real run was summarized "no errors" though 14 items failed; it now reads "5 items fetched; 14 items could not be", marked failed. MyBooks' picture-placing tidy, which shares the tidy log name, was summarized "whitelist only"; it now gives its own result line.
+
 ## 1.72.33 -- 13 October 2026
 
 - **kdpFetch, a new book tool.** It fetches what a book lacks through the same remembered Edge window the other KDP tools use: a missing cover from the book's Amazon page (the full-size original, found by its ASIN), and each picture a manuscript names by web address that the build cannot find, cannot read as a picture, or finds as YouTube's 120-by-90 "no thumbnail" placeholder. For YouTube the sizes are tried largest first. Sites refused buildBooks' plain downloads; a real browser is refused far less often. Nothing on KDP or Amazon is changed. `-metadata` runs `kdpBooks -export`; `-manuscripts` explains that KDP offers no download of a published manuscript; `-dry-run` lists what is missing and where it would come from, opening no browser. It looks for each picture exactly where buildBooks does, through buildBooks' own functions, so it never fetches a picture the build already has.

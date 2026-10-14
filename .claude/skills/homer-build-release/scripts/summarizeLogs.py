@@ -126,6 +126,10 @@ def summarizeRelease(sText):
 
 
 def summarizeTidy(sText):
+    # A BOOK PROJECT'S TIDY PLACES PICTURES (13 October 2026): MyBooks' tidy shares the log name and was summarized
+    # "whitelist only", which says nothing about what it did. Its own result line is the summary.
+    sPictures = firstMatch(sText, r"SAY (\d+ pictures? (?:copied|would be copied), \d+ pictures? already in place, \d+ pictures? still without one)")
+    if sPictures: return [sPictures], False
     sChanges = firstMatch(sText, r"(\d+ changes? made)")
     iStrays = len(re.findall(r"TRACKED STRAY", sText))
     iMoved = len(re.findall(r"\bMOVED\b", sText))
@@ -183,8 +187,18 @@ def summarizeKdpUpdate(sText):
     return lsFacts, bFailed
 
 
+def summarizeKdpFetch(sText):
+    """kdpFetch's own result: what it fetched and what it could not, so a run that fetched nothing is not "no errors"."""
+    sResult = firstMatch(sText, r"CONSOLE: (\d+ items? fetched; \d+ items? could not be)")
+    if sResult: return [sResult], not sResult.split("; ")[1].startswith("0 ")
+    sNothing = firstMatch(sText, r"CONSOLE: (Nothing is missing[^.]*)")
+    if sNothing: return [sNothing], False
+    if re.search(r"CONSOLE: A dry run", sText): return ["dry run: " + (firstMatch(sText, r"CONSOLE: (Missing: [^\r\n]*)") or "listed what is missing")], False
+    return ["no result line" + ("; it crashed" if "CRASH" in sText else "")], True
+
+
 dSummarizers = {"build": summarizeBuild, "buildBooks": summarizeBuildBooks, "kdpUpdate": summarizeKdpUpdate, "check": summarizeCheck, "release": summarizeRelease,
-                  "tidy": summarizeTidy, "push": summarizePush, "": summarizeSession}
+                  "tidy": summarizeTidy, "push": summarizePush, "kdpFetch": summarizeKdpFetch, "": summarizeSession}
 
 
 def collect(sFolder):

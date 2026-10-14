@@ -2351,6 +2351,18 @@ def buildKey(dBook, sBookDir, dKdp):
     return hashlib.sha256(json.dumps(lParts, sort_keys=True, default=str).encode("utf-8")).hexdigest()
 
 
+def foundReadable(sBookDir):
+    """True when the book's found.inix exists and its [found] section can be read. A DAMAGED found.inix IS GATHERED AGAIN
+    (13 October 2026): one held the text \\xef\\xbb\\xbf -- a byte order mark written out as characters -- before
+    [found], so its section was invisible and the book lost its extra picture folders; since only a missing file was
+    gathered again, it would have stayed that way."""
+    sPath = os.path.join(sBookDir, "found.inix")
+    if not os.path.exists(sPath): return False
+    if "found" in readInix(sPath): return True
+    log(os.path.basename(sBookDir) + ": found.inix has no readable [found] section, so its sources are gathered again")
+    return False
+
+
 def keptAudit(dBook, sKey):
     """The book's last audit as a summary entry, when it was of this exact build and is still true: it names this build
     fingerprint, says ready, and names the EPUB in results byte for byte. Otherwise None, and the book is built."""
@@ -2524,7 +2536,7 @@ def main():
                 continue
             sBookDir = os.path.join(sProject, "books", dBook["root"])
             os.makedirs(sBookDir, exist_ok=True)
-            if bGather or not os.path.exists(os.path.join(sBookDir, "found.inix")):
+            if bGather or not foundReadable(sBookDir):
                 if dIndex is None:
                     say("Looking through the search folders for Word files, covers and images folders.")
                     dIndex = searchIndex()
