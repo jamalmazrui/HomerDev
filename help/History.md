@@ -7,6 +7,19 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.33 -- 13 October 2026
+
+- **kdpFetch, a new book tool.** It fetches what a book lacks through the same remembered Edge window the other KDP tools use: a missing cover from the book's Amazon page (the full-size original, found by its ASIN), and each picture a manuscript names by web address that the build cannot find, cannot read as a picture, or finds as YouTube's 120-by-90 "no thumbnail" placeholder. For YouTube the sizes are tried largest first. Sites refused buildBooks' plain downloads; a real browser is refused far less often. Nothing on KDP or Amazon is changed. `-metadata` runs `kdpBooks -export`; `-manuscripts` explains that KDP offers no download of a published manuscript; `-dry-run` lists what is missing and where it would come from, opening no browser. It looks for each picture exactly where buildBooks does, through buildBooks' own functions, so it never fetches a picture the build already has.
+- **A picture saved from a Word file is found again after the Word files are retired.** The build saves a Word file's picture under the manuscript's name with the Word file's extension (Newcomb_s_problem.png for Newcomb_s_problem.svg), and found it only by exact name. While the Word files sat beside the manuscripts that did not matter; once 1.72.31 retired them, 24 pictures would have had to come from the web on every build, and any refused download would have made a ready book not ready. A file with the same name and another picture extension, whose bytes are a picture, is now that picture.
+- **Legacy of Mazrui's two "good" pictures were placeholders.** Its regalia photo and documentary thumbnail were byte-identical, 1,097 bytes, 120 by 90 pixels: YouTube's grey image for a thumbnail size that does not exist. kdpFetch treats such a file as missing.
+- Every book tool's wrapper now refreshes kdpFetch from the kit as well.
+
+## 1.72.32 -- 13 October 2026
+
+- **A reused kit check no longer claims a clean build.** 1.72.28's sentence decided from the samples it saw, and a check reused whole sees none, so it fell back to "built from a clean start" -- the claim it was written to stop. A reused check now says no sample was built and names the pass it reuses.
+- **The log summary reads a reused check and the kit's check as what they are.** Both were listed UNFINISHED on every release: a reused check has no totals of its own, and the kit's check now reports checkHomerDev's exit code. They read "reused the pass at <time>" and "the kit: checkHomerDev exit code 0".
+- **A book is judged again when the rules for ready change.** Each audit now records the rules it was judged by; an audit judged by earlier rules is not reused. When missing covers became errors, five books without covers kept their earlier "ready", because their build fingerprints had not changed -- and the fingerprint must not carry the rules, since kdpUpdate compares it and a change resends a book to KDP. The EPUBs are unchanged by this, so nothing is resent.
+
 ## 1.72.31 -- 13 October 2026
 
 - **A book's manuscript is its Markdown, alone.** Compared paragraph by paragraph and fact by fact, the fifteen MyBooks titles that also had a Word file held the same content in their Markdown, revised and extended; one Word file carried an AI chat's "max length" message pasted mid-sentence, and one ".docx" was a downloaded web page. buildBooks now moves a Word file beside a manuscript to notes\\word\\<root>\\, never deleting it and still reading it to recover a named picture; gathering no longer copies a Word file for a book that has its manuscript; a Word file starts only a book with none; and the word-count comparison between the two is gone.

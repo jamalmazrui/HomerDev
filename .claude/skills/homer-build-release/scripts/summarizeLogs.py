@@ -85,6 +85,14 @@ def summarizeCheck(sText):
     # reported as "FAILED: no totals". It is reported as what it is.
     if not sCounts and re.search(r"This is the kit, which checkHomerDev checks", sText):
         return ["the kit: check hands over to checkHomerDev"], False
+    # READ AS WHAT THEY ARE (13 October 2026): a check that reused an earlier pass ends "check end, reused" with no
+    # totals of its own, and the kit's check now says "This is the kit; running checkHomerDev" and reports its exit
+    # code; both were listed as UNFINISHED on every release.
+    if not sCounts and re.search(r"check end, reused", sText):
+        return ["reused the pass at " + (firstMatch(sText, r"passed this check at (\S+)") or "an earlier run")], False
+    oKit = re.search(r"checkHomerDev exit code (\d+)", sText)
+    if not sCounts and oKit and re.search(r"This is the kit", sText):
+        return ["the kit: checkHomerDev exit code " + oKit.group(1)], oKit.group(1) != "0"
     # UNFINISHED IS NOT FAILED (9 October 2026): the check started by a release is still running when the release
     # gathers the logs, so its own log has no totals yet; every project's release reported "FAILED check: no
     # totals". A check log with no totals, no failed finding and no traceback is unfinished. A crash keeps its

@@ -484,9 +484,15 @@ def checkDependencies():
 # fresh run would have done (13 October 2026, from an audit: it said "built from a clean start" about samples reused
 # from the day before).
 dReusedSamples = {}
+sReusedRun = ""   # when the whole check was reused, the time of the pass it reuses
 
 
 def samplesSentence(bDeep):
+    # A REUSED CHECK BUILT NOTHING (13 October 2026): it leaves before the samples are looked at, so the list above was
+    # empty and the sentence fell back to "built from a clean start" -- the very claim it was written to stop.
+    if sReusedRun:
+        return ("No sample was built in this run: the whole check was reused from its pass at %s, which recorded how its "
+                "samples were built. checkHomerDev --fresh builds them all again." % sReusedRun)
     iAll, iReused = len(lAllSamples), len(dReusedSamples)
     sEarliest = min(dReusedSamples.values())[:10] if dReusedSamples else ""
     if iReused == 0:
@@ -597,6 +603,8 @@ def main():
     bReusable = not (dArguments.fresh or dArguments.ui or dArguments.deep or dArguments.no_clean)
     if bReusable and oCache.isCurrent("checkHomerDev pass", sPrint, []):
         sWhen = oCache.d["jobs"]["checkHomerDev pass"].get("when", "?")
+        global sReusedRun
+        sReusedRun = sWhen
         finding("reused", "pass", "the kit passed this check at %s with exactly these inputs (fingerprint %s); not run again. checkHomerDev --fresh runs it in full" % (sWhen, sPrint[:12]))
         # WHAT THE REUSED RUN DID NOT CHECK STILL WAS NOT CHECKED (13 October 2026, from an audit). Its skips are restored
         # with their reasons; a pass recorded before findings were kept says its coverage is unknown.

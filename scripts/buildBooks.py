@@ -43,6 +43,12 @@ import collections, datetime, glob, hashlib, html, json, os, platform, posixpath
 
 # The way an EPUB is made: raised when buildBooks changes what it puts in a book, so every book is built again once.
 sBuildFormat = "2026-10-09"
+# THE RULES A BOOK IS JUDGED BY (13 October 2026). A kept audit is reused only when it was judged by these rules. When
+# the readiness rules tightened -- a missing cover an error, a picture that is not one an error -- five books without
+# covers kept their earlier "ready", since their fingerprints had not changed. The fingerprint must not change for a
+# rule (kdpUpdate compares it, and a change resends the book to KDP), so the rules are recorded in the audit instead.
+# Raise this whenever what makes a book ready changes; each book is then judged again, its EPUB unchanged.
+sAuditRules = "2026-10-13 a book needs its cover and real pictures"
 dDefaults = {"author": "", "ownTemplates": "", "imageMaxBytes": "150000", "imageMaxEdge": "1000", "jpegQuality": "75", "pandocMinimum": "3.1", "searchDepth": "6", "toolRefreshDays": "7", "userAgent": "HomerBooksBuild/1"}
 dSeriesSections = {"Strange Truths": ["Copyright", "Table of Contents", "Introduction", "Conclusion", "Key Terms", "Further Reading", "Also in the Strange Truths Series", "About the Author"]}
 iLongSentence = 30
@@ -1278,6 +1284,19 @@ def findInFolders(lFolders, sName):
         dLower = {s.lower(): s for s in os.listdir(sDir)}
         for sTry in lNames:
             if sTry.lower() in dLower: return os.path.join(sDir, dLower[sTry.lower()])
+    # THE SAME PICTURE UNDER ANOTHER PICTURE EXTENSION (13 October 2026). A picture taken from a Word file is saved
+    # under the manuscript's name with the Word file's extension -- Newcomb_s_problem.png for Newcomb_s_problem.svg --
+    # and an exact match never found it again. While the Word files stayed beside the manuscripts it was taken from
+    # them each time; once they were retired to notes\word, 24 such pictures would have had to come from the web on
+    # every build. A file with the same name and another picture extension, whose bytes are a picture, is that picture.
+    sStem = os.path.splitext(sName)[0].lower()
+    if sStem and os.path.splitext(sName)[1].lower().lstrip(".") in lImageExtensions:
+        for sDir in lFolders:
+            if not os.path.isdir(sDir): continue
+            for sFile in sorted(os.listdir(sDir), key=str.lower):
+                sFileStem, sFileExtension = os.path.splitext(sFile)
+                if sFileStem.lower() == sStem and sFileExtension.lower().lstrip(".") in lImageExtensions and isPicture(os.path.join(sDir, sFile)):
+                    return os.path.join(sDir, sFile)
     return ""
 
 
@@ -2276,6 +2295,7 @@ def writeAudit(dBook, dAudit):
         import hashlib
         l.append("- EPUB SHA-256: " + hashlib.sha256(open(dAudit["epub"], "rb").read()).hexdigest())
         if dAudit.get("buildKey"): l.append("- Build SHA-256: " + dAudit["buildKey"])
+        l.append("- Audit rules: " + sAuditRules)
         for sEdition in dAudit.get("editions", []): l.append("- Edition: " + sEdition)
         # The sources this EPUB was made from, by content (9 October 2026): kdpUpdate knows an EPUB is stale when the
         # book's sources no longer have this fingerprint, without trusting file times.
@@ -2342,6 +2362,10 @@ def keptAudit(dBook, sKey):
     oBuild = re.search(r"(?m)^- Build SHA-256: ([0-9a-f]{64})", sText)
     oEpub = re.search(r"(?m)^- EPUB SHA-256: ([0-9a-f]{64})", sText)
     if not oBuild or oBuild.group(1) != sKey or not re.search(r"(?m)^Ready to submit", sText): return None
+    oRules = re.search(r"(?m)^- Audit rules: (.+)$", sText)
+    if not oRules or oRules.group(1).strip() != sAuditRules:
+        log(dBook["root"] + ": its last audit was judged by " + (oRules.group(1).strip() if oRules else "earlier rules") + ", not today's, so it is judged again")
+        return None
     if not oEpub or oEpub.group(1) != hashlib.sha256(open(sEpub, "rb").read()).hexdigest(): return None
     # An edition's file must still be there too; a missing one builds the book again.
     for dEdition in editionRules(dBook["root"]):
