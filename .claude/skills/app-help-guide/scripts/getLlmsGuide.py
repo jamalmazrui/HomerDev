@@ -1,4 +1,4 @@
-﻿"""getLlmsGuide.py version 1
+﻿"""getLlmsGuide.py version 2
 
 Gathers a product's help from the publisher's own llms.txt index and builds the guide in one run.
 
@@ -23,7 +23,7 @@ the guides are written as <Name>.md and <Name>.htm beside it. The .htm is built 
 from the kit, so it has one level-one heading and the Homer encoding.
 """
 
-import datetime, importlib.util, io, logging, os, platform, re, shutil, subprocess, sys, time, urllib.error, urllib.parse, urllib.request, urllib.robotparser
+import datetime, hashlib, html, importlib.util, io, logging, os, platform, re, shutil, subprocess, sys, time, urllib.error, urllib.parse, urllib.request
 
 iMinimumWords, iRetries, iTimeoutSeconds = 15, 3, 60
 nPauseSeconds = 1.0
@@ -35,7 +35,12 @@ sMiscellaneous = "Miscellaneous"
 sNewLine = "\r\n"
 sPlaceholder = "\u0001"
 sUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
-sVersion = "1"
+sVersion = "2"
+lPageFurniture = ["copy as markdown", "copy page", "edit on github", "edit this page", "next", "on this page", "previous",
+                  "was this page helpful?"]
+# A code fence, as CommonMark defines one: a run of three or more backticks with no backtick after it on the line (so
+# ``` [details].tsx``matches``` is inline code, not a fence), or three or more tildes.
+reFence = re.compile(r"^\s*(`{3,}(?=[^`]*$)|~{3,})")
 
 # Each product: where its index lives, how its sections become categories, and what is left out and why. A pattern
 # is matched against the page's path (lower case, without .md); a section is matched against the index's own heading.
@@ -87,7 +92,7 @@ lProducts = [
     },
     {
         "sKey": "kiro", "sName": "Kiro", "sTitle": "Kiro help", "sProduct": "Kiro",
-        "sIndexUrl": "https://kiro.dev/llms.txt", "sMode": "pages", "sCategoryMode": "tree",
+        "sIndexUrl": "https://kiro.dev/sitemap.xml", "sMode": "sitemap", "sCategoryMode": "tree", "sPagePattern": r"^/docs(/|$)",
         "dSectionRoots": {"IDE": "/docs", "CLI": "/docs/cli", "Web": "/docs/web", "Shared": "/docs"},
         "dSectionLabels": {"IDE": "Kiro IDE", "CLI": "Kiro CLI", "Web": "Kiro Web", "Shared": "Account, billing and privacy"},
         "lSharedPrefixes": ["/docs/billing", "/docs/enterprise", "/docs/models", "/docs/privacy-and-security", "/docs/migrating-from-q-developer"],
@@ -96,8 +101,9 @@ lProducts = [
                              (r"^/docs/cli/mcp/registry$", "administrator material for organisations")],
         "sIntro": ("This guide holds the documentation Amazon publishes for Kiro, its coding agent for the desktop (the Kiro IDE), "
                    "the terminal (the Kiro CLI, which replaced the Amazon Q Developer CLI) and the browser (Kiro Web), gathered on "
-                   "{date} from the Markdown copies Kiro publishes of each page: {count} articles. The categories follow Kiro's own "
-                   "sections and page tree."),
+                   "{date} from Kiro's documentation web pages: {count} articles. Kiro also publishes Markdown copies and an index for "
+                   "machine reading, but its robots.txt asks automated readers to leave those alone, so the ordinary pages listed in its "
+                   "sitemap were read instead. The categories follow Kiro's page tree."),
         "sCaution": "Kiro meters its work in credits, and the billing articles explain what happens when a plan's credits run out.",
         "sSiblings": ("The Claude, ChatGPT and Gemini guides in this collection cover Claude Code, Codex and Antigravity, and the "
                       "Visual Studio Code guide covers the editor Kiro is built on."),
@@ -139,11 +145,11 @@ def writeText(sPath, sText):
     io.open(sPath, "wb").write(b"\xef\xbb\xbf" + sBody.encode("utf-8"))
 
 
-def fetchText(sUrl):
+def fetchText(sUrl, sWanted=sAccept):
     """Fetches one address, retrying a busy or failing host. Returns (status, text); status 0 means no answer."""
     for iAttempt in range(1, iRetries + 1):
         nStart = time.time()
-        oRequest = urllib.request.Request(sUrl, headers={"User-Agent": sUserAgent, "Accept": sAccept})
+        oRequest = urllib.request.Request(sUrl, headers={"User-Agent": sUserAgent, "Accept": sWanted})
         try:
             with urllib.request.urlopen(oRequest, timeout=iTimeoutSeconds) as oResponse:
                 binBody = oResponse.read()
@@ -161,26 +167,50 @@ def fetchText(sUrl):
 
 
 def getRobots(dRobots, sUrl):
-    """The robots rules for an address's host, read once per host."""
+    """The robots rules for all agents on an address's host, read once per host: a list of (allowed, pattern)."""
     oParts = urllib.parse.urlsplit(sUrl)
     sHost = oParts.scheme + "://" + oParts.netloc
     if sHost in dRobots: return dRobots[sHost]
     iStatus, sText = fetchText(sHost + "/robots.txt")
-    oRobots = urllib.robotparser.RobotFileParser()
+    lRules = []
     if iStatus == 200:
-        oRobots.parse(sText.splitlines())
-        for sLine in sText.splitlines()[:60]:
+        for sLine in sText.splitlines()[:80]:
             if sLine.strip(): logging.info("robots.txt %s: %s", sHost, sLine.strip())
+        # Python's own robots parser ignores the * and $ wildcards that hosts now use ("Disallow: /docs/*.md"), so the
+        # rules for all agents are read here: the longest matching pattern wins, and Allow wins a tie.
+        bForAll, bInRules = False, False
+        for sLine in sText.splitlines():
+            sLine = sLine.split("#", 1)[0].strip()
+            if ":" not in sLine: continue
+            sField, sValue = [s.strip() for s in sLine.split(":", 1)]
+            sField = sField.lower()
+            if sField == "user-agent":
+                if bInRules: bForAll, bInRules = False, False
+                if sValue == "*": bForAll = True
+            elif sField in ("allow", "disallow"):
+                bInRules = True
+                if bForAll and sValue: lRules.append((sField == "allow", sValue))
     else:
-        oRobots.parse([])
         logging.info("robots.txt %s: none (status %d), so nothing is refused", sHost, iStatus)
-    dRobots[sHost] = oRobots
-    return oRobots
+    dRobots[sHost] = lRules
+    return lRules
+
+
+def robotsAllow(lRules, sPathAndQuery):
+    """Whether a path is allowed under robots rules with wildcards: the longest matching pattern decides."""
+    iBest, bAllowed = -1, True
+    for bAllow, sPattern in lRules:
+        sRegex = "".join(".*" if sChar == "*" else re.escape(sChar) for sChar in sPattern.rstrip("$"))
+        if sPattern.endswith("$"): sRegex += "$"
+        if not re.match(sRegex, sPathAndQuery): continue
+        if len(sPattern) > iBest or (len(sPattern) == iBest and bAllow): iBest, bAllowed = len(sPattern), bAllow
+    return bAllowed
 
 
 def mayFetch(dRobots, sUrl):
     """Whether robots.txt lets any agent fetch this address."""
-    return getRobots(dRobots, sUrl).can_fetch("*", sUrl)
+    oParts = urllib.parse.urlsplit(sUrl)
+    return robotsAllow(getRobots(dRobots, sUrl), (oParts.path or "/") + ("?" + oParts.query if oParts.query else ""))
 
 
 def keyOfUrl(sUrl):
@@ -245,8 +275,10 @@ def gatherPages(dProduct, sFolder, lEntries, dRobots, bFresh):
     say("%s: %d pages to gather, about one a second" % (dProduct["sProduct"], iTotal))
     for iIndex, dEntry in enumerate(lKept, 1):
         sKey = keyOfUrl(dEntry["sUrl"])
-        sUrl = dEntry["sUrl"] if re.search(r"\.mdx?$", dEntry["sUrl"]) else dEntry["sUrl"].rstrip("/") + ".md"
-        sPath = os.path.join(sFolder, fileNameFor(sKey))
+        bHtml = dProduct["sMode"] == "sitemap"
+        if bHtml: sUrl = dEntry["sUrl"]
+        else: sUrl = dEntry["sUrl"] if re.search(r"\.mdx?$", dEntry["sUrl"]) else dEntry["sUrl"].rstrip("/") + ".md"
+        sPath = os.path.join(sFolder, fileNameFor(sKey)[:-3] + (".htm" if bHtml else ".md"))
         say("%s %d of %d: %s" % (dProduct["sProduct"], iIndex, iTotal, sKey))
         if not mayFetch(dRobots, sUrl):
             logging.warning("robots.txt refuses %s; not fetched", sUrl)
@@ -256,12 +288,12 @@ def gatherPages(dProduct, sFolder, lEntries, dRobots, bFresh):
             logging.info("kept from the last run: %s", sPath)
             lRows.append((sUrl, os.path.basename(sPath), "saved earlier"))
             continue
-        iStatus, sText = fetchText(sUrl)
+        iStatus, sText = fetchText(sUrl, "text/html" if bHtml else sAccept)
         time.sleep(nPauseSeconds)
         if iStatus != 200 or not sText.strip():
             lRows.append((sUrl, "", "status %d" % iStatus))
             continue
-        if re.match(r"\s*(<!doctype|<html)", sText, re.I):
+        if not bHtml and re.match(r"\s*(<!doctype|<html)", sText, re.I):
             logging.warning("%s answered with a web page rather than Markdown; not kept", sUrl)
             lRows.append((sUrl, "", "web page, not Markdown"))
             continue
@@ -274,7 +306,8 @@ def gatherProduct(dProduct, sHere, dRobots, bFresh):
     """Reads the index and saves what the product's mode calls for. Returns True when there is something to build."""
     sFolder = os.path.join(sHere, dProduct["sName"] + "Help")
     os.makedirs(sFolder, exist_ok=True)
-    say("%s: reading the index" % dProduct["sProduct"])
+    say("%s: reading the %s" % (dProduct["sProduct"], "sitemap" if dProduct["sMode"] == "sitemap" else "index"))
+    if dProduct["sMode"] == "sitemap": return gatherSitemap(dProduct, sFolder, dRobots, bFresh)
     if not mayFetch(dRobots, dProduct["sIndexUrl"]):
         say("%s: robots.txt refuses the index, so nothing was gathered (see the log)" % dProduct["sProduct"])
         logging.error("%s: robots.txt refuses %s", dProduct["sProduct"], dProduct["sIndexUrl"])
@@ -313,6 +346,72 @@ def gatherProduct(dProduct, sHere, dRobots, bFresh):
     return iSaved > 0
 
 
+def gatherSitemap(dProduct, sFolder, dRobots, bFresh):
+    """For a publisher whose robots.txt refuses its machine-readable copies: the ordinary pages its sitemap lists."""
+    lQueue, lEntries, dSeen = [dProduct["sIndexUrl"]], [], {}
+    sHost = urllib.parse.urlsplit(dProduct["sIndexUrl"]).netloc
+    while lQueue:
+        sMapUrl = lQueue.pop(0)
+        if not mayFetch(dRobots, sMapUrl):
+            logging.error("%s: robots.txt refuses the sitemap %s", dProduct["sProduct"], sMapUrl)
+            continue
+        iStatus, sMap = fetchText(sMapUrl, "application/xml, text/xml")
+        if iStatus != 200:
+            logging.error("%s: sitemap %s answered %d", dProduct["sProduct"], sMapUrl, iStatus)
+            continue
+        writeText(os.path.join(sFolder, fileNameFor(urllib.parse.urlsplit(sMapUrl).path)[:-3] + ".xml"), sMap)
+        # A sitemap index lists further sitemaps; a sitemap lists pages.
+        bIndex = "<sitemapindex" in sMap
+        for sLoc in re.findall(r"<loc>\s*([^<\s]+)\s*</loc>", sMap):
+            sLoc = sLoc.replace("&amp;", "&")
+            if bIndex:
+                lQueue.append(sLoc)
+                continue
+            sKey = keyOfUrl(sLoc)
+            if urllib.parse.urlsplit(sLoc).netloc != sHost or not re.search(dProduct["sPagePattern"], sKey) or sKey in dSeen: continue
+            dSeen[sKey] = True
+            lEntries.append({"sTitle": "", "sUrl": sLoc, "sSection": "", "sSubsection": ""})
+    logging.info("%s: the sitemap lists %d documentation pages", dProduct["sProduct"], len(lEntries))
+    if not lEntries:
+        say("%s: the sitemap listed no documentation pages, so nothing was gathered" % dProduct["sProduct"])
+        return False
+    lRows = gatherPages(dProduct, sFolder, lEntries, dRobots, bFresh)
+    lManifest = ["address\tfile\toutcome"] + ["\t".join(tRow) for tRow in lRows]
+    writeText(os.path.join(sFolder, "manifest.txt"), "\n".join(lManifest) + "\n")
+    iSaved = sum(1 for tRow in lRows if tRow[1])
+    logging.info("%s: %d pages saved or kept, %d not", dProduct["sProduct"], iSaved, len(lRows) - iSaved)
+    shutil.make_archive(sFolder, "zip", sFolder)
+    return iSaved > 0
+
+
+def htmlToMarkdown(sPandoc, sHtml, sKey):
+    """A documentation web page as (title, Markdown): its main region, without menus, scripts or page furniture."""
+    oRegion = re.search(r"(?is)<main\b[^>]*>(.*)</main>", sHtml) or re.search(r"(?is)<article\b[^>]*>(.*)</article>", sHtml) \
+        or re.search(r"(?is)<body\b[^>]*>(.*)</body>", sHtml)
+    sRegion = oRegion.group(1) if oRegion else sHtml
+    for sTag in ("script", "style", "noscript", "svg", "nav", "aside", "footer", "header", "form", "button", "template", "iframe"):
+        sBefore = None
+        while sBefore != sRegion:
+            sBefore = sRegion
+            sRegion = re.sub(r"(?is)<%s\b[^>]*>(?:(?!<%s\b).)*?</%s>" % (sTag, sTag, sTag), "", sRegion)
+    oHeading = re.search(r"(?is)<h1\b[^>]*>(.*?)</h1>", sRegion)
+    oTitle = re.search(r"(?is)<title>(.*?)</title>", sHtml)
+    sTitle = re.sub(r"<[^>]+>", "", oHeading.group(1) if oHeading else (oTitle.group(1) if oTitle else ""))
+    sTitle = re.sub(r"\s+", " ", re.sub(r"\s*[|\-\u2013\u2014]\s*Kiro\s*$", "", html.unescape(sTitle))).strip()
+    if not sPandoc: return sTitle, re.sub(r"<[^>]+>", " ", sRegion)
+    oResult = subprocess.run([sPandoc, "-f", "html", "-t", "gfm-raw_html", "--wrap=none"], input=sRegion.encode("utf-8"), capture_output=True)
+    if oResult.returncode != 0:
+        logging.warning("Pandoc could not read the page %s: %s", sKey, oResult.stderr.decode("utf-8", "replace")[-300:])
+        return sTitle, ""
+    lKept = []
+    for sLine in oResult.stdout.decode("utf-8", "replace").replace("\r\n", "\n").split("\n"):
+        sBare = re.sub(r"[*_`\[\]]|\(#[^)]*\)", "", sLine).strip().lower()
+        # Page furniture, named rather than guessed at: these lines are the site's, not the article's.
+        if sBare in lPageFurniture: continue
+        lKept.append(sLine)
+    return sTitle, "\n".join(lKept)
+
+
 def splitFullManual(dProduct, sFull):
     """Splits llms-full.txt at its source markers. Returns (key, page address, text) for each page."""
     lPages = []
@@ -327,6 +426,21 @@ def splitFullManual(dProduct, sFull):
     return lPages
 
 
+def fenceStep(sLine, iFence):
+    """Follows code fences the CommonMark way. iFence is the open fence's length (negative for tildes, zero when none
+    is open). A fence opens on three or more backticks with no backtick after them, or tildes; it closes only on a run
+    of the same character at least as long, WITH NOTHING ELSE ON THE LINE, so "```bash" inside a block is code.
+    Returns (whether this line is a fence, the new state)."""
+    if not iFence:
+        oOpen = reFence.match(sLine)
+        if not oOpen: return False, 0
+        sRun = oOpen.group(1)
+        return True, len(sRun) if sRun[0] == "`" else -len(sRun)
+    oClose = re.match(r"^\s*(`{3,}|~{3,})\s*$", sLine)
+    if oClose and (oClose.group(1)[0] == "`") == (iFence > 0) and len(oClose.group(1)) >= abs(iFence): return True, 0
+    return False, iFence
+
+
 def stripComponents(sText):
     """Turns the publisher's page components into plain Markdown, keeping every word a reader needs."""
     sText = re.sub(r"(?s)<AgentInstructions>.*?</AgentInstructions>", "", sText)
@@ -338,11 +452,8 @@ def stripComponents(sText):
     sText = re.sub(r"(?im)^\s*</?details>\s*$", "", sText)
     lOut, iFence = [], 0
     for sLine in sText.split("\n"):
-        oFence = re.match(r"\s*(`{3,}|~{3,})", sLine)
-        if oFence:
-            iRun = len(oFence.group(1))
-            if not iFence: iFence = iRun
-            elif iRun >= iFence: iFence = 0
+        bFenceLine, iFence = fenceStep(sLine, iFence)
+        if bFenceLine:
             lOut.append(sLine)
             continue
         if iFence:
@@ -412,11 +523,8 @@ def assignIdentifiers(lLines):
     """Every heading's identifier as Pandoc assigns them, in document order. Returns a list of (line number, level, id)."""
     lFound, dUsed, iFence = [], {}, 0
     for iLine, sLine in enumerate(lLines):
-        oFence = re.match(r"\s*(`{3,}|~{3,})", sLine)
-        if oFence:
-            iRun = len(oFence.group(1))
-            if not iFence: iFence = iRun
-            elif iRun >= iFence: iFence = 0
+        bFenceLine, iFence = fenceStep(sLine, iFence)
+        if bFenceLine:
             continue
         if iFence: continue
         oHeading = re.match(r"^(#{1,6}) (.+?)\s*#*\s*$", sLine)
@@ -452,22 +560,21 @@ def rewriteLinks(sText, sPageUrl, dAnchors, sSiteHost):
 
     lOut, iFence = [], 0
     for sLine in sText.split("\n"):
-        oFence = re.match(r"\s*(`{3,}|~{3,})", sLine)
-        if oFence:
-            iRun = len(oFence.group(1))
-            if not iFence: iFence = iRun
-            elif iRun >= iFence: iFence = 0
+        bFenceLine, iFence = fenceStep(sLine, iFence)
+        if bFenceLine:
             lOut.append(sLine)
             continue
         if iFence:
             lOut.append(sLine)
             continue
-        lParts = sLine.split("`")
-        for iPart in range(0, len(lParts), 2):
-            sPart = re.sub(r"!\[([^\]]*)\]\([^)]*\)", replaceImage, lParts[iPart])
-            sPart = re.sub(r"(?<!!)\[([^\]]+)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)", replaceLink, sPart)
-            lParts[iPart] = sPart
-        lOut.append("`".join(lParts))
+        # A link's label may itself hold code ([`pre_tool_call`](#pre_tool_call)), so links are found across the whole
+        # line and only a link that STARTS inside a code span is left alone.
+        lCode = [oSpan.span() for oSpan in re.finditer(r"`[^`]*`", sLine)]
+        fnOutside = lambda oMatch, fnDo: oMatch.group(0) if any(iStart < oMatch.start() < iEnd for iStart, iEnd in lCode) else fnDo(oMatch)
+        sLine = re.sub(r"!\[([^\]]*)\]\([^)]*\)", lambda oMatch: fnOutside(oMatch, replaceImage), sLine)
+        lCode = [oSpan.span() for oSpan in re.finditer(r"`[^`]*`", sLine)]
+        sLine = re.sub(r"(?<!!)\[([^\]]+)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)", lambda oMatch: fnOutside(oMatch, replaceLink), sLine)
+        lOut.append(sLine)
     return "\n".join(lOut)
 
 
@@ -475,19 +582,20 @@ def labelOneAddress(oMatch):
     """Builds the replacement for one address left bare in prose (the builder's rule)."""
     sUrl = oMatch.group(1).rstrip(".,;:")
     sTail = oMatch.group(1)[len(sUrl):]
-    sHost = re.sub(r"^https?://(www\.)?", "", sUrl).split("/")[0]
-    return "[" + sHost + "](" + sUrl + ")" + sTail
+    return "[" + readableAddress(sUrl) + "](" + sUrl + ")" + sTail
+
+
+def readableAddress(sUrl):
+    """An address as a reader hears it: host and path, without the scheme, a www or a closing slash."""
+    return re.sub(r"^https?://(www\.)?", "", sUrl).rstrip("/")
 
 
 def labelProse(lLines):
     """Labels bare addresses and escapes dollar signs in prose, leaving code exactly as the publisher wrote it."""
     lOut, iFence = [], 0
     for sLine in lLines:
-        oFence = re.match(r"\s*(`{3,}|~{3,})", sLine)
-        if oFence:
-            iRun = len(oFence.group(1))
-            if not iFence: iFence = iRun
-            elif iRun >= iFence: iFence = 0
+        bFenceLine, iFence = fenceStep(sLine, iFence)
+        if bFenceLine:
             lOut.append(sLine)
             continue
         if iFence:
@@ -496,6 +604,7 @@ def labelProse(lLines):
         lParts = sLine.split("`")
         for iPart in range(0, len(lParts), 2):
             sPart = re.sub(r"(?<!\\)\$", r"\\$", lParts[iPart])
+            sPart = re.sub(r"\[(https?://[^\]\s]+)\]\(([^)\s]+)\)", lambda oMatch: "[" + readableAddress(oMatch.group(1)) + "](" + oMatch.group(2) + ")", sPart)
             sPart = re.sub(r"(?<![\(\[<])(https?://[A-Za-z0-9-]+\.[A-Za-z]{2,}[^\s\)\]<>\"'`]*)", labelOneAddress, sPart)
             sPart = re.sub(r"<(https?://[^>\s]+)>", lambda oMatch: labelOneAddress(re.match(r"(.*)", oMatch.group(1))), sPart)
             lParts[iPart] = sPart
@@ -507,36 +616,32 @@ def balanceFences(lLines):
     """Closes a code fence an article leaves open (the builder's rule)."""
     iFence = 0
     for sLine in lLines:
-        oFence = re.match(r"\s*(`{3,})", sLine)
-        if not oFence: continue
-        iRun = len(oFence.group(1))
-        if not iFence: iFence = iRun
-        elif iRun >= iFence: iFence = 0
+        bFenceLine, iFence = fenceStep(sLine, iFence)
     if not iFence: return lLines
     logging.warning("an article left a code fence open; closing it")
-    return list(lLines) + ["`" * iFence, ""]
+    return list(lLines) + [("`" if iFence > 0 else "~") * abs(iFence), ""]
 
 
 def renumberHeadings(lLines):
     """Renumbers an article's own headings by nesting depth from level four (the builder's rule)."""
     lOut, lStack, iFence = [], [], 0
     for sLine in lLines:
-        oFence = re.match(r"\s*(`{3,}|~{3,})", sLine)
-        if oFence:
-            iRun = len(oFence.group(1))
-            if not iFence: iFence = iRun
-            elif iRun >= iFence: iFence = 0
+        bFenceLine, iFence = fenceStep(sLine, iFence)
+        if bFenceLine:
             lOut.append(sLine)
             continue
-        oHeading = None if iFence else re.match(r"^(#{1,6}) (.+)$", sLine)
+        # A heading inside a list item arrives indented, and is still a heading to Pandoc.
+        oHeading = None if iFence else re.match(r"^(\s*)(#{1,6}) (.+)$", sLine)
         if not oHeading:
             lOut.append(sLine)
             continue
-        iSource = len(oHeading.group(1))
+        iSource = len(oHeading.group(2))
         while lStack and lStack[-1] >= iSource: lStack.pop()
         iLevel = min(6, 4 + len(lStack))
         lStack.append(iSource)
-        lOut.append("#" * iLevel + " " + oHeading.group(2))
+        # Pandoc reads a heading only after a blank line; without one, the line is text in a paragraph.
+        if lOut and lOut[-1].strip(): lOut.append("")
+        lOut.append(oHeading.group(1) + "#" * iLevel + " " + oHeading.group(3))
     return lOut
 
 
@@ -570,15 +675,31 @@ def treeCategory(dProduct, sKey, sSection, dTitles):
     return sLabel + ": " + sGroupTitle, sLabel
 
 
-def collectArticles(dProduct, sFolder):
+def collectArticles(dProduct, sFolder, sPandoc):
     """Reads the harvest into (category, title, key, page address, text) and counts what was left out and why."""
-    lEntries = parseIndex(readText(os.path.join(sFolder, "llms.txt")))
+    sIndexPath = os.path.join(sFolder, "llms.txt")
+    lEntries = parseIndex(readText(sIndexPath)) if os.path.isfile(sIndexPath) else []
     dIndex = {}
     for dEntry in lEntries: dIndex.setdefault(keyOfUrl(dEntry["sUrl"]), dEntry)
     dTitles = {sKey: dEntry["sTitle"] for sKey, dEntry in dIndex.items()}
     dLeftOut, lArticles = {}, []
     if dProduct["sMode"] == "full":
         lPages = splitFullManual(dProduct, readText(os.path.join(sFolder, "llms-full.txt")))
+    elif dProduct["sMode"] == "sitemap":
+        lPages = []
+        lRows = [sLine.split("\t") for sLine in readText(os.path.join(sFolder, "manifest.txt")).splitlines()[1:]]
+        say("%s: Pandoc is reading %d web pages" % (dProduct["sProduct"], sum(1 for lRow in lRows if len(lRow) >= 2 and lRow[1])))
+        for lRow in lRows:
+            if len(lRow) < 2 or not lRow[1]: continue
+            sKey = keyOfUrl(lRow[0])
+            sTitle, sText = htmlToMarkdown(sPandoc, readText(os.path.join(sFolder, lRow[1])), sKey)
+            if not sText.strip():
+                logging.warning("no article text found in %s", lRow[0])
+                continue
+            dIndex[sKey] = {"sTitle": sTitle or sKey.rsplit("/", 1)[-1].replace("-", " ").capitalize(), "sUrl": lRow[0],
+                            "sSection": "", "sSubsection": ""}
+            lPages.append((sKey, lRow[0], sText))
+        dTitles = {sKey: dEntry["sTitle"] for sKey, dEntry in dIndex.items()}
     else:
         lPages = []
         dFiles = {}
@@ -592,7 +713,18 @@ def collectArticles(dProduct, sFolder):
                 sReason = exclusionReason(dProduct, sKey, dEntry["sSection"])
                 if sReason: dLeftOut[sReason] = dLeftOut.get(sReason, 0) + 1
                 else: logging.warning("listed in the index but not gathered: %s", dEntry["sUrl"])
+    dTexts = {}
+    # Shorter addresses first, so a page served twice is kept at its plainer address (/docs/billing, not /docs/cli/billing).
+    lPages.sort(key=lambda tPage: (tPage[0].count("/"), tPage[0]))
     for sKey, sPageUrl, sText in lPages:
+        # A page served at two addresses (Kiro gives its shared pages an IDE and a CLI address) is kept once.
+        sDigest = hashlib.sha1(re.sub(r"\s+", " ", sText).strip().encode("utf-8")).hexdigest()
+        if sDigest in dTexts:
+            sReason = "second copies of pages published at two addresses"
+            dLeftOut[sReason] = dLeftOut.get(sReason, 0) + 1
+            logging.info("left out: %s is the same page as %s", sKey, dTexts[sDigest])
+            continue
+        dTexts[sDigest] = sKey
         dEntry = dIndex.get(sKey)
         sSection = dEntry["sSection"] if dEntry else ""
         sReason = exclusionReason(dProduct, sKey, sSection)
@@ -663,7 +795,21 @@ def leftOutSentence(dLeftOut):
     return "Left out: " + "; ".join(lParts[:-1]) + "; and " + lParts[-1] + "."
 
 
-def buildGuideText(dProduct, lArticles, dLeftOut, sDate):
+def normalizeMarkdown(sPandoc, sText, sKey):
+    """Reads an article as the publisher wrote it (GitHub-style Markdown) and writes it as Pandoc's Markdown, so a
+    heading, a code block or a list means the same to this script as to Pandoc. Unchanged when Pandoc is not here."""
+    if not sPandoc: return sText
+    lCommand = [sPandoc, "-f", "gfm-gfm_auto_identifiers", "-t",
+                "markdown-smart-header_attributes-link_attributes-bracketed_spans-native_divs-native_spans-simple_tables-multiline_tables-grid_tables",
+                "--wrap=none"]
+    oResult = subprocess.run(lCommand, input=sText.encode("utf-8"), capture_output=True)
+    if oResult.returncode != 0:
+        logging.warning("Pandoc could not read %s (exit %d): %s; kept as gathered", sKey, oResult.returncode, oResult.stderr.decode("utf-8", "replace")[-300:])
+        return sText
+    return oResult.stdout.decode("utf-8", "replace").replace("\r\n", "\n")
+
+
+def buildGuideText(dProduct, lArticles, dLeftOut, sDate, sPandoc):
     """The finished guide, in the collection's shape, with every internal link pointing at Pandoc's own identifier."""
     sHost = urllib.parse.urlsplit(dProduct["sIndexUrl"]).netloc
     dAnchors = {dArticle["sKey"]: True for dArticle in lArticles}
@@ -683,10 +829,12 @@ def buildGuideText(dProduct, lArticles, dLeftOut, sDate):
             lLines.append("    - [" + dArticle["sTitle"] + "](#" + sPlaceholder + dArticle["sKey"] + sPlaceholder + ")")
     lLines.append("")
     lThin = []
+    if sPandoc: say("%s: Pandoc is reading %d articles" % (dProduct["sProduct"], len(lOrder)))
     for sCategory in sorted(dCategories, key=sortKeyCategory):
         lLines.extend(["## " + sCategory, ""])
         for dArticle in dCategories[sCategory]:
             sBody = dropTitleHeading(stripComponents(dArticle["sText"].replace("\r\n", "\n")), dArticle["sBaseTitle"])
+            sBody = normalizeMarkdown(sPandoc, sBody, dArticle["sKey"])
             sBody = rewriteLinks(sBody, dArticle["sPageUrl"], dAnchors, sHost)
             lBody = labelProse(renumberHeadings(balanceFences(sBody.split("\n"))))
             lClean = []
@@ -702,7 +850,13 @@ def buildGuideText(dProduct, lArticles, dLeftOut, sDate):
     lFlat = []
     for sLine in lLines: lFlat.extend(sLine.split("\n"))
     iContents = lFlat.index("## Contents")
-    lArticleIds = [sId for iLine, iLevel, sId in assignIdentifiers(lFlat) if iLevel == 3 and iLine > iContents]
+    # Pandoc decides the identifiers, so Pandoc is asked; working them out here is only the fallback, because a
+    # publisher's page can hold a line that looks like a heading to a reader and is not one to Pandoc.
+    lArticleIds = pandocArticleIds(sPandoc, "\n".join(lFlat))
+    if lArticleIds is None or len(lArticleIds) != len(lOrder):
+        logging.warning("Pandoc's heading identifiers could not be used (%s); working them out instead",
+                        "no Pandoc" if lArticleIds is None else "%d for %d articles" % (len(lArticleIds), len(lOrder)))
+        lArticleIds = [sId for iLine, iLevel, sId in assignIdentifiers(lFlat) if iLevel == 3 and iLine > iContents]
     dIds = {dArticle["sKey"]: sId for dArticle, sId in zip(lOrder, lArticleIds)}
     if len(lArticleIds) != len(lOrder): logging.error("%d article headings found for %d articles", len(lArticleIds), len(lOrder))
     for dArticle in lOrder:
@@ -713,10 +867,26 @@ def buildGuideText(dProduct, lArticles, dLeftOut, sDate):
     return sText, dCategories
 
 
-def pageGates(sPagePath):
-    """Checks the built .htm: every internal link has a target, and no identifier is used twice."""
+def pandocArticleIds(sPandoc, sText):
+    """The identifiers Pandoc itself gives the level-three headings, in order, or None when Pandoc cannot say."""
+    if not sPandoc: return None
+    oResult = subprocess.run([sPandoc, "-f", "markdown", "-t", "html5"], input=sText.encode("utf-8"), capture_output=True)
+    logging.info("pandoc asked for heading identifiers: exit %d %s", oResult.returncode, oResult.stderr.decode("utf-8", "replace")[-300:])
+    if oResult.returncode != 0: return None
+    return re.findall(r"<h3\b[^>]*\bid=\"([^\"]*)\"", oResult.stdout.decode("utf-8", "replace"))
+
+
+def pageGates(sPagePath, bRaw=False):
+    """Checks the built .htm. As Pandoc built it: every internal link has a target. Finished: one level-one heading
+    and no identifier used twice."""
     lFailures = []
     sPage = readText(sPagePath)
+    if bRaw:
+        dIds = {sId: True for sId in re.findall(r"\sid=\"([^\"]+)\"", sPage)}
+        lMissing = sorted({sHref for sHref in re.findall(r"href=\"#([^\"]+)\"", sPage) if sHref not in dIds})
+        if lMissing: lFailures.append("%d internal links in the .htm have no target, first #%s" % (len(lMissing), lMissing[0]))
+        for sFailure in lFailures: logging.error("PAGE GATE FAILED for %s: %s", sPagePath, sFailure)
+        return lFailures
     lIds = re.findall(r"\sid=\"([^\"]+)\"", sPage)
     dIds = {}
     for sId in lIds: dIds[sId] = dIds.get(sId, 0) + 1
@@ -738,11 +908,8 @@ def runGates(sProduct, sPath, sText):
     if b"\r\n" not in io.open(sPath, "rb").read(): lFailures.append("no Windows line endings")
     lOutside, iFence = [], 0
     for sLine in sText.split(sNewLine):
-        oFence = re.match(r"\s*(`{3,}|~{3,})", sLine)
-        if oFence:
-            iRun = len(oFence.group(1))
-            if not iFence: iFence = iRun
-            elif iRun >= iFence: iFence = 0
+        bFenceLine, iFence = fenceStep(sLine, iFence)
+        if bFenceLine:
             continue
         if not iFence: lOutside.append(sLine)
     sBare = sNewLine.join(lOutside)
@@ -760,11 +927,8 @@ def runGates(sProduct, sPath, sText):
         lLines = lLines[iEnd + 1:]
     lBare, iFence = [], 0
     for sLine in lLines:
-        oFence = re.match(r"\s*(`{3,}|~{3,})", sLine)
-        if oFence:
-            iRun = len(oFence.group(1))
-            if not iFence: iFence = iRun
-            elif iRun >= iFence: iFence = 0
+        bFenceLine, iFence = fenceStep(sLine, iFence)
+        if bFenceLine:
             continue
         if iFence: continue
         sProse = "".join(sLine.split("`")[0::2])
@@ -775,7 +939,7 @@ def runGates(sProduct, sPath, sText):
         for sLine in lBare[:5]: logging.info("bare address: %s", sLine[:200])
     dKnown = {sId: True for iLine, iLevel, sId in assignIdentifiers(sText.split(sNewLine))}
     lBroken = sorted({oMatch.group(1) for oMatch in re.finditer(r"\]\(#([^\)]+)\)", sBare) if oMatch.group(1) not in dKnown})
-    if lBroken: lFailures.append("%d internal links point at no heading, first #%s" % (len(lBroken), lBroken[0]))
+    if lBroken: logging.info("%d internal links point at no heading by this script's own reckoning, first #%s; the .htm check decides", len(lBroken), lBroken[0])
     if iFence: lFailures.append("a code fence is left open at the end of the guide")
     dSeen = {}
     for sHeading in re.findall(r"^### (.+)$", sBare, re.M):
@@ -793,38 +957,59 @@ def runGates(sProduct, sPath, sText):
 
 
 def loadFixPages(sHere):
-    """fixPages.py from this folder, or from the kit, so the .htm is built the collection's way."""
-    for sFolder in (sHere, os.path.join(os.environ.get("HomerDev", "") or r"C:\HomerDev", "scripts")):
+    """The kit's fixPages.py (version 4, with its page rules) or, failing that, the collection's own copy."""
+    for sFolder in (os.path.join(os.environ.get("HomerDev", "") or r"C:\HomerDev", "scripts"), sHere):
         sPath = os.path.join(sFolder, "fixPages.py")
         if not os.path.isfile(sPath): continue
         try:
             oSpec = importlib.util.spec_from_file_location("fixPagesModule", sPath)
             oModule = importlib.util.module_from_spec(oSpec)
             oSpec.loader.exec_module(oModule)
-            logging.info("fixPages loaded from %s", sPath)
-            return oModule
         except Exception as oError:
             logging.warning("fixPages at %s could not be loaded: %s", sPath, oError)
+            continue
+        if hasattr(oModule, "loadRules") or hasattr(oModule, "buildPage"):
+            logging.info("fixPages loaded from %s (%s)", sPath, "version 4 rules" if hasattr(oModule, "loadRules") else "version 3")
+            return oModule
+        logging.warning("fixPages at %s has neither loadRules nor buildPage; not used", sPath)
     logging.warning("fixPages.py was not found; the .htm is built with Pandoc directly")
     return None
 
 
+def findPandoc(oFixPages):
+    """The newest Pandoc, chosen the kit's way when the kit is here."""
+    sPandoc = oFixPages.findPandoc() if oFixPages and hasattr(oFixPages, "findPandoc") else ""
+    return sPandoc or shutil.which("pandoc") or ""
+
+
 def buildPage(oFixPages, sMarkdownPath, sTitle):
-    """Builds the .htm pair. Returns True when it has exactly one level-one heading."""
-    if oFixPages:
-        sPandoc = oFixPages.findPandoc()
-        if not sPandoc: return False
+    """Builds the .htm pair the kit's way. Returns True when it has exactly one level-one heading."""
+    sPandoc = findPandoc(oFixPages)
+    if not sPandoc:
+        logging.error("Pandoc was not found, so %s has no .htm", sMarkdownPath)
+        return False
+    if oFixPages and hasattr(oFixPages, "buildPage") and not hasattr(oFixPages, "loadRules"):
         return oFixPages.buildPage(sPandoc, oFixPages.kitHeadingRule(), sMarkdownPath, sTitle)
-    sPandoc = shutil.which("pandoc")
-    if not sPandoc: return False
+    sFolder = os.path.dirname(os.path.abspath(sMarkdownPath))
     sPagePath = sMarkdownPath[:-3] + ".htm"
+    oRules = oFixPages.loadRules() if oFixPages else None
     lCommand = [sPandoc, sMarkdownPath, "-f", "markdown", "-t", "html5", "--standalone", "--toc", "--toc-depth=2",
-                "-M", "title=", "-M", "pagetitle=" + sTitle, "-o", sPagePath]
-    logging.info("running: %s", " ".join(lCommand))
+                "-M", "pagetitle=" + sTitle, "-M", "lang=" + (oRules.sLang if oRules else "en"), "-o", sPagePath]
+    if not oRules: lCommand[-2:-2] = ["-M", "title="]
     oResult = subprocess.run(lCommand, capture_output=True)
-    logging.info("pandoc exit %d %s", oResult.returncode, oResult.stderr.decode("utf-8", "replace")[:400])
+    logging.info("RUN %s: exit %d %s", " ".join(lCommand), oResult.returncode, oResult.stderr.decode("utf-8", "replace")[-400:])
     if oResult.returncode != 0: return False
-    sPage = readText(sPagePath)
+    sPage = readText(sPagePath).replace("\r\n", "\n")
+    # Checked as Pandoc built it, before the kit's finish quietly turns a link to nothing into plain text.
+    lRawFailures = pageGates(sPagePath, True)
+    if lRawFailures: return False
+    if oRules:
+        # The kit's two page rules, exactly as fixPages version 4 applies them: one level-one heading, then the finish
+        # (language, main landmark, unique identifiers, links that lead somewhere).
+        sPage = oRules.oneTitleHeading(sPage)
+        setLocal = {s.lower() for s in os.listdir(sFolder)}
+        sPage, dDone = oRules.finishPage(sPage, setLocal, oFixPages.readFixes(sFolder))
+        logging.info("%s finished by the kit's rules: %s", sPagePath, ", ".join("%s %d" % t for t in sorted(dDone.items())) or "unchanged")
     writeText(sPagePath, sPage)
     return len(re.findall(r"(?i)<h1\b", sPage)) == 1
 
@@ -832,14 +1017,16 @@ def buildPage(oFixPages, sMarkdownPath, sTitle):
 def buildProduct(dProduct, sHere, oFixPages, sDate):
     """Builds one guide and its pair from the harvest. Returns True when every gate passed."""
     sFolder = os.path.join(sHere, dProduct["sName"] + "Help")
-    if not os.path.isfile(os.path.join(sFolder, "llms.txt")):
+    if not os.path.isfile(os.path.join(sFolder, "manifest.txt")):
         say("%s: nothing gathered yet, so nothing to build" % dProduct["sProduct"])
         logging.error("%s: no harvest at %s", dProduct["sProduct"], sFolder)
         return False
     say("%s: building the guide" % dProduct["sProduct"])
-    lArticles, dLeftOut = collectArticles(dProduct, sFolder)
+    # "Gathered on" is the day the harvest was saved, so a later rebuild does not move the date.
+    sDate = datetime.date.fromtimestamp(os.path.getmtime(os.path.join(sFolder, "manifest.txt"))).strftime("%d %B %Y").lstrip("0")
+    lArticles, dLeftOut = collectArticles(dProduct, sFolder, findPandoc(oFixPages))
     lArticles = settleTitles(lArticles)
-    sText, dCategories = buildGuideText(dProduct, lArticles, dLeftOut, sDate)
+    sText, dCategories = buildGuideText(dProduct, lArticles, dLeftOut, sDate, findPandoc(oFixPages))
     sPath = os.path.join(sHere, dProduct["sName"] + ".md")
     writeText(sPath, sText)
     sText = readText(sPath).replace("\n", sNewLine).replace("\r\r\n", sNewLine)

@@ -476,15 +476,17 @@ if not defined pandoc (
   goto :failed
 )
 >> "%log%" echo Pandoc: !pandoc!
-rem A .htm is written when it is missing or older than its .md, so a lost
-rem .htm is a non-event and an unchanged document is left alone.
+rem A .htm is written when it is missing, older than its .md, or without a contents
+rem list, so a lost .htm is a non-event and an unchanged document is left alone. EVERY PAGE
+rem HAS A CONTENTS LIST (14 October 2026): pages were built without --toc, so a long guide
+rem had no list of its sections; a page that lacks one is built again once to gain it.
 powershell -NoProfile -Command ^
   "$n = 0;" ^
   "$l = @(Get-ChildItem -LiteralPath '.' -Filter '*.md' -File) + @(Get-ChildItem -LiteralPath 'help' -Filter '*.md' -File -ErrorAction SilentlyContinue);" ^
   "foreach ($m in $l) {" ^
   "  $h = [IO.Path]::ChangeExtension($m.FullName, '.htm');" ^
-  "  if ((Test-Path -LiteralPath $h) -and ((Get-Item -LiteralPath $h).LastWriteTime -ge $m.LastWriteTime)) { continue }" ^
-  "  & '!pandoc!' -f markdown -t html5 --standalone --metadata ('title=' + $m.BaseName) -o $h $m.FullName;" ^
+  "  if ((Test-Path -LiteralPath $h) -and ((Get-Item -LiteralPath $h).LastWriteTime -ge $m.LastWriteTime) -and ((Get-Content -LiteralPath $h -Raw) -match 'id=.TOC.')) { continue }" ^
+  "  & '!pandoc!' -f markdown -t html5 --standalone --toc --toc-depth=2 --metadata ('title=' + $m.BaseName) -o $h $m.FullName;" ^
   "  'Ran: pandoc ' + $m.Name + ', exit code ' + $LASTEXITCODE;" ^
   "  if ($LASTEXITCODE -eq 0) { $n++ } else { $bad = 1 }" ^
   "}" ^

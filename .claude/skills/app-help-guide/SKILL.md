@@ -77,6 +77,19 @@ address with its status, and the reason for anything not kept.
   titles, and checks every link in the built .htm. Expo, Hermes Agent and Kiro
   were the first three (13 October 2026). Hermes renames its llms-full.txt with
   a hash on every deploy, so use the stable /docs/llms-full.txt address.
+- **A robots.txt may refuse the machine copies and allow the pages.** Kiro
+  disallows `/llms.txt` and `/docs/*.md` for every agent but allows its web
+  pages, so `getLlmsGuide.py` reads the sitemap's pages instead (its "sitemap"
+  mode). Python's own robots parser ignores `*` and `$` in rules; the script
+  reads the rules itself, longest match winning.
+- **Let Pandoc read the publisher's Markdown as the publisher wrote it.** These
+  sources are GitHub-style Markdown, where a heading needs no blank line before
+  it; read as Pandoc's own dialect, a code block inside a list went unnoticed,
+  shell comments became headings, and 64 Expo article headings vanished. Each
+  article now goes through Pandoc (`-f gfm`) before its headings are
+  renumbered, every fence scanner follows CommonMark (a fence line holds no
+  further backtick; a closing fence holds nothing else), and Pandoc itself is
+  asked for the article identifiers rather than predicting them.
 - **Structured data beats drawn text.** Angi, CrimeCon and Udio all publish
   their own questions or trails as schema.org data in the page head; that is a
   better source than the prose, because it pairs each question with its answer.

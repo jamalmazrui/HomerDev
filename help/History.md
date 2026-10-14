@@ -7,6 +7,16 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.42 -- 14 October 2026
+
+- **checkDocs measures a list fairly.** The reading grade ends a sentence at a full stop or a blank line, and list markers were removed before that, so a list with no full stops counted as one long sentence: urlFido's fourteen editing keys, one per line, scored grade 14.3. Each list item now ends the sentence before it, as readability tools treat bullets; the same list scores 5.5, and prose without lists measures exactly as before. With lists measured fairly, DbDo's and urlFido's guides meet the ninth-grade target without a word changed; EdSharp's, at 10.3, is genuinely dense.
+
+
+## 1.72.41 -- 14 October 2026
+
+- **New apps' help pages have a contents list.** The app template's build ran Pandoc without --toc, so a long guide made from it had no list of its sections, and checkDocs rightly reported it. It now builds with --toc --toc-depth=2, and a page without a contents list is rebuilt once to gain one, rather than waiting for its .md to change. Existing apps get the same change in their own builds.
+
+
 ## 1.72.40 -- 14 October 2026
 
 - **makeTutorials proves its own output is settled.** After writing Tutorials.md it reads it back and applies the same walkthrough again in memory; if that would change anything, the build stops, and the log gives both fingerprints. Tested on DbDo's own files: the first run removed its 80 copies and wrote one, 3.7 MB to 70 KB, and a second run wrote the identical file; with the old duplicating splice put back on purpose, the build stopped as it should (from an audit by another AI, which asked for proof of two-run idempotence).

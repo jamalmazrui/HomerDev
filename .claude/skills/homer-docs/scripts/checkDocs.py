@@ -43,6 +43,11 @@ def proseOf(sText):
     lsLines = []
     for sLine in sText.split("\n"):
         if sLine.startswith(("    ", "\t", "#", "|")): continue
+        # A LIST ITEM IS ITS OWN SENTENCE (14 October 2026). The marker was removed and the item joined to the lines
+        # around it, so a list of keys with no full stops counted as one sentence of ninety words: urlFido's editing
+        # keys scored grade 24.5. A reader takes each item on its own, as readability tools treat bullets, so a blank
+        # line now goes before each item, which ends the sentence before it. Prose without lists measures as before.
+        if re.match(r"^\s*([-*+]|\d+\.)\s+", sLine): lsLines.append("")
         sLine = re.sub(r"^\s*([-*+]|\d+\.)\s+", "", sLine)
         sLine = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", sLine)
         sLine = re.sub(r"`[^`]*`", "code", sLine)
