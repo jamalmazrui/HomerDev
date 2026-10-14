@@ -43,9 +43,50 @@ def testOptions():
     return True
 
 
+# A SYNTHETIC CATALOG WHERE THERE IS NO REAL ONE (1.72.35, from an audit by another AI): the suite read the author's own
+# configs\books.inix and stopped wherever it was absent -- the kit itself, a fresh clone, an auditor's copy. In a book
+# project the real catalog is checked, all 22 books; elsewhere one invented book for each kind of AI use is checked by
+# the same rules, in a temporary folder.
+sSyntheticCatalog = """[Generated_Book]
+title = A Generated Book
+aiUse = generated
+aiTools = Claude
+aiTextExtent = Entire work, with minimal or no editing
+aiImages = One or a few, with minimal or no editing
+aiImageTools = ChatGPT
+
+[Assisted_Book]
+title = An Assisted Book
+aiUse = assisted
+aiTools = Claude
+aiTextExtent = None
+aiImages = None
+
+[Plain_Book]
+title = A Plain Book
+aiUse = none
+"""
+
+
+def catalogUnderTest():
+    """(books, label): the project's own catalog when it has one, otherwise the synthetic one."""
+    if os.path.isfile(os.path.join(u.sProject, "configs", "books.inix")): return u.catalog(), "real"
+    sTemp = tempfile.mkdtemp(prefix="testKdpUpdate-catalog-")
+    os.makedirs(os.path.join(sTemp, "configs"))
+    with open(os.path.join(sTemp, "configs", "books.inix"), "w", encoding="utf-8-sig") as f: f.write(sSyntheticCatalog)
+    sWas = u.sProject
+    try:
+        u.sProject = sTemp
+        return u.catalog(), "synthetic"
+    finally:
+        u.sProject = sWas
+        shutil.rmtree(sTemp, ignore_errors=True)
+
+
 def testAiAnswers():
-    lBooks = u.catalog()
-    check("catalog: 22 books, Blind Vibe Coding included", len(lBooks) == 22, str(len(lBooks)))
+    lBooks, sKind = catalogUnderTest()
+    if sKind == "real": check("catalog: 22 books, Blind Vibe Coding included", len(lBooks) == 22, str(len(lBooks)))
+    else: check("catalog: the synthetic catalog's 3 books are read (this project has no configs\\books.inix)", len(lBooks) == 3, str(len(lBooks)))
     for sRoot, dBook in lBooks:
         d = u.aiAnswers(dBook)
         bShape = d["texts"] in lAllowedTexts and d["images"] in lAllowedImages and d["translations"] == "None"
@@ -153,9 +194,19 @@ def testRoyalty():
 def testKitReader():
     # Any book's data file whose keywords are a fenced list, the case this test is about; no book is named.
     lData = [s for s in sorted(glob.glob(os.path.join(k.sProject, "data", "books", "*.inix"))) if re.search(r"(?m)^keywords\s*=\s*`\s*$", open(s, encoding="utf-8-sig").read())]
-    if not lData: return check("kit reader: a book's data file in data\\books with a fenced keyword list", False)
-    sData = lData[0]
-    d = k.readInix(sData)
+    # Without a book's own data file (the kit itself, a fresh clone), an invented one with a fenced list is read instead
+    # (1.72.35, from an audit by another AI): the case is the fenced list, not any particular book.
+    sTemp = ""
+    if lData:
+        sData = lData[0]
+    else:
+        sTemp = tempfile.mkdtemp(prefix="testKdpUpdate-reader-")
+        sData = os.path.join(sTemp, "Demo_Book.inix")
+        with open(sData, "w", encoding="utf-8-sig") as f: f.write("[kdp]\ntitle = A Demo Book\nkeywords = `\nfirst keyword\nsecond keyword\nthird keyword\n`\n")
+    try:
+        d = k.readInix(sData)
+    finally:
+        if sTemp: shutil.rmtree(sTemp, ignore_errors=True)
     lKeywords = k.inixList(d.get("kdp", {}).get("keywords", ""))
     check("kit reader: kdpSubmit reads a fenced keyword list as a list", len(lKeywords) >= 3 and "`" not in lKeywords, str(lKeywords[:3]))
     return True

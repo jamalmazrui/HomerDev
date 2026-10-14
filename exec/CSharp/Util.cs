@@ -306,6 +306,78 @@ textWriter.Write(sBody);
 textWriter.Close();
 } // string2File method
 
+// SAFE REPLACEMENT (14 October 2026, from an audit by another AI). Several apps wrote straight over a file, deleted a
+// backup before its successor existed, or reused one fixed recovery name and so deleted the last recovery copy. These
+// four functions are the one way a Homer app replaces a file or keeps a recovery copy:
+// stagingPath gives a unique name beside the target, so the final swap stays on one volume; replaceFileSafely commits a
+// complete staged file over the target, keeping the target's previous content as the backup, and leaves the target as
+// it was if anything fails; recoveryPath gives a recovery name that does not exist yet; writeTextSafely writes text by
+// staging and replacing.
+
+public static string stagingPath(string sTarget) {
+string sFull = Path.GetFullPath(sTarget);
+return Path.Combine(Path.GetDirectoryName(sFull), "~" + Path.GetFileName(sFull) + "." + Guid.NewGuid().ToString("N").Substring(0, 8) + ".tmp");
+} // stagingPath method
+
+public static string recoveryPath(string sPath) {
+// A name that does not exist yet: the path, ".recovery-", the date and time, and a number if that is taken too.
+string sFull = Path.GetFullPath(sPath).TrimEnd(Path.DirectorySeparatorChar);
+string sCandidate = sFull + ".recovery-" + DateTime.Now.ToString("yyyyMMdd-HHmmss");
+if (!File.Exists(sCandidate) && !Directory.Exists(sCandidate)) return sCandidate;
+for (int i = 2; i < 1000; i++) {
+string sTry = sCandidate + "-" + i.ToString();
+if (!File.Exists(sTry) && !Directory.Exists(sTry)) return sTry;
+}
+return sCandidate + "-" + Guid.NewGuid().ToString("N").Substring(0, 8);
+} // recoveryPath method
+
+public static void replaceFileSafely(string sStaged, string sTarget, string sBackup) {
+// sStaged must be complete. sBackup is where the target's previous content is kept, or "" for no backup. An earlier
+// file at sBackup is kept until the new backup exists. On failure the target is as it was and sStaged is not deleted.
+if (!File.Exists(sStaged)) throw new FileNotFoundException("The staged file to commit is missing.", sStaged);
+if (!File.Exists(sTarget)) {
+File.Move(sStaged, sTarget);
+return;
+}
+string sNewBackup = (sBackup == null || sBackup == "") ? null : stagingPath(sBackup);
+try {
+File.Replace(sStaged, sTarget, sNewBackup, true);
+}
+catch (PlatformNotSupportedException) {
+replaceByCopy(sStaged, sTarget, sNewBackup);
+}
+catch (IOException oError) {
+// File.Replace refuses some volumes and network shares; a copy that keeps the backup first is the fallback.
+// A sharing violation (the target is open elsewhere) is not retried this way.
+if (oError.HResult == unchecked((int) 0x80070020)) throw;
+replaceByCopy(sStaged, sTarget, sNewBackup);
+}
+if (sNewBackup != null && File.Exists(sNewBackup)) {
+if (File.Exists(sBackup)) File.Delete(sBackup);
+File.Move(sNewBackup, sBackup);
+}
+} // replaceFileSafely method
+
+private static void replaceByCopy(string sStaged, string sTarget, string sNewBackup) {
+if (sNewBackup != null) File.Copy(sTarget, sNewBackup, false);
+File.Copy(sStaged, sTarget, true);
+File.Delete(sStaged);
+} // replaceByCopy method
+
+public static void writeTextSafely(string sTarget, string sText, Encoding encoding, string sBackup) {
+string sStaged = stagingPath(sTarget);
+try {
+File.WriteAllText(sStaged, sText, encoding);
+replaceFileSafely(sStaged, sTarget, sBackup);
+}
+catch {
+// The staged copy holds nothing the caller still lacks (the text is in memory), so it is cleaned up; the target is
+// untouched.
+try { if (File.Exists(sStaged)) File.Delete(sStaged); } catch { }
+throw;
+}
+} // writeTextSafely method
+
 public static string getUniqueName(string sSource) {
 if (!Directory.Exists(sSource) && !File.Exists(sSource)) return sSource;
 string sTarget = "";

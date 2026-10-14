@@ -7,6 +7,16 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.35 -- 14 October 2026
+
+From a coordinated audit of every project by another AI (72 findings); the shared parts are here, each app's in its own History.
+
+- **Safe replacement, one way for every app.** `Util.cs` gains `stagingPath`, `replaceFileSafely`, `recoveryPath` and `writeTextSafely`. Apps wrote straight over files, deleted a backup before its successor existed, or reused one fixed recovery name and so deleted the last recovery copy. A complete staged copy is now swapped in with `File.Replace`, the previous backup is kept until the new one exists, and every recovery name is new. 2htm, DbDo, EdSharp, FileDir, HomerScribe and urlFido use them.
+- **The installer pattern requires starting the program as the person.** Eight apps' installers started the program with `Exec`, which, even through cmd, keeps the installer's elevated rights. The template had used `ExecAsOriginalUser` since 1.43.42 and the apps never took it up. All are corrected, and the check now fails an installer that starts its program with `Exec`, or leaves its launch marker without first creating the logs folder.
+- **The skills' reference documents are published.** build copies twelve documents from help into the skills' references folders, and `.gitignore` kept the copies out of the repository, so the published skills had twelve broken links. They are published now; build still makes them at every build.
+- **The number of skills AGENTS.md states is checked.** It said seventeen; there are twenty. build now compares a stated count with the skill folders. (The audit's other point, that AGENTS.md prescribes the `c_` prefix, did not hold for this version.)
+- **The book test suite runs anywhere.** It read the author's own catalog and data files and stopped without them; where they are absent it now checks the same rules against an invented catalog and data file, in a temporary folder. In the kit: 66 passed, 0 failed.
+
 ## 1.72.34 -- 13 October 2026
 
 - **A damaged found.inix is gathered again.** One book's found.inix held the text \\xef\\xbb\\xbf -- a byte order mark written out as characters -- before [found], so the section was invisible and the book lost its extra picture folders. The build gathered a book's sources only when found.inix was missing, so it would have stayed that way; a found.inix with no readable [found] section now counts as missing, and the log names the book.

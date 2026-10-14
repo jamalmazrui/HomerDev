@@ -1,6 +1,6 @@
 # AGENTS.md -- the Homer Development Kit, for AI agents
 
-HomerDev is a development kit for building Windows programs, documents, books, databases, installers and spoken tutorials for people who use screen readers. It holds shared code in C# and Python, templates, build and release scripts, checks, and seventeen skills that state its conventions. Its programs are used with a keyboard and a screen reader -- JAWS, NVDA or Narrator -- so every rule serves one aim: the person hears each thing once, in the order they meet it, and can reach any command by a key they can guess.
+HomerDev is a development kit for building Windows programs, documents, books, databases, installers and spoken tutorials for people who use screen readers. It holds shared code in C# and Python, templates, build and release scripts, checks, and twenty skills that state its conventions. Its programs are used with a keyboard and a screen reader -- JAWS, NVDA or Narrator -- so every rule serves one aim: the person hears each thing once, in the order they meet it, and can reach any command by a key they can guess.
 
 This file is for any AI agent asked to use the kit. Read it first; then read the skill that matches the task before writing anything.
 

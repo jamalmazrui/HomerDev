@@ -1587,6 +1587,19 @@ def checkAgentRoutes(lsProblems):
         sText = open(sPath, "rb").read().decode("utf-8-sig")
         for sSkill in lsSkills:
             if ".claude/skills/%s/SKILL.md" % sSkill not in sText: lsProblems.append("%s does not list the skill %s" % (sRoute, sSkill))
+        # THE NUMBER OF SKILLS IT STATES IS COUNTED (1.72.35, from an audit by another AI): AGENTS.md said seventeen
+        # skills while twenty were there; a number typed by hand drifts as skills are added. A stated count, in words
+        # or digits, must match the skill folders.
+        dWords = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
+                  "eleven": 11, "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15, "sixteen": 16, "seventeen": 17,
+                  "eighteen": 18, "nineteen": 19, "twenty": 20, "twenty-one": 21, "twenty-two": 22, "twenty-three": 23,
+                  "twenty-four": 24, "twenty-five": 25, "twenty-six": 26, "twenty-seven": 27, "twenty-eight": 28,
+                  "twenty-nine": 29, "thirty": 30}
+        for oCount in re.finditer(r"(?i)\b([a-z]+(?:-[a-z]+)?|\d+) skills that\b", sText):
+            sSaid = oCount.group(1).lower()
+            iSaid = int(sSaid) if sSaid.isdigit() else dWords.get(sSaid, -1)
+            if iSaid >= 0 and iSaid != len(lsSkills):
+                lsProblems.append("%s says %s skills; the kit has %d" % (sRoute, oCount.group(1), len(lsSkills)))
     sAgents = os.path.join(sScriptDir, ".claude", "agents")
     for sName in (sorted(os.listdir(sAgents)) if os.path.isdir(sAgents) else []):
         if not sName.endswith(".md"): continue
