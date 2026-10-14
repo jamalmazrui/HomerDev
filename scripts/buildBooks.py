@@ -467,11 +467,14 @@ def cachedTool(sName):
         # SAID, NOT SILENT (1.65.34): a build with no record looked for every tool without a word about why, so a
         # first run and a lost record looked alike in the log.
         log("%s: no record yet in %s, so it is looked for, and checked on the web" % (sName, toolCachePath()))
+        say("Looking for " + sName + " and checking for a newer version, since there is no record of it yet.")
         return None
     fAge = (time.time() - float(dTool.get("checked", 0))) / 86400
     lMissing = [s for s in dTool.get("files", []) if not os.path.exists(s)]
     if fAge > float(dSettings["toolRefreshDays"]) or lMissing or not dTool.get("files"):
         log("%s record set aside: checked %.1f days ago%s" % (sName, fAge, ("; missing " + ", ".join(lMissing)) if lMissing else ""))
+        say("Looking for " + sName + " again and checking for a newer version: its record is %.0f days old." % fAge if not lMissing
+            else "Looking for " + sName + " again: a file its record names is missing.")
         return None
     log("%s %s from the record, checked %.1f days ago: %s" % (sName, dTool.get("version", ""), fAge, dTool["files"][0]))
     return dTool
@@ -2351,6 +2354,39 @@ def buildKey(dBook, sBookDir, dKdp):
     return hashlib.sha256(json.dumps(lParts, sort_keys=True, default=str).encode("utf-8")).hexdigest()
 
 
+# IN THE KIT, WHERE IT RUNS (14 October 2026): this was first written into MyBooks' own copy of buildBooks.py, which
+# buildBooks.cmd replaces with the kit's on every run, so it never took effect. The kit's copy is the one that runs.
+def contentKey(dBook, sBookDir, dKdp):
+    """The fingerprint of the book itself: its sources, its metadata and its edition files, but not the builder, its
+    templates or the Pandoc version. It decides the book's source date, below."""
+    import glob, hashlib, kdpSubmit
+    lsEditions = [os.path.basename(s) + ":" + hashlib.sha256(open(s, "rb").read()).hexdigest() for s in sorted(glob.glob(os.path.join(sProject, "configs", "editions", dBook["root"] + "-*.inix")), key=str.lower)]
+    lParts = [kdpSubmit.bookSourcesSha(sBookDir), dBook, {s: dKdp.get(s, {}) for s in ("kdp", "proposed")}, lsEditions]
+    return hashlib.sha256(json.dumps(lParts, sort_keys=True, default=str).encode("utf-8")).hexdigest()
+
+
+def sourceDateEpoch(dBook, sContentKey):
+    """THE SAME BOOK BUILDS TO THE SAME BYTES (14 October 2026). Pandoc stamped every EPUB and Word file with the time
+    of the build -- its date, its modified date and the time of every file inside it -- so two builds of an unchanged
+    book differed byte for byte, and kdpSubmit, which compares a file with its upload receipt, sent the book to KDP
+    again. The time is now the book's source date: the moment its content last changed, kept in data\\buildDates.inix
+    and given to Pandoc as SOURCE_DATE_EPOCH, which it uses for every one of those stamps. While the book is
+    unchanged the date stays, and so do the bytes; when it changes, so does the date, and the new file goes to KDP."""
+    import kdpSubmit
+    sPath = os.path.join(sProject, "data", "buildDates.inix")
+    dDates = kdpSubmit.readInix(sPath) if os.path.exists(sPath) else {}
+    dEntry = dDates.get(dBook["root"], {})
+    if dEntry.get("content") == sContentKey and str(dEntry.get("epoch", "")).isdigit():
+        log(dBook["root"] + ": content unchanged since " + str(dEntry.get("date", "")) + ", so the build keeps that source date")
+        return str(dEntry["epoch"])
+    iEpoch = int(time.time())
+    dDates[dBook["root"]] = {"content": sContentKey, "epoch": str(iEpoch),
+                             "date": datetime.datetime.fromtimestamp(iEpoch, datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
+    kdpSubmit.writeInix(sPath, dDates)
+    log(dBook["root"] + ": content " + ("changed" if dEntry else "seen for the first time") + ", so its source date is now " + dDates[dBook["root"]]["date"])
+    return str(iEpoch)
+
+
 def foundReadable(sBookDir):
     """True when the book's found.inix exists and its [found] section can be read. A DAMAGED found.inix IS GATHERED AGAIN
     (13 October 2026): one held the text \\xef\\xbb\\xbf -- a byte order mark written out as characters -- before
@@ -2365,7 +2401,14 @@ def foundReadable(sBookDir):
 
 def keptAudit(dBook, sKey):
     """The book's last audit as a summary entry, when it was of this exact build and is still true: it names this build
-    fingerprint, says ready, and names the EPUB in results byte for byte. Otherwise None, and the book is built."""
+    fingerprint and today's rules, and names the EPUB in results byte for byte. Otherwise None, and the book is built.
+
+    A BOOK NOT READY IS KEPT TOO, FOR A WHILE (14 October 2026). Only an audit that said "Ready to submit" was kept, so a
+    book not ready -- Legacy of Mazrui, whose pictures cannot be found -- was built and judged again on every run: its 14
+    missing pictures fetched and failed again, then EPUBCheck, Ace and Kindle Previewer, about 45 seconds for a known
+    answer. A not-ready audit is now kept like a ready one, until it is toolRefreshDays old -- the period after which the
+    tools are looked at again too -- so its pictures are still tried again, only not on every build. A change to the book
+    changes its build fingerprint and builds it at once, as before."""
     import hashlib
     sAudit = os.path.join(sProject, "results", dBook["root"] + "-audit.md")
     sEpub = os.path.join(sProject, "results", dBook["root"] + ".epub")
@@ -2373,7 +2416,12 @@ def keptAudit(dBook, sKey):
     with open(sAudit, encoding="utf-8-sig") as f: sText = f.read().replace("\r\n", "\n")
     oBuild = re.search(r"(?m)^- Build SHA-256: ([0-9a-f]{64})", sText)
     oEpub = re.search(r"(?m)^- EPUB SHA-256: ([0-9a-f]{64})", sText)
-    if not oBuild or oBuild.group(1) != sKey or not re.search(r"(?m)^Ready to submit", sText): return None
+    if not oBuild or oBuild.group(1) != sKey: return None
+    bReady = re.search(r"(?m)^Ready to submit", sText) is not None
+    fAgeDays = (time.time() - os.path.getmtime(sAudit)) / 86400
+    if not bReady and fAgeDays > float(dSettings["toolRefreshDays"]):
+        log(dBook["root"] + ": not ready when last judged, %.1f days ago, so it is built and judged again" % fAgeDays)
+        return None
     oRules = re.search(r"(?m)^- Audit rules: (.+)$", sText)
     if not oRules or oRules.group(1).strip() != sAuditRules:
         log(dBook["root"] + ": its last audit was judged by " + (oRules.group(1).strip() if oRules else "earlier rules") + ", not today's, so it is judged again")
@@ -2384,7 +2432,12 @@ def keptAudit(dBook, sKey):
         if not os.path.isfile(os.path.join(sProject, "results", dEdition["file"])): return None
     oWarnings = re.search(r"(?ms)^## Warnings\n\n(.*?)(?:\n## |\Z)", sText)
     lWarnings = [s[2:].strip() for s in (oWarnings.group(1).splitlines() if oWarnings else []) if s.startswith("- ")]
-    return {"root": dBook["root"], "title": dBook["title"], "errors": [], "warnings": lWarnings, "ready": True,
+    oErrors = re.search(r"(?ms)^## Errors\n\n(.*?)(?:\n## |\Z)", sText)
+    lErrors = [s[2:].strip() for s in (oErrors.group(1).splitlines() if oErrors else []) if s.startswith("- ")]
+    if not bReady:
+        log(dBook["root"] + ": not ready, as when it was judged %.1f days ago; that verdict is kept until it is %s days old, "
+            "or until the book changes" % (fAgeDays, dSettings["toolRefreshDays"]))
+    return {"root": dBook["root"], "title": dBook["title"], "errors": lErrors, "warnings": lWarnings, "ready": bReady,
             "size": os.path.getsize(sEpub), "kept": True}
 
 
@@ -2506,7 +2559,10 @@ def main():
     if not ensurePillow():
         say("Pillow could not be installed; nothing was built. See " + sLogPath)
         return 3
-    say("Checking for EPUBCheck and Ace by DAISY.")
+    # SPOKEN ONLY WHEN IT IS DONE (14 October 2026): this was said on every build, though the tools are usually taken
+    # from their record without any checking; it sounded like a check every time. It goes to the log, and cachedTool
+    # speaks when a tool really is looked for again.
+    log("Checking for EPUBCheck and Ace by DAISY.")
     if not ensureEpubcheck(): say("EPUBCheck is not available, so every book will be marked not ready. See the log.")
     if not ensureAce(): say("Ace by DAISY is not available, so every book will be marked not ready. See the log.")
     importNewer(dCatalog)
@@ -2557,8 +2613,11 @@ def main():
             if dKept:
                 lAudits.append(dKept)
                 log(dBook["root"] + ": unchanged since its last build (fingerprint " + dAudit["buildKey"][:12] + "), so its EPUB and audit are kept")
-                say(dBook["title"] + ": unchanged since its last build; kept.")
+                # ONE SENTENCE FOR ALL THE BOOKS KEPT (14 October 2026): each was said by name, 21 lines on a build that
+                # changed nothing; each is in the log, and the count is said once, with the summary.
+                log(dBook["title"] + ": unchanged since its last build; kept.")
                 continue
+            os.environ["SOURCE_DATE_EPOCH"] = sourceDateEpoch(dBook, contentKey(dBook, sBookDir, dKdp))
             if not dKdp: dAudit["warnings"].append("No KDP metadata in data\\books\\" + dBook["root"] + ".inix, so the EPUB has no description or keywords.")
             sEpub = buildEpub(dBook, dKdp, dAudit)
             auditManuscript(dBook, dAudit, dCatalog)
@@ -2582,6 +2641,8 @@ def main():
         bReady = writeAudit(dBook, dAudit)
         lAudits.append(dAudit)
         say(dBook["title"] + ": " + ("ready" if bReady else "not ready") + ", " + plural(len(dAudit["errors"]), "error") + ", " + plural(len(dAudit["warnings"]), "warning") + ".")
+    iKeptBooks = sum(1 for d in lAudits if d.get("kept"))
+    if iKeptBooks: say(plural(iKeptBooks, "book") + " unchanged since the last build, so kept as they were.")
     iReady = writeSummary(lAudits)
     if lsUnreadable:
         say("Could not read " + plural(len(lsUnreadable), "file") + " the search found, probably because OneDrive is not running: " + "; ".join(lsUnreadable[:5]) + ". Start OneDrive, then run scripts\\buildBooks.cmd --gather.")

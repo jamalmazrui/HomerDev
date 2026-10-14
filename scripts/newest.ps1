@@ -87,6 +87,28 @@ function candidatePaths([string] $sName) {
     return $lUnique
 }
 
+# A RECORD OF EACH COPY'S VERSION (14 October 2026). Every copy was RUN for its version on every call -- for Pandoc,
+# several copies, every build of every app, about four seconds each time -- though a copy's version changes only when
+# its file does. Each copy's version is now kept with its size and time in %LOCALAPPDATA%\HomerDev\newest-<name>.txt;
+# a copy whose file is unchanged takes its version from there without being run, and a new or changed copy is run and
+# recorded. Every copy is still found and weighed, so a newly installed one is noticed at once. If the record cannot be
+# read or written, every copy is simply run, as before.
+$sRecordDir = ""
+if ($env:LOCALAPPDATA) { $sRecordDir = Join-Path $env:LOCALAPPDATA "HomerDev" }
+$sRecord = ""
+if ($sRecordDir) { $sRecord = Join-Path $sRecordDir ("newest-" + $Name.ToLower() + ".txt") }
+$dKnown = @{}
+if ($sRecord -and (Test-Path -LiteralPath $sRecord)) {
+    try {
+        foreach ($sLine in [System.IO.File]::ReadAllLines($sRecord)) {
+            $aParts = $sLine.Split([char]9)
+            if ($aParts.Count -eq 4) { $dKnown[$aParts[0].ToLower()] = $aParts }
+        }
+    } catch { $dKnown = @{} }
+}
+$lRecord = New-Object System.Collections.ArrayList
+$iFromRecord = 0
+
 $aMinimum = @()
 if ($Minimum) { $aMinimum = versionParts $Minimum }
 if ($Minimum) { note ("Looking for every copy of " + $Name + " at " + $Minimum + " or later:") } else { note ("Looking for every copy of " + $Name + ":") }
@@ -99,15 +121,39 @@ foreach ($sOne in (candidatePaths $Name)) {
     $sArgs = "--version"
     if ($Name.ToLower() -eq "java") { $sArgs = "-version" }
     $sOut = ""
-    # Run the copy itself. 2>&1 turns each stderr line (java -version writes
-    # there) into an error record; "$_" makes each one its plain text again.
-    try { $sOut = (@(& $sOne $sArgs 2>&1) | ForEach-Object { "$_" }) -join "`n" } catch { $sOut = "" }
+    $sSize = ""
+    $sTicks = ""
+    try {
+        $oFile = Get-Item -LiteralPath $sOne -ErrorAction Stop
+        $sSize = [string] $oFile.Length
+        $sTicks = [string] $oFile.LastWriteTimeUtc.Ticks
+    } catch { }
+    $aKnown = $dKnown[$sOne.ToLower()]
+    if ($aKnown -and $sSize -ne "" -and $aKnown[1] -eq $sSize -and $aKnown[2] -eq $sTicks -and $aKnown[3] -ne "") {
+        # Unchanged since its version was read: that version stands, and the copy is not run.
+        $sOut = $aKnown[3]
+        $iFromRecord++
+    } else {
+        # Run the copy itself. 2>&1 turns each stderr line (java -version writes
+        # there) into an error record; "$_" makes each one its plain text again.
+        try { $sOut = (@(& $sOne $sArgs 2>&1) | ForEach-Object { "$_" }) -join "`n" } catch { $sOut = "" }
+    }
     $aVersion = versionParts $sOut
+    if ($aVersion.Count -gt 0 -and $sSize -ne "") {
+        [void] $lRecord.Add($sOne + [char]9 + $sSize + [char]9 + $sTicks + [char]9 + (($aVersion | ForEach-Object { [string] $_ }) -join "."))
+    }
     if ($aVersion.Count -eq 0) { note ("  " + $sOne + " -- will not run"); continue }
     $sText = ($aVersion | ForEach-Object { [string] $_ }) -join "."
     note ("  " + $sOne + " -- version " + $sText)
     if ($aMinimum.Count -gt 0 -and (compareVersions $aVersion $aMinimum) -lt 0) { continue }
     if ($sBest -eq "" -or (compareVersions $aVersion $aBest) -gt 0) { $sBest = $sOne; $aBest = $aVersion; $sBestText = $sText }
+}
+if ($iFromRecord -gt 0) { note ("  " + $iFromRecord + " of these versions came from the record, " + $sRecord + ", since those copies are unchanged; the rest were run.") }
+if ($sRecord) {
+    try {
+        if (-not (Test-Path -LiteralPath $sRecordDir)) { [void] (New-Item -ItemType Directory -Path $sRecordDir -Force) }
+        [System.IO.File]::WriteAllLines($sRecord, [string[]] $lRecord.ToArray())
+    } catch { note ("  The record could not be written, so next time every copy is run again: " + $_.Exception.Message) }
 }
 if ($sBest) { note ("Chosen: " + $sBest + ", version " + $sBestText + ", of " + $iSeen + " found.") }
 elseif ($iSeen -gt 0) { note "None qualifies." }

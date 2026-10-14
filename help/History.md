@@ -7,6 +7,20 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.50 -- 14 October 2026
+
+- **A build that builds nothing no longer sounds as if it builds.** The fingerprints were working -- Homer.dll, for one, was skipped in seven of ten builds on 13 and 14 October -- but every part found current was announced on its own: "exec\Homer.dll is unchanged since its last build; not built again", and five lines like it, every build. Each is now in the log, and one sentence says how many parts were current. (HomerDev.exe and the installer do build on every release: each carries the new version number.)
+- **Finding the newest Pandoc no longer runs every copy each time.** newest.ps1 ran every copy it found for its version -- about four seconds on every build of every app. Each copy's version is now kept with its size and time in %LOCALAPPDATA%\HomerDev\newest-<name>.txt; an unchanged copy is not run, and a new or changed one is. Every copy is still found, so a newly installed one is noticed at once.
+- **buildBooks keeps a book that is not ready, for a while.** Only a ready book's audit was kept, so Legacy of Mazrui was built and judged again on every run: its 14 missing pictures fetched and failed again, then EPUBCheck, Ace and Kindle Previewer, about 45 seconds for a known answer. A not-ready audit of the same build is now kept until it is toolRefreshDays old (7 days), when its pictures are tried again; a change to the book builds it at once. Tested on the real code: kept when unchanged and young, judged again when old or changed.
+- **buildBooks says only what it does.** "Checking for EPUBCheck and Ace by DAISY" was said on every build, though the tools are usually taken from their record without checking; it is now logged, and a real check -- a record that is old, missing or broken -- is said. The 21 books kept as they were are counted in one sentence rather than named one by one.
+- **The build date that stops needless resubmissions now takes effect.** It was written into MyBooks' own copy of buildBooks.py on 14 October, but buildBooks.cmd replaces that copy with the kit's on every run, so the fix never ran. It is now in the kit's copy, and was tested again there: an unchanged book keeps its date, an edited one gets a new one, and two builds under one date are byte-identical.
+
+
+## 1.72.49 -- 14 October 2026
+
+- **help\AuditResponse.md answers the audit of 14 October morning:** 2htm's undefined constant, HomerScribe's command-line source and its acceptance evidence, and HomerView's results file.
+
+
 ## 1.72.48 -- 14 October 2026
 
 - **Replacing a file keeps two complete copies at every moment.** When File.Replace was refused, replaceFileSafely copied the new file over the old, so a full disk or an interrupted copy could leave it truncated, with no copy of the old content when no backup was asked for; and a backup that could not be rotated after the file was replaced made the call throw, so callers said "unchanged" of a changed file. Now the fallback is two renames, each atomic, putting the old file back if the second fails and naming both copies if even that fails; only a failed commit throws; a commit whose backup could not be rotated returns a warning naming where the previous content is; and the backup is swapped in atomically, so the earlier one stays until its successor exists. writeTextSafely keeps its staged copy when the target is missing, since it may then be the only complete one. Tested by a simulation of every combination of failures, 256 runs, before it was written here (from a second audit by another AI).

@@ -408,6 +408,25 @@ def sayLine(sText):
     return True
 
 
+# ONE LINE FOR EVERYTHING NOT BUILT AGAIN (14 October 2026). Each part the fingerprints found current was announced on
+# its own -- "exec\Homer.dll is unchanged since its last build; not built again", and five more -- so a build that built
+# nothing sounded as though it were building DLLs. Each is now logged, and their count said once, after the build steps.
+lsUnchanged = []
+
+
+def unchangedLine(sName, sWhy="is unchanged since its last build; not built again."):
+    lsUnchanged.append(sName)
+    logLine(sName + " " + sWhy)
+    return True
+
+
+def sayUnchanged():
+    if lsUnchanged:
+        sayLine("%d part%s unchanged since the last build, so not built again; the log names them." % (len(lsUnchanged), "" if len(lsUnchanged) == 1 else "s"))
+    del lsUnchanged[:]
+    return True
+
+
 def runCommand(lsArgs):
     """Run a command, log its exit code and output, return (iCode, sOutput)."""
     sCmd = " ".join(lsArgs)
@@ -565,7 +584,7 @@ def buildSamples():
         sOutput = "Templates/samples/" + sName + ".exe"
         sPrint = oCache.fingerprint(sampleInputs(sName, sScript))
         if oCache.isCurrent("sample " + sName, sPrint, [sOutput]):
-            sayLine("%s is unchanged since its last build; not built again." % sName)
+            unchangedLine(sName)
             continue
         logLine("RUN: %s in %s" % (sScript, sSamples))
         try:
@@ -654,7 +673,7 @@ def buildHomerDll():
     oCache = kitCache()
     sPrint = oCache.fingerprint(["exec/CSharp/" + sClass + ".cs" for sClass in lsHomerDllClasses])
     if oCache.isCurrent("Homer.dll", sPrint, ["exec/Homer.dll"]):
-        sayLine("exec\\Homer.dll is unchanged since its last build; not built again.")
+        unchangedLine("exec\\Homer.dll")
         return ""
     iCode, sOutput = runCommand([sCsc, "/nologo", "/target:library", "/platform:x64", "/optimize+",
                                  "/out:" + sOut] + lsRefs + lsSources)
@@ -681,7 +700,7 @@ def buildHomerDevApp():
     # leaves it alone.
     sPrint = oCache.fingerprint(["HomerDev.cs", "HomerDev.ico", "version.txt"] + ["exec/CSharp/" + sClass + ".cs" for sClass in lsHomerDevAppClasses])
     if oCache.isCurrent("HomerDev.exe", sPrint, ["exec/HomerDev.exe"]):
-        sayLine("exec\\HomerDev.exe is unchanged since its last build; not built again.")
+        unchangedLine("exec\\HomerDev.exe")
         return ""
     sCsc = findRoslyn()
     if sCsc == "": return "exec\\HomerDev.exe was not built: no Roslyn C# compiler; the C# samples install the Build Tools"
@@ -739,7 +758,7 @@ def buildHomerDevSetup():
     lsInputs = [s for s in sorted(os.listdir(sScriptDir)) if s.lower() not in ("homerdev_setup.exe", "homerdev_setup.building.exe", "build_release.bat", "logs", "notes", ".git")]
     sPrint = oCache.fingerprint(lsInputs)
     if oCache.isCurrent("HomerDev_setup.exe", sPrint, ["HomerDev_setup.exe"]):
-        sayLine("HomerDev_setup.exe is unchanged since its last build; not built again.")
+        unchangedLine("HomerDev_setup.exe")
         return ""
     sIscc = findIscc()
     if sIscc == "": return "HomerDev_setup.exe was not built: Inno Setup could not be installed"
@@ -1897,7 +1916,7 @@ def main():
         sPrint = oCache.fingerprint(["scripts/testConversion.py", "exec/Python", "exec/conversions.inix"], lsTools + [sys.version.split()[0]])
         try:
             if oCache.isCurrent("conversion test", sPrint, []):
-                sayLine("The conversion routes are unchanged since they last passed; not tested again.")
+                unchangedLine("The conversion routes", "are unchanged since they last passed; not tested again.")
                 oDone = None
             else:
                 oDone = subprocess.run([sys.executable, os.path.join(sScriptDir, "scripts", "testConversion.py")],
@@ -1952,6 +1971,7 @@ def main():
             iSamplesFailed += 1
             lsFailedParts.append("HomerDev_setup.exe")
 
+    sayUnchanged()
     lsProblems = checkKit()
     if len(lsProblems) == 0 and iSamplesFailed == 0:
         sayLine("0 problems found. The kit is complete.")

@@ -129,6 +129,15 @@ That audit rechecked the current repositories and added these findings; each is 
 - **The KDP suite in a clean checkout. Done.** 66 passed, 0 failed, with no personal files and no HomerDev variable.
 - **HomerView's metadata order and parity gaps.** Both were fixed on 14 October, but HomerView's build stopped on a naming check, so the repository the audit read did not have them; the naming check is answered (Yield Structure), and the next build carries them.
 
+## The audit of 14 October morning
+
+That audit read the morning's logs: nine releases succeeded, and two candidates were blocked. Its new findings:
+
+- **2htm-08, an undefined constant. Done.** The guard used iExitFatal from another class; it now says program.iExitFatal.
+- **HomerScribe-09, the acceptance test heard a remote video. Done, and it found a real fault.** A source named on the command line was added to the built-in sample instead of replacing it, so the sample was transcribed; the first source given now replaces it. The test counts only the test recording's transcripts, and was checked again here against its two stand-ins: a content-judging one passes all four steps, a size-and-time one fails exactly step 3.
+- **HomerScribe-10, evidence deleted. Done.** A failed run keeps its folder -- each run's log, every transcript, both clips -- in logs, and the clips' fingerprints are logged.
+- **HomerView-08, an incomplete results file. Done.** The file and the setup log now hold the whole summary shown, screen reader outcomes included.
+
 ## In numbers
 
 Of the 72 findings, 57 are done, one of them with a check still open; 1 is partly done; and 14 are open, each of them needing a run on Windows, Office, a clean machine or a screen reader.
