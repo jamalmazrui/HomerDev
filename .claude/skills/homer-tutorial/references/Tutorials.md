@@ -553,7 +553,11 @@ What the Homer Development Kit is, in a paragraph; the two reader keys every wal
 
 HomerDev is a kit of parts for building Windows programs that work well by keyboard and screen reader: shared C sharp classes and Python modules, build and release scripts, installer parts, templates for a new app, and skills that teach an AI assistant the house rules. Every decision that makes a program pleasant to use without sight -- where the focus goes, what is spoken, what the keys do -- has been made once and put in a class, so an app built on the kit inherits it. DbDo, EdSharp and FileDir are built on it, and these walks use their voices to show what the kit's code does for a person.
 
-### Step 2: Insert+Up Arrow
+### Step 2
+
+Two voices take these walks. I am the host; the other voice plays the screen reader. It is a simulation, so your own reader's words may differ a little.
+
+### Step 3: Insert+Up Arrow
 
 You know your screen reader's own keys already, and three of them are worth remembering whenever you feel lost or unsure. Insert plus Up Arrow says the line you are on again.
 
@@ -561,7 +565,7 @@ Screen reader:
 
 - Hello, world.
 
-### Step 3: Insert+Tab
+### Step 4: Insert+Tab
 
 Insert plus Tab says what has the focus: its name, its role, and its value or state.
 
@@ -569,7 +573,7 @@ Screen reader:
 
 - Untitled, edit, multiline, Hello, world.
 
-### Step 4: Insert+T
+### Step 5: Insert+T
 
 Insert plus T says the title of the window.
 
@@ -577,15 +581,15 @@ Screen reader:
 
 - EdSharp, Untitled
 
-### Step 5
-
-If you set your screen reader to use Caps Lock in place of Insert, Caps Lock works the same way for all three.
-
 ### Step 6
+
+On a laptop keyboard, Caps Lock usually stands in for Insert, though in some laptop layouts the line command moves to a letter, such as Caps Lock plus L. And if speech goes by before you catch it, your reader can replay it: Insert plus X in some readers, a speech history in others.
+
+### Step 7
 
 Now the table of contents. I say the number and the title; the reader says what the walk covers.
 
-### Step 7
+### Step 8
 
 One, User Interface.
 
@@ -593,7 +597,7 @@ Screen reader:
 
 - What a Homer program is made of, heard in DbDo, EdSharp and FileDir, and the rules every key follows, so a key can be guessed.
 
-### Step 8
+### Step 9
 
 Two, Install and Launch.
 
@@ -601,7 +605,7 @@ Screen reader:
 
 - Unarchiving the kit, running its own build, and launching the sample program it builds.
 
-### Step 9
+### Step 10
 
 Three, Start an App from the Kit.
 
@@ -609,7 +613,7 @@ Screen reader:
 
 - A new app from the template: its files, its first build, its first run.
 
-### Step 10
+### Step 11
 
 Four, Build, Check and Release.
 
@@ -617,7 +621,7 @@ Screen reader:
 
 - What build does, stage by stage; what check refuses; what release publishes.
 
-### Step 11
+### Step 12
 
 Five, The Installer and Its Finish Page.
 
@@ -625,7 +629,7 @@ Screen reader:
 
 - The shared installer parts: boxes that say their state, the results box, the summary.
 
-### Step 12
+### Step 13
 
 Six, Spoken Tutorials.
 
@@ -633,7 +637,7 @@ Screen reader:
 
 - Writing a walk, the two voices, the pattern of ten, and the tool that speaks and measures them.
 
-### Step 13
+### Step 14
 
 Seven, Shared Code and the Homer Player.
 
@@ -641,7 +645,7 @@ Screen reader:
 
 - The classes every app uses, and the player heard in FileDir and DbDo alike.
 
-### Step 14
+### Step 15
 
 Eight, Build with an AI Assistant.
 
@@ -649,7 +653,7 @@ Screen reader:
 
 - A feature written with an AI assistant in the kit's house style: the skills, the three sentences, and the check that proves it.
 
-### Step 15
+### Step 16
 
 Nine, Conclusion.
 
@@ -657,7 +661,7 @@ Screen reader:
 
 - The conclusion and summary, the words the kit uses, the help built into every program, and where to learn more.
 
-### Step 16
+### Step 17
 
 Ten walks, three to five minutes each, under an hour together: the overview, the user interface, seven tasks, and the conclusion. They are a course, not a reference: each one assumes those before it.
 
@@ -1209,7 +1213,7 @@ Screen reader:
 
 ### Step 2
 
-The stages, in order, each logged. The kit's version is checked against what the app needs. Old file names are retired. The encoding of every file is put right: UTF-8 with a byte order mark, CRLF line endings. The hotkey list is generated from the program itself. Any tutorial whose audio is missing or older than its script is spoken. The program compiles. The installer is built.
+The stages, in order, each logged. The kit's version is checked against what the app needs. Old file names are retired. The encoding of every file is put right: UTF-8 with a byte order mark and CRLF line endings, except batch files, which get CRLF and no byte order mark. The hotkey list is generated from the program itself. Any tutorial whose audio is missing or older than its script is spoken. The program compiles. The installer is built.
 
 ### Step 3
 
@@ -1382,7 +1386,7 @@ What the table in the app's script looks like, in words: one line per piece -- t
 
 ### Step 15
 
-Why winget. It knows what is installed and what the newest version is, so the three states are read rather than guessed; it fetches from the maker's own feed; and it is on every Windows 10 and 11 machine. The kit asks it once per piece as the finish page is built, so the boxes are right before you reach them.
+Why winget. It knows what is installed and what the newest version is, so the three states are read rather than guessed; it fetches from the maker's own feed; and it comes with current Windows 10 and 11 as part of App Installer, though an older machine or a brand-new account may need App Installer updated first. The kit asks it once per piece as the finish page is built, so the boxes are right before you reach them.
 
 ### Step 16
 
@@ -1885,7 +1889,7 @@ Homer encoding.
 
 Screen reader:
 
-- UTF-8 with a byte order mark and CRLF line endings, for every text file the kit or an app ships.
+- UTF-8 with a byte order mark and CRLF line endings for text files; batch files get CRLF and no byte order mark.
 
 ### Step 12
 

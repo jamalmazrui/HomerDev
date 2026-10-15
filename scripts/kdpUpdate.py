@@ -56,7 +56,7 @@ iProcessingMinutes = 20
 lFlags = ["--ask", "--book", "--except", "--limit", "--list", "--no-build", "--no-publish", "--record", "--republish", "--reupload", "--survey"]
 lValueFlags = ["--book", "--except", "--limit"]
 sContentButton = "data-assets-interior-file-upload-browse-button-announce"
-sVersion = "2026-10-09 version 11: a book is unchanged when its sources' and answers' fingerprints match its last submission, whatever its EPUB's build time; staleness is the audit's sources fingerprint, not file times; --record writes the current fingerprints without opening KDP; version 10: readiness requires the audited EPUB fingerprint, a book unchanged since its last submission is not sent, only a submission counts as one, DRM failure blocks Publish, royalty follows the $2.99-$12.99 band; version 9: an AI answer the author has confirmed (aiConfirmed) is given exactly, even below what KDP holds; version 8: a recent submission is also known from the upload receipt, which survives a replaced data file; version 7: a title that will not open within 72 hours of being submitted is reported as in review, not as a problem; version 6: a book built by its own project, such as Blind Vibe Coding, is read from there, and a title with no ASIN is found on the Bookshelf by its title ID; version 5: when KDP stays on the Content tab without naming a problem, the boxes are checked again and the step tried once more; a live title with an update in review is reported as such; version 4: a title KDP shows as Publishing is locked like one In Review, and is not opened; version 3: AI answers never disclose less than KDP already holds, read live before answering; version 2: a manuscript dated in the future, as an unzipped one can be, no longer counts as newer than its EPUB; version 1 was the first, built on kdpSubmit version 36 and kdpBooks version 14"
+sVersion = "2026-10-15 version 12: a run record in data\\kdpUpdate-run.inix, naming a book a previous run left in progress; version 11: a book is unchanged when its sources' and answers' fingerprints match its last submission, whatever its EPUB's build time; staleness is the audit's sources fingerprint, not file times; --record writes the current fingerprints without opening KDP; version 10: readiness requires the audited EPUB fingerprint, a book unchanged since its last submission is not sent, only a submission counts as one, DRM failure blocks Publish, royalty follows the $2.99-$12.99 band; version 9: an AI answer the author has confirmed (aiConfirmed) is given exactly, even below what KDP holds; version 8: a recent submission is also known from the upload receipt, which survives a replaced data file; version 7: a title that will not open within 72 hours of being submitted is reported as in review, not as a problem; version 6: a book built by its own project, such as Blind Vibe Coding, is read from there, and a title with no ASIN is found on the Bookshelf by its title ID; version 5: when KDP stays on the Content tab without naming a problem, the boxes are checked again and the step tried once more; a live title with an update in review is reported as such; version 4: a title KDP shows as Publishing is locked like one In Review, and is not opened; version 3: AI answers never disclose less than KDP already holds, read live before answering; version 2: a manuscript dated in the future, as an unzipped one can be, no longer counts as newer than its EPUB; version 1 was the first, built on kdpSubmit version 36 and kdpBooks version 14"
 
 sProject = k.sProject
 
@@ -578,6 +578,65 @@ def buildFirst():
     return oDone.returncode
 
 
+# A RUN RECORD THAT SAYS HOW THE RUN ENDED (15 October 2026, from an audit of MyBooks): the run of 14 October stopped
+# during Blind Vibe Coding's upload, and its log simply ended -- no summary, nothing to tell the next run that a book was
+# left half sent. data\\kdpUpdate-run.inix now records the run's state (running, complete, interrupted, crashed or
+# stopped) and each book's stage (planned, in progress, then its outcome), rewritten at every step. It lives in data,
+# not logs, because logs are zipped away between sessions. A run that finds the last one still "running" names the book
+# left in progress, so its KDP draft can be checked before it is sent again.
+sRunName = "kdpUpdate-run.inix"
+
+
+def runPath():
+    return os.path.join(sProject, "data", sRunName)
+
+
+def writeRun(dRun):
+    """The run record, written whole to a temporary file and moved into place, so it is never half written."""
+    sPath = runPath()
+    os.makedirs(os.path.dirname(sPath), exist_ok=True)
+    k.writeInix(sPath + ".tmp", dRun)
+    os.replace(sPath + ".tmp", sPath)
+    return True
+
+
+def stamp():
+    return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
+def setStage(dRun, sRoot, sStage):
+    dRun.setdefault(sRoot, {})["stage"] = sStage
+    dRun[sRoot]["at"] = stamp()
+    dRun["run"]["updated"] = stamp()
+    log("Run record: " + sRoot + " " + sStage)
+    return writeRun(dRun)
+
+
+def endRun(dRun, sState):
+    dRun["run"]["state"] = sState
+    dRun["run"]["finished"] = stamp()
+    log("Run record: run " + sState)
+    return writeRun(dRun)
+
+
+def warnUnfinished():
+    """Says what the last run left undone, when its record shows it never ended. Returns the roots left in progress."""
+    sPath = runPath()
+    if not os.path.isfile(sPath): return []
+    try:
+        dLast = k.readInix(sPath)
+    except Exception as oError:
+        log("The last run record could not be read: " + str(oError))
+        return []
+    dLastRun = dLast.get("run", {})
+    if dLastRun.get("state", "") not in ("running", "interrupted", "crashed"): return []
+    lLeft = [sRoot for sRoot, d in dLast.items() if sRoot != "run" and d.get("stage") == "in progress"]
+    say("The last kdpUpdate run, started " + dLastRun.get("started", "at an unknown time") + ", did not finish (" + dLastRun.get("state", "") + ")"
+        + ((": " + ", ".join(dLast[s].get("title", s)[:50] for s in lLeft) + " was left in progress. Check " + ("its" if len(lLeft) == 1 else "their")
+            + " KDP draft before it is sent again.") if lLeft else "; no book was in progress."))
+    return lLeft
+
+
 def main():
     sProblem = checkOptions()
     if sProblem:
@@ -585,10 +644,13 @@ def main():
         return 2
     os.makedirs(os.path.join(sProject, "logs"), exist_ok=True)
     k.sLogPath = os.path.join(sProject, "logs", os.path.basename(sProject) + "-kdpUpdate-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + ".log")
-    log("kdpUpdate.py started; " + sVersion + "; script " + os.path.abspath(__file__) + "; kdpSubmit " + k.sVersion.split(":")[0] + "; kdpBooks " + kb.sVersion.split(":")[0])
+    # THE CURRENT VERSION ONLY (15 October 2026, from an audit of MyBooks): the whole version history went into the first
+    # line of every log, a paragraph long, which made logs hard to compare. The history stays here and in help\\History.md.
+    log("kdpUpdate.py started; " + sVersion.split("; version ")[0] + "; script " + os.path.abspath(__file__) + "; kdpSubmit " + k.sVersion.split(":")[0] + "; kdpBooks " + kb.sVersion.split(":")[0])
     log("Python " + sys.version.split()[0] + " on " + platform.platform() + "; project " + sProject + "; cwd " + os.getcwd() + "; command line " + " ".join(sys.argv))
     log("inix reader: " + ("the kit's, " + k.kitInix().__file__ if k.kitInix() else "kdpSubmit's own"))
     print("kdpUpdate " + sVersion.split(":")[0])
+    warnUnfinished()
     buildFirst()
     dCatalog = dict(catalog())
     lStates = chosen([bookState(sRoot, dBook) for sRoot, dBook in dCatalog.items()])
@@ -622,6 +684,10 @@ def main():
     k.closeLeftovers(sProfile)
     os.makedirs(sProfile, exist_ok=True)
     lResults, lFailed = [], []
+    dRun = {"run": {"started": stamp(), "updated": stamp(), "finished": "", "state": "running", "kind": "survey" if bSurvey else "update",
+                    "command": " ".join(sys.argv), "log": k.sLogPath}}
+    for d in lReady: dRun[d["root"]] = {"title": d["title"], "stage": "planned", "at": stamp()}
+    writeRun(dRun)
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch_persistent_context(sProfile, channel="msedge", headless=False, args=["--start-maximized"], viewport=None, ignore_default_args=["--enable-automation"])
@@ -632,6 +698,7 @@ def main():
             lRows = kb.bookshelfRows(page)
             if lRows is None:
                 say("KDP was not signed in within the time allowed. Nothing was changed.")
+                endRun(dRun, "stopped: not signed in")
                 return 3
             dRows = {r["asin"]: r for r in lRows if r.get("asin")}
             dRowsById = {r["id"]: r for r in lRows if r.get("id")}
@@ -642,10 +709,13 @@ def main():
                 if r.get("review") or re.search(r"review|publishing", r.get("status", ""), re.I):
                     # KDP is publishing an update of it, which locks the title; that is a book on its way, not a problem.
                     lResults.append((d["title"], (r.get("status") or "in review").lower() + (", update in review" if r.get("review") else "") + "; KDP locks it until then, so it was skipped"))
+                    setStage(dRun, d["root"], "skipped: in review")
                     continue
                 if r.get("id") and r["id"] != d["titleId"]: log("The Bookshelf gives title ID " + r["id"] + " where the data file has " + d["titleId"] + "; using the Bookshelf's")
                 d["titleId"] = r.get("id") or d["titleId"]
+                setStage(dRun, d["root"], "in progress")
                 sOutcome = surveyBook(page, d, k.readInix(d["data"])) if bSurvey else updateBook(page, d, dCatalog[d["root"]])
+                setStage(dRun, d["root"], sOutcome)
                 if sOutcome == "locked" and recentlySubmitted(d["data"]):
                     lResults.append((d["title"], "submitted recently; KDP still locks it for review, though its Bookshelf may not say so yet"))
                     continue
@@ -653,10 +723,16 @@ def main():
                 if sOutcome not in ("submitted", "surveyed") and not (sOutcome == "draft" and "--no-publish" in sys.argv):
                     lFailed.append(d["title"] + ": " + sOutcome + (("; " + "; ".join(k.lUnresolved)) if k.lUnresolved else ""))
             browser.close()
+    except KeyboardInterrupt:
+        endRun(dRun, "interrupted")
+        say("Stopped by request. data\\" + sRunName + " records which book was in progress, and the next run names it.")
+        return 130
     except Exception as oError:
         log("CRASH: " + traceback.format_exc())
+        endRun(dRun, "crashed: " + str(oError).splitlines()[0][:120])
         say("The script hit an error: " + str(oError).splitlines()[0][:200] + ". The details are in the log.")
         return 4
+    endRun(dRun, "complete")
     say("Outcome by book:")
     for sTitle, sOutcome in lResults: say("  " + sTitle[:60] + ": " + sOutcome)
     lSkipped = [d for d in lStates if d["problems"]]

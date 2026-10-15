@@ -103,7 +103,10 @@ def check(sPath):
     logLine("anchors " + str(len(sAnchors)) + ", internal links " + str(len(lRefs)))
 
     # bare urls: an http(s) address not inside (...) of a Markdown link
-    lBare = [m.group(0) for m in re.finditer(r"(?<!\]\()https?://\S+", sBody)]
+    # THE FRONT MATTER IS NOT TEXT (15 October 2026): license_url is an address by design, and the kit's front-matter
+    # standard requires it, so only the body after the closing --- is scanned.
+    sProse = re.sub(r"\A\ufeff?---\r?\n.*?\r?\n---\r?\n", "", sBody, count=1, flags=re.S)
+    lBare = [m.group(0) for m in re.finditer(r"(?<!\]\()https?://\S+", sProse)]
     lBare = [u for u in lBare if not re.search(r"\]\(" + re.escape(u.rstrip(").,")), sBody)]
     if lBare: lFail.append(str(len(lBare)) + " bare url(s), first: " + lBare[0])
 

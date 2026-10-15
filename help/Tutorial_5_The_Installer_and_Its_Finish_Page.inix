@@ -92,7 +92,7 @@ Hear=
 
 [step]
 
-Say=Why winget. It knows what is installed and what the newest version is, so the three states are read rather than guessed; it fetches from the maker's own feed; and it is on every Windows 10 and 11 machine. The kit asks it once per piece as the finish page is built, so the boxes are right before you reach them.
+Say=Why winget. It knows what is installed and what the newest version is, so the three states are read rather than guessed; it fetches from the maker's own feed; and it comes with current Windows 10 and 11 as part of App Installer, though an older machine or a brand-new account may need App Installer updated first. The kit asks it once per piece as the finish page is built, so the boxes are right before you reach them.
 Key=
 Hear=
 

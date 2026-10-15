@@ -2523,6 +2523,27 @@ def importNewer(dCatalog):
     return iBrought
 
 
+# PRIVATE DATA STAYS OUT OF GIT, CHECKED ON EVERY BUILD (15 October 2026, from an audit of MyBooks): kdpReport repairs
+# .gitignore when it runs, but a push need not follow a report. The build is the one step always run, so it confirms
+# each private pattern is in .gitignore and restores any that are missing, without needing git. Untracking a file git
+# already holds stays kdpReport's job, since only git can do it.
+lPrivatePatterns = ["data/kdpPayments.xlsx", "data/kdpReport.inix", "data/kdpSales-*", "results/KDP_Report.*"]
+
+
+def ensurePrivateIgnored():
+    """Returns the patterns it had to add to .gitignore (none when all were already there)."""
+    sGitignore = os.path.join(sProject, ".gitignore")
+    sOld = open(sGitignore, encoding="utf-8-sig").read() if os.path.isfile(sGitignore) else ""
+    setHave = {s.strip() for s in sOld.splitlines()}
+    lMissing = [s for s in lPrivatePatterns if s not in setHave]
+    if lMissing:
+        sNew = sOld.rstrip("\r\n") + ("\n" if sOld else "") + "# Private sales and payment data, restored by buildBooks\n" + "\n".join(lMissing) + "\n"
+        with open(sGitignore, "wb") as f: f.write(sNew.replace("\r\n", "\n").encode("utf-8"))
+        say("Restored " + plural(len(lMissing), "private-data line") + " in .gitignore, so sales and payment files stay out of Git.")
+    log("private data: " + (("added to .gitignore: " + ", ".join(lMissing)) if lMissing else "all " + str(len(lPrivatePatterns)) + " patterns already in .gitignore"))
+    return lMissing
+
+
 def main():
     global sLogPath, dSettings
     os.makedirs(os.path.join(sProject, "logs"), exist_ok=True)
@@ -2548,6 +2569,7 @@ def main():
         say("Could not read configs\\buildBooks.inix or configs\\books.inix: " + str(oError))
         return 2
     for sKey in sorted(dSettings): log("setting " + sKey + " = " + dSettings[sKey].replace("\n", "; "))
+    ensurePrivateIgnored()
     lBooks = sorted(chosenBooks(dCatalog, lArgs), key=lambda d: titleKey(d["title"]))
     if not lBooks:
         say("No book in configs\\books.inix matches what you named.")

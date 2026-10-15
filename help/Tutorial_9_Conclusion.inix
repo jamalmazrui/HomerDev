@@ -68,7 +68,7 @@ Hear=The installer's last page: optional pieces as boxes, each saying Install, U
 
 Say=Homer encoding.
 Key=
-Hear=UTF-8 with a byte order mark and CRLF line endings, for every text file the kit or an app ships.
+Hear=UTF-8 with a byte order mark and CRLF line endings for text files; batch files get CRLF and no byte order mark.
 
 [step]
 

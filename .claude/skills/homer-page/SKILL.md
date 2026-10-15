@@ -10,7 +10,9 @@ description: >-
   publish, host or update a GitHub Page, a github.io site or a web version of a
   guide, directory or help document; asks to add an image, logo or favicon to
   such a page; or asks whether a published page is accessible, even if they
-  only say "postPage", "post it" or "put it online".
+  only say "postPage", "post it" or "put it online". Use it too when writing
+  or changing the entries of a directory page (a lesson, presentation or
+  episode, its description, links, fields, length or statistics).
 ---
 
 # Homer page
@@ -26,6 +28,19 @@ Before changing a page's design, read
 [references/wcag-and-homer.md](references/wcag-and-homer.md). Before
 diagnosing a failed post, read
 [references/jekyll-and-git.md](references/jekyll-and-git.md).
+
+## Directory pages
+
+A directory page lists works, such as lessons, presentations or episodes. Each
+entry is a level-3 heading linking the work, then a one- or two-sentence
+description with no label, then Source page and Transcript links in
+paragraphs of their own, then the other fields in alphabetical order.
+Presenter stays singular; Length is whole minutes; near-constant fields are
+dropped; By the Numbers keeps a few notable observations; the subtitle
+begins "A Directory of" and a count that code supplies. Before writing or
+changing a directory's entries or the code that builds them, read
+[references/directory-entries.md](references/directory-entries.md), which
+gives each rule and its reason, in alphabetical order.
 
 ## Four kinds of resource
 

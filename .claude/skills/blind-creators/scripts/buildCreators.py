@@ -174,6 +174,9 @@ def render(lPeople, sVersion):
     # A COUNTED SUBTITLE (13 October 2026): every directory's subtitle begins "A Directory of <count>", computed here,
     # so it can never go stale the way a typed count did.
     w('subtitle: "A Directory of ' + str(iTotal) + ' People ' + sSubtitle + '"')
+    # A DESCRIPTION (15 October 2026): one plain sentence for search results and link previews, which MyPages' post
+    # expects in every page's front matter.
+    w('description: "A directory of people who are blind or have low vision and who author books, develop apps, or make presentations, merging Blind Authors, Blind Developers, and Blind Presenters."')
     w('author: "Jamal Mazrui"')
     w('date: "' + datetime.date.today().strftime("%B %Y") + '"')
     if sVersion: w('version: "' + sVersion + '"')

@@ -1694,7 +1694,17 @@ def checkKit():
                                   (sShown, "should not have" if bBom else "needs"))
             iLf = binData.count(b"\n")
             iCrLf = binData.count(b"\r\n")
-            if iLf != iCrLf:
+            # A STRAY LINE ENDING IS REPAIRED, NOT REPORTED (15 October 2026). Every build from 14 October afternoon
+            # stopped on two bare LF endings in scripts/kdpUpdate.py, after an edit made elsewhere. Turning a bare LF
+            # into CRLF changes nothing a reader or interpreter sees, so the build repairs the file in place, says so,
+            # and logs the count; push then commits the repaired file. A file that also holds a lone CR is not
+            # touched, since what it meant cannot be judged; it is reported as before.
+            if iLf != iCrLf and binData.count(b"\r") == iCrLf:
+                binFixed = re.sub(rb"(?<!\r)\n", b"\r\n", binData)
+                with open(sPath, "wb") as oFile: oFile.write(binFixed)
+                logLine("encoding repaired: %s had %d of %d line endings as bare LF; now all CRLF" % (sShown, iLf - iCrLf, iLf))
+                sayLine("Repaired %s: %s now CRLF." % (sShown, "1 line ending" if iLf - iCrLf == 1 else "%d line endings" % (iLf - iCrLf)))
+            elif iLf != iCrLf:
                 lsProblems.append("%s: %d of %d line endings are not CRLF" %
                                   (sShown, iLf - iCrLf, iLf))
 

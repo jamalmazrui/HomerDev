@@ -7,6 +7,22 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.54 -- 15 October 2026
+
+- **The build repairs stray line endings instead of stopping.** Every build since 14 October afternoon stopped on two bare LF endings in scripts\kdpUpdate.py, left by an edit made elsewhere. Turning a bare LF into CRLF changes nothing a reader or interpreter sees, so the build now repairs such a file in place, says so, and logs the count; push commits the repaired file. A file that also holds a lone CR is still reported, since what it meant cannot be judged.
+- **push tries four times before failing.** extCheck's push of three tutorial MP3s timed out (HTTP 408) on both of its tries, on a day when a fetch elsewhere was also reset. After the large-upload retry, push now waits 30 seconds and tries again, then 60 seconds and tries once more, logging each try. The commit is kept either way, so the next push sends it.
+- **Directory subtitles are counted.** The homer-page skill's directory-entries rules gain a Subtitle rule: every directory's subtitle begins "A Directory of" and a count that code supplies, and the subtitle is not repeated in `pagetitle`, where it goes stale.
+
+## 1.72.53 -- 15 October 2026
+
+- **Blind Creators has a description.** buildCreators.py now writes a one-sentence description into the front matter of BlindCreators.md, for search results and link previews; MyPages' post had noted it missing on every run.
+- **checkDirectory no longer counts the front matter as text.** It reported a page's license_url as a bare address, though the kit's front-matter standard requires that line; only the text after the front matter is now scanned, and a real bare address in the text is still caught.
+
+## 1.72.52 -- 15 October 2026
+
+- **Every directory's entries follow one set of rules.** A new reference in the homer-page skill, references\directory-entries.md, gives each rule in alphabetical order with its reason: a one- or two-sentence description right after the heading, with no label; Source page and Transcript links in paragraphs of their own; the other fields in alphabetical order; Presenter singular, in the source's order; Length in whole minutes with no "about"; near-constant fields such as Medium dropped; required values read from the work itself, or the entry left out and named; and only a few notable observations in By the Numbers.
+- **Podcast directories follow them.** The podcast-directory builder now puts the summary first, cut to two sentences and unlabeled, says Source page rather than Episode page, and gives Length in whole minutes in place of the feed's Duration.
+
 ## 1.72.51 -- 14 October 2026
 
 - **setup /defaults takes the defaults, with one Enter.** Given alone, /defaults left the whole wizard showing, so "homerdev_setup /defaults" asked every question. Inno decides before any code runs whether a run is silent, so code cannot make it silent; but it can skip pages, and with /defaults every page Inno allows to be skipped now is, each keeping its default. The finish page stays, with its default boxes ticked, and Enter finishes. For no screens at all, /verysilent /defaults, as before. This is in the shared HomerComponents.iss, so every Homer installer has it (from an audit by another AI, HomerDev-11).

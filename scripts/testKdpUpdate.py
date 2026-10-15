@@ -218,6 +218,149 @@ def testKitReader():
     return True
 
 
+# BOTH FALLBACK READERS, EVERY FORM (15 October 2026, from an audit of MyBooks): kdpSubmit's fallback could not read a
+# fence and kdpReport's could not read a plain block, so a file read correctly by one was misread by the other. Each form
+# the Homer INIX rules allow is read by both, and both must give the same, expected values.
+sTripleQuote = '"' * 3
+sInixForms = "\n".join([
+    "[book]",
+    "title = A Title",
+    "url = https://example.org/a?b=c&d=e",
+    "description =",
+    "First line of a plain block.",
+    "",
+    "Third line, after a kept blank line.",
+    " note = this line looks like a key, so it is written with one leading space",
+    "",
+    "keywords = `",
+    "first keyword",
+    "second = with an equals sign",
+    "[looks like a section]",
+    "`",
+    "quoted = " + sTripleQuote,
+    "a value with a ` backtick",
+    sTripleQuote,
+    "; a comment outside any value",
+    "[second]",
+    "empty =",
+    "last = done",
+    ""])
+
+
+def testInixFallbacks(sTemp):
+    sPath = os.path.join(sTemp, "forms.inix")
+    with open(sPath, "w", encoding="utf-8-sig", newline="") as f: f.write(sInixForms.replace("\n", "\r\n"))
+    dSubmit = k.readInixOwn(sPath)
+    # kdpReport belongs to a book project such as MyBooks, not to the kit, so the two readers are compared only where
+    # both are present; kdpSubmit's own reader is checked everywhere, against the expected values below.
+    try:
+        import kdpReport as r
+    except ImportError:
+        r = None
+        print("NOTE inix: kdpReport is not in this project, so only kdpSubmit's reader is checked")
+    if r: check("inix: both fallback readers give the same result for every form", dSubmit == r.readInixOwn(sPath), str(dSubmit) + " | " + str(r.readInixOwn(sPath)))
+    dBook = dSubmit.get("book", {})
+    check("inix: an equals sign inside a one-line value is kept", dBook.get("url") == "https://example.org/a?b=c&d=e", dBook.get("url", ""))
+    check("inix: a plain block keeps its inner blank line and its escaped key-like line",
+          dBook.get("description") == "First line of a plain block.\n\nThird line, after a kept blank line.\nnote = this line looks like a key, so it is written with one leading space",
+          repr(dBook.get("description")))
+    check("inix: a backtick fence keeps equals signs and section-like lines verbatim",
+          dBook.get("keywords") == "first keyword\nsecond = with an equals sign\n[looks like a section]", repr(dBook.get("keywords")))
+    check("inix: a triple-quote fence keeps a backtick", dBook.get("quoted") == "a value with a ` backtick", repr(dBook.get("quoted")))
+    check("inix: a later section and an empty value are read", dSubmit.get("second", {}).get("last") == "done" and dSubmit.get("second", {}).get("empty") == "", str(dSubmit.get("second")))
+    return True
+
+
+# SAVED MEANS SEEN SAVED (15 October 2026, from an audit of MyBooks): Save and Continue opened the next tab directly
+# whenever KDP stayed put without an error, as if the save were confirmed. A simulated page plays KDP's part: the next
+# tab may be opened directly only after a save-success message was read.
+class FakePage:
+    def __init__(self, lMoveOnAttempt, sTitle="A1B2C3D4"):
+        self.url = k.sTitleSetup + sTitle + "/details"
+        self.lMoveOnAttempt, self.iPresses, self.lGoto, self.sTitle = lMoveOnAttempt, 0, [], sTitle
+    def goto(self, sUrl):
+        self.lGoto.append(sUrl)
+        self.url = sUrl
+    def wait_for_load_state(self, *lArgs, **dArgs):
+        return True
+
+
+def runSave(oPage, lMessages):
+    """Runs saveAndContinue against oPage, with lMessages[i] the messages KDP shows after press i+1."""
+    dSaved = {s: getattr(k, s) for s in ("clickButton", "logMessages", "tabLooksReady", "unresolved", "say", "iSaveWaitSeconds", "iSettleSeconds")}
+    fSleep = time.sleep
+    lUnresolved = []
+    def fakeClick(page, sWhat, lSelectors):
+        page.iPresses += 1
+        if page.iPresses in page.lMoveOnAttempt: page.url = k.sTitleSetup + page.sTitle + "/content"
+        return True
+    try:
+        k.clickButton = fakeClick
+        k.logMessages = lambda page, sWhen: lMessages[min(page.iPresses, len(lMessages)) - 1] if lMessages else []
+        k.tabLooksReady = lambda page, sTab: True
+        k.unresolved = lambda sWhat, sWhy: lUnresolved.append(sWhy) or True
+        k.say = lambda sText: True
+        k.iSaveWaitSeconds, k.iSettleSeconds = 1, 1
+        time.sleep = lambda n: None
+        bOk = k.saveAndContinue(oPage, "content")
+    finally:
+        for sName, oValue in dSaved.items(): setattr(k, sName, oValue)
+        time.sleep = fSleep
+    return bOk, lUnresolved
+
+
+def testSaveConfirmation():
+    oPage = FakePage([1])
+    bOk, lUnresolved = runSave(oPage, [["Save Successful!"]])
+    check("save: moving on at once needs no direct opening", bOk and not oPage.lGoto and oPage.iPresses == 1, str((bOk, oPage.lGoto, oPage.iPresses)))
+    oPage = FakePage([])
+    bOk, lUnresolved = runSave(oPage, [["Save Successful!", "Complete"]] * 3)
+    check("save: KDP stays put but said Save Successful, so the next tab is opened directly", bOk and len(oPage.lGoto) == 1 and oPage.lGoto[0].endswith("/content"), str((bOk, oPage.lGoto)))
+    oPage = FakePage([])
+    bOk, lUnresolved = runSave(oPage, [["Complete"]] * 3)
+    check("save: KDP stays put and never confirms the save, so nothing is opened and the run stops", not bOk and not oPage.lGoto and lUnresolved and "never said the save succeeded" in lUnresolved[0], str((bOk, oPage.lGoto, lUnresolved)))
+    oPage = FakePage([])
+    bOk, lUnresolved = runSave(oPage, [["Please fix the highlighted fields"]])
+    check("save: a refusal stops at once, with no direct opening", not bOk and not oPage.lGoto and oPage.iPresses == 1, str((bOk, oPage.lGoto, oPage.iPresses)))
+    oPage = FakePage([])
+    bOk, lUnresolved = runSave(oPage, [["Complete"], ["Save Successful!"], ["Complete"]])
+    check("save: a confirmation in any attempt counts", bOk and len(oPage.lGoto) == 1, str((bOk, oPage.lGoto)))
+    return True
+
+
+# THE RUN RECORD (15 October 2026, from an audit of MyBooks): a run that never ended must be named by the next one.
+def testRunRecord(sTemp):
+    sProjectWas = u.sProject
+    lSaid = []
+    fSay = u.say
+    try:
+        u.sProject = os.path.join(sTemp, "runrecord")
+        u.say = lambda sText: lSaid.append(sText) or True
+        check("run record: with no record, nothing is said", u.warnUnfinished() == [] and not lSaid, str(lSaid))
+        dRun = {"run": {"started": "2026-10-14 16:16:29", "updated": "", "finished": "", "state": "running", "kind": "update", "command": "kdpUpdate", "log": "x.log"},
+                "Blind_Vibe_Coding": {"title": "Blind Vibe Coding", "stage": "planned", "at": ""},
+                "Returning_Alive": {"title": "Returning Alive", "stage": "planned", "at": ""}}
+        u.writeRun(dRun)
+        u.setStage(dRun, "Returning_Alive", "submitted")
+        u.setStage(dRun, "Blind_Vibe_Coding", "in progress")
+        dBack = k.readInix(u.runPath())
+        check("run record: stages read back as written", dBack.get("Blind_Vibe_Coding", {}).get("stage") == "in progress" and dBack.get("Returning_Alive", {}).get("stage") == "submitted", str(dBack))
+        check("run record: no temporary file is left behind", not os.path.exists(u.runPath() + ".tmp"))
+        lLeft = u.warnUnfinished()
+        check("run record: a run that never ended names the book left in progress", lLeft == ["Blind_Vibe_Coding"] and lSaid and "Blind Vibe Coding was left in progress" in lSaid[-1], str((lLeft, lSaid)))
+        u.endRun(dRun, "interrupted")
+        lSaid.clear()
+        check("run record: an interrupted run is named too", u.warnUnfinished() == ["Blind_Vibe_Coding"] and "(interrupted)" in lSaid[-1], str(lSaid))
+        u.setStage(dRun, "Blind_Vibe_Coding", "submitted")
+        u.endRun(dRun, "complete")
+        lSaid.clear()
+        check("run record: after a complete run, nothing is said", u.warnUnfinished() == [] and not lSaid, str(lSaid))
+    finally:
+        u.sProject = sProjectWas
+        u.say = fSay
+    return True
+
+
 def testFingerprints(sTemp):
     """Version 11: a book's sources by content, an EPUB rebuilt from unchanged sources still unchanged, staleness from
     the audit's sources fingerprint, and --record's receipt (9 October 2026)."""
@@ -279,6 +422,9 @@ def main():
         testConfirmed()
         testRoyalty()
         testKitReader()
+        testInixFallbacks(sTemp)
+        testSaveConfirmation()
+        testRunRecord(sTemp)
         testPreflightAndChoice(sTemp)
         testFingerprints(sTemp)
     finally:
