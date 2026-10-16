@@ -7,6 +7,25 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.72.58 -- 15 October 2026
+
+- **Util.runResponsive does long work without "Not Responding."** It runs a job on a background thread while the window keeps answering Windows, disables the window so no second command starts halfway through, and returns focus where it was. A progress callback runs on the window's own thread, because screen reader calls do not belong on a background thread. An error in the job is thrown again to the caller. FileDir's Zip then Delete is the first user: zipping about 200 MB had left it "Not Responding" until it was closed by force.
+
+## 1.72.57 -- 15 October 2026
+
+- **Builds speak their tutorials in the order they arrived.** Only one build speaks at a time, so the others wait. But the lock went to whichever waiting build happened to check first, not the one that had waited longest. On 15 October, HomerScribe began waiting at 11:20 and spoke at 14:17, after eight builds that arrived later: 177 minutes of waiting for 32 minutes of speaking. Each waiting build now writes a ticket named for when it arrived, and only the oldest ticket waits on the lock. The console says how many builds are ahead. A ticket left by a build that has ended is removed, so it cannot hold up the line.
+
+## 1.72.56 -- 15 October 2026
+
+- **A component found outside winget has its version read.** winget lists only what it installed. DbDo's installer found mpv by its file under Program Files and stopped there, so its log said the version "could not be read," and its box could only ever say Reinstall. HomerComponents.iss now asks the program found for its version, compares that with the newest release winget offers, and offers Update, ticked, when it is older. Two numbers that cannot be compared, such as a dated build against a numbered release, stay Reinstall, and the setup log says why.
+- **Updating a copy winget did not install now works.** winget upgrade answers such a copy with "no installed package found." installCommon's wingetUpgrade then installs the newest release in its default machine-wide folder, and reports the result like any other.
+
+## 1.72.55 -- 15 October 2026
+
+- **check fails a Windows program whose Main has lost [STAThread].** In DbDo 1.0.287, a function added between the attribute and Main took the attribute for itself. The compiler accepted that, but Copy Cell then failed with a clipboard error, and the file dialogs were at the same risk. The new mainthread check fails any Windows Forms source where Main lacks the attribute, or where the attribute sits on something else. It found exactly those two lines in DbDo 1.0.287.
+- **check fails an installer that runs a script it does not install.** DbDo 1.0.287's finish page had no JAWS box on a computer running JAWS. Its installer asked installScreenReaderSupport.cmd whether the scripts needed installing, but never installed that script. Its mpv box ran installMpv.cmd, which the build never copied. The new shipped check reads each installer's [Run] and [UninstallRun] lines. Any program under the app's folder must be installed by a Source: line, and any script it names must be in the project. It found both of DbDo's gaps, and it passes all 55 programs the kit's own installer runs.
+- **The kit holds itself to both checks.** checkHomerDev runs the same two functions from check.py against the kit, rather than keeping a copy of them.
+
 ## 1.72.54 -- 15 October 2026
 
 - **The build repairs stray line endings instead of stopping.** Every build since 14 October afternoon stopped on two bare LF endings in scripts\kdpUpdate.py, left by an edit made elsewhere. Turning a bare LF into CRLF changes nothing a reader or interpreter sees, so the build now repairs such a file in place, says so, and logs the count; push commits the repaired file. A file that also holds a lone CR is still reported, since what it meant cannot be judged.

@@ -189,6 +189,27 @@ def runHere(sCommand, sFolder):
 
 # --- 1. the kit audit -------------------------------------------------------
 
+# THE KIT KEEPS THE RULES IT GIVES (15 October 2026). check.py's mainthread and shipped checks came from DbDo 1.0.287:
+# Copy Cell broke because [STAThread] had drifted off Main, and the finish page lost its JAWS box because the installer
+# never shipped installScreenReaderSupport.cmd. The kit's own programs and installer are held to the same two checks,
+# by running check.py's own functions here rather than a copy of them.
+def checkAppRules():
+    """check.py's mainthread and shipped checks, run against the kit itself."""
+    try:
+        import importlib.util
+        oSpec = importlib.util.spec_from_file_location("homerCheck", os.path.join(sKit, "scripts", "check.py"))
+        oCheck = importlib.util.module_from_spec(oSpec)
+        oSpec.loader.exec_module(oCheck)
+        oCheck.sRoot = sKit
+        oCheck.oLog = None
+        oCheck.checkMainThread()
+        oCheck.checkShipped()
+    except Exception as oError:
+        return finding("app rules", "skip", "check.py could not be run against the kit: %s" % oError)
+    for sName, sVerdict, sEvidence in oCheck.lsFindings: finding(sName, sVerdict, sEvidence)
+    return True
+
+
 def checkKit():
     """build's own audit: every component present and encoded right."""
     iCode, sOut = runHere("python build.py check", sKit)
@@ -629,6 +650,7 @@ def main():
 
     checkEnvironment()
     checkKit()
+    checkAppRules()
     checkDependencies()
     checkSharedTools()
     if dArguments.no_clean:

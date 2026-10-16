@@ -154,6 +154,122 @@ begin
     end;
 end;
 
+// ---- versions read from a program found by its file (15 October 2026) ------
+// winget lists only what it installed. DbDo 1.0.287 found mpv by its file under
+// Program Files, which winget had not installed, and stopped there: its log said
+// "its version could not be read", and the box could only ever say Reinstall.
+// These three ask the program itself and compare the answer with the newest
+// release winget offers, so a stale copy is offered as Update.
+
+function homerVersionIn(sText: String): String;
+(* The first version number in a line: digits joined by dots, with at least one
+   dot. "mpv v0.40.0-dirty Copyright 2000-2025" gives 0.40.0. Empty if none. *)
+var
+  bDot: Boolean;
+  i, iLength, iStart: Integer;
+begin
+  Result := '';
+  iLength := Length(sText);
+  i := 1;
+  while i <= iLength do
+  begin
+    if (sText[i] >= '0') and (sText[i] <= '9') then
+    begin
+      iStart := i;
+      bDot := False;
+      while i <= iLength do
+      begin
+        if (sText[i] >= '0') and (sText[i] <= '9') then
+          i := i + 1
+        else if (sText[i] = '.') and (i < iLength) then
+        begin
+          if (sText[i + 1] >= '0') and (sText[i + 1] <= '9') then
+          begin
+            bDot := True;
+            i := i + 1;
+          end
+          else break;
+        end
+        else break;
+      end;
+      if bDot then
+      begin
+        Result := Copy(sText, iStart, i - iStart);
+        exit;
+      end;
+    end
+    else i := i + 1;
+  end;
+end;
+
+function homerVersionPart(var sRest: String): Integer;
+(* The next dot-separated number, taken off the front of sRest; -1 when none is left. *)
+var
+  iDot: Integer;
+begin
+  Result := -1;
+  if sRest = '' then exit;
+  iDot := Pos('.', sRest);
+  if iDot = 0 then
+  begin
+    Result := StrToIntDef(sRest, 0);
+    sRest := '';
+  end
+  else
+  begin
+    Result := StrToIntDef(Copy(sRest, 1, iDot - 1), 0);
+    sRest := Copy(sRest, iDot + 1, 100);
+  end;
+end;
+
+function homerVersionOrder(sOne, sTwo: String): Integer;
+(* -1 when sOne is older than sTwo, 0 the same, 1 newer; 2 when they cannot be
+   compared -- either is empty, or one is a dated build (a first number of 1000
+   or more) and the other a numbered release -- so no box gets its verb on a guess. *)
+var
+  iOne, iTwo: Integer;
+begin
+  Result := 2;
+  if (sOne = '') or (sTwo = '') then exit;
+  iOne := homerVersionPart(sOne);
+  iTwo := homerVersionPart(sTwo);
+  if (iOne >= 1000) <> (iTwo >= 1000) then exit;
+  while True do
+  begin
+    if iOne < iTwo then begin Result := -1; exit; end;
+    if iOne > iTwo then begin Result := 1; exit; end;
+    if (sOne = '') and (sTwo = '') then begin Result := 0; exit; end;
+    iOne := homerVersionPart(sOne);
+    iTwo := homerVersionPart(sTwo);
+    if iOne < 0 then iOne := 0;
+    if iTwo < 0 then iTwo := 0;
+  end;
+end;
+
+function homerFileVersion(sPath: String): String;
+(* The version a program at a full path gives for --version, as a number. TWO
+   PAIRS OF QUOTES: cmd /c strips the outermost pair, which leaves the quoted
+   Program Files path whole. *)
+var
+  lsLines: TArrayOfString;
+  i, iCode: Integer;
+  sTemp: String;
+begin
+  Result := '';
+  if (sPath = '') or (not FileExists(sPath)) then exit;
+  sTemp := ExpandConstant('{tmp}\homerVersion.txt');
+  if not Exec(ExpandConstant('{cmd}'), '/c ""' + sPath + '" --version > "' + sTemp + '" 2>&1"',
+              '', SW_HIDE, ewWaitUntilTerminated, iCode) then exit;
+  if LoadStringsFromFile(sTemp, lsLines) then
+    for i := 0 to GetArrayLength(lsLines) - 1 do
+      if homerVersionIn(lsLines[i]) <> '' then
+      begin
+        Result := homerVersionIn(lsLines[i]);
+        break;
+      end;
+  DeleteFile(sTemp);
+end;
+
 function homerAdd(sName, sIdList, sExe, sFile, sUse, sRegKey: String): Integer;
 (* Register one component and get its index back. Call these from
    InitializeWizard, in any order -- homerOrder sorts them for display. *)
@@ -197,7 +313,8 @@ function homerState(iAt: Integer): Integer;
    The order matters: every winget id first, then the FILE, then the EXE. A
    file that exists cannot lie; winget can be absent, slow or refused. *)
 var
-  sInstalled, sAvailable, sId, sRest, sVersion: String;
+  iOrder: Integer;
+  sAvailable, sId, sInstalled, sRest, sVersion: String;
 begin
   Result := 0;
   if (iAt < 0) or (iAt >= GetArrayLength(gHomer)) then exit;
@@ -248,6 +365,32 @@ begin
     begin
       gHomer[iAt].sLocal := sVersion;
       Result := 2;
+    end;
+  end;
+
+  // FOUND OUTSIDE WINGET, ITS VERSION IS STILL READ (15 October 2026): the program
+  // found is asked, by its file when there is one, and compared with the newest
+  // release winget offers; older is Update, ticked. Two numbers that cannot be
+  // compared stay Reinstall, and the log says so. installCommon's wingetUpgrade
+  // installs the newest release when winget knows no installed copy.
+  if (Result = 2) and (gHomer[iAt].sLocal = '') then
+  begin
+    if (gHomer[iAt].sFile <> '') and FileExists(ExpandConstant(gHomer[iAt].sFile)) then
+      gHomer[iAt].sLocal := homerFileVersion(ExpandConstant(gHomer[iAt].sFile))
+    else
+      gHomer[iAt].sLocal := homerVersionIn(homerExeVersion(gHomer[iAt].sExe));
+    if gHomer[iAt].sLocal <> '' then
+    begin
+      sRest := gHomer[iAt].sIdList;
+      if sRest <> '' then gHomer[iAt].sRemote := homerVersionIn(homerWingetLatest(homerNextId(sRest)));
+      iOrder := homerVersionOrder(gHomer[iAt].sLocal, gHomer[iAt].sRemote);
+      if iOrder = -1 then Result := 1;
+      if (iOrder = 2) and (gHomer[iAt].sRemote <> '') then
+      begin
+        Log('Component ' + gHomer[iAt].sName + ': ' + gHomer[iAt].sLocal + ' found and '
+            + gHomer[iAt].sRemote + ' offered, but the two cannot be compared');
+        gHomer[iAt].sRemote := '';
+      end;
     end;
   end;
 

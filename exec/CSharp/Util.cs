@@ -29,6 +29,55 @@ public static class Util {
 public static string sSectionBreak = "\r\n----------\r\n\f\r\n";
 public static string sEndOfDocument = "\r\n----------\r\nEnd of Document\r\n";
 
+// runResponsive: does a long job without the window going "Not Responding" (15 October 2026). FileDir's Zip then
+// Delete compressed about 200 MB and tested the archive on the window's own thread; Windows marked FileDir "Not
+// Responding" and JAWS lost its way, so the program was killed while it was still working. The job runs on a
+// background thread, and this thread keeps answering Windows until it ends. The window is disabled meanwhile, so
+// no keystroke starts a second command halfway through the first, and focus goes back where it was afterwards.
+// Every iSayEvery seconds fnSay is called, on THIS thread -- screen reader calls do not belong on a background
+// thread -- with the seconds so far, to say how long it has taken. An error in the job is thrown again here, so
+// the caller handles it as before. The job must not touch the window or speak.
+public static void runResponsive(Form frm, Action fnWork, int iSayEvery, Action<int> fnSay) {
+Exception oError = null;
+Control ctlFocused = null;
+bool bWasEnabled = true;
+System.Threading.Thread oThread = new System.Threading.Thread(delegate() {
+try { fnWork(); }
+catch (Exception ex) { oError = ex; }
+});
+oThread.IsBackground = true;
+oThread.SetApartmentState(System.Threading.ApartmentState.STA);
+if (frm != null) {
+ctlFocused = frm.ActiveControl;
+bWasEnabled = frm.Enabled;
+frm.Enabled = false;
+}
+DateTime dtStart = DateTime.Now;
+int iNextSay = iSayEvery;
+try {
+oThread.Start();
+while (!oThread.Join(100)) {
+Application.DoEvents();
+int iSeconds = (int) (DateTime.Now - dtStart).TotalSeconds;
+if (iSayEvery > 0 && fnSay != null && iSeconds >= iNextSay) {
+try { fnSay(iSeconds); } catch (Exception) { }
+iNextSay = iNextSay + iSayEvery;
+}
+}
+}
+finally {
+if (frm != null) {
+frm.Enabled = bWasEnabled;
+try {
+frm.Activate();
+if (ctlFocused != null && ctlFocused.CanFocus) ctlFocused.Focus();
+}
+catch (Exception) { }
+}
+}
+if (oError != null) throw new Exception(oError.Message, oError);
+} // runResponsive method
+
 // Human-readable byte size, e.g. "1.5 K". (Not in HomerLib; kept here
 // because FileDir's listings rely on it.)
 public static string formatBytes(long lBytes) {
