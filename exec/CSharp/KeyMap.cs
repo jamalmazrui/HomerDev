@@ -575,9 +575,13 @@ public static class KeyMap {
         return lsKeys;
     }
 
-    // friendlyKey: the Homer name of a key, as JAWS writes it -- modifiers in
-    // alphabetical order, Control spelled out, Accent, BackSlash, SemiColon.
+    // friendlyKey: the Homer name of a key, from KeyName, the one table of
+    // spellings -- taken from JAWS's own default.jkm: modifiers in
+    // alphabetical order, Control spelled out, GraveAccent, Backslash,
+    // SemiColon. Only a key KeyName has no name for is spelled here.
     public static string friendlyKey(Keys key) {
+        string sName = KeyName.fromWinFormsKeys((int)key);
+        if (sName.Length > 0) return sName;
         Keys keyBase = key & ~Keys.Modifiers;
         string sBase = baseKeyLabel(keyBase);
         if (sBase.Length == 0) return "";
@@ -589,48 +593,17 @@ public static class KeyMap {
         return sb.ToString();
     }
 
+    // baseKeyLabel: only the keys KeyName's table does not name.
     private static string baseKeyLabel(Keys keyBase) {
         if (keyBase == Keys.None) return "";
-        if (keyBase >= Keys.A && keyBase <= Keys.Z) return keyBase.ToString();
-        if (keyBase >= Keys.D0 && keyBase <= Keys.D9) return ((int)(keyBase - Keys.D0)).ToString();
         if (keyBase >= Keys.NumPad0 && keyBase <= Keys.NumPad9) return "NumPad" + ((int)(keyBase - Keys.NumPad0)).ToString();
         switch (keyBase) {
-            case Keys.OemQuotes: return "Apostrophe";
-            case Keys.OemSemicolon: return "SemiColon";
-            case Keys.OemQuestion: return "Slash";
-            case Keys.OemPeriod: return "Period";
-            case Keys.Oemcomma: return "Comma";
-            case Keys.OemMinus: return "Dash";
-            case Keys.Oemplus: return "Equals";
-            case Keys.OemOpenBrackets: return "LeftBracket";
-            case Keys.OemCloseBrackets: return "RightBracket";
-            case Keys.OemPipe: return "BackSlash";
-            case Keys.OemBackslash: return "BackSlash";
-            case Keys.Oemtilde: return "Accent";
-            case Keys.Back: return "Backspace";
-            case Keys.Return: return "Enter";
-            case Keys.Escape: return "Escape";
-            case Keys.Space: return "Space";
-            case Keys.Tab: return "Tab";
-            case Keys.Up: return "UpArrow";
-            case Keys.Down: return "DownArrow";
-            case Keys.Left: return "LeftArrow";
-            case Keys.Right: return "RightArrow";
-            case Keys.PageUp: return "PageUp";
-            case Keys.PageDown: return "PageDown";
-            case Keys.Home: return "Home";
-            case Keys.End: return "End";
-            case Keys.Insert: return "Insert";
-            case Keys.Delete: return "Delete";
+            case Keys.OemBackslash: return "Backslash";
             case Keys.PrintScreen: return "PrintScreen";
             case Keys.CapsLock: return "CapsLock";
             case Keys.NumLock: return "NumLock";
             case Keys.Scroll: return "ScrollLock";
             case Keys.Clear: return "NumPad5";
-            case Keys.Add: return "NumPadPlus";
-            case Keys.Subtract: return "NumPadMinus";
-            case Keys.Multiply: return "NumPadStar";
-            case Keys.Divide: return "NumPadSlash";
             case Keys.Decimal: return "NumPadDelete";
         }
         return keyBase.ToString();

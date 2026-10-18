@@ -430,6 +430,32 @@ public static class KeyName
     }
 
     /// <summary>
+    /// The Homer spelling of a System.Windows.Forms.Keys value, modifiers
+    /// included -- the reverse of toWinFormsKeys, read from the same table, so
+    /// no spelling is written twice (1.73.2). KeyMap names every key with it.
+    ///
+    /// Returns an empty string for a key this table has no name for (a number
+    /// pad digit, Print Screen); the caller decides what to say then.
+    /// </summary>
+    public static string fromWinFormsKeys(int iKeys)
+    {
+        int iBase = iKeys & 0xFFFF;
+        string sMain = "";
+        foreach (KeyValuePair<string, int> pair in dWinForms)
+        {
+            // Enter and NumPadEnter share 13; the main Enter is the one meant.
+            if (pair.Value == iBase && pair.Key != "NumPadEnter") { sMain = pair.Key; break; }
+        }
+        if (sMain == "") return "";
+        StringBuilder sb = new StringBuilder();
+        if ((iKeys & 0x00040000) != 0) sb.Append("Alt+");       // Keys.Alt
+        if ((iKeys & 0x00020000) != 0) sb.Append("Control+");   // Keys.Control
+        if ((iKeys & 0x00010000) != 0) sb.Append("Shift+");     // Keys.Shift
+        sb.Append(sMain);
+        return sb.ToString();
+    }
+
+    /// <summary>
     /// For a wxPython accelerator string. wx wants Ctrl rather than Control and
     /// its own names for the named keys, and it is the one place Homer's
     /// spell-it-out rule is set aside, because wx will not parse Control.

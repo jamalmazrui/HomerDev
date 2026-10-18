@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.73.2 -- 18 October 2026
+
+- **One table of key spellings, KeyName's.** KeyMap 1.73.0 had its own list of key names, which spelled two keys Accent and BackSlash, on the belief that those were the JAWS spellings. KeyName.cs, whose spellings were taken from JAWS 2026's own default.jkm, says GraveAccent and Backslash. KeyName is right, and a second list was the mistake the conventions forbid: conversion tables live in one shared class. KeyName gains fromWinFormsKeys, the reverse of toWinFormsKeys, read from the same table, and KeyMap names every key through it. Only keys KeyName has no name for, such as the number-pad digits, are spelled in KeyMap.
+- **The suite data uses KeyName's spellings,** and checkKeys accepts the other spellings when comparing, as KeyName itself does: a forgiving reader, a strict writer.
+
 ## 1.73.1 -- 18 October 2026
 
 - **The suite key check is a gate, in the kit's build and in every app's push.**

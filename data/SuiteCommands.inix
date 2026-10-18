@@ -487,9 +487,9 @@ status=current
 
 [DbDo openCommandPrompt]
 name=Open Command Prompt
-keys=Control+BackSlash or Control+Slash
+keys=Control+Backslash or Control+Slash
 change=keys changed, was Control+Slash
-reason=Control+BackSlash added as the suite key
+reason=Control+Backslash added as the suite key
 disposition=accepted
 status=proposed
 
@@ -500,12 +500,12 @@ status=current
 
 [DbDo openDotPrompt]
 name=Open Dot Prompt
-keys=Control+Accent
+keys=Control+GraveAccent
 status=current
 
 [DbDo openInExplorer]
 name=Open in Explorer
-keys=Alt+BackSlash
+keys=Alt+Backslash
 status=current
 
 [DbDo openScriptFolder]
@@ -938,7 +938,7 @@ status=current
 
 [DbDo sqleanConsole]
 name=Sqlean Console
-keys=Control+Shift+Accent
+keys=Control+Shift+GraveAccent
 status=current
 
 [DbDo startMark]
@@ -1648,16 +1648,16 @@ status=current
 
 [EdSharp openCommandPrompt]
 name=Open Command Prompt
-keys=Control+BackSlash
-change=renamed from Command Prompt, was Control+BackSlash
+keys=Control+Backslash
+change=renamed from Command Prompt, was Control+Backslash
 reason=wording; Control+Slash stays Next Style
 disposition=accepted
 status=proposed
 
 [EdSharp openInExplorer]
 name=Open in Explorer
-keys=Alt+BackSlash
-change=renamed from Explorer Folder, was Alt+BackSlash
+keys=Alt+Backslash
+change=renamed from Explorer Folder, was Alt+Backslash
 reason=wording
 disposition=accepted
 status=proposed
@@ -2216,14 +2216,14 @@ status=proposed
 [EdSharp toggleIndentation]
 name=Toggle Indentation
 keys=
-change=keys changed, was Windows+Accent
+change=keys changed, was Windows+GraveAccent
 reason=Windows-key combinations belong to Windows
 disposition=accepted
 status=proposed
 
 [EdSharp togglePunctuation]
 name=Toggle Punctuation
-keys=JAWSKey+Accent
+keys=JAWSKey+GraveAccent
 status=current
 
 [EdSharp topic]
@@ -2278,22 +2278,22 @@ status=current
 
 [EdSharp voiceFaster]
 name=Voice Faster
-keys=Control+Accent
+keys=Control+GraveAccent
 status=current
 
 [EdSharp voiceLouder]
 name=Voice Louder
-keys=Alt+Accent
+keys=Alt+GraveAccent
 status=current
 
 [EdSharp voiceSlower]
 name=Voice Slower
-keys=Control+Shift+Accent
+keys=Control+Shift+GraveAccent
 status=current
 
 [EdSharp voiceSofter]
 name=Voice Softer
-keys=Alt+Shift+Accent
+keys=Alt+Shift+GraveAccent
 status=current
 
 [EdSharp webClientUtilities]
@@ -2699,12 +2699,12 @@ exception=shares Comma with Come up Level; merged in stage 4
 
 [FileDir goToQuickFolder]
 name=Go to Quick Folder
-keys=Accent
+keys=GraveAccent
 status=current
 
 [FileDir goToRootFolder]
 name=Go to Root Folder
-keys=Shift+BackSlash
+keys=Shift+Backslash
 status=current
 
 [FileDir goToSpecialFolder]
@@ -2956,9 +2956,9 @@ status=current
 
 [FileDir openCommandPrompt]
 name=Open Command Prompt
-keys=Control+BackSlash or Control+Slash
-change=renamed from Command Prompt, was Control+Slash or Control+BackSlash
-reason=wording; BackSlash first
+keys=Control+Backslash or Control+Slash
+change=renamed from Command Prompt, was Control+Slash or Control+Backslash
+reason=wording; Backslash first
 disposition=accepted
 status=proposed
 
@@ -2982,9 +2982,9 @@ status=proposed
 
 [FileDir openInExplorer]
 name=Open in Explorer
-keys=Alt+BackSlash or Alt+Slash
-change=renamed from Explorer Directory, was Alt+Slash or Alt+BackSlash
-reason=wording; BackSlash first
+keys=Alt+Backslash or Alt+Slash
+change=renamed from Explorer Directory, was Alt+Slash or Alt+Backslash
+reason=wording; Backslash first
 disposition=accepted
 status=proposed
 
@@ -3006,7 +3006,7 @@ status=current
 
 [FileDir openRootFolder]
 name=Open Root Folder
-keys=BackSlash
+keys=Backslash
 status=current
 
 [FileDir openSpecialFolder]
@@ -3372,7 +3372,7 @@ status=current
 
 [FileDir shortPathToClipboard]
 name=Short Path to Clipboard
-keys=Shift+Accent
+keys=Shift+GraveAccent
 status=current
 
 [FileDir show]
@@ -4063,7 +4063,7 @@ status=proposed
 
 [HomerView speechSettings]
 name=Speech Settings
-keys=Shift+Accent
+keys=Shift+GraveAccent
 status=current
 
 [HomerView startSelection]
@@ -4093,7 +4093,7 @@ status=current
 
 [HomerView togglePunctuation]
 name=Toggle Punctuation
-keys=NVDA+Accent
+keys=NVDA+GraveAccent
 status=current
 
 [HomerView toggleReading]
@@ -4108,22 +4108,22 @@ status=current
 
 [HomerView voiceFaster]
 name=Voice Faster
-keys=Control+Accent
+keys=Control+GraveAccent
 status=current
 
 [HomerView voiceLouder]
 name=Voice Louder
-keys=Alt+Accent
+keys=Alt+GraveAccent
 status=current
 
 [HomerView voiceSlower]
 name=Voice Slower
-keys=Control+Shift+Accent
+keys=Control+Shift+GraveAccent
 status=current
 
 [HomerView voiceSofter]
 name=Voice Softer
-keys=Alt+Shift+Accent
+keys=Alt+Shift+GraveAccent
 status=current
 
 [HomerView webDownload]

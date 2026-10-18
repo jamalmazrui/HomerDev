@@ -324,6 +324,11 @@ browser.</li>
 holding unsaved work may refuse, and the count of windows kept open is
 spoken.</li>
 </ul></li>
+<li><strong>Key spellings</strong> are KeyName.cs’s, taken from JAWS’s
+own default.jkm: modifiers in the order Alt, Control, Shift, Windows;
+Control spelled out; GraveAccent, Backslash and SemiColon for those
+keys. The checker accepts other spellings when comparing, but every file
+Homer writes uses these.</li>
 <li><strong>Help family:</strong>
 <ul>
 <li><strong>F1:</strong> Documentation.</li>
@@ -521,10 +526,12 @@ checklist below.</li>
 <ul>
 <li><strong>The checker is a gate</strong> in the kit’s build and in
 every app’s push. Implemented in kit 1.73.1.</li>
-<li><strong>Still to come,</strong> each as its own change: KeyName.cs
-writing the JAWS spellings (Accent, BackSlash), the reviewed JAWS key
-map generator, the clipboard helpers, the .inix cache, and the menu
-repaint change.</li>
+<li><strong>One table of key spellings.</strong> KeyMap names every key
+through KeyName.cs, whose spellings come from JAWS’s own default.jkm:
+GraveAccent, Backslash, SemiColon. Implemented in kit 1.73.2.</li>
+<li><strong>Still to come,</strong> each as its own change: the reviewed
+JAWS key map generator, the clipboard helpers, the .inix cache, and the
+menu repaint change.</li>
 </ul></li>
 <li><strong>Stage 3, DbDo.</strong> Its private KeyMap is replaced
 through an adapter and retired once equivalence is shown, then its key

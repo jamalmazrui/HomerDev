@@ -75,8 +75,17 @@ def readInix(sPath):
     return lsSections
 
 
+# THE READER IS FORGIVING, THE WRITER IS NOT (1.73.2): the manifest and the
+# exports are written in KeyName.cs's spellings, taken from JAWS's own
+# default.jkm (GraveAccent, Backslash, SemiColon), but a key typed another way
+# still compares equal.
+dKeyAliases = {"accent": "GraveAccent", "grave": "GraveAccent", "graveaccent": "GraveAccent",
+               "backslash": "Backslash", "semicolon": "SemiColon", "ctrl": "Control",
+               "minus": "Dash", "hyphen": "Dash", "back": "Backspace", "backspace": "Backspace"}
+
+
 def normKey(sKey):
-    lsParts = [s.strip() for s in sKey.split("+") if s.strip()]
+    lsParts = [dKeyAliases.get(s.strip().lower(), s.strip()) for s in sKey.split("+") if s.strip()]
     lsMods = sorted([s for s in lsParts if s in lsModifierOrder], key=lsModifierOrder.index)
     lsRest = [s for s in lsParts if s not in lsModifierOrder]
     return "+".join(lsMods + lsRest)

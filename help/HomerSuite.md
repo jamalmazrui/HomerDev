@@ -89,6 +89,7 @@ A key shared on purpose carries an exception= line in the manifest saying why, a
   - **Shift+F4:** say the windows open.
   - **Control+F4:** close this window.
   - **Control+Shift+F4:** close all but this one. A window holding unsaved work may refuse, and the count of windows kept open is spoken.
+- **Key spellings** are KeyName.cs's, taken from JAWS's own default.jkm: modifiers in the order Alt, Control, Shift, Windows; Control spelled out; GraveAccent, Backslash and SemiColon for those keys. The checker accepts other spellings when comparing, but every file Homer writes uses these.
 - **Help family:**
   - **F1:** Documentation.
   - **Shift+F1:** History of Changes.
@@ -199,7 +200,8 @@ The HomerView commands added to the manifest are:
    Verified needs one more thing: your JAWS and NVDA pass through the checklist below.
 3. **Stage 2, the minimum core.**
    - **The checker is a gate** in the kit's build and in every app's push. Implemented in kit 1.73.1.
-   - **Still to come,** each as its own change: KeyName.cs writing the JAWS spellings (Accent, BackSlash), the reviewed JAWS key map generator, the clipboard helpers, the .inix cache, and the menu repaint change.
+   - **One table of key spellings.** KeyMap names every key through KeyName.cs, whose spellings come from JAWS's own default.jkm: GraveAccent, Backslash, SemiColon. Implemented in kit 1.73.2.
+   - **Still to come,** each as its own change: the reviewed JAWS key map generator, the clipboard helpers, the .inix cache, and the menu repaint change.
 4. **Stage 3, DbDo.** Its private KeyMap is replaced through an adapter and retired once equivalence is shown, then its key changes, JAWS scripts and laptop-layout tests follow.
 5. **Stage 4, EdSharp, then FileDir,** each on its own, with new commands implemented before their keys are checked.
 6. **Stage 5, HomerView.** The catalog, eligibility, verified session routing, per-browser JAWS script sets and the key alignment.
