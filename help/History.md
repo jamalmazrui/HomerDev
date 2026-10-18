@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.73.7 -- 18 October 2026
+
+- **The suite check really runs in every app's push.** It found the kit through the kind.py already loaded, which can be the installed kit's in Program Files, older than the development kit and without checkKeys.py, so DbDo's, EdSharp's and FileDir's pushes all reported "the kit's checkKeys.py was not found" and skipped it. It now finds the kit with kind.findKit, which prefers the development kit, as tidy already did.
+- **A top-level folder outside the Homer tree goes to notes, by tidy.** EdSharp's push stopped on a folder named "l;ogs", most likely "logs" mistyped. Tidy now applies check's own layout rule: a folder at the top that is neither standard for the project's kind, declared in RepoFiles.txt or LocalFiles.txt, nor in the kit's conformance backlog is moved whole into notes, under its own name. Nothing is deleted, the log names it, and the push that follows passes.
+- **Confirmed on 18 October, from the first runs of 1.73.5 and 1.73.6:**
+  - the Python fruit basket loaded the C# frame through pythonnet and exported the same 38 commands as its C# twin;
+  - FileDir's tidy wrote its JAWS pass-through for Alt+Delete and named its bracket keys, and push committed them.
+
 ## 1.73.6 -- 18 October 2026
 
 - **One frame for C# and Python.**

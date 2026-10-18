@@ -1067,8 +1067,15 @@ def checkSuite():
     An app neither in the suite manifest nor on the frame is skipped.
     """
     sApp = os.path.basename(os.path.normpath(sRoot))
-    oKind = sys.modules.get("kind")
-    sKitScripts = os.path.dirname(os.path.abspath(oKind.__file__)) if oKind is not None and getattr(oKind, "__file__", None) else ""
+    # THE DEVELOPMENT KIT, FOUND AS TIDY FINDS IT (1.73.7). This took the folder of the kind.py already loaded, which
+    # can be the installed kit's in Program Files, older than the development kit and without checkKeys.py, so every
+    # app's suite check skipped. kind.findKit prefers the development kit beside or above the project.
+    try:
+        import kind
+        sKit = kind.findKit([sRoot]) or ""
+    except Exception:
+        sKit = ""
+    sKitScripts = os.path.join(sKit, "scripts") if sKit else ""
     sChecker = os.path.join(sKitScripts, "checkKeys.py") if sKitScripts else ""
     if not sChecker or not os.path.isfile(sChecker):
         return finding("suite", "skip", "the kit's checkKeys.py was not found")
