@@ -1,0 +1,334 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.12.1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>MdiFramework</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      color: light-dark(#1a1a1a, #fdfdfd);
+      background-color: #fdfdfd;
+      background-color: light-dark(#fdfdfd, #1a1a1a);
+      color-scheme: light dark;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a, a:visited {
+      color: inherit;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid;
+      border-color: #e6e6e6;
+      border-color: light-dark(#e6e6e6, #4c4c4c);
+      color: #606060;
+      color: light-dark(#606060, #b6b6b6);
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid currentColor;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+    }
+    th {
+      border-top: 1px solid currentColor;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+<main>
+<h1 id="build-your-own-app-on-the-homer-mdi-framework">Build Your Own
+App on the Homer MDI Framework</h1>
+<p>This guide is for anybody who wants to build a Windows program that
+works well with a screen reader, alone or with an AI assistant. You need
+some comfort with code, but you do not need to know Windows Forms. The
+kit’s frame does the hard parts: windows, menus, keys, help and
+speech.</p>
+<p>DbDo, EdSharp and FileDir are this kind of program. So is the fruit
+basket sample, which shows every feature in one small file:
+Templates\samples\FruitBasketMdiCs.cs.</p>
+<h2 id="what-you-get-without-writing-anything">What You Get Without
+Writing Anything</h2>
+<p>A new app on the frame already has all of this:</p>
+<ul>
+<li><strong>A window for each thing you work on,</strong> inside one
+frame. F4 lists the windows, Shift+F4 says them, Control+Tab moves
+between them, and Control+F4 closes one.</li>
+<li><strong>A Help menu.</strong> F1 opens the guide, Shift+F1 the
+history, and Alt+F1 About. Control+F1 makes every key describe itself
+instead of running. Alt+F10 lists every command in one searchable
+list.</li>
+<li><strong>Settings.</strong> Alt+Shift+E changes a setting at once,
+with nothing to restart.</li>
+<li><strong>Small conveniences.</strong> Alt+Apostrophe says the
+clipboard, Alt+SemiColon the time, and Control+F12 copies the log as a
+file, ready to attach to an email.</li>
+<li><strong>Keys that never fight your screen reader.</strong> Typing in
+a text box always types, and a list keeps first-letter navigation.</li>
+</ul>
+<h2 id="start-an-app">Start an App</h2>
+<ol type="1">
+<li><strong>Make the project.</strong> In a command prompt in the
+HomerDev folder, type <code>newHomerApp MyApp --mdi</code>. This makes a
+MyApp folder beside the kit, with MyApp.cs, a build script, an installer
+script and starter documents.</li>
+<li><strong>Build it.</strong> In the MyApp folder, type
+<code>build</code>. The program is exec\MyApp.exe.</li>
+<li><strong>Try it.</strong> Start it, press Control+N for a new window,
+and try the keys above.</li>
+</ol>
+<h2 id="add-a-command">Add a Command</h2>
+<p>A command is one line in your frame’s constructor:</p>
+<pre><code>addCommand(&quot;&amp;Add Item&quot;, &quot;Control+Shift+A&quot;, &quot;Put the typed item in the list.&quot;, addItem);</code></pre>
+<p>The four parts are:</p>
+<ul>
+<li><strong>The caption,</strong> with an ampersand before its menu
+letter.</li>
+<li><strong>The keys,</strong> in Homer spelling: “Control+Shift+A”,
+“Shift+R or F2” for two keys, or “” for a command found only on its
+menu.</li>
+<li><strong>A one-line summary</strong> that starts with a verb. The
+menu, the Key Describer and the Alternate Menu all speak it.</li>
+<li><strong>The function that does the work.</strong> It returns true
+when it has dealt with the command.</li>
+</ul>
+<p>You never write a KeyDown handler. Every key goes through one router
+in the kit, which knows where your keys belong.</p>
+<h2 id="choose-good-keys">Choose Good Keys</h2>
+<ul>
+<li><strong>Use the first letter of a word in the command’s
+name,</strong> never a letter from the middle of a word. X for export
+and Z for a toggle are the accepted exceptions.</li>
+<li><strong>Leave Alt+Control with letters, digits, function keys and
+punctuation alone.</strong> Windows uses those for desktop
+shortcuts.</li>
+<li><strong>Do not take keys the frame already uses.</strong> The AI
+NOTE at the top of your MyApp.cs lists them.</li>
+<li><strong>Your keys are checked for you.</strong> Started with
+<code>/exportkeys &lt;file&gt;</code>, a program on the frame writes
+every command and key it declares and ends without opening a window. The
+kit’s checkKeys reads that file and reports any key Windows or a screen
+reader owns, and any key used twice. The kit’s own build already does
+this for the sample on every build, and the plan’s next stage adds the
+same step to every app’s build.</li>
+</ul>
+<h2 id="say-why-a-command-cannot-run">Say Why a Command Cannot Run</h2>
+<p>A command that cannot run should say why, not stay silent. Set its
+fUnavailable to a function that returns an empty string when the command
+can run, and the reason when it cannot:</p>
+<pre><code>KeyMap.Command oDelete = addCommand(&quot;&amp;Delete Item&quot;, &quot;Control+Shift+D&quot;, &quot;Remove the item you are on.&quot;, deleteItem);
+oDelete.fUnavailable = delegate() { return countItems() == 0 ? &quot;the list is empty&quot; : &quot;&quot;; };</code></pre>
+<p>Pressing Control+Shift+D on an empty list then says “Delete Item is
+unavailable: the list is empty”.</p>
+<h2 id="give-answers-the-homer-way">Give Answers the Homer Way</h2>
+<p>A command that tells the person something calls KeyMap.answer with a
+title and the parts to say:</p>
+<pre><code>return KeyMap.answer(&quot;Position&quot;, &quot;Item 3 of 10&quot;, &quot;30 percent&quot;);</code></pre>
+<p>One press speaks each part, as its own utterance. A quick second
+press shows the same text in a window, where the screen reader can spell
+it, and Control+C copies it. Mark such a command with
+<code>.sRepeat = "review"</code> so the Hotkeys list says so.</p>
+<p>Speak only what the screen reader cannot know. It already says the
+window title and the focused control, so never repeat those.</p>
+<h2 id="lists-with-shiftletter-commands">Lists with Shift+Letter
+Commands</h2>
+<p>In a list, letters move by first letter. If you want Shift plus a
+letter to run commands while the list has focus, pass the list to
+manageList in your window, and declare those commands with the list
+context:</p>
+<pre><code>manageList(lbItems);
+addCommand(&quot;Say &amp;Item&quot;, &quot;Shift+I&quot;, KeyMap.sListContext, &quot;Say the item you are on.&quot;, sayItem);</code></pre>
+<p>Typing the start of an item still goes to it, and an unbound
+Shift+letter says it has no command, so a question never meets
+silence.</p>
+<h2 id="ask-then-repeat">Ask, Then Repeat</h2>
+<p>A command that asks a question can remember the answer for each
+window, so a partner command repeats it without asking. Control+J for
+Jump and Alt+J for Jump Again are the usual pair:</p>
+<pre><code>KeyMap.rememberInput(&quot;jumpToItem&quot;, this, sAnswer);
+string sLast = KeyMap.recallInput(&quot;jumpToItem&quot;, this);</code></pre>
+<p>Call KeyMap.setLastSearch so F3 knows which search to repeat in that
+window. When a window closes, its memory goes with it.</p>
+<h2 id="titles">Titles</h2>
+<p>The frame’s title is your app’s name and nothing else. A window’s
+title is what it shows, set with setTitle, and never the app’s name
+again. A screen reader reads the two together, and a repeated name is
+read twice.</p>
+<h2 id="settings">Settings</h2>
+<p>Declare a setting once, in your frame’s constructor:</p>
+<pre><code>addSetting(&quot;Basket Size&quot;, &quot;10&quot;, &quot;The most fruit one basket holds.&quot;);</code></pre>
+<p>Alt+Shift+E lists your settings, saves a change to MyApp.inix the
+moment it is made, and calls your onSettingChanged so the program acts
+on it at once. Read a setting with settingValue.</p>
+<h2 id="working-with-an-ai-assistant">Working with an AI Assistant</h2>
+<p>Give your AI assistant MyApp.cs and this guide, and ask for one
+command at a time. The AI NOTE at the top of MyApp.cs states the rules
+it must keep. For example:</p>
+<blockquote>
+<p>Add a command, Sort Items, on Control+Shift+S, that sorts the list in
+this window alphabetically and says how many items it sorted.</p>
+</blockquote>
+<p>After each change:</p>
+<ol type="1">
+<li><strong>Build.</strong></li>
+<li><strong>Try the new key with your screen reader.</strong></li>
+<li><strong>Press Control+F1 and then the key,</strong> to hear that it
+describes itself correctly.</li>
+<li><strong>Run your build again.</strong></li>
+</ol>
+<p>When something goes wrong, Control+F12 copies the log, ready to hand
+to the assistant.</p>
+<h2 id="learn-from-the-sample">Learn from the Sample</h2>
+<p>Templates\samples\FruitBasketMdiCs.cs uses every feature on this
+page. Its opening comment lists what to try with a screen reader.
+help\HomerSuite.md is the contract the four Homer Suite apps follow, and
+the rules your app inherits from the frame.</p>
+</main>
+</body>
+</html>

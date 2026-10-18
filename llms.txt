@@ -12,6 +12,9 @@ Start with AGENTS.md. Each skill below is a folder under .claude/skills holding 
 - [homer-auditor](.claude/agents/homer-auditor.md): a subagent that audits projects against the kit
 - [homer-listener](.claude/agents/homer-listener.md): a subagent that reviews tutorial reader lines
 
+- [Homer Suite contract](help/HomerSuite.md): the rules DbDo, EdSharp, FileDir and HomerView share, with the command manifest data/SuiteCommands.inix and key ownership data/KeyOwnership.inix
+- [Build your own app](help/MdiFramework.md): building a multi-window, screen-reader-friendly app on the kit's frame (newHomerApp MyApp --mdi), declaring commands with addCommand
+
 ## Skills
 
 - [app-help-guide](.claude/skills/app-help-guide/SKILL.md): build a screen-reader-friendly help guide for a product from the publisher's own help pages
@@ -22,7 +25,8 @@ Start with AGENTS.md. Each skill below is a folder under .claude/skills holding 
 - [homer-build-release](.claude/skills/homer-build-release/SKILL.md): run or troubleshoot build, check, tidy, push and release, and read their logs
 - [homer-code](.claude/skills/homer-code/SKILL.md): write or review code in Camel Type with the kit's shared classes
 - [homer-convert](.claude/skills/homer-convert/SKILL.md): convert documents and data between formats, writing the Homer encoding
-- [homer-db](.claude/skills/homer-db/SKILL.md): design or check a SQLite database the way DbDo opens it
+- [homer-db](.claude/skills/homer-db/SKILL.md): design or check a SQLite database the way DbDo opens it
+
 - [homer-library-source](.claude/skills/homer-library-source/SKILL.md): add a book library, such as Apple Books, to bookFido, or a source to any harvester
 - [homer-docs](.claude/skills/homer-docs/SKILL.md): write or review an app's documents at a ninth-grade reading level
 - [homer-elevate](.claude/skills/homer-elevate/SKILL.md): add or fix F11, Elevate Version, the update check

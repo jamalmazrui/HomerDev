@@ -1,85 +1,137 @@
-﻿// Mdi.cs -- part of the shared Homer toolkit (namespace Homer).
+﻿// Mdi.cs -- the Homer multiple-window frame, shared by every Homer MDI app.
 //
-// REQUIRES: KeyMap.cs, Lbc.cs, Log.cs, Paths.cs, Say.cs, Util.cs.
+// REQUIRES: KeyMap.cs, KeyName.cs, Elevate.cs, Inix.cs, Lbc.cs, Log.cs,
+// Paths.cs, Say.cs, Util.cs. The build template compiles them together.
 //
-// KeyMap is the one that is easy to miss, because a build script can compile
-// this file without it and fail with nine copies of "The name 'KeyMap' does not
-// exist in the current context". Every command registers itself with KeyMap as
-// it is added, which is what keeps the menu, the alternate menu, the key
-// describer and the hotkey document in agreement. The two are switched on
-// together in the build template for that reason.
+// THE SHAPE. One frame holds the menu bar and the app's name. Each thing being
+// worked on -- a database table, a document, a folder, a basket of fruit --
+// has a window of its own inside the frame. A window is a first-class object
+// to a screen reader: the window list reaches it, its title is announced when
+// it activates, and it keeps its own state. DbDo, EdSharp and FileDir are this
+// shape, and so is any app made with newHomerApp --mdi.
 //
-// THE THIRD KIND OF HOMER APP: a multiple-document program, where each thing
-// being worked on has its own window inside one frame. EdSharp, FileDir and
-// DbDo are all this shape, and each grew its own version of the same frame
-// code. This is that code, once.
+// WHAT THE FRAME GIVES EVERY APP, so no app writes it again:
 //
-// THE DESIGN IS NOT NEW. It comes from the Homer.NET MDI fruit basket of 2010 --
-// LbcMdiApp, LbcMdiFrame, LbcMdiChild, with a menu built by name and key, focus
-// tips per control, a window picker, a command list, and a key describer. That
-// program was right about the shape twenty years before this file existed. What
-// is new is that the three current apps can share one implementation instead of
-// three that drift.
+//   Window   F4 Current Windows, Shift+F4 Say Windows Open, Control+Tab and
+//            Control+Shift+Tab Next and Previous Window, Control+F4 Close
+//            Window, Control+Shift+F4 Close All But Current Window
+//   Query    Alt+Apostrophe Say Clipboard, Alt+SemiColon Say Time
+//   Misc     Alt+Shift+E Edit Settings, Control+Shift+I Invoke Script
+//   Help     F1 Documentation, Shift+F1 History of Changes, Alt+F1 About,
+//            Control+F1 Key Describer Toggle, Control+Shift+F1 Hotkeys,
+//            Alt+Shift+F1 ReadMe, Alt+F10 Alternate Menu, Alt+Shift+H Hotkey
+//            Summary, F11 Elevate Version, Control+F12 Copy Log, and Play
+//            Tutorials in the Homer Player
 //
-// WHY MDI AT ALL, when the rest of the world moved to tabs. Because a window is
-// a first-class object to a screen reader and a tab is not. Alt+Tab reaches it,
-// the window list reaches it, the title announces it on activation, and each
-// window keeps its own state -- its own file, filter, position and focus. A
-// tabbed interface has to reimplement every one of those, usually badly.
+// Every key goes through KeyMap.route, so a key that types in a text box
+// types, a list keeps first-letter navigation, and a command that cannot run
+// says why. The rules are in KeyMap.cs and the guide is help\MdiFramework.md.
 //
-// WHAT THE FRAME GIVES YOU, and no app should write again:
+// THE TITLE RULE. The FRAME carries the app name and nothing else. A CHILD
+// carries what it is showing and nothing else. Windows merges a maximized
+// child into the frame caption, so JAWS+T reads "DbDo - [contacts.db]"; a
+// child that repeated the app name made the reader say it twice.
 //
-//     F4                    current windows, as a pick list
-//     Shift+F4              say how many windows are open, and their titles
-//     Control+Tab           next window
-//     Control+Shift+Tab     previous window
-//     Control+F4            close this window
-//     Control+Shift+F4      close all but this one
-//     Alt+F10               alternate menu: every command in one filterable list
-//     Alt+Shift+C           change a setting, from a list of what is settable
-//     Alt+Shift+S           run a script, from a list of what is in the scripts folder
-//     Control+F1            key describer: a key says what it would do
-//     Alt+F1                about
-//     F1                    documentation
+// THE LEVELS OF NEXT AND PREVIOUS (the suite contract, help\HomerSuite.md):
+// Control+Tab moves between windows; Control+F6 between the things inside a
+// window in a fixed order; Alt+F6 between them in the order last visited;
+// F6 between the views or parts of the current thing. The frame owns the
+// first; an app adds the others when it has such things.
 //
-// THE TITLE RULE, which cost DbDo a bug before it was written down. The FRAME
-// carries the app name and nothing else. A CHILD carries what it is showing and
-// nothing else. Windows merges a maximized child into the frame caption, so
-// JAWS+T reads "DbDo - [contacts.db - contacts]". A child that repeated the app
-// name made the reader say it twice.
+// COMPATIBILITY. addItem(name, Keys, summary) and onCommand(name) still work,
+// so an app written for the earlier frame compiles unchanged.
 //
-// Usage, which is the whole of an MDI app's plumbing:
-//
-//     using Homer;
-//
-//     public class fruitFrame : MdiFrame
-//     {
-//         public fruitFrame() : base("FruitBasketMdi")
-//         {
-//             addMenu("&File");
-//             addItem("&New basket", Keys.Control | Keys.N, "Open another basket.");
-//             addMenu("&Window");           // the frame fills this one in
-//             addMenu("&Help");             // and this one
-//             finishMenus();
-//         }
-//         protected override bool onCommand(string sCommand) { ... }
-//     }
-//
-// Nothing here throws where it can help it: a menu that cannot be built, a
-// window that cannot be closed, or a title that cannot be set is logged and
-// stepped over, because an MDI frame that dies takes every open document with
-// it.
+// Nothing here throws where it can help it: a frame that dies takes every
+// open window with it, so failures are logged and stepped over.
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Windows.Forms;
 
 namespace Homer {
 
+// ------- window services, usable by any frame -------
+
+// MdiWindows: the window commands, for a frame of any kind -- this kit's
+// MdiFrame, or an older app frame that has not moved to it yet.
+public static class MdiWindows {
+
+    public static List<string> titles(Form frmFrame) {
+        List<string> lsTitles = new List<string>();
+        if (frmFrame == null) return lsTitles;
+        foreach (Form frm in frmFrame.MdiChildren) lsTitles.Add(frm.Text);
+        return lsTitles;
+    }
+
+    public static string countText(int iCount) {
+        return iCount == 1 ? "1 window open" : iCount.ToString() + " windows open";
+    }
+
+    // sayOpen: Shift+F4. The count, then the titles, as separate utterances.
+    public static bool sayOpen(Form frmFrame) {
+        List<string> lsTitles = titles(frmFrame);
+        List<string> lsParts = new List<string>();
+        lsParts.Add(countText(lsTitles.Count));
+        lsParts.AddRange(lsTitles);
+        return KeyMap.answer("Windows Open", lsParts.ToArray());
+    }
+
+    // pick: F4. A list of the open windows; Enter goes to the one chosen.
+    public static bool pick(Form frmFrame) {
+        Form[] afrmChildren = frmFrame.MdiChildren;
+        if (afrmChildren.Length == 0) { Say.sayForced(countText(0)); return true; }
+        List<string> lsTitles = titles(frmFrame);
+        using (LbcDialog dlg = new LbcDialog("Current Windows", frmFrame)) {
+            ListBox lb = dlg.addPickBox("&Window:", lsTitles,
+                frmFrame.ActiveMdiChild == null ? "" : frmFrame.ActiveMdiChild.Text,
+                "Type the start of a title, then press Enter to go to that window.");
+            if (!dlg.runOkCancel()) return true;
+            int iPick = lb.SelectedIndex;
+            if (iPick >= 0 && iPick < afrmChildren.Length && !afrmChildren[iPick].IsDisposed) afrmChildren[iPick].Activate();
+        }
+        return true;
+    }
+
+    // step: Control+Tab and Control+Shift+Tab, in a fixed order.
+    public static bool step(Form frmFrame, int iDirection) {
+        Form[] afrmChildren = frmFrame.MdiChildren;
+        if (afrmChildren.Length < 2) { Say.sayForced(countText(afrmChildren.Length)); return true; }
+        int iNow = Array.IndexOf(afrmChildren, frmFrame.ActiveMdiChild);
+        if (iNow < 0) iNow = 0;
+        int iNext = (iNow + iDirection + afrmChildren.Length) % afrmChildren.Length;
+        afrmChildren[iNext].Activate();
+        return true;
+    }
+
+    // closeCurrent: Control+F4. A window that refuses (unsaved work the
+    // person chose to keep) stays open; its own question said why.
+    public static bool closeCurrent(Form frmFrame) {
+        if (frmFrame.ActiveMdiChild == null) { Say.sayForced(countText(0)); return true; }
+        frmFrame.ActiveMdiChild.Close();
+        return true;
+    }
+
+    // closeOthers: Control+Shift+F4. Counts only the windows that really closed.
+    public static bool closeOthers(Form frmFrame) {
+        Form frmKeep = frmFrame.ActiveMdiChild;
+        int iClosed = 0, iKept = 0;
+        foreach (Form frm in frmFrame.MdiChildren) {
+            if (frm == frmKeep) continue;
+            frm.Close();
+            if (frm.IsDisposed || !frm.Visible) iClosed++;
+            else iKept++;
+        }
+        string sClosed = iClosed == 1 ? "1 window closed" : iClosed.ToString() + " windows closed";
+        if (iKept > 0) Say.sayForced(sClosed + ", " + (iKept == 1 ? "1 kept open" : iKept.ToString() + " kept open"));
+        else Say.sayForced(sClosed);
+        return true;
+    }
+}
+
 // ------- the frame -------
 
-public class MdiFrame : LbcForm
-{
+public class MdiFrame : LbcForm {
     private Dictionary<string, ToolStripMenuItem> dMenus =
         new Dictionary<string, ToolStripMenuItem>(StringComparer.OrdinalIgnoreCase);
     private Dictionary<string, string> dSettable =
@@ -90,296 +142,265 @@ public class MdiFrame : LbcForm
     private ToolStripMenuItem menuNow;
     private string sAppName = "";
 
-    public MdiFrame(string sAppNameGiven)
-    {
-        sAppName = (sAppNameGiven ?? "").Trim();
-        if (sAppName == "") sAppName = "Homer";
+    // bCloseWithLastWindow: when the last window closes there is no work left
+    // and no menu worth having, so by default the frame closes too.
+    public bool bCloseWithLastWindow = true;
 
-        // THE FRAME CARRIES THE APP NAME AND NOTHING ELSE. A child adds what it
-        // is showing, and Windows merges the two for a maximized child.
+    public MdiFrame(string sAppNameGiven) {
+        sAppName = (sAppNameGiven == null ? "" : sAppNameGiven).Trim();
+        if (sAppName == "") sAppName = "Homer";
         this.Text = sAppName;
         this.IsMdiContainer = true;
         this.StartPosition = FormStartPosition.CenterScreen;
         this.WindowState = FormWindowState.Maximized;
 
         menuBar = new MenuStrip();
-        menuBar.AccessibleName = "Main menu";
         menuBar.Dock = DockStyle.Top;
-        menuBar.AllowMerge = true;
         this.MainMenuStrip = menuBar;
         this.Controls.Add(menuBar);
 
         Say.attach(this);
 
-        // When the last child closes there is no menu bar left, so an empty
-        // frame is a dead end for a keyboard user. Close it instead.
-        this.MdiChildActivate += delegate(object oSender, EventArgs evArgs)
-        {
-            if (this.MdiChildren.Length == 0 && this.Visible) this.Close();
+        this.MdiChildActivate += delegate(object oSender, EventArgs evArgs) {
+            if (bCloseWithLastWindow && this.MdiChildren.Length == 0 && this.Visible) this.Close();
         };
     }
 
     public string appName { get { return sAppName; } }
 
+    // ProcessCmdKey: every key through the one router, first.
+    protected override bool ProcessCmdKey(ref Message msg, Keys keyData) {
+        if (KeyMap.route(this, ref msg, keyData)) return true;
+        return base.ProcessCmdKey(ref msg, keyData);
+    }
+
     // ------- building the menus -------
 
-    // addMenu: start a top-level menu. Name it with an ampersand, as every
-    // Homer label is; the plain Windows API does the rest.
-    public ToolStripMenuItem addMenu(string sTitle)
-    {
+    // addMenu: start a top-level menu, named with its ampersand.
+    public ToolStripMenuItem addMenu(string sTitle) {
+        string sPlain = sTitle.Replace("&", "");
+        ToolStripMenuItem menu;
+        if (dMenus.TryGetValue(sPlain, out menu)) { menuNow = menu; return menu; }
         menuNow = new ToolStripMenuItem(sTitle);
         menuBar.Items.Add(menuNow);
-        dMenus[sTitle.Replace("&", "")] = menuNow;
+        dMenus[sPlain] = menuNow;
         return menuNow;
     }
 
-    // addItem: one command on the current menu, with its key and its tip.
-    //
-    // The command NAME is what onCommand receives, so an app dispatches on a
-    // sentence a person would say rather than on a control id. The key and the
-    // summary go to KeyMap, which is what makes the alternate menu, the key
-    // describer and the hotkey document agree without being told twice.
-    public ToolStripMenuItem addItem(string sCommand, Keys keyData, string sSummary)
-    {
-        ToolStripMenuItem item = new ToolStripMenuItem(sCommand);
-        if (keyData != Keys.None) item.ShortcutKeys = keyData;
-        item.ToolTipText = sSummary;
-        string sPlain = sCommand.Replace("&", "");
-        item.Click += delegate(object oSender, EventArgs evArgs) { runCommand(sPlain); };
-        if (menuNow != null) menuNow.DropDownItems.Add(item);
-        try
-        {
-            KeyMap.register(sPlain, keyData, item, sAppName);
-            KeyMap.setSummary(sPlain, sSummary);
-        }
-        catch (Exception oError)
-        {
-            Log.exception(oError);
-        }
-        return item;
+    // addCommand: one command on the current menu. The caption carries the
+    // ampersand; sKeys is in Homer spelling ("Control+Shift+A", "Shift+R or
+    // F2", "" for none); fRun does the work. Set the returned command's
+    // fUnavailable, fChecked or sRepeat to say more.
+    public KeyMap.Command addCommand(string sCaption, string sKeys, string sSummary, Func<bool> fRun) {
+        return addCommand(sCaption, sKeys, KeyMap.sAnywhere, sSummary, fRun);
     }
 
-    public bool addSeparator()
-    {
+    public KeyMap.Command addCommand(string sCaption, string sKeys, string sContext, string sSummary, Func<bool> fRun) {
+        KeyMap.Command oCommand = KeyMap.addCommand(sCaption, sKeys, sContext, sSummary, fRun);
+        if (oCommand == null) return null;
+        LbcMenuItem item = new LbcMenuItem(sCaption);
+        item.ToolTipText = sSummary;
+        if (oCommand.lsKeys.Count > 0) item.ShortcutKeyDisplayString = oCommand.keysText();
+        item.Click += delegate(object oSender, EventArgs evArgs) { KeyMap.runCommand(oCommand); };
+        oCommand.oItem = item;
+        oCommand.sMenu = menuNow == null ? "" : menuNow.Text.Replace("&", "");
+        if (menuNow != null) {
+            menuNow.DropDownItems.Add(item);
+            // The state of a mode is shown, and a refusal is announced when
+            // the command is chosen, never only greyed out.
+            menuNow.DropDownOpening += delegate(object oSender, EventArgs evArgs) {
+                if (oCommand.fChecked != null) {
+                    try { item.Checked = oCommand.fChecked(); } catch (Exception) { }
+                }
+            };
+        }
+        return oCommand;
+    }
+
+    // addItem: the earlier form, kept so older apps compile. The command name
+    // goes to onCommand.
+    public ToolStripMenuItem addItem(string sCommand, Keys keyData, string sSummary) {
+        string sPlain = KeyMap.plainName(sCommand);
+        KeyMap.Command oCommand = addCommand(sCommand,
+            keyData == Keys.None ? "" : KeyMap.friendlyKey(keyData), sSummary,
+            delegate() { return runCommand(sPlain); });
+        return oCommand == null ? null : oCommand.oItem;
+    }
+
+    public bool addSeparator() {
         if (menuNow != null) menuNow.DropDownItems.Add(new ToolStripSeparator());
         return true;
     }
 
-    // finishMenus: fill in the Window and Help menus the frame owns, and log
-    // any key claimed twice. Call it once, after the app's own menus.
-    public bool finishMenus()
-    {
-        if (!dMenus.ContainsKey("Window")) addMenu("&Window");
-        menuNow = dMenus["Window"];
-        addItem("Current Windows", Keys.F4, "Pick an open window from a list.");
-        addItem("Say Windows Open", Keys.Shift | Keys.F4, "Say how many windows are open, and their titles.");
-        addItem("Next Window", Keys.Control | Keys.Tab, "Go to the next window.");
-        addItem("Previous Window", Keys.Control | Keys.Shift | Keys.Tab, "Go to the previous window.");
-        addItem("Close Window", Keys.Control | Keys.F4, "Close this window.");
-        addItem("Close All But Current Window", Keys.Control | Keys.Shift | Keys.F4, "Close every window but this one.");
+    // finishMenus: add the frame's own commands, after the app's. Call once.
+    public bool finishMenus() {
+        addMenu("&Query");
+        addCommand("Say &Clipboard", "Alt+Apostrophe", "Say the text on the clipboard.", sayClipboard).sRepeat = "review";
+        addCommand("Say &Time", "Alt+SemiColon", "Say the time and date.", sayTime).sRepeat = "review";
 
-        if (!dMenus.ContainsKey("Help")) addMenu("&Help");
-        menuNow = dMenus["Help"];
-        addItem("Documentation", Keys.F1, "Open the guide.");
-        addItem("Run a Script", Keys.Alt | Keys.Shift | Keys.S,
-                "Pick a script from the scripts folder and run it.");
-        addItem("Change a Setting", Keys.Alt | Keys.Shift | Keys.C,
-                "Change a setting and have it take effect now.");
-        addItem("Alternate Menu", Keys.Alt | Keys.F10, "Every command in one list you can filter.");
-        addItem("Key Help Toggle", Keys.Control | Keys.F1, "A key says what it would do instead of doing it.");
-        addItem("About", Keys.Alt | Keys.F1, "The name, the version, and where this copy came from.");
+        addMenu("&Misc");
+        addCommand("&Edit Settings...", "Alt+Shift+E", "Change a setting and have it take effect now.", changeSetting);
+        addCommand("&Invoke Script...", "Control+Shift+I", "Pick a script from the scripts folder and run it.", runScript);
 
+        addMenu("&Window");
+        addCommand("&Current Windows...", "F4", "Pick an open window from a list.", delegate() { return MdiWindows.pick(this); });
+        addCommand("&Say Windows Open", "Shift+F4", "Say how many windows are open, and their titles.", delegate() { return MdiWindows.sayOpen(this); }).sRepeat = "review";
+        addCommand("&Next Window", "Control+Tab", "Go to the next window.", delegate() { return MdiWindows.step(this, 1); });
+        addCommand("&Previous Window", "Control+Shift+Tab", "Go to the previous window.", delegate() { return MdiWindows.step(this, -1); });
+        addCommand("C&lose Window", "Control+F4", "Close this window.", delegate() { return MdiWindows.closeCurrent(this); });
+        addCommand("Close &All But Current Window", "Control+Shift+F4", "Close every window but this one.", delegate() { return MdiWindows.closeOthers(this); });
+
+        addMenu("&Help");
+        addCommand("&Documentation", "F1", "Open the guide.", delegate() { return openHelp(sAppName + ".htm"); });
+        addCommand("&History of Changes", "Shift+F1", "Open the list of changes, newest first.", delegate() { return openHelp("History.htm"); });
+        addCommand("&About", "Alt+F1", "The name, the version, and where this copy keeps its files.", showAbout);
+        KeyMap.Command oDescriber = addCommand("&Key Describer Toggle", "Control+F1", "A key says what it would do instead of doing it.", toggleKeyDescriber);
+        oDescriber.fChecked = delegate() { return KeyMap.bKeyDescriber; };
+        addCommand("Hot&keys", "Control+Shift+F1", "Open the document of every command and key.", showHotkeys);
+        addCommand("&ReadMe", "Alt+Shift+F1", "Open the quick start.", delegate() { return openHelp("ReadMe.htm"); });
+        addCommand("Alternate &Menu...", "Alt+F10", "Every command in one list you can search.", showAlternateMenu);
+        addCommand("Hotkey &Summary", "Alt+Shift+H", "Every command, key and summary in a window.", showHotkeySummary);
+        addCommand("&Play Tutorials...", "", "Play the spoken tutorials in the Homer Player.", playTutorials);
+        addCommand("&Elevate Version...", "F11", "Check for a newer release and offer to install it.", elevateVersion);
+        addCommand("Copy &Log", "Control+F12", "Put this session's log on the clipboard as a file, ready to attach.", copyLog);
+
+        foreach (string sProblem in KeyMap.lsProblems) Log.warn("Key map: " + sProblem);
         foreach (string sConflict in KeyMap.lsConflicts) Log.warn("Key claimed twice: " + sConflict);
+        exportIfAsked();
         return true;
     }
 
-    // ------- running a command -------
+    // bExportOnly: true when the program was started with /exportkeys. The
+    // export is written as the menus are finished, and the app's Main then
+    // ends without running the frame, so no window ever appears: the kit's
+    // build runs the export of the sample on every build, and a window
+    // flashing up would take focus from whatever the person was doing.
+    public static bool bExportOnly = false;
+    public static bool bExportWritten = false;
 
-    // runCommand: the one way in. Key Help turns every command into a
-    // description of itself, which is how a person explores a program safely.
-    public bool runCommand(string sCommand)
-    {
+    // exportIfAsked: "<App>.exe /exportkeys <file>" writes every command and
+    // key as declared. The kit's checkKeys reads the file.
+    private bool exportIfAsked() {
+        string[] aArgs = Environment.GetCommandLineArgs();
+        for (int i = 1; i < aArgs.Length - 1; i++) {
+            string sSwitch = aArgs[i].ToLowerInvariant();
+            if (sSwitch != "/exportkeys" && sSwitch != "-exportkeys" && sSwitch != "--exportkeys") continue;
+            bExportOnly = true;
+            bExportWritten = KeyMap.exportInix(aArgs[i + 1], sAppName);
+            Log.info("Exported commands to " + aArgs[i + 1] + (bExportWritten ? "" : " -- FAILED"));
+            return bExportWritten;
+        }
+        return false;
+    }
+
+    // runOrExport: what an app's Main calls instead of Application.Run. It runs
+    // the frame normally, or, after an export, returns at once: 0 when the
+    // export was written, 1 when it was not.
+    public static int runOrExport(MdiFrame frm) {
+        if (bExportOnly) return bExportWritten ? 0 : 1;
+        Application.Run(frm);
+        return 0;
+    }
+
+    // ------- running a command by name (the earlier frame's way) -------
+
+    public bool runCommand(string sCommand) {
         Log.info("Command: " + sCommand);
-        if (KeyMap.bKeyDescriber)
-        {
-            Say.sayForced(sCommand + ". " + KeyMap.getSummary(sCommand));
+        if (KeyMap.bKeyDescriber) {
+            KeyMap.Command c = KeyMap.commandById(KeyMap.toId(sCommand));
+            Say.sayForced(c == null ? sCommand : KeyMap.describe(c.primaryKey, c));
             return true;
         }
-        try
-        {
+        try {
             if (onCommand(sCommand)) return true;
-            return runFrameCommand(sCommand);
+            KeyMap.Command c = KeyMap.commandById(KeyMap.toId(sCommand));
+            return c != null && c.fRun != null && c.fRun();
         }
-        catch (Exception oError)
-        {
+        catch (Exception oError) {
             Log.exception(oError);
             Say.sayForced(sCommand + " failed. The log has why.");
             return false;
         }
     }
 
-    // onCommand: the app's own commands. Answer true when you handled one.
-    protected virtual bool onCommand(string sCommand)
-    {
+    // onCommand: an app written for the earlier frame handles its commands
+    // here. An app using addCommand never needs it.
+    protected virtual bool onCommand(string sCommand) {
         return false;
     }
 
-    // The commands the frame owns, tried after the app has had its turn.
-    private bool runFrameCommand(string sCommand)
-    {
-        switch (sCommand)
-        {
-            case "About": return showAbout();
-            case "Alternate Menu": return showAlternateMenu();
-            case "Close All But Current Window": return closeOthers();
-            case "Close Window": return closeCurrent();
-            case "Current Windows": return pickWindow();
-            case "Change a Setting": return changeSetting();
-            case "Documentation": return showDocumentation();
-            case "Run a Script": return runScript();
-            case "Key Help Toggle":
-                KeyMap.bKeyDescriber = !KeyMap.bKeyDescriber;
-                Say.sayForced(KeyMap.bKeyDescriber ? "Key help on" : "Key help off");
-                return true;
-            case "Next Window": return stepWindow(1);
-            case "Previous Window": return stepWindow(-1);
-            case "Say Windows Open": return sayWindows();
-            default: return false;
-        }
+    // ------- the earlier names for the window commands -------
+
+    public List<string> windowTitles() { return MdiWindows.titles(this); }
+    public bool sayWindows() { return MdiWindows.sayOpen(this); }
+    public bool pickWindow() { return MdiWindows.pick(this); }
+    public bool stepWindow(int iDirection) { return MdiWindows.step(this, iDirection); }
+    public bool closeCurrent() { return MdiWindows.closeCurrent(this); }
+    public bool closeOthers() { return MdiWindows.closeOthers(this); }
+
+    // ------- query -------
+
+    public bool sayClipboard() {
+        string sText = "";
+        try { if (Clipboard.ContainsText()) sText = Clipboard.GetText(); } catch (Exception oError) { Log.exception(oError); }
+        if (sText.Length == 0) return KeyMap.answer("Clipboard", "The clipboard holds no text");
+        return KeyMap.answer("Clipboard", sText);
     }
 
-    // ------- the window commands -------
-
-    public List<string> windowTitles()
-    {
-        List<string> lsTitles = new List<string>();
-        foreach (Form frm in this.MdiChildren) lsTitles.Add(frm.Text);
-        return lsTitles;
+    public bool sayTime() {
+        DateTime dtNow = DateTime.Now;
+        return KeyMap.answer("Time", dtNow.ToShortTimeString(), dtNow.ToLongDateString());
     }
 
-    public bool sayWindows()
-    {
-        List<string> lsTitles = windowTitles();
-        // The noun matches the count, and zero is a real answer.
-        string sCount = lsTitles.Count == 1 ? "1 window open" : lsTitles.Count + " windows open";
-        Say.sayForced(sCount + (lsTitles.Count > 0 ? ": " + string.Join(", ", lsTitles.ToArray()) : ""));
-        return true;
-    }
+    // ------- scripts -------
 
-    public bool pickWindow()
-    {
-        List<string> lsTitles = windowTitles();
-        if (lsTitles.Count == 0) { Say.sayForced("0 windows open"); return true; }
-        using (LbcDialog dlg = new LbcDialog("Current Windows", this))
-        {
-            ListBox lb = dlg.addPickBox("&Window:", lsTitles,
-                this.ActiveMdiChild == null ? "" : this.ActiveMdiChild.Text,
-                "Choose the window to go to.");
-            if (!dlg.runOkCancel()) return true;
-            int iPick = lb.SelectedIndex;
-            if (iPick >= 0 && iPick < this.MdiChildren.Length) this.MdiChildren[iPick].Activate();
-        }
-        return true;
-    }
-
-    public bool stepWindow(int iDirection)
-    {
-        Form[] afrmChildren = this.MdiChildren;
-        if (afrmChildren.Length < 2) { Say.sayForced("1 window open"); return true; }
-        int iNow = Array.IndexOf(afrmChildren, this.ActiveMdiChild);
-        int iNext = (iNow + iDirection + afrmChildren.Length) % afrmChildren.Length;
-        afrmChildren[iNext].Activate();
-        return true;
-    }
-
-    public bool closeCurrent()
-    {
-        if (this.ActiveMdiChild != null) this.ActiveMdiChild.Close();
-        return true;
-    }
-
-    public bool closeOthers()
-    {
-        Form frmKeep = this.ActiveMdiChild;
-        int iClosed = 0;
-        foreach (Form frm in this.MdiChildren)
-        {
-            if (frm == frmKeep) continue;
-            frm.Close();
-            iClosed++;
-        }
-        Say.sayForced(iClosed == 1 ? "1 window closed" : iClosed + " windows closed");
-        return true;
-    }
-
-    // ------- jobs -------
-
-    // scriptFiles: every job, the user's first and the shipped ones after.
-    //
-    // A script is a script the user can run: .cmd, .ps1, .py, .js, .vbs. The
-    // user's own live in the per-user tree so they survive an update; the
-    // shipped ones come with the program and are read-only.
-    public List<string> scriptFiles()
-    {
+    // scriptFiles: the user's own scripts first, then the shipped ones.
+    public List<string> scriptFiles() {
         List<string> lsFound = new List<string>();
         List<string> lsSeen = new List<string>();
-        foreach (string sFolder in new string[] { Paths.scripts(), Paths.shippedScripts() })
-        {
-            try
-            {
-                foreach (string sPath in System.IO.Directory.GetFiles(sFolder))
-                {
+        foreach (string sFolder in new string[] { Paths.scripts(), Paths.shippedScripts() }) {
+            try {
+                foreach (string sPath in System.IO.Directory.GetFiles(sFolder)) {
                     string sName = System.IO.Path.GetFileName(sPath);
                     if (lsSeen.Contains(sName.ToLower())) continue;
                     lsSeen.Add(sName.ToLower());
                     lsFound.Add(sPath);
                 }
             }
-            catch (Exception)
-            {
+            catch (Exception) {
             }
         }
         lsFound.Sort(StringComparer.OrdinalIgnoreCase);
         return lsFound;
     }
 
-    // runScript: pick a job from a list and run it.
-    //
-    // A LIST, not a folder browser and not a command line. The list is the whole
-    // design: every job this program can run, in one place, reachable by first
-    // letter, with no path to type and nothing to remember.
-    public bool runScript()
-    {
+    // runScript: Invoke Script. A list of every script, reachable by its
+    // first letters, with no path to type.
+    public bool runScript() {
         List<string> lsScripts = scriptFiles();
-        if (lsScripts.Count == 0)
-        {
+        if (lsScripts.Count == 0) {
             Say.sayForced("0 scripts. Put one in " + Paths.scripts());
             return true;
         }
         List<string> lsNames = new List<string>();
         foreach (string sPath in lsScripts) lsNames.Add(System.IO.Path.GetFileName(sPath));
-        using (LbcDialog dlg = new LbcDialog("Run a Script", this))
-        {
+        using (LbcDialog dlg = new LbcDialog("Invoke Script", this)) {
             ListBox lb = dlg.addPickBox("&Script:", lsNames, "",
-                "Type a letter or two to narrow the list, then press Enter to run it.");
+                "Type the start of a name, then press Enter to run it.");
             if (!dlg.runOkCancel()) return true;
             int iPick = lb.SelectedIndex;
             if (iPick < 0) return true;
-            string sScript = lsScripts[iPick];
-            Log.info("Running job: " + sScript);
-            try
-            {
-                System.Diagnostics.ProcessStartInfo oStart =
-                    new System.Diagnostics.ProcessStartInfo(sScript);
+            Log.info("Running script: " + lsScripts[iPick]);
+            try {
+                System.Diagnostics.ProcessStartInfo oStart = new System.Diagnostics.ProcessStartInfo(lsScripts[iPick]);
                 oStart.UseShellExecute = true;
                 oStart.WorkingDirectory = Paths.results();
                 System.Diagnostics.Process.Start(oStart);
                 Say.sayForced(lsNames[iPick] + " started");
             }
-            catch (Exception oError)
-            {
+            catch (Exception oError) {
                 Log.exception(oError);
-                Say.sayForced("That job could not be started. The log has why.");
+                Say.sayForced("That script could not be started. The log has why.");
             }
         }
         return true;
@@ -387,48 +408,35 @@ public class MdiFrame : LbcForm
 
     // ------- settings -------
 
-    // addSetting: declare a setting the user may change while the program runs.
-    //
-    // The app names what is settable; the frame does the rest -- the list, the
-    // reading, the writing, and the call back into the app. A setting nobody
-    // declared cannot be changed by accident, and one that is declared needs no
-    // dialog of its own.
-    public bool addSetting(string sName, string sDefault, string sSummary)
-    {
+    // addSetting: declare a setting the person may change while the program
+    // runs. The frame does the list, the reading, the writing and the call
+    // back into the app.
+    public bool addSetting(string sName, string sDefault, string sSummary) {
         dSettable[sName] = sDefault;
         dSettableSummary[sName] = sSummary;
         return true;
     }
 
-    public string settingsFile()
-    {
+    public string settingsFile() {
         return Paths.configFile(sAppName + ".inix");
     }
 
-    public string settingValue(string sName)
-    {
+    public string settingValue(string sName) {
         string sDefault = dSettable.ContainsKey(sName) ? dSettable[sName] : "";
         return InixCodec.readValue(settingsFile(), "Settings", sName, sDefault);
     }
 
-    // changeSetting: change a setting from a list, and have it take effect now.
-    //
-    // A LIST OF WHAT IS SETTABLE, not a text file to edit and not a dialog of
-    // twenty controls. Pick the setting, type the value, and the program acts on
-    // it immediately -- no restart, no hunting for the file, no chance of
-    // breaking the syntax.
-    public bool changeSetting()
-    {
+    // changeSetting: Edit Settings. Pick the setting, type the value, and the
+    // program acts on it at once -- no restart, no file to find.
+    public bool changeSetting() {
         List<string> lsNames = new List<string>(dSettable.Keys);
         lsNames.Sort(StringComparer.OrdinalIgnoreCase);
-        if (lsNames.Count == 0)
-        {
+        if (lsNames.Count == 0) {
             Say.sayForced("0 settings can be changed here");
             return true;
         }
         string sName = "";
-        using (LbcDialog dlg = new LbcDialog("Change a Setting", this))
-        {
+        using (LbcDialog dlg = new LbcDialog("Edit Settings", this)) {
             ListBox lb = dlg.addPickBox("&Setting:", lsNames, "",
                 "Pick the setting to change, then press Enter.");
             if (!dlg.runOkCancel()) return true;
@@ -436,12 +444,15 @@ public class MdiFrame : LbcForm
             sName = lsNames[lb.SelectedIndex];
         }
         string sNow = settingValue(sName);
-        using (LbcDialog dlg = new LbcDialog("Change a Setting", this))
-        {
+        using (LbcDialog dlg = new LbcDialog("Edit Settings", this)) {
             TextBox tb = dlg.addInputBox("&" + sName + ":", sNow,
                 dSettableSummary.ContainsKey(sName) ? dSettableSummary[sName] : "");
             if (!dlg.runOkCancel()) return true;
-            InixCodec.writeValue(settingsFile(), "Settings", sName, tb.Text);
+            if (!InixCodec.writeValue(settingsFile(), "Settings", sName, tb.Text)) {
+                Say.sayForced(sName + " could not be saved. The log has why.");
+                Log.error("Setting " + sName + " could not be written to " + settingsFile());
+                return true;
+            }
             Log.info("Setting " + sName + " = " + tb.Text);
             onSettingChanged(sName, tb.Text);
             Say.sayForced(sName + " is now " + tb.Text);
@@ -449,31 +460,56 @@ public class MdiFrame : LbcForm
         return true;
     }
 
-    // onSettingChanged: the app acts on the new value here. Nothing restarts.
-    protected virtual bool onSettingChanged(string sName, string sValue)
-    {
+    protected virtual bool onSettingChanged(string sName, string sValue) {
         return false;
     }
 
     // ------- help -------
 
-    public bool showAlternateMenu()
-    {
-        List<string> lsCommands = KeyMap.commands();
-        lsCommands.Sort(StringComparer.OrdinalIgnoreCase);
-        if (lsCommands.Count == 0) { Say.sayForced("0 commands"); return true; }
-        using (LbcDialog dlg = new LbcDialog("Alternate Menu", this))
-        {
-            ListBox lb = dlg.addPickBox("&Command:", lsCommands, "",
-                "Type a letter or two to narrow the list, then press Enter.");
-            if (!dlg.runOkCancel()) return true;
-            if (lb.SelectedIndex >= 0) runCommand(lsCommands[lb.SelectedIndex]);
-        }
+    public bool toggleKeyDescriber() {
+        KeyMap.bKeyDescriber = !KeyMap.bKeyDescriber;
+        Say.sayForced(KeyMap.bKeyDescriber ? "Key Describer on" : "Key Describer off");
         return true;
     }
 
-    public bool showAbout()
-    {
+    // showAlternateMenu: every command in one searchable list. Its key and
+    // summary follow its name, so the list answers "how do I" as well.
+    public bool showAlternateMenu() {
+        List<KeyMap.Command> lsCommands = new List<KeyMap.Command>();
+        foreach (string sId in KeyMap.lsCommandOrder) lsCommands.Add(KeyMap.dCommands[sId]);
+        lsCommands.Sort(delegate(KeyMap.Command a, KeyMap.Command b) { return string.Compare(a.sName, b.sName, StringComparison.OrdinalIgnoreCase); });
+        if (lsCommands.Count == 0) { Say.sayForced("0 commands"); return true; }
+        List<string> lsLines = new List<string>();
+        foreach (KeyMap.Command c in lsCommands) {
+            string sLine = c.sName + ", " + (c.lsKeys.Count > 0 ? c.keysText() : "no key");
+            if (c.sSummary.Length > 0) sLine += ": " + c.sSummary;
+            lsLines.Add(sLine);
+        }
+        KeyMap.Command oChosen = null;
+        using (LbcDialog dlg = new LbcDialog("Alternate Menu", this)) {
+            ListBox lb = dlg.addPickBox("&Command:", lsLines, "",
+                "Type the start of a command, then press Enter to run it.");
+            if (!dlg.runOkCancel()) return true;
+            if (lb.SelectedIndex >= 0) oChosen = lsCommands[lb.SelectedIndex];
+        }
+        // Run after the list has closed, so the command acts on the window
+        // the person was in, not on the list.
+        if (oChosen != null) KeyMap.runCommand(oChosen);
+        return true;
+    }
+
+    public bool showHotkeySummary() {
+        HelpDialog.show(this, "Hotkey Summary", KeyMap.hotkeySummary());
+        return true;
+    }
+
+    public bool showHotkeys() {
+        string sPath = System.IO.Path.Combine(Paths.shippedHelp(), "Hotkeys.htm");
+        if (System.IO.File.Exists(sPath)) return openPath(sPath);
+        return showHotkeySummary();
+    }
+
+    public bool showAbout() {
         System.Text.StringBuilder sbAbout = new System.Text.StringBuilder();
         sbAbout.AppendLine(sAppName);
         sbAbout.AppendLine("Version: " + versionText());
@@ -485,92 +521,148 @@ public class MdiFrame : LbcForm
         return true;
     }
 
-    private string versionText()
-    {
-        try
-        {
+    public string versionText() {
+        try {
             Type oBuild = Type.GetType("BuildVersion");
-            if (oBuild != null)
-            {
+            if (oBuild != null) {
                 System.Reflection.FieldInfo oField = oBuild.GetField("Version");
                 if (oField != null) return "" + oField.GetValue(null);
             }
         }
-        catch (Exception)
-        {
+        catch (Exception) {
         }
         return "unknown";
     }
 
-    public bool showDocumentation()
-    {
-        // The guide is in help; the ReadMe stays at the top of the folder.
-        string sGuide = System.IO.Path.Combine(Paths.shippedHelp(), sAppName + ".htm");
-        if (!System.IO.File.Exists(sGuide))
-            sGuide = System.IO.Path.Combine(Paths.installedFolder, "ReadMe.htm");
-        if (!System.IO.File.Exists(sGuide))
-        {
-            Say.sayForced("The guide was not found beside the program");
+    // configureUpdates: the GitHub owner and repository that Elevate Version
+    // asks for a newer release. Call it once at startup.
+    public bool configureUpdates(string sOwner, string sRepo) {
+        return Elevate.configure(sOwner, sRepo, versionText());
+    }
+
+    public bool elevateVersion() {
+        if (!Elevate.isConfigured) {
+            Say.sayForced("This program has no release address, so it cannot look for a newer version");
             return true;
         }
-        try { System.Diagnostics.Process.Start(sGuide); } catch (Exception oError) { Log.exception(oError); }
+        Elevate.offer(this);
         return true;
     }
+
+    // playTutorials: the walks play in the Homer Player when the app compiles
+    // it in; otherwise the written tutorials open.
+    public bool playTutorials() {
+        try {
+            Type oPlayer = Type.GetType("Homer.MediaPlayer");
+            if (oPlayer != null) {
+                System.Reflection.MethodInfo oPlay = oPlayer.GetMethod("playTutorials",
+                    new Type[] { typeof(IWin32Window), typeof(string), typeof(string) });
+                if (oPlay != null) {
+                    object oResult = oPlay.Invoke(null, new object[] { this, sAppName, Paths.shippedHelp() });
+                    if (oResult is bool && (bool)oResult) return true;
+                }
+            }
+        }
+        catch (Exception oError) {
+            Log.exception(oError);
+        }
+        return openHelp("Tutorials.htm");
+    }
+
+    // copyLog: the log as a FILE on the clipboard, so Control+V in an email
+    // attaches it rather than pasting its name.
+    public bool copyLog() {
+        string sLog = Log.path;
+        if (string.IsNullOrEmpty(sLog) || !System.IO.File.Exists(sLog)) {
+            Say.sayForced("There is no log for this session");
+            return true;
+        }
+        try {
+            StringCollection lsFiles = new StringCollection();
+            lsFiles.Add(sLog);
+            Clipboard.SetFileDropList(lsFiles);
+            Say.sayForced("Log copied as a file, ready to paste as an attachment");
+        }
+        catch (Exception oError) {
+            Log.exception(oError);
+            Say.sayForced("The log could not be copied. Its path is " + sLog);
+        }
+        return true;
+    }
+
+    // openHelp: a document from the shipped help folder, or the ReadMe from
+    // the top of the program folder.
+    public bool openHelp(string sFileName) {
+        string sPath = System.IO.Path.Combine(Paths.shippedHelp(), sFileName);
+        if (!System.IO.File.Exists(sPath)) sPath = System.IO.Path.Combine(Paths.installedFolder, sFileName);
+        if (!System.IO.File.Exists(sPath)) {
+            Say.sayForced(sFileName + " was not found beside the program");
+            return true;
+        }
+        return openPath(sPath);
+    }
+
+    public bool openPath(string sPath) {
+        try { System.Diagnostics.Process.Start(sPath); }
+        catch (Exception oError) { Log.exception(oError); Say.sayForced("That could not be opened. The log has why."); }
+        return true;
+    }
+
+    // showDocumentation: the earlier name.
+    public bool showDocumentation() { return openHelp(sAppName + ".htm"); }
 }
 
 // ------- the child -------
 
-public class MdiChild : Form
-{
+public class MdiChild : Form {
     private string sSubject = "";
     private string sView = "";
 
-    // THE CHILD IS BUILT BY THE SAME BUILDER AS A DIALOG.
-    //
-    // LbcDialog can adopt an existing form instead of making one, so everything
-    // Lbc does for a dialog happens here too and nothing is written twice: add
-    // order is focus order, an ampersand is the whole of an access key, the
-    // status line at the foot carries each control's tip, a list arrives with
-    // Control+J search and F3, and a field arrives with the line chords.
-    //
-    // Add controls through this, then call finishLayout.
+    // THE CHILD IS BUILT BY THE SAME BUILDER AS A DIALOG. Add controls through
+    // lbc -- add order is focus order, an ampersand is the whole of an access
+    // key -- then call finishLayout.
     public LbcDialog lbc;
 
-    public MdiChild(MdiFrame frmParent)
-    {
+    public MdiChild(MdiFrame frmParent) {
         this.MdiParent = frmParent;
         this.WindowState = FormWindowState.Maximized;
         lbc = new LbcDialog("", frmParent, this);
+        // A closed window's repeat and search state go with it.
+        this.FormClosed += delegate(object oSender, FormClosedEventArgs evArgs) { KeyMap.forgetTarget(this); };
     }
 
-    // finishLayout: size to what was added and set the opening focus. The frame
-    // shows the window; this never does.
-    public bool finishLayout()
-    {
+    // ProcessCmdKey: a key in a child goes to the one router, with the frame
+    // as its window, before the child's controls can take it.
+    protected override bool ProcessCmdKey(ref Message msg, Keys keyData) {
+        Form frmFrame = this.MdiParent;
+        if (frmFrame != null && KeyMap.route(frmFrame, ref msg, keyData)) return true;
+        return base.ProcessCmdKey(ref msg, keyData);
+    }
+
+    public bool finishLayout() {
         lbc.layoutIntoForm();
         return true;
     }
 
-    // setTitle: what this window is showing.
-    //
-    // THE CHILD CARRIES NO APP NAME. The frame is already titled with it, and
-    // Windows merges a maximized child's caption into the frame's, so repeating
-    // it here makes a screen reader say it twice on JAWS+T.
-    public bool setTitle(string sSubjectGiven, string sViewGiven)
-    {
-        sSubject = sSubjectGiven ?? "";
-        sView = sViewGiven ?? "";
+    // manageList: Shift+letter in this list runs the list's commands, and
+    // typing the start of an item goes to it.
+    public bool manageList(Control ctl) {
+        return KeyMap.manageList(ctl);
+    }
+
+    // setTitle: what this window is showing. NEVER the app name.
+    public bool setTitle(string sSubjectGiven, string sViewGiven) {
+        sSubject = sSubjectGiven == null ? "" : sSubjectGiven;
+        sView = sViewGiven == null ? "" : sViewGiven;
         this.Text = sView == "" ? sSubject : sSubject + " - " + sView;
-        this.AccessibleName = this.Text;
         return true;
     }
 
     public string subject { get { return sSubject; } }
     public string view { get { return sView; } }
 
-    public bool setStatusText(string sText)
-    {
-        lbc.setStatusText(sText ?? "");
+    public bool setStatusText(string sText) {
+        lbc.setStatusText(sText == null ? "" : sText);
         return true;
     }
 }

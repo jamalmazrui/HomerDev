@@ -1,0 +1,588 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.12.1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>HomerSuite</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      color: light-dark(#1a1a1a, #fdfdfd);
+      background-color: #fdfdfd;
+      background-color: light-dark(#fdfdfd, #1a1a1a);
+      color-scheme: light dark;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a, a:visited {
+      color: inherit;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid;
+      border-color: #e6e6e6;
+      border-color: light-dark(#e6e6e6, #4c4c4c);
+      color: #606060;
+      color: light-dark(#606060, #b6b6b6);
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid currentColor;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+    }
+    th {
+      border-top: 1px solid currentColor;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+<main>
+<h1 id="the-homer-suite-contract">The Homer Suite Contract</h1>
+<p>The Homer Suite is four programs that share one set of habits:</p>
+<ul>
+<li><strong>DbDo</strong> for data.</li>
+<li><strong>EdSharp</strong> for documents.</li>
+<li><strong>FileDir</strong> for files and folders.</li>
+<li><strong>HomerView</strong> for the web.</li>
+</ul>
+<p>HomerDev is the kit beneath them, and DbDo is the reference for how a
+command is found, described and run.</p>
+<p>This page is the contract: the rules all four follow, the data files
+that record them, the stages of the work, and where the work stands. It
+was settled over five rounds of planning, with Claude leading and
+ChatGPT reviewing, and with Jamal Mazrui’s rulings deciding every
+disagreement.</p>
+<h2 id="how-to-read-a-status">How to read a status</h2>
+<p>Every decision carries one of five statuses, and no status is assumed
+from another:</p>
+<ul>
+<li><strong>Current</strong> means it is how the program works today,
+with no change planned.</li>
+<li><strong>Proposed</strong> means both AIs recommend it; it waits for
+its stage.</li>
+<li><strong>Ruled</strong> means Jamal decided it.</li>
+<li><strong>Implemented</strong> means the code is written and
+delivered.</li>
+<li><strong>Verified</strong> means it was tested on Windows with a
+screen reader, and the result was recorded.</li>
+</ul>
+<h2 id="the-data-files">The data files</h2>
+<h3 id="command-manifest">Command manifest</h3>
+<p>The command manifest is data\SuiteCommands.inix. It lists every
+command of the four apps, one section each, named by app and stable
+identifier, for example <code>[DbDo saveClipboard]</code>.</p>
+<ul>
+<li><strong>Each section</strong> holds the command’s name, its
+recommended keys, and its status.</li>
+<li><strong>A changed command</strong> also says what changed, why, and
+its disposition: accepted, accepted with a stated correction, or removed
+by ruling.</li>
+</ul>
+<h3 id="key-ownership">Key ownership</h3>
+<p>Key ownership is in data\KeyOwnership.inix. It lists the keys that
+Windows, the screen readers and the browsers own. Each key records its
+owner, its kind, where it applies, what happens to it, and what a Homer
+app may do with it.</p>
+<p>The kinds are:</p>
+<ul>
+<li><strong>System:</strong> Windows takes the key first.</li>
+<li><strong>Convention:</strong> the app receives the key, but it means
+one thing everywhere.</li>
+<li><strong>Conditional:</strong> the key is taken only on some
+machines.</li>
+<li><strong>Reader global:</strong> a screen reader takes the key
+everywhere.</li>
+<li><strong>Reader tables:</strong> a screen reader takes the key only
+inside tables.</li>
+<li><strong>Reader laptop:</strong> JAWS takes the key in the laptop
+layout.</li>
+<li><strong>Browser:</strong> the browser owns the key, in HomerView
+only.</li>
+<li><strong>Historical:</strong> Window-Eyes, kept for reference, not
+enforced.</li>
+</ul>
+<h3 id="the-checker">The checker</h3>
+<p>The checker is scripts\checkKeys in the kit. It reads both files, and
+also any file an app writes when started with
+<code>/exportkeys &lt;file&gt;</code>. It reports:</p>
+<ul>
+<li>duplicate identifiers;</li>
+<li>a key bound twice in one app;</li>
+<li>a key that a system or a screen reader takes everywhere;</li>
+<li>keys to test in their real control;</li>
+<li>hotkey letters that start no word of their command;</li>
+<li>every difference between what a program declares and what the
+manifest says.</li>
+</ul>
+<p>The kit’s build runs it on every build, with the MDI sample’s export,
+so nobody runs it by hand. It reports only, for now; stage 2 makes it a
+gate that stops a build, and runs it in each app’s build too.</p>
+<h2 id="rulings">Rulings</h2>
+<ul>
+<li><strong>Alt+C appends.</strong> Control+C copies the current item (a
+line without a selection, a cell, a file), and Alt+C appends it to the
+clipboard. (Ruled)</li>
+<li><strong>Alt+Delete is Say Position.</strong> It gives useful
+position information: a count and a percent for the current unit. Where
+JAWS would report pixel coordinates, each app’s JAWS key map passes the
+key through to the app, from a reviewed allowlist. (Ruled)</li>
+<li><strong>Claude leads; ChatGPT advises and reviews.</strong>
+(Ruled)</li>
+<li><strong>Control+Tab and Control+F6 never duplicate each
+other.</strong> They are next-in-cycle at different levels or in
+different orders. (Ruled)</li>
+<li><strong>Edit Settings is Alt+Shift+E in every app.</strong> Alt+E
+already opens the Edit menu. X for export is an accepted exception to
+the first-letter rule. (Ruled)</li>
+<li><strong>EdSharp’s block movement is removed,</strong> and its
+bookmarks move to the B keys. (Ruled)</li>
+<li><strong>HomerView joins the suite,</strong> and records in an .inix
+file the browser installations it is active in. (Ruled)</li>
+<li><strong>New apps on a new core.</strong> Settings are .inix only;
+the programs are 64-bit on .NET Framework 4.8.1, with NuGet; there is no
+transition code for existing users, beyond a History note. (Ruled)</li>
+<li><strong>No c_ prefix on constants,</strong> and url is written in
+lower case. (Ruled)</li>
+</ul>
+<h2 id="the-key-families">The key families</h2>
+<ul>
+<li><strong>Levels of next and previous:</strong>
+<ul>
+<li><strong>Control+Tab and Control+Shift+Tab:</strong> the app’s
+windows. In HomerView, the browser’s tabs.</li>
+<li><strong>Control+F6 and Control+Shift+F6:</strong> the things inside
+a window, in a fixed order.</li>
+<li><strong>Alt+F6 and Alt+Shift+F6:</strong> the same things, in the
+order last visited.</li>
+<li><strong>F6 and Shift+F6:</strong> the views or parts of the current
+thing.</li>
+</ul>
+An app fills only the levels it has. HomerView leaves F6 to the
+browser.</li>
+<li><strong>Window family:</strong>
+<ul>
+<li><strong>F4:</strong> pick a window.</li>
+<li><strong>Shift+F4:</strong> say the windows open.</li>
+<li><strong>Control+F4:</strong> close this window.</li>
+<li><strong>Control+Shift+F4:</strong> close all but this one. A window
+holding unsaved work may refuse, and the count of windows kept open is
+spoken.</li>
+</ul></li>
+<li><strong>Help family:</strong>
+<ul>
+<li><strong>F1:</strong> Documentation.</li>
+<li><strong>Shift+F1:</strong> History of Changes.</li>
+<li><strong>Alt+F1:</strong> About.</li>
+<li><strong>Control+F1:</strong> Key Describer Toggle.</li>
+<li><strong>Control+Shift+F1:</strong> Hotkeys.</li>
+<li><strong>Alt+Shift+F1:</strong> ReadMe.</li>
+<li><strong>Alt+F10:</strong> Alternate Menu.</li>
+<li><strong>Alt+Shift+H:</strong> Hotkey Summary.</li>
+<li><strong>F11:</strong> Elevate Version.</li>
+<li><strong>Control+F12:</strong> Copy Log.</li>
+<li><strong>Play Tutorials,</strong> with no key, plays the walks in the
+Homer Player.</li>
+</ul></li>
+<li><strong>Say family:</strong>
+<ul>
+<li><strong>Alt+Apostrophe:</strong> Say Clipboard.</li>
+<li><strong>Alt+P:</strong> Say Path.</li>
+<li><strong>Alt+Delete:</strong> Say Position.</li>
+<li><strong>Alt+Z:</strong> Say Status.</li>
+<li><strong>Alt+SemiColon:</strong> Say Time.</li>
+<li><strong>Shift+F4:</strong> Say Windows Open.</li>
+<li><strong>Alt+Y:</strong> Say Yield.</li>
+</ul>
+DbDo keeps its Shift+letter say layer as a second set of keys.</li>
+<li><strong>Clipboard family:</strong>
+<ul>
+<li><strong>Alt+Apostrophe:</strong> say the clipboard.</li>
+<li><strong>Alt+Shift+Apostrophe:</strong> clear it.</li>
+<li><strong>Control+Apostrophe:</strong> save the clipboard to a new
+text file.</li>
+<li><strong>Control+Shift+Apostrophe:</strong> append the clipboard to a
+text file.</li>
+</ul></li>
+<li><strong>Undo and Redo:</strong> Control+Z and Control+Shift+Z
+everywhere.</li>
+<li><strong>Export:</strong> Alt+Shift+X. In the editors, Alt+X stays
+Cut Append.</li>
+<li><strong>Repeat keys:</strong> a quick second press of a Say key
+shows the same information in a read-only window you can review and
+copy. Control plus a letter asks; Alt plus the same letter repeats the
+last answer, but only where an app registers that pair. F3 and Shift+F3
+repeat whichever search ran last in the window.</li>
+<li><strong>Managed lists</strong> (the DbDo grid, the FileDir list):
+<ul>
+<li>unshifted letters move by first letter or by typed sequence;</li>
+<li>Shift plus a letter runs a command or says none is bound;</li>
+<li>Control+Space toggles the mark;</li>
+<li>Control+Home and End go to the first and last item;</li>
+<li>Control+Shift+Home and End go to the first and last marked
+item;</li>
+<li>Control+UpArrow and DownArrow go to the previous and next marked
+item.</li>
+</ul></li>
+</ul>
+<p>The exceptions each app keeps on purpose (EdSharp’s F2 and F5,
+FileDir’s Shift+letter actions, HomerView’s browser keys) are recorded
+in the manifest.</p>
+<h2 id="ai-attachment-rules">AI attachment rules</h2>
+<p>These apply to Chat with AI (F12) and Chat about (Shift+F12) in every
+app.</p>
+<ul>
+<li><strong>No implicit attachment.</strong> Chat with AI never attaches
+a document, table or file because of how a question is worded. When
+context is attached, the choice is shown plainly. EdSharp’s current
+behavior, which attaches the document when the wording refers to it,
+must change, not merely be renamed.</li>
+<li><strong>Say the source and scope first.</strong> Chat about names
+the actual source and scope before sending: the selection, the marked
+rows, the visible view, or the whole thing.</li>
+<li><strong>Report what happened.</strong> Truncation, omitted content,
+conversion failures, and the model or service used are reported
+accurately.</li>
+<li><strong>Answers are content, not instructions.</strong> Instructions
+inside a document or an answer are treated as text. No SQL, script,
+browser action or file operation runs automatically from an answer.</li>
+</ul>
+<h2 id="text-files-and-settings">Text files and settings</h2>
+<ul>
+<li><strong>New text files</strong> are UTF-8 with a byte order mark and
+CRLF line endings, the Homer encoding.</li>
+<li><strong>Appending to a file:</strong>
+<ul>
+<li>detect the existing file’s encoding first;</li>
+<li>never put a second byte order mark in the middle of a file;</li>
+<li>say whether a separating line break is added;</li>
+<li>leave the file as it was if the append fails;</li>
+<li>if a file cannot be appended to safely, say so and offer a new file
+or an explicit conversion, never a mix of encodings.</li>
+</ul></li>
+<li><strong>Saving the clipboard</strong> proposes a new file name and
+never overwrites without asking.</li>
+<li><strong>Settings in .inix:</strong>
+<ul>
+<li>writes are serialized and atomic, written to a temporary file and
+then swapped in;</li>
+<li>before a cached file is replaced, a change made outside the program
+is detected, and then the file is reloaded and the change applied again,
+or the conflict is reported;</li>
+<li>a malformed file is reported in plain words and kept intact, never
+treated as empty;</li>
+<li>each settings file carries a schema version.</li>
+</ul></li>
+</ul>
+<h2 id="homerview-browsers-and-identity">HomerView: browsers and
+identity</h2>
+<p>Four ideas are kept apart:</p>
+<ul>
+<li><strong>The catalog</strong> lists the known browser families, each
+with a stable browserId such as chrome. One authored file,
+configs\HomerView.inix in the HomerView project, is the source. The
+build makes packaged copies (one inside the NVDA add-on) and checks them
+against it. Registry discovery stays, so browsers missing from the
+catalog are still found.</li>
+<li><strong>Eligibility</strong> records each browser installation
+HomerView may be active in. Each has its own installationId, resolved
+path, channel where known, and active flag. Two Chrome installations
+share a browserId but never an installationId. A missing or moved
+installation is reported, never silently replaced by another of the same
+family.</li>
+<li><strong>The launch choice</strong> names the installationId that
+Launch starts.</li>
+<li><strong>The verified session</strong> is the connected browser
+process family, window, page and document generation actually in front
+of you.</li>
+</ul>
+<p>Eligibility authorizes nothing. It only makes a window worth probing
+for a connection.</p>
+<p>Two rules govern identity:</p>
+<ul>
+<li><strong>Identity is decided once, in identity.py,</strong> by
+process, never by program name. With no process known, every key keeps
+its normal browser and screen reader meaning. (Implemented in stage
+1.)</li>
+<li><strong>A queued request carries a TargetStamp</strong> of the
+session, window, page and document generation it was made for. Before it
+acts, the stamp is compared with what is current, and stale work is
+cancelled with a spoken reason. A read-only result about a page you have
+left names its source. (The stamp is implemented and tested in stage 1;
+the queue adopts it in stage 5.)</li>
+</ul>
+<p>The HomerView commands added to the manifest are:</p>
+<ul>
+<li><strong>Choose Active Browsers</strong> (chooseActiveBrowsers), menu
+only.</li>
+<li><strong>Key Describer Toggle</strong> (keyDescriberToggle), menu
+only. It describes HomerView’s gestures without running them; gestures
+the browser or screen reader owns are named, not run.</li>
+<li><strong>Open Saved Page in EdSharp</strong>
+(openSavedPageInEdSharp), menu only. It opens an identified saved copy,
+and offers saving or extraction when there is none.</li>
+<li><strong>Show Page Folder in FileDir</strong>
+(showPageFolderInFileDir), menu only. Page Folder keeps opening
+Explorer.</li>
+</ul>
+<h2 id="building-and-compiling">Building and compiling</h2>
+<ul>
+<li><strong>Compiler.</strong> Both AIs recommend the Roslyn compiler
+from Visual Studio Build Tools at C# 7.3, as the suite’s chosen language
+baseline. The build would install it with winget when missing, then find
+it by an installation probe and verify that it can compile C#, rather
+than trusting that the install succeeded. (Proposed; awaiting your
+ruling.)</li>
+<li><strong>Until that ruling,</strong> the shared classes keep to C# 5,
+so they still build with the compiler that comes with Windows.</li>
+<li><strong>.NET Framework 4.8.1.</strong> A build pins the
+Microsoft.NETFramework.ReferenceAssemblies.net481 package and compiles
+against those references, not the installed runtime’s. Each exe.config
+keeps version=“v4.0” with sku=“.NETFramework,Version=v4.8.1”. The
+compiler’s path, version and language option go in the build log.</li>
+</ul>
+<h2 id="stages">Stages</h2>
+<ol type="1">
+<li><strong>Stage 0, the contract.</strong> This page and the two data
+files. Implemented in kit 1.73.0.</li>
+<li><strong>Stage 1, the proofs.</strong>
+<ul>
+<li><strong>Desktop proof:</strong>
+Templates\samples\FruitBasketMdiCs.cs on the new frame.</li>
+<li><strong>Browser-identity proof:</strong> HomerView’s identity.py and
+scripts\testIdentity.py.</li>
+</ul>
+Implemented in kit 1.73.0 and HomerView 1.48.110; not yet verified on
+Windows.</li>
+<li><strong>Stage 2, the minimum core.</strong> The checker becomes a
+gate. KeyName.cs writes the JAWS spellings (Accent, BackSlash), and the
+reviewed JAWS key map generator arrives. The clipboard helpers, the
+.inix cache and the menu repaint change each come as a separate
+change.</li>
+<li><strong>Stage 3, DbDo.</strong> Its private KeyMap is replaced
+through an adapter and retired once equivalence is shown, then its key
+changes, JAWS scripts and laptop-layout tests follow.</li>
+<li><strong>Stage 4, EdSharp, then FileDir,</strong> each on its own,
+with new commands implemented before their keys are checked.</li>
+<li><strong>Stage 5, HomerView.</strong> The catalog, eligibility,
+verified session routing, per-browser JAWS script sets and the key
+alignment.</li>
+<li><strong>Stage 6, documents, tutorials and packaging.</strong></li>
+<li><strong>Stage 7, release</strong> of each tested app, then one
+announcement.</li>
+<li><strong>Later:</strong> common frame inheritance, a combined
+installer, shared suite settings, round-trip edits between apps.</li>
+</ol>
+<h2 id="testing-stage-1-on-windows">Testing stage 1 on Windows</h2>
+<h3 id="the-desktop-proof">The desktop proof</h3>
+<ol type="1">
+<li>Run build_release in the kit, as usual. The build compiles the
+sample whenever it or the shared classes change, exports its keys
+without opening a window, and runs checkKeys; the build log has the
+results. Then start Templates\samples\FruitBasketMdiCs.exe.</li>
+<li>Check each of these with JAWS, then with NVDA:
+<ul>
+<li><strong>Windows:</strong> Control+N opens Basket 2. F4 lists both
+baskets, Shift+F4 says them, and Control+Tab moves between them.</li>
+<li><strong>Typing:</strong> in the Fruit field, type a word with
+capital letters; capitals and Shift+F type.</li>
+<li><strong>The list:</strong> Control+Shift+A adds fruit. In the basket
+list, typing the start of a fruit goes to it, Shift+F says the fruit,
+Shift+Y the count, and Shift+Q says it has no command.</li>
+<li><strong>The alias:</strong> Delete in the list deletes the fruit;
+Delete in the Fruit field deletes a character.</li>
+<li><strong>Unavailable:</strong> delete every fruit, then press
+Control+Shift+D; it says the basket is empty.</li>
+<li><strong>Modal:</strong> F2 renames the basket in a dialog, and the
+dialog’s own keys work.</li>
+<li><strong>Double press:</strong> Alt+Delete says the position; press
+it twice quickly to review it in a window, and Escape returns.</li>
+<li><strong>Again:</strong> Control+J asks for a fruit, Alt+J and F3 go
+to the next match without asking, and the other basket has its own
+answer.</li>
+<li><strong>Closing:</strong> Control+F4 on a basket holding fruit asks
+first; choosing Keep open keeps it. Control+Shift+F4 says how many
+windows closed and how many were kept.</li>
+<li><strong>Help:</strong> Control+F1 makes keys describe themselves;
+Alt+F10 lists every command; Alt+Shift+E changes Basket Size at
+once.</li>
+</ul></li>
+</ol>
+<h3 id="the-browser-identity-proof">The browser-identity proof</h3>
+<ol type="1">
+<li>Run build_release in HomerView, as usual. Its build now runs
+scripts\testIdentity.py and stops if a case fails.</li>
+<li>Under NVDA, with HomerView launched in Chrome, its page commands
+work there.</li>
+<li>In an ordinary Chrome or Edge window, and before HomerView’s browser
+is running, every key keeps its browser and screen reader meaning.</li>
+</ol>
+<h2 id="evidence-so-far">Evidence so far</h2>
+<p>These results come from a Linux container with Python 3. No Windows
+build, installer or screen reader session was run.</p>
+<ul>
+<li><strong>The C# sources were not compiled.</strong> Their braces and
+brackets balance, and they use no syntax newer than C# 5. The first
+Windows build is the real test.</li>
+<li><strong>checkKeys on the manifest reported:</strong>
+<ul>
+<li>5 shared keys needing review: EdSharp Control+I, Control+Shift+I and
+Control+L, and FileDir Backspace and Comma, each shared by context or
+listed twice;</li>
+<li>13 keys to test in their real control: the laptop-layout table keys
+and Control+Space;</li>
+<li>9 first-letter misses, such as FileDir’s Play Media on
+Alt+Shift+L.</li>
+</ul></li>
+<li><strong>testIdentity:</strong> 18 of 18 cases pass. Its first run
+found a real fault, Windows paths split wrongly on another system, which
+was fixed before delivery.</li>
+</ul>
+</main>
+</body>
+</html>

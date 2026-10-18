@@ -607,6 +607,54 @@ def buildSamples():
     return iFailed
 
 
+def checkSuiteKeys():
+    """Check the suite's commands and keys on every build (1.73.0).
+
+    The MDI sample is started with /exportkeys, which writes every command and
+    key the program actually declares and ends before any window appears; then
+    scripts\\checkKeys.py reads that export with the suite manifest and the key
+    ownership file. Report-only until stage 2 of the suite plan makes it a gate,
+    so it never fails the build; its findings are summarized here and named in
+    its own log. Nobody runs it by hand.
+    """
+    sChecker = os.path.join(sScriptDir, "scripts", "checkKeys.py")
+    if not os.path.isfile(sChecker):
+        logLine("checkKeys: scripts\\checkKeys.py is missing, so the suite keys were not checked")
+        return 0
+    lsExports = []
+    sSample = os.path.join(sScriptDir, "Templates", "samples", "FruitBasketMdiCs.exe")
+    if os.path.isfile(sSample):
+        sExport = os.path.join(sScriptDir, "logs", "FruitBasketMdiCs-keys-%s.inix" % datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+        logLine("RUN: %s /exportkeys %s" % (sSample, sExport))
+        try:
+            oResult = subprocess.run([sSample, "/exportkeys", sExport], cwd=os.path.dirname(sSample),
+                                     capture_output=True, text=True, timeout=120)
+            logLine("EXIT: %d" % oResult.returncode)
+            if oResult.returncode == 0 and os.path.isfile(sExport):
+                lsExports.append(sExport)
+            else:
+                sayLine("The MDI sample did not export its keys (exit %d); the manifest is checked without it." % oResult.returncode)
+        except Exception as oError:
+            logLine("EXPORT FAILED: %s" % oError)
+            sayLine("The MDI sample could not export its keys; the log has why.")
+    else:
+        logLine("checkKeys: no FruitBasketMdiCs.exe yet, so no export to check")
+    logLine("RUN: %s %s" % (sChecker, " ".join(lsExports)))
+    try:
+        oResult = subprocess.run([sys.executable, sChecker] + lsExports, cwd=sScriptDir,
+                                 capture_output=True, text=True, timeout=300)
+        if oResult.stdout: logLine("STDOUT:\n" + oResult.stdout[-3000:])
+        if oResult.stderr: logLine("STDERR:\n" + oResult.stderr[-3000:])
+        logLine("EXIT: %d" % oResult.returncode)
+        for sLine in oResult.stdout.splitlines():
+            if sLine.startswith("checkKeys:"):
+                sayLine(sLine)
+    except Exception as oError:
+        logLine("CHECKKEYS FAILED: %s" % oError)
+        sayLine("checkKeys could not run; the log has why.")
+    return 0
+
+
 # THE KIT'S C# CLASSES AS ONE LIBRARY, FOR PYTHON (1.43.6). A Python app with
 # a WinForms interface loads exec\Homer.dll through pythonnet (exec\Python\lbcnet.py)
 # and builds its dialogs with the very LbcDialog the C# apps use, so a Python
@@ -1897,6 +1945,7 @@ def main():
             iDone = convertDocs(sPandoc)
             sayLine("%d document%s converted to HTML." % (iDone, "" if iDone == 1 else "s"))
         iSamplesFailed = buildSamples()
+        checkSuiteKeys()
         # WHAT FAILED, BY NAME (9 October 2026): a failing conversion route ended the build with "1 sample build
         # failed", which named the wrong thing, so the pptx > pdf failure went unexamined for a day. Each failing
         # part is now named in the closing line, with the failing routes themselves.

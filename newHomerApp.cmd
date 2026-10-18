@@ -3,6 +3,7 @@ rem newHomerApp.cmd -- start a new Homer Tools app from the kit templates.
 rem
 rem   newHomerApp                  ask for the name, write into C:\<App>
 rem   newHomerApp JobDo            write C:\JobDo
+rem   newHomerApp JobDo --mdi      a C# app with several windows (Homer MDI)
 rem   newHomerApp JobDo D:\Work    write somewhere else
 rem
 rem It writes a complete starting project -- source, build, installer, lists,

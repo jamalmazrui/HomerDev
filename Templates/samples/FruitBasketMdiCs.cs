@@ -1,31 +1,41 @@
-﻿// FruitBasketMdiCs.cs -- the fruit basket as an MDI app, the third Homer shape.
+﻿// FruitBasketMdiCs.cs -- the fruit basket as a Homer MDI app, and the proof
+// that the shared frame and key router behave as the suite contract says.
 //
-// ITS TWIN IS FruitBasketMdiPy.py. The two are the same program in two
-// languages, as FruitBasketCs and FruitBasketPy are, so the claim the kit makes
-// -- one behaviour, either language -- holds for the MDI shape too.
+// It is the worked example for anybody building an app on the Homer MDI
+// framework: every feature a real app needs appears here once, small enough to
+// read in one sitting. help\MdiFramework.md in the kit walks through it, and
+// help\HomerSuite.md lists the checks it is used for (stage 1, the desktop
+// proof).
 //
-// READ FruitBasketCs.cs FIRST. That one is a single dialog, and its twelve
-// numbered blocks explain the nine decisions every Homer program makes. This
-// file does not repeat them. It shows only what changes when a program holds
-// SEVERAL things at once -- several baskets here, several files in EdSharp,
-// several folders in FileDir, several tables in DbDo.
+// WHAT IT SHOWS, and what to try with a screen reader:
 //
-// THE LINEAGE. The MDI fruit basket goes back to Homer.NET in 2010, with
-// LbcMdiApp, LbcMdiFrame and LbcMdiChild, a menu declared by name and key, a
-// focus tip on every control, a window picker, an alternate menu and a key
-// describer. That program was right about the shape. What is different now is
-// that the frame lives in the kit, so EdSharp, FileDir and DbDo can share one
-// implementation instead of three that drift apart.
+//   Two windows        Control+N opens another basket. F4 lists them,
+//                      Shift+F4 says them, Control+Tab moves between them.
+//   Typing             In the Fruit field, capital letters type, and so do
+//                      Shift+letter keys that are commands in the list.
+//   A managed list     In the basket list, type the start of a fruit to go to
+//                      it; Shift+F says the fruit, Shift+Y the count, and an
+//                      unbound Shift+letter says it has no command.
+//   An alias           Delete in the list runs Delete Fruit, whose main key
+//                      is Control+Shift+D. Delete in the Fruit field deletes
+//                      a character, as it should.
+//   Unavailable        Delete Fruit in an empty basket says why it cannot run.
+//                      Add Fruit in a full basket says so too.
+//   A modal dialog     F2 renames the basket. Its own keys come first.
+//   Double press       Alt+Delete says the position; press it twice quickly
+//                      and the same appears in a window to review and copy.
+//   Again              Control+J asks which fruit to jump to; Alt+J jumps to
+//                      the next one with no question; F3 repeats it too.
+//   Parts              F6 moves between the Fruit field and the basket list.
+//   Closing            Control+F4 on a basket that holds fruit asks first;
+//                      keeping it open is a real answer.
+//   Key Describer      Control+F1, then any key, says what it would do.
+//   Settings           Alt+Shift+E changes the basket size limit at once.
+//   Export             FruitBasketMdiCs.exe /exportkeys keys.inix writes every
+//                      command and key, then closes.
 //
-// WHAT CHANGES WHEN THERE IS MORE THAN ONE WINDOW:
-//
-//   ---- MDI 1: the frame owns the app name, the child owns the subject ----
-//   ---- MDI 2: commands are named sentences, not control ids ----
-//   ---- MDI 3: the frame's own window and help commands come free ----
-//   ---- MDI 4: each child keeps its own state ----
-//   ---- MDI 5: closing the last window closes the program ----
-//
-// Build with buildFruitBasketMdiCs.cmd.
+// Camel Type. No key-handling code anywhere: every key is declared with
+// addCommand and the kit's router does the rest.
 
 using System;
 using System.Collections.Generic;
@@ -38,148 +48,154 @@ namespace FruitBasketMdiCs
 public static class Program
 {
 
-private const string sAppName = "FruitBasketMdiCs";
+private static readonly string sAppName = "FruitBasketMdiCs";
 
 private static fruitFrame frmMain;
 
-// ---- MDI 1: the frame owns the app name, the child owns the subject ----
-//
-// The frame is titled "FruitBasketMdiCs" and nothing else. A child is titled
-// "Basket 1 - 3 fruits" and nothing else. Windows merges a maximized child into
-// the frame caption, so JAWS+T reads
-//
-//     FruitBasketMdiCs - [Basket 1 - 3 fruits]
-//
-// A child that repeated the app name made the reader say it twice, which is a
-// bug DbDo shipped once and now carries a comment against. MdiChild.setTitle is
-// the only way to set a child title, so the rule cannot be broken by accident.
+// ------- the frame: the menus and the commands -------
+
 public class fruitFrame : MdiFrame
 {
     private int iBaskets = 0;
 
     public fruitFrame() : base(sAppName)
     {
-        // ---- MDI 2: commands are named sentences, not control ids ----
-        //
-        // addItem takes the command, its key and its one-line summary. The
-        // summary is not decoration: it becomes the status tip, the key
-        // describer's answer under Control+F1, and the entry in the hotkey
-        // document. Written once, it reaches a person three ways.
+        addSetting("Basket Size", "10", "The most fruit one basket holds.");
+
         addMenu("&File");
-        addItem("New Basket", Keys.Control | Keys.N, "Open another basket in its own window.");
-        addItem("Exit", Keys.Alt | Keys.F4, "Close every basket and leave.");
+        addCommand("&New Basket", "Control+N", "Open another basket in its own window.", newBasket);
+        addCommand("&Rename Basket...", "F2", "Give this basket a new name.", delegate() { return withBasket(delegate(fruitChild c) { return c.renameBasket(); }); });
+        addCommand("E&xit", "Alt+F4", "Close every basket and leave.", delegate() { this.Close(); return true; });
 
         addMenu("&Basket");
-        addItem("Add Fruit", Keys.Control | Keys.Shift | Keys.A, "Put what is in the fruit field into this basket.");
-        addItem("Delete Fruit", Keys.Control | Keys.Shift | Keys.D, "Take the selected fruit out of this basket.");
-        addItem("Count Fruit", Keys.Alt | Keys.Shift | Keys.C, "Say how full this basket is.");
+        KeyMap.Command oAdd = addCommand("&Add Fruit", "Control+Shift+A", "Put what is in the fruit field into this basket.",
+            delegate() { return withBasket(delegate(fruitChild c) { return c.addFruit(); }); });
+        oAdd.fUnavailable = delegate() { fruitChild c = activeBasket(); return c != null && c.isFull() ? "the basket is full" : ""; };
 
-        // ---- MDI 3: the frame's own window and help commands come free ----
-        //
-        // finishMenus fills in Window and Help: the window picker on F4, the
-        // spoken window list on Shift+F4, next and previous, close, close
-        // others, the alternate menu on Alt+F10, the key describer on
-        // Control+F1, about on Alt+F1 and the guide on F1. Not one of them is
-        // in this file, and every Homer MDI app has all of them.
+        KeyMap.Command oDelete = addCommand("&Delete Fruit", "Control+Shift+D", "Take the fruit you are on out of this basket.",
+            delegate() { return withBasket(delegate(fruitChild c) { return c.deleteFruit(); }); });
+        oDelete.fUnavailable = delegate() { fruitChild c = activeBasket(); return c != null && c.count() == 0 ? "the basket is empty" : ""; };
+        KeyMap.addAlias(oDelete.sId, "Delete");
+
+        addCommand("&Jump to Fruit...", "Control+J", "Ask for a fruit and go to the next one that starts with it.",
+            delegate() { return withBasket(delegate(fruitChild c) { return c.jump(true, 1); }); });
+        addCommand("Jump A&gain", "Alt+J", "Go to the next fruit that starts with the same letters, without asking.",
+            delegate() { return withBasket(delegate(fruitChild c) { return c.jump(false, 1); }); });
+        addCommand("Search &Next", "F3", "Repeat the last search in this basket.",
+            delegate() { return withBasket(delegate(fruitChild c) { return c.searchAgain(1); }); });
+        addCommand("Search &Previous", "Shift+F3", "Repeat the last search in this basket, backward.",
+            delegate() { return withBasket(delegate(fruitChild c) { return c.searchAgain(-1); }); });
+        addCommand("Next &Part", "F6", "Move between the fruit field and the basket list.",
+            delegate() { return withBasket(delegate(fruitChild c) { return c.nextPart(); }); });
+
+        addMenu("&Query");
+        addCommand("Say P&osition", "Alt+Delete", "Say which fruit you are on, of how many, and how far through.",
+            delegate() { return withBasket(delegate(fruitChild c) { return c.sayPosition(); }); }).sRepeat = "review";
+        addCommand("Say &Yield", "Alt+Y", "Say how full this basket is.",
+            delegate() { return withBasket(delegate(fruitChild c) { return c.sayYield(); }); }).sRepeat = "review";
+
+        // The list layer: Shift plus a letter, live only in the basket list.
+        addCommand("Say &Fruit", "Shift+F", KeyMap.sListContext, "Say the fruit you are on.",
+            delegate() { return withBasket(delegate(fruitChild c) { return c.sayFruit(); }); }).sRepeat = "review";
+        addCommand("Say Yield in List", "Shift+Y", KeyMap.sListContext, "Say how full this basket is.",
+            delegate() { return withBasket(delegate(fruitChild c) { return c.sayYield(); }); });
+
         finishMenus();
-
         newBasket();
     }
 
-    // onCommand answers the app's own commands and lets the frame have the
-    // rest. One switch, in alphabetical order, reading like the menu does.
-    protected override bool onCommand(string sCommand)
+    public fruitChild activeBasket()
     {
-        fruitChild child = this.ActiveMdiChild as fruitChild;
-        switch (sCommand)
-        {
-            case "Add Fruit": if (child != null) child.addFruit(); return true;
-            case "Count Fruit": if (child != null) Say.sayForced(child.basketState()); return true;
-            case "Delete Fruit": if (child != null) child.deleteFruit(); return true;
-            case "Exit": this.Close(); return true;
-            case "New Basket": return newBasket();
-            default: return false;
-        }
+        return this.ActiveMdiChild as fruitChild;
+    }
+
+    // withBasket: run a command on the active basket, or say there is none.
+    public bool withBasket(Func<fruitChild, bool> fWork)
+    {
+        fruitChild child = activeBasket();
+        if (child == null) { Say.sayForced("No basket is open"); return true; }
+        return fWork(child);
+    }
+
+    public int basketSize()
+    {
+        int iSize;
+        return int.TryParse(settingValue("Basket Size"), out iSize) && iSize > 0 ? iSize : 10;
+    }
+
+    protected override bool onSettingChanged(string sName, string sValue)
+    {
+        Log.info("Basket size is now " + basketSize().ToString());
+        return true;
     }
 
     public bool newBasket()
     {
         iBaskets++;
-        fruitChild child = new fruitChild(this, "Basket " + iBaskets);
+        fruitChild child = new fruitChild(this, "Basket " + iBaskets.ToString());
         child.Show();
         return true;
     }
 }
 
-// ---- MDI 4: each child keeps its own state ----
-//
-// This is the reason to use windows rather than tabs. A window is a first-class
-// object to a screen reader: Alt+Tab reaches it, the window list names it, and
-// its title is announced when it is activated. Each basket below holds its own
-// fruit, its own selection and its own status line, and none of that needed any
-// code to keep separate.
+// ------- a basket: one window -------
+
 public class fruitChild : MdiChild
 {
     private Button btnAdd;
+    private fruitFrame frmFrame;
     private ListBox lbBasket;
     private TextBox txtFruit;
 
-    public fruitChild(MdiFrame frmParent, string sName) : base(frmParent)
+    public fruitChild(fruitFrame frmParent, string sName) : base(frmParent)
     {
-        // The controls are built with Lbc primitives, exactly as in the single
-        // dialog version, so everything there is true here: add order is focus
-        // order, an ampersand is the whole of an access key, and the list and
-        // the field arrive with their search and their line chords already on.
-        // THE MENU OWNS THE PLAIN LETTERS, so the controls take others: the
-        // field is F&ruit and the list is Bas&ket, because Alt+F belongs to the
-        // File menu and Alt+B to the Basket menu. In the single-dialog version
-        // there is no menu bar and the same controls are &Fruit and &Basket.
-        // check found this on its first run of this file, which is
-        // exactly what it is for.
+        frmFrame = frmParent;
         lbc.addBand();
         txtFruit = lbc.addInputBox("F&ruit:", "", "Type a fruit, then press Enter.");
         btnAdd = lbc.addButton("&Add", "Put this fruit in the basket.");
         lbc.endBand();
-
         lbBasket = lbc.addPickBox("Bas&ket:", new List<string>(), "",
-            "The fruit in this basket. Press Delete to remove the one you are on.");
-
+            "The fruit in this basket. Type the start of one to go to it.");
         finishLayout();
 
+        manageList(lbBasket);
         btnAdd.Click += delegate(object oSender, EventArgs evArgs) { addFruit(); };
         this.AcceptButton = btnAdd;
-        lbBasket.KeyDown += delegate(object oSender, KeyEventArgs evKey)
-        {
-            if (evKey.KeyCode == Keys.Delete) { deleteFruit(); evKey.Handled = true; }
-        };
+        this.FormClosing += delegate(object oSender, FormClosingEventArgs evArgs) { evArgs.Cancel = !mayClose(); };
 
         setTitle(sName, "empty");
-        setStatusText(basketState());
+        setStatusText(state());
         txtFruit.Focus();
         Log.info("Opened " + sName);
     }
 
-    public string basketState()
+    public int count() { return lbBasket.Items.Count; }
+
+    public bool isFull() { return count() >= frmFrame.basketSize(); }
+
+    public string state()
     {
-        int iCount = lbBasket.Items.Count;
-        if (iCount == 0) return "the basket is empty";
-        return Util.stringPlural("fruit", iCount) + " in the basket";
+        int iCount = count();
+        if (iCount == 0) return "empty";
+        return (iCount == 1 ? "1 fruit" : iCount.ToString() + " fruit") + " of " + frmFrame.basketSize().ToString();
+    }
+
+    private bool showState()
+    {
+        setTitle(subject, state());
+        setStatusText(state());
+        return true;
     }
 
     public bool addFruit()
     {
         string sFruit = txtFruit.Text.Trim();
-        if (sFruit == "")
-        {
-            Say.sayForced("Type a fruit first");
-            txtFruit.Focus();
-            return false;
-        }
+        if (sFruit == "") { Say.sayForced("Type a fruit first"); txtFruit.Focus(); return true; }
         lbBasket.Items.Add(sFruit);
         lbBasket.SelectedIndex = lbBasket.Items.Count - 1;
         txtFruit.Text = "";
         showState();
-        Say.say(sFruit + " added, " + basketState());
+        Say.say(sFruit + " added", state());
         txtFruit.Focus();
         return true;
     }
@@ -187,38 +203,118 @@ public class fruitChild : MdiChild
     public bool deleteFruit()
     {
         int iFruit = lbBasket.SelectedIndex;
-        if (iFruit == -1)
-        {
-            Say.sayForced("No fruit is selected");
-            lbBasket.Focus();
-            return false;
-        }
+        if (iFruit < 0) { Say.sayForced("Go to a fruit in the list first"); lbBasket.Focus(); return true; }
         string sFruit = ("" + lbBasket.Items[iFruit]).Trim();
         lbBasket.Items.RemoveAt(iFruit);
         if (iFruit > lbBasket.Items.Count - 1) iFruit = lbBasket.Items.Count - 1;
         if (iFruit >= 0) lbBasket.SelectedIndex = iFruit;
         showState();
-        Say.say(sFruit + " deleted, " + basketState());
+        Say.say(sFruit + " deleted", state());
         lbBasket.Focus();
         return true;
     }
 
-    // The count goes in the title AND the status line, and for different
-    // readers. The title is what Alt+Tab and the window list say, so a person
-    // choosing between three baskets hears which is which without opening them.
-    private bool showState()
+    public bool renameBasket()
     {
-        setTitle(subject, basketState());
-        setStatusText(basketState());
+        using (LbcDialog dlg = new LbcDialog("Rename Basket", this))
+        {
+            TextBox tb = dlg.addInputBox("&Name:", subject, "The new name for this basket.");
+            if (!dlg.runOkCancel()) return true;
+            string sName = tb.Text.Trim();
+            if (sName == "") { Say.sayForced("A basket needs a name, so it was not renamed"); return true; }
+            setTitle(sName, state());
+            Say.sayForced("Renamed " + sName);
+        }
         return true;
+    }
+
+    public bool sayFruit()
+    {
+        int iFruit = lbBasket.SelectedIndex;
+        if (iFruit < 0) return KeyMap.answer("Fruit", "No fruit is selected");
+        return KeyMap.answer("Fruit", "" + lbBasket.Items[iFruit]);
+    }
+
+    public bool sayYield()
+    {
+        return KeyMap.answer("Yield", state());
+    }
+
+    // sayPosition: the suite's Alt+Delete. The unit and its denominator are
+    // said, and an empty basket is a plain answer, not a division by zero.
+    public bool sayPosition()
+    {
+        int iCount = count();
+        if (iCount == 0) return KeyMap.answer("Position", "0 fruit");
+        int iFruit = lbBasket.SelectedIndex;
+        if (iFruit < 0) return KeyMap.answer("Position", "No fruit is selected", (iCount == 1 ? "1 fruit" : iCount.ToString() + " fruit"));
+        int iPercent = (int)Math.Round(100.0 * (iFruit + 1) / iCount);
+        return KeyMap.answer("Position", "Fruit " + (iFruit + 1).ToString() + " of " + iCount.ToString(), iPercent.ToString() + " percent");
+    }
+
+    // jump: Control+J asks; Alt+J repeats without asking. The last answer is
+    // kept for THIS basket, and F3 knows it was the last search here.
+    public bool jump(bool bAsk, int iDirection)
+    {
+        string sStart = KeyMap.recallInput("jumpToFruit", this);
+        if (bAsk || sStart == "")
+        {
+            using (LbcDialog dlg = new LbcDialog("Jump to Fruit", this))
+            {
+                TextBox tb = dlg.addInputBox("&Starts with:", sStart, "The first letters of the fruit to go to.");
+                if (!dlg.runOkCancel()) return true;
+                sStart = tb.Text.Trim();
+            }
+            if (sStart == "") return true;
+            KeyMap.rememberInput("jumpToFruit", this, sStart);
+        }
+        KeyMap.setLastSearch(this, "jumpToFruit");
+        int iCount = count();
+        if (iCount == 0) { Say.sayForced("The basket is empty"); return true; }
+        int iFrom = lbBasket.SelectedIndex < 0 ? -1 : lbBasket.SelectedIndex;
+        for (int i = 1; i <= iCount; i++)
+        {
+            int iTry = ((iFrom + i * iDirection) % iCount + iCount) % iCount;
+            string sItem = "" + lbBasket.Items[iTry];
+            if (sItem.StartsWith(sStart, StringComparison.CurrentCultureIgnoreCase))
+            {
+                lbBasket.SelectedIndex = iTry;
+                lbBasket.Focus();
+                return true;
+            }
+        }
+        Say.sayForced("No fruit starts with " + sStart);
+        return true;
+    }
+
+    public bool searchAgain(int iDirection)
+    {
+        if (KeyMap.lastSearch(this) == "jumpToFruit") return jump(false, iDirection);
+        Say.sayForced("Nothing has been searched for in this basket yet");
+        return true;
+    }
+
+    public bool nextPart()
+    {
+        if (lbBasket.Focused) txtFruit.Focus();
+        else lbBasket.Focus();
+        return true;
+    }
+
+    // mayClose: a basket with fruit in it asks first, and keeping it open is
+    // a real answer that Close All But Current Window counts as kept.
+    private bool mayClose()
+    {
+        if (count() == 0) return true;
+        using (LbcDialog dlg = new LbcDialog("Close Basket", this))
+        {
+            dlg.addLabel(subject + " holds " + state() + ".");
+            string sAnswer = dlg.runWithButtons(new string[] { "Close", "Keep open" }, false, "Keep open");
+            return sAnswer != null && sAnswer.Replace("&", "").Trim().Equals("Close", StringComparison.OrdinalIgnoreCase);
+        }
     }
 }
 
-// ---- MDI 5: closing the last window closes the program ----
-//
-// A frame with no children has no menu bar and nothing to tab to, which is a
-// dead end for a keyboard user. MdiFrame closes itself when the last child
-// goes, so this file does not have to think about it.
 [STAThread]
 public static int Main(string[] aArguments)
 {
@@ -229,9 +325,9 @@ public static int Main(string[] aArguments)
     try
     {
         frmMain = new fruitFrame();
-        Application.Run(frmMain);
+        int iCode = MdiFrame.runOrExport(frmMain);
         Log.close();
-        return 0;
+        return iCode;
     }
     catch (Exception oError)
     {

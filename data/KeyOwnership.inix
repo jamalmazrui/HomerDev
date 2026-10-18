@@ -1,0 +1,424 @@
+﻿; KeyOwnership.inix -- keys owned by Windows, screen readers and browsers, and
+; what a Homer app may do with each. The authority for scripts\checkKeys and
+; for the short table inside exec\CSharp\KeyMap.cs, which checkKeys compares
+; with this file.
+;
+; kind: system (Windows takes it first), convention (the app receives it but
+; it means one thing everywhere), conditional (taken only on some machines),
+; reader global, reader tables, reader laptop, browser, historical.
+;
+; Sources: Microsoft's Windows 11 shortcut list, Freedom Scientific's JAWS
+; keystroke list, the Window-Eyes reference. Also always reserved: every
+; Windows-key and Insert-key combination, Alt+Control with letters, digits,
+; function keys or punctuation, and Control+Alt+N, which starts NVDA.
+
+[Ownership]
+schema=1
+
+[Key Alt+Tab]
+owner=Windows
+kind=system
+what=switches apps
+context=everywhere
+interception=taken before any app
+disposition=never bind
+
+[Key Alt+Escape]
+owner=Windows
+kind=system
+what=cycles windows
+context=everywhere
+interception=taken before any app
+disposition=never bind
+
+[Key Alt+Space]
+owner=Windows
+kind=system
+what=system menu
+context=everywhere
+interception=opens the window's system menu
+disposition=never bind
+
+[Key Alt+Dash]
+owner=Windows
+kind=system
+what=document window menu
+context=MDI document windows
+interception=opens a document window's system menu
+disposition=never bind in an MDI app
+
+[Key Control+Escape]
+owner=Windows
+kind=system
+what=Start
+context=everywhere
+interception=taken before any app
+disposition=never bind
+
+[Key Control+Shift+Escape]
+owner=Windows
+kind=system
+what=Task Manager
+context=everywhere
+interception=taken before any app
+disposition=never bind
+
+[Key Alt+Control+Delete]
+owner=Windows
+kind=system
+what=security screen
+context=everywhere
+interception=taken before any app
+disposition=never bind
+
+[Key PrintScreen]
+owner=Windows
+kind=system
+what=screenshot
+context=everywhere
+interception=screenshot or Snipping Tool
+disposition=never bind
+
+[Key F10]
+owner=Windows
+kind=convention
+what=menu bar
+context=any app with a menu bar
+interception=the app receives it; Windows moves to the menu bar by default
+disposition=bind only to the menu bar
+
+[Key Shift+F10]
+owner=Windows
+kind=convention
+what=context menu
+context=any app
+interception=the app receives it; it opens the context menu
+disposition=bind only to a context menu
+
+[Key Control+Space]
+owner=Windows
+kind=conditional
+what=input method on or off
+context=only with a Chinese input method installed
+interception=the input method may take it
+disposition=allowed, recorded as an input-method exception and tested
+
+[Key Control+Shift+0]
+owner=Windows
+kind=conditional
+what=keyboard layout hotkey
+context=machines with more than one keyboard layout
+interception=the layout hotkey may take it
+disposition=do not bind
+
+[Key Control+A]
+owner=Windows
+kind=convention
+what=select all
+context=everywhere
+interception=the app receives it
+disposition=bind only to select all, or mark all in a list
+
+[Key Control+C]
+owner=Windows
+kind=convention
+what=copy
+context=everywhere
+interception=the app receives it
+disposition=bind only to copy the current item
+
+[Key Control+V]
+owner=Windows
+kind=convention
+what=paste
+context=everywhere
+interception=the app receives it
+disposition=bind only to paste
+
+[Key Control+X]
+owner=Windows
+kind=convention
+what=cut
+context=everywhere
+interception=the app receives it
+disposition=bind only to cut
+
+[Key Control+Z]
+owner=Windows
+kind=convention
+what=undo
+context=everywhere
+interception=the app receives it
+disposition=bind only to undo
+
+[Key Control+Shift+Z]
+owner=Windows
+kind=convention
+what=redo
+context=everywhere
+interception=the app receives it
+disposition=bind only to redo
+
+[Key Control+Y]
+owner=Windows
+kind=convention
+what=redo or repeat
+context=everywhere
+interception=the app receives it
+disposition=bind only to redo or repeat
+
+[Key Control+F4]
+owner=Windows
+kind=convention
+what=close window
+context=MDI apps
+interception=the app receives it
+disposition=bind only to close the window
+
+[Key Control+Tab]
+owner=Windows
+kind=convention
+what=next window
+context=MDI apps and dialogs with pages
+interception=the app receives it
+disposition=bind only to the next window or page
+
+[Key Control+Shift+Tab]
+owner=Windows
+kind=convention
+what=previous window
+context=MDI apps and dialogs with pages
+interception=the app receives it
+disposition=bind only to the previous window or page
+
+[Key Alt+Enter]
+owner=Windows
+kind=convention
+what=properties
+context=everywhere
+interception=the app receives it
+disposition=bind only to properties
+
+[Key Alt+LeftArrow]
+owner=Windows
+kind=convention
+what=back
+context=navigable views
+interception=the app receives it
+disposition=bind only to back, or a recorded editor exception
+
+[Key Alt+RightArrow]
+owner=Windows
+kind=convention
+what=forward
+context=navigable views
+interception=the app receives it
+disposition=bind only to forward, or a recorded editor exception
+
+[Key F2]
+owner=Windows
+kind=convention
+what=rename or edit
+context=everywhere
+interception=the app receives it
+disposition=bind only to rename or edit, or a recorded exception
+
+[Key F5]
+owner=Windows
+kind=convention
+what=refresh
+context=everywhere
+interception=the app receives it
+disposition=bind only to refresh, or a recorded exception
+
+[Key Alt+Delete]
+owner=JAWS
+kind=reader global
+what=Say Active Cursor
+context=everywhere, desktop layout
+interception=JAWS takes it: Say Active Cursor, pixel coordinates in a list
+disposition=approved suite override: Say Position, passed through by each app's JAWS key map allowlist
+
+[Key Alt+Control+PageUp]
+owner=JAWS
+kind=reader global
+what=voice rate faster
+context=everywhere
+interception=JAWS takes it
+disposition=never bind
+
+[Key Alt+Control+PageDown]
+owner=JAWS
+kind=reader global
+what=voice rate slower
+context=everywhere
+interception=JAWS takes it
+disposition=never bind
+
+[Key Alt+Shift+UpArrow]
+owner=JAWS
+kind=reader global
+what=mouse up
+context=everywhere
+interception=JAWS takes it
+disposition=never bind
+
+[Key Alt+Shift+DownArrow]
+owner=JAWS
+kind=reader global
+what=mouse down
+context=everywhere
+interception=JAWS takes it
+disposition=never bind
+
+[Key Alt+Shift+LeftArrow]
+owner=JAWS
+kind=reader global
+what=mouse left
+context=everywhere
+interception=JAWS takes it
+disposition=never bind
+
+[Key Alt+Shift+RightArrow]
+owner=JAWS
+kind=reader global
+what=mouse right
+context=everywhere
+interception=JAWS takes it
+disposition=never bind
+
+[Key Shift+NumPad5]
+owner=JAWS
+kind=reader global
+what=say the control's hotkey
+context=everywhere, NumLock off
+interception=JAWS takes it
+disposition=never bind
+
+[Key Control+Shift+F11]
+owner=JAWS
+kind=reader global
+what=system tray contents
+context=everywhere
+interception=JAWS takes it
+disposition=never bind
+
+[Key Alt+Control+UpArrow]
+owner=JAWS and NVDA
+kind=reader tables
+what=cell above
+context=inside tables and some list views
+interception=the reader takes it there
+disposition=allowed for cell movement inside the app's own grid only, tested
+
+[Key Alt+Control+DownArrow]
+owner=JAWS and NVDA
+kind=reader tables
+what=cell below
+context=inside tables and some list views
+interception=the reader takes it there
+disposition=allowed for cell movement inside the app's own grid only, tested
+
+[Key Alt+Control+LeftArrow]
+owner=JAWS and NVDA
+kind=reader tables
+what=previous cell
+context=inside tables and some list views
+interception=the reader takes it there
+disposition=allowed for cell movement inside the app's own grid only, tested
+
+[Key Alt+Control+RightArrow]
+owner=JAWS and NVDA
+kind=reader tables
+what=next cell
+context=inside tables and some list views
+interception=the reader takes it there
+disposition=allowed for cell movement inside the app's own grid only, tested
+
+[Key Alt+Shift+Comma]
+owner=JAWS
+kind=reader laptop
+what=current table cell
+context=laptop layout, inside tables
+interception=JAWS may take it there
+disposition=kept; tested in the DbDo grid and the FileDir list under the laptop layout; allowlisted or moved if taken
+
+[Key Alt+Shift+Period]
+owner=JAWS
+kind=reader laptop
+what=next table cell
+context=laptop layout, inside tables
+interception=JAWS may take it inside a table, in the laptop layout
+disposition=kept; tested in the DbDo grid and the FileDir list under the laptop layout; allowlisted or moved if taken
+
+[Key Alt+Shift+M]
+owner=JAWS
+kind=reader laptop
+what=previous table cell
+context=laptop layout, inside tables
+interception=JAWS may take it inside a table, in the laptop layout
+disposition=kept; tested in the DbDo grid and the FileDir list under the laptop layout; allowlisted or moved if taken
+
+[Key Alt+Shift+N]
+owner=JAWS
+kind=reader laptop
+what=table cell down
+context=laptop layout, inside tables
+interception=JAWS may take it inside a table, in the laptop layout
+disposition=kept; tested in the DbDo grid and the FileDir list under the laptop layout; allowlisted or moved if taken
+
+[Key Alt+Shift+Y]
+owner=JAWS
+kind=reader laptop
+what=table cell up
+context=laptop layout, inside tables
+interception=JAWS may take it inside a table, in the laptop layout
+disposition=kept; tested in the DbDo grid and the FileDir list under the laptop layout; allowlisted or moved if taken
+
+[Key F6]
+owner=Browser
+kind=browser
+what=panes
+context=HomerView only
+interception=the browser moves among panes and the address bar
+disposition=left to the browser
+
+[Key F11]
+owner=Browser
+kind=browser
+what=full screen
+context=HomerView only
+interception=full screen
+disposition=left to the browser; Elevate Version is Control+F11 there
+
+[Key F12]
+owner=Browser
+kind=browser
+what=developer tools
+context=HomerView only
+interception=developer tools
+disposition=left to the browser; Copy Log is Alt+Shift+L there
+
+[Key Control+Slash]
+owner=Window-Eyes
+kind=historical
+what=forms mode toggle
+context=discontinued 2017
+interception=none today
+disposition=reference only, not enforced
+
+[Key Control+Shift+A]
+owner=Window-Eyes
+kind=historical
+what=browse mode toggle
+context=discontinued 2017
+interception=none today
+disposition=reference only, not enforced
+
+[Key Control+Shift+R]
+owner=Window-Eyes
+kind=historical
+what=read to end
+context=discontinued 2017
+interception=none today
+disposition=reference only, not enforced

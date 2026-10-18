@@ -15,7 +15,7 @@
 //   * Build every dialog from Lbc primitives. Never place a control by hand
 //     and never use a visual designer. ADD ORDER IS FOCUS ORDER.
 //   * Camel Type naming: sString, iInteger, bBoolean, lsList, dDictionary,
-//     oObject; lowerCamel methods; c_ before a constant; double quotes;
+//     oObject; lowerCamel methods; no c_ prefix on constants; double quotes;
 //     declarations alphabetical; functions, not subprocedures.
 //   * Every control that the dialog conventions below name keeps its name, its
 //     ampersand letter, and its command-line equivalent. A user who learns one

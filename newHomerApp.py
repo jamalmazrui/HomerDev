@@ -6,6 +6,8 @@ Usage (through the wrapper, which is how it is meant to be run):
     newHomerApp                     ask for the app name, write <App> beside the kit
     newHomerApp JobDo               write JobDo beside the kit, a C# app
     newHomerApp JobDo --python      write JobDo beside the kit, a Python app
+    newHomerApp JobDo --mdi         write JobDo beside the kit, a C# app with
+                                    several windows, on the Homer MDI framework
     newHomerApp JobDo D:\Work\JobDo  write somewhere else, on any drive
 
 Beside the kit means in the same folder as HomerDev: C:\JobDo for a kit in
@@ -238,9 +240,18 @@ def main():
     logLine("Working directory: %s" % os.getcwd())
     logFact("arguments", " ".join(sys.argv[1:]))
 
-    lsWords = [s for s in sys.argv[1:] if s.lower() not in ("--python", "-python", "python")]
-    bPython = len(lsWords) < len(sys.argv) - 1
-    logLine("Language: %s" % ("Python" if bPython else "C#"))
+    # THE SHAPE OF THE APP (1.73.0): --python for a Python app, --mdi for a C#
+    # app with several windows on the Homer MDI framework, nothing for the
+    # one-dialog C# launchpad. Switches are read case-insensitively.
+    lsSwitches = [s.lower() for s in sys.argv[1:] if s.startswith("-") or s.lower() in ("python", "mdi")]
+    lsWords = [s for s in sys.argv[1:] if not (s.startswith("-") or s.lower() in ("python", "mdi"))]
+    bPython = any(s.lstrip("-") == "python" for s in lsSwitches)
+    bMdi = any(s.lstrip("-") == "mdi" for s in lsSwitches)
+    if bPython and bMdi:
+        sayLine("Choose --python or --mdi, not both: the MDI framework is C#.")
+        logLine("ERROR: both --python and --mdi were given")
+        return 1
+    logLine("Language: %s, shape: %s" % ("Python" if bPython else "C#", "MDI" if bMdi else ("Python" if bPython else "launchpad")))
 
     sApp = lsWords[0] if len(lsWords) > 0 else ""
     if sApp == "":
@@ -288,6 +299,11 @@ def main():
         ("version.txt",          "version.txt"),
         ("accept.inix",          "accept.inix"),
     ]
+
+    if bMdi:
+        # The MDI starter replaces the launchpad as the app's source.
+        lsScripts = [t for t in lsScripts if t[0] != "_APP_.cs"]
+        lsScripts.insert(0, ("_APP_Mdi.cs", sApp + ".cs"))
 
     if bPython:
         #  A Python app takes the Python build script instead of the C# one and
@@ -358,6 +374,9 @@ def main():
     if bPython:
         sayLine("Next: write %s.py -- Templates\\samples\\FruitBasketPy is the worked example --"
                 % sApp)
+        sayLine("set the AppId and hotkey in %s_setup.iss, then run build." % sApp)
+    elif bMdi:
+        sayLine("Next: add your commands to %s.cs with addCommand -- help\\MdiFramework.md in the kit explains --" % sApp)
         sayLine("set the AppId and hotkey in %s_setup.iss, then run build." % sApp)
     else:
         sayLine("Next: fill in runScript() in %s.cs, set the AppId and hotkey in %s_setup.iss, then run build."

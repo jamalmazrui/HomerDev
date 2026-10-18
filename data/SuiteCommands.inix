@@ -1,0 +1,4143 @@
+﻿; SuiteCommands.inix -- the Homer Suite command manifest: every command of DbDo,
+; EdSharp, FileDir and HomerView, with its stable identifier, its recommended
+; keys, and the status of any change. help\HomerSuite.md explains it.
+;
+; GENERATED for kit 1.73.0 from the four apps' sources of 17 October 2026 and
+; the fifth-round plan. Counts here are source-derived; an app's own
+; /exportkeys file, read by scripts\checkKeys, is what proves its keys.
+;
+; status: current (no change), proposed (both AIs agree; awaiting its stage),
+;   ruled (follows a ruling of yours), implemented, verified.
+
+[Suite]
+schema=1
+apps=DbDo, EdSharp, FileDir, HomerView
+
+[DbDo about]
+name=About
+keys=Alt+F1
+status=current
+
+[DbDo addTable]
+name=Add Table
+keys=
+status=current
+
+[DbDo alternateMenu]
+name=Alternate Menu
+keys=Alt+F10
+status=current
+
+[DbDo announcement]
+name=Announcement
+keys=
+status=current
+
+[DbDo appendCellToClipboard]
+name=Append Cell to Clipboard
+keys=Alt+C
+status=current
+
+[DbDo appendClipboard]
+name=Append Clipboard
+keys=Control+Shift+Apostrophe
+change=new
+reason=clipboard family
+disposition=accepted
+status=proposed
+
+[DbDo appendRecordToClipboard]
+name=Append Record to Clipboard
+keys=Alt+Shift+C
+status=current
+
+[DbDo backupDatabase]
+name=Backup Database
+keys=
+status=current
+
+[DbDo chatAboutTable]
+name=Chat about Table
+keys=Shift+F12
+status=current
+
+[DbDo chatWithAI]
+name=Chat with AI
+keys=F12
+status=current
+
+[DbDo chooseTable]
+name=Choose Table
+keys=Control+T
+status=current
+
+[DbDo chooseView]
+name=Choose View
+keys=
+status=current
+
+[DbDo chooseVisibleColumns]
+name=Choose Visible Columns
+keys=
+status=current
+
+[DbDo clearBookmark]
+name=Clear Bookmark
+keys=Control+Shift+B
+status=current
+
+[DbDo clearClipboard]
+name=Clear Clipboard
+keys=Alt+Shift+Apostrophe
+change=new
+reason=clipboard family
+disposition=accepted
+status=proposed
+
+[DbDo clearFilter]
+name=Clear Filter
+keys=Control+Shift+F
+status=current
+
+[DbDo clearSort]
+name=Clear Sort
+keys=
+status=current
+
+[DbDo closeAllButCurrentWindow]
+name=Close All But Current Window
+keys=Control+Shift+F4
+status=current
+
+[DbDo closeDatabase]
+name=Close Database
+keys=
+status=current
+
+[DbDo closeWindow]
+name=Close Window
+keys=Control+F4
+status=current
+
+[DbDo commandEchoToggle]
+name=Command Echo Toggle
+keys=
+change=keys changed, was Control+Shift+Z
+reason=leaves Control+Shift+Z, reserved for Redo
+disposition=accepted
+status=proposed
+
+[DbDo compareDatabase]
+name=Compare Database
+keys=
+status=current
+
+[DbDo completeMark]
+name=Complete Mark
+keys=Shift+F8
+status=current
+
+[DbDo completeUnmarkToAnchor]
+name=Complete Unmark to Anchor
+keys=Alt+Shift+F8
+status=current
+
+[DbDo copyCellToClipboard]
+name=Copy Cell to Clipboard
+keys=Control+C
+status=current
+
+[DbDo copyColumnToClipboard]
+name=Copy Column to Clipboard
+keys=
+status=current
+
+[DbDo copyGridAsTSVToClipboard]
+name=Copy Grid as TSV to Clipboard
+keys=
+status=current
+
+[DbDo copyLog]
+name=Copy Log
+keys=Control+F12
+change=new
+reason=suite Help key
+disposition=accepted
+status=proposed
+
+[DbDo copyRecord]
+name=Copy Record
+keys=Control+Shift+C
+status=current
+
+[DbDo copyVisibleCellsAsTSVToClipboard]
+name=Copy Visible Cells as TSV to Clipboard
+keys=
+status=current
+
+[DbDo currentWindows]
+name=Current Windows
+keys=F4
+status=current
+
+[DbDo databaseSummary]
+name=Database Summary
+keys=Alt+D
+status=current
+
+[DbDo deleteRecord]
+name=Delete Record
+keys=Control+D or Delete
+status=current
+
+[DbDo deleteWithoutConfirmation]
+name=Delete Without Confirmation
+keys=Control+Shift+D
+status=current
+
+[DbDo describeTable]
+name=Describe Table
+keys=
+status=current
+
+[DbDo developerGuide]
+name=Developer Guide
+keys=
+status=current
+
+[DbDo documentation]
+name=Documentation
+keys=F1
+status=current
+
+[DbDo editCell]
+name=Edit Cell
+keys=F2
+status=current
+
+[DbDo editNotes]
+name=Edit Notes
+keys=Alt+Shift+N
+status=current
+
+[DbDo editSettings]
+name=Edit Settings
+keys=Alt+Shift+E
+status=current
+
+[DbDo editSnippet]
+name=Edit Snippet
+keys=Control+Shift+E
+status=current
+
+[DbDo editTags]
+name=Edit Tags
+keys=Alt+Shift+T
+status=current
+
+[DbDo editUrl]
+name=Edit url
+keys=Alt+Shift+U
+change=renamed from Edit URL, was Alt+Shift+U
+disposition=accepted
+status=proposed
+
+[DbDo editView]
+name=Edit View
+keys=Control+E
+status=current
+
+[DbDo elevateVersion]
+name=Elevate Version
+keys=F11
+status=current
+
+[DbDo emailLogFile]
+name=Email Log File
+keys=
+status=current
+
+[DbDo enterChildTable]
+name=Enter Child Table
+keys=Alt+RightArrow or Enter
+status=current
+
+[DbDo evaluateExpression]
+name=Evaluate Expression
+keys=Control+Equals
+status=current
+
+[DbDo exitChildTable]
+name=Exit Child Table
+keys=Alt+LeftArrow or Backspace
+status=current
+
+[DbDo exitDbDo]
+name=Exit DbDo
+keys=Alt+F4
+status=current
+
+[DbDo exitToRootTable]
+name=Exit to Root Table
+keys=Alt+Home
+status=current
+
+[DbDo exportData]
+name=Export Data
+keys=Alt+Shift+X
+change=keys changed, was Alt+X
+reason=X for export, Alt+Shift as in the suite; Alt+X stays the editors' Cut Append
+disposition=accepted
+status=ruled
+
+[DbDo extraSpeechToggle]
+name=Extra Speech Toggle
+keys=Alt+Shift+Z
+status=current
+
+[DbDo extractWithRegex]
+name=Extract with Regex
+keys=Control+Shift+X
+status=current
+
+[DbDo facetColumn]
+name=Facet Column
+keys=
+status=current
+
+[DbDo fileGitHubIssue]
+name=File GitHub Issue
+keys=
+status=current
+
+[DbDo filterByRegex]
+name=Filter by Regex
+keys=
+status=current
+
+[DbDo filterRecords]
+name=Filter Records
+keys=Control+F
+status=current
+
+[DbDo findRegex]
+name=Find Regex
+keys=Control+F3
+status=current
+
+[DbDo firstRecord]
+name=First Record
+keys=
+status=current
+
+[DbDo frequentlyAskedQuestions]
+name=Frequently Asked Questions
+keys=
+status=current
+
+[DbDo generateFromGrid]
+name=Generate from Grid
+keys=Alt+Shift+G
+status=current
+
+[DbDo goToRecord]
+name=Go to Record
+keys=Control+G
+status=current
+
+[DbDo graphicsColumn]
+name=Graphics Column
+keys=Control+Shift+G
+status=current
+
+[DbDo historyOfChanges]
+name=History of Changes
+keys=Shift+F1
+status=current
+
+[DbDo hotkeySummary]
+name=Hotkey Summary
+keys=Alt+Shift+H
+status=current
+
+[DbDo hotkeys]
+name=Hotkeys
+keys=Control+Shift+F1
+status=current
+
+[DbDo import]
+name=Import
+keys=Alt+I
+status=current
+
+[DbDo inspectRecord]
+name=Inspect Record
+keys=Control+I
+status=current
+
+[DbDo invertMarked]
+name=Invert Marked
+keys=Alt+Shift+I
+status=current
+
+[DbDo invokeScript]
+name=Invoke Script
+keys=Control+Shift+I
+status=current
+
+[DbDo jumpToNextInitial]
+name=Jump to Next Initial
+keys=
+status=current
+
+[DbDo jumpToRecord]
+name=Jump to Record
+keys=Control+J
+status=current
+
+[DbDo keyDescriberToggle]
+name=Key Describer Toggle
+keys=Control+F1
+status=current
+
+[DbDo keywords]
+name=Keywords
+keys=Control+K
+status=current
+
+[DbDo lastRecord]
+name=Last Record
+keys=
+status=current
+
+[DbDo license]
+name=License
+keys=
+status=current
+
+[DbDo listBookmarks]
+name=List Bookmarks
+keys=Alt+B
+status=current
+
+[DbDo mailRecord]
+name=Mail Record
+keys=
+status=current
+
+[DbDo markAll]
+name=Mark All
+keys=Control+A
+status=current
+
+[DbDo markRecord]
+name=Mark Record
+keys=Control+M
+status=current
+
+[DbDo mergeData]
+name=Merge Data
+keys=Alt+M
+status=current
+
+[DbDo newCopy]
+name=New Copy
+keys=Control+Shift+N
+status=current
+
+[DbDo newDatabase]
+name=New Database
+keys=
+status=current
+
+[DbDo newRecord]
+name=New Record
+keys=Control+N
+status=current
+
+[DbDo nextRecord]
+name=Next Record
+keys=
+status=current
+
+[DbDo nextTableOrView]
+name=Next Table or View
+keys=Control+F6
+status=current
+
+[DbDo nextVisitedTable]
+name=Next Visited Table
+keys=Alt+F6
+status=current
+
+[DbDo nextWindow]
+name=Next Window
+keys=Control+Tab
+status=current
+
+[DbDo openAsManagedCopy]
+name=Open as Managed Copy
+keys=
+status=current
+
+[DbDo openCellValue]
+name=Open Cell Value
+keys=Control+Enter
+status=current
+
+[DbDo openCommandPrompt]
+name=Open Command Prompt
+keys=Control+BackSlash or Control+Slash
+change=keys changed, was Control+Slash
+reason=Control+BackSlash added as the suite key
+disposition=accepted
+status=proposed
+
+[DbDo openDatabase]
+name=Open Database
+keys=Control+O
+status=current
+
+[DbDo openDotPrompt]
+name=Open Dot Prompt
+keys=Control+Accent
+status=current
+
+[DbDo openInExplorer]
+name=Open in Explorer
+keys=Alt+BackSlash
+status=current
+
+[DbDo openScriptFolder]
+name=Open Script Folder
+keys=
+status=current
+
+[DbDo openTable]
+name=Open Table
+keys=Control+Shift+O
+status=current
+
+[DbDo openTableInNewWindow]
+name=Open Table in New Window
+keys=Control+Shift+T
+status=current
+
+[DbDo openTemplateDatabase]
+name=Open Template Database
+keys=Alt+Shift+D
+status=current
+
+[DbDo openUrl]
+name=Open url
+keys=Control+Shift+U
+change=renamed from Open Url, was Control+Shift+U
+disposition=accepted
+status=proposed
+
+[DbDo openWebsite]
+name=Open Website
+keys=
+status=current
+
+[DbDo orderRecords]
+name=Order Records
+keys=Alt+O
+status=current
+
+[DbDo pickValue]
+name=Pick Value
+keys=Control+F2
+status=current
+
+[DbDo playStream]
+name=Play Stream
+keys=Alt+Shift+P
+status=current
+
+[DbDo playTutorials]
+name=Play Tutorials
+keys=
+status=current
+
+[DbDo previousRecord]
+name=Previous Record
+keys=
+status=current
+
+[DbDo previousTableOrView]
+name=Previous Table or View
+keys=Control+Shift+F6
+status=current
+
+[DbDo previousVisitedTable]
+name=Previous Visited Table
+keys=Alt+Shift+F6
+status=current
+
+[DbDo previousWindow]
+name=Previous Window
+keys=Control+Shift+Tab
+status=current
+
+[DbDo print]
+name=Print
+keys=Control+P
+status=current
+
+[DbDo query]
+name=Query
+keys=Control+Q
+status=current
+
+[DbDo queryHistory]
+name=Query History
+keys=Alt+Shift+Q
+status=current
+
+[DbDo readOnlyToggle]
+name=Read Only Toggle
+keys=
+change=renamed from Toggle Read Only, was Alt+Z
+reason=Alt+Z becomes Say Status
+disposition=accepted
+status=proposed
+
+[DbDo readme]
+name=ReadMe
+keys=Alt+Shift+F1
+status=current
+
+[DbDo recentFiles]
+name=Recent Files
+keys=Alt+R
+status=current
+
+[DbDo refreshView]
+name=Refresh View
+keys=F5
+status=current
+
+[DbDo regexReplace]
+name=Regex Replace
+keys=Control+Shift+R
+status=current
+
+[DbDo relatedRecords]
+name=Related Records
+keys=
+status=current
+
+[DbDo repeatGoTo]
+name=Repeat Go To
+keys=Alt+G
+status=current
+
+[DbDo replaceColumn]
+name=Replace Column
+keys=Control+R
+status=current
+
+[DbDo reverseJump]
+name=Reverse Jump
+keys=Control+Shift+J
+status=current
+
+[DbDo reverseKeywords]
+name=Reverse Keywords
+keys=Control+Shift+K
+status=current
+
+[DbDo reverseOrder]
+name=Reverse Order
+keys=Alt+Shift+O
+status=current
+
+[DbDo reverseRegexFind]
+name=Reverse Regex Find
+keys=Control+Shift+F3
+status=current
+
+[DbDo runReport]
+name=Run Report
+keys=Alt+Shift+R
+status=current
+
+[DbDo save]
+name=Save
+keys=Control+S
+status=current
+
+[DbDo saveAs]
+name=Save As
+keys=Control+Shift+S
+status=current
+
+[DbDo saveBookmark]
+name=Save Bookmark
+keys=Control+B
+status=current
+
+[DbDo saveClipboard]
+name=Save Clipboard
+keys=Control+Apostrophe
+change=new
+reason=clipboard family
+disposition=accepted
+status=proposed
+
+[DbDo sayAdded]
+name=Say Added
+keys=Shift+A
+status=current
+
+[DbDo sayBookmark]
+name=Say Bookmark
+keys=Shift+B
+status=current
+
+[DbDo sayCell]
+name=Say Cell
+keys=Shift+C
+status=current
+
+[DbDo sayClipboard]
+name=Say Clipboard
+keys=Alt+Apostrophe
+status=current
+
+[DbDo sayColumnAsList]
+name=Say Column as List
+keys=Alt+L
+status=current
+
+[DbDo sayColumnAsListFromCurrent]
+name=Say Column as List from Current
+keys=Control+L
+status=current
+
+[DbDo sayColumnAsListFromCurrentMarked]
+name=Say Column as List from Current Marked
+keys=Control+Shift+L
+status=current
+
+[DbDo sayColumnAsListOfMarked]
+name=Say Column as List of Marked
+keys=Alt+Shift+L
+status=current
+
+[DbDo sayDatabase]
+name=Say Database
+keys=Shift+D
+status=current
+
+[DbDo sayEdited]
+name=Say Edited
+keys=Shift+E
+status=current
+
+[DbDo sayFilter]
+name=Say Filter
+keys=Shift+F
+status=current
+
+[DbDo sayGoTo]
+name=Say Go to
+keys=Shift+G
+change=renamed from Say Goto, was Shift+G
+reason=wording
+disposition=accepted
+status=proposed
+
+[DbDo sayId]
+name=Say Id
+keys=Shift+I
+status=current
+
+[DbDo sayJump]
+name=Say Jump
+keys=Shift+J
+status=current
+
+[DbDo sayKeywords]
+name=Say Keywords
+keys=Shift+K
+status=current
+
+[DbDo sayLook]
+name=Say Look
+keys=Shift+L
+status=current
+
+[DbDo sayMarkStatus]
+name=Say Mark Status
+keys=Shift+M
+status=current
+
+[DbDo sayMarked]
+name=Say Marked
+keys=
+status=current
+
+[DbDo sayMarkedRows]
+name=Say Marked Rows
+keys=Shift+Space
+status=current
+
+[DbDo sayMarkedYield]
+name=Say Marked Yield
+keys=
+status=current
+
+[DbDo sayNotes]
+name=Say Notes
+keys=Shift+N
+status=current
+
+[DbDo sayOrder]
+name=Say Order
+keys=Shift+O
+status=current
+
+[DbDo sayPath]
+name=Say Path
+keys=Alt+P
+change=new
+reason=the database path
+disposition=accepted
+status=proposed
+
+[DbDo sayPosition]
+name=Say Position
+keys=Alt+Delete
+status=current
+
+[DbDo sayPrime]
+name=Say Prime
+keys=Shift+P
+status=current
+
+[DbDo sayQuery]
+name=Say Query
+keys=Shift+Q
+status=current
+
+[DbDo sayRecordsRest]
+name=Say Records Rest
+keys=
+status=current
+
+[DbDo sayRecordsRestMarked]
+name=Say Records Rest Marked
+keys=Alt+Shift+M
+status=current
+
+[DbDo sayRegexReplace]
+name=Say Regex Replace
+keys=Shift+X
+status=current
+
+[DbDo sayRelated]
+name=Say Related
+keys=Shift+R
+status=current
+
+[DbDo sayReplacementValue]
+name=Say Replacement Value
+keys=Shift+V
+status=current
+
+[DbDo saySelectColumns]
+name=Say Select Columns
+keys=Shift+S
+status=current
+
+[DbDo saySortAndFilter]
+name=Say Sort and Filter
+keys=Shift+8 or NumPadStar
+status=current
+
+[DbDo sayStatus]
+name=Say Status
+keys=Alt+Z or Shift+Z
+change=keys changed, was Shift+Z
+reason=Alt+Z added to match the suite
+disposition=accepted
+status=proposed
+
+[DbDo sayTables]
+name=Say Tables
+keys=
+status=current
+
+[DbDo sayTags]
+name=Say Tags
+keys=Shift+T
+status=current
+
+[DbDo sayTime]
+name=Say Time
+keys=Alt+SemiColon
+change=new
+reason=suite Query key
+disposition=accepted
+status=proposed
+
+[DbDo sayUrl]
+name=Say url
+keys=Shift+U
+change=renamed from Say URL, was Shift+U
+disposition=accepted
+status=proposed
+
+[DbDo sayWindowsOpen]
+name=Say Windows Open
+keys=Shift+F4
+status=current
+
+[DbDo sayYield]
+name=Say Yield
+keys=Alt+Y or Shift+Y
+change=keys changed, was Shift+Y
+reason=Alt+Y added to match the suite
+disposition=accepted
+status=proposed
+
+[DbDo searchNext]
+name=Search Next
+keys=F3
+status=current
+
+[DbDo searchPrevious]
+name=Search Previous
+keys=Shift+F3
+status=current
+
+[DbDo selectColumnsToDisplay]
+name=Select Columns to Display
+keys=Alt+S
+status=current
+
+[DbDo showInFileDir]
+name=Show in FileDir
+keys=
+change=new
+reason=handoff
+disposition=accepted
+status=proposed
+
+[DbDo showLogLocation]
+name=Show Log Location
+keys=
+status=current
+
+[DbDo showSchema]
+name=Show Schema
+keys=
+status=current
+
+[DbDo sqleanConsole]
+name=Sqlean Console
+keys=Control+Shift+Accent
+status=current
+
+[DbDo startMark]
+name=Start Mark
+keys=F8
+status=current
+
+[DbDo startUnmark]
+name=Start Unmark
+keys=Alt+F8
+status=current
+
+[DbDo statisticsFromColumn]
+name=Statistics from Column
+keys=Alt+Shift+S
+status=current
+
+[DbDo tableProperties]
+name=Table Properties
+keys=Alt+Enter
+status=current
+
+[DbDo tableSummary]
+name=Table Summary
+keys=Alt+T
+status=current
+
+[DbDo testIntegrity]
+name=Test Integrity
+keys=
+status=current
+
+[DbDo toggleMarked]
+name=Toggle Marked
+keys=Control+Space
+status=current
+
+[DbDo transferImport]
+name=Transfer Import
+keys=
+status=current
+
+[DbDo tutorialsTranscript]
+name=Tutorials Transcript
+keys=
+status=current
+
+[DbDo unmarkAll]
+name=Unmark All
+keys=Control+Shift+A
+status=current
+
+[DbDo unmarkRecord]
+name=Unmark Record
+keys=Control+Shift+M
+status=current
+
+[DbDo updateFromTemplate]
+name=Update from Template
+keys=
+status=current
+
+[DbDo whereAmI]
+name=Where Am I
+keys=
+status=current
+
+[DbDo windowToggle]
+name=Window Toggle
+keys=
+status=current
+
+[EdSharp about]
+name=About
+keys=Alt+F1
+status=current
+
+[EdSharp align]
+name=Align
+keys=Alt+Shift+A
+status=current
+
+[EdSharp alternateMenu]
+name=Alternate Menu
+keys=Alt+F10
+status=current
+
+[EdSharp appendClipboard]
+name=Append Clipboard
+keys=Control+Shift+Apostrophe
+change=new
+reason=clipboard family
+disposition=accepted
+status=proposed
+
+[EdSharp appendFromClipboard]
+name=Append from Clipboard
+keys=Alt+7
+status=current
+
+[EdSharp arrangeIcons]
+name=Arrange Icons
+keys=Alt+F11
+status=current
+
+[EdSharp baseline]
+name=Baseline
+keys=Alt+Shift+6
+status=current
+
+[EdSharp burnToCD]
+name=Burn to CD
+keys=Alt+Shift+B
+status=current
+
+[EdSharp calculateDate]
+name=Calculate Date
+keys=Control+Shift+SemiColon
+status=current
+
+[EdSharp cascade]
+name=Cascade
+keys=Control+F11
+status=current
+
+[EdSharp chatAboutDocument]
+name=Chat about Document
+keys=Shift+F12
+status=current
+
+[EdSharp chatWithAI]
+name=Chat with AI
+keys=F12
+status=current
+
+[EdSharp checkMarkdown]
+name=Check Markdown
+keys=Alt+F9
+status=current
+
+[EdSharp clearBookmark]
+name=Clear Bookmark
+keys=Control+Shift+B
+change=keys changed, was Control+Shift+K
+reason=as in DbDo
+disposition=accepted
+status=ruled
+
+[EdSharp clearClipboard]
+name=Clear Clipboard
+keys=Alt+Shift+Apostrophe
+change=new
+reason=clipboard family
+disposition=accepted
+status=proposed
+
+[EdSharp clearFavorite]
+name=Clear Favorite
+keys=Control+Shift+L
+status=current
+
+[EdSharp closeAllButCurrentWindow]
+name=Close All But Current Window
+keys=Control+Shift+F4
+change=renamed from Close All but Current Window, was Control+Shift+F4
+reason=capital B
+disposition=accepted
+status=proposed
+
+[EdSharp closeWindow]
+name=Close Window
+keys=Control+F4
+status=current
+
+[EdSharp compile]
+name=Compile
+keys=Control+F5
+status=current
+
+[EdSharp completeSelection]
+name=Complete Selection
+keys=Shift+F8
+status=current
+
+[EdSharp contextMenu]
+name=Context Menu
+keys=Shift+F10
+status=current
+
+[EdSharp copy]
+name=Copy
+keys=Control+C
+status=current
+
+[EdSharp copyAll]
+name=Copy All
+keys=Control+F8
+status=current
+
+[EdSharp copyAppend]
+name=Copy Append
+keys=Alt+C
+status=current
+
+[EdSharp copyLog]
+name=Copy Log
+keys=Control+F12
+status=current
+
+[EdSharp copyRichText]
+name=Copy Rich Text
+keys=Control+Shift+C
+status=current
+
+[EdSharp currentWindows]
+name=Current Windows
+keys=F4
+status=current
+
+[EdSharp cut]
+name=Cut
+keys=Control+X
+status=current
+
+[EdSharp cutAppend]
+name=Cut Append
+keys=Alt+X
+status=current
+
+[EdSharp deleteDown]
+name=Delete Down
+keys=Alt+Shift+Delete
+status=current
+
+[EdSharp deleteFile]
+name=Delete File
+keys=Alt+Shift+D
+status=current
+
+[EdSharp deleteHardLine]
+name=Delete Hard Line
+keys=Control+D
+status=current
+
+[EdSharp deleteLeft]
+name=Delete Left
+keys=Control+Shift+Backspace
+status=current
+
+[EdSharp deleteLine]
+name=Delete Line
+keys=Alt+Backspace
+status=current
+
+[EdSharp deleteParagraph]
+name=Delete Paragraph
+keys=Control+Shift+D
+status=current
+
+[EdSharp deleteRight]
+name=Delete Right
+keys=Control+Shift+Delete
+status=current
+
+[EdSharp deleteUp]
+name=Delete Up
+keys=Alt+Shift+Backspace
+status=current
+
+[EdSharp documentation]
+name=Documentation
+keys=F1
+status=current
+
+[EdSharp editSettings]
+name=Edit Settings
+keys=Alt+Shift+E
+change=renamed from Configuration Options, was Alt+Shift+C
+reason=E for edit, as in DbDo
+disposition=accepted
+status=ruled
+
+[EdSharp editSettingsFile]
+name=Edit Settings File
+keys=
+change=renamed from Manual Options, was Alt+Shift+M
+reason=frees Alt+Shift+M
+disposition=accepted
+status=proposed
+
+[EdSharp elevateVersion]
+name=Elevate Version
+keys=F11
+status=current
+
+[EdSharp endCharacter]
+name=End Character
+keys=Alt+End
+status=current
+
+[EdSharp endTag]
+name=End Tag
+keys=Control+Shift+Period
+status=current
+
+[EdSharp enterNewLine]
+name=Enter New Line
+keys=Enter
+status=current
+
+[EdSharp environmentVariables]
+name=Environment Variables
+keys=Control+E
+status=current
+
+[EdSharp evaluateExpression]
+name=Evaluate Expression
+keys=Control+Equals
+status=current
+
+[EdSharp exitEdSharp]
+name=Exit EdSharp
+keys=Alt+F4
+status=current
+
+[EdSharp exportFormat]
+name=Export Format
+keys=Alt+Shift+X
+change=keys changed, was Alt+Shift+E
+reason=X for export; frees Alt+Shift+E
+disposition=accepted
+status=ruled
+
+[EdSharp extraSpeechLog]
+name=Extra Speech Log
+keys=
+change=keys changed, was Alt+Shift+X
+reason=frees Alt+Shift+X for export
+disposition=accepted
+status=proposed
+
+[EdSharp extraSpeechToggle]
+name=Extra Speech Toggle
+keys=Alt+Shift+Z
+change=keys changed, was Control+Shift+X
+reason=Z toggles, as in DbDo
+disposition=accepted
+status=proposed
+
+[EdSharp extractWithRegex]
+name=Extract with Regex
+keys=Control+Shift+E
+change=renamed from Extract with Regular Expression, was Control+Shift+E
+disposition=accepted
+status=proposed
+
+[EdSharp fileFind]
+name=File Find
+keys=Alt+Shift+F
+status=current
+
+[EdSharp formatCode]
+name=Format Code
+keys=Control+4
+status=current
+
+[EdSharp forwardFind]
+name=Forward Find
+keys=Control+F
+status=current
+
+[EdSharp forwardFindAtCursor]
+name=Forward Find at Cursor
+keys=Alt+F3
+status=current
+
+[EdSharp forwardFindWithRegex]
+name=Forward Find with Regex
+keys=Control+F3
+change=renamed from Forward Find with Regular Expression, was Control+F3
+disposition=accepted
+status=proposed
+
+[EdSharp goToContents]
+name=Go to Contents
+keys=Shift+F6
+status=current
+
+[EdSharp goToEnvironment]
+name=Go to Environment
+keys=Control+Shift+G
+status=current
+
+[EdSharp goToFolder]
+name=Go to Folder
+keys=Control+0
+status=current
+
+[EdSharp goToPart]
+name=Go to Part
+keys=Alt+Shift+G
+status=current
+
+[EdSharp goToPercent]
+name=Go to Percent
+keys=Control+G
+status=current
+
+[EdSharp goToPercentAgain]
+name=Go to Percent Again
+keys=Alt+G
+status=current
+
+[EdSharp goToSection]
+name=Go to Section
+keys=F6
+status=current
+
+[EdSharp goToSpecialFolder]
+name=Go to Special Folder
+keys=
+change=keys changed, was Control+Shift+0
+reason=Control+Shift+0 is often taken by the Windows keyboard-layout hotkey
+disposition=accepted
+status=proposed
+
+[EdSharp goToStartOfSelection]
+name=Go to Start of Selection
+keys=Alt+Shift+F8
+status=current
+
+[EdSharp guardDocument]
+name=Guard Document
+keys=Control+F7
+status=current
+
+[EdSharp hardLineBreak]
+name=Hard Line Break
+keys=Control+Shift+H
+status=current
+
+[EdSharp historyOfChanges]
+name=History of Changes
+keys=Shift+F1
+status=current
+
+[EdSharp homeCharacter]
+name=Home Character
+keys=Alt+Home
+status=current
+
+[EdSharp hotkeySummary]
+name=Hotkey Summary
+keys=Alt+Shift+H
+status=current
+
+[EdSharp hotkeys]
+name=Hotkeys
+keys=Control+Shift+F1
+change=new
+reason=suite Help key
+disposition=accepted
+status=proposed
+
+[EdSharp htmlFormat]
+name=HTML Format
+keys=Control+H
+status=current
+
+[EdSharp htmlToMarkdown]
+name=HTML to Markdown
+keys=
+status=current
+
+[EdSharp htmlToPlainText]
+name=HTML to Plain Text
+keys=
+status=current
+
+[EdSharp indent]
+name=Indent
+keys=Tab
+status=current
+
+[EdSharp indentMode]
+name=Indent Mode
+keys=Alt+Shift+I
+status=current
+
+[EdSharp indentNewLine]
+name=Indent New Line
+keys=Shift+Enter
+status=current
+
+[EdSharp indentNewLinePrevious]
+name=Indent New Line Previous
+keys=Alt+Shift+Enter
+change=renamed from Indent New Line Prior, was Alt+Shift+Enter
+disposition=accepted
+status=proposed
+
+[EdSharp inferIndent]
+name=Infer Indent
+keys=Alt+RightBracket
+status=current
+
+[EdSharp insertAllUsersPath]
+name=Insert All Users Path
+keys=Control+Shift+I
+status=current
+
+[EdSharp insertScriptPath]
+name=Insert Script Path
+keys=Control+I
+status=current
+
+[EdSharp insertTime]
+name=Insert Time
+keys=Alt+Shift+SemiColon
+status=current
+
+[EdSharp invokeSnippet]
+name=Invoke Snippet
+keys=Alt+V
+status=current
+
+[EdSharp joinLines]
+name=Join Lines
+keys=Control+Shift+J
+status=current
+
+[EdSharp jumpToLine]
+name=Jump to Line
+keys=Control+J
+status=current
+
+[EdSharp jumpToLineAgain]
+name=Jump to Line Again
+keys=Alt+J
+status=current
+
+[EdSharp justify]
+name=Justify
+keys=Alt+Shift+J
+status=current
+
+[EdSharp keepUniqueItems]
+name=Keep Unique Items
+keys=Alt+Shift+K
+status=current
+
+[EdSharp keyDescriberToggle]
+name=Key Describer Toggle
+keys=Control+F1
+change=renamed from Key Describer, was Control+F1
+reason=wording
+disposition=accepted
+status=proposed
+
+[EdSharp launchEdSharp]
+name=Launch EdSharp
+keys=Alt+Control+E
+status=current
+
+[EdSharp leftBrace]
+name=Left Brace
+keys=Control+Shift+LeftBracket
+status=current
+
+[EdSharp listBookmarks]
+name=List Bookmarks
+keys=Alt+B
+change=renamed from Go to Bookmark, was Alt+K
+reason=as in DbDo
+disposition=accepted
+status=ruled
+
+[EdSharp listDifferentItems]
+name=List Different Items
+keys=Alt+Shift+L
+status=current
+
+[EdSharp listFavorites]
+name=List Favorites
+keys=Alt+L
+status=current
+
+[EdSharp lookupTerm]
+name=Lookup Term
+keys=Alt+F7
+status=current
+
+[EdSharp lowerCase]
+name=Lower Case
+keys=Control+Shift+U
+status=current
+
+[EdSharp mailAttachment]
+name=Mail Attachment
+keys=Control+Shift+M
+status=current
+
+[EdSharp mailBody]
+name=Mail Body
+keys=Control+M
+status=current
+
+[EdSharp markdownToPlainText]
+name=Markdown to Plain Text
+keys=
+status=current
+
+[EdSharp new]
+name=New
+keys=Control+N
+status=current
+
+[EdSharp newFromClipboard]
+name=New from Clipboard
+keys=Control+Shift+N
+status=current
+
+[EdSharp nextAlignment]
+name=Next Alignment
+keys=Control+RightBracket
+status=current
+
+[EdSharp nextBaseline]
+name=Next Baseline
+keys=Control+6
+status=current
+
+[EdSharp nextChunk]
+name=Next Chunk
+keys=Alt+RightArrow
+status=current
+
+[EdSharp nextFont]
+name=Next Font
+keys=Control+Dash
+status=current
+
+[EdSharp nextIndent]
+name=Next Indent
+keys=Control+I
+status=current
+
+[EdSharp nextParagraph]
+name=Next Paragraph
+keys=Control+DownArrow
+status=current
+
+[EdSharp nextPart]
+name=Next Part
+keys=Alt+PageDown
+status=current
+
+[EdSharp nextSection]
+name=Next Section
+keys=Control+F6 or Control+PageDown
+change=keys changed, was Control+PageDown
+reason=Control+F6 added: the F6 cycle
+disposition=accepted
+status=proposed
+
+[EdSharp nextSentence]
+name=Next Sentence
+keys=Alt+DownArrow
+status=current
+
+[EdSharp nextStyle]
+name=Next Style
+keys=Control+Slash
+status=current
+
+[EdSharp nextWindow]
+name=Next Window
+keys=Control+Tab
+status=current
+
+[EdSharp nextWord]
+name=Next Word
+keys=Control+RightArrow
+status=current
+
+[EdSharp noGuard]
+name=No Guard
+keys=Control+Shift+F7
+status=current
+
+[EdSharp numberItems]
+name=Number Items
+keys=Alt+Shift+N
+status=current
+
+[EdSharp open]
+name=Open
+keys=Control+O
+status=current
+
+[EdSharp openAgain]
+name=Open Again
+keys=Alt+O
+status=current
+
+[EdSharp openCommandPrompt]
+name=Open Command Prompt
+keys=Control+BackSlash
+change=renamed from Command Prompt, was Control+BackSlash
+reason=wording; Control+Slash stays Next Style
+disposition=accepted
+status=proposed
+
+[EdSharp openInExplorer]
+name=Open in Explorer
+keys=Alt+BackSlash
+change=renamed from Explorer Folder, was Alt+BackSlash
+reason=wording
+disposition=accepted
+status=proposed
+
+[EdSharp openOtherFormat]
+name=Open Other Format
+keys=Control+Shift+O
+status=current
+
+[EdSharp orderItems]
+name=Order Items
+keys=Alt+Shift+O
+status=current
+
+[EdSharp outdent]
+name=Outdent
+keys=Shift+Tab
+status=current
+
+[EdSharp paste]
+name=Paste
+keys=Control+V
+status=current
+
+[EdSharp pasteFile]
+name=Paste File
+keys=Control+Shift+V
+status=current
+
+[EdSharp pathList]
+name=Path List
+keys=Control+Shift+P
+status=current
+
+[EdSharp pathToClipboard]
+name=Path to Clipboard
+keys=Alt+Shift+P
+status=current
+
+[EdSharp pickCompiler]
+name=Pick Compiler
+keys=Control+Shift+F5
+status=current
+
+[EdSharp playTutorials]
+name=Play Tutorials
+keys=
+change=renamed from Tutorials, was Control+Shift+F1
+reason=opens the Homer Player; frees Control+Shift+F1
+disposition=accepted with correction: Play Tutorials must actually play the audio walks in the Homer Player; a written tutorial stays a separate command if its material differs
+status=proposed
+
+[EdSharp previewMarkdown]
+name=Preview Markdown
+keys=Control+F9
+status=current
+
+[EdSharp previewMarkdownInWebBrowser]
+name=Preview Markdown in Web Browser
+keys=
+status=current
+
+[EdSharp previousAlignment]
+name=Previous Alignment
+keys=Control+LeftBracket
+change=renamed from Prior Alignment, was Control+LeftBracket
+disposition=accepted
+status=proposed
+
+[EdSharp previousBaseline]
+name=Previous Baseline
+keys=Control+Shift+6
+change=renamed from Prior Baseline, was Control+Shift+6
+disposition=accepted
+status=proposed
+
+[EdSharp previousChunk]
+name=Previous Chunk
+keys=Alt+LeftArrow
+change=renamed from Prior Chunk, was Alt+LeftArrow
+disposition=accepted
+status=proposed
+
+[EdSharp previousFont]
+name=Previous Font
+keys=Control+Shift+Dash
+change=renamed from Prior Font, was Control+Shift+Dash
+disposition=accepted
+status=proposed
+
+[EdSharp previousIndent]
+name=Previous Indent
+keys=Control+Shift+I
+change=renamed from Prior Indent, was Control+Shift+I
+disposition=accepted
+status=proposed
+
+[EdSharp previousParagraph]
+name=Previous Paragraph
+keys=Control+UpArrow
+change=renamed from Prior Paragraph, was Control+UpArrow
+disposition=accepted
+status=proposed
+
+[EdSharp previousPart]
+name=Previous Part
+keys=Alt+PageUp
+change=renamed from Prior Part, was Alt+PageUp
+disposition=accepted
+status=proposed
+
+[EdSharp previousSection]
+name=Previous Section
+keys=Control+Shift+F6 or Control+PageUp
+change=renamed from Prior Section, was Control+PageUp
+reason=Control+Shift+F6 added
+disposition=accepted
+status=proposed
+
+[EdSharp previousSentence]
+name=Previous Sentence
+keys=Alt+UpArrow
+change=renamed from Prior Sentence, was Alt+UpArrow
+disposition=accepted
+status=proposed
+
+[EdSharp previousStyle]
+name=Previous Style
+keys=Control+Shift+Slash
+change=renamed from Prior Style, was Control+Shift+Slash
+disposition=accepted
+status=proposed
+
+[EdSharp previousWindow]
+name=Previous Window
+keys=Control+Shift+Tab
+change=renamed from Prior Window, was Control+Shift+Tab
+disposition=accepted
+status=proposed
+
+[EdSharp previousWord]
+name=Previous Word
+keys=Control+LeftArrow
+change=renamed from Prior Word, was Control+LeftArrow
+disposition=accepted
+status=proposed
+
+[EdSharp print]
+name=Print
+keys=Control+P
+status=current
+
+[EdSharp promptCommand]
+name=Prompt Command
+keys=Alt+F5
+status=current
+
+[EdSharp properCase]
+name=Proper Case
+keys=Alt+U
+status=current
+
+[EdSharp properties]
+name=Properties
+keys=Alt+Enter
+status=current
+
+[EdSharp pybrace]
+name=PyBrace
+keys=Alt+Shift+LeftBracket
+status=current
+
+[EdSharp pydent]
+name=PyDent
+keys=Alt+LeftBracket
+status=current
+
+[EdSharp queryCommonItems]
+name=Query Common Items
+keys=Alt+Shift+Q
+status=current
+
+[EdSharp quote]
+name=Quote
+keys=Control+Q
+status=current
+
+[EdSharp readAll]
+name=Read All
+keys=Alt+F8
+status=current
+
+[EdSharp readme]
+name=ReadMe
+keys=Alt+Shift+F1
+change=new
+reason=suite Help key
+disposition=accepted
+status=proposed
+
+[EdSharp recentFiles]
+name=Recent Files
+keys=Alt+R
+status=current
+
+[EdSharp redo]
+name=Redo
+keys=Control+Shift+Z
+status=current
+
+[EdSharp rename]
+name=Rename
+keys=Alt+Shift+R
+status=current
+
+[EdSharp repeatLine]
+name=Repeat Line
+keys=Control+Y
+status=current
+
+[EdSharp replace]
+name=Replace
+keys=Control+R
+status=current
+
+[EdSharp replaceTokens]
+name=Replace Tokens
+keys=Control+Shift+Equals
+status=current
+
+[EdSharp replaceWithRegex]
+name=Replace with Regex
+keys=Control+Shift+R
+change=renamed from Replace with Regular Expression, was Control+Shift+R
+disposition=accepted
+status=proposed
+
+[EdSharp reselect]
+name=Reselect
+keys=Control+Shift+F8
+status=current
+
+[EdSharp resetConfiguration]
+name=Reset Configuration
+keys=Alt+Shift+0
+status=current
+
+[EdSharp reverseFind]
+name=Reverse Find
+keys=Control+Shift+F
+status=current
+
+[EdSharp reverseFindAtCursor]
+name=Reverse Find at Cursor
+keys=Alt+Shift+F3
+status=current
+
+[EdSharp reverseFindWithRegex]
+name=Reverse Find with Regex
+keys=Control+Shift+F3
+change=renamed from Reverse Find with Regular Expression, was Control+Shift+F3
+disposition=accepted
+status=proposed
+
+[EdSharp reverseItems]
+name=Reverse Items
+keys=
+change=keys changed, was Alt+Shift+Z
+reason=frees Alt+Shift+Z
+disposition=accepted
+status=proposed
+
+[EdSharp reviewOutput]
+name=Review Output
+keys=Alt+Shift+F5
+status=current
+
+[EdSharp rightBrace]
+name=Right Brace
+keys=Control+Shift+RightBracket
+status=current
+
+[EdSharp run]
+name=Run
+keys=F5
+status=current
+
+[EdSharp runAtCursor]
+name=Run at Cursor
+keys=Shift+F5
+status=current
+
+[EdSharp runCodeBlocks]
+name=Run Code Blocks
+keys=Alt+Shift+F9
+status=current
+
+[EdSharp samplePrograms]
+name=Sample Programs
+keys=Control+Shift+F2
+status=current
+
+[EdSharp save]
+name=Save
+keys=Control+S
+status=current
+
+[EdSharp saveAs]
+name=Save As
+keys=Control+Shift+S
+status=current
+
+[EdSharp saveBookmark]
+name=Save Bookmark
+keys=Control+B
+change=renamed from Set Bookmark, was Control+K
+reason=B for bookmark, as in DbDo
+disposition=accepted
+status=ruled
+
+[EdSharp saveClipboard]
+name=Save Clipboard
+keys=Control+Apostrophe
+change=new
+reason=clipboard family
+disposition=accepted
+status=proposed
+
+[EdSharp saveCopy]
+name=Save Copy
+keys=Alt+Shift+S
+status=current
+
+[EdSharp saveSnippet]
+name=Save Snippet
+keys=Alt+S
+status=current
+
+[EdSharp sayAddress]
+name=Say Address
+keys=Alt+A
+status=current
+
+[EdSharp sayBraces]
+name=Say Braces
+keys=Alt+Shift+RightBracket
+status=current
+
+[EdSharp sayChunk]
+name=Say Chunk
+keys=Shift+Backspace
+status=current
+
+[EdSharp sayClipboard]
+name=Say Clipboard
+keys=Alt+Apostrophe
+status=current
+
+[EdSharp sayCompiler]
+name=Say Compiler
+keys=Alt+0
+status=current
+
+[EdSharp sayFont]
+name=Say Font
+keys=
+change=keys changed, was Alt+Dash
+reason=Alt+Dash is the Windows menu for a document window
+disposition=accepted
+status=proposed
+
+[EdSharp sayIndentation]
+name=Say Indentation
+keys=Alt+I
+status=current
+
+[EdSharp sayPath]
+name=Say Path
+keys=Alt+P
+status=current
+
+[EdSharp sayPosition]
+name=Say Position
+keys=Alt+Delete
+change=new
+reason=line, column and percent; JAWS key map passes it through
+disposition=accepted with correction: line and column in the buffer, not wrapped screen lines
+status=proposed
+
+[EdSharp saySelected]
+name=Say Selected
+keys=Shift+Space
+status=current
+
+[EdSharp sayStatus]
+name=Say Status
+keys=Alt+Z
+status=current
+
+[EdSharp sayStyles]
+name=Say Styles
+keys=Alt+Slash
+status=current
+
+[EdSharp sayTime]
+name=Say Time
+keys=Alt+SemiColon
+status=current
+
+[EdSharp sayWindowsOpen]
+name=Say Windows Open
+keys=Shift+F4
+change=renamed from Windows Open, was Shift+F4
+reason=wording
+disposition=accepted
+status=proposed
+
+[EdSharp sayYield]
+name=Say Yield
+keys=Alt+Y
+status=current
+
+[EdSharp searchForTopic]
+name=Search for Topic
+keys=
+change=keys changed, was Control+F6
+reason=Control+F6 becomes Next Section, the F6 cycle
+disposition=accepted
+status=proposed
+
+[EdSharp searchNext]
+name=Search Next
+keys=F3
+change=renamed from Forward Find Again, was F3
+reason=wording; repeats whichever search was last
+disposition=accepted
+status=proposed
+
+[EdSharp searchPrevious]
+name=Search Previous
+keys=Shift+F3
+change=renamed from Reverse Find Again, was Shift+F3
+reason=wording
+disposition=accepted
+status=proposed
+
+[EdSharp sectionBreak]
+name=Section Break
+keys=Control+Enter
+status=current
+
+[EdSharp selectAll]
+name=Select All
+keys=Control+A
+status=current
+
+[EdSharp selectChunk]
+name=Select Chunk
+keys=Control+Space
+status=current
+
+[EdSharp sendtoMenu]
+name=SendTo Menu
+keys=Control+F10
+status=current
+
+[EdSharp setDefaultFontAndColor]
+name=Set Default Font and Color
+keys=Alt+Shift+Equals
+status=current
+
+[EdSharp setFavorite]
+name=Set Favorite
+keys=Control+L
+status=current
+
+[EdSharp setOnFavoriteList]
+name=Set on Favorite List
+keys=Control+L
+status=current
+
+[EdSharp setSelectionFont]
+name=Set Selection Font
+keys=Alt+Shift+Dash
+status=current
+
+[EdSharp showInFileDir]
+name=Show in FileDir
+keys=
+change=new
+reason=handoff
+disposition=accepted
+status=proposed
+
+[EdSharp specialCharacter]
+name=Special Character
+keys=F2
+status=current
+
+[EdSharp spellCheck]
+name=Spell Check
+keys=F7
+status=current
+
+[EdSharp startSelection]
+name=Start Selection
+keys=F8
+status=current
+
+[EdSharp startTag]
+name=Start Tag
+keys=Control+Shift+Comma
+status=current
+
+[EdSharp style]
+name=Style
+keys=Alt+Shift+Slash
+status=current
+
+[EdSharp swapCase]
+name=Swap Case
+keys=Alt+Shift+U
+status=current
+
+[EdSharp textCombine]
+name=Text Combine
+keys=Control+Shift+T
+status=current
+
+[EdSharp textContents]
+name=Text Contents
+keys=Alt+Shift+T
+status=current
+
+[EdSharp textConvert]
+name=Text Convert
+keys=Control+T
+status=current
+
+[EdSharp thesaurus]
+name=Thesaurus
+keys=Shift+F7
+status=current
+
+[EdSharp tileHorizontal]
+name=Tile Horizontal
+keys=
+change=keys changed, was Alt+Shift+F11
+reason=paired with Tile Vertical
+disposition=accepted
+status=proposed
+
+[EdSharp tileVertical]
+name=Tile Vertical
+keys=
+change=keys changed, was Control+Shift+F11
+reason=Control+Shift+F11 is a JAWS key
+disposition=accepted
+status=proposed
+
+[EdSharp toggleIndentation]
+name=Toggle Indentation
+keys=
+change=keys changed, was Windows+Accent
+reason=Windows-key combinations belong to Windows
+disposition=accepted
+status=proposed
+
+[EdSharp togglePunctuation]
+name=Toggle Punctuation
+keys=JAWSKey+Accent
+status=current
+
+[EdSharp topic]
+name=Topic
+keys=Alt+T
+status=current
+
+[EdSharp transformFiles]
+name=Transform Files
+keys=Alt+Equals
+status=current
+
+[EdSharp translateLanguage]
+name=Translate Language
+keys=Alt+Shift+F7
+status=current
+
+[EdSharp trimBlanks]
+name=Trim Blanks
+keys=Control+Shift+Enter
+status=current
+
+[EdSharp undo]
+name=Undo
+keys=Control+Z
+status=current
+
+[EdSharp unquote]
+name=Unquote
+keys=Control+Shift+Q
+status=current
+
+[EdSharp unselectAll]
+name=Unselect All
+keys=Control+Shift+A
+status=current
+
+[EdSharp unwrap]
+name=Unwrap
+keys=Control+Shift+W
+status=current
+
+[EdSharp upperCase]
+name=Upper Case
+keys=Control+U
+status=current
+
+[EdSharp viewSnippet]
+name=View Snippet
+keys=Alt+Shift+V
+status=current
+
+[EdSharp voiceFaster]
+name=Voice Faster
+keys=Control+Accent
+status=current
+
+[EdSharp voiceLouder]
+name=Voice Louder
+keys=Alt+Accent
+status=current
+
+[EdSharp voiceSlower]
+name=Voice Slower
+keys=Control+Shift+Accent
+status=current
+
+[EdSharp voiceSofter]
+name=Voice Softer
+keys=Alt+Shift+Accent
+status=current
+
+[EdSharp webClientUtilities]
+name=Web Client Utilities
+keys=Alt+Shift+Space
+status=current
+
+[EdSharp webDownload]
+name=Web Download
+keys=Alt+Shift+W
+status=current
+
+[EdSharp wordWrap]
+name=Word Wrap
+keys=Control+W
+status=current
+
+[EdSharp yieldEncoding]
+name=Yield Encoding
+keys=Alt+Shift+Y
+status=current
+
+[EdSharp yieldWithRegex]
+name=Yield with Regex
+keys=Control+Shift+Y
+change=renamed from Yield with Regular Expression, was Control+Shift+Y
+disposition=accepted
+status=proposed
+
+[EdSharp nextBlock]
+name=Next Block
+keys=
+change=removed, was Control+B
+reason=block movement jettisoned
+disposition=removed by ruling
+status=ruled
+
+[EdSharp priorBlock]
+name=Prior Block
+keys=
+change=removed, was Control+Shift+B
+reason=block movement jettisoned
+disposition=removed by ruling
+status=ruled
+
+[EdSharp searchForTopicAgain]
+name=Search for Topic Again
+keys=
+change=removed, was Alt+F6
+reason=F3 repeats whichever search was last, Search for Topic included
+disposition=removed by ruling
+status=ruled
+
+[EdSharp sayBlock]
+name=Say Block
+keys=
+change=removed, was Alt+B
+reason=block movement jettisoned
+disposition=removed by ruling
+status=ruled
+
+[FileDir about]
+name=About
+keys=Alt+F1
+status=current
+
+[FileDir alphaOrder]
+name=Alpha Order
+keys=Alt+A
+status=current
+
+[FileDir alternateMenu]
+name=Alternate Menu
+keys=Alt+F10
+status=current
+
+[FileDir appendClipboard]
+name=Append Clipboard
+keys=Control+Shift+Apostrophe
+change=new
+reason=clipboard family
+disposition=accepted
+status=proposed
+
+[FileDir appendToClipboard]
+name=Append to Clipboard
+keys=Shift+A
+status=current
+
+[FileDir arrangeIcons]
+name=Arrange Icons
+keys=Alt+F11
+status=current
+
+[FileDir batchMail]
+name=Batch Mail
+keys=Control+Shift+B
+status=current
+
+[FileDir beginningFile]
+name=Beginning File
+keys=Alt+B
+status=current
+
+[FileDir beginningMarked]
+name=Beginning Marked
+keys=Shift+B or Control+Shift+Home
+change=renamed from Beginning Tagged, was Shift+B or Control+Home
+reason=Control+Home is the first item, as in DbDo; first marked moves to Control+Shift+Home, as in DbDo
+disposition=accepted with correction: verified against the list control's native behavior
+status=proposed
+
+[FileDir burnToCD]
+name=Burn to CD
+keys=Alt+Shift+B
+status=current
+
+[FileDir cascade]
+name=Cascade
+keys=Control+F11
+status=current
+
+[FileDir characterEncoding]
+name=Character Encoding
+keys=Shift+2
+status=current
+
+[FileDir chatAboutFile]
+name=Chat about File
+keys=Shift+F12
+status=current
+
+[FileDir chatWithAI]
+name=Chat with AI
+keys=F12
+status=current
+
+[FileDir clearClipboard]
+name=Clear Clipboard
+keys=Alt+Shift+Apostrophe
+status=current
+
+[FileDir clearFilter]
+name=Clear Filter
+keys=Control+Shift+F
+status=current
+
+[FileDir closeAllButCurrentWindow]
+name=Close All But Current Window
+keys=Control+Shift+F4
+status=current
+
+[FileDir closeWindow]
+name=Close Window
+keys=Control+F4
+status=current
+
+[FileDir comeUpLevel]
+name=Come up Level
+keys=Comma or Backspace
+status=current
+
+[FileDir completeMark]
+name=Complete Mark
+keys=Shift+F8
+change=renamed from Complete Tag, was Shift+F8
+disposition=accepted
+status=proposed
+
+[FileDir completeUnmark]
+name=Complete Unmark
+keys=Alt+Shift+F8
+change=renamed from Complete Untag, was Alt+Shift+F8
+disposition=accepted
+status=proposed
+
+[FileDir contextMenu]
+name=Context Menu
+keys=Shift+F10
+status=current
+
+[FileDir convertEncoding]
+name=Convert Encoding
+keys=Control+2
+status=current
+
+[FileDir convertUnits]
+name=Convert Units
+keys=Shift+3
+status=current
+
+[FileDir copy]
+name=Copy
+keys=Control+C
+status=current
+
+[FileDir copyAppend]
+name=Copy Append
+keys=Alt+C
+status=current
+
+[FileDir copyLog]
+name=Copy Log
+keys=Control+F12
+status=current
+
+[FileDir copyName]
+name=Copy Name
+keys=Control+Shift+C
+status=current
+
+[FileDir copyToFolder]
+name=Copy to Folder
+keys=Shift+C
+status=current
+
+[FileDir currentWindows]
+name=Current Windows
+keys=F4
+status=current
+
+[FileDir cut]
+name=Cut
+keys=Control+X
+status=current
+
+[FileDir dateOrder]
+name=Date Order
+keys=Alt+D
+status=current
+
+[FileDir delete]
+name=Delete
+keys=Delete
+status=current
+
+[FileDir deleteAndRecycle]
+name=Delete and Recycle
+keys=Control+Delete
+status=current
+
+[FileDir deleteAndRecycleFileNow]
+name=Delete and Recycle File Now
+keys=Control+D
+status=current
+
+[FileDir deleteFileNow]
+name=Delete File Now
+keys=Control+Shift+D
+status=current
+
+[FileDir deleteWithoutRecycle]
+name=Delete without Recycle
+keys=Shift+Delete
+status=current
+
+[FileDir documentation]
+name=Documentation
+keys=F1
+status=current
+
+[FileDir driveLetter]
+name=Drive Letter
+keys=Alt+1
+status=current
+
+[FileDir editSettings]
+name=Edit Settings
+keys=Alt+Shift+E
+change=renamed from Configuration Options, was Alt+Shift+C
+reason=E for edit, as in DbDo
+disposition=accepted
+status=ruled
+
+[FileDir editSettingsFile]
+name=Edit Settings File
+keys=
+change=renamed from Manual Options, was Alt+Shift+M
+reason=frees Alt+Shift+M
+disposition=accepted
+status=proposed
+
+[FileDir elevateVersion]
+name=Elevate Version
+keys=F11
+status=current
+
+[FileDir endMarked]
+name=End Marked
+keys=Shift+E or Control+Shift+End
+change=renamed from End Tagged, was Shift+E or Control+End
+reason=Control+End is the last item; last marked moves to Control+Shift+End, as in DbDo
+disposition=accepted with correction: as Beginning Marked
+status=proposed
+
+[FileDir environmentVariables]
+name=Environment Variables
+keys=Control+E
+status=current
+
+[FileDir evaluateExpression]
+name=Evaluate Expression
+keys=Control+Equals
+status=current
+
+[FileDir exitFileDir]
+name=Exit FileDir
+keys=Alt+F4
+status=current
+
+[FileDir extensionChange]
+name=Extension Change
+keys=Shift+X
+status=current
+
+[FileDir extraSpeechLog]
+name=Extra Speech Log
+keys=
+change=keys changed, was Alt+Shift+X
+reason=as in EdSharp
+disposition=accepted
+status=proposed
+
+[FileDir extraSpeechToggle]
+name=Extra Speech Toggle
+keys=Alt+Shift+Z
+change=keys changed, was Control+Shift+X
+reason=Z toggles, as in DbDo
+disposition=accepted
+status=proposed
+
+[FileDir extractWithRegex]
+name=Extract with Regex
+keys=Control+Shift+E
+change=renamed from Extract with Regular Expression, was Control+Shift+E
+disposition=accepted
+status=proposed
+
+[FileDir fileFind]
+name=File Find
+keys=Alt+Shift+F
+status=current
+
+[FileDir findDuplicatesInTree]
+name=Find Duplicates in Tree
+keys=Alt+Shift+J
+status=current
+
+[FileDir folderToClipboard]
+name=Folder to Clipboard
+keys=
+change=keys changed, was Control+Shift+Apostrophe
+reason=frees Control+Shift+Apostrophe for Append Clipboard
+disposition=accepted
+status=proposed
+
+[FileDir ftpPut]
+name=FTP Put
+keys=Shift+F
+status=current
+
+[FileDir general]
+name=General
+keys=Shift+LeftBracket
+status=current
+
+[FileDir getFTP]
+name=Get FTP
+keys=Shift+G
+status=current
+
+[FileDir goBack]
+name=Go Back
+keys=Alt+LeftArrow
+status=current
+
+[FileDir goForward]
+name=Go Forward
+keys=Alt+RightArrow
+status=current
+
+[FileDir goToDrive]
+name=Go to Drive
+keys=Alt+G
+status=current
+
+[FileDir goToFolder]
+name=Go to Folder
+keys=Control+G
+status=current
+
+[FileDir goToItem]
+name=Go to Item
+keys=Shift+Enter
+status=current
+
+[FileDir goToParentFolder]
+name=Go to Parent Folder
+keys=Comma or Shift+Backspace
+status=current
+
+[FileDir goToQuickFolder]
+name=Go to Quick Folder
+keys=Accent
+status=current
+
+[FileDir goToRootFolder]
+name=Go to Root Folder
+keys=Shift+BackSlash
+status=current
+
+[FileDir goToSpecialFolder]
+name=Go to Special Folder
+keys=Control+Shift+G
+status=current
+
+[FileDir goToVirtualFolder]
+name=Go to Virtual Folder
+keys=Alt+Shift+G
+status=current
+
+[FileDir hide]
+name=Hide
+keys=Shift+0
+status=current
+
+[FileDir historyOfChanges]
+name=History of Changes
+keys=Shift+F1
+status=current
+
+[FileDir homerPlayer]
+name=Homer Player
+keys=Control+Shift+H
+status=current
+
+[FileDir hotkeySummary]
+name=Hotkey Summary
+keys=Alt+Shift+H
+status=current
+
+[FileDir hotkeys]
+name=Hotkeys
+keys=Control+Shift+F1
+change=new
+reason=suite Help key
+disposition=accepted
+status=proposed
+
+[FileDir initialChange]
+name=Initial Change
+keys=Shift+I
+status=current
+
+[FileDir inquireDifferences]
+name=Inquire Differences
+keys=Alt+Shift+I
+status=current
+
+[FileDir invertMarked]
+name=Invert Marked
+keys=Control+I
+change=renamed from Invert Tagged, was Control+I
+disposition=accepted
+status=proposed
+
+[FileDir iterateProcesses]
+name=Iterate Processes
+keys=Alt+I
+status=current
+
+[FileDir jump]
+name=Jump
+keys=Control+J
+status=current
+
+[FileDir jumpAgain]
+name=Jump Again
+keys=Alt+J
+status=current
+
+[FileDir keyDescriberToggle]
+name=Key Describer Toggle
+keys=Control+F1
+change=renamed from Key Describer, was Control+F1
+reason=wording
+disposition=accepted
+status=proposed
+
+[FileDir keywords]
+name=Keywords
+keys=Control+K
+status=current
+
+[FileDir keywordsAgain]
+name=Keywords Again
+keys=Alt+K
+status=current
+
+[FileDir launchFileDir]
+name=Launch FileDir
+keys=Alt+Control+F
+status=current
+
+[FileDir list]
+name=List
+keys=Control+L
+status=current
+
+[FileDir listFiles]
+name=List Files
+keys=Alt+L
+status=current
+
+[FileDir listMarked]
+name=List Marked
+keys=Shift+L
+change=renamed from List Tagged, was Shift+L
+disposition=accepted
+status=proposed
+
+[FileDir mailAttachment]
+name=Mail Attachment
+keys=Control+Shift+M
+status=current
+
+[FileDir mailBody]
+name=Mail Body
+keys=Control+M
+status=current
+
+[FileDir mark]
+name=Mark
+keys=SemiColon
+change=renamed from Tag, was SemiColon or Shift+NumPad5
+reason=Shift+NumPad5 is a JAWS key
+disposition=accepted
+status=proposed
+
+[FileDir markAll]
+name=Mark All
+keys=Control+A
+change=renamed from Tag All, was Control+A
+disposition=accepted
+status=proposed
+
+[FileDir markAllFiles]
+name=Mark All Files
+keys=Alt+Period
+change=renamed from Tag All Files, was Alt+Period
+disposition=accepted
+status=proposed
+
+[FileDir markAndNext]
+name=Mark and Next
+keys=Shift+Period or Shift+DownArrow
+change=renamed from Tag and Next, was Shift+Period or Shift+DownArrow
+disposition=accepted
+status=proposed
+
+[FileDir markAndPrevious]
+name=Mark and Previous
+keys=Shift+UpArrow
+change=renamed from Tag and Previous, was Shift+UpArrow
+disposition=accepted
+status=proposed
+
+[FileDir markDuplicateFiles]
+name=Mark Duplicate Files
+keys=Alt+Shift+Period
+change=renamed from Tag Duplicate Files, was Alt+Shift+Period
+disposition=accepted
+status=proposed
+
+[FileDir markSimilarFiles]
+name=Mark Similar Files
+keys=Alt+Shift+Comma
+change=renamed from Tag Similar Files, was Alt+Shift+Comma
+disposition=accepted
+status=proposed
+
+[FileDir markToBottom]
+name=Mark to Bottom
+keys=Shift+End
+change=renamed from Tag to Bottom, was Shift+End
+disposition=accepted
+status=proposed
+
+[FileDir markToTop]
+name=Mark to Top
+keys=Shift+Home
+change=renamed from Tag to Top, was Shift+Home
+disposition=accepted
+status=proposed
+
+[FileDir markWithRegex]
+name=Mark with Regex
+keys=Control+Shift+Period
+change=renamed from Tag with Regular Expression, was Control+Shift+Period
+disposition=accepted
+status=proposed
+
+[FileDir moveToFolder]
+name=Move to Folder
+keys=Shift+M
+status=current
+
+[FileDir networkConnections]
+name=Network Connections
+keys=Alt+Shift+N
+status=current
+
+[FileDir newFolder]
+name=New Folder
+keys=Control+N
+status=current
+
+[FileDir newItemCopy]
+name=New Item Copy
+keys=Control+Shift+N
+status=current
+
+[FileDir nextMarked]
+name=Next Marked
+keys=Shift+N or Control+DownArrow
+change=renamed from Next Tagged, was Shift+N or Control+DownArrow
+disposition=accepted
+status=proposed
+
+[FileDir nextPart]
+name=Next Part
+keys=F6
+change=new
+reason=jumps between the folder part and the file part of the list
+disposition=accepted with correction: jumps to the first visible folder or file; says so when a kind is absent; archives and virtual folders handled explicitly
+status=proposed
+
+[FileDir nextSiblingFolder]
+name=Next Sibling Folder
+keys=Control+F6
+change=new
+reason=the next folder beside this one in its parent
+disposition=accepted with correction: same window, stable order, roots and access-denied entries handled
+status=proposed
+
+[FileDir nextVisitedFolder]
+name=Next Visited Folder
+keys=Alt+F6
+change=new
+reason=the next folder in order of recent visits
+disposition=accepted with correction: the ring is a frozen snapshot while cycling, separate from back and forward history
+status=proposed
+
+[FileDir nextWindow]
+name=Next Window
+keys=Control+Tab
+status=current
+
+[FileDir openCommandPrompt]
+name=Open Command Prompt
+keys=Control+BackSlash or Control+Slash
+change=renamed from Command Prompt, was Control+Slash or Control+BackSlash
+reason=wording; BackSlash first
+disposition=accepted
+status=proposed
+
+[FileDir openDrive]
+name=Open Drive
+keys=Alt+O
+status=current
+
+[FileDir openFolder]
+name=Open Folder
+keys=Control+O
+status=current
+
+[FileDir openInDbDo]
+name=Open in DbDo
+keys=
+change=new
+reason=handoff for databases and data files
+disposition=accepted
+status=proposed
+
+[FileDir openInExplorer]
+name=Open in Explorer
+keys=Alt+BackSlash or Alt+Slash
+change=renamed from Explorer Directory, was Alt+Slash or Alt+BackSlash
+reason=wording; BackSlash first
+disposition=accepted
+status=proposed
+
+[FileDir openItem]
+name=Open Item
+keys=Enter
+status=current
+
+[FileDir openParentFolder]
+name=Open Parent Folder
+keys=Backspace
+status=current
+
+[FileDir openQuickFolder]
+name=Open Quick Folder
+keys=Control+Q
+status=current
+
+[FileDir openRootFolder]
+name=Open Root Folder
+keys=BackSlash
+status=current
+
+[FileDir openSpecialFolder]
+name=Open Special Folder
+keys=Control+Shift+O
+status=current
+
+[FileDir openVirtualFolder]
+name=Open Virtual Folder
+keys=Alt+Shift+O
+status=current
+
+[FileDir outputType]
+name=Output Type
+keys=Shift+O
+status=current
+
+[FileDir parentFolder]
+name=Parent Folder
+keys=Backspace
+status=current
+
+[FileDir paste]
+name=Paste
+keys=Control+V
+status=current
+
+[FileDir pasteCopy]
+name=Paste Copy
+keys=Alt+V
+status=current
+
+[FileDir pasteMove]
+name=Paste Move
+keys=Alt+Shift+V
+status=current
+
+[FileDir pathListToClipboard]
+name=Path List to Clipboard
+keys=Control+Shift+P
+status=current
+
+[FileDir pathToClipboard]
+name=Path to Clipboard
+keys=Alt+Shift+P
+status=current
+
+[FileDir playList]
+name=Play List
+keys=Control+Shift+L
+status=current
+
+[FileDir playMedia]
+name=Play Media
+keys=Alt+Shift+L
+status=current
+
+[FileDir playTutorials]
+name=Play Tutorials
+keys=
+change=new
+reason=the Homer Player
+disposition=accepted
+status=proposed
+
+[FileDir previousMarked]
+name=Previous Marked
+keys=Shift+P or Control+UpArrow
+change=renamed from Previous Tagged, was Shift+P or Control+UpArrow
+disposition=accepted
+status=proposed
+
+[FileDir previousPart]
+name=Previous Part
+keys=Shift+F6
+change=new
+reason=reverse of Next Part
+disposition=accepted with correction: as Next Part
+status=proposed
+
+[FileDir previousSiblingFolder]
+name=Previous Sibling Folder
+keys=Control+Shift+F6
+change=new
+reason=reverse
+disposition=accepted with correction: as Next Sibling Folder
+status=proposed
+
+[FileDir previousVisitedFolder]
+name=Previous Visited Folder
+keys=Alt+Shift+F6
+change=new
+reason=reverse
+disposition=accepted with correction: as Next Visited Folder
+status=proposed
+
+[FileDir previousWindow]
+name=Previous Window
+keys=Control+Shift+Tab
+status=current
+
+[FileDir print]
+name=Print
+keys=Control+P
+status=current
+
+[FileDir properties]
+name=Properties
+keys=Alt+Enter
+status=current
+
+[FileDir quickShortcut]
+name=Quick Shortcut
+keys=Shift+Q
+status=current
+
+[FileDir quickUrl]
+name=Quick url
+keys=Alt+Shift+Q
+change=renamed from Quick URL, was Alt+Shift+Q
+disposition=accepted
+status=proposed
+
+[FileDir readme]
+name=ReadMe
+keys=Alt+Shift+F1
+change=new
+reason=suite Help key
+disposition=accepted
+status=proposed
+
+[FileDir readonly]
+name=ReadOnly
+keys=RightBracket
+status=current
+
+[FileDir readwrite]
+name=ReadWrite
+keys=LeftBracket
+status=current
+
+[FileDir recentFolders]
+name=Recent Folders
+keys=Alt+R
+status=current
+
+[FileDir recycleBin]
+name=Recycle Bin
+keys=Control+B
+status=current
+
+[FileDir recycleToggle]
+name=Recycle Toggle
+keys=Alt+Shift+R
+status=current
+
+[FileDir refreshFolder]
+name=Refresh Folder
+keys=Period or F5
+status=current
+
+[FileDir rename]
+name=Rename
+keys=Shift+R or F2
+status=current
+
+[FileDir renameToIdentifyContent]
+name=Rename to Identify Content
+keys=Control+Shift+I
+status=current
+
+[FileDir renameWithRegex]
+name=Rename with Regex
+keys=Control+Shift+R
+change=renamed from Rename with Regular Expression, was Control+Shift+R
+disposition=accepted
+status=proposed
+
+[FileDir renameWithWildcards]
+name=Rename with Wildcards
+keys=Control+R
+status=current
+
+[FileDir reorderNames]
+name=Reorder Names
+keys=Alt+Shift+K
+status=current
+
+[FileDir restartWindows]
+name=Restart Windows
+keys=Alt+Shift+F4
+status=current
+
+[FileDir restoreMarks]
+name=Restore Marks
+keys=Control+Shift+S
+change=renamed from Restore Tags, was Control+Shift+S
+disposition=accepted
+status=proposed
+
+[FileDir reverseAlphaOrder]
+name=Reverse Alpha Order
+keys=Alt+Shift+A
+status=current
+
+[FileDir reverseDateOrder]
+name=Reverse Date Order
+keys=Alt+Shift+D
+status=current
+
+[FileDir reverseKeywords]
+name=Reverse Keywords
+keys=Control+Shift+K
+status=current
+
+[FileDir reverseSizeOrder]
+name=Reverse Size Order
+keys=Alt+Shift+S
+status=current
+
+[FileDir reverseTypeOrder]
+name=Reverse Type Order
+keys=Alt+Shift+T
+status=current
+
+[FileDir saveClipboard]
+name=Save Clipboard
+keys=Control+Apostrophe
+change=renamed from Export Clipboard to File, was Alt+Shift+E
+reason=joins the clipboard family; frees Alt+Shift+E
+disposition=accepted
+status=proposed
+
+[FileDir saveMarks]
+name=Save Marks
+keys=Control+S
+change=renamed from Save Tags, was Control+S
+disposition=accepted
+status=proposed
+
+[FileDir sayClipboard]
+name=Say Clipboard
+keys=Alt+Apostrophe
+status=current
+
+[FileDir sayDate]
+name=Say Date
+keys=Shift+D
+status=current
+
+[FileDir sayFilterAndOrder]
+name=Say Filter and Order
+keys=Shift+8
+status=current
+
+[FileDir sayFolder]
+name=Say Folder
+keys=
+change=keys changed, was Control+Apostrophe
+reason=frees Control+Apostrophe for Save Clipboard
+disposition=accepted
+status=proposed
+
+[FileDir sayFolderName]
+name=Say Folder Name
+keys=Shift+Apostrophe
+status=current
+
+[FileDir sayItemName]
+name=Say Item Name
+keys=Apostrophe
+status=current
+
+[FileDir sayPath]
+name=Say Path
+keys=Alt+P
+status=current
+
+[FileDir sayPosition]
+name=Say Position
+keys=Alt+Delete or Shift+5
+change=renamed from Say Percent Through, was Shift+5 or Alt+Delete
+reason=suite name; Alt+Delete first, passed through by the JAWS key map
+disposition=accepted with correction: states its denominator; handles empty and one-item lists
+status=ruled
+
+[FileDir saySelected]
+name=Say Selected
+keys=Shift+Space or Shift+JAWSKey+DownArrow
+status=current
+
+[FileDir saySize]
+name=Say Size
+keys=Shift+S
+status=current
+
+[FileDir sayStatus]
+name=Say Status
+keys=Alt+Z
+status=current
+
+[FileDir sayTime]
+name=Say Time
+keys=Alt+SemiColon
+status=current
+
+[FileDir sayTimer]
+name=Say Timer
+keys=
+status=current
+
+[FileDir sayType]
+name=Say Type
+keys=Shift+T
+status=current
+
+[FileDir sayWhatContent]
+name=Say What Content
+keys=Shift+Slash
+status=current
+
+[FileDir sayWindowsOpen]
+name=Say Windows Open
+keys=Shift+F4 or Alt+NumPad5
+status=current
+
+[FileDir searchNext]
+name=Search Next
+keys=F3
+change=renamed from Search Again, was F3
+reason=wording
+disposition=accepted
+status=proposed
+
+[FileDir searchPrevious]
+name=Search Previous
+keys=Shift+F3
+change=renamed from Reverse Search Again, was Shift+F3
+reason=wording
+disposition=accepted
+status=proposed
+
+[FileDir sendToTextEditor]
+name=Send to Text Editor
+keys=Control+T
+status=current
+
+[FileDir sendToWordProcessor]
+name=Send to Word Processor
+keys=Control+W
+status=current
+
+[FileDir sendtoMenu]
+name=SendTo Menu
+keys=Control+F10
+status=current
+
+[FileDir setFilter]
+name=Set Filter
+keys=Control+F
+status=current
+
+[FileDir shortPathToClipboard]
+name=Short Path to Clipboard
+keys=Shift+Accent
+status=current
+
+[FileDir show]
+name=Show
+keys=Shift+9
+status=current
+
+[FileDir sizeOrder]
+name=Size Order
+keys=Alt+S
+status=current
+
+[FileDir stampWithDateAndTime]
+name=Stamp with Date and Time
+keys=Shift+1
+status=current
+
+[FileDir startMarkOrUnmark]
+name=Start Mark or Unmark
+keys=F8
+change=renamed from Start Tag or Untag, was F8
+disposition=accepted
+status=proposed
+
+[FileDir startTimer]
+name=Start Timer
+keys=
+status=current
+
+[FileDir stopTimer]
+name=Stop Timer
+keys=
+status=current
+
+[FileDir system]
+name=System
+keys=Shift+RightBracket
+status=current
+
+[FileDir tileHorizontal]
+name=Tile Horizontal
+keys=
+change=keys changed, was Alt+Shift+F11
+reason=paired with Tile Vertical
+disposition=accepted
+status=proposed
+
+[FileDir tileVertical]
+name=Tile Vertical
+keys=
+change=keys changed, was Control+Shift+F11
+reason=Control+Shift+F11 is a JAWS key
+disposition=accepted
+status=proposed
+
+[FileDir timer]
+name=Timer
+keys=
+status=current
+
+[FileDir toggleMark]
+name=Toggle Mark
+keys=Space or Control+Space
+change=renamed from Toggle Tag, was Space
+reason=Control+Space added, the Windows list-view key
+disposition=accepted with correction: Control+Space is recorded as an input-method exception and tested
+status=proposed
+
+[FileDir translateFile]
+name=Translate File
+keys=Alt+Shift+F7
+status=current
+
+[FileDir typeExtended]
+name=Type Extended
+keys=Control+Shift+T
+status=current
+
+[FileDir typeOrder]
+name=Type Order
+keys=Alt+T
+status=current
+
+[FileDir unarchive]
+name=Unarchive
+keys=Shift+U
+status=current
+
+[FileDir unarchivePassword]
+name=Unarchive Password
+keys=Alt+Shift+U
+status=current
+
+[FileDir unarchiveTest]
+name=Unarchive Test
+keys=Alt+U
+status=current
+
+[FileDir unarchiveToSameName]
+name=Unarchive to Same Name
+keys=Control+Shift+U
+status=current
+
+[FileDir unarchiveWithoutSubfolders]
+name=Unarchive without Subfolders
+keys=Control+U
+status=current
+
+[FileDir unmark]
+name=Unmark
+keys=Slash or Alt+Shift+NumPad5
+change=renamed from Untag, was Slash or Alt+Shift+NumPad5
+disposition=accepted
+status=proposed
+
+[FileDir unmarkAll]
+name=Unmark All
+keys=Control+Shift+A
+change=renamed from Untag All, was Control+Shift+A
+disposition=accepted
+status=proposed
+
+[FileDir unmarkAllButCurrent]
+name=Unmark All But Current
+keys=Alt+Comma
+change=renamed from Untag All But Current, was Alt+Comma
+disposition=accepted
+status=proposed
+
+[FileDir unmarkAndNext]
+name=Unmark and Next
+keys=Shift+Comma
+change=renamed from Untag and Next, was Shift+Comma or Alt+Shift+DownArrow
+reason=Alt+Shift+DownArrow is a JAWS mouse key
+disposition=accepted
+status=proposed
+
+[FileDir unmarkAndPrevious]
+name=Unmark and Previous
+keys=
+change=renamed from Untag and Previous, was Alt+Shift+UpArrow
+reason=Alt+Shift+UpArrow is a JAWS mouse key
+disposition=accepted
+status=proposed
+
+[FileDir unmarkToBottom]
+name=Unmark to Bottom
+keys=Alt+Shift+End
+change=renamed from Untag to Bottom, was Alt+Shift+End
+disposition=accepted
+status=proposed
+
+[FileDir unmarkToTop]
+name=Unmark to Top
+keys=Alt+Shift+Home
+change=renamed from Untag to Top, was Alt+Shift+Home
+disposition=accepted
+status=proposed
+
+[FileDir volumeFormat]
+name=Volume Format
+keys=Control+Shift+V
+status=current
+
+[FileDir webDownload]
+name=Web Download
+keys=Alt+Shift+W
+status=current
+
+[FileDir windowToggle]
+name=Window Toggle
+keys=Shift+W
+status=current
+
+[FileDir windowsControlPanel]
+name=Windows Control Panel
+keys=Control+Shift+W
+status=current
+
+[FileDir yield]
+name=Yield
+keys=Control+Y
+status=current
+
+[FileDir yieldFiles]
+name=Yield Files
+keys=Alt+Y
+status=current
+
+[FileDir yieldInOperatingSystem]
+name=Yield in Operating System
+keys=Alt+Shift+Y
+status=current
+
+[FileDir yieldMarked]
+name=Yield Marked
+keys=Shift+Y
+change=renamed from Yield Tagged, was Shift+Y
+disposition=accepted
+status=proposed
+
+[FileDir yieldOnDrive]
+name=Yield on Drive
+keys=Control+Shift+Y
+status=current
+
+[FileDir zip]
+name=Zip
+keys=Shift+Z
+status=current
+
+[FileDir zipList]
+name=Zip List
+keys=
+change=keys changed, was Control+Shift+Z
+reason=Control+Shift+Z is reserved for Redo
+disposition=accepted
+status=proposed
+
+[FileDir zipThenDelete]
+name=Zip then Delete
+keys=
+change=keys changed, was Control+Z
+reason=Control+Z is reserved for Undo
+disposition=accepted
+status=proposed
+
+[HomerView aboutHomerView]
+name=About HomerView
+keys=Alt+F1
+status=current
+
+[HomerView alternateMenu]
+name=Alternate Menu
+keys=Alt+F10
+status=current
+
+[HomerView appendClipboard]
+name=Append Clipboard
+keys=Control+Shift+Apostrophe
+status=current
+
+[HomerView checkAccessibility]
+name=Check Accessibility
+keys=Alt+Shift+A
+status=current
+
+[HomerView checkWithAxe]
+name=Check with Axe
+keys=
+status=current
+
+[HomerView checkWithEqualAccess]
+name=Check with Equal Access
+keys=
+change=keys changed, was Alt+Shift+E
+reason=frees Alt+Shift+E; Check Accessibility asks which engine
+disposition=accepted
+status=proposed
+
+[HomerView chooseActiveBrowsers]
+name=Choose Active Browsers
+keys=
+change=new
+reason=which installed browsers HomerView works in, kept in HomerView.inix
+disposition=accepted
+status=proposed
+
+[HomerView chooseBrowser]
+name=Choose Browser
+keys=Alt+Shift+B
+status=current
+
+[HomerView clearClipboard]
+name=Clear Clipboard
+keys=Alt+Shift+Apostrophe
+status=current
+
+[HomerView completeSelection]
+name=Complete Selection
+keys=Shift+F8
+status=current
+
+[HomerView consultCopilot]
+name=Consult Copilot
+keys=Alt+NVDA+C
+status=current
+
+[HomerView copyAll]
+name=Copy All
+keys=Control+F8
+status=current
+
+[HomerView copyAppend]
+name=Copy Append
+keys=Alt+C
+status=current
+
+[HomerView copyLine]
+name=Copy Line
+keys=Control+C
+status=current
+
+[HomerView copyLog]
+name=Copy Log
+keys=Alt+Shift+L
+change=renamed from Log to Clipboard, was Alt+Shift+L
+reason=suite name; Control+F12 belongs to the browser's developer tools
+disposition=accepted
+status=proposed
+
+[HomerView developerNotes]
+name=Developer Notes
+keys=
+change=keys changed, was Control+Shift+F1
+reason=frees Control+Shift+F1
+disposition=accepted
+status=proposed
+
+[HomerView dismissDialog]
+name=Dismiss Dialog
+keys=Alt+Shift+D
+status=current
+
+[HomerView editSettings]
+name=Edit Settings
+keys=Alt+Shift+E
+change=renamed from HomerView Settings, was Alt+Shift+S
+reason=E for edit, as in the suite
+disposition=accepted
+status=ruled
+
+[HomerView elevateVersion]
+name=Elevate Version
+keys=Control+F11
+status=current
+
+[HomerView explorePage]
+name=Explore Page
+keys=Alt+NVDA+E
+status=current
+
+[HomerView extractMainContent]
+name=Extract Main Content
+keys=Shift+F9
+status=current
+
+[HomerView findContacts]
+name=Find Contacts
+keys=Alt+Shift+C
+status=current
+
+[HomerView forwardFind]
+name=Forward Find
+keys=Control+F
+status=current
+
+[HomerView forwardFindAtCursor]
+name=Forward Find at Cursor
+keys=Alt+F3
+status=current
+
+[HomerView forwardFindWithRegex]
+name=Forward Find with Regex
+keys=Control+F3
+change=renamed from Forward Find with Regular Expression, was Control+F3
+disposition=accepted
+status=proposed
+
+[HomerView goToPercent]
+name=Go to Percent
+keys=Control+G
+status=current
+
+[HomerView goToPercentAgain]
+name=Go to Percent Again
+keys=Alt+G
+status=current
+
+[HomerView goToStartOfSelection]
+name=Go to Start of Selection
+keys=Alt+Shift+F8
+status=current
+
+[HomerView historyOfChanges]
+name=History of Changes
+keys=Shift+F1
+status=current
+
+[HomerView hotkeySummary]
+name=Hotkey Summary
+keys=Alt+Shift+H
+status=current
+
+[HomerView hotkeys]
+name=Hotkeys
+keys=Control+Shift+F1
+change=renamed from Hotkey Document, was no key
+reason=suite key
+disposition=accepted
+status=proposed
+
+[HomerView invokeScript]
+name=Invoke Script
+keys=Alt+I
+status=current
+
+[HomerView jumpToMain]
+name=Jump to Main
+keys=J
+status=current
+
+[HomerView jumpToProbableMain]
+name=Jump to Probable Main
+keys=NVDA Shift+J
+status=current
+
+[HomerView keyDescriberToggle]
+name=Key Describer Toggle
+keys=
+change=new
+reason=menu only: describes HomerView's own gestures without running them, in the page and the address bar; host-owned gestures are named, not run; Escape or the command again leaves it
+disposition=accepted
+status=proposed
+
+[HomerView launchHomerView]
+name=Launch HomerView
+keys=Alt+Control+Shift+H
+status=current
+
+[HomerView linkTarget]
+name=Link Target
+keys=Alt+L
+status=current
+
+[HomerView listElements]
+name=List Elements
+keys=Alt+NVDA+L
+status=current
+
+[HomerView listFormFields]
+name=List Form Fields
+keys=NVDA+F5
+status=current
+
+[HomerView listHeadings]
+name=List Headings
+keys=NVDA+F6
+status=current
+
+[HomerView listLinks]
+name=List Links
+keys=Shift+NVDA+F7
+status=current
+
+[HomerView listNames]
+name=List Names
+keys=Alt+N
+status=current
+
+[HomerView nextDifferentKind]
+name=Next Different Kind
+keys=Alt+Z
+status=current
+
+[HomerView nextParagraph]
+name=Next Paragraph
+keys=Control+DownArrow
+status=current
+
+[HomerView nextSameKind]
+name=Next Same Kind
+keys=Z
+status=current
+
+[HomerView nextSentence]
+name=Next Sentence
+keys=Alt+DownArrow
+status=current
+
+[HomerView openDocument]
+name=Open Document
+keys=Control+O
+status=current
+
+[HomerView openSavedPageInEdSharp]
+name=Open Saved Page in EdSharp
+keys=
+change=new
+reason=menu only: opens an identified saved copy of the page; with none saved, offers saving or extraction first; never converts or overwrites
+disposition=accepted
+status=proposed
+
+[HomerView pageFolder]
+name=Page Folder
+keys=Alt+Shift+F
+status=current
+
+[HomerView pageLinksToClipboard]
+name=Page Links to Clipboard
+keys=Alt+Shift+P
+status=current
+
+[HomerView previousDifferentKind]
+name=Previous Different Kind
+keys=Alt+Shift+Z
+change=renamed from Prior Different Kind, was Alt+Shift+Z
+disposition=accepted
+status=proposed
+
+[HomerView previousParagraph]
+name=Previous Paragraph
+keys=Control+UpArrow
+change=renamed from Prior Paragraph, was Control+UpArrow
+disposition=accepted
+status=proposed
+
+[HomerView previousSameKind]
+name=Previous Same Kind
+keys=Shift+Z
+change=renamed from Prior Same Kind, was Shift+Z
+disposition=accepted
+status=proposed
+
+[HomerView previousSentence]
+name=Previous Sentence
+keys=Alt+UpArrow
+change=renamed from Prior Sentence, was Alt+UpArrow
+disposition=accepted
+status=proposed
+
+[HomerView projectAnnouncement]
+name=Project Announcement
+keys=
+status=current
+
+[HomerView queryWeb]
+name=Query Web
+keys=Alt+Q
+status=current
+
+[HomerView readAll]
+name=Read All
+keys=Alt+F8
+status=current
+
+[HomerView readme]
+name=ReadMe
+keys=Alt+Shift+F1
+change=renamed from Quick Start, was Alt+Shift+F1
+reason=suite name
+disposition=accepted
+status=proposed
+
+[HomerView recentPages]
+name=Recent Pages
+keys=Alt+R
+status=current
+
+[HomerView reportAccessibility]
+name=Report Accessibility
+keys=
+status=current
+
+[HomerView reportConnection]
+name=Report Connection
+keys=
+status=current
+
+[HomerView reverseFind]
+name=Reverse Find
+keys=Control+Shift+F
+status=current
+
+[HomerView reverseFindAtCursor]
+name=Reverse Find at Cursor
+keys=Alt+Shift+F3
+status=current
+
+[HomerView reverseFindWithRegex]
+name=Reverse Find with Regex
+keys=Control+Shift+F3
+change=renamed from Reverse Find with Regular Expression, was Control+Shift+F3
+disposition=accepted
+status=proposed
+
+[HomerView saveClipboard]
+name=Save Clipboard
+keys=Control+Apostrophe
+status=current
+
+[HomerView savePage]
+name=Save Page
+keys=Control+S
+status=current
+
+[HomerView sayAddress]
+name=Say Address
+keys=Alt+A
+status=current
+
+[HomerView sayAddressAnywhere]
+name=Say Address Anywhere
+keys=Alt+NVDA+U
+status=current
+
+[HomerView sayChunk]
+name=Say Chunk
+keys=Shift+Backspace
+status=current
+
+[HomerView sayClipboard]
+name=Say Clipboard
+keys=Alt+Apostrophe
+status=current
+
+[HomerView sayMetadata]
+name=Say Metadata
+keys=Alt+M
+status=current
+
+[HomerView sayPosition]
+name=Say Position
+keys=Alt+Delete
+status=current
+
+[HomerView saySelected]
+name=Say Selected
+keys=Shift+Space
+status=current
+
+[HomerView sayTime]
+name=Say Time
+keys=Alt+SemiColon
+status=current
+
+[HomerView sayUrl]
+name=Say url
+keys=Alt+U
+change=renamed from Say Url, was Alt+U
+reason=lower-case url
+disposition=accepted
+status=proposed
+
+[HomerView sayYield]
+name=Say Yield
+keys=Alt+Y
+status=current
+
+[HomerView searchNext]
+name=Search Next
+keys=F3
+change=renamed from Forward Find Again, was F3
+reason=wording
+disposition=accepted
+status=proposed
+
+[HomerView searchPrevious]
+name=Search Previous
+keys=Shift+F3
+change=renamed from Reverse Find Again, was Shift+F3
+reason=wording
+disposition=accepted
+status=proposed
+
+[HomerView selectChunk]
+name=Select Chunk
+keys=Control+Space
+status=current
+
+[HomerView selfTest]
+name=Self Test
+keys=
+status=current
+
+[HomerView sessionLog]
+name=Session Log
+keys=Control+Shift+L
+status=current
+
+[HomerView showPageFolderInFileDir]
+name=Show Page Folder in FileDir
+keys=
+change=new
+reason=menu only: the page's saved folder in FileDir; Page Folder keeps opening Explorer
+disposition=accepted
+status=proposed
+
+[HomerView speechSettings]
+name=Speech Settings
+keys=Shift+Accent
+status=current
+
+[HomerView startSelection]
+name=Start Selection
+keys=F8
+status=current
+
+[HomerView submitForm]
+name=Submit Form
+keys=Control+Enter
+status=current
+
+[HomerView tabCloseOthers]
+name=Tab Close Others
+keys=Control+Shift+F4
+status=current
+
+[HomerView tabList]
+name=Tab List
+keys=F4
+status=current
+
+[HomerView tabNames]
+name=Tab Names
+keys=Shift+F4
+status=current
+
+[HomerView togglePunctuation]
+name=Toggle Punctuation
+keys=NVDA+Accent
+status=current
+
+[HomerView toggleReading]
+name=Toggle Reading
+keys=ScrollLock
+status=current
+
+[HomerView userGuide]
+name=User Guide
+keys=Control+F1
+status=current
+
+[HomerView voiceFaster]
+name=Voice Faster
+keys=Control+Accent
+status=current
+
+[HomerView voiceLouder]
+name=Voice Louder
+keys=Alt+Accent
+status=current
+
+[HomerView voiceSlower]
+name=Voice Slower
+keys=Control+Shift+Accent
+status=current
+
+[HomerView voiceSofter]
+name=Voice Softer
+keys=Alt+Shift+Accent
+status=current
+
+[HomerView webDownload]
+name=Web Download
+keys=Alt+Shift+W
+status=current
+
+[HomerView yieldStructure]
+name=Yield Structure
+keys=Alt+Shift+Y
+status=current
+
+[HomerView yieldWithRegex]
+name=Yield with Regex
+keys=Control+Shift+Y
+change=renamed from Yield with Regular Expression, was Control+Shift+Y
+disposition=accepted
+status=proposed

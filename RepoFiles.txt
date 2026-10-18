@@ -10,6 +10,8 @@ exec/Python/
 # conversion module without its table.
 exec/conversions.inix
 Templates/
+# The suite contract's data (1.73.0): the command manifest and key ownership, read by scripts/checkKeys.
+data/
 
 
 # The Claude skills, where Claude Code finds them: one folder each, SKILL.md at the top

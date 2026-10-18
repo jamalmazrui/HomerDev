@@ -7,6 +7,28 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.73.0 -- 18 October 2026
+
+- **One command and key mechanism for every Homer app.** KeyMap.cs now declares each command once: a stable identifier, the keys, the context they belong to, a summary, an "unavailable because" check, a checked state and a repeat behavior. One router decides where every key goes. A text box keeps its typing keys unless the app marks it as its editor, and a managed list keeps first-letter and typed-sequence navigation. Shift plus a letter in such a list runs its command or says that none is bound. A command that cannot run says why. The members EdSharp and FileDir use today are kept, so their builds compile unchanged.
+- **Double presses, again, and search memory.** A quick second press of a Say command shows its answer in a window to review and copy; a held-down key never counts. Control plus a letter can remember its answer for each window, so Alt plus the letter repeats it, and F3 repeats whichever search ran last in that window. A closed window's memory goes with it.
+- **The MDI frame gives every app the suite's shared commands.**
+  - Window commands: F4, Shift+F4, Control+Tab, Control+F4 and Control+Shift+F4. Closing can be refused, and only the windows that really closed are counted.
+  - Edit Settings on Alt+Shift+E, and Invoke Script on Control+Shift+I.
+  - Say Clipboard and Say Time.
+  - The Help family: Key Describer Toggle, Hotkeys, ReadMe, the Alternate Menu, Hotkey Summary, Elevate Version and Copy Log.
+  - Play Tutorials in the Homer Player.
+  
+  Every key goes through the router; menu items show their keys without Windows' shortcut handling.
+- **newHomerApp MyApp --mdi** starts a multi-window app from a new starter, Templates\_APP_Mdi.cs, whose AI NOTE gives an assistant the framework's rules. help\MdiFramework.md is the guide for anybody building an app on the frame.
+- **The fruit basket sample is the stage 1 desktop proof.** It shows two windows, typing, a managed list, an alias, unavailable commands, a modal dialog, the double press, Again with F3, F6 parts, refusing to close, settings and the key export.
+- **The Homer Suite contract.** help\HomerSuite.md holds the rulings and statuses, the key families, the AI attachment rules, the text-file and settings rules, HomerView's browser identity, the stages and the stage 1 test steps. Two new data files go with it:
+  - data\SuiteCommands.inix: every command of DbDo, EdSharp, FileDir and HomerView.
+  - data\KeyOwnership.inix: the keys Windows, the screen readers and the browsers own.
+- **scripts\checkKeys** checks the manifest, the ownership file, KeyMap's own reserved list and any app's /exportkeys file. It reports for now; stage 2 makes it a gate.
+- **The starter no longer suggests a c_ prefix for constants.**
+- **The key checks run inside the build, with nothing to run by hand.** After building the samples, the build starts the MDI sample with /exportkeys, which now writes the export and ends before any window appears, so a build never takes focus. Then it runs checkKeys on the manifest and that export, and puts the summary in the build's output. An app's Main calls MdiFrame.runOrExport instead of Application.Run, which is what makes the export windowless.
+- **llms.txt has no byte order mark again,** as KeepEncoding.txt requires; the first 1.73.0 build stopped on it.
+
 ## 1.72.58 -- 15 October 2026
 
 - **Util.runResponsive does long work without "Not Responding."** It runs a job on a background thread while the window keeps answering Windows, disables the window so no second command starts halfway through, and returns focus where it was. A progress callback runs on the window's own thread, because screen reader calls do not belong on a background thread. An error in the job is thrown again to the caller. FileDir's Zip then Delete is the first user: zipping about 200 MB had left it "Not Responding" until it was closed by force.
