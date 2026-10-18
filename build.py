@@ -607,6 +607,36 @@ def buildSamples():
     return iFailed
 
 
+def readExport(sPath):
+    """An /exportkeys file as {identifier: (keys, context)}."""
+    dCommands = {}
+    sId = ""
+    for sLine in open(sPath, "rb").read().decode("utf-8-sig", "replace").splitlines():
+        sLine = sLine.strip()
+        if sLine.startswith("[Command ") and sLine.endswith("]"):
+            sId = sLine[9:-1]
+            dCommands[sId] = ["", ""]
+        elif sLine.startswith("["):
+            sId = ""
+        elif sId and sLine.startswith("keys="):
+            dCommands[sId][0] = sLine[5:]
+        elif sId and sLine.startswith("context="):
+            dCommands[sId][1] = sLine[8:]
+    return {k: tuple(v) for k, v in dCommands.items()}
+
+
+def compareExports(sOne, sOther):
+    """Every difference between two exports, in words."""
+    dOne, dOther = readExport(sOne), readExport(sOther)
+    lsDiffer = []
+    for sId in sorted(set(dOne) | set(dOther)):
+        if sId not in dOther: lsDiffer.append("%s is only in the C# sample" % sId)
+        elif sId not in dOne: lsDiffer.append("%s is only in the Python sample" % sId)
+        elif dOne[sId] != dOther[sId]:
+            lsDiffer.append("%s: C# %s (%s), Python %s (%s)" % (sId, dOne[sId][0] or "no key", dOne[sId][1], dOther[sId][0] or "no key", dOther[sId][1]))
+    return lsDiffer
+
+
 def checkSuiteKeys():
     """Check the suite's commands and keys on every build (1.73.0).
 
@@ -623,23 +653,38 @@ def checkSuiteKeys():
         logLine("checkKeys: scripts\\checkKeys.py is missing, so the suite keys were not checked")
         return 0
     lsExports = []
-    sSample = os.path.join(sScriptDir, "Templates", "samples", "FruitBasketMdiCs.exe")
-    if os.path.isfile(sSample):
-        sExport = os.path.join(sScriptDir, "logs", "FruitBasketMdiCs-keys-%s.inix" % datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+    dExports = {}
+    sStamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    for sName in ("FruitBasketMdiCs", "FruitBasketMdiPy"):
+        sSample = os.path.join(sScriptDir, "Templates", "samples", sName + ".exe")
+        if not os.path.isfile(sSample):
+            logLine("checkKeys: no %s.exe yet, so no export of it to check" % sName)
+            continue
+        sExport = os.path.join(sScriptDir, "logs", "%s-keys-%s.inix" % (sName, sStamp))
         logLine("RUN: %s /exportkeys %s" % (sSample, sExport))
         try:
             oResult = subprocess.run([sSample, "/exportkeys", sExport], cwd=os.path.dirname(sSample),
-                                     capture_output=True, text=True, timeout=120)
+                                     capture_output=True, text=True, timeout=180)
             logLine("EXIT: %d" % oResult.returncode)
             if oResult.returncode == 0 and os.path.isfile(sExport):
                 lsExports.append(sExport)
+                dExports[sName] = sExport
             else:
-                sayLine("The MDI sample did not export its keys (exit %d); the manifest is checked without it." % oResult.returncode)
+                sayLine("%s did not export its keys (exit %d); the log has why." % (sName, oResult.returncode))
+                return 1
         except Exception as oError:
             logLine("EXPORT FAILED: %s" % oError)
-            sayLine("The MDI sample could not export its keys; the log has why.")
-    else:
-        logLine("checkKeys: no FruitBasketMdiCs.exe yet, so no export to check")
+            sayLine("%s could not export its keys; the log has why." % sName)
+            return 1
+    # THE TWINS ARE ONE PROGRAM (1.73.6): the C# and Python MDI samples build the same frame, so their commands --
+    # identifier, keys and context -- must be identical. Any difference fails the build, naming each.
+    if len(dExports) == 2:
+        lsDiffer = compareExports(dExports["FruitBasketMdiCs"], dExports["FruitBasketMdiPy"])
+        for sLine in lsDiffer: logLine("TWINS DIFFER: " + sLine)
+        if lsDiffer:
+            sayLine("The C# and Python MDI samples differ in %d command%s; the log names each." % (len(lsDiffer), "" if len(lsDiffer) == 1 else "s"))
+            return 1
+        sayLine("The C# and Python MDI samples declare the same commands and keys.")
     logLine("RUN: %s %s" % (sChecker, " ".join(lsExports)))
     try:
         oResult = subprocess.run([sys.executable, sChecker, "--gate"] + lsExports, cwd=sScriptDir,
@@ -666,7 +711,10 @@ def checkSuiteKeys():
 # dialog gets the same focus order, keys, Help box and F11 by construction
 # rather than by a second implementation kept in step by hand. The list is
 # what LbcDialog needs, the set every C# app with a dialog compiles.
-lsHomerDllClasses = ["Elevate", "Inix", "Lbc", "Log", "Paths", "Say", "Util", "Web"]
+#
+# THE FRAME TOO (1.73.6): KeyMap, KeyName and Mdi joined, so a Python MDI app builds the very Homer.MdiFrame, key
+# router and commands a C# app does (exec\\Python\\mdi.py), instead of a wxPython copy that drifted from it.
+lsHomerDllClasses = ["Elevate", "Inix", "KeyMap", "KeyName", "Lbc", "Log", "Mdi", "Paths", "Say", "Util", "Web"]
 
 
 def findRoslyn():
@@ -1949,6 +1997,11 @@ def main():
         else:
             iDone = convertDocs(sPandoc)
             sayLine("%d document%s converted to HTML." % (iDone, "" if iDone == 1 else "s"))
+        # HOMER.DLL BEFORE THE SAMPLES (1.73.6): the Python MDI sample bundles it, so it must already hold this
+        # build's classes. When no compiler is found yet -- a new machine, whose C# samples install the Build
+        # Tools -- the call after the samples builds it; the cache makes the second call free otherwise.
+        sEarlyDll = buildHomerDll()
+        if sEarlyDll: logLine("Homer.dll before the samples: " + sEarlyDll)
         iSamplesFailed = buildSamples()
         # WHAT FAILED, BY NAME (9 October 2026): a failing conversion route ended the build with "1 sample build
         # failed", which named the wrong thing, so the pptx > pdf failure went unexamined for a day. Each failing

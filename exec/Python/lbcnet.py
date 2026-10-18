@@ -5,8 +5,10 @@ THE C# LBC, FROM PYTHON, THROUGH PYTHONNET.
 Every Homer dialog is built from Lbc primitives on the 64-bit WinForms API.
 A Python app with a WinForms interface (urlCheck, helpFido) does not get a
 second Lbc written in Python: it loads exec\Homer.dll, which build
-compiles from the kit's own exec\CSharp\Elevate, Inix, Lbc, Log, Paths, Say, Util
-and Web, and builds its dialogs with the very LbcDialog the C# apps use. The
+compiles from the kit's own exec\CSharp\Elevate, Inix, KeyMap, KeyName, Lbc,
+Log, Mdi, Paths, Say, Util and Web, and builds its dialogs with the very
+LbcDialog the C# apps use -- and, since kit 1.73.6, its multiple-window
+frame with the very Homer.MdiFrame and KeyMap (see mdi.py). The
 focus order, the access keys, Control+Enter, Shift+F1, F7, the editing keys
 and the Help box with its version check are therefore the same in both
 languages by construction, and every fix to Lbc.cs reaches the Python apps on

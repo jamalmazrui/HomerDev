@@ -3,7 +3,8 @@
 //
 // It is the worked example for anybody building an app on the Homer MDI
 // framework: every feature a real app needs appears here once, small enough to
-// read in one sitting. help\MdiFramework.md in the kit walks through it, and
+// read in one sitting. Its twin, FruitBasketMdiPy.py, builds the same frame from
+// Python, and the kit's build fails if the two ever declare different commands. help\MdiFramework.md in the kit walks through it, and
 // help\HomerSuite.md lists the checks it is used for (stage 1, the desktop
 // proof).
 //
@@ -31,6 +32,8 @@
 //                      keeping it open is a real answer.
 //   Key Describer      Control+F1, then any key, says what it would do.
 //   Settings           Alt+Shift+E changes the basket size limit at once.
+//   Clipboard          Control+Apostrophe saves the clipboard to a new file,
+//                      Control+Shift+Apostrophe appends it to one.
 //   Export             FruitBasketMdiCs.exe /exportkeys keys.inix writes every
 //                      command and key, then closes.
 //

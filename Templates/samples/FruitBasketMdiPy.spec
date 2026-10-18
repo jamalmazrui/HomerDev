@@ -1,12 +1,21 @@
 # -*- mode: python ; coding: utf-8 -*-
+from PyInstaller.utils.hooks import collect_all
+
+datas = []
+binaries = [('C:/HomerDev/exec/Homer.dll', '.')]
+hiddenimports = ['lbcnet', 'log', 'mdi', 'paths']
+tmp_ret = collect_all('pythonnet')
+datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+tmp_ret = collect_all('clr_loader')
+datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 
 
 a = Analysis(
     ['FruitBasketMdiPy.py'],
     pathex=['C:/HomerDev/exec/Python'],
-    binaries=[],
-    datas=[],
-    hiddenimports=['inix', 'lbc', 'log', 'mdi', 'paths', 'say', 'util', 'web'],
+    binaries=binaries,
+    datas=datas,
+    hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

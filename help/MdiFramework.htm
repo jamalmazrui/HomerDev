@@ -221,20 +221,32 @@ email.</li>
 <li><strong>Keys that never fight your screen reader.</strong> Typing in
 a text box always types, and a list keeps first-letter navigation.</li>
 </ul>
+<h2 id="c-or-python">C# or Python</h2>
+<p>The frame is written once, in C#. A Python app uses that same frame,
+not a copy: the kit’s mdi.py loads it from exec\Homer.dll through
+pythonnet. Every command, key and help feature on this page is therefore
+the same in both languages. The fruit basket comes in both,
+FruitBasketMdiCs.cs and FruitBasketMdiPy.py, and the kit’s build fails
+if the two ever declare different commands.</p>
 <h2 id="start-an-app">Start an App</h2>
 <ol type="1">
 <li><strong>Make the project.</strong> In a command prompt in the
-HomerDev folder, type <code>newHomerApp MyApp --mdi</code>. This makes a
-MyApp folder beside the kit, with MyApp.cs, a build script, an installer
-script and starter documents.</li>
+HomerDev folder, type <code>newHomerApp MyApp --mdi</code> for C#, or
+<code>newHomerApp MyApp --mdi --python</code> for Python. This makes a
+MyApp folder beside the kit, with the source, a build script, an
+installer script and starter documents. A Python project’s build
+installs Python 3.13 and pythonnet if they are missing, and bundles the
+kit’s frame into the program.</li>
 <li><strong>Build it.</strong> In the MyApp folder, type
 <code>build</code>. The program is exec\MyApp.exe.</li>
 <li><strong>Try it.</strong> Start it, press Control+N for a new window,
 and try the keys above.</li>
 </ol>
 <h2 id="add-a-command">Add a Command</h2>
-<p>A command is one line in your frame’s constructor:</p>
+<p>A command is one line where you build your frame. In C#:</p>
 <pre><code>addCommand(&quot;&amp;Add Item&quot;, &quot;Control+Shift+A&quot;, &quot;Put the typed item in the list.&quot;, addItem);</code></pre>
+<p>In Python, the frame comes first:</p>
+<pre><code>mdi.addCommand(frm, &quot;&amp;Add Item&quot;, &quot;Control+Shift+A&quot;, &quot;Put the typed item in the list.&quot;, addItem)</code></pre>
 <p>The four parts are:</p>
 <ul>
 <li><strong>The caption,</strong> with an ampersand before its menu

@@ -19,18 +19,28 @@ A new app on the frame already has all of this:
 - **Small conveniences.** Alt+SemiColon says the time, and Control+F12 copies the log as a file, ready to attach to an email.
 - **Keys that never fight your screen reader.** Typing in a text box always types, and a list keeps first-letter navigation.
 
+## C# or Python
+
+The frame is written once, in C#. A Python app uses that same frame, not a copy: the kit's mdi.py loads it from exec\\Homer.dll through pythonnet. Every command, key and help feature on this page is therefore the same in both languages. The fruit basket comes in both, FruitBasketMdiCs.cs and FruitBasketMdiPy.py, and the kit's build fails if the two ever declare different commands.
+
 ## Start an App
 
-1. **Make the project.** In a command prompt in the HomerDev folder, type `newHomerApp MyApp --mdi`. This makes a MyApp folder beside the kit, with MyApp.cs, a build script, an installer script and starter documents.
+1. **Make the project.** In a command prompt in the HomerDev folder, type `newHomerApp MyApp --mdi` for C#, or `newHomerApp MyApp --mdi --python` for Python. This makes a MyApp folder beside the kit, with the source, a build script, an installer script and starter documents. A Python project's build installs Python 3.13 and pythonnet if they are missing, and bundles the kit's frame into the program.
 2. **Build it.** In the MyApp folder, type `build`. The program is exec\\MyApp.exe.
 3. **Try it.** Start it, press Control+N for a new window, and try the keys above.
 
 ## Add a Command
 
-A command is one line in your frame's constructor:
+A command is one line where you build your frame. In C#:
 
 ```
 addCommand("&Add Item", "Control+Shift+A", "Put the typed item in the list.", addItem);
+```
+
+In Python, the frame comes first:
+
+```
+mdi.addCommand(frm, "&Add Item", "Control+Shift+A", "Put the typed item in the list.", addItem)
 ```
 
 The four parts are:

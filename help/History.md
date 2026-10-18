@@ -7,6 +7,18 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.73.6 -- 18 October 2026
+
+- **One frame for C# and Python.**
+  - **The problem:** the Python MDI frame, exec\\Python\\mdi.py, was a wxPython copy of the C# one, and it had drifted. It still used the old keys (Alt+Shift+C for settings, Alt+Shift+S for scripts) and had none of the key router, managed lists, Say and clipboard commands, or double press.
+  - **The cure:** exec\\Homer.dll now carries KeyMap, KeyName and Mdi, and mdi.py is a thin face over the C# Homer.MdiFrame, MdiChild and KeyMap, loaded through pythonnet as lbcnet.py already did for dialogs. Every fix to the C# frame reaches Python apps on their next build.
+  - **Build order:** the kit builds Homer.dll before the samples, so the Python sample always bundles this build's frame.
+- **The fruit basket twins are one program.**
+  - FruitBasketMdiPy.py is rewritten to match FruitBasketMdiCs.cs command for command: two windows, typing, a managed list with Shift+letter commands, the Delete alias, unavailable commands, a modal dialog, the double press, Jump with Again and F3, F6 parts, refusing to close, settings, and the clipboard family.
+  - Its build now finds Python 3.13 through the py launcher (pythonnet supports up to 3.13), installing it with winget if missing, and bundles Homer.dll with pythonnet instead of wxPython.
+  - **Checked every build:** the kit's build exports both samples' commands and fails, naming each difference, if their identifiers, keys or contexts ever differ.
+- **newHomerApp MyApp --mdi --python** makes a Python app on the same frame, from a new starter, Templates\\_APP_MdiPy.py, with its build set to bundle Homer.dll and pythonnet. The starter's AI NOTE gives an assistant the framework's rules.
+
 ## 1.73.5 -- 18 October 2026
 
 - **JAWS hands Alt+Delete to the apps that use it, with nothing edited by hand.**

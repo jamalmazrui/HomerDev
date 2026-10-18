@@ -8,6 +8,8 @@ Usage (through the wrapper, which is how it is meant to be run):
     newHomerApp JobDo --python      write JobDo beside the kit, a Python app
     newHomerApp JobDo --mdi         write JobDo beside the kit, a C# app with
                                     several windows, on the Homer MDI framework
+    newHomerApp JobDo --mdi --python  the same app in Python, on the same
+                                    framework, through pythonnet
     newHomerApp JobDo D:\Work\JobDo  write somewhere else, on any drive
 
 Beside the kit means in the same folder as HomerDev: C:\JobDo for a kit in
@@ -247,10 +249,6 @@ def main():
     lsWords = [s for s in sys.argv[1:] if not (s.startswith("-") or s.lower() in ("python", "mdi"))]
     bPython = any(s.lstrip("-") == "python" for s in lsSwitches)
     bMdi = any(s.lstrip("-") == "mdi" for s in lsSwitches)
-    if bPython and bMdi:
-        sayLine("Choose --python or --mdi, not both: the MDI framework is C#.")
-        logLine("ERROR: both --python and --mdi were given")
-        return 1
     logLine("Language: %s, shape: %s" % ("Python" if bPython else "C#", "MDI" if bMdi else ("Python" if bPython else "launchpad")))
 
     sApp = lsWords[0] if len(lsWords) > 0 else ""
@@ -308,8 +306,11 @@ def main():
     if bPython:
         #  A Python app takes the Python build script instead of the C# one and
         #  writes its source from the Python sample rather than the C# starter.
-        lsScripts = [t for t in lsScripts if t[0] not in ("_APP_.cs", "build_APP_.cmd")]
+        lsScripts = [t for t in lsScripts if t[0] not in ("_APP_.cs", "_APP_Mdi.cs", "build_APP_.cmd")]
         lsScripts.insert(0, ("build_APP_Py.cmd", "build.cmd"))
+        # A PYTHON MDI APP (1.73.6) uses the C# frame through pythonnet, so its
+        # source is the Python MDI starter.
+        if bMdi: lsScripts.insert(0, ("_APP_MdiPy.py", sApp + ".py"))
 
     # EVERY TEMPLATE CHECKED BEFORE ANYTHING IS WRITTEN (1.62.5, from an audit by another AI): a template found missing
     # part-way left a half-made project. The new-repository templates are local-only by the author's rule, from a
@@ -334,7 +335,19 @@ def main():
             iSkipped += 1
             logLine("SKIPPED, already there: %s" % sToPath)
             continue
-        writeHomer(sToPath, readTemplate(sFromPath).replace(sToken, sApp))
+        sText = readTemplate(sFromPath).replace(sToken, sApp)
+        # THE PYTHON MDI BUILD (1.73.6): it bundles exec\\Homer.dll, the C# frame, and
+        # pythonnet to reach it -- set in the build's own settings lines, so the
+        # new project builds as written with nothing to edit.
+        if bPython and bMdi and sFrom == "build_APP_Py.cmd":
+            for sOld, sNew in (('set "homerModules=elevate inix lbc log paths say util web"', 'set "homerModules=lbcnet log mdi paths"'),
+                               ('set "homerDll="', 'set "homerDll=1"'),
+                               ('set "pyiExtra="', 'set "pyiExtra=--collect-all pythonnet --collect-all clr_loader"'),
+                               ('set "pipPackages=pyinstaller"', 'set "pipPackages=pyinstaller pythonnet"')):
+                if sOld not in sText:
+                    logLine("WARNING: the Python build template no longer has: " + sOld)
+                sText = sText.replace(sOld, sNew, 1)
+        writeHomer(sToPath, sText)
         iWritten += 1
 
     # THE TUTORIAL SKELETONS (1.62.0): one walk per part of the pattern of ten,
@@ -371,7 +384,10 @@ def main():
     sayLine("%d file%s written in %s." % (iWritten, "" if iWritten == 1 else "s", sTarget))
     if iSkipped:
         sayLine("%d file%s left alone, already there." % (iSkipped, "" if iSkipped == 1 else "s"))
-    if bPython:
+    if bPython and bMdi:
+        sayLine("Next: add your commands to %s.py with mdi.addCommand -- help\\MdiFramework.md in the kit explains --" % sApp)
+        sayLine("set the AppId and hotkey in %s_setup.iss, then run build." % sApp)
+    elif bPython:
         sayLine("Next: write %s.py -- Templates\\samples\\FruitBasketPy is the worked example --"
                 % sApp)
         sayLine("set the AppId and hotkey in %s_setup.iss, then run build." % sApp)
