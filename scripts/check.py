@@ -1100,6 +1100,17 @@ def checkSuite():
     sSummary = next((s for s in oResult.stdout.splitlines() if s.startswith("checkKeys")), "checkKeys gave no summary")
     if oResult.returncode != 0:
         return finding("suite", "fail", sSummary + " The checkKeys log in the kit's logs folder names each one.")
+    # THE JAWS KEY MAP HANDS ON WHAT THE SUITE ALLOWS (1.73.5). Tidy writes those lines before every push, so a key
+    # still missing here means tidy could not, and the log of that tidy says why.
+    try:
+        if sKitScripts not in sys.path: sys.path.insert(0, sKitScripts)
+        import jawsKeys
+        lsMissing = jawsKeys.missing(sRoot, sApp, os.path.dirname(sKitScripts))
+    except Exception as oError:
+        lsMissing = []
+        logLine("suite: the JAWS key map could not be read: %s" % oError)
+    if lsMissing:
+        return finding("suite", "fail", "%s The JAWS key map does not hand on %s; tidy writes it, so its log says why it could not." % (sSummary, ", ".join(lsMissing)))
     return finding("suite", "pass", sSummary)
 
 

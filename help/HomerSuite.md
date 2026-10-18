@@ -209,7 +209,8 @@ The HomerView commands added to the manifest are:
      - a file that cannot be read is reported once, through onProblem, which the frame connects to the log, and is never taken as empty.
      
      Implemented in kit 1.73.4. The schema version in each settings file comes with each app's move to the frame.
-   - **Still to come,** each as its own change: the reviewed JAWS key map generator, and the menu repaint change, which belongs to EdSharp and FileDir in stage 4.
+   - **The reviewed JAWS pass-through.** Each tidy writes into an app's scripts\\jaws\\\<App\>.jkm the keys the suite allows it to hand on, which today is Alt+Delete, Say Position. The allowed keys are those with passThrough=yes in data\\KeyOwnership.inix; a key is handed on only when the app really binds it, by its own Hotkeys.md. The lines go in a marked block, and keys the app maps itself are left alone. Tidy also names bracket keys that a bare "[" would turn into a section. The shared check confirms the block before every push. HomerView is excepted in the data, because its key map is chained into the browsers'. Implemented in kit 1.73.5.
+   - **Stage 2 is complete.** The menu repaint change is EdSharp's and FileDir's own code, so it moves to stage 4.
 4. **Stage 3, DbDo.** Its private KeyMap is replaced through an adapter and retired once equivalence is shown, then its key changes, JAWS scripts and laptop-layout tests follow.
 5. **Stage 4, EdSharp, then FileDir,** each on its own, with new commands implemented before their keys are checked.
 6. **Stage 5, HomerView.** The catalog, eligibility, verified session routing, per-browser JAWS script sets and the key alignment.

@@ -1027,6 +1027,24 @@ def givePagesOneHeading():
     return iFixed
 
 
+def keepJawsKeys():
+    """THE APP'S JAWS PASS-THROUGH KEYS (1.73.5). An app's scripts\\jaws\\<App>.jkm hands on the keys the suite
+    allows (data\\KeyOwnership.inix, passThrough=yes) that the app really binds -- Alt+Delete, Say Position, instead
+    of JAWS's pixel coordinates -- in a marked block tidy writes, and names any bracket key a bare "[" would turn into
+    a section. The work is the kit's scripts\\jawsKeys.py, found through kind.findKit, so an app never needs a copy of
+    its own. Tidy runs after every build and before every push, and push commits what changed. Returns what was done."""
+    import kind
+    sKit = kind.findKit([sRoot])
+    if not sKit: return []
+    sKitScripts = os.path.join(sKit, "scripts")
+    if sKitScripts not in sys.path: sys.path.insert(0, sKitScripts)
+    import jawsKeys
+    lsDone = jawsKeys.ensure(sRoot, appName(), sKit)
+    for sDone in lsDone: logLine("JAWS KEY MAP: %s" % sDone)
+    if lsDone: sayLine("The JAWS key map %s." % "; ".join(lsDone))
+    return lsDone
+
+
 def removeKitSampleLeftovers(bRepo):
     """The kit's samples, unarchived into an app, leave what their build made beside the files removeStrayKitFiles
     takes away: the sample programs, PyInstaller's build and dist folders, their logs, the generated version files.
@@ -1152,6 +1170,9 @@ def main():
         except Exception as oError: logLine("one heading per page: skipped, " + str(oError))
         try: renameObsoleteConstants()
         except Exception as oError: logLine("Camel Type constants: skipped, " + str(oError))
+        if sKind == "app":
+            try: keepJawsKeys()
+            except Exception as oError: logLine("JAWS key map: skipped, " + str(oError))
 
     # THE BUILD SCRIPT TAKES ITS SHORT NAME HERE (1.43.56). Since 1.43.55 an
     # app's build script is build.cmd, and check fails build<App>.cmd. Tidy runs

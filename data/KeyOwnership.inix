@@ -238,6 +238,8 @@ what=Say Active Cursor
 context=everywhere, desktop layout
 interception=JAWS takes it: Say Active Cursor, pixel coordinates in a list
 disposition=approved suite override: Say Position, passed through by each app's JAWS key map allowlist
+passThrough=yes
+passThroughExcept=HomerView, whose key map is chained into the browsers'; its JAWS Say Position script comes in stage 5
 
 [Key Alt+Control+PageUp]
 owner=JAWS

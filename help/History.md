@@ -7,6 +7,17 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.73.5 -- 18 October 2026
+
+- **JAWS hands Alt+Delete to the apps that use it, with nothing edited by hand.**
+  - **Why:** JAWS takes Alt+Delete everywhere for Say Active Cursor, which in a list reports pixel coordinates. The suite's Say Position is the useful answer, by Jamal's ruling.
+  - **How:** a new kit module, scripts\\jawsKeys.py, is run by the shared tidy after every build. It writes a marked block into an app's scripts\\jaws\\\<App\>.jkm that hands the allowed keys on with TypeCurrentScriptKey.
+  - **Which keys:** the reviewed allowlist in data\\KeyOwnership.inix (passThrough=yes), never every key JAWS owns, and only when the app's own Hotkeys.md shows it binds the key. A key the app does not yet bind keeps its JAWS meaning, and a key the app maps itself is left alone.
+  - **Checked:** the shared check confirms the block before every push.
+  - **Who it affects today:** FileDir, whose Say Percent Through is on Alt+Delete; its next cycle writes the block and push commits it. EdSharp gets it once its own Say Position exists, and DbDo once it has a key map, in stage 3. HomerView is excepted in the data, since its key map is chained into the browsers'.
+- **Bracket keys by name in JAWS key maps.** A key map line beginning "[" is read by JAWS as a new section. Tidy now renames a bare "[" or "]" key LeftBracket or RightBracket; FileDir.jkm had four such lines.
+- **Stage 2 of the suite plan is complete.**
+
 ## 1.73.4 -- 18 October 2026
 
 - **Settings files are safer, in every app that uses InixCodec.**
