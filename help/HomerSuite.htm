@@ -535,9 +535,20 @@ Every app on the frame has them. Implemented in kit 1.73.3.</li>
 <li><strong>One trigger letter per menu, enforced by the frame.</strong>
 A later item that would repeat a letter loses its ampersand, so an app’s
 items and the frame’s never clash. Implemented in kit 1.73.3.</li>
+<li><strong>Safer .inix files.</strong> InixCodec now does three things:
+<ul>
+<li>readValue parses a file once and again only when its time or length
+changes;</li>
+<li>writeValue and writeAsConfig write a temporary file and swap it
+in;</li>
+<li>a file that cannot be read is reported once, through onProblem,
+which the frame connects to the log, and is never taken as empty.</li>
+</ul>
+Implemented in kit 1.73.4. The schema version in each settings file
+comes with each app’s move to the frame.</li>
 <li><strong>Still to come,</strong> each as its own change: the reviewed
-JAWS key map generator, the .inix cache, and the menu repaint
-change.</li>
+JAWS key map generator, and the menu repaint change, which belongs to
+EdSharp and FileDir in stage 4.</li>
 </ul></li>
 <li><strong>Stage 3, DbDo.</strong> Its private KeyMap is replaced
 through an adapter and retired once equivalence is shown, then its key

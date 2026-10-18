@@ -7,6 +7,15 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.73.4 -- 18 October 2026
+
+- **Settings files are safer, in every app that uses InixCodec.**
+  - **Cached reads:** readValue keeps each file it has parsed and parses it again only when the file's time or length changes. An app reading forty settings at startup reads the file once, and an edit made outside the program is still seen at the next read.
+  - **Atomic writes:** writeValue and writeAsConfig write a temporary file beside the real one and swap it into place, so a full disk or a power cut halfway leaves the old file whole rather than half written.
+  - **Problems reported:** a file that cannot be read gives the defaults and is left untouched, as before, but is now reported once through InixCodec.onProblem instead of in silence. The Homer frame sends that report to the log; other apps can connect it the same way.
+  
+  Every member keeps its signature, and Inix.cs still depends on no other Homer class, so DbDo, EdSharp and FileDir compile it unchanged.
+
 ## 1.73.3 -- 18 October 2026
 
 - **The clipboard family, in every app on the frame.**

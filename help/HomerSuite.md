@@ -203,7 +203,13 @@ The HomerView commands added to the manifest are:
    - **One table of key spellings.** KeyMap names every key through KeyName.cs, whose spellings come from JAWS's own default.jkm: GraveAccent, Backslash, SemiColon. Implemented in kit 1.73.2.
    - **The clipboard family in the frame:** Save Clipboard, Append Clipboard and Clear Clipboard, by the text-file rules above. Every app on the frame has them. Implemented in kit 1.73.3.
    - **One trigger letter per menu, enforced by the frame.** A later item that would repeat a letter loses its ampersand, so an app's items and the frame's never clash. Implemented in kit 1.73.3.
-   - **Still to come,** each as its own change: the reviewed JAWS key map generator, the .inix cache, and the menu repaint change.
+   - **Safer .inix files.** InixCodec now does three things:
+     - readValue parses a file once and again only when its time or length changes;
+     - writeValue and writeAsConfig write a temporary file and swap it in;
+     - a file that cannot be read is reported once, through onProblem, which the frame connects to the log, and is never taken as empty.
+     
+     Implemented in kit 1.73.4. The schema version in each settings file comes with each app's move to the frame.
+   - **Still to come,** each as its own change: the reviewed JAWS key map generator, and the menu repaint change, which belongs to EdSharp and FileDir in stage 4.
 4. **Stage 3, DbDo.** Its private KeyMap is replaced through an adapter and retired once equivalence is shown, then its key changes, JAWS scripts and laptop-layout tests follow.
 5. **Stage 4, EdSharp, then FileDir,** each on its own, with new commands implemented before their keys are checked.
 6. **Stage 5, HomerView.** The catalog, eligibility, verified session routing, per-browser JAWS script sets and the key alignment.

@@ -269,6 +269,10 @@ public class MdiFrame : LbcForm {
 
         Say.attach(this);
 
+        // A settings file that cannot be read is reported in the log, once,
+        // instead of being taken silently as empty (kit 1.73.4).
+        if (InixCodec.onProblem == null) InixCodec.onProblem = delegate(string sProblem) { Log.warn(sProblem); };
+
         this.MdiChildActivate += delegate(object oSender, EventArgs evArgs) {
             if (bCloseWithLastWindow && this.MdiChildren.Length == 0 && this.Visible) this.Close();
         };

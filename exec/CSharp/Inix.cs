@@ -379,7 +379,8 @@ public static class InixCodec
     {
         if (string.IsNullOrEmpty(sPath)) throw new ArgumentException("writeAsConfig requires a path.");
         if (lsSections == null) throw new ArgumentNullException("lsSections");
-        using (StreamWriter w = new StreamWriter(sPath, false, new UTF8Encoding(true)))
+        string sTemp = sPath + ".homer-write.tmp";
+        using (StreamWriter w = new StreamWriter(sTemp, false, new UTF8Encoding(true)))
         {
             w.NewLine = "\r\n";
             bool bFirst = true;
@@ -394,6 +395,7 @@ public static class InixCodec
                 writePairs(w, sec.Pairs);
             }
         }
+        swapIn(sTemp, sPath);
     }
 
     // writeAsTable: serialize a sequence of records as an .inix
@@ -486,11 +488,120 @@ public static class InixCodec
     // missing file, a missing section, a missing key, and for a key present
     // with no value, because a caller asking for a setting wants a usable
     // answer rather than four ways of saying no.
+    // ------------------------------------------------------------------
+    // SETTINGS SAFETY (kit 1.73.4, the suite contract's .inix rules).
+    //
+    // readValue keeps each file it has parsed, keyed by its full path, and
+    // parses it again only when the file's time or length has changed -- so
+    // an app reading forty settings at startup reads the file once, and an
+    // edit made outside the program is seen at the next read. Only readValue
+    // uses the cache, and it never hands out the cached sections, so nothing
+    // can change them behind its back.
+    //
+    // writeValue and writeAsConfig write a temporary file beside the real
+    // one and swap it into place, so a failure halfway -- a full disk, a
+    // power cut -- leaves the old file whole instead of half written. Each
+    // write forgets the cached copy.
+    //
+    // A file that cannot be read is never treated as empty and never
+    // overwritten by a read: readValue gives the default and reports the
+    // problem once, through onProblem, which an app connects to its log
+    // (the Homer frame does). This file stays free of any other Homer class.
+    // ------------------------------------------------------------------
+    public static Action<string> onProblem = null;
+
+    private class CachedFile
+    {
+        public DateTime dtWrite;
+        public long iLength;
+        public List<Section> lsSections;
+    }
+
+    private static readonly Dictionary<string, CachedFile> dCache = new Dictionary<string, CachedFile>();
+    private static readonly Dictionary<string, string> dReported = new Dictionary<string, string>();
+    private static readonly object oCacheLock = new object();
+
+    private static string cacheKey(string sPath)
+    {
+        try { return Path.GetFullPath(sPath).ToLowerInvariant(); }
+        catch (Exception) { return (sPath == null ? "" : sPath).ToLowerInvariant(); }
+    }
+
+    // forget: drop a file's cached copy, after a write or when an app
+    // knows the file changed.
+    public static void forget(string sPath)
+    {
+        lock (oCacheLock) { dCache.Remove(cacheKey(sPath)); }
+    }
+
+    private static List<Section> readCached(string sPath)
+    {
+        FileInfo oInfo = new FileInfo(sPath);
+        if (!oInfo.Exists) return null;
+        string sKey = cacheKey(sPath);
+        lock (oCacheLock)
+        {
+            CachedFile oCached;
+            if (dCache.TryGetValue(sKey, out oCached) && oCached.dtWrite == oInfo.LastWriteTimeUtc && oCached.iLength == oInfo.Length)
+                return oCached.lsSections;
+        }
+        List<Section> lsSections = read(sPath);
+        CachedFile oNew = new CachedFile();
+        oNew.dtWrite = oInfo.LastWriteTimeUtc;
+        oNew.iLength = oInfo.Length;
+        oNew.lsSections = lsSections;
+        lock (oCacheLock) { dCache[sKey] = oNew; }
+        return lsSections;
+    }
+
+    // reportProblem: once per file and per state of the file, so a setting
+    // read forty times does not log forty times.
+    private static void reportProblem(string sPath, string sWhy)
+    {
+        string sStamp = "";
+        try { FileInfo oInfo = new FileInfo(sPath); sStamp = oInfo.LastWriteTimeUtc.Ticks.ToString() + "/" + oInfo.Length.ToString(); }
+        catch (Exception) { }
+        string sKey = cacheKey(sPath);
+        lock (oCacheLock)
+        {
+            string sSeen;
+            if (dReported.TryGetValue(sKey, out sSeen) && sSeen == sStamp) return;
+            dReported[sKey] = sStamp;
+        }
+        Action<string> fReport = onProblem;
+        if (fReport != null)
+        {
+            try { fReport(sPath + " could not be read, so its defaults are used and the file is left as it is: " + sWhy); }
+            catch (Exception) { }
+        }
+    }
+
+    // swapIn: put a finished temporary file in the real file's place.
+    private static void swapIn(string sTemp, string sPath)
+    {
+        try
+        {
+            if (File.Exists(sPath)) File.Replace(sTemp, sPath, null);
+            else File.Move(sTemp, sPath);
+        }
+        catch
+        {
+            try { if (File.Exists(sTemp)) File.Delete(sTemp); } catch (Exception) { }
+            throw;
+        }
+        finally
+        {
+            forget(sPath);
+        }
+    }
+
     public static string readValue(string sPath, string sSection, string sKey, string sDefault)
     {
         try
         {
-            foreach (Section oSection in read(sPath))
+            List<Section> lsSections = readCached(sPath);
+            if (lsSections == null) return sDefault;
+            foreach (Section oSection in lsSections)
             {
                 if (!string.Equals(oSection.Name, sSection, StringComparison.OrdinalIgnoreCase))
                     continue;
@@ -499,8 +610,9 @@ public static class InixCodec
                 return sFound;
             }
         }
-        catch (Exception)
+        catch (Exception oError)
         {
+            reportProblem(sPath, oError.Message);
         }
         return sDefault;
     }
@@ -609,14 +721,19 @@ public static class InixCodec
             }
         }
 
+        string sTemp = sPath + ".homer-write.tmp";
         try {
-            using (StreamWriter w = new StreamWriter(sPath, false, new UTF8Encoding(true))) {
+            using (StreamWriter w = new StreamWriter(sTemp, false, new UTF8Encoding(true))) {
                 w.NewLine = "\r\n";
                 foreach (string sLn in lsLines) w.WriteLine(sLn);
             }
+            swapIn(sTemp, sPath);
             return true;
         }
-        catch { return false; }
+        catch {
+            try { if (File.Exists(sTemp)) File.Delete(sTemp); } catch (Exception) { }
+            return false;
+        }
     }
 
     // fileTask: the declared purpose of an .inix file, read from the "FileTask" key
