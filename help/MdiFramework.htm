@@ -254,9 +254,10 @@ NOTE at the top of your MyApp.cs lists them.</li>
 <code>/exportkeys &lt;file&gt;</code>, a program on the frame writes
 every command and key it declares and ends without opening a window. The
 kit’s checkKeys reads that file and reports any key Windows or a screen
-reader owns, and any key used twice. The kit’s own build already does
-this for the sample on every build, and the plan’s next stage adds the
-same step to every app’s build.</li>
+reader owns, and any key used twice. You never run it by hand: the kit’s
+build checks the sample on every build, and the shared check that runs
+when you push checks your app the same way, stopping the push if a key
+clashes.</li>
 </ul>
 <h2 id="say-why-a-command-cannot-run">Say Why a Command Cannot Run</h2>
 <p>A command that cannot run should say why, not stay silent. Set its

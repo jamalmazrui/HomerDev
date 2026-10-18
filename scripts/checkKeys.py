@@ -5,6 +5,7 @@ Usage (through checkKeys.cmd):
     checkKeys                      check the kit's manifest and ownership data
     checkKeys DbDo-keys.inix ...   also check files an app wrote with /exportkeys
     checkKeys --gate               exit 1 when a problem is found (for a build)
+    checkKeys --app DbDo           check one app's manifest entries and exports
 
 What it reads, all in the kit:
     data\SuiteCommands.inix    every command of the four apps, with its keys
@@ -107,8 +108,13 @@ def firstLetterMiss(sName, sKey):
 
 def main():
     global oLog
-    bGate = "--gate" in [s.lower() for s in sys.argv[1:]]
-    lsExports = [s for s in sys.argv[1:] if not s.startswith("--")]
+    lsArgs = sys.argv[1:]
+    bGate = "--gate" in [s.lower() for s in lsArgs]
+    sOnlyApp = ""
+    for i, sArg in enumerate(lsArgs):
+        if sArg.lower() == "--app" and i + 1 < len(lsArgs):
+            sOnlyApp = lsArgs[i + 1]
+    lsExports = [s for i, s in enumerate(lsArgs) if not s.startswith("--") and not (i > 0 and lsArgs[i - 1].lower() == "--app")]
     os.makedirs(os.path.dirname(sLogPath), exist_ok=True)
     oLog = open(sLogPath, "w", encoding="utf-8-sig", newline="\r\n")
     logLine("checkKeys start")
@@ -116,13 +122,16 @@ def main():
     logLine("python: " + platform.python_version() + ", " + platform.platform())
     logLine("working directory: " + os.getcwd())
     logLine("command line: " + " ".join(sys.argv))
-    logLine("kit: " + sKitDir + ", gate: " + str(bGate))
+    logLine("kit: " + sKitDir + ", gate: " + str(bGate) + ", app: " + (sOnlyApp or "all"))
 
     lsProblems = []
+    lsExceptions = []
     lsToTest = []
     lsLetterMisses = []
 
     lsCommands = [d for d in readInix(os.path.join(sKitDir, "data", "SuiteCommands.inix")) if " " in d[""]]
+    if sOnlyApp:
+        lsCommands = [d for d in lsCommands if d[""].split(" ", 1)[0].lower() == sOnlyApp.lower()]
     lsOwnership = [d for d in readInix(os.path.join(sKitDir, "data", "KeyOwnership.inix")) if d[""].startswith("Key ")]
     dOwned = {}
     for d in lsOwnership:
@@ -132,6 +141,7 @@ def main():
     # Identifiers and keys, per app.
     dSeenIds = {}
     dAppKeys = {}
+    dExceptions = {}
     for d in lsCommands:
         sApp, sId = d[""].split(" ", 1)
         if d.get("change", "").startswith("removed"):
@@ -139,6 +149,8 @@ def main():
         if (sApp, sId) in dSeenIds:
             lsProblems.append("%s: the identifier %s is used twice" % (sApp, sId))
         dSeenIds[(sApp, sId)] = d
+        if d.get("exception"):
+            dExceptions[(sApp, d.get("name", sId))] = d.get("exception")
         for sKey in splitKeys(d.get("keys", "")):
             dAppKeys.setdefault(sApp, {}).setdefault(sKey, []).append(d.get("name", sId))
             dOwner = dOwned.get(sKey)
@@ -152,11 +164,18 @@ def main():
                     lsToTest.append(sWhere + " -- " + dOwner.get("disposition", ""))
             if firstLetterMiss(d.get("name", ""), sKey):
                 lsLetterMisses.append("%s %s: %s" % (sApp, d.get("name", sId), sKey))
+    # A KEY SHARED ON PURPOSE IS AN EXCEPTION, NOT A PROBLEM (1.73.1): every
+    # command but one sharing the key must carry an exception= line in the
+    # manifest saying why, so the gate stops only on sharing nobody reviewed.
     for sApp, dKeys in sorted(dAppKeys.items()):
         for sKey, lsNames in sorted(dKeys.items()):
             if len(lsNames) > 1:
-                lsProblems.append("%s: %s is bound to %s (allowed only when their contexts differ; recorded for review)"
-                                  % (sApp, sKey, ", ".join(lsNames)))
+                lsUnexplained = [s for s in lsNames if (sApp, s) not in dExceptions]
+                sLine = "%s: %s is bound to %s" % (sApp, sKey, ", ".join(lsNames))
+                if len(lsUnexplained) <= 1:
+                    lsExceptions.append(sLine + " -- reviewed: " + "; ".join(dExceptions[(sApp, s)] for s in lsNames if (sApp, s) in dExceptions))
+                else:
+                    lsProblems.append(sLine + " -- give all but one an exception= line, or a different key")
 
     # KeyMap.cs's own table must agree with KeyOwnership.inix.
     sKeyMap = open(os.path.join(sKitDir, "exec", "CSharp", "KeyMap.cs"), "rb").read().decode("utf-8-sig")
@@ -197,12 +216,15 @@ def main():
 
     for sLine in lsProblems:
         logLine("PROBLEM: " + sLine)
+    for sLine in lsExceptions:
+        logLine("EXCEPTION: " + sLine)
     for sLine in lsToTest:
         logLine("TO TEST: " + sLine)
     for sLine in lsLetterMisses:
         logLine("LETTER: " + sLine)
-    sayLine("checkKeys: %s, %s to test in their real control, %s." % (
-        plural(len(lsProblems), "problem"), plural(len(lsToTest), "key"), plural(len(lsLetterMisses), "first-letter miss")))
+    sayLine("checkKeys%s: %s, %s reviewed, %s to test in their real control, %s." % (
+        (" " + sOnlyApp) if sOnlyApp else "", plural(len(lsProblems), "problem"), plural(len(lsExceptions), "shared key"),
+        plural(len(lsToTest), "key"), plural(len(lsLetterMisses), "first-letter miss")))
     sayLine("Details: " + sLogPath)
     logLine("checkKeys end")
     return 1 if (bGate and lsProblems) else 0

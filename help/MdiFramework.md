@@ -42,7 +42,7 @@ You never write a KeyDown handler. Every key goes through one router in the kit,
 - **Use the first letter of a word in the command's name,** never a letter from the middle of a word. X for export and Z for a toggle are the accepted exceptions.
 - **Leave Alt+Control with letters, digits, function keys and punctuation alone.** Windows uses those for desktop shortcuts.
 - **Do not take keys the frame already uses.** The AI NOTE at the top of your MyApp.cs lists them.
-- **Your keys are checked for you.** Started with `/exportkeys <file>`, a program on the frame writes every command and key it declares and ends without opening a window. The kit's checkKeys reads that file and reports any key Windows or a screen reader owns, and any key used twice. The kit's own build already does this for the sample on every build, and the plan's next stage adds the same step to every app's build.
+- **Your keys are checked for you.** Started with `/exportkeys <file>`, a program on the frame writes every command and key it declares and ends without opening a window. The kit's checkKeys reads that file and reports any key Windows or a screen reader owns, and any key used twice. You never run it by hand: the kit's build checks the sample on every build, and the shared check that runs when you push checks your app the same way, stopping the push if a key clashes.
 
 ## Say Why a Command Cannot Run
 

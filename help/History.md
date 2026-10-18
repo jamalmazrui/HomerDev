@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.73.1 -- 18 October 2026
+
+- **The suite key check is a gate, in the kit's build and in every app's push.**
+  - **The kit's build** fails when checkKeys finds a problem: a key bound twice with no reviewed reason, a key Windows or a screen reader takes everywhere, or a clash the program itself reported. Keys to test in their real control and first-letter misses are still reported, not failed.
+  - **Every app's push** runs a new "suite" check in the shared check. An app on the Homer frame first exports its own keys, without a window, so the check reads what the program really declares; any other app in the suite manifest is checked against its entries there.
+- **Shared keys carry their reason.** A command that shares a key on purpose has an exception= line in data\SuiteCommands.inix, and checkKeys counts it as reviewed rather than as a problem. The four shared keys found by the first gated run now say why: EdSharp's Open and Save dialog commands, and FileDir's parent-folder commands, which merge in stage 4. EdSharp's Set on Favorite List, a second name for Set Favorite, left the manifest.
+- **checkKeys --app** checks one app.
+
 ## 1.73.0 -- 18 October 2026
 
 - **One command and key mechanism for every Homer app.** KeyMap.cs now declares each command once: a stable identifier, the keys, the context they belong to, a summary, an "unavailable because" check, a checked state and a repeat behavior. One router decides where every key goes. A text box keeps its typing keys unless the app marks it as its editor, and a managed list keeps first-letter and typed-sequence navigation. Shift plus a letter in such a list runs its command or says that none is bound. A command that cannot run says why. The members EdSharp and FileDir use today are kept, so their builds compile unchanged.

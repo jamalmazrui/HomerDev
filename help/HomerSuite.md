@@ -56,7 +56,12 @@ The checker is scripts\\checkKeys in the kit. It reads both files, and also any 
 - hotkey letters that start no word of their command;
 - every difference between what a program declares and what the manifest says.
 
-The kit's build runs it on every build, with the MDI sample's export, so nobody runs it by hand. It reports only, for now; stage 2 makes it a gate that stops a build, and runs it in each app's build too.
+It runs inside the normal cycle, so nobody runs it by hand:
+
+- **The kit's build** checks the whole manifest and the MDI sample's export, and fails on a problem.
+- **Every app's push** runs the shared check, whose "suite" check exports the app's own keys when it is on the Homer frame and checks that app's manifest entries, and stops the push on a problem.
+
+A key shared on purpose carries an exception= line in the manifest saying why, and is counted as reviewed, not as a problem. Keys to test in their real control and first-letter misses are reported, never failed.
 
 ## Rulings
 
@@ -185,8 +190,16 @@ The HomerView commands added to the manifest are:
    - **Desktop proof:** Templates\\samples\\FruitBasketMdiCs.cs on the new frame.
    - **Browser-identity proof:** HomerView's identity.py and scripts\\testIdentity.py.
    
-   Implemented in kit 1.73.0 and HomerView 1.48.110; not yet verified on Windows.
-3. **Stage 2, the minimum core.** The checker becomes a gate. KeyName.cs writes the JAWS spellings (Accent, BackSlash), and the reviewed JAWS key map generator arrives. The clipboard helpers, the .inix cache and the menu repaint change each come as a separate change.
+   Implemented and released on 18 October 2026, in kit 1.73.0 and HomerView 1.48.110:
+   - both full cycles passed;
+   - the sample compiled with the compiler that comes with Windows;
+   - its export listed all 35 commands with no problem;
+   - testIdentity passed 18 of 18 on Windows.
+
+   Verified needs one more thing: your JAWS and NVDA pass through the checklist below.
+3. **Stage 2, the minimum core.**
+   - **The checker is a gate** in the kit's build and in every app's push. Implemented in kit 1.73.1.
+   - **Still to come,** each as its own change: KeyName.cs writing the JAWS spellings (Accent, BackSlash), the reviewed JAWS key map generator, the clipboard helpers, the .inix cache, and the menu repaint change.
 4. **Stage 3, DbDo.** Its private KeyMap is replaced through an adapter and retired once equivalence is shown, then its key changes, JAWS scripts and laptop-layout tests follow.
 5. **Stage 4, EdSharp, then FileDir,** each on its own, with new commands implemented before their keys are checked.
 6. **Stage 5, HomerView.** The catalog, eligibility, verified session routing, per-browser JAWS script sets and the key alignment.

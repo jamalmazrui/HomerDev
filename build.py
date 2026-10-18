@@ -613,9 +613,10 @@ def checkSuiteKeys():
     The MDI sample is started with /exportkeys, which writes every command and
     key the program actually declares and ends before any window appears; then
     scripts\\checkKeys.py reads that export with the suite manifest and the key
-    ownership file. Report-only until stage 2 of the suite plan makes it a gate,
-    so it never fails the build; its findings are summarized here and named in
-    its own log. Nobody runs it by hand.
+    ownership file. It is a GATE from 1.73.1: a problem -- a key bound twice
+    with no reviewed exception, a key Windows or a screen reader takes, a clash
+    the program itself reported -- fails the build, and returns 1. Keys to test
+    and first-letter misses are reported, not failed. Nobody runs it by hand.
     """
     sChecker = os.path.join(sScriptDir, "scripts", "checkKeys.py")
     if not os.path.isfile(sChecker):
@@ -641,7 +642,7 @@ def checkSuiteKeys():
         logLine("checkKeys: no FruitBasketMdiCs.exe yet, so no export to check")
     logLine("RUN: %s %s" % (sChecker, " ".join(lsExports)))
     try:
-        oResult = subprocess.run([sys.executable, sChecker] + lsExports, cwd=sScriptDir,
+        oResult = subprocess.run([sys.executable, sChecker, "--gate"] + lsExports, cwd=sScriptDir,
                                  capture_output=True, text=True, timeout=300)
         if oResult.stdout: logLine("STDOUT:\n" + oResult.stdout[-3000:])
         if oResult.stderr: logLine("STDERR:\n" + oResult.stderr[-3000:])
@@ -649,9 +650,13 @@ def checkSuiteKeys():
         for sLine in oResult.stdout.splitlines():
             if sLine.startswith("checkKeys:"):
                 sayLine(sLine)
+        if oResult.returncode != 0:
+            sayLine("The suite keys have problems; the checkKeys log in logs names each one.")
+            return 1
     except Exception as oError:
         logLine("CHECKKEYS FAILED: %s" % oError)
         sayLine("checkKeys could not run; the log has why.")
+        return 1
     return 0
 
 
@@ -1945,11 +1950,13 @@ def main():
             iDone = convertDocs(sPandoc)
             sayLine("%d document%s converted to HTML." % (iDone, "" if iDone == 1 else "s"))
         iSamplesFailed = buildSamples()
-        checkSuiteKeys()
         # WHAT FAILED, BY NAME (9 October 2026): a failing conversion route ended the build with "1 sample build
         # failed", which named the wrong thing, so the pptx > pdf failure went unexamined for a day. Each failing
         # part is now named in the closing line, with the failing routes themselves.
         lsFailedParts = ["%d sample build%s" % (iSamplesFailed, "" if iSamplesFailed == 1 else "s")] if iSamplesFailed else []
+        if checkSuiteKeys():
+            iSamplesFailed += 1
+            lsFailedParts.append("suite keys")
         # After the samples, whose C# build installs the Build Tools if needed.
         sDllProblem = buildHomerDll()
         if sDllProblem != "":

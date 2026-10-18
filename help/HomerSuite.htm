@@ -260,9 +260,19 @@ also any file an app writes when started with
 <li>every difference between what a program declares and what the
 manifest says.</li>
 </ul>
-<p>The kit’s build runs it on every build, with the MDI sample’s export,
-so nobody runs it by hand. It reports only, for now; stage 2 makes it a
-gate that stops a build, and runs it in each app’s build too.</p>
+<p>It runs inside the normal cycle, so nobody runs it by hand:</p>
+<ul>
+<li><strong>The kit’s build</strong> checks the whole manifest and the
+MDI sample’s export, and fails on a problem.</li>
+<li><strong>Every app’s push</strong> runs the shared check, whose
+“suite” check exports the app’s own keys when it is on the Homer frame
+and checks that app’s manifest entries, and stops the push on a
+problem.</li>
+</ul>
+<p>A key shared on purpose carries an exception= line in the manifest
+saying why, and is counted as reviewed, not as a problem. Keys to test
+in their real control and first-letter misses are reported, never
+failed.</p>
 <h2 id="rulings">Rulings</h2>
 <ul>
 <li><strong>Alt+C appends.</strong> Control+C copies the current item (a
@@ -497,13 +507,25 @@ Templates\samples\FruitBasketMdiCs.cs on the new frame.</li>
 <li><strong>Browser-identity proof:</strong> HomerView’s identity.py and
 scripts\testIdentity.py.</li>
 </ul>
-Implemented in kit 1.73.0 and HomerView 1.48.110; not yet verified on
-Windows.</li>
-<li><strong>Stage 2, the minimum core.</strong> The checker becomes a
-gate. KeyName.cs writes the JAWS spellings (Accent, BackSlash), and the
-reviewed JAWS key map generator arrives. The clipboard helpers, the
-.inix cache and the menu repaint change each come as a separate
-change.</li>
+Implemented and released on 18 October 2026, in kit 1.73.0 and HomerView
+1.48.110:
+<ul>
+<li>both full cycles passed;</li>
+<li>the sample compiled with the compiler that comes with Windows;</li>
+<li>its export listed all 35 commands with no problem;</li>
+<li>testIdentity passed 18 of 18 on Windows.</li>
+</ul>
+Verified needs one more thing: your JAWS and NVDA pass through the
+checklist below.</li>
+<li><strong>Stage 2, the minimum core.</strong>
+<ul>
+<li><strong>The checker is a gate</strong> in the kit’s build and in
+every app’s push. Implemented in kit 1.73.1.</li>
+<li><strong>Still to come,</strong> each as its own change: KeyName.cs
+writing the JAWS spellings (Accent, BackSlash), the reviewed JAWS key
+map generator, the clipboard helpers, the .inix cache, and the menu
+repaint change.</li>
+</ul></li>
 <li><strong>Stage 3, DbDo.</strong> Its private KeyMap is replaced
 through an adapter and retired once equivalence is shown, then its key
 changes, JAWS scripts and laptop-layout tests follow.</li>

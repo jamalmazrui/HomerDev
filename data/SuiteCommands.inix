@@ -1449,11 +1449,13 @@ status=current
 name=Insert All Users Path
 keys=Control+Shift+I
 status=current
+exception=shares Control+Shift+I with Previous Indent: it runs only in the Open and Save dialogs, a different context
 
 [EdSharp insertScriptPath]
 name=Insert Script Path
 keys=Control+I
 status=current
+exception=shares Control+I with Next Indent: it runs only in the Open and Save dialogs, a different context
 
 [EdSharp insertTime]
 name=Insert Time
@@ -2132,11 +2134,6 @@ name=Set Favorite
 keys=Control+L
 status=current
 
-[EdSharp setOnFavoriteList]
-name=Set on Favorite List
-keys=Control+L
-status=current
-
 [EdSharp setSelectionFont]
 name=Set Selection Font
 keys=Alt+Shift+Dash
@@ -2458,6 +2455,7 @@ status=current
 name=Come up Level
 keys=Comma or Backspace
 status=current
+exception=shares Backspace and Comma with the other parent-folder commands: one key, the variant chosen by FileDir's settings; merged into one command in stage 4
 
 [FileDir completeMark]
 name=Complete Mark
@@ -2697,6 +2695,7 @@ status=current
 name=Go to Parent Folder
 keys=Comma or Shift+Backspace
 status=current
+exception=shares Comma with Come up Level; merged in stage 4
 
 [FileDir goToQuickFolder]
 name=Go to Quick Folder
@@ -2998,6 +2997,7 @@ status=current
 name=Open Parent Folder
 keys=Backspace
 status=current
+exception=shares Backspace with the other parent-folder commands; merged in stage 4
 
 [FileDir openQuickFolder]
 name=Open Quick Folder
@@ -3028,6 +3028,7 @@ status=current
 name=Parent Folder
 keys=Backspace
 status=current
+exception=shares Backspace with the other parent-folder commands; merged in stage 4
 
 [FileDir paste]
 name=Paste
