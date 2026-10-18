@@ -11,7 +11,12 @@ A new app on the frame already has all of this:
 - **A window for each thing you work on,** inside one frame. F4 lists the windows, Shift+F4 says them, Control+Tab moves between them, and Control+F4 closes one.
 - **A Help menu.** F1 opens the guide, Shift+F1 the history, and Alt+F1 About. Control+F1 makes every key describe itself instead of running. Alt+F10 lists every command in one searchable list.
 - **Settings.** Alt+Shift+E changes a setting at once, with nothing to restart.
-- **Small conveniences.** Alt+Apostrophe says the clipboard, Alt+SemiColon the time, and Control+F12 copies the log as a file, ready to attach to an email.
+- **The clipboard and files.**
+  - Alt+Apostrophe says the clipboard.
+  - Control+Apostrophe saves it in a new text file. It never replaces a file.
+  - Control+Shift+Apostrophe adds it to the end of a text file you pick.
+  - Alt+Shift+Apostrophe clears it.
+- **Small conveniences.** Alt+SemiColon says the time, and Control+F12 copies the log as a file, ready to attach to an email.
 - **Keys that never fight your screen reader.** Typing in a text box always types, and a list keeps first-letter navigation.
 
 ## Start an App
@@ -36,6 +41,10 @@ The four parts are:
 - **The function that does the work.** It returns true when it has dealt with the command.
 
 You never write a KeyDown handler. Every key goes through one router in the kit, which knows where your keys belong.
+
+## Menu Letters
+
+Put the ampersand before the first letter of a word, never in the middle of one. If two items on one menu claim the same letter, the frame keeps it for the first and gives the later one no letter, and the log says so. Arrowing still reaches every item, and its hotkey still works.
 
 ## Choose Good Keys
 

@@ -7,6 +7,17 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.73.3 -- 18 October 2026
+
+- **The clipboard family, in every app on the frame.**
+  - **Control+Apostrophe, Save Clipboard,** proposes a new file in the results folder named for the date and time. It never replaces a file: a name already taken is refused and asked for again, and the file is opened in a way that cannot replace even by a race.
+  - **Control+Shift+Apostrophe, Append Clipboard,** adds the text to the end of a text file you pick. It appends only to UTF-8, so a UTF-16 or older code-page file is refused with the reason, rather than mixing two encodings in one file. It never puts a byte order mark mid-file, starts a new line when the file does not end with one and says so, and writes through a temporary file swapped into place, so a failure leaves the original exactly as it was.
+  - **Alt+Shift+Apostrophe, Clear Clipboard.**
+  
+  New text is UTF-8 with CRLF line endings.
+- **One trigger letter per menu, enforced by the frame.** The first item on a menu to claim a letter keeps it; a later one that would repeat it loses its ampersand, and the log says which. An app's items and the frame's can no longer clash.
+- **No more mid-word trigger letters.** Hotkeys and Close Window, which had them, now have none, since their menus have used those first letters already. The sample's Say Position, Jump Again and Exit now use the first letter of a word.
+
 ## 1.73.2 -- 18 October 2026
 
 - **One table of key spellings, KeyName's.** KeyMap 1.73.0 had its own list of key names, which spelled two keys Accent and BackSlash, on the belief that those were the JAWS spellings. KeyName.cs, whose spellings were taken from JAWS 2026's own default.jkm, says GraveAccent and Backslash. KeyName is right, and a second list was the mistake the conventions forbid: conversion tables live in one shared class. KeyName gains fromWinFormsKeys, the reverse of toWinFormsKeys, read from the same table, and KeyMap names every key through it. Only keys KeyName has no name for, such as the number-pad digits, are spelled in KeyMap.

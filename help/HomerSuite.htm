@@ -529,9 +529,15 @@ every app’s push. Implemented in kit 1.73.1.</li>
 <li><strong>One table of key spellings.</strong> KeyMap names every key
 through KeyName.cs, whose spellings come from JAWS’s own default.jkm:
 GraveAccent, Backslash, SemiColon. Implemented in kit 1.73.2.</li>
+<li><strong>The clipboard family in the frame:</strong> Save Clipboard,
+Append Clipboard and Clear Clipboard, by the text-file rules above.
+Every app on the frame has them. Implemented in kit 1.73.3.</li>
+<li><strong>One trigger letter per menu, enforced by the frame.</strong>
+A later item that would repeat a letter loses its ampersand, so an app’s
+items and the frame’s never clash. Implemented in kit 1.73.3.</li>
 <li><strong>Still to come,</strong> each as its own change: the reviewed
-JAWS key map generator, the clipboard helpers, the .inix cache, and the
-menu repaint change.</li>
+JAWS key map generator, the .inix cache, and the menu repaint
+change.</li>
 </ul></li>
 <li><strong>Stage 3, DbDo.</strong> Its private KeyMap is replaced
 through an adapter and retired once equivalence is shown, then its key

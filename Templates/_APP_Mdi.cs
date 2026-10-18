@@ -26,7 +26,9 @@
 //   * THE SUITE'S SHARED KEYS ARE TAKEN BY THE FRAME: F1, Shift+F1, Alt+F1,
 //     Control+F1, Control+Shift+F1, Alt+Shift+F1, F4, Shift+F4, Control+F4,
 //     Control+Shift+F4, Control+Tab, Alt+F10, Alt+Shift+H, Alt+Shift+E,
-//     Control+Shift+I, Alt+Apostrophe, Alt+SemiColon, F11, Control+F12.
+//     Control+Shift+I, Alt+Apostrophe, Control+Apostrophe,
+//     Control+Shift+Apostrophe, Alt+Shift+Apostrophe, Alt+SemiColon, F11,
+//     Control+F12.
 //   * A COMMAND THAT CANNOT RUN SAYS WHY: set its fUnavailable to a function
 //     returning "" when it can run, or the reason when it cannot.
 //   * SAY COMMANDS USE KeyMap.answer(sTitle, part, part...): one press speaks
@@ -64,7 +66,7 @@ public class appFrame : MdiFrame
     {
         addMenu("&File");
         addCommand("&New Window", "Control+N", "Open another window.", newWindow);
-        addCommand("E&xit", "Alt+F4", "Close every window and leave.", delegate() { this.Close(); return true; });
+        addCommand("&Exit", "Alt+F4", "Close every window and leave.", delegate() { this.Close(); return true; });
 
         addMenu("&Edit");
         KeyMap.Command oAdd = addCommand("&Add Item", "Control+Shift+A", "Put what is in the item field into the list.",

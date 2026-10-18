@@ -65,7 +65,7 @@ public class fruitFrame : MdiFrame
         addMenu("&File");
         addCommand("&New Basket", "Control+N", "Open another basket in its own window.", newBasket);
         addCommand("&Rename Basket...", "F2", "Give this basket a new name.", delegate() { return withBasket(delegate(fruitChild c) { return c.renameBasket(); }); });
-        addCommand("E&xit", "Alt+F4", "Close every basket and leave.", delegate() { this.Close(); return true; });
+        addCommand("&Exit", "Alt+F4", "Close every basket and leave.", delegate() { this.Close(); return true; });
 
         addMenu("&Basket");
         KeyMap.Command oAdd = addCommand("&Add Fruit", "Control+Shift+A", "Put what is in the fruit field into this basket.",
@@ -79,7 +79,7 @@ public class fruitFrame : MdiFrame
 
         addCommand("&Jump to Fruit...", "Control+J", "Ask for a fruit and go to the next one that starts with it.",
             delegate() { return withBasket(delegate(fruitChild c) { return c.jump(true, 1); }); });
-        addCommand("Jump A&gain", "Alt+J", "Go to the next fruit that starts with the same letters, without asking.",
+        addCommand("Jump &Again", "Alt+J", "Go to the next fruit that starts with the same letters, without asking.",
             delegate() { return withBasket(delegate(fruitChild c) { return c.jump(false, 1); }); });
         addCommand("Search &Next", "F3", "Repeat the last search in this basket.",
             delegate() { return withBasket(delegate(fruitChild c) { return c.searchAgain(1); }); });
@@ -89,7 +89,7 @@ public class fruitFrame : MdiFrame
             delegate() { return withBasket(delegate(fruitChild c) { return c.nextPart(); }); });
 
         addMenu("&Query");
-        addCommand("Say P&osition", "Alt+Delete", "Say which fruit you are on, of how many, and how far through.",
+        addCommand("Say &Position", "Alt+Delete", "Say which fruit you are on, of how many, and how far through.",
             delegate() { return withBasket(delegate(fruitChild c) { return c.sayPosition(); }); }).sRepeat = "review";
         addCommand("Say &Yield", "Alt+Y", "Say how full this basket is.",
             delegate() { return withBasket(delegate(fruitChild c) { return c.sayYield(); }); }).sRepeat = "review";

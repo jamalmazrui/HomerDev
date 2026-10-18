@@ -206,9 +206,18 @@ instead of running. Alt+F10 lists every command in one searchable
 list.</li>
 <li><strong>Settings.</strong> Alt+Shift+E changes a setting at once,
 with nothing to restart.</li>
-<li><strong>Small conveniences.</strong> Alt+Apostrophe says the
-clipboard, Alt+SemiColon the time, and Control+F12 copies the log as a
-file, ready to attach to an email.</li>
+<li><strong>The clipboard and files.</strong>
+<ul>
+<li>Alt+Apostrophe says the clipboard.</li>
+<li>Control+Apostrophe saves it in a new text file. It never replaces a
+file.</li>
+<li>Control+Shift+Apostrophe adds it to the end of a text file you
+pick.</li>
+<li>Alt+Shift+Apostrophe clears it.</li>
+</ul></li>
+<li><strong>Small conveniences.</strong> Alt+SemiColon says the time,
+and Control+F12 copies the log as a file, ready to attach to an
+email.</li>
 <li><strong>Keys that never fight your screen reader.</strong> Typing in
 a text box always types, and a list keeps first-letter navigation.</li>
 </ul>
@@ -240,6 +249,12 @@ when it has dealt with the command.</li>
 </ul>
 <p>You never write a KeyDown handler. Every key goes through one router
 in the kit, which knows where your keys belong.</p>
+<h2 id="menu-letters">Menu Letters</h2>
+<p>Put the ampersand before the first letter of a word, never in the
+middle of one. If two items on one menu claim the same letter, the frame
+keeps it for the first and gives the later one no letter, and the log
+says so. Arrowing still reaches every item, and its hotkey still
+works.</p>
 <h2 id="choose-good-keys">Choose Good Keys</h2>
 <ul>
 <li><strong>Use the first letter of a word in the command’s

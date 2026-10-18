@@ -15,6 +15,8 @@
 //   Window   F4 Current Windows, Shift+F4 Say Windows Open, Control+Tab and
 //            Control+Shift+Tab Next and Previous Window, Control+F4 Close
 //            Window, Control+Shift+F4 Close All But Current Window
+//   Edit     Control+Apostrophe Save Clipboard, Control+Shift+Apostrophe
+//            Append Clipboard, Alt+Shift+Apostrophe Clear Clipboard
 //   Query    Alt+Apostrophe Say Clipboard, Alt+SemiColon Say Time
 //   Misc     Alt+Shift+E Edit Settings, Control+Shift+I Invoke Script
 //   Help     F1 Documentation, Shift+F1 History of Changes, Alt+F1 About,
@@ -129,6 +131,111 @@ public static class MdiWindows {
     }
 }
 
+// ------- the clipboard and text files -------
+
+// ClipFile: moving the clipboard's text into a file, by the suite's text-file
+// rules (help\HomerSuite.md): a new file is UTF-8 with a byte order mark and
+// CRLF line endings and never replaces a file; an append detects the file's
+// encoding, never puts a second byte order mark mid-file, says whether it
+// started a new line, and leaves the file as it was if anything fails.
+public static class ClipFile {
+
+    public static string clipboardText() {
+        try { if (Clipboard.ContainsText()) return Clipboard.GetText(); }
+        catch (Exception oError) { Log.exception(oError); }
+        return "";
+    }
+
+    public static string toCrLf(string sText) {
+        return (sText == null ? "" : sText).Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "\r\n");
+    }
+
+    // proposedPath: "Clipboard 2026-10-18 1405.txt" in the folder, with a
+    // number added when that name is taken, so the proposal never replaces.
+    public static string proposedPath(string sFolder) {
+        string sStem = "Clipboard " + DateTime.Now.ToString("yyyy-MM-dd HHmm");
+        string sPath = System.IO.Path.Combine(sFolder, sStem + ".txt");
+        for (int i = 2; System.IO.File.Exists(sPath); i++) sPath = System.IO.Path.Combine(sFolder, sStem + " " + i.ToString() + ".txt");
+        return sPath;
+    }
+
+    // writeNew: a new file only. CreateNew fails if the file exists, so an
+    // existing file can never be replaced, even by a race.
+    public static bool writeNew(string sPath, string sText, out string sError) {
+        sError = "";
+        try {
+            using (System.IO.FileStream oStream = new System.IO.FileStream(sPath, System.IO.FileMode.CreateNew, System.IO.FileAccess.Write)) {
+                byte[] abBom = new byte[] { 0xEF, 0xBB, 0xBF };
+                byte[] abText = new System.Text.UTF8Encoding(false).GetBytes(toCrLf(sText));
+                oStream.Write(abBom, 0, abBom.Length);
+                oStream.Write(abText, 0, abText.Length);
+            }
+            return true;
+        }
+        catch (Exception oError) {
+            Log.exception(oError);
+            sError = oError.Message;
+            return false;
+        }
+    }
+
+    // appendRefusal: "" when text can be appended to these bytes as UTF-8,
+    // otherwise the plain reason it cannot. Only UTF-8 is appended to; any
+    // other encoding would end up mixed in one file.
+    public static string appendRefusal(byte[] abExisting) {
+        if (abExisting.Length >= 2 && ((abExisting[0] == 0xFF && abExisting[1] == 0xFE) || (abExisting[0] == 0xFE && abExisting[1] == 0xFF)))
+            return "it is in UTF-16, and adding UTF-8 text would mix two encodings in one file";
+        int iStart = hasBom(abExisting) ? 3 : 0;
+        try {
+            new System.Text.UTF8Encoding(false, true).GetString(abExisting, iStart, abExisting.Length - iStart);
+            return "";
+        }
+        catch (Exception) {
+            return "it is not in UTF-8 (it may be in an older Windows code page), and adding UTF-8 text would mix two encodings in one file";
+        }
+    }
+
+    private static bool hasBom(byte[] ab) {
+        return ab.Length >= 3 && ab[0] == 0xEF && ab[1] == 0xBB && ab[2] == 0xBF;
+    }
+
+    // append: the clipboard text at the end of an existing UTF-8 file, on a
+    // new line when the file does not already end with one. Written to a
+    // temporary file beside it, then swapped in, so a failure halfway leaves
+    // the original exactly as it was.
+    public static bool append(string sPath, string sText, out bool bAddedBreak, out string sError) {
+        bAddedBreak = false;
+        sError = "";
+        string sTemp = "";
+        try {
+            byte[] abExisting = System.IO.File.ReadAllBytes(sPath);
+            string sWhy = appendRefusal(abExisting);
+            if (sWhy.Length > 0) { sError = sWhy; return false; }
+            List<byte> lsBytes = new List<byte>(abExisting);
+            if (abExisting.Length == 0) lsBytes.AddRange(new byte[] { 0xEF, 0xBB, 0xBF });
+            int iEnd = abExisting.Length;
+            bool bEndsWithBreak = iEnd > 0 && abExisting[iEnd - 1] == 0x0A;
+            bool bOnlyBom = iEnd == 3 && hasBom(abExisting);
+            if (iEnd > 0 && !bEndsWithBreak && !bOnlyBom) {
+                lsBytes.Add(0x0D);
+                lsBytes.Add(0x0A);
+                bAddedBreak = true;
+            }
+            lsBytes.AddRange(new System.Text.UTF8Encoding(false).GetBytes(toCrLf(sText)));
+            sTemp = sPath + ".homer-append.tmp";
+            System.IO.File.WriteAllBytes(sTemp, lsBytes.ToArray());
+            System.IO.File.Replace(sTemp, sPath, null);
+            return true;
+        }
+        catch (Exception oError) {
+            Log.exception(oError);
+            sError = oError.Message;
+            try { if (sTemp.Length > 0 && System.IO.File.Exists(sTemp)) System.IO.File.Delete(sTemp); } catch (Exception) { }
+            return false;
+        }
+    }
+}
+
 // ------- the frame -------
 
 public class MdiFrame : LbcForm {
@@ -138,6 +245,7 @@ public class MdiFrame : LbcForm {
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
     private Dictionary<string, string> dSettableSummary =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+    private Dictionary<ToolStripMenuItem, List<char>> dMenuLetters = new Dictionary<ToolStripMenuItem, List<char>>();
     private MenuStrip menuBar;
     private ToolStripMenuItem menuNow;
     private string sAppName = "";
@@ -198,7 +306,7 @@ public class MdiFrame : LbcForm {
     public KeyMap.Command addCommand(string sCaption, string sKeys, string sContext, string sSummary, Func<bool> fRun) {
         KeyMap.Command oCommand = KeyMap.addCommand(sCaption, sKeys, sContext, sSummary, fRun);
         if (oCommand == null) return null;
-        LbcMenuItem item = new LbcMenuItem(sCaption);
+        LbcMenuItem item = new LbcMenuItem(uniqueTrigger(sCaption));
         item.ToolTipText = sSummary;
         if (oCommand.lsKeys.Count > 0) item.ShortcutKeyDisplayString = oCommand.keysText();
         item.Click += delegate(object oSender, EventArgs evArgs) { KeyMap.runCommand(oCommand); };
@@ -215,6 +323,28 @@ public class MdiFrame : LbcForm {
             };
         }
         return oCommand;
+    }
+
+    // uniqueTrigger: ONE TRIGGER LETTER PER MENU. The first item in a menu to
+    // claim a letter keeps it; a later item that would repeat it loses its
+    // ampersand rather than take a letter from the middle of a word, so an
+    // app's own items and the frame's can never fight over a letter.
+    private string uniqueTrigger(string sCaption) {
+        if (menuNow == null || sCaption == null) return sCaption;
+        int iAmp = sCaption.IndexOf('&');
+        if (iAmp < 0 || iAmp + 1 >= sCaption.Length) return sCaption;
+        char chLetter = char.ToUpperInvariant(sCaption[iAmp + 1]);
+        List<char> lsUsed;
+        if (!dMenuLetters.TryGetValue(menuNow, out lsUsed)) {
+            lsUsed = new List<char>();
+            dMenuLetters[menuNow] = lsUsed;
+        }
+        if (lsUsed.Contains(chLetter)) {
+            Log.info("Menu " + menuNow.Text.Replace("&", "") + ": " + KeyMap.plainName(sCaption) + " has no trigger letter, because " + chLetter.ToString() + " is taken");
+            return sCaption.Remove(iAmp, 1);
+        }
+        lsUsed.Add(chLetter);
+        return sCaption;
     }
 
     // addItem: the earlier form, kept so older apps compile. The command name
@@ -234,6 +364,11 @@ public class MdiFrame : LbcForm {
 
     // finishMenus: add the frame's own commands, after the app's. Call once.
     public bool finishMenus() {
+        addMenu("&Edit");
+        addCommand("&Save Clipboard...", "Control+Apostrophe", "Save the clipboard's text in a new file.", saveClipboard);
+        addCommand("&Append Clipboard...", "Control+Shift+Apostrophe", "Add the clipboard's text to the end of a text file.", appendClipboard);
+        addCommand("&Clear Clipboard", "Alt+Shift+Apostrophe", "Empty the clipboard.", clearClipboard);
+
         addMenu("&Query");
         addCommand("Say &Clipboard", "Alt+Apostrophe", "Say the text on the clipboard.", sayClipboard).sRepeat = "review";
         addCommand("Say &Time", "Alt+SemiColon", "Say the time and date.", sayTime).sRepeat = "review";
@@ -247,7 +382,7 @@ public class MdiFrame : LbcForm {
         addCommand("&Say Windows Open", "Shift+F4", "Say how many windows are open, and their titles.", delegate() { return MdiWindows.sayOpen(this); }).sRepeat = "review";
         addCommand("&Next Window", "Control+Tab", "Go to the next window.", delegate() { return MdiWindows.step(this, 1); });
         addCommand("&Previous Window", "Control+Shift+Tab", "Go to the previous window.", delegate() { return MdiWindows.step(this, -1); });
-        addCommand("C&lose Window", "Control+F4", "Close this window.", delegate() { return MdiWindows.closeCurrent(this); });
+        addCommand("Close Window", "Control+F4", "Close this window.", delegate() { return MdiWindows.closeCurrent(this); });
         addCommand("Close &All But Current Window", "Control+Shift+F4", "Close every window but this one.", delegate() { return MdiWindows.closeOthers(this); });
 
         addMenu("&Help");
@@ -256,7 +391,7 @@ public class MdiFrame : LbcForm {
         addCommand("&About", "Alt+F1", "The name, the version, and where this copy keeps its files.", showAbout);
         KeyMap.Command oDescriber = addCommand("&Key Describer Toggle", "Control+F1", "A key says what it would do instead of doing it.", toggleKeyDescriber);
         oDescriber.fChecked = delegate() { return KeyMap.bKeyDescriber; };
-        addCommand("Hot&keys", "Control+Shift+F1", "Open the document of every command and key.", showHotkeys);
+        addCommand("Hotkeys", "Control+Shift+F1", "Open the document of every command and key.", showHotkeys);
         addCommand("&ReadMe", "Alt+Shift+F1", "Open the quick start.", delegate() { return openHelp("ReadMe.htm"); });
         addCommand("Alternate &Menu...", "Alt+F10", "Every command in one list you can search.", showAlternateMenu);
         addCommand("Hotkey &Summary", "Alt+Shift+H", "Every command, key and summary in a window.", showHotkeySummary);
@@ -345,6 +480,75 @@ public class MdiFrame : LbcForm {
         try { if (Clipboard.ContainsText()) sText = Clipboard.GetText(); } catch (Exception oError) { Log.exception(oError); }
         if (sText.Length == 0) return KeyMap.answer("Clipboard", "The clipboard holds no text");
         return KeyMap.answer("Clipboard", sText);
+    }
+
+    // saveClipboard: Control+Apostrophe. A name is proposed in the results
+    // folder; a name already taken is never replaced, and the question comes
+    // again.
+    public bool saveClipboard() {
+        string sText = ClipFile.clipboardText();
+        if (sText.Length == 0) { Say.sayForced("The clipboard holds no text"); return true; }
+        string sFolder = Paths.results();
+        string sName = System.IO.Path.GetFileName(ClipFile.proposedPath(sFolder));
+        while (true) {
+            using (LbcDialog dlg = new LbcDialog("Save Clipboard", this)) {
+                TextBox tb = dlg.addInputBox("&File name:", sName, "The new file, in the results folder. A file already there is never replaced.");
+                if (!dlg.runOkCancel()) return true;
+                sName = tb.Text.Trim();
+            }
+            if (sName == "" || sName.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) >= 0) {
+                Say.sayForced("A file name cannot be empty or hold any of these: \\ / : * ? quote < > |");
+                continue;
+            }
+            if (System.IO.Path.GetExtension(sName) == "") sName += ".txt";
+            string sPath = System.IO.Path.Combine(sFolder, sName);
+            if (System.IO.File.Exists(sPath)) {
+                Say.sayForced(sName + " already exists. Choose another name.");
+                continue;
+            }
+            string sError;
+            if (ClipFile.writeNew(sPath, sText, out sError)) {
+                Log.info("Saved the clipboard to " + sPath);
+                Say.sayForced("Saved " + sName + " in the results folder");
+            }
+            else {
+                Say.sayForced(sName + " could not be saved: " + sError);
+            }
+            return true;
+        }
+    }
+
+    // appendClipboard: Control+Shift+Apostrophe. Pick a text file; the text
+    // goes at its end, by the suite's append rules.
+    public bool appendClipboard() {
+        string sText = ClipFile.clipboardText();
+        if (sText.Length == 0) { Say.sayForced("The clipboard holds no text"); return true; }
+        string sPath = "";
+        using (OpenFileDialog dlg = new OpenFileDialog()) {
+            dlg.Title = "Append Clipboard";
+            dlg.InitialDirectory = Paths.results();
+            dlg.Filter = "Text files (*.txt, *.md, *.inix, *.csv)|*.txt;*.md;*.inix;*.csv|All files (*.*)|*.*";
+            dlg.CheckFileExists = true;
+            if (dlg.ShowDialog(this) != DialogResult.OK) return true;
+            sPath = dlg.FileName;
+        }
+        bool bAddedBreak;
+        string sError;
+        string sName = System.IO.Path.GetFileName(sPath);
+        if (ClipFile.append(sPath, sText, out bAddedBreak, out sError)) {
+            Log.info("Appended the clipboard to " + sPath + (bAddedBreak ? ", after a line break" : ""));
+            Say.sayForced("Appended to " + sName + (bAddedBreak ? ", starting a new line" : ""));
+        }
+        else {
+            Say.sayForced("Nothing was added to " + sName + ", because " + sError + ". Save Clipboard makes a new file instead.");
+        }
+        return true;
+    }
+
+    public bool clearClipboard() {
+        try { Clipboard.Clear(); Say.sayForced("Clipboard cleared"); }
+        catch (Exception oError) { Log.exception(oError); Say.sayForced("The clipboard could not be cleared. The log has why."); }
+        return true;
     }
 
     public bool sayTime() {
