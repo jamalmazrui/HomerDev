@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.74.1 -- 19 October 2026
+
+- **Command names are spoken if and only if they help.** The new KeyMap.shouldEcho decides, so every Homer app decides alike. A command that opens a dialog, opens a window that names itself, moves the focus, or speaks its own answer or state does not say its name. Every other command, such as Clear Filter, says its name at once, before its work. The kit's frame follows the rule; a frame command that speaks its own result, such as Clear Clipboard, carries bNoEcho. DbDo's Command Echo Toggle is retired.
+- **help\\CommandEcho.md** lists where every menu command of DbDo, EdSharp, FileDir and the frame falls, for review.
+- **Freed and restored keys in the manifest:** DbDo's Read Only Toggle takes Control+Shift+Z and its Say Status gains Alt+Z; FileDir's Zip then Delete has Control+Z again. Each is a recorded exception, since neither app has Undo or Redo there.
+
 ## 1.74.0 -- 19 October 2026
 
 - **One copy of every file conversion.** The new Conversion.cs is the C# side of the kit's conversion code, which every app is to use. It began as FileDir's own Convert.cs, moved here and renamed so it cannot hide .NET's System.Convert. Table.cs moved with it and now reads .xlsx with .NET's own zip support. ConversionMedia.cs holds the audio, video and picture conversions, for apps that compile Media.cs.

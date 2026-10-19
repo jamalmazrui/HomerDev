@@ -419,6 +419,20 @@ on three. <em>Implemented in kit 1.73.8.</em></li>
 a new key rather than none. <em>Stage 3.</em></li>
 <li><strong>.inix only in EdSharp and FileDir.</strong> Already ruled.
 <em>Next delivery.</em></li>
+<li><strong>Command names are spoken if and only if they help.</strong>
+Command Echo Toggle is retired. A command that opens a dialog is
+confirmed by the dialog’s title, which should be close to the command’s
+name. A command that moves the focus is confirmed by the screen reader
+saying where it landed, as an arrow key is. A Say command or a toggle
+speaks its own answer or state. Every other command says its name at
+once, before its work. The rule is KeyMap.shouldEcho, and
+help\CommandEcho.md lists every command’s group. <em>Implemented in kit
+1.74.1 for the frame and DbDo; EdSharp and FileDir move to it in stage
+4.</em> (Ruled, 19 October 2026.)</li>
+<li><strong>Control+Z in FileDir is Zip then Delete again,</strong> and
+Control+Shift+Z in DbDo is Read Only Toggle. Neither app has Undo or
+Redo there, so each is a recorded exception to the Undo and Redo ruling.
+(Ruled, 19 October 2026.)</li>
 <li><strong>One copy of every file conversion.</strong> Every app
 converts files through the kit’s Conversion.cs (C#) or conversion.py
 (Python), reading one routing table, exec\conversions.inix, whose

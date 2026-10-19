@@ -129,10 +129,10 @@ status=current
 [DbDo commandEchoToggle]
 name=Command Echo Toggle
 keys=
-change=keys changed, was Control+Shift+Z
-reason=leaves Control+Shift+Z, reserved for Redo
-disposition=accepted
-status=proposed
+change=removed by ruling, was Control+Shift+Z
+reason=command names are spoken by the suite's rule, KeyMap.shouldEcho, if and only if nothing else confirms the command at once (Jamal, 19 October 2026)
+disposition=removed by ruling
+status=implemented
 
 [DbDo compareDatabase]
 name=Compare Database
@@ -604,11 +604,12 @@ status=current
 
 [DbDo readOnlyToggle]
 name=Read Only Toggle
-keys=
-change=renamed from Toggle Read Only, was Alt+Z
-reason=Alt+Z becomes Say Status
+keys=Control+Shift+Z
+change=keys changed, was Alt+Z
+reason=Alt+Z becomes Say Status; Control+Shift+Z is free once Command Echo Toggle is retired, and Z keys are toggles
+exception=keeps Redo's key: DbDo has no Undo or Redo, and Z keys are toggles (19 October 2026)
 disposition=accepted
-status=proposed
+status=implemented
 
 [DbDo readme]
 name=ReadMe
@@ -870,7 +871,7 @@ keys=Alt+Z or Shift+Z
 change=keys changed, was Shift+Z
 reason=Alt+Z added to match the suite
 disposition=accepted
-status=proposed
+status=implemented
 
 [DbDo sayTables]
 name=Say Tables
@@ -3608,9 +3609,10 @@ exception=keeps Redo's key: FileDir has no Undo or Redo, Zip List only makes or 
 
 [FileDir zipThenDelete]
 name=Zip then Delete
-keys=Control+Shift+Delete
-change=keys changed, was Control+Z
-reason=Control+Z is Undo, and a destructive command must not sit on a reflex key; beside FileDir's other delete keys
+keys=Control+Z or Control+Shift+Delete
+change=Control+Z restored, Control+Shift+Delete kept
+reason=FileDir's list has no Undo for Control+Z to mean, and Jamal missed it (19 October 2026)
+exception=keeps Undo's key: FileDir has no Undo, and the command asks before deleting, so a reflex press costs only Escape
 disposition=accepted
 status=implemented
 

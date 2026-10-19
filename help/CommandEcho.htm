@@ -1,0 +1,952 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.12.1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Jamal Mazrui" />
+  <title>CommandEcho</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      color: light-dark(#1a1a1a, #fdfdfd);
+      background-color: #fdfdfd;
+      background-color: light-dark(#fdfdfd, #1a1a1a);
+      color-scheme: light dark;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a, a:visited {
+      color: inherit;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid;
+      border-color: #e6e6e6;
+      border-color: light-dark(#e6e6e6, #4c4c4c);
+      color: #606060;
+      color: light-dark(#606060, #b6b6b6);
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid currentColor;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+    }
+    th {
+      border-top: 1px solid currentColor;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Homer Command Echo</h1>
+<p class="author">Jamal Mazrui</p>
+</header>
+<main>
+<p>This page records, for every menu command in the HomerDev frame,
+DbDo, EdSharp and FileDir, whether it says its own name as it starts. It
+was made on 19 October 2026 by applying the suite’s rule to each
+command’s menu caption, and is meant for review. A command in the wrong
+group is corrected in its app’s code, or, on the frame, with
+bNoEcho.</p>
+<h2 id="the-rule">The Rule</h2>
+<p>A command’s name is spoken as it starts if and only if nothing else
+would tell you at once that the command you meant is under way. The rule
+is KeyMap.shouldEcho in the kit, so every app decides alike. Each
+command falls in one of five groups:</p>
+<ul>
+<li><strong>Dialog:</strong> its caption ends in “…”. The dialog’s
+title, close to the command’s name, is the echo.</li>
+<li><strong>Focus:</strong> it moves the focus, as an arrow key does, so
+the screen reader says where you landed. Its first word is Back, Bottom,
+Close, End, Exit, First, Forward, Go, Home, Jump, Last, Next, Open,
+Previous, Prior, Top, or any word is Find, Go, Jump, Keywords,
+Search.</li>
+<li><strong>Result:</strong> a Say command or a toggle, which speaks its
+answer or its new state.</li>
+<li><strong>Spoken:</strong> every other command says its name at once,
+before its work, because it changes something the screen reader does not
+announce, and may take a noticeable moment. Clear Filter is the
+example.</li>
+<li><strong>Window:</strong> it opens a window or document that names
+itself. Its first word is Chat, Describe, Inspect, Mail, Pick, Play,
+Show, Statistics, Test, Where; its name ends in Console or Summary; or
+it is one of About, Developer Guide, Documentation, Frequently Asked
+Questions, History of Changes, Hotkeys, License, ReadMe, Tutorials,
+Tutorials Transcript.</li>
+</ul>
+<h2 id="where-it-applies-now">Where It Applies Now</h2>
+<ul>
+<li><strong>DbDo and the HomerDev frame</strong> follow the rule as of
+this release. DbDo’s Command Echo Toggle and its setting are
+retired.</li>
+<li><strong>EdSharp and FileDir</strong> still speak from their own
+handlers: EdSharp by a speak or silent mark on each menu item, FileDir
+by a line at the start of many handlers. The groups below show what the
+rule would do for them; their handlers move to it with their stage-4
+work.</li>
+<li><strong>HomerView</strong> follows in stage 5, where the browser
+speaks most results itself.</li>
+</ul>
+<h2 id="for-review">For Review</h2>
+<ul>
+<li><strong>Clipboard copies in DbDo,</strong> such as Copy Cell to
+Clipboard on Control+C, are Spoken. If a handler already says what it
+copied, that handler’s own words should go, or the command should join
+Result.</li>
+<li><strong>Delete Record in DbDo,</strong> Control+D, is Spoken, and
+then asks to confirm. If the confirmation’s title is enough, it should
+join Dialog by gaining “…” in its caption.</li>
+</ul>
+<h2 id="dbdo">DbDo</h2>
+<p>182 commands: 27 spoken, 58 dialog, 26 window, 28 focus, 43
+result.</p>
+<h3 id="dbdo-spoken">DbDo: Spoken</h3>
+<ul>
+<li>Announcement</li>
+<li>Append Cell to Clipboard (Alt+C)</li>
+<li>Append Record to Clipboard (Alt+Shift+C)</li>
+<li>Clear Bookmark (Control+Shift+B)</li>
+<li>Clear Filter (Control+Shift+F)</li>
+<li>Clear Sort</li>
+<li>Complete Mark (Shift+F8)</li>
+<li>Complete Unmark to Anchor (Alt+Shift+F8)</li>
+<li>Copy Cell to Clipboard (Control+C)</li>
+<li>Copy Column to Clipboard</li>
+<li>Copy Grid as TSV to Clipboard</li>
+<li>Copy Record (Control+Shift+C)</li>
+<li>Copy Visible Cells as TSV to Clipboard</li>
+<li>Delete Record (Control+D)</li>
+<li>Delete Without Confirmation (Control+Shift+D)</li>
+<li>Invert Marked (Alt+Shift+I)</li>
+<li>Mark All (Control+A)</li>
+<li>Mark Record (Control+M)</li>
+<li>Refresh View (F5)</li>
+<li>Reverse Order (Alt+Shift+O)</li>
+<li>Save (Control+S)</li>
+<li>Save Bookmark (Control+B)</li>
+<li>Start Mark (F8)</li>
+<li>Start Unmark (Alt+F8)</li>
+<li>Table Properties (Alt+Enter)</li>
+<li>Unmark All (Control+Shift+A)</li>
+<li>Unmark Record (Control+Shift+M)</li>
+</ul>
+<h3 id="dbdo-dialog">DbDo: Dialog</h3>
+<ul>
+<li>Add Table</li>
+<li>Alternate Menu (Alt+F10)</li>
+<li>Backup Database</li>
+<li>Choose Table (Control+T)</li>
+<li>Choose View</li>
+<li>Choose Visible Columns</li>
+<li>Compare Database</li>
+<li>Current Windows (F4)</li>
+<li>Edit Cell (F2)</li>
+<li>Edit Notes (Alt+Shift+N)</li>
+<li>Edit Settings (Alt+Shift+E)</li>
+<li>Edit Snippet (Control+Shift+E)</li>
+<li>Edit Tags (Alt+Shift+T)</li>
+<li>Edit URL (Alt+Shift+U)</li>
+<li>Edit View (Control+E)</li>
+<li>Elevate Version (F11)</li>
+<li>Email Log File</li>
+<li>Enter Child Table (Alt+Right)</li>
+<li>Evaluate Expression (Control+Oemplus)</li>
+<li>Export Data (Alt+X)</li>
+<li>Extract with Regex (Control+Shift+X)</li>
+<li>Facet Column</li>
+<li>File GitHub Issue</li>
+<li>Filter by Regex</li>
+<li>Filter Records (Control+F)</li>
+<li>Find Regex (Control+F3)</li>
+<li>Generate from Grid (Alt+Shift+G)</li>
+<li>Go to Record (Control+G)</li>
+<li>Graphics Column (Control+Shift+G)</li>
+<li>Import (Alt+I)</li>
+<li>Invoke Script (Control+Shift+I)</li>
+<li>Jump to Next Initial</li>
+<li>Jump to Record (Control+J)</li>
+<li>Keywords (Control+K)</li>
+<li>List Bookmarks (Alt+B)</li>
+<li>Merge Data (Alt+M)</li>
+<li>New Copy (Control+Shift+N)</li>
+<li>New Database</li>
+<li>New Record (Control+N)</li>
+<li>Open as Managed Copy</li>
+<li>Open Cell Value (Control+Enter)</li>
+<li>Open Database (Control+O)</li>
+<li>Open Table (Control+Shift+O)</li>
+<li>Open Table in New Window (Control+Shift+T)</li>
+<li>Open Template Database (Alt+Shift+D)</li>
+<li>Order Records (Alt+O)</li>
+<li>Print (Control+P)</li>
+<li>Query (Control+Q)</li>
+<li>Query History (Alt+Shift+Q)</li>
+<li>Recent Files (Alt+R)</li>
+<li>Regex Replace (Control+Shift+R)</li>
+<li>Related Records</li>
+<li>Replace Column (Control+R)</li>
+<li>Run Report (Alt+Shift+R)</li>
+<li>Save As (Control+Shift+S)</li>
+<li>Select Columns to Display (Alt+S)</li>
+<li>Transfer Import</li>
+<li>Update from Template</li>
+</ul>
+<h3 id="dbdo-window">DbDo: Window</h3>
+<ul>
+<li>About (Alt+F1)</li>
+<li>Chat about Table (Shift+F12)</li>
+<li>Chat with AI (F12)</li>
+<li>Database Summary (Alt+D)</li>
+<li>Describe Table</li>
+<li>Developer Guide</li>
+<li>Documentation (F1)</li>
+<li>Frequently Asked Questions</li>
+<li>History of Changes (Shift+F1)</li>
+<li>Hotkey Summary (Alt+Shift+H)</li>
+<li>Hotkeys (Control+Shift+F1)</li>
+<li>Inspect Record (Control+I)</li>
+<li>License</li>
+<li>Mail Record</li>
+<li>Pick Value (Control+F2)</li>
+<li>Play Stream (Alt+Shift+P)</li>
+<li>Play Tutorials</li>
+<li>ReadMe (Alt+Shift+F1)</li>
+<li>Show Log Location</li>
+<li>Show Schema</li>
+<li>Sqlean Console (Control+Shift+Oemtilde)</li>
+<li>Statistics from Column (Alt+Shift+S)</li>
+<li>Table Summary (Alt+T)</li>
+<li>Test Integrity</li>
+<li>Tutorials Transcript</li>
+<li>Where Am I</li>
+</ul>
+<h3 id="dbdo-focus">DbDo: Focus</h3>
+<ul>
+<li>Close All But Current Window (Control+Shift+F4)</li>
+<li>Close Database</li>
+<li>Close Window (Control+F4)</li>
+<li>Exit Child Table (Alt+Left)</li>
+<li>Exit DbDo (Alt+F4)</li>
+<li>Exit to Root Table (Alt+Home)</li>
+<li>First Record</li>
+<li>Last Record</li>
+<li>Next Record</li>
+<li>Next Table or View (Control+F6)</li>
+<li>Next Visited Table (Alt+F6)</li>
+<li>Next Window (Control+Tab)</li>
+<li>Open Command Prompt (Control+OemQuestion)</li>
+<li>Open Dot Prompt (Control+Oemtilde)</li>
+<li>Open in Explorer (Alt+OemPipe)</li>
+<li>Open Script Folder</li>
+<li>Open Url (Control+Shift+U)</li>
+<li>Open Website</li>
+<li>Previous Record</li>
+<li>Previous Table or View (Control+Shift+F6)</li>
+<li>Previous Visited Table (Alt+Shift+F6)</li>
+<li>Previous Window (Control+Shift+Tab)</li>
+<li>Repeat Go To (Alt+G)</li>
+<li>Reverse Jump (Control+Shift+J)</li>
+<li>Reverse Keywords (Control+Shift+K)</li>
+<li>Reverse Regex Find (Control+Shift+F3)</li>
+<li>Search Next (F3)</li>
+<li>Search Previous (Shift+F3)</li>
+</ul>
+<h3 id="dbdo-result">DbDo: Result</h3>
+<ul>
+<li>Extra Speech Toggle (Alt+Shift+Z)</li>
+<li>Key Describer Toggle (Control+F1)</li>
+<li>Say Added (Shift+A)</li>
+<li>Say Bookmark (Shift+B)</li>
+<li>Say Cell (Shift+C)</li>
+<li>Say Clipboard (Alt+Apostrophe)</li>
+<li>Say Column as List (Alt+L)</li>
+<li>Say Column as List from Current (Control+L)</li>
+<li>Say Column as List from Current Marked (Control+Shift+L)</li>
+<li>Say Column as List of Marked (Alt+Shift+L)</li>
+<li>Say Database (Shift+D)</li>
+<li>Say Edited (Shift+E)</li>
+<li>Say Filter (Shift+F)</li>
+<li>Say Goto (Shift+G)</li>
+<li>Say Id (Shift+I)</li>
+<li>Say Jump (Shift+J)</li>
+<li>Say Keywords (Shift+K)</li>
+<li>Say Look (Shift+L)</li>
+<li>Say Mark Status (Shift+M)</li>
+<li>Say Marked</li>
+<li>Say Marked Rows (Shift+Space)</li>
+<li>Say Marked Yield</li>
+<li>Say Notes (Shift+N)</li>
+<li>Say Order (Shift+O)</li>
+<li>Say Position (Alt+Delete)</li>
+<li>Say Prime (Shift+P)</li>
+<li>Say Query (Shift+Q)</li>
+<li>Say Records Rest</li>
+<li>Say Records Rest Marked (Alt+Shift+M)</li>
+<li>Say Regex Replace (Shift+X)</li>
+<li>Say Related (Shift+R)</li>
+<li>Say Replacement Value (Shift+V)</li>
+<li>Say Select Columns (Shift+S)</li>
+<li>Say Sort and Filter (Shift+D8)</li>
+<li>Say Status (Shift+Z)</li>
+<li>Say Tables</li>
+<li>Say Tags (Shift+T)</li>
+<li>Say URL (Shift+U)</li>
+<li>Say Windows Open (Shift+F4)</li>
+<li>Say Yield (Shift+Y)</li>
+<li>Toggle Marked (Control+Space)</li>
+<li>Toggle Read Only (Control+Shift+Z)</li>
+<li>Window Toggle</li>
+</ul>
+<h2 id="edsharp">EdSharp</h2>
+<p>219 commands: 126 spoken, 41 dialog, 7 window, 44 focus, 1
+result.</p>
+<h3 id="edsharp-spoken">EdSharp: Spoken</h3>
+<ul>
+<li>Address (Alt+A)</li>
+<li>Align (Alt+Shift+A)</li>
+<li>Append from Clipboard (Alt+D7)</li>
+<li>Arrange Icons (Alt+F11)</li>
+<li>Braces (Alt+Shift+OemCloseBrackets)</li>
+<li>Burn to CD (Alt+Shift+B)</li>
+<li>Cascade (Control+F11)</li>
+<li>Check Markdown (Alt+F9)</li>
+<li>Chunk (Shift+Back)</li>
+<li>Clear Bookmark (Control+Shift+B)</li>
+<li>Clear Favorite (Control+Shift+L)</li>
+<li>Clipboard (Alt+OemQuotes)</li>
+<li>Command Prompt (Control+Oem5)</li>
+<li>Compile (Control+F5)</li>
+<li>Compiler (Alt+D0)</li>
+<li>Complete Selection (Shift+F8)</li>
+<li>Copy (Control+C)</li>
+<li>Copy All (Control+F8)</li>
+<li>Copy Append (Alt+C)</li>
+<li>Copy Log (Control+F12)</li>
+<li>Copy Rich Text (Control+Shift+C)</li>
+<li>Cut (Control+&amp;X)</li>
+<li>Cut Append (Alt+X)</li>
+<li>Delete Down (Alt+Shift+Delete)</li>
+<li>Delete File (Alt+Shift+D)</li>
+<li>Delete Hard Line (Control+D)</li>
+<li>Delete Left (Control+Shift+Back)</li>
+<li>Delete Line (Alt+Back)</li>
+<li>Delete Paragraph (Control+Shift+D)</li>
+<li>Delete Right (Control+Shift+Delete)</li>
+<li>Delete Up (Alt+Shift+Back)</li>
+<li>Elevate Version (F11)</li>
+<li>Enter New Line (Enter)</li>
+<li>Evaluate Expression (Control+Oemplus)</li>
+<li>Explorer Folder (Alt+Oem5)</li>
+<li>Extra Speech Log (Alt+Shift+X)</li>
+<li>Font (Alt+OemMinus)</li>
+<li>Format Code (Control+D4)</li>
+<li>Guard Document (Control+F7)</li>
+<li>HTML Format (Control+H)</li>
+<li>HTML to Markdown</li>
+<li>HTML to Plain Text</li>
+<li>Indent (Tab)</li>
+<li>Indent Mode (Alt+Shift+I)</li>
+<li>Indent New Line (Shift+Enter)</li>
+<li>Indent New Line Prior (Alt+Shift+Enter)</li>
+<li>Indentation (Alt+I)</li>
+<li>Infer Indent (Alt+OemCloseBrackets)</li>
+<li>Insert Time (Alt+Shift+OemSemicolon)</li>
+<li>Invoke Snippet (Alt+V)</li>
+<li>Join Lines (Control+Shift+J)</li>
+<li>Keep Unique Items (Alt+Shift+K)</li>
+<li>Key Describer (Control+F1)</li>
+<li>Left Brace (Control+Shift+OemOpenBrackets)</li>
+<li>List Different Items (Alt+Shift+L)</li>
+<li>Lookup Term (Alt+F7)</li>
+<li>Lower Case (Control+Shift+U)</li>
+<li>Manual Options (Alt+Shift+M)</li>
+<li>Markdown to Plain Text</li>
+<li>New (Control+N)</li>
+<li>New from Clipboard (Control+Shift+N)</li>
+<li>No Guard (Control+Shift+F7)</li>
+<li>Order Items (Alt+Shift+O)</li>
+<li>Outdent (Shift+Tab)</li>
+<li>Paste (Control+&amp;V)</li>
+<li>Path (Alt+P)</li>
+<li>Path List (Control+Shift+P)</li>
+<li>Path to Clipboard (Alt+Shift+P)</li>
+<li>Preview Markdown (Control+F9)</li>
+<li>Preview Markdown in Web Browser</li>
+<li>Print (Control+P)</li>
+<li>Prompt Command (Alt+F5)</li>
+<li>Proper Case (Alt+U)</li>
+<li>Properties (Alt+Enter)</li>
+<li>PyBrace (Alt+Shift+OemOpenBrackets)</li>
+<li>PyDent (Alt+OemOpenBrackets)</li>
+<li>Query Common Items (Alt+Shift+Q)</li>
+<li>Quote (Control+Q)</li>
+<li>Read All (Alt+F8)</li>
+<li>Redo (Control+Shift+Z)</li>
+<li>Repeat Line (Control+Y)</li>
+<li>Replace Tokens (Control+Shift+Oemplus)</li>
+<li>Reselect (Control+Shift+F8)</li>
+<li>Reset Configuration (Alt+Shift+D0)</li>
+<li>Reverse Items (Alt+Shift+Z)</li>
+<li>Review Output (Alt+Shift+F5)</li>
+<li>Right Brace (Control+Shift+OemCloseBrackets)</li>
+<li>Run (F5)</li>
+<li>Run Code Blocks (Alt+Shift+F9)</li>
+<li>Save (Control+S)</li>
+<li>Save Snippet (Alt+S)</li>
+<li>Section Break (Control+Enter)</li>
+<li>Select All (Control+A)</li>
+<li>Select Chunk (Control+Space)</li>
+<li>Selected (Shift+Space)</li>
+<li>Set Bookmark (Control+B)</li>
+<li>Set Favorite (Control+&amp;L)</li>
+<li>Set on Favorite List (Control+L)</li>
+<li>Spell Check (F7)</li>
+<li>Start Selection (F8)</li>
+<li>Start Tag (Control+Shift+Oemcomma)</li>
+<li>Status (Alt+Z)</li>
+<li>Styles (Alt+OemQuestion)</li>
+<li>Swap Case (Alt+Shift+U)</li>
+<li>Text Combine (Control+Shift+T)</li>
+<li>Text Contents (Alt+Shift+T)</li>
+<li>Text Convert (Control+T)</li>
+<li>Thesaurus (Shift+F7)</li>
+<li>Tile Horizontal (Alt+Shift+F11)</li>
+<li>Tile Vertical (Control+Shift+F11)</li>
+<li>Time (Alt+OemSemicolon)</li>
+<li>Topic (Alt+T)</li>
+<li>Transform Files (Alt+Oemplus)</li>
+<li>Translate Language (Alt+Shift+F7)</li>
+<li>Trim Blanks (Control+Shift+Enter)</li>
+<li>Undo (Control+&amp;Z)</li>
+<li>Unquote (Control+Shift+Q)</li>
+<li>Unselect All (Control+Shift+A)</li>
+<li>Unwrap (Control+Shift+W)</li>
+<li>Upper Case (Control+U)</li>
+<li>View Snippet (Alt+Shift+V)</li>
+<li>Web Download (Alt+Shift+W)</li>
+<li>Windows Open (Shift+F4)</li>
+<li>Word Wrap (Control+W)</li>
+<li>Yield (Alt+Y)</li>
+<li>Yield Encoding (Alt+Shift+Y)</li>
+</ul>
+<h3 id="edsharp-dialog">EdSharp: Dialog</h3>
+<ul>
+<li>About (Alt+F1)</li>
+<li>Alternate Menu (Alt+F10)</li>
+<li>Baseline (Alt+Shift+D6)</li>
+<li>Calculate Date (Control+Shift+OemSemicolon)</li>
+<li>Configuration Options (Alt+Shift+C)</li>
+<li>Context Menu (Shift+F10)</li>
+<li>Current Windows (F4)</li>
+<li>Environment Variables (Control+E)</li>
+<li>Export Format (Alt+Shift+E)</li>
+<li>Extract with Regular Expression (Control+Shift+E)</li>
+<li>File Find (Alt+Shift+F)</li>
+<li>Forward Find (Control+F)</li>
+<li>Forward Find with Regular Expression (Control+F3)</li>
+<li>Go to Percent (Control+G)</li>
+<li>Hard Line Break (Control+Shift+H)</li>
+<li>Jump to Line (Control+J)</li>
+<li>Justify (Alt+Shift+J)</li>
+<li>List Favorites (Alt+L)</li>
+<li>Mail Attachment (Control+Shift+M)</li>
+<li>Mail Body (Control+M)</li>
+<li>Number Items (Alt+Shift+N)</li>
+<li>Open (Control+O)</li>
+<li>Open Other Format (Control+Shift+O)</li>
+<li>Paste File (Control+Shift+V)</li>
+<li>Recent Files (Alt+R)</li>
+<li>Rename (Alt+Shift+R)</li>
+<li>Replace (Control+R)</li>
+<li>Replace with Regular Expression (Control+Shift+R)</li>
+<li>Reverse Find (Control+Shift+F)</li>
+<li>Reverse Find with Regular Expression (Control+Shift+F3)</li>
+<li>Run at Cursor (Shift+F5)</li>
+<li>Sample Programs (Control+Shift+F2)</li>
+<li>Save As (Control+Shift+S)</li>
+<li>Save Copy (Alt+Shift+S)</li>
+<li>Search for Topic (Control+F6)</li>
+<li>SendTo Menu (Control+F10)</li>
+<li>Set Default Font and Color (Alt+Shift+Oemplus)</li>
+<li>Set Selection Font (Alt+Shift+OemMinus)</li>
+<li>Special Character (F2)</li>
+<li>Style (Alt+Shift+OemQuestion)</li>
+<li>Yield with Regular Expression (Control+Shift+Y)</li>
+</ul>
+<h3 id="edsharp-window">EdSharp: Window</h3>
+<ul>
+<li>Chat about Document (Shift+F12)</li>
+<li>Chat with AI (F12)</li>
+<li>Documentation (F1)</li>
+<li>History of Changes (Shift+F1)</li>
+<li>Hotkey Summary (Alt+Shift+H)</li>
+<li>Pick Compiler (Control+Shift+F5)</li>
+<li>Tutorials (Control+Shift+F1)</li>
+</ul>
+<h3 id="edsharp-focus">EdSharp: Focus</h3>
+<ul>
+<li>Close All but Current Window (Control+Shift+F4)</li>
+<li>Close Window (Control+F4)</li>
+<li>End Character (Alt+End)</li>
+<li>End Tag (Control+Shift+OemPeriod)</li>
+<li>Exit EdSharp (Alt+F4)</li>
+<li>Forward Find Again (F3)</li>
+<li>Forward Find at Cursor (Alt+F3)</li>
+<li>Go to Bookmark (Alt+B)</li>
+<li>Go to Contents (Shift+F6)</li>
+<li>Go to Environment (Control+Shift+G)</li>
+<li>Go to Folder (Control+D0)</li>
+<li>Go to Part (Alt+Shift+G)</li>
+<li>Go to Percent Again (Alt+G)</li>
+<li>Go to Section (F6)</li>
+<li>Go to Special Folder (Control+Shift+D0)</li>
+<li>Go to Start of Selection (Alt+Shift+F8)</li>
+<li>Home Character (Alt+Home)</li>
+<li>Jump to Line Again (Alt+J)</li>
+<li>Next Alignment (Control+OemCloseBrackets)</li>
+<li>Next Baseline (Control+D6)</li>
+<li>Next Chunk (Alt+Right)</li>
+<li>Next Font (Control+OemMinus)</li>
+<li>Next Indent (Control+I)</li>
+<li>Next Paragraph (Control+Down)</li>
+<li>Next Part (Alt+PageDown)</li>
+<li>Next Section (Control+PageDown)</li>
+<li>Next Sentence (Alt+Down)</li>
+<li>Next Style (Control+OemQuestion)</li>
+<li>Next Window (Control+Tab)</li>
+<li>Open Again (Alt+O)</li>
+<li>Prior Alignment (Control+OemOpenBrackets)</li>
+<li>Prior Baseline (Control+Shift+D6)</li>
+<li>Prior Chunk (Alt+Left)</li>
+<li>Prior Font (Control+Shift+OemMinus)</li>
+<li>Prior Indent (Control+Shift+I)</li>
+<li>Prior Paragraph (Control+Up)</li>
+<li>Prior Part (Alt+PageUp)</li>
+<li>Prior Section (Control+PageUp)</li>
+<li>Prior Sentence (Alt+Up)</li>
+<li>Prior Style (Control+Shift+OemQuestion)</li>
+<li>Prior Window (Control+Shift+Tab)</li>
+<li>Reverse Find Again (Shift+F3)</li>
+<li>Reverse Find at Cursor (Alt+Shift+F3)</li>
+<li>Search for Topic Again (Alt+F6)</li>
+</ul>
+<h3 id="edsharp-result">EdSharp: Result</h3>
+<ul>
+<li>Extra Speech Toggle (Control+Shift+X)</li>
+</ul>
+<h2 id="filedir">FileDir</h2>
+<p>211 commands: 131 spoken, 43 dialog, 11 window, 22 focus, 4
+result.</p>
+<h3 id="filedir-spoken">FileDir: Spoken</h3>
+<ul>
+<li>Alpha Order (Alt+A)</li>
+<li>Append to Clipboard (Shift+A)</li>
+<li>Arrange Icons (Alt+F11)</li>
+<li>Batch Mail (Control+Shift+B)</li>
+<li>Beginning File (Alt+B)</li>
+<li>Beginning Tagged (Shift+B or Control+Home)</li>
+<li>Burn to CD (Alt+Shift+B)</li>
+<li>Cascade (Control+F11)</li>
+<li>Character Encoding (Shift+2 or @)</li>
+<li>Clear Clipboard (Alt+Shift+’)</li>
+<li>Clear Filter (Control+Shift+F)</li>
+<li>Clipboard (Alt+’)</li>
+<li>Command Prompt (Control+/)</li>
+<li>Complete Tag (Shift+F8)</li>
+<li>Complete Untag (Alt+Shift+F8)</li>
+<li>Configuration Options (Alt+Shift+C)</li>
+<li>Configure Timer (Control+F12)</li>
+<li>Convert Encoding (Control+2)</li>
+<li>Copy (Control+C)</li>
+<li>Copy Append (Alt+C)</li>
+<li>Copy Log (Control+F12)</li>
+<li>Copy Name (Control+Shift+C)</li>
+<li>Copy Path Tagged to Clipboard (Alt+C)</li>
+<li>Copy to Folder (Shift+C)</li>
+<li>Cut (Control+X)</li>
+<li>Date (Shift+D)</li>
+<li>Date Order (Alt+D)</li>
+<li>Delete (Delete)</li>
+<li>Delete and Recycle (Control+Delete)</li>
+<li>Delete and Recycle File Now (Control+D)</li>
+<li>Delete File Now (Control+Shift+D)</li>
+<li>Delete without Recycle (Shift+Delete)</li>
+<li>Drive A (Alt+1)</li>
+<li>Drive B (Alt+2)</li>
+<li>Drive C (Alt+3)</li>
+<li>Drive D (Alt+4)</li>
+<li>Drive E (Alt+5)</li>
+<li>Drive F (Alt+6)</li>
+<li>Drive G (Alt+7)</li>
+<li>Drive H (Alt+8)</li>
+<li>Drive I (Alt+9)</li>
+<li>Elevate Version (F11)</li>
+<li>Explorer Directory (Alt+/)</li>
+<li>Extension Change (Shift+X)</li>
+<li>Extra Speech Log (Alt+Shift+X)</li>
+<li>Extract with Regular Expression (Control+Shift+E)</li>
+<li>Filter and Order (Shift+8)</li>
+<li>Folder (Control+’)</li>
+<li>Folder Name (Shift+’)</li>
+<li>Folder to Clipboard (Control+Shift+’)</li>
+<li>General ({)</li>
+<li>Hide ())</li>
+<li>Homer Player (Control+Shift+H)</li>
+<li>Initial Change (Shift+I)</li>
+<li>Invert Tagged (Control+I)</li>
+<li>Item Name (’)</li>
+<li>Key Describer (Control+F1)</li>
+<li>List (Control+L)</li>
+<li>List Files (Alt+L)</li>
+<li>List Tagged (Shift+L)</li>
+<li>Manual Options (Alt+Shift+M)</li>
+<li>Move to Folder (Shift+M)</li>
+<li>New Item Copy (Control+Shift+N)</li>
+<li>Output Type (Shift+O)</li>
+<li>Paste (Control+V)</li>
+<li>Paste Copy (Alt+V)</li>
+<li>Paste Move (Alt+Shift+V)</li>
+<li>Path (Alt+P)</li>
+<li>Path List to Clipboard (Control+Shift+P)</li>
+<li>Path to Clipboard (Alt+Shift+P)</li>
+<li>Percent Through (Shift+5 or %)</li>
+<li>Print (Control+P)</li>
+<li>ReadOnly (])</li>
+<li>ReadWrite ([)</li>
+<li>Recycle Bin (Control+B)</li>
+<li>Refresh Folder (. or F5)</li>
+<li>Rename to Identify Content (Control+Shift+I)</li>
+<li>Reorder Names (Alt+Shift+K)</li>
+<li>Restart Windows (Alt+Shift+F4)</li>
+<li>Restore Tags (Control+Shift+S)</li>
+<li>Reverse Alpha Order (Alt+Shift+A)</li>
+<li>Reverse Date Order (Alt+Shift+D)</li>
+<li>Reverse Size Order (Alt+Shift+S)</li>
+<li>Reverse Type Order (Alt+Shift+T)</li>
+<li>Save Tags (Control+S)</li>
+<li>Selected (Shift+Space)</li>
+<li>Send to Text Editor (Control+T)</li>
+<li>Send to Word Processor (Control+W)</li>
+<li>Short Path to Clipboard (~)</li>
+<li>Size (Shift+S)</li>
+<li>Size Order (Alt+S)</li>
+<li>Start Tag or Untag (F8)</li>
+<li>Status (Alt+Z)</li>
+<li>Stop Timer</li>
+<li>System (})</li>
+<li>Tag (; or Shift+NumPad5)</li>
+<li>Tag All (Control+A)</li>
+<li>Tag All Files (Alt+.)</li>
+<li>Tag and Next (&gt; or Shift+DownArrow)</li>
+<li>Tag and Previous (Shift+UpArrow)</li>
+<li>Tag Duplicate Files (Alt+Shift+.)</li>
+<li>Tag Similar Files (Alt+Shift+,)</li>
+<li>Tag to Bottom (Shift+End)</li>
+<li>Tag to Top (Shift+Home)</li>
+<li>Tile Horizontal (Alt+Shift+F11)</li>
+<li>Tile Vertical (Control+Shift+F11)</li>
+<li>Time (Alt+;)</li>
+<li>Timer</li>
+<li>Translate File (Alt+Shift+F7)</li>
+<li>Type (Shift+T)</li>
+<li>Type Extended (Control+Shift+T)</li>
+<li>Type Order (Alt+T)</li>
+<li>Unarchive (Shift+U)</li>
+<li>Unarchive Password (Alt+Shift+U)</li>
+<li>Unarchive Test (Alt+U)</li>
+<li>Unarchive to Same Name (Control+Shift+U)</li>
+<li>Unarchive without Subfolders (Control+U)</li>
+<li>Untag (/ or Alt+Shift+NumPad5)</li>
+<li>Untag All (Control+Shift+A)</li>
+<li>Untag All But Current (Alt+,)</li>
+<li>Untag and Next (&lt; or Alt+Shift+DownArrow)</li>
+<li>Untag and Previous (Alt+Shift+UpArrow)</li>
+<li>Untag to Bottom (Alt+Shift+End)</li>
+<li>Untag to Top (Alt+Shift+Home)</li>
+<li>What Content (?)</li>
+<li>Windows Open (Shift+F4 or Alt+NumPad5)</li>
+<li>Yield (Control+Y)</li>
+<li>Yield Files (Alt+Y)</li>
+<li>Yield in Operating System (Alt+Shift+Y)</li>
+<li>Yield on Drive (Control+Shift+Y)</li>
+<li>Yield Tagged (Shift+Y)</li>
+</ul>
+<h3 id="filedir-dialog">FileDir: Dialog</h3>
+<ul>
+<li>Alternate Menu (Alt+F10)</li>
+<li>Context Menu (Shift+F10)</li>
+<li>Convert Units (Shift+3)</li>
+<li>Current Windows (F4)</li>
+<li>Environment Variables (Control+E)</li>
+<li>Evaluate Expression (Control+Equals)</li>
+<li>Explorer Menu (Alt+Shift+F10)</li>
+<li>Export Clipboard to File (Alt+Shift+E)</li>
+<li>File Find (Alt+Shift+F)</li>
+<li>FTP Put (Shift+F)</li>
+<li>Get FTP (Shift+G)</li>
+<li>Go to Drive (Alt+G)</li>
+<li>Go to Folder (Control+G)</li>
+<li>Go to Special Folder (Control+Shift+G)</li>
+<li>Go to Virtual Folder (Alt+Shift+G)</li>
+<li>Inquire Differences (Alt+Shift+I)</li>
+<li>Iterate Processes (Alt+I)</li>
+<li>Jump (Control+J)</li>
+<li>Keywords (Control+K)</li>
+<li>Network Connections (Alt+Shift+N)</li>
+<li>New Folder (Control+N)</li>
+<li>Open Drive (Alt+O)</li>
+<li>Open Folder (Control+O)</li>
+<li>Open Special Folder (Control+Shift+O)</li>
+<li>Open Virtual Folder (Alt+Shift+O)</li>
+<li>Properties (Alt+Enter)</li>
+<li>Quick Shortcut (Shift+Q)</li>
+<li>Quick URL (Alt+Shift+Q)</li>
+<li>Recent Folders (Alt+R)</li>
+<li>Rename (Shift+R or F2)</li>
+<li>Rename with Regular Expression (Control+Shift+R)</li>
+<li>Rename with Wildcards (Control+R)</li>
+<li>SendTo Menu (Control+F10)</li>
+<li>Set Filter (Control+F)</li>
+<li>Stamp with Date and Time (Shift+1 or !)</li>
+<li>Start Timer</li>
+<li>Tag with Regular Expression (Control+Shift+.)</li>
+<li>Volume Format (Control+Shift+V)</li>
+<li>Web Download (Alt+Shift+W)</li>
+<li>Windows Control Panel (Control+Shift+W)</li>
+<li>Zip (Shift+Z)</li>
+<li>Zip List (Control+Shift+Z)</li>
+<li>Zip then Delete (Control+Z)</li>
+</ul>
+<h3 id="filedir-window">FileDir: Window</h3>
+<ul>
+<li>About (Alt+F1)</li>
+<li>Chat about File (Shift+F12)</li>
+<li>Chat with AI (F12)</li>
+<li>Documentation (F1)</li>
+<li>History of Changes (Shift+F1)</li>
+<li>Hotkey Summary (Alt+Shift+H)</li>
+<li>Mail Attachment (Control+Shift+M)</li>
+<li>Mail Body (Control+M)</li>
+<li>Play List (Control+Shift+L)</li>
+<li>Play Media (Alt+Shift+L)</li>
+<li>Show (()</li>
+</ul>
+<h3 id="filedir-focus">FileDir: Focus</h3>
+<ul>
+<li>Close All But Current Window (Control+Shift+F4)</li>
+<li>Close Window (Control+F4)</li>
+<li>End Tagged (Shift+E or Control+End)</li>
+<li>Exit FileDir (Alt+F4)</li>
+<li>Find Duplicates in Tree (Alt+Shift+J)</li>
+<li>Go Back (Alt+LeftArrow)</li>
+<li>Go Forward (Alt+RightArrow)</li>
+<li>Go to Item (Shift+Enter)</li>
+<li>Go to Parent Folder (, or Shift+Backspace)</li>
+<li>Go to Quick Folder (`)</li>
+<li>Jump Again (Alt+J)</li>
+<li>Keywords Again (Alt+K)</li>
+<li>Next Tagged (Shift+N or Control+DownArrow)</li>
+<li>Next Window (Control+Tab)</li>
+<li>Open Item (Enter)</li>
+<li>Open Parent Folder (Backspace)</li>
+<li>Open Quick Folder (Control+Q)</li>
+<li>Previous Tagged (Shift+P or Control+UpArrow)</li>
+<li>Previous Window (Control+Shift+Tab)</li>
+<li>Reverse Keywords (Control+Shift+K)</li>
+<li>Reverse Search Again (Shift+F3)</li>
+<li>Search Again (F3)</li>
+</ul>
+<h3 id="filedir-result">FileDir: Result</h3>
+<ul>
+<li>Extra Speech Toggle (Alt+Shift+Z)</li>
+<li>Recycle Toggle (Alt+Shift+R)</li>
+<li>Toggle Tag (Space)</li>
+<li>Window Toggle (Shift+W)</li>
+</ul>
+<h2 id="homerdev-frame">HomerDev frame</h2>
+<p>24 commands: 0 spoken, 8 dialog, 6 window, 4 focus, 6 result.</p>
+<h3 id="homerdev-frame-dialog">HomerDev frame: Dialog</h3>
+<ul>
+<li>Alternate Menu (Alt+F10)</li>
+<li>Append Clipboard (Control+Shift+Apostrophe)</li>
+<li>Current Windows (F4)</li>
+<li>Edit Settings (Alt+Shift+E)</li>
+<li>Elevate Version (F11)</li>
+<li>Invoke Script (Control+Shift+I)</li>
+<li>Play Tutorials</li>
+<li>Save Clipboard (Control+Apostrophe)</li>
+</ul>
+<h3 id="homerdev-frame-window">HomerDev frame: Window</h3>
+<ul>
+<li>About (Alt+F1)</li>
+<li>Documentation (F1)</li>
+<li>History of Changes (Shift+F1)</li>
+<li>Hotkey Summary (Alt+Shift+H)</li>
+<li>Hotkeys (Control+Shift+F1)</li>
+<li>ReadMe (Alt+Shift+F1)</li>
+</ul>
+<h3 id="homerdev-frame-focus">HomerDev frame: Focus</h3>
+<ul>
+<li>Close All But Current Window (Control+Shift+F4)</li>
+<li>Close Window (Control+F4)</li>
+<li>Next Window (Control+Tab)</li>
+<li>Previous Window (Control+Shift+Tab)</li>
+</ul>
+<h3 id="homerdev-frame-result">HomerDev frame: Result</h3>
+<ul>
+<li>Clear Clipboard (Alt+Shift+Apostrophe)</li>
+<li>Copy Log (Control+F12)</li>
+<li>Key Describer Toggle (Control+F1)</li>
+<li>Say Clipboard (Alt+Apostrophe)</li>
+<li>Say Time (Alt+SemiColon)</li>
+<li>Say Windows Open (Shift+F4)</li>
+</ul>
+</main>
+</body>
+</html>

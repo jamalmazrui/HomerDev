@@ -491,6 +491,8 @@ public class MdiFrame : LbcForm {
         this.Controls.Add(menuBar);
 
         Say.attach(this);
+        // Command echo by the suite's rule, KeyMap.shouldEcho (kit 1.74.0).
+        KeyMap.bEchoCommands = true;
 
         // A settings file that cannot be read is reported in the log, once,
         // instead of being taken silently as empty (kit 1.73.4).
@@ -595,7 +597,7 @@ public class MdiFrame : LbcForm {
         addMenu("&Edit");
         addCommand("&Save Clipboard...", "Control+Apostrophe", "Save the clipboard's text in a new file.", saveClipboard);
         addCommand("&Append Clipboard...", "Control+Shift+Apostrophe", "Add the clipboard's text to the end of a text file.", appendClipboard);
-        addCommand("&Clear Clipboard", "Alt+Shift+Apostrophe", "Empty the clipboard.", clearClipboard);
+        addCommand("&Clear Clipboard", "Alt+Shift+Apostrophe", "Empty the clipboard.", clearClipboard).bNoEcho = true;
 
         addMenu("&Query");
         addCommand("Say &Clipboard", "Alt+Apostrophe", "Say the text on the clipboard.", sayClipboard).sRepeat = "review";
@@ -614,18 +616,18 @@ public class MdiFrame : LbcForm {
         addCommand("Close &All But Current Window", "Control+Shift+F4", "Close every window but this one.", delegate() { return MdiWindows.closeOthers(this); });
 
         addMenu("&Help");
-        addCommand("&Documentation", "F1", "Open the guide.", delegate() { return openHelp(sAppName + ".htm"); });
-        addCommand("&History of Changes", "Shift+F1", "Open the list of changes, newest first.", SuiteCommands.openHistory);
-        addCommand("&About", "Alt+F1", "The name, the version, and where this copy keeps its files.", showAbout);
+        addCommand("&Documentation", "F1", "Open the guide.", delegate() { return openHelp(sAppName + ".htm"); }).bNoEcho = true;
+        addCommand("&History of Changes", "Shift+F1", "Open the list of changes, newest first.", SuiteCommands.openHistory).bNoEcho = true;
+        addCommand("&About", "Alt+F1", "The name, the version, and where this copy keeps its files.", showAbout).bNoEcho = true;
         KeyMap.Command oDescriber = addCommand("&Key Describer Toggle", "Control+F1", "A key says what it would do instead of doing it.", toggleKeyDescriber);
         oDescriber.fChecked = delegate() { return KeyMap.bKeyDescriber; };
-        addCommand("Hotkeys", "Control+Shift+F1", "Open the document of every command and key.", showHotkeys);
-        addCommand("&ReadMe", "Alt+Shift+F1", "Open the quick start.", SuiteCommands.openReadMe);
+        addCommand("Hotkeys", "Control+Shift+F1", "Open the document of every command and key.", showHotkeys).bNoEcho = true;
+        addCommand("&ReadMe", "Alt+Shift+F1", "Open the quick start.", SuiteCommands.openReadMe).bNoEcho = true;
         addCommand("Alternate &Menu...", "Alt+F10", "Every command in one list you can search.", showAlternateMenu);
-        addCommand("Hotkey &Summary", "Alt+Shift+H", "Every command, key and summary in a window.", showHotkeySummary);
+        addCommand("Hotkey &Summary", "Alt+Shift+H", "Every command, key and summary in a window.", showHotkeySummary).bNoEcho = true;
         addCommand("&Play Tutorials...", "", "Play the spoken tutorials in the Homer Player.", playTutorials);
         addCommand("&Elevate Version...", "F11", "Check for a newer release and offer to install it.", elevateVersion);
-        addCommand("Copy &Log", "Control+F12", "Put this session's log on the clipboard as a file, ready to attach.", copyLog);
+        addCommand("Copy &Log", "Control+F12", "Put this session's log on the clipboard as a file, ready to attach.", copyLog).bNoEcho = true;
 
         foreach (string sProblem in KeyMap.lsProblems) Log.warn("Key map: " + sProblem);
         foreach (string sConflict in KeyMap.lsConflicts) Log.warn("Key claimed twice: " + sConflict);

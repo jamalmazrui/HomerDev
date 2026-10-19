@@ -86,6 +86,7 @@ public static class KeyMap {
         public Func<string> fUnavailable;    // null, or "" when available, else the reason it is not
         public List<Keys> lsKeys = new List<Keys>();   // the first is the primary key
         public ToolStripMenuItem oItem;      // the menu item, when the command has one
+        public bool bNoEcho = false;         // it speaks its own result, or opens a window that says its name (kit 1.74.0)
         public string sContext = sAnywhere;
         public string sDescription = "";     // longer help, for the Alternate Menu's detail
         public string sId = "";              // stable lowerCamel identifier
@@ -245,6 +246,8 @@ public static class KeyMap {
         }
         Log.info("command: " + oCommand.sId);
         try {
+            if (bEchoCommands && !oCommand.bNoEcho && shouldEcho(oCommand.sName, oCommand.oItem != null && oCommand.oItem.Text.TrimEnd().EndsWith("...")))
+                Say.say(oCommand.sName);
             if (oCommand.fRun != null) return oCommand.fRun();
             if (oCommand.oItem != null) { oCommand.oItem.PerformClick(); return true; }
         }
@@ -475,6 +478,56 @@ public static class KeyMap {
 
     public static bool isLbcListKey(Keys keyData) {
         return Array.IndexOf(aLbcListKeys, keyData) >= 0;
+    }
+
+    // ------------------------------------------------------------- echo
+
+    // shouldEcho: COMMAND ECHO IF AND ONLY IF IT HELPS (kit 1.74.0, his ruling
+    // of 19 October 2026, replacing the Command Echo Toggle). A command's name is
+    // spoken as it starts only when nothing else would tell the person, at once,
+    // that the command they meant is under way:
+    //   - A command that opens a dialog (its caption ends in "...") is NOT
+    //     echoed: the dialog's title, close to the command's name, is the echo.
+    //   - A Say command or a toggle is NOT echoed: it speaks its own answer or
+    //     its new state.
+    //   - A command that moves the focus -- next, previous, first, last, go to,
+    //     jump, open, close, exit -- is NOT echoed: the screen reader already
+    //     says where the focus landed, as it does for an arrow key.
+    //   - Every other command IS echoed, at once, before its work: Clear Filter,
+    //     Sort, Refresh and the like change things the reader does not announce,
+    //     and can take a noticeable moment.
+    // bEchoCommands: the kit's MdiFrame turns this on, so every command run
+    // through runCommand follows shouldEcho. An app whose own handlers still
+    // speak (EdSharp, FileDir until they move) leaves it off.
+    public static bool bEchoCommands = false;
+
+    // The words that decide, in lowercase alphabetical order. A first word in
+    // aFocusVerbs, or any word in aSearchWords, moves the focus. A first word in
+    // aWindowVerbs, a name ending in Console or Summary, or a name in
+    // aWindowNames opens a window or document that names itself, as a dialog's
+    // title does. help\CommandEcho.md lists where every command falls.
+    public static readonly string[] aFocusVerbs = {
+        "Back", "Bottom", "Close", "End", "Exit", "First", "Forward", "Go", "Home", "Jump",
+        "Last", "Next", "Open", "Previous", "Prior", "Top" };
+    public static readonly string[] aSearchWords = { "Find", "Go", "Jump", "Keywords", "Search" };
+    public static readonly string[] aWindowVerbs = { "Chat", "Describe", "Inspect", "Mail", "Pick", "Play", "Show", "Statistics", "Test", "Where" };
+    public static readonly string[] aWindowNames = {
+        "About", "Developer Guide", "Documentation", "Frequently Asked Questions", "History of Changes",
+        "Hotkeys", "License", "ReadMe", "Tutorials", "Tutorials Transcript" };
+
+    public static bool shouldEcho(string sName, bool bOpensDialog) {
+        string sPlain = plainName(sName ?? "").Trim();
+        if (sPlain.Length == 0 || bOpensDialog || (sName ?? "").TrimEnd().EndsWith("...")) return false;
+        if (sPlain.StartsWith("Say ", StringComparison.OrdinalIgnoreCase)) return false;
+        if (sPlain.EndsWith(" Toggle", StringComparison.OrdinalIgnoreCase) || sPlain.StartsWith("Toggle ", StringComparison.OrdinalIgnoreCase)) return false;
+        if (sPlain.EndsWith(" Console", StringComparison.OrdinalIgnoreCase) || sPlain.EndsWith(" Summary", StringComparison.OrdinalIgnoreCase)) return false;
+        foreach (string sWindow in aWindowNames) if (string.Compare(sPlain, sWindow, true) == 0) return false;
+        string[] aWords = sPlain.Split(' ');
+        foreach (string sVerb in aFocusVerbs) if (string.Compare(aWords[0], sVerb, true) == 0) return false;
+        foreach (string sVerb in aWindowVerbs) if (string.Compare(aWords[0], sVerb, true) == 0) return false;
+        foreach (string sWord in aWords)
+            foreach (string sSearch in aSearchWords) if (string.Compare(sWord, sSearch, true) == 0) return false;
+        return true;
     }
 
     // ------------------------------------------------------------- presses
