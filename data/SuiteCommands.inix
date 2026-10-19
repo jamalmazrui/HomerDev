@@ -929,11 +929,11 @@ status=current
 
 [DbDo showInFileDir]
 name=Show in FileDir
-keys=
+keys=Control+Shift+Backslash
 change=new
-reason=handoff
+reason=the Backslash keys open the current thing somewhere else (Explorer with Alt, a command prompt with Control); Control+Shift hands it to the other Homer app, the same key both ways
 disposition=accepted
-status=proposed
+status=implemented
 
 [DbDo showLogLocation]
 name=Show Log Location
@@ -2995,11 +2995,11 @@ status=current
 
 [FileDir openInDbDo]
 name=Open in DbDo
-keys=
+keys=Control+Shift+Backslash
 change=new
-reason=handoff for databases and data files
+reason=the Backslash keys open the current thing somewhere else (Explorer with Alt, a command prompt with Control); Control+Shift hands it to the other Homer app, the same key both ways
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir openInExplorer]
 name=Open in Explorer

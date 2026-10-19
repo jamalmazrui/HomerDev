@@ -385,6 +385,53 @@ public static class SuiteCommands {
     }
 
     // copyLog(sLogPath): for an app that keeps its own log file.
+    // ---- one Homer app handing a file to another (kit 1.79.0) ----
+
+    // homerProgram: another Homer app's program -- its Program Files folder, under exec as the
+    // Homer layout puts it or at the top as EdSharp's does, then Windows' registered App Paths.
+    // "" when it is not installed.
+    public static string homerProgram(string sApp) {
+        foreach (Environment.SpecialFolder oFolder in new Environment.SpecialFolder[] { Environment.SpecialFolder.ProgramFiles, Environment.SpecialFolder.ProgramFilesX86 }) {
+            string sRoot = Environment.GetFolderPath(oFolder);
+            if (string.IsNullOrEmpty(sRoot)) continue;
+            foreach (string sTry in new string[] { System.IO.Path.Combine(sRoot, sApp, "exec", sApp + ".exe"), System.IO.Path.Combine(sRoot, sApp, sApp + ".exe") })
+                if (System.IO.File.Exists(sTry)) return sTry;
+        }
+        try {
+            using (Microsoft.Win32.RegistryKey oKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\" + sApp + ".exe")) {
+                string sValue = oKey == null ? null : oKey.GetValue("") as string;
+                if (!string.IsNullOrEmpty(sValue) && System.IO.File.Exists(sValue.Trim('"'))) return sValue.Trim('"');
+            }
+        } catch (Exception) { }
+        return "";
+    }
+
+    // openInHomerApp: start another Homer app on a path. Each is a single instance, so when it is
+    // already running, Windows hands it the path and it opens it there. When the app is not
+    // installed, a message says so and where to get it.
+    public static bool openInHomerApp(IWin32Window owner, string sApp, string sPath) {
+        string sExe = homerProgram(sApp);
+        if (sExe.Length == 0) {
+            Log.info("Open in " + sApp + ": not installed");
+            MessageBox.Show(owner, sApp + " is not installed on this computer. The HomerDev dialog lists every Homer project and can install it.",
+                sApp, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return false;
+        }
+        try {
+            System.Diagnostics.ProcessStartInfo oStart = new System.Diagnostics.ProcessStartInfo(sExe, "\"" + sPath + "\"");
+            oStart.UseShellExecute = false;
+            oStart.WorkingDirectory = System.IO.Path.GetDirectoryName(sExe);
+            System.Diagnostics.Process.Start(oStart);
+            Log.info("Open in " + sApp + ": " + sExe + " " + sPath);
+            Say.say("Opening in " + sApp);
+            return true;
+        } catch (Exception oError) {
+            Log.info("Open in " + sApp + " failed: " + oError.Message);
+            MessageBox.Show(owner, sApp + " could not be started: " + oError.Message, sApp, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return false;
+        }
+    }
+
     public static bool copyLog(string sLogPath) {
         if (string.IsNullOrEmpty(sLogPath) || !System.IO.File.Exists(sLogPath)) {
             Say.sayForced("There is no log for this session");

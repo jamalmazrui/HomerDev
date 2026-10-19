@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.79.0 -- 19 October 2026
+
+- **One Homer app can hand a file to another.** SuiteCommands.homerProgram finds another Homer app's program, under its Program Files folder or in Windows' App Paths, and openInHomerApp starts it on a path; each app is a single instance, so a running copy is handed the path. When the app is not installed, a message says so and points to the HomerDev dialog. FileDir's Open in DbDo and DbDo's Show in FileDir use it, both on Control+Shift+Backslash.
+
 ## 1.78.2 -- 19 October 2026
 
 - **An installer knows EPUBCheck's version.** It is a .jar, which cannot answer --version, so every install said "its version could not be read". HomerComponents now reads a version.txt beside a component's file first, which EPUBCheck's install script already writes, and asks only a program (.exe or .cmd) for --version.
