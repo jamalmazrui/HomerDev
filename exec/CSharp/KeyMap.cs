@@ -503,7 +503,7 @@ public static class KeyMap {
 
     // The words that decide, in lowercase alphabetical order. A first word in
     // aFocusVerbs, or any word in aSearchWords, moves the focus. A first word in
-    // aWindowVerbs, a name ending in Console or Summary, or a name in
+    // aWindowVerbs, a name ending in Console, Properties or Summary, or a name in
     // aWindowNames opens a window or document that names itself, as a dialog's
     // title does. help\CommandEcho.md lists where every command falls.
     public static readonly string[] aFocusVerbs = {
@@ -520,7 +520,10 @@ public static class KeyMap {
         if (sPlain.Length == 0 || bOpensDialog || (sName ?? "").TrimEnd().EndsWith("...")) return false;
         if (sPlain.StartsWith("Say ", StringComparison.OrdinalIgnoreCase)) return false;
         if (sPlain.EndsWith(" Toggle", StringComparison.OrdinalIgnoreCase) || sPlain.StartsWith("Toggle ", StringComparison.OrdinalIgnoreCase)) return false;
-        if (sPlain.EndsWith(" Console", StringComparison.OrdinalIgnoreCase) || sPlain.EndsWith(" Summary", StringComparison.OrdinalIgnoreCase)) return false;
+        // " Properties" too (kit 1.77.4): Alt+Enter's Properties window names itself throughout Windows,
+        // which is why DbDo's Table Properties sat in the CommandEcho review as a gap in the Window group.
+        if (sPlain.EndsWith(" Console", StringComparison.OrdinalIgnoreCase) || sPlain.EndsWith(" Summary", StringComparison.OrdinalIgnoreCase)
+            || sPlain.EndsWith(" Properties", StringComparison.OrdinalIgnoreCase)) return false;
         foreach (string sWindow in aWindowNames) if (string.Compare(sPlain, sWindow, true) == 0) return false;
         string[] aWords = sPlain.Split(' ');
         foreach (string sVerb in aFocusVerbs) if (string.Compare(aWords[0], sVerb, true) == 0) return false;

@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.77.4 -- 19 October 2026
+
+- **A command whose name ends in Properties is not echoed,** since its window names itself, as Alt+Enter's does throughout Windows. This closes the Window group's gap that DbDo's Table Properties showed.
+- **The CommandEcho review is decided,** in help\CommandEcho.md: DbDo's copy commands and Delete Record tell you themselves, so they are Result; Table Properties is Window.
+
 ## 1.77.3 -- 19 October 2026
 
 - **The build says when it starts packing HomerDev_setup.exe.** That last step runs quietly for minutes, and the console looked stuck after "Built exec\HomerDev.exe". It now says what it is doing, and that an app's build can start.

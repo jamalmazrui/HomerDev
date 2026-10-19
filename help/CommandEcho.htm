@@ -233,18 +233,24 @@ work.</li>
 <li><strong>HomerView</strong> follows in stage 5, where the browser
 speaks most results itself.</li>
 </ul>
-<h2 id="for-review">For Review</h2>
+<h2 id="decided-19-october-2026">Decided, 19 October 2026</h2>
 <ul>
-<li><strong>Clipboard copies in DbDo,</strong> such as Copy Cell to
-Clipboard on Control+C, are Spoken. If a handler already says what it
-copied, that handler’s own words should go, or the command should join
-Result.</li>
-<li><strong>Delete Record in DbDo,</strong> Control+D, is Spoken, and
-then asks to confirm. If the confirmation’s title is enough, it should
-join Dialog by gaining “…” in its caption.</li>
+<li><strong>DbDo’s copy commands say what they copied,</strong> with a
+count, so they are Result, not Spoken: Copy Cell, Copy Visible Cells,
+Copy Column, Copy Grid, and Copy Record, which now reports like the
+others.</li>
+<li><strong>Delete Record is Result.</strong> Its Yes or No box appears
+at once and the screen reader reads it. It gets no ellipsis: by the
+Windows convention a confirmation alone does not earn one.</li>
+<li><strong>A command ending in Properties opens a window</strong> (kit
+1.77.4), as Alt+Enter does throughout Windows, so Table Properties is
+Window.</li>
+<li><strong>DbDo holds these in its own list for now,</strong>
+hsTellsItself, which becomes the kit router’s Command.bNoEcho when DbDo
+moves onto the router.</li>
 </ul>
 <h2 id="dbdo">DbDo</h2>
-<p>182 commands: 27 spoken, 58 dialog, 26 window, 28 focus, 43
+<p>182 commands: 20 spoken, 58 dialog, 27 window, 28 focus, 49
 result.</p>
 <h3 id="dbdo-spoken">DbDo: Spoken</h3>
 <ul>
@@ -256,12 +262,6 @@ result.</p>
 <li>Clear Sort</li>
 <li>Complete Mark (Shift+F8)</li>
 <li>Complete Unmark to Anchor (Alt+Shift+F8)</li>
-<li>Copy Cell to Clipboard (Control+C)</li>
-<li>Copy Column to Clipboard</li>
-<li>Copy Grid as TSV to Clipboard</li>
-<li>Copy Record (Control+Shift+C)</li>
-<li>Copy Visible Cells as TSV to Clipboard</li>
-<li>Delete Record (Control+D)</li>
 <li>Delete Without Confirmation (Control+Shift+D)</li>
 <li>Invert Marked (Alt+Shift+I)</li>
 <li>Mark All (Control+A)</li>
@@ -272,7 +272,6 @@ result.</p>
 <li>Save Bookmark (Control+B)</li>
 <li>Start Mark (F8)</li>
 <li>Start Unmark (Alt+F8)</li>
-<li>Table Properties (Alt+Enter)</li>
 <li>Unmark All (Control+Shift+A)</li>
 <li>Unmark Record (Control+Shift+M)</li>
 </ul>
@@ -361,6 +360,7 @@ result.</p>
 <li>Show Schema</li>
 <li>Sqlean Console (Control+Shift+Oemtilde)</li>
 <li>Statistics from Column (Alt+Shift+S)</li>
+<li>Table Properties (Alt+Enter)</li>
 <li>Table Summary (Alt+T)</li>
 <li>Test Integrity</li>
 <li>Tutorials Transcript</li>
@@ -399,6 +399,12 @@ result.</p>
 </ul>
 <h3 id="dbdo-result">DbDo: Result</h3>
 <ul>
+<li>Copy Cell to Clipboard (Control+C)</li>
+<li>Copy Column to Clipboard</li>
+<li>Copy Grid as TSV to Clipboard</li>
+<li>Copy Record (Control+Shift+C)</li>
+<li>Copy Visible Cells as TSV to Clipboard</li>
+<li>Delete Record (Control+D)</li>
 <li>Extra Speech Toggle (Alt+Shift+Z)</li>
 <li>Key Describer Toggle (Control+F1)</li>
 <li>Say Added (Shift+A)</li>

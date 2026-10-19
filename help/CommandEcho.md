@@ -21,14 +21,16 @@ A command's name is spoken as it starts if and only if nothing else would tell y
 - **EdSharp and FileDir** still speak from their own handlers: EdSharp by a speak or silent mark on each menu item, FileDir by a line at the start of many handlers. The groups below show what the rule would do for them; their handlers move to it with their stage-4 work.
 - **HomerView** follows in stage 5, where the browser speaks most results itself.
 
-## For Review
+## Decided, 19 October 2026
 
-- **Clipboard copies in DbDo,** such as Copy Cell to Clipboard on Control+C, are Spoken. If a handler already says what it copied, that handler's own words should go, or the command should join Result.
-- **Delete Record in DbDo,** Control+D, is Spoken, and then asks to confirm. If the confirmation's title is enough, it should join Dialog by gaining "..." in its caption.
+- **DbDo's copy commands say what they copied,** with a count, so they are Result, not Spoken: Copy Cell, Copy Visible Cells, Copy Column, Copy Grid, and Copy Record, which now reports like the others.
+- **Delete Record is Result.** Its Yes or No box appears at once and the screen reader reads it. It gets no ellipsis: by the Windows convention a confirmation alone does not earn one.
+- **A command ending in Properties opens a window** (kit 1.77.4), as Alt+Enter does throughout Windows, so Table Properties is Window.
+- **DbDo holds these in its own list for now,** hsTellsItself, which becomes the kit router's Command.bNoEcho when DbDo moves onto the router.
 
 ## DbDo
 
-182 commands: 27 spoken, 58 dialog, 26 window, 28 focus, 43 result.
+182 commands: 20 spoken, 58 dialog, 27 window, 28 focus, 49 result.
 
 ### DbDo: Spoken
 
@@ -40,12 +42,6 @@ A command's name is spoken as it starts if and only if nothing else would tell y
 - Clear Sort
 - Complete Mark (Shift+F8)
 - Complete Unmark to Anchor (Alt+Shift+F8)
-- Copy Cell to Clipboard (Control+C)
-- Copy Column to Clipboard
-- Copy Grid as TSV to Clipboard
-- Copy Record (Control+Shift+C)
-- Copy Visible Cells as TSV to Clipboard
-- Delete Record (Control+D)
 - Delete Without Confirmation (Control+Shift+D)
 - Invert Marked (Alt+Shift+I)
 - Mark All (Control+A)
@@ -56,7 +52,6 @@ A command's name is spoken as it starts if and only if nothing else would tell y
 - Save Bookmark (Control+B)
 - Start Mark (F8)
 - Start Unmark (Alt+F8)
-- Table Properties (Alt+Enter)
 - Unmark All (Control+Shift+A)
 - Unmark Record (Control+Shift+M)
 
@@ -145,6 +140,7 @@ A command's name is spoken as it starts if and only if nothing else would tell y
 - Show Schema
 - Sqlean Console (Control+Shift+Oemtilde)
 - Statistics from Column (Alt+Shift+S)
+- Table Properties (Alt+Enter)
 - Table Summary (Alt+T)
 - Test Integrity
 - Tutorials Transcript
@@ -183,6 +179,12 @@ A command's name is spoken as it starts if and only if nothing else would tell y
 
 ### DbDo: Result
 
+- Copy Cell to Clipboard (Control+C)
+- Copy Column to Clipboard
+- Copy Grid as TSV to Clipboard
+- Copy Record (Control+Shift+C)
+- Copy Visible Cells as TSV to Clipboard
+- Delete Record (Control+D)
 - Extra Speech Toggle (Alt+Shift+Z)
 - Key Describer Toggle (Control+F1)
 - Say Added (Shift+A)
