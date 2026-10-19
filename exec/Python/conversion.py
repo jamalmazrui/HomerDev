@@ -438,6 +438,10 @@ def convert(sSource, sTarget, dOptions=None):
                 dEngines[sEngine](sCurrent, sStepTo, sStepOut)
                 sCurrent = sStepOut
             os.replace(sOut + ".part", sOut)
+            # Text in the Homer encoding (1.80.0), as Conversion.cs does: UTF-8 with a byte order mark and CRLF.
+            if typeOf(sOut) in ("csv", "htm", "html", "inix", "md", "tsv", "txt"):
+                sMade = decodeText(open(sOut, "rb").read()).replace("\r\n", "\n").replace("\r", "\n")
+                open(sOut, "w", encoding="utf-8-sig", newline="\r\n").write(sMade)
             iMs = int((time.time() - dtStart) * 1000)
             say("%s -> %s by %s in %d ms" % (sSource, sOut, sName, iMs))
             return {"path": sOut, "route": sName, "ms": iMs, "skipped": lsTried}

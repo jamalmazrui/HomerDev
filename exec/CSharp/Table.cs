@@ -26,14 +26,12 @@
 //
 // So the round trip works in both directions:
 //
-//   inix <-> csv <-> tsv <-> xlsx(in) <-> md <-> docx/html/odt(out)
+//   inix <-> csv <-> tsv <-> xlsx <-> md <-> docx/html/odt(out)
 //
-// WHAT IS NOT HERE
-//
-// Writing .xlsx. That needs the whole Open XML package written correctly --
-// styles, shared strings, relationships -- and a spreadsheet that opens with a
-// repair warning is worse than one that was never written. A table becomes .csv
-// instead, which every spreadsheet opens directly.
+// WRITING .XLSX (kit 1.80.0, from ChatGPT's BatCon work, reviewed): a minimal Open
+// XML workbook -- content types, relationships, one worksheet -- with every value
+// an inline string, so leading zeros stay and nothing is taken for a formula.
+// Excel's row, column and cell limits are checked before a byte is written.
 
 using System;
 using System.Collections.Generic;
@@ -65,7 +63,7 @@ return lsRow[iField] == null ? "" : lsRow[iField];
 // ---- What can be read and written -----------------------------------------
 
 public static readonly string[] aReadable = {".inix", ".csv", ".tsv", ".xlsx", ".md", ".markdown"};
-public static readonly string[] aWritable = {".inix", ".csv", ".tsv", ".md", ".markdown"};
+public static readonly string[] aWritable = {".csv", ".inix", ".markdown", ".md", ".tsv", ".xlsx"};
 
 // Written by handing a Markdown pipe table to Pandoc.
 public static readonly string[] aViaPandoc = {".docx", ".html", ".htm", ".odt", ".rtf", ".epub", ".tex", ".rst"};
@@ -353,6 +351,7 @@ public bool write(string sTarget, out string sError) {
 sError = "";
 string sExt = Path.GetExtension(sTarget).ToLower();
 try {
+if (sExt == ".xlsx") return toXlsx(sTarget);
 if (sExt == ".inix") { toInix(sTarget); return true; }
 if (sExt == ".csv") { toSeparated(sTarget, ','); return true; }
 if (sExt == ".tsv") { toSeparated(sTarget, '\t'); return true; }
@@ -366,6 +365,67 @@ return false;
 sError = "FileDir cannot write a table as " + sExt + ".";
 return false;
 } // write method
+
+// toXlsx: the table as a workbook (kit 1.80.0, from ChatGPT's BatCon work, reviewed; Create, not
+// CreateNew, so converting again over an earlier result replaces it).
+public bool toXlsx(string sTarget) {
+const string sNs = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
+List<List<string>> lsAll = new List<List<string>>();
+lsAll.Add(lsFields);
+lsAll.AddRange(lsRows);
+if (lsAll.Count > 1048576 || lsFields.Count > 16384) throw new InvalidDataException("The table exceeds Excel's row or column limit.");
+foreach (List<string> lsRow in lsAll) {
+if (lsRow.Count > lsFields.Count) throw new InvalidDataException("A row has more values than the header has fields.");
+foreach (string sValue in lsRow) if ((sValue ?? "").Length > 32767) throw new InvalidDataException("A value exceeds Excel's 32767-character cell limit.");
+}
+using (FileStream stream = new FileStream(sTarget, FileMode.Create))
+using (System.IO.Compression.ZipArchive zip = new System.IO.Compression.ZipArchive(stream, System.IO.Compression.ZipArchiveMode.Create)) {
+xlsxPart(zip, "[Content_Types].xml", "<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/xl/workbook.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml\"/><Override PartName=\"/xl/worksheets/sheet1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/></Types>");
+xlsxPart(zip, "_rels/.rels", "<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument\" Target=\"xl/workbook.xml\"/></Relationships>");
+xlsxPart(zip, "xl/workbook.xml", "<workbook xmlns=\"" + sNs + "\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"><sheets><sheet name=\"Data\" sheetId=\"1\" r:id=\"rId1\"/></sheets></workbook>");
+xlsxPart(zip, "xl/_rels/workbook.xml.rels", "<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet\" Target=\"worksheets/sheet1.xml\"/></Relationships>");
+using (Stream streamSheet = zip.CreateEntry("xl/worksheets/sheet1.xml").Open())
+using (System.Xml.XmlWriter writer = System.Xml.XmlWriter.Create(streamSheet, new System.Xml.XmlWriterSettings { Encoding = new UTF8Encoding(false), CloseOutput = false })) {
+int iRow = 0;
+writer.WriteStartDocument();
+writer.WriteStartElement("worksheet", sNs);
+writer.WriteStartElement("sheetData", sNs);
+foreach (List<string> lsRow in lsAll) {
+iRow++;
+writer.WriteStartElement("row", sNs);
+writer.WriteAttributeString("r", iRow.ToString());
+int iColumn = 0;
+foreach (string sValue in lsRow) {
+iColumn++;
+writer.WriteStartElement("c", sNs);
+writer.WriteAttributeString("r", xlsxColumn(iColumn) + iRow);
+writer.WriteAttributeString("t", "inlineStr");
+writer.WriteStartElement("is", sNs);
+writer.WriteStartElement("t", sNs);
+writer.WriteAttributeString("xml", "space", "http://www.w3.org/XML/1998/namespace", "preserve");
+writer.WriteString(sValue ?? "");
+writer.WriteEndElement();
+writer.WriteEndElement();
+writer.WriteEndElement();
+}
+writer.WriteEndElement();
+}
+writer.WriteEndElement();
+writer.WriteEndElement();
+writer.WriteEndDocument();
+}
+}
+return true;
+}
+private static bool xlsxPart(System.IO.Compression.ZipArchive zip, string sName, string sXml) {
+using (StreamWriter writer = new StreamWriter(zip.CreateEntry(sName).Open(), new UTF8Encoding(false))) writer.Write(sXml);
+return true;
+}
+private static string xlsxColumn(int iColumn) {
+string sColumn = "";
+while (iColumn > 0) { iColumn--; sColumn = (char)('A' + iColumn % 26) + sColumn; iColumn /= 26; }
+return sColumn;
+}
 
 public void toInix(string sTarget) {
 // The list-of-records form, through the codec that owns the format, so the

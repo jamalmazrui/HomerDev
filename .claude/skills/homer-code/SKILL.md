@@ -55,6 +55,10 @@ The full rules, with examples, are in the style references below. When porting
 from another language, keep the original names first, then render them in
 Camel Type.
 
+## Command-line switches
+
+One convention for every Homer program (1.80.0): a switch is a lowercase word, documented as `/switch` (`/defaults`, `/output folder`). A program accepts `/switch`, `-switch` and `--switch` alike, in any case, so older habits and scripts keep working. Apps written before this rule, which document `--switch` or `-switch`, move to it when next updated.
+
 ## Encoding
 
 Every text file is UTF-8 with a byte order mark and CRLF line endings, except

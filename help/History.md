@@ -7,6 +7,17 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.80.0 -- 19 October 2026
+
+Learned from BatCon, an app another AI (ChatGPT) built from the kit's documents alone. It did much right, and showed where the kit did not describe itself.
+
+- **The kit says its most important rules first.** AGENTS.md opens with them: use the kit and never copy it; change the kit itself and deliver HomerDev.zip when it lacks something; read homer-new-app to make an app; ask whether the kit already does a thing before writing it; no new top-level folders; one switch convention. A stray carriage return in it is gone.
+- **homer-new-app covers working without the kit on the machine,** listing what newHomerApp would have written, and gives the kit's answer to common needs: the format list, conversion, settings, dialogs, speech, the log, updates and the suite's shared commands.
+- **Conversion.cs names the functions a dialog or a batch should call,** such as targetLabelsFor for a format picker. BatCon had parsed conversions.inix itself, for want of that list.
+- **The shared check fails a project that copies the kit, or cannot find it** (the new kituse check). BatCon's copy had made five comparison checks skip unseen. A declared folder outside the Homer tree is now a warning rather than a quiet pass.
+- **One command-line switch convention,** in homer-code: lowercase words documented as /switch, with /, - and -- all accepted in any case.
+- **From BatCon's own kit changes, reviewed and adopted:** Table writes .xlsx, a minimal workbook keeping every value as text (it replaces an earlier file rather than failing); nine table routes among CSV, inix, Markdown, TSV and XLSX; and every text conversion ends in the Homer encoding, UTF-8 with a byte order mark and CRLF, in C# and Python alike. The new table routes are C# only for now, since Python has no table engine yet; its conversion test reports them as not tested.
+
 ## 1.79.2 -- 19 October 2026
 
 - **Installer scripts write one log per run.** finish.cmd, installScreenReaderSupport.cmd and the installModels.cmd template appended every install to one <App>_setup.log; each now writes <App>-<script>-<yyyymmdd-hhmmss>.log, as installCommon.cmd and help\Logging.md already had it, so the logs folder sorts by time and zips whole.

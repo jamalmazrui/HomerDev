@@ -93,6 +93,31 @@ scripts\release
 cycle of homer-build-release applies. Then add the app to the Homer Tools
 page and to Homer Resources.
 
+## Without the kit on the machine
+
+An agent working where `newHomerApp` cannot run -- a sandbox, a chat -- still makes the same app, by hand, and never by copying the kit into it. The app's build finds the installed kit when its owner builds it. Write what `newHomerApp` would have written, from the kit's `Templates` folder:
+
+- `<App>.cs` from `_APP_.cs` (or `_APP_Mdi.cs` for an app of several windows): the log started first, Elevate configured, settings through Paths and InixCodec.
+- `build.cmd` from `build_APP_.cmd`, with `kitNeeded` set to the kit version the app needs, and nothing that points the build at a kit inside the project.
+- `<App>_setup.iss` from `_APP__setup.iss`, with a fresh AppId.
+- `accept.inix`, `version.txt`, `LocalFiles.txt`, `RepoFiles.txt` and the default documents: ReadMe, `<App>.md`, Developer, License, History and Hotkeys, each Markdown, the .htm made by the build.
+- The ten tutorial walks, `help\Tutorial_0_Overview.inix` to `help\Tutorial_9_Conclusion.inix`, from the templates; the build speaks them.
+
+If the kit lacks something the app needs, do not add it to the app: describe the kit change (or make it, where the kit is at hand) and deliver it as HomerDev.zip, as AGENTS.md says.
+
+## The kit's answer to common needs
+
+Use these rather than writing your own; each is one shared copy across the suite.
+
+- **A list of the formats a file converts to:** `Conversion.targetLabelsFor(path, out extensions)`, labels a person reads.
+- **Converting a file:** `Conversion.convertFile(source, target, out error)`, with `hasRoute` and `hasAnyRoute` to ask first.
+- **Settings saved as soon as they are answered:** `Paths.configFile("<App>.inix")` with `InixCodec.readValue` and `InixCodec.writeValue`.
+- **A dialog:** `LbcDialog`, built by add order: `addInputBox`, `addPickBox`, `addCheckBox`, `addButton`, between `addBand` and `endBand`; `Lbc` names a control by its label.
+- **Speaking to the screen reader:** `Say.say`, one utterance per part.
+- **The session log:** `Log.start("<App>")` first in Main, then `Log.info` and `Log.error`.
+- **Updates from GitHub:** `Elevate.configure(owner, repo, version)` at startup.
+- **The suite's shared commands** (clipboard, Say Time, Copy Log, ReadMe, Hotkeys, Open in another Homer app): `SuiteCommands` in Mdi.cs.
+
 ## Checklist
 
 - [ ] Shape and language chosen; the matching fruit basket read

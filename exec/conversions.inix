@@ -47,6 +47,10 @@ ways = table
 [csv2txt]
 ways = copy
 
+[csv2xlsx]
+ways = table
+note = A table written by the kit's Table class (1.80.0), every value kept as text.
+
 [doc2docx]
 ways = officecom
 
@@ -134,6 +138,16 @@ ways = table
 [inix2md]
 ways = table
 
+[inix2tsv]
+ways = table
+
+[inix2xlsx]
+ways = table
+note = A table written by the kit's Table class (1.80.0), every value kept as text.
+
+[md2csv]
+ways = table
+
 [md2doc]
 ways = pandoc:docx > officecom
 
@@ -145,6 +159,9 @@ ways = pandoc
 
 [md2htm]
 ways = pandoc
+
+[md2inix]
+ways = table
 
 [md2odt]
 ways = pandoc
@@ -158,8 +175,15 @@ ways = pandoc
 [md2rtf]
 ways = pandoc
 
+[md2tsv]
+ways = table
+
 [md2txt]
 ways = pandoc
+
+[md2xlsx]
+ways = table
+note = A table written by the kit's Table class (1.80.0), every value kept as text.
 
 [odp2md]
 ways = zipxml
@@ -255,11 +279,18 @@ ways = table
 [tsv2htm]
 ways = table
 
+[tsv2inix]
+ways = table
+
 [tsv2md]
 ways = table
 
 [tsv2txt]
 ways = copy
+
+[tsv2xlsx]
+ways = table
+note = A table written by the kit's Table class (1.80.0), every value kept as text.
 
 [txt2doc]
 ways = officecom

@@ -4,6 +4,17 @@ HomerDev is a development kit for building Windows programs, documents, books, d
 
 This file is for any AI agent asked to use the kit. Read it first; then read the skill that matches the task before writing anything.
 
+## The rules that matter most
+
+Learned from an app built from the kit by another AI that had only these documents (ChatGPT's BatCon, 19 October 2026).
+
+- **Use the kit; never copy it.** A project builds against the installed kit, wherever `scripts\kind --kit` finds it. Never put a copy of the kit, or of its folders, inside a project: the copy drifts, its changes never reach the other apps, and it hides the project from the checks that compare it with the kit. The shared check fails a project that holds one.
+- **When the kit itself needs a change, change the kit.** Make the change in HomerDev, raise the kit's version.txt and its History, and deliver HomerDev.zip beside the app's zip, both in files.zip; raise the app's `kitNeeded` to the new kit version. Working without the kit on the machine, describe the change for its owner rather than copying the kit.
+- **To make an app, read homer-new-app first.** It says what `newHomerApp` writes and, when it cannot be run, what to write by hand: the starter source, Elevate, the installer, the documents and the ten tutorial walks.
+- **Before writing code, ask whether the kit already does it.** Conversions, settings, speech, logging, updates, dialogs and the suite's shared commands all have shared classes; homer-new-app has the table. Re-writing one of them is the most common way an app drifts from the suite.
+- **No new top-level folders.** The Homer tree is fixed (configs, data, exec, help, logs, notes, results, scripts, templates); anything else needs the owner's approval, and the shared check warns about it.
+- **Command-line switches** are lowercase words, documented as `/switch`; a program accepts `/switch`, `-switch` and `--switch` alike, in any case. homer-code has the rule.
+
 ## Using the kit from another project
 
 - **Finding the kit.** The `HomerDev` environment variable names its folder; HomerDev_setup.exe installs it to `C:\Program Files\HomerDev`, and developers often keep it at `C:\HomerDev`. `scripts\kind --kit` prints the folder it finds. Read files there directly; do not ask the person where the kit is.
@@ -35,7 +46,7 @@ Each skill holds the rules for one kind of work. Claude loads a skill by its des
 - **homer-build-release** -- run or troubleshoot build, tidy, push and release, with the checks inside them, and read their logs. `.claude/skills/homer-build-release/SKILL.md`
 - **homer-code** -- write or review code in Camel Type with the kit's shared classes. `.claude/skills/homer-code/SKILL.md`
 - **homer-convert** -- convert documents and data between formats, writing the Homer encoding. `.claude/skills/homer-convert/SKILL.md`
-- **homer-db** -- design or check a SQLite database the way DbDo opens it. `.claude/skills/homer-db/SKILL.md`
+- **homer-db** -- design or check a SQLite database the way DbDo opens it. `.claude/skills/homer-db/SKILL.md`
 - **homer-library-source** -- add a book library, such as Apple Books, to bookFido, or a source to any harvester. `.claude/skills/homer-library-source/SKILL.md`
 - **homer-docs** -- write or review an app's documents at a ninth-grade reading level. `.claude/skills/homer-docs/SKILL.md`
 - **homer-elevate** -- add or fix F11, Elevate Version, the update check. `.claude/skills/homer-elevate/SKILL.md`

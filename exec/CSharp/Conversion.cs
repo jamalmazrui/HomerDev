@@ -22,6 +22,18 @@
 //   officecom             Microsoft Office: the LAST RESORT, used only when nothing
 //                         approved will do, with an Alert box when it is missing
 //
+// FOR A DIALOG OR A BATCH, call these rather than reading conversions.inix (1.80.0):
+//   targetLabelsFor(path, out exts)  the targets for a file, as labels a person reads
+//                                    ("Markdown (.md)") with their extensions alongside:
+//                                    the list a target picker shows
+//   targetsFor(path)                 the same as [label, extension] pairs
+//   hasAnyRoute(path)                whether a file can be converted at all
+//   hasRoute(source, target)         whether one particular conversion exists
+//   convertFile(source, target, out error)  convert one file, by the best way that works
+//   typeOf(pathOrType)               the type a path or a name stands for (html -> htm)
+// ChatGPT's BatCon parsed conversions.inix with a regular expression to find targets,
+// because this list was not here to find; a picker built that way shows bare extensions.
+//
 // EVERY CONVERSION IS LOGGED WITH ITS ROUTE AND ITS TIME in milliseconds, so the
 // order of the ways is tuned from measurements, not guesses.
 //
@@ -153,7 +165,17 @@ bool bMade = runWay(aSteps, sSource, sTarget, out sStepError);
 oClock.Stop();
 Log.info("Conversion " + sRoute + " by " + sWay + ": " + (bMade ? "made" : "failed") + " in " + oClock.ElapsedMilliseconds + " ms, " + Path.GetFileName(sSource)
 + (sStepError != "" ? " -- " + sStepError : ""));
-if (bMade) return true;
+if (bMade) {
+// TEXT IN THE HOMER ENCODING (kit 1.80.0, from ChatGPT's BatCon work): whatever an engine wrote,
+// a text result ends as UTF-8 with a byte order mark and CRLF, as every Homer text file is.
+string sMadeType = typeOf(sTarget);
+if (Array.IndexOf(new string[] {"csv", "htm", "inix", "md", "tsv", "txt"}, sMadeType) >= 0) {
+string sMadeText = decodeText(File.ReadAllBytes(sTarget));
+sMadeText = sMadeText.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "\r\n");
+File.WriteAllText(sTarget, sMadeText, new UTF8Encoding(true));
+}
+return true;
+}
 lsWhy.Add(sWay + ": " + sStepError);
 }
 sError = lsWhy.Count == 1 ? lsWhy[0] : "every way failed: " + String.Join("; ", lsWhy.ToArray());
