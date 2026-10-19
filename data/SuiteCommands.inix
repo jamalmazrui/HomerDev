@@ -564,8 +564,9 @@ status=current
 
 [DbDo playTutorials]
 name=Play Tutorials
-keys=
-status=current
+keys=Alt+F12
+status=proposed
+reason=decision 1, the same key as EdSharp; free here
 
 [DbDo previousRecord]
 name=Previous Record
@@ -1293,9 +1294,9 @@ status=implemented
 name=Extra Speech Toggle
 keys=Alt+Shift+Z
 change=keys changed, was Control+Shift+X
-reason=Z toggles, as in DbDo
+reason=decision 4: Z keys are toggles, as in DbDo and FileDir
 disposition=accepted
-status=proposed
+status=implemented
 
 [EdSharp extractWithRegex]
 name=Extract with Regex
@@ -1338,8 +1339,10 @@ status=current
 
 [EdSharp goToEnvironment]
 name=Go to Environment
-keys=Control+Shift+G
-status=current
+keys=Control+Shift+F12
+status=implemented
+change=keys changed, was Control+Shift+G
+reason=decision 7: the interactive console of the current language sits beside Chat about Document (Shift+F12), a conversation with an interpreter beside one with a model; see help\KeyDecisions.md
 
 [EdSharp goToFolder]
 name=Go to Folder
@@ -1368,11 +1371,11 @@ status=current
 
 [EdSharp goToSpecialFolder]
 name=Go to Special Folder
-keys=
+keys=Control+Shift+G
 change=keys changed, was Control+Shift+0
-reason=Control+Shift+0 is often taken by the Windows keyboard-layout hotkey
+reason=decision 7: the same key as FileDir; Control+Shift+0 is a Windows keyboard-layout hotkey on many machines; see help\KeyDecisions.md
 disposition=accepted
-status=proposed
+status=implemented
 
 [EdSharp goToStartOfSelection]
 name=Go to Start of Selection
@@ -1409,9 +1412,9 @@ status=current
 name=Hotkeys
 keys=Control+Shift+F1
 change=new
-reason=suite Help key
+reason=suite Help key, now that Play Tutorials has Alt+F12
 disposition=accepted
-status=proposed
+status=implemented
 
 [EdSharp htmlFormat]
 name=HTML Format
@@ -1714,11 +1717,11 @@ status=current
 
 [EdSharp playTutorials]
 name=Play Tutorials
-keys=
+keys=Alt+F12
 change=renamed from Tutorials, was Control+Shift+F1
-reason=opens the Homer Player; frees Control+Shift+F1
+reason=decision 1: F1 is full and Control+Shift+F1 is the suite's Hotkeys; F12 holds what the program opens for you, its log and chat; free in all four apps; see help\KeyDecisions.md
 disposition=accepted with correction: Play Tutorials must actually play the audio walks in the Homer Player; a written tutorial stays a separate command if its material differs
-status=proposed
+status=implemented
 
 [EdSharp previewMarkdown]
 name=Preview Markdown
@@ -1880,8 +1883,10 @@ status=current
 
 [EdSharp rename]
 name=Rename
-keys=Alt+Shift+R
-status=current
+keys=Shift+F2
+status=implemented
+change=keys changed, was Alt+Shift+R
+reason=decision 3: F2 is the rename family, and plain F2 is EdSharp's long-standing Special Character; frees Alt+Shift+R for Reverse Items; see help\KeyDecisions.md
 
 [EdSharp repeatLine]
 name=Repeat Line
@@ -1934,11 +1939,11 @@ status=implemented
 
 [EdSharp reverseItems]
 name=Reverse Items
-keys=
+keys=Alt+Shift+R
 change=keys changed, was Alt+Shift+Z
-reason=frees Alt+Shift+Z
+reason=decision 3: completes the Alt+Shift item family, K, L, N, O, Q and now R; see help\KeyDecisions.md
 disposition=accepted
-status=proposed
+status=implemented
 
 [EdSharp reviewOutput]
 name=Review Output
@@ -2035,10 +2040,10 @@ status=current
 [EdSharp sayFont]
 name=Say Font
 keys=
-change=keys changed, was Alt+Dash
-reason=Alt+Dash is the Windows menu for a document window
+change=removed, was Alt+Dash; Say Styles now ends with the font and color
+reason=decision 5: Alt+Dash is never bound in an MDI app (KeyOwnership.inix) and every Dash key was taken; see help\KeyDecisions.md
 disposition=accepted
-status=proposed
+status=implemented
 
 [EdSharp sayIndentation]
 name=Say Indentation
@@ -2072,6 +2077,7 @@ status=current
 name=Say Styles
 keys=Alt+Slash
 status=current
+reason=says the style, alignment and baseline that differ from normal, then the font and color (decision 5)
 
 [EdSharp sayTime]
 name=Say Time
@@ -2227,11 +2233,11 @@ status=implemented
 
 [EdSharp toggleIndentation]
 name=Toggle Indentation
-keys=
+keys=JAWSKey+Shift+GraveAccent
 change=keys changed, was Windows+GraveAccent
-reason=Windows-key combinations belong to Windows
+reason=decision 6: a JAWS-only feature on the JAWS key beside its sibling Toggle Punctuation (JAWSKey+GraveAccent); Windows keys belong to Windows; see help\KeyDecisions.md
 disposition=accepted
-status=proposed
+status=implemented
 
 [EdSharp togglePunctuation]
 name=Toggle Punctuation
@@ -2585,9 +2591,9 @@ status=ruled
 
 [FileDir editSettingsFile]
 name=Edit Settings File
-keys=
+keys=Alt+Shift+F2
 change=renamed from Manual Options, was Alt+Shift+M
-reason=frees Alt+Shift+M
+reason=as in EdSharp: F2 edits, Alt+Shift pairs it with Edit Settings
 disposition=accepted
 status=proposed
 
@@ -2626,9 +2632,9 @@ status=current
 
 [FileDir extraSpeechLog]
 name=Extra Speech Log
-keys=
+keys=Alt+Shift+F12
 change=keys changed, was Alt+Shift+X
-reason=as in EdSharp
+reason=decision 2, as in EdSharp: beside Copy Log in the F12 family
 disposition=accepted
 status=proposed
 
@@ -3082,9 +3088,9 @@ status=current
 
 [FileDir playTutorials]
 name=Play Tutorials
-keys=
+keys=Alt+F12
 change=new
-reason=the Homer Player
+reason=decision 1, the same key as EdSharp; free here
 disposition=accepted
 status=proposed
 
@@ -3431,17 +3437,17 @@ status=current
 
 [FileDir tileHorizontal]
 name=Tile Horizontal
-keys=
+keys=Alt+Shift+F11
 change=keys changed, was Alt+Shift+F11
-reason=paired with Tile Vertical
+reason=as in EdSharp
 disposition=accepted
 status=proposed
 
 [FileDir tileVertical]
 name=Tile Vertical
-keys=
+keys=Shift+F11
 change=keys changed, was Control+Shift+F11
-reason=Control+Shift+F11 is a JAWS key
+reason=as in EdSharp: free in every app, beside Cascade (Control+F11)
 disposition=accepted
 status=proposed
 

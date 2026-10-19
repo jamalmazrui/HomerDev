@@ -1,0 +1,359 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.12.1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>KeyDecisions</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      color: light-dark(#1a1a1a, #fdfdfd);
+      background-color: #fdfdfd;
+      background-color: light-dark(#fdfdfd, #1a1a1a);
+      color-scheme: light dark;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a, a:visited {
+      color: inherit;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid;
+      border-color: #e6e6e6;
+      border-color: light-dark(#e6e6e6, #4c4c4c);
+      color: #606060;
+      color: light-dark(#606060, #b6b6b6);
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid currentColor;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+    }
+    th {
+      border-top: 1px solid currentColor;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+<main>
+<h1 id="key-decisions-of-19-october-2026">Key Decisions of 19 October
+2026</h1>
+<p>Jamal asked for every pending key decision to be settled by best
+judgment under Homer’s rules, moving other keys where that gave a better
+whole, with each choice justified and each one easy to take back. This
+page is that record. The suite manifest, data.inix, carries the same
+decisions command by command, each with the key it replaced.</p>
+<h2 id="the-rules-weighed">The Rules Weighed</h2>
+<p>The rules that decided these cases, in the order they usually
+won:</p>
+<ul>
+<li><strong>A key never fights Windows or a screen reader.</strong> The
+kit’s data.inix says which keys belong to Windows, JAWS or NVDA, and a
+Homer app does not take them.</li>
+<li><strong>No command becomes menu-only.</strong> A legacy key may be
+lost, but the command keeps some key (the 19 October ruling).</li>
+<li><strong>The same command has the same key in every app.</strong>
+Where two apps share a command, one key serves both.</li>
+<li><strong>Families before letters.</strong> When letters run out, a
+command joins the function-key family of its kind: F1 help, F2 edit and
+rename, F3 search, F6 panels, F11 windows and version, F12 the files and
+conversations the program opens for you.</li>
+<li><strong>A letter starts a word of the name.</strong> Never a letter
+from the middle of a word.</li>
+<li><strong>Fewer keys beat strained keys.</strong> Where one command
+can absorb another without losing anything, that is better than a key
+nobody could guess.</li>
+</ul>
+<h2 id="the-decisions">The Decisions</h2>
+<h3 id="play-tutorials-on-altf12">1. Play Tutorials on Alt+F12</h3>
+<ul>
+<li><strong>Problem.</strong> Control+Shift+F1 is to be Hotkeys in all
+four apps, so Play Tutorials needed a new key.</li>
+<li><strong>Weighed.</strong> Every F1 combination is taken, and
+Alt+Control with a function key belongs to Windows desktop shortcuts. P
+and T keys are taken in every app (Path to Clipboard, Text Combine, Play
+Stream and others), and moving them would break four apps to fix one
+command. The Homer Player key, Control+Shift+H, is Hard Line Break in
+EdSharp.</li>
+<li><strong>Chosen.</strong> Alt+F12, free in DbDo, EdSharp, FileDir and
+HomerView. F12 holds what the program opens for you: the log
+(Control+F12), the speech log (Alt+Shift+F12), the AI chat (Shift+F12),
+and now the tutorials, which play in the Homer Player.</li>
+<li><strong>Rollback.</strong> Give Play Tutorials Control+Shift+F1
+again and take Hotkeys off it, one line each in EdSharp.cs.</li>
+</ul>
+<h3 id="extra-speech-log-on-altshiftf12">2. Extra Speech Log on
+Alt+Shift+F12</h3>
+<ul>
+<li><strong>Problem.</strong> Export Format took Alt+Shift+X, X for
+export.</li>
+<li><strong>Chosen.</strong> Alt+Shift+F12, beside Copy Log on
+Control+F12; free in every app, and proposed for FileDir too.</li>
+<li><strong>Rollback.</strong> Alt+Shift+X, after moving Export Format
+back to Alt+Shift+E.</li>
+</ul>
+<h3 id="rename-on-shiftf2-reverse-items-on-altshiftr">3. Rename on
+Shift+F2, Reverse Items on Alt+Shift+R</h3>
+<ul>
+<li><strong>Problem.</strong> Extra Speech Toggle is to take
+Alt+Shift+Z, since Z keys are toggles, which left Reverse Items with no
+key, and no R or I key was free.</li>
+<li><strong>Weighed.</strong> Rename belongs in the F2 family, as
+FileDir’s Rename is on F2. EdSharp’s plain F2 has long been Special
+Character, and in an editor F2 carries no Windows meaning, so Rename
+takes Shift+F2 rather than unseating it.</li>
+<li><strong>Chosen.</strong> Rename moves to Shift+F2, freeing
+Alt+Shift+R. Reverse Items takes it, which completes EdSharp’s family of
+item commands on Alt+Shift with their first letter: Keep Unique (K),
+List Different (L), Number (N), Order (O), Query Common (Q) and now
+Reverse (R).</li>
+<li><strong>Rollback.</strong> Rename to Alt+Shift+R and Reverse Items
+to Alt+Shift+Z; Extra Speech Toggle then returns to
+Control+Shift+X.</li>
+</ul>
+<h3 id="extra-speech-toggle-on-altshiftz">4. Extra Speech Toggle on
+Alt+Shift+Z</h3>
+<p>As DbDo and FileDir have it: Z for toggles. Control+Shift+X is now
+free.</p>
+<h3 id="say-font-joins-say-styles">5. Say Font Joins Say Styles</h3>
+<ul>
+<li><strong>Problem.</strong> Say Font’s key, Alt+Dash, opens a document
+window’s system menu, and KeyOwnership.inix says never to bind it in an
+MDI app.</li>
+<li><strong>Weighed.</strong> The font commands are a family on the Dash
+key: Next Font (Control+Dash), Previous Font (Control+Shift+Dash), Set
+Selection Font (Alt+Shift+Dash). Its natural Say key is the forbidden
+one, and no free key in or near the family has any mnemonic tie to
+fonts. Overriding the rule was weighed and refused, since the rule
+protects a Windows feature every MDI app shares.</li>
+<li><strong>Chosen.</strong> Say Styles (Alt+Slash) already says
+everything about how text looks except the font: its style, alignment
+and baseline. It now ends with the font and color, so nothing Say Font
+did is lost, and one key answers “how does this text look?”</li>
+<li><strong>Rollback.</strong> Restore the Font item in the Query menu
+with its own key, and remove the font from Say Styles.</li>
+</ul>
+<h3 id="toggle-indentation-on-jawskeyshiftgraveaccent">6. Toggle
+Indentation on JAWSKey+Shift+GraveAccent</h3>
+<ul>
+<li><strong>Problem.</strong> It was Windows+GraveAccent, and Windows
+keys belong to Windows.</li>
+<li><strong>Chosen.</strong> It is a JAWS-only feature, set in EdSharp’s
+JAWS key map, so it takes the JAWS key beside its sibling Toggle
+Punctuation (JAWSKey+GraveAccent). The GraveAccent key is EdSharp’s
+speech family: voice rate and volume, punctuation, and now
+indentation.</li>
+<li><strong>To test.</strong> That JAWS itself does nothing with
+Insert+Shift+GraveAccent on your setup.</li>
+<li><strong>Rollback.</strong> One line in scripts.jkm.</li>
+</ul>
+<h3
+id="go-to-special-folder-on-controlshiftg-go-to-environment-on-controlshiftf12">7.
+Go to Special Folder on Control+Shift+G, Go to Environment on
+Control+Shift+F12</h3>
+<ul>
+<li><strong>Problem.</strong> Go to Special Folder was Control+Shift+0,
+which Windows takes as a keyboard-layout hotkey on many machines with
+more than one language; the key works on some computers and silently
+does nothing on others.</li>
+<li><strong>Weighed.</strong> FileDir has Go to Special Folder on
+Control+Shift+G, so the same key in both apps is the suite answer. In
+EdSharp that key was Go to Environment, the interactive console of the
+current language, such as Python’s prompt with your file already
+run.</li>
+<li><strong>Chosen.</strong> Go to Special Folder takes Control+Shift+G,
+as in FileDir. Go to Environment moves to Control+Shift+F12, beside Chat
+about Document on Shift+F12: a conversation with an interpreter beside a
+conversation with a model.</li>
+<li><strong>Rollback.</strong> Swap the two lines back; Control+Shift+0
+would return its old problem with it.</li>
+</ul>
+<h3 id="math-in-web-pages-as-mathml">8. Math in Web Pages as MathML</h3>
+<ul>
+<li><strong>Problem.</strong> EdSharp’s own Export passed Pandoc’s
+MathML option for Markdown to web page. The kit’s conversion did
+not.</li>
+<li><strong>Chosen.</strong> The kit’s Pandoc now writes MathML for
+every web page, in C# and Python. Screen readers read MathML as math,
+through MathCAT in NVDA and JAWS’s own math support, while Pandoc’s
+default leaves TeX source. A page without math is unchanged.</li>
+<li><strong>Rollback.</strong> Remove the –mathml argument in
+Conversion.cs and conversion.py.</li>
+</ul>
+<h3 id="word-2003-xml-export-stays-retired">9. Word 2003 XML Export
+Stays Retired</h3>
+<p>The format was replaced by .docx in 2007, which EdSharp exports
+through Pandoc. Keeping it would mean a Word-only route for a format no
+current program needs.</p>
+<ul>
+<li><strong>Rollback.</strong> Add xml back to EdSharp’s Export choices
+and an officecom route, txt2xml, to conversions.inix.</li>
+</ul>
+<h2 id="decided-earlier-the-same-day">Decided Earlier the Same Day</h2>
+<ul>
+<li><strong>Edit Settings File on Alt+Shift+F2.</strong> F2 edits, and
+Alt+Shift pairs it with Edit Settings on Alt+Shift+E. It is proposed for
+FileDir too.</li>
+<li><strong>Search for Topic on Alt+F6.</strong> Search for Topic Again
+is gone, because Search Next (F3) now repeats Search for Topic when that
+was the last search.</li>
+<li><strong>Tile Vertical on Shift+F11.</strong> Control+Shift+F11 is a
+JAWS key. Shift+F11 is free in every app, beside Tile Horizontal
+(Alt+Shift+F11) and Cascade (Control+F11).</li>
+</ul>
+<h2 id="how-to-roll-back">How to Roll Back</h2>
+<p>Each decision is one or two lines in the app’s source, named in the
+comment beside EdSharp’s Help menu with the key it replaced. The
+manifest’s change line says what each key was, and git keeps every
+earlier version. To take a decision back, restore those lines and the
+manifest entry, then build.</p>
+</main>
+</body>
+</html>

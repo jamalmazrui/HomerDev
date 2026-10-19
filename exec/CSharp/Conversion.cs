@@ -604,6 +604,9 @@ StringBuilder sb = new StringBuilder(Util.stringQuote(sSource));
 if (sTo == "htm" || sTo == "epub" || sTo == "tex" || sTo == "rtf") sb.Append(" --standalone");
 if (sTo == "txt") sb.Append(" -t plain --wrap=none");
 if (sTo == "htm") sb.Append(" -t html5");
+// MATH AS MATHML (kit 1.77.0, key decision 8): screen readers read MathML as math, through MathCAT in
+// NVDA and JAWS's own math support, where Pandoc's default leaves TeX source. A page without math is unchanged.
+if (sTo == "htm") sb.Append(" --mathml");
 string sFilter = pageBreakFilter();
 if (sFilter != "" && (sTo == "docx" || sTo == "htm" || sTo == "odt" || sTo == "epub")) sb.Append(" -L " + Util.stringQuote(sFilter));
 sb.Append(" -o " + Util.stringQuote(sTarget));

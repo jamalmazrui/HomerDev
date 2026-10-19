@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.77.0 -- 19 October 2026
+
+- **Every pending key decision is settled,** by best judgment under the Homer rules, in help\KeyDecisions.md: what was weighed, why each choice won, and how to take each one back. The suite manifest records each decision, with the key it replaced.
+- **Web pages written by the kit carry math as MathML,** which screen readers read as math. A page without math is unchanged.
+- **Proposed for DbDo and FileDir, to match EdSharp:** Play Tutorials on Alt+F12; and in FileDir, Extra Speech Log on Alt+Shift+F12, Edit Settings File on Alt+Shift+F2, and Tile Vertical on Shift+F11.
+
 ## 1.76.1 -- 19 October 2026
 
 - **Text from Word is read correctly.** The new .doc routes were made, but reading them back failed: Word writes its text as UTF-16 from some documents and in the Windows code page from others, and the readers expected UTF-8. Word's text is now decoded by its byte order mark, then UTF-8, then the code page, and rewritten as UTF-8 with a byte order mark, in C# and Python alike. The conversion test, which failed five .doc routes on this, found it.

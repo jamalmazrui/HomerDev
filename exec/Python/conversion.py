@@ -155,6 +155,8 @@ def enginePandoc(sSource, sTo, sOut):
     lsCommand = [programFor("pandoc"), sSource, "-f", dPandocReader.get(typeOf(sSource), typeOf(sSource)),
                  "-t", dPandocWriter.get(sTo, sTo), "-o", sOut, "--wrap=none"]
     if sTo in ("htm", "html", "docx", "epub", "odt", "rtf"): lsCommand.append("--standalone")
+    # Math as MathML (1.77.0), which screen readers read as math; a page without math is unchanged.
+    if sTo in ("htm", "html"): lsCommand.append("--mathml")
     run(lsCommand, "Pandoc")
 
 
