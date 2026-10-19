@@ -11,7 +11,7 @@ rem AI NOTE FOR CUSTOMIZING THIS FILE: put every model this app needs on the
 rem sModels line, separated by spaces, and say in sModelNote what they are
 rem for. Nothing else here is app-specific.
 rem
-rem LOG: %LOCALAPPDATA%\<App>\logs\<App>_setup.log, with the app name taken from
+rem LOG: %LOCALAPPDATA%\<App>\logs\<App>-<script>-<yyyymmdd-hhmmss>.log, with the app name taken from
 rem the folder this script is installed into.
 setlocal EnableExtensions EnableDelayedExpansion
 
@@ -23,7 +23,11 @@ rem exec in an installed copy, so climb one level when it is.
 for %%d in ("%~dp0.") do set "sApp=%%~nxd"
 if /i "%sApp%"=="exec" for %%d in ("%~dp0..") do set "sApp=%%~nxd"
 set "sLogDir=%LOCALAPPDATA%\%sApp%\logs"
-set "sLog=%sLogDir%\%sApp%_setup.log"
+rem ONE LOG PER RUN (kit 1.79.2): <App>-<script>-<yyyymmdd-hhmmss>.log, as installCommon.cmd and
+rem help\Logging.md have it, rather than one <App>-<script>-<yyyymmdd-hhmmss>.log that every run appended to.
+for /f %%T in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd-HHmmss" 2^>nul') do set "sNow=%%T"
+if not defined sNow set "sNow=unknown-time"
+set "sLog=%sLogDir%\%sApp%-installModels-%sNow%.log"
 if not exist "%sLogDir%" mkdir "%sLogDir%" >nul 2>&1
 
 call :logLine "installModels started %DATE% %TIME%"

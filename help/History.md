@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.79.2 -- 19 October 2026
+
+- **Installer scripts write one log per run.** finish.cmd, installScreenReaderSupport.cmd and the installModels.cmd template appended every install to one <App>_setup.log; each now writes <App>-<script>-<yyyymmdd-hhmmss>.log, as installCommon.cmd and help\Logging.md already had it, so the logs folder sorts by time and zips whole.
+
 ## 1.79.1 -- 19 October 2026
 
 - **Old PowerPoint and Excel files convert to Markdown and web pages:** ppt2md, ppt2htm, xls2md and xls2htm. Office makes the newer format, its last resort, then the kit reads that as its .pptx or .xlsx route does. They let EdSharp retire its last private converters.
