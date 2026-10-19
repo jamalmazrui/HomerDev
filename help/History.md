@@ -7,6 +7,16 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.76.1 -- 19 October 2026
+
+- **Text from Word is read correctly.** The new .doc routes were made, but reading them back failed: Word writes its text as UTF-16 from some documents and in the Windows code page from others, and the readers expected UTF-8. Word's text is now decoded by its byte order mark, then UTF-8, then the code page, and rewritten as UTF-8 with a byte order mark, in C# and Python alike. The conversion test, which failed five .doc routes on this, found it.
+
+## 1.76.0 -- 19 October 2026
+
+- **EdSharp converts through the kit.** It now compiles Conversion.cs and Table.cs and ships conversions.inix, and the shared check fails it, as it does FileDir, on any private conversion code.
+- **Word's 1997 .doc format can be written,** as well as .rtf and .odt, by the officecom engine in C# and Python, and plain text can be opened by Word. New routes txt2doc, htm2doc, md2doc, rtf2doc, odt2doc and docx2doc serve an editor's Export. Only Word can write a .doc file, so each is Office alone, the last resort.
+- **Office used for something other than converting can be marked.** A line ending in "// homer: not a conversion -- <why>" is logged with its reason by the shared check and not counted. EdSharp marks the two lines that start Word for its optional Word spelling, thesaurus and mail.
+
 ## 1.75.0 -- 19 October 2026
 
 - **HomerScribe's PDF reader is now the kit's.** The new PdfReader.cs is the reader from HomerScribe's PdfRead.cs and the PDF half of HomerScribe.cs, moved whole into one shared class. It reads the PDF's own tags where they carry the document, otherwise the text layer in reading order with headings from type sizes, and reads scanned pages with Tesseract above a confidence floor. A picture model for pages and descriptions of figures are optional, supplied by the app. HomerScribe calls it, and so can any app.

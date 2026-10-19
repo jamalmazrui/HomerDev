@@ -886,7 +886,7 @@ return oTable.write(sTarget, out sError);
 // ------- engine: officecom, the last resort -------
 
 // Office's own numbers for the formats it saves, named rather than written bare.
-private const int iWordFormatDocx = 16, iWordFormatFilteredHtml = 10, iWordFormatPdf = 17, iWordFormatUnicodeText = 7;
+private const int iWordFormatDoc = 0, iWordFormatDocx = 16, iWordFormatFilteredHtml = 10, iWordFormatOdt = 23, iWordFormatPdf = 17, iWordFormatRtf = 6, iWordFormatUnicodeText = 7;
 private const int iExcelFormatCsvUtf8 = 62, iExcelFormatHtml = 44, iExcelFormatXlsx = 51;
 private const int iPowerPointFormatPdf = 32, iPowerPointFormatPptx = 24;
 private const int iMsoFalse = 0, iMsoTrue = -1;
@@ -898,7 +898,7 @@ private static List<string> lsAlerted = new List<string>();
 
 private static string officeApp(string sSource) {
 string sFrom = typeOf(sSource);
-if (sFrom == "doc" || sFrom == "docx" || sFrom == "rtf" || sFrom == "odt" || sFrom == "pdf" || sFrom == "htm") return "Word";
+if (sFrom == "doc" || sFrom == "docx" || sFrom == "rtf" || sFrom == "odt" || sFrom == "pdf" || sFrom == "htm" || sFrom == "txt") return "Word";
 if (sFrom == "xls" || sFrom == "xlsx" || sFrom == "csv") return "Excel";
 if (sFrom == "ppt" || sFrom == "pptx") return "PowerPoint";
 return "";
@@ -929,9 +929,14 @@ if (sApp == "Word") {
 setProp(oApp, "DisplayAlerts", 0);
 object oDocs = getProp(oApp, "Documents");
 object oDoc = call(oDocs, "Open", sFull, false, true);
-int iFormat = sTo == "docx" ? iWordFormatDocx : sTo == "htm" ? iWordFormatFilteredHtml : sTo == "pdf" ? iWordFormatPdf : iWordFormatUnicodeText;
+// .doc, .rtf and .odt as well (kit 1.76.0), for an editor's Export to a 1997 Word file.
+int iFormat = sTo == "doc" ? iWordFormatDoc : sTo == "docx" ? iWordFormatDocx : sTo == "htm" ? iWordFormatFilteredHtml
+: sTo == "odt" ? iWordFormatOdt : sTo == "pdf" ? iWordFormatPdf : sTo == "rtf" ? iWordFormatRtf : iWordFormatUnicodeText;
 call(oDoc, "SaveAs2", sOut, iFormat);
 call(oDoc, "Close", false);
+// WORD'S TEXT IN THE HOMER ENCODING (1.76.1): Word writes UTF-16 from some documents and the
+// Windows code page from others, so its text is rewritten as UTF-8 with a byte order mark.
+if (iFormat == iWordFormatUnicodeText && File.Exists(sOut)) File.WriteAllText(sOut, decodeText(File.ReadAllBytes(sOut)), new UTF8Encoding(true));
 }
 else if (sApp == "Excel") {
 setProp(oApp, "DisplayAlerts", false);
@@ -967,6 +972,15 @@ try { System.Runtime.InteropServices.Marshal.FinalReleaseComObject(oApp); } catc
 }
 }
 } // officeCom method
+
+// decodeText: text from bytes whose encoding is not promised: the byte order mark
+// first, then UTF-8 if every byte fits, then the Windows code page.
+public static string decodeText(byte[] ab) {
+if (ab.Length >= 2 && ((ab[0] == 0xFF && ab[1] == 0xFE) || (ab[0] == 0xFE && ab[1] == 0xFF))) return new StreamReader(new MemoryStream(ab), true).ReadToEnd();
+if (ab.Length >= 3 && ab[0] == 0xEF && ab[1] == 0xBB && ab[2] == 0xBF) return new UTF8Encoding(false).GetString(ab, 3, ab.Length - 3);
+try { return new UTF8Encoding(false, true).GetString(ab); }
+catch (DecoderFallbackException) { return Encoding.Default.GetString(ab); }
+} // decodeText method
 
 // alert: once per Office program per session, so a batch of twenty legacy files
 // brings one box, not twenty. Every later case is still logged and returned.

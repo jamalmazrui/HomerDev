@@ -311,9 +311,14 @@ data\SuiteCommands.inix, fails on any such line; others get a warning
 that counts them until their move.</p>
 <h2 id="moves">Moves</h2>
 <ul>
-<li><strong>DbDo, EdSharp and HomerView:</strong> next. Each still has
-its own Pandoc finder, 2htm calls or Office COM code: 13 lines in DbDo,
-6 in EdSharp and 5 in HomerView.</li>
+<li><strong>DbDo and HomerView:</strong> next. Each still has its own
+Pandoc finder, 2htm calls or Office COM code: 13 lines in DbDo and 5 in
+HomerView.</li>
+<li><strong>EdSharp:</strong> moved in kit 1.76.0. Import and Export
+offer and use the kit’s routes first; its [Import] and [Export] sections
+serve only the targets the kit does not cover, such as MediaWiki, LaTeX
+and braille. Its Word conversion code is gone; Word remains only for its
+optional Word spelling, thesaurus and mail.</li>
 <li><strong>FileDir:</strong> moved in kit 1.74.0. Its Convert.cs and
 Table.cs became the kit’s Conversion.cs and Table.cs.</li>
 <li><strong>HomerScribe:</strong> its PDF reader moved into the kit in

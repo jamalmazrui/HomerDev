@@ -345,7 +345,8 @@ def engineZipXml(sSource, sTo, sOut):
     open(sOut, "w", encoding="utf-8-sig", newline="\r\n").write(sJoin.join(lsOut).strip() + "\n")
 
 
-dOfficeFormat = {("word", "docx"): 16, ("word", "pdf"): 17, ("word", "htm"): 10, ("word", "txt"): 7,
+dOfficeFormat = {("word", "doc"): 0, ("word", "docx"): 16, ("word", "odt"): 23, ("word", "pdf"): 17, ("word", "htm"): 10,
+                   ("word", "rtf"): 6, ("word", "txt"): 7,
                    ("excel", "xlsx"): 51, ("excel", "csv"): 6, ("excel", "htm"): 44,
                    ("powerpoint", "pptx"): 24, ("powerpoint", "pdf"): 32}
 
@@ -354,7 +355,7 @@ def engineOfficeCom(sSource, sTo, sOut):
     """The last resort: Microsoft Office by COM, Windows only, and logged as such."""
     import win32com.client
     sFrom = typeOf(sSource)
-    sApp = "word" if sFrom in ("doc", "docx", "rtf", "odt", "htm", "html") else ("excel" if sFrom in ("xls", "xlsx", "ods", "csv") else "powerpoint")
+    sApp = "word" if sFrom in ("doc", "docx", "rtf", "odt", "htm", "html", "txt") else ("excel" if sFrom in ("xls", "xlsx", "ods", "csv") else "powerpoint")
     iFormat = dOfficeFormat.get((sApp, sTo))
     if iFormat is None: raise RuntimeError("Office cannot write .%s from .%s here" % (sTo, sFrom))
     say("officecom: the last resort, for %s" % os.path.basename(sSource))
@@ -372,6 +373,10 @@ def engineOfficeCom(sSource, sTo, sOut):
             lsMade = [s for s in os.listdir(sOfficeDir) if s.lower().startswith("converted")]
             if not lsMade: raise RuntimeError("Office reported success but wrote no file")
             sOut = os.path.join(sOfficeDir, lsMade[0])
+        # WORD'S TEXT IN THE HOMER ENCODING (1.76.1): UTF-8 with a byte order mark, whatever Word chose to write.
+        if sApp == "word" and sTo == "txt":
+            sText = decodeText(open(sOut, "rb").read())
+            open(sOut, "w", encoding="utf-8-sig", newline="").write(sText)
         os.replace(sOut, sFinal)
     finally:
         shutil.rmtree(sOfficeDir, ignore_errors=True)
@@ -441,12 +446,22 @@ def convert(sSource, sTarget, dOptions=None):
     raise RuntimeError("could not convert %s to .%s: %s" % (sSource, sTo, "; ".join(lsTried)))
 
 
+def decodeText(abText):
+    """Text from bytes whose encoding is not promised (1.76.1): the byte order mark first, then UTF-8, then the
+    Windows code page. Word's text output was the case that needed it: UTF-16 from some documents and the code
+    page from others, so a bullet (0x95) or a UTF-16 mark (0xFF) failed a UTF-8 read."""
+    if abText[:2] in (b"\xff\xfe", b"\xfe\xff"): return abText.decode("utf-16")
+    if abText[:3] == b"\xef\xbb\xbf": return abText[3:].decode("utf-8", "replace")
+    try: return abText.decode("utf-8")
+    except UnicodeDecodeError: return abText.decode("cp1252", "replace")
+
+
 def toText(sSource):
     """The text of a file, by the quickest route the table offers for plain text."""
     sDir = tempfile.mkdtemp(prefix="homerText-")
     try:
         sOut = os.path.join(sDir, "text.txt")
         convert(sSource, sOut)
-        return open(sOut, encoding="utf-8-sig").read()
+        return decodeText(open(sOut, "rb").read())
     finally:
         shutil.rmtree(sDir, ignore_errors=True)

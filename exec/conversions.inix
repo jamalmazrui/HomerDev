@@ -63,6 +63,10 @@ ways = officecom
 ways = officecom
 note = A 1997 Word file has no free reader yet, so Office is the only way; without Office an Alert box says so and how to avoid it.
 
+[docx2doc]
+ways = officecom
+note = A 1997 Word file can only be written by Word; .docx is its free successor.
+
 [docx2docx]
 ways = copy
 
@@ -97,6 +101,9 @@ ways = pandoc
 [epub2txt]
 ways = pandoc
 
+[htm2doc]
+ways = officecom
+
 [htm2docx]
 ways = pandoc
 
@@ -126,6 +133,9 @@ ways = table
 
 [inix2md]
 ways = table
+
+[md2doc]
+ways = pandoc:docx > officecom
 
 [md2docx]
 ways = pandoc
@@ -162,6 +172,9 @@ ways = zipxml
 
 [ods2txt]
 ways = zipxml
+
+[odt2doc]
+ways = officecom
 
 [odt2docx]
 ways = pandoc
@@ -214,6 +227,9 @@ ways = officecom
 [pptx2txt]
 ways = zipxml
 
+[rtf2doc]
+ways = officecom
+
 [rtf2docx]
 ways = pandoc, officecom
 
@@ -237,6 +253,9 @@ ways = table
 
 [tsv2txt]
 ways = copy
+
+[txt2doc]
+ways = officecom
 
 [txt2docx]
 ways = pandoc
