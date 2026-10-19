@@ -2952,7 +2952,7 @@ keys=F6
 change=new
 reason=jumps between the folder part and the file part of the list
 disposition=accepted with correction: jumps to the first visible folder or file; says so when a kind is absent; archives and virtual folders handled explicitly
-status=proposed
+status=implemented
 
 [FileDir nextSiblingFolder]
 name=Next Sibling Folder
@@ -2960,7 +2960,7 @@ keys=Control+F6
 change=new
 reason=the next folder beside this one in its parent
 disposition=accepted with correction: same window, stable order, roots and access-denied entries handled
-status=proposed
+status=implemented
 
 [FileDir nextVisitedFolder]
 name=Next Visited Folder
@@ -2968,7 +2968,7 @@ keys=Alt+F6
 change=new
 reason=the next folder in order of recent visits
 disposition=accepted with correction: the ring is a frozen snapshot while cycling, separate from back and forward history
-status=proposed
+status=implemented
 
 [FileDir nextWindow]
 name=Next Window
@@ -3107,7 +3107,7 @@ keys=Shift+F6
 change=new
 reason=reverse of Next Part
 disposition=accepted with correction: as Next Part
-status=proposed
+status=implemented
 
 [FileDir previousSiblingFolder]
 name=Previous Sibling Folder
@@ -3115,7 +3115,7 @@ keys=Control+Shift+F6
 change=new
 reason=reverse
 disposition=accepted with correction: as Next Sibling Folder
-status=proposed
+status=implemented
 
 [FileDir previousVisitedFolder]
 name=Previous Visited Folder
@@ -3123,7 +3123,7 @@ keys=Alt+Shift+F6
 change=new
 reason=reverse
 disposition=accepted with correction: as Next Visited Folder
-status=proposed
+status=implemented
 
 [FileDir previousWindow]
 name=Previous Window
