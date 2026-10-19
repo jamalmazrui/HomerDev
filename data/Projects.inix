@@ -1,0 +1,55 @@
+﻿; Projects.inix -- the Homer projects the HomerDev dialog can install or download (kit 1.78.0).
+; One section per project, in lowercase alphabetical order. kind is app or kit; summary is the
+; project's own one-line description, from its ReadMe; repo is its GitHub repository. Its
+; installer is <name>_setup.exe on the repository's latest release. Add a project here and the
+; dialog lists it, with no change to code.
+
+[2htm]
+kind=app
+summary=Converts Word, Excel, PowerPoint, PDF, Markdown and other files to accessible HTML or plain text.
+repo=JamalMazrui/2htm
+
+[bookFido]
+kind=app
+summary=Fetches every book you own or have borrowed in Audible, Bookshare, Goodreads, Kindle and NLS into one catalog.
+repo=JamalMazrui/bookFido
+
+[DbDo]
+kind=app
+summary=A keyboard-first database manager: read, add to, sort, filter and follow a database.
+repo=JamalMazrui/DbDo
+
+[EdSharp]
+kind=app
+summary=A text and code editor for Windows, built for people who work by keyboard and screen reader.
+repo=JamalMazrui/EdSharp
+
+[FileDir]
+kind=app
+summary=A file and folder manager for keyboard and screen reader users.
+repo=JamalMazrui/FileDir
+
+[HomerDev]
+kind=kit
+summary=The Homer Development Kit: the shared code, skills, templates and tutorials behind every Homer project.
+repo=JamalMazrui/HomerDev
+
+[HomerScribe]
+kind=app
+summary=Describes video and transcribes speech, on your own computer.
+repo=JamalMazrui/HomerScribe
+
+[HomerView]
+kind=app
+summary=Reads and works the web with a screen reader through Microsoft Edge.
+repo=JamalMazrui/HomerView
+
+[urlCheck]
+kind=app
+summary=Checks web pages for accessibility problems with the axe-core engine and saves a report.
+repo=JamalMazrui/urlCheck
+
+[urlFido]
+kind=app
+summary=Downloads the files of the types you choose from web pages.
+repo=JamalMazrui/urlFido

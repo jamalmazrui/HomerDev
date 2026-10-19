@@ -1,6 +1,6 @@
 # AGENTS.md -- the Homer Development Kit, for AI agents
 
-HomerDev is a development kit for building Windows programs, documents, books, databases, installers and spoken tutorials for people who use screen readers. It holds shared code in C# and Python, templates, build and release scripts, checks, and twenty skills that state its conventions. Its programs are used with a keyboard and a screen reader -- JAWS, NVDA or Narrator -- so every rule serves one aim: the person hears each thing once, in the order they meet it, and can reach any command by a key they can guess.
+HomerDev is a development kit for building Windows programs, documents, books, databases, installers and spoken tutorials for people who use screen readers. It holds shared code in C# and Python, templates, build and release scripts, checks, and twenty-one skills that state its conventions. Its programs are used with a keyboard and a screen reader -- JAWS, NVDA or Narrator -- so every rule serves one aim: the person hears each thing once, in the order they meet it, and can reach any command by a key they can guess.
 
 This file is for any AI agent asked to use the kit. Read it first; then read the skill that matches the task before writing anything.
 
@@ -29,6 +29,7 @@ Each skill holds the rules for one kind of work. Claude loads a skill by its des
 - **app-help-guide** -- build a screen-reader-friendly help guide for a product from the publisher's own help pages. `.claude/skills/app-help-guide/SKILL.md`
 - **blind-creators** -- add, verify or remove a person or work in the Blind Authors, Developers, Presenters or Creators directories. `.claude/skills/blind-creators/SKILL.md`
 - **convention-database** -- build a DbDo database of any organization's convention or conference from its agenda: sessions, rooms, speakers and sponsors, linked. `.claude/skills/convention-database/SKILL.md`
+- **convention-walking-guide** -- research and write a convention walking guide for blind white cane and guide dog users, organized by the tasks a traveler sets out to do, with a separate organizer worksheet; two 2026 Virginia conventions are its worked examples. `.claude/skills/convention-walking-guide/SKILL.md`
 - **readable-text** -- edit machine text -- captions, transcripts, OCR output, hard-wrapped or escaped text -- into readable, faithful prose, marking doubt rather than guessing and saying where the words came from. `.claude/skills/readable-text/SKILL.md`
 - **homer-books** -- build, audit and publish Kindle books with the kit's book tools. `.claude/skills/homer-books/SKILL.md`
 - **homer-build-release** -- run or troubleshoot build, tidy, push and release, with the checks inside them, and read their logs. `.claude/skills/homer-build-release/SKILL.md`

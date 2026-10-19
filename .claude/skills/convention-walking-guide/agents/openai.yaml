@@ -1,0 +1,14 @@
+interface:
+  display_name: Convention Walking Guide
+  short_description: Research accessible convention routes for blind travelers
+  default_prompt: Create an evidence-based convention walking guide for white cane
+    and guide dog users from current venue sources and floor plans.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

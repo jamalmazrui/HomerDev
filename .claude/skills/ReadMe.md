@@ -30,8 +30,18 @@ HomerDev.md, under "Claude skills".
 - **blind-creators**: keep the Blind Authors, Blind Developers and Blind
   Presenters directories and the combined Blind Creators listing: vet a person,
   add or update an entry, regenerate the combined list, and audit a file.
+- **convention-database**: build a DbDo database of a convention or conference
+  from its agenda -- sessions, rooms, speakers and sponsors, linked -- with
+  scripts for a calendar, a schedule page and contact cards.
+- **convention-walking-guide**: research and write a walking guide to a
+  convention's hotel for blind white cane and guide dog users, organized by the
+  tasks a traveler sets out to do, with a separate organizer worksheet. Two 2026
+  Virginia state conventions are its worked examples.
 - **podcast-directory**: build a one-page directory of a podcast from its RSS
   feed, every episode with date, length, summary and a link that plays it.
+
+- **readable-text**: edit machine text -- captions, transcripts, OCR output,
+  hard-wrapped or escaped text -- into readable, faithful prose.
 
 ## Skills for Homer development
 

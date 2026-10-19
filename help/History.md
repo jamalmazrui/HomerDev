@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.78.0 -- 19 October 2026
+
+- **A new skill, convention-walking-guide,** researches and writes a walking guide to a convention's hotel for blind white cane and guide dog users, with a separate organizer worksheet. It was developed with ChatGPT on two 2026 Virginia state conventions, whose guides and worksheets are its worked examples. Every main section of a guide is a task a traveler sets out to do; a sort by place is allowed only in an appendix that links back to the tasks.
+- **The HomerDev dialog lists every Homer project.** Run setup installs or updates the one you are on from its newest release on GitHub, and Download saves its installer in your Downloads folder. The download runs in the background, so the dialog keeps answering, and the list comes from the new data\Projects.inix.
+- **The skills list is complete:** convention-database and readable-text were missing from the skills ReadMe.
+
 ## 1.77.7 -- 19 October 2026
 
 - **An installer says "current" when winget says so.** winget's list fills its Available column only when an upgrade exists, so a component it lists with that column empty is the newest it knows. HomerComponents.iss logged each such component as "no newer version could be looked up": 17 of 19 in Jamal's setup log of 19 October, though ImageMagick, offered as an Update the day before, showed the comparison works. They are now logged "found, current (version is the newest)". The boxes were already right: Reinstall, unticked.

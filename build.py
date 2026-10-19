@@ -68,6 +68,7 @@ lsExpected = [
     ".claude/skills/homer-page/templates/assets/css/style.scss", ".claude/skills/homer-screen-reader/SKILL.md",
     ".claude/skills/homer-installer/references/components.md",
     ".claude/skills/homer-tutorial/SKILL.md", ".claude/skills/podcast-directory/SKILL.md",
+    ".claude/skills/convention-walking-guide/SKILL.md",
     "Templates/makeHotkeys.py",
     "Templates/LocalFiles.txt",
     "Templates/_APP_.cmd",

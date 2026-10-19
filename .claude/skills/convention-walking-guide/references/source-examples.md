@@ -1,0 +1,14 @@
+﻿# Examples of Useful Orientation Sources
+
+Checked October 18, 2026. These links teach research and writing methods; they do not supply transferable hotel turns.
+
+- [2017 NFB convention agenda, Navigating the Hotel](https://nfbnet.org/pipermail/nfbwv-talk_nfbnet.org/2017-June/003209.html): republishes a description adapted from Mary Ellen Jernigan's May 2011 Braille Monitor article. Uses fixed facing directions, a memorable hub, separate elevator systems, and specific wrong-turn recovery. The original Monitor pages could not be fetched during this research; cite the accessible reproduction transparently.
+- [Dallas 2025: Last-Minute Convention Information](https://www.acb.org/dallas-2025-last-minute-convention-information): Janet Dickelman's ACB convention article gives a landmark sequence to tour pickup and distinguishes stairs from a ramp.
+- [Staying Connected in Sparks](https://www.acb.org/content/staying-connected-sparks): documents accessible orientation information at the convention information desk and multiple formats.
+- [Summary of the Fall 2023 Board of Directors Meeting](https://www.acb.org/summary-fall-2023-board-directors-meeting): records a proposal that blind and low-vision users review the hotel orientation guide.
+- [Staying Oriented: Using AI-Powered Apps as a Tool for Further Independence](https://applevis.com/blog/staying-oriented-using-ai-powered-apps-tool-further-independence): Deborah Armstrong describes her guide dog travel using OCR; blind commenters identify camera-aiming and unfamiliar-airport difficulties. Preserve that diversity rather than treating one successful trip as universal evidence.
+- [VoiceVista community entry and comments](https://www.applevis.com/apps/ios/navigation/voicevista): demonstrates the need to separate a dated community description from a current store listing and current features.
+
+- [2026 NFB Maryland agenda: Navigating the Ashore Resort & Beach Club](https://nfbmd.org/convention/2026/agenda2026): read October 18, 2026. A current affiliate model for linked buildings, named levels, a vehicle crossing, elevator orientation, and separate relief options. Use its writing method, never its turns, for a different hotel.
+
+Encoding exception: SKILL.md must remain UTF-8 without a byte order mark so cross-engine frontmatter parsers see `---` at byte zero. User-facing Markdown may use BOM/CRLF as requested.

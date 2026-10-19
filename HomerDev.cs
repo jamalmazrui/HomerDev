@@ -777,6 +777,107 @@ private static bool runChat(IWin32Window owner)
 // ---- connecting the AI tools ----
 
 
+// ---- the Homer projects (kit 1.78.0) ----
+
+// THE PROJECTS LIST. Every Homer project, from data\Projects.inix, so the dialog
+// can install or download any of them: one list in data, read with the kit's
+// InixCodec class, and adding a project there needs no change here. Each row is
+// {name, summary, repo}, in lowercase alphabetical order by name.
+private static List<string[]> loadProjects()
+{
+    List<string[]> lsRows = new List<string[]>();
+    string sPath = Path.Combine(sKit, "data", "Projects.inix");
+    try
+    {
+        foreach (InixCodec.Section oSection in InixCodec.read(sPath))
+        {
+            if (string.IsNullOrEmpty(oSection.Name)) continue;
+            string sRepo = oSection.get("repo") ?? "";
+            if (sRepo.Length == 0) continue;
+            lsRows.Add(new string[] { oSection.Name, oSection.get("summary") ?? "", sRepo });
+        }
+    }
+    catch (Exception oError) { Log.info("Projects list not read from " + sPath + ": " + oError.Message); }
+    lsRows.Sort(delegate(string[] a, string[] b) { return string.Compare(a[0], b[0], StringComparison.OrdinalIgnoreCase); });
+    Log.info("Projects list: " + lsRows.Count + (lsRows.Count == 1 ? " project" : " projects") + " from " + sPath);
+    return lsRows;
+}
+
+// setupUrl: the project's newest installer, by GitHub's latest-release address,
+// which always points at the newest release's file of that name.
+private static string setupUrl(string[] aProject)
+{
+    return "https://github.com/" + aProject[2] + "/releases/latest/download/" + aProject[0] + "_setup.exe";
+}
+
+// fetchProject: download a project's installer on a background thread, so the
+// dialog keeps answering, then on the dialog's own thread either run it (bRun)
+// or say where it was saved. A large installer can take a minute; the dialog
+// says what it is fetching first, and the two buttons wait until it is done.
+private static void fetchProject(LbcDialog dlg, string[] aProject, bool bRun, Button btnSetup, Button btnDownload)
+{
+    string sUrl = setupUrl(aProject);
+    string sDir = bRun ? Path.Combine(Path.GetTempPath(), "HomerDev-setup")
+                       : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+    try { Directory.CreateDirectory(sDir); } catch (Exception) { }
+    btnSetup.Enabled = false;
+    btnDownload.Enabled = false;
+    string sDoing = "Fetching the newest " + aProject[0] + " installer from GitHub";
+    dlg.setStatusText(sDoing + " ...");
+    Say.say(sDoing);
+    Log.info((bRun ? "Run setup" : "Download") + ": " + aProject[0] + " from " + sUrl + " into " + sDir);
+    Thread oWork = new Thread(delegate()
+    {
+        string sSaved = "";
+        try { Web.configure(); sSaved = Web.download(sUrl, sDir, aProject[0] + "_setup.exe"); }
+        catch (Exception oError) { Log.info("Download failed: " + oError.Message); }
+        try
+        {
+            dlg.form.BeginInvoke((MethodInvoker) delegate()
+            {
+                btnSetup.Enabled = true;
+                btnDownload.Enabled = true;
+                if (sSaved.Length == 0 || !File.Exists(sSaved))
+                {
+                    Log.info("Not downloaded: " + sUrl);
+                    dlg.setStatusText(aProject[0] + ": not downloaded");
+                    MessageBox.Show(dlg.form, "The " + aProject[0] + " installer could not be downloaded from:\r\n" + sUrl
+                        + "\r\n\r\nCheck the connection, or open the project's releases on GitHub. The log in %LOCALAPPDATA%\\HomerDev\\logs has the details.",
+                        sAppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+                Log.info("Downloaded " + sSaved + ", " + new FileInfo(sSaved).Length + " bytes");
+                if (!bRun)
+                {
+                    dlg.setStatusText("Saved " + Path.GetFileName(sSaved) + " in Downloads");
+                    Say.say("Saved " + Path.GetFileName(sSaved) + " in your Downloads folder");
+                    return;
+                }
+                try
+                {
+                    ProcessStartInfo oStart = new ProcessStartInfo(sSaved);
+                    oStart.UseShellExecute = true;
+                    Process.Start(oStart);
+                    dlg.setStatusText("Started " + Path.GetFileName(sSaved));
+                    Log.info("Started " + sSaved);
+                    // HomerDev's own setup replaces this program, so the dialog steps aside for it.
+                    if (string.Equals(aProject[0], sAppName, StringComparison.OrdinalIgnoreCase)) dlg.close();
+                }
+                catch (Exception oError)
+                {
+                    // Most often the answer No to Windows' question whether to let the installer make changes.
+                    Log.info("Setup not started: " + oError.Message);
+                    dlg.setStatusText(aProject[0] + " setup not started");
+                    Say.say(aProject[0] + " setup was not started");
+                }
+            });
+        }
+        catch (Exception oError) { Log.info("Download finished after the dialog closed: " + oError.Message); }
+    });
+    oWork.IsBackground = true;
+    oWork.Start();
+}
+
 // ---- the dialog ----
 
 private static bool runDialog()
@@ -796,6 +897,16 @@ private static bool runDialog()
         Button btnOpen = dlg.addButton("&Open", "Open the item you are on in the list.");
         Button btnPlay = dlg.addButton("&Play tutorials", "Play the kit's ten spoken tutorials in the Homer Player: Enter plays a walk, Down Arrow moves to the next.");
         dlg.endBand();
+        // THE HOMER PROJECTS (kit 1.78.0): install or download any of them from here.
+        List<string[]> lsProjects = loadProjects();
+        List<string> lsProjectLines = new List<string>();
+        foreach (string[] aProject in lsProjects) lsProjectLines.Add(aProject[0] + ": " + aProject[1]);
+        ListBox lbProjects = dlg.addPickBox("&Homer projects:", lsProjectLines, lsProjectLines.Count > 0 ? lsProjectLines[0] : "",
+            "Every Homer project, each with what it does. Run setup installs or updates the one you are on, from its newest release on GitHub; Download saves its installer in your Downloads folder.");
+        dlg.addBand();
+        Button btnSetup = dlg.addButton("Run &setup", "Download the project's newest installer from GitHub and run it. Windows asks whether to allow it, since a Homer program installs for every user of the computer.");
+        Button btnDownload = dlg.addButton("&Download", "Save the project's newest installer in your Downloads folder, to run or share later.");
+        dlg.endBand();
         dlg.addBand();
         Button btnInix = dlg.addButton("&Inix explained", "What the inix format is, with an example read by the kit's own reader.");
         Button btnLayout = dlg.addButton("&Layout by Code", "How every Homer dialog is made, then a dialog that code builds.");
@@ -812,6 +923,19 @@ private static bool runDialog()
             if (!MediaPlayer.playTutorials(dlg.form, sAppName, Path.Combine(sKit, "help")))
                 MessageBox.Show(dlg.form, "No tutorial is installed in " + Path.Combine(sKit, "help", "tutorials") + ".", sAppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
         };
+        btnSetup.Click += delegate(object oSender, EventArgs evArgs)
+        {
+            int iRow = dlg.listSourceIndex(lbProjects, lbProjects.SelectedIndex);
+            if (iRow >= 0 && iRow < lsProjects.Count) fetchProject(dlg, lsProjects[iRow], true, btnSetup, btnDownload);
+        };
+        btnDownload.Click += delegate(object oSender, EventArgs evArgs)
+        {
+            int iRow = dlg.listSourceIndex(lbProjects, lbProjects.SelectedIndex);
+            if (iRow >= 0 && iRow < lsProjects.Count) fetchProject(dlg, lsProjects[iRow], false, btnSetup, btnDownload);
+        };
+        // ENTER DOES WHAT THE LIST YOU ARE IN IS FOR: open a kit item, or run a project's setup.
+        lbItems.Enter += delegate(object oSender, EventArgs evArgs) { dlg.form.AcceptButton = btnOpen; };
+        lbProjects.Enter += delegate(object oSender, EventArgs evArgs) { dlg.form.AcceptButton = btnSetup; };
         btnInix.Click += delegate(object oSender, EventArgs evArgs) { showInix(dlg.form); };
         btnLayout.Click += delegate(object oSender, EventArgs evArgs) { showLayout(dlg.form); };
         btnAsk.Click += delegate(object oSender, EventArgs evArgs) { runChat(dlg.form); };
@@ -827,7 +951,7 @@ private static bool runDialog()
         // Enter in the list opens what it is on; the buttons below the list keep their own Enter.
         dlg.form.AcceptButton = btnOpen;
         dlg.setInitialFocus(lbItems);
-        dlg.setStatusText(lsItems.Count + (lsItems.Count == 1 ? " item" : " items") + " in HomerDev " + sVersion);
+        dlg.setStatusText(lsItems.Count + (lsItems.Count == 1 ? " item" : " items") + " and " + lsProjects.Count + (lsProjects.Count == 1 ? " project" : " projects") + " in HomerDev " + sVersion);
         dlg.runWithButtons(new string[] { "Close" });
     }
     return true;

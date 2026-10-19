@@ -161,6 +161,11 @@ The controls, in tab order:
   opens in a window you read line by line.
 - **Play tutorials** plays the kit's ten spoken walks in the Homer Player. Focus
   starts on the first walk: Enter plays it, and Down Arrow moves to the next.
+- **Homer projects**, a list of every Homer project, each with what it does.
+  **Run setup** (Alt+S) downloads the newest installer of the one you are on
+  from GitHub and runs it; **Download** (Alt+D) saves the installer in your
+  Downloads folder instead. Enter in the list runs setup. The list comes from
+  data\Projects.inix, so a new project is added there, not in code.
 - **Inix explained** shows the inix format with an example file, and then what
   the kit's own reader made of that file, section by section.
 - **Layout by Code** explains how every Homer dialog is made, shows the whole

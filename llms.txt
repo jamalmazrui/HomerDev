@@ -20,6 +20,7 @@ Start with AGENTS.md. Each skill below is a folder under .claude/skills holding 
 - [app-help-guide](.claude/skills/app-help-guide/SKILL.md): build a screen-reader-friendly help guide for a product from the publisher's own help pages
 - [blind-creators](.claude/skills/blind-creators/SKILL.md): add, verify or remove a person or work in the Blind Authors, Developers, Presenters or Creators directories
 - [convention-database](.claude/skills/convention-database/SKILL.md): build a DbDo database of any organization's convention or conference from its agenda
+- [convention-walking-guide](.claude/skills/convention-walking-guide/SKILL.md): write a convention walking guide for blind cane and guide dog users, organized by traveler tasks, with a separate organizer worksheet
 - [readable-text](.claude/skills/readable-text/SKILL.md): edit machine text -- captions, transcripts, OCR output -- into readable, faithful prose
 - [homer-books](.claude/skills/homer-books/SKILL.md): build, audit and publish Kindle books with the kit's book tools
 - [homer-build-release](.claude/skills/homer-build-release/SKILL.md): run or troubleshoot build, check, tidy, push and release, and read their logs
