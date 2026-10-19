@@ -9,6 +9,15 @@ Each version is a level-2 heading, newest first, so your screen reader's heading
 
 ## 1.74.0 -- 19 October 2026
 
+- **One copy of every file conversion.** The new Conversion.cs is the C# side of the kit's conversion code, which every app is to use. It began as FileDir's own Convert.cs, moved here and renamed so it cannot hide .NET's System.Convert. Table.cs moved with it and now reads .xlsx with .NET's own zip support. ConversionMedia.cs holds the audio, video and picture conversions, for apps that compile Media.cs.
+- **Conversions are named source2target.** The routing table, exec\\conversions.inix, now has one section per conversion, such as pdf2txt or pdf2docx, each listing its ways best first with a note on why. Python's conversion.py and C#'s Conversion.cs read the same file.
+- **Both the source and the target decide.** pdf2txt reads only the text layer, through PdfPig in-process when it is beside the program, else PyMuPDF's plain text. pdf2docx works out the structure first. A quick read never uses OCR.
+- **New internal readers need no program at all:** docx2txt and odt2txt read the XML inside the file, and xlsx goes through the Table class.
+- **Office is the last resort, and says so.** When a conversion needs Microsoft Office and it is missing, an Alert box explains it once per session and names the free way around it. A console program gets the same words as an error instead.
+- **Every conversion is timed.** The log names the route and the milliseconds it took, so the order of the ways can be tuned from measurements.
+- **The shared check has a conversion step.** It counts an app's private conversion code: its own Pandoc finder, a 2htm call, an Office COM object or pymupdf4llm. Apps listed as moved fail on it; FileDir is the first. The others are warned until they move.
+- **help\\Conversions.md** records the review of every app's conversions and the best engine for each.
+
 - **The suite's shared commands are one piece of code.** The new SuiteCommands class in Mdi.cs holds Say Clipboard, Say Time, Copy Log, Save, Append and Clear Clipboard, and the Help openers for the guide, History, ReadMe and Hotkeys. The frame calls it, and so do EdSharp and FileDir from frames of their own, so the words and behavior match in every app.
 - **The best of each app went in.**
   - Say Clipboard says how many files are copied and names them, as FileDir did.

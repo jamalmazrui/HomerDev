@@ -192,36 +192,70 @@
 reader’s heading keys move from one version to the next.</p>
 <h2 id="october-2026">1.74.0 – 19 October 2026</h2>
 <ul>
-<li><strong>The suite’s shared commands are one piece of code.</strong>
-The new SuiteCommands class in Mdi.cs holds Say Clipboard, Say Time,
-Copy Log, Save, Append and Clear Clipboard, and the Help openers for the
-guide, History, ReadMe and Hotkeys. The frame calls it, and so do
-EdSharp and FileDir from frames of their own, so the words and behavior
-match in every app.</li>
-<li><strong>The best of each app went in.</strong>
+<li><p><strong>One copy of every file conversion.</strong> The new
+Conversion.cs is the C# side of the kit’s conversion code, which every
+app is to use. It began as FileDir’s own Convert.cs, moved here and
+renamed so it cannot hide .NET’s System.Convert. Table.cs moved with it
+and now reads .xlsx with .NET’s own zip support. ConversionMedia.cs
+holds the audio, video and picture conversions, for apps that compile
+Media.cs.</p></li>
+<li><p><strong>Conversions are named source2target.</strong> The routing
+table, exec\conversions.inix, now has one section per conversion, such
+as pdf2txt or pdf2docx, each listing its ways best first with a note on
+why. Python’s conversion.py and C#’s Conversion.cs read the same
+file.</p></li>
+<li><p><strong>Both the source and the target decide.</strong> pdf2txt
+reads only the text layer, through PdfPig in-process when it is beside
+the program, else PyMuPDF’s plain text. pdf2docx works out the structure
+first. A quick read never uses OCR.</p></li>
+<li><p><strong>New internal readers need no program at all:</strong>
+docx2txt and odt2txt read the XML inside the file, and xlsx goes through
+the Table class.</p></li>
+<li><p><strong>Office is the last resort, and says so.</strong> When a
+conversion needs Microsoft Office and it is missing, an Alert box
+explains it once per session and names the free way around it. A console
+program gets the same words as an error instead.</p></li>
+<li><p><strong>Every conversion is timed.</strong> The log names the
+route and the milliseconds it took, so the order of the ways can be
+tuned from measurements.</p></li>
+<li><p><strong>The shared check has a conversion step.</strong> It
+counts an app’s private conversion code: its own Pandoc finder, a 2htm
+call, an Office COM object or pymupdf4llm. Apps listed as moved fail on
+it; FileDir is the first. The others are warned until they
+move.</p></li>
+<li><p><strong>help\Conversions.md</strong> records the review of every
+app’s conversions and the best engine for each.</p></li>
+<li><p><strong>The suite’s shared commands are one piece of
+code.</strong> The new SuiteCommands class in Mdi.cs holds Say
+Clipboard, Say Time, Copy Log, Save, Append and Clear Clipboard, and the
+Help openers for the guide, History, ReadMe and Hotkeys. The frame calls
+it, and so do EdSharp and FileDir from frames of their own, so the words
+and behavior match in every app.</p></li>
+<li><p><strong>The best of each app went in.</strong></p>
 <ul>
 <li>Say Clipboard says how many files are copied and names them, as
 FileDir did.</li>
 <li>Copy Log puts the log on the clipboard both as a file and as its
 path, as EdSharp and FileDir did.</li>
 </ul></li>
-<li><strong>The suite check holds apps to it.</strong> A manifest
+<li><p><strong>The suite check holds apps to it.</strong> A manifest
 command can carry a <code>shared=</code> line naming its SuiteCommands
 method. checkKeys fails when the method is missing, and, on an app’s
 push, when the app’s code does not call it. The shared check now passes
 the project folder for this. Ten commands in EdSharp and FileDir are
-marked so far.</li>
-<li><strong>A menu choice is always a first press.</strong> A Say
+marked so far.</p></li>
+<li><p><strong>A menu choice is always a first press.</strong> A Say
 command picked from a menu no longer spells because the same key was
-pressed a moment before.</li>
-<li><strong>The kit’s own program speaks to NVDA.</strong> HomerDev’s
+pressed a moment before.</p></li>
+<li><p><strong>The kit’s own program speaks to NVDA.</strong> HomerDev’s
 log said the NVDA controller client was missing. The kit now carries NV
 Access’s 64-bit nvdaControllerClient.dll in exec, beside HomerDev.exe,
-and an app’s build can copy it from there, as FileDir’s now does.</li>
-<li><strong>Two documents corrected.</strong> The suite contract and the
-framework guide both gave Alt+Shift+Apostrophe for Append Clipboard as
-well as Clear Clipboard. Append Clipboard is Control+Shift+Apostrophe,
-as the code always had it.</li>
+and an app’s build can copy it from there, as FileDir’s now
+does.</p></li>
+<li><p><strong>Two documents corrected.</strong> The suite contract and
+the framework guide both gave Alt+Shift+Apostrophe for Append Clipboard
+as well as Clear Clipboard. Append Clipboard is
+Control+Shift+Apostrophe, as the code always had it.</p></li>
 </ul>
 <h2 id="october-2026-1">1.73.8 – 19 October 2026</h2>
 <ul>

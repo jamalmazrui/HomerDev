@@ -55,20 +55,26 @@ def tablePath():
 
 
 def loadTable():
-    """{source type: {target type: [route, ...]}}, a route being [(engine, handsOnType), ...]."""
+    """{source type: {target type: [route, ...]}}, a route being [(engine, handsOnType), ...].
+
+    Sections are named <source>2<target> (kit 1.74.0), e.g. [pdf2txt], each with a
+    ways= line listing its routes best first, the same file C#'s Conversion.cs reads.
+    """
     dRaw = inix.readInix(tablePath())
     dTable = {}
-    for sSource, dTargets in dRaw.items():
-        if sSource.lower() == "global" or not isinstance(dTargets, dict): continue
-        for sTarget, sRoutes in dTargets.items():
-            lRoutes = []
-            for sRoute in inix.inixList(sRoutes) if hasattr(inix, "inixList") else sRoutes.split(","):
-                lSteps = []
-                for sStep in sRoute.split(">"):
-                    sEngine, _, sHands = sStep.strip().partition(":")
-                    lSteps.append((sEngine.strip().lower(), sHands.strip().lower()))
-                lRoutes.append(lSteps)
-            dTable.setdefault(sSource.lower(), {})[sTarget.lower()] = lRoutes
+    for sName, dSection in dRaw.items():
+        oMatch = re.match(r"^([a-z0-9]+?)2([a-z0-9]+)$", sName.strip().lower())
+        if not oMatch or not isinstance(dSection, dict): continue
+        sWays = next((v for k, v in dSection.items() if k.lower() == "ways"), "")
+        lRoutes = []
+        for sRoute in sWays.split(","):
+            if not sRoute.strip(): continue
+            lSteps = []
+            for sStep in sRoute.split(">"):
+                sEngine, _, sHands = sStep.strip().partition(":")
+                lSteps.append((sEngine.strip().lower(), sHands.strip().lower()))
+            lRoutes.append(lSteps)
+        dTable.setdefault(oMatch.group(1), {})[oMatch.group(2)] = lRoutes
     return dTable
 
 

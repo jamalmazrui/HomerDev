@@ -419,6 +419,15 @@ on three. <em>Implemented in kit 1.73.8.</em></li>
 a new key rather than none. <em>Stage 3.</em></li>
 <li><strong>.inix only in EdSharp and FileDir.</strong> Already ruled.
 <em>Next delivery.</em></li>
+<li><strong>One copy of every file conversion.</strong> Every app
+converts files through the kit’s Conversion.cs (C#) or conversion.py
+(Python), reading one routing table, exec\conversions.inix, whose
+conversions are named source2target, such as pdf2txt. Office through COM
+is the last resort, with an Alert box when it is missing.
+help\Conversions.md records the best engine for each conversion.
+<em>Implemented in kit 1.74.0, with FileDir moved; DbDo, EdSharp,
+HomerView, HomerScribe’s PDF reader and 2htm follow, one each.</em> This
+was ruled on 9 October and missed from the first integration plan.</li>
 </ul>
 <h2 id="the-key-families">The key families</h2>
 <ul>

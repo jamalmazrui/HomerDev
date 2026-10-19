@@ -1,0 +1,303 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.12.1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Jamal Mazrui" />
+  <title>Conversions</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      color: light-dark(#1a1a1a, #fdfdfd);
+      background-color: #fdfdfd;
+      background-color: light-dark(#fdfdfd, #1a1a1a);
+      color-scheme: light dark;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a, a:visited {
+      color: inherit;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid;
+      border-color: #e6e6e6;
+      border-color: light-dark(#e6e6e6, #4c4c4c);
+      color: #606060;
+      color: light-dark(#606060, #b6b6b6);
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid currentColor;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+    }
+    th {
+      border-top: 1px solid currentColor;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Homer Conversions</h1>
+<p class="author">Jamal Mazrui</p>
+</header>
+<main>
+<p>Every Homer app converts files through one shared copy of the code:
+Conversion.cs in C#, conversion.py in Python, and one routing table both
+read, exec\conversions.inix. This page explains the design and records
+which engine each conversion uses and why.</p>
+<h2 id="names-and-routes">Names and Routes</h2>
+<p>Each conversion is named by its source and target types, joined by a
+2: pdf2txt, pdf2docx, docx2md. The routing table has one section per
+conversion. Its ways line lists the engines to try, best first; the
+first whose engines are all present is used. A way can take steps, as in
+pdfstructure:md &gt; pandoc, which makes Markdown and then hands it to
+Pandoc.</p>
+<p>Both the source and the target decide the way. A plain text target
+wants speed, so pdf2txt reads only the PDF’s text layer. A Word target
+wants structure, so pdf2docx works out headings, lists and tables
+first.</p>
+<h2 id="engines">Engines</h2>
+<p>Each engine is either internal code, which starts no program and is
+the quickest, or an outside program, used where its quality is worth the
+start-up time.</p>
+<ul>
+<li><strong>copy</strong> (internal): the file as it is.</li>
+<li><strong>ocr</strong> (outside): Tesseract reads a scanned page.
+Never used for a quick read, since it can take minutes.</li>
+<li><strong>officecom</strong> (outside, last resort): Microsoft Office
+through COM. Used only where nothing free will do. When Office is needed
+and missing, an Alert box says so once per session, and says how to
+avoid it.</li>
+<li><strong>pandoc</strong> (outside): Pandoc, for the markup and
+document formats it reads and writes.</li>
+<li><strong>pdfstructure</strong> (outside): a PDF’s headings, lists and
+tables, through Python.</li>
+<li><strong>pdftext</strong> (internal when it can be): a PDF’s text
+layer. PdfPig in-process when PdfPig is beside the program; otherwise
+PyMuPDF’s plain text through Python.</li>
+<li><strong>table</strong> (internal): rows and columns, through the
+kit’s Table class, with cells placed by their references.</li>
+<li><strong>zipxml</strong> (internal): the text inside a Word, Excel,
+PowerPoint or OpenDocument file, read straight from its XML.</li>
+</ul>
+<h2 id="the-best-engine-for-each-conversion">The Best Engine for Each
+Conversion</h2>
+<p>This is the review of October 2026, across DbDo, EdSharp, FileDir,
+HomerScribe, HomerView and 2htm. Each choice is the best way any app
+had, with Office last.</p>
+<ul>
+<li><strong>csv, tsv and inix to md, htm or docx:</strong> the table
+engine, from FileDir. Pandoc has no writer for csv or tsv.</li>
+<li><strong>doc, xls and ppt (the 1997 Office formats):</strong> Office
+through COM, with the Alert box when it is missing. Recommended next:
+NPOI, a free NuGet package DbDo already uses, reads .xls without Office,
+so xls2csv and xls2md can move off COM.</li>
+<li><strong>docx2htm, docx2md, docx2epub and docx2odt:</strong> Pandoc.
+2htm used Word for docx2htm; Pandoc needs no Office and keeps the
+structure.</li>
+<li><strong>docx2txt and odt2txt:</strong> zipxml, new in kit 1.74.0,
+since no program starts; then Pandoc.</li>
+<li><strong>md2docx, md2htm and md2epub:</strong> Pandoc, with the
+page-break filter where the program ships it, as HomerScribe does.</li>
+<li><strong>pdf2md, pdf2docx and pdf2htm:</strong> HomerScribe’s reader
+is the best in the suite. It uses PdfPig’s layout analysis and reading
+order, so a two-column page reads down each column. It uses the PDF’s
+own tag tree when there is one, infers headings from type size, reads
+scanned pages with Tesseract above a confidence floor, and describes
+pictures with a local model. It is still part of HomerScribe’s own
+program, so until it moves into the kit as the pdfstructure engine,
+pymupdf4llm is used, as FileDir and EdSharp did.</li>
+<li><strong>pdf2txt:</strong> pdftext, for speed. This is what FileDir’s
+? key uses. It replaces pymupdf4llm, which worked out the whole
+structure only to throw it away, and 2htm, which read PDFs through
+Word.</li>
+<li><strong>pptx2md and pptx2txt:</strong> zipxml, with a heading for
+each slide in Markdown. PowerPoint only for the old .ppt.</li>
+<li><strong>xlsx2csv, xlsx2md and xlsx2txt:</strong> the table engine,
+then zipxml. Excel only for the old .xls.</li>
+<li><strong>Audio, video and pictures:</strong> ffmpeg and ImageMagick,
+in ConversionMedia.cs, moved from FileDir.</li>
+</ul>
+<p>Every conversion is logged with its route and its time in
+milliseconds, so the order of the ways can be tuned from measurements
+over many test cycles.</p>
+<h2 id="for-an-app">For an App</h2>
+<p>An app compiles Conversion.cs and Table.cs from the kit, and
+ConversionMedia.cs if it converts media. Its build copies
+exec\conversions.inix beside the program, and its installer ships it.
+Then:</p>
+<pre><code>string sError;
+string sText = Homer.Conversion.toText(sPath, out sError);
+bool bMade = Homer.Conversion.convert(sSource, sTarget, out sError);</code></pre>
+<p>toText takes the quickest way and never uses OCR, for a key that must
+answer at once. convert takes the best way for the target.</p>
+<h2 id="the-check">The Check</h2>
+<p>The shared check’s conversion step scans an app’s own C# for private
+conversion code: its own Pandoc finder, a 2htm call, an Office COM
+object or pymupdf4llm. An app listed in conversionsMoved, in
+data\SuiteCommands.inix, fails on any such line; others get a warning
+that counts them until their move.</p>
+<h2 id="moves">Moves</h2>
+<ul>
+<li><strong>DbDo, EdSharp and HomerView:</strong> next. Each still has
+its own Pandoc finder, 2htm calls or Office COM code: 13 lines in DbDo,
+6 in EdSharp and 5 in HomerView.</li>
+<li><strong>FileDir:</strong> moved in kit 1.74.0. Its Convert.cs and
+Table.cs became the kit’s Conversion.cs and Table.cs.</li>
+<li><strong>HomerScribe:</strong> its PDF reader moves into the kit as a
+class of its own, so HomerScribe and every other app call the same
+code.</li>
+<li><strong>2htm:</strong> becomes a thin command-line and dialog face
+over Conversion, keeping its own csv and json readers until they move
+into the kit too, and its Office converters as the last resort.</li>
+</ul>
+</main>
+</body>
+</html>

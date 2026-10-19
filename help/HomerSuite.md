@@ -124,6 +124,7 @@ Jamal asked Claude to settle the pending decisions by best judgment, as optimiza
 - **Repeat presses: one, two or three.** One press speaks, two spell, three show a read-only window. This follows NVDA, whose Report Current Line spells on two presses and spells phonetically on three. *Implemented in kit 1.73.8.*
 - **Say Status on Alt+Z in DbDo.** Read Only Toggle gets a new key rather than none. *Stage 3.*
 - **.inix only in EdSharp and FileDir.** Already ruled. *Next delivery.*
+- **One copy of every file conversion.** Every app converts files through the kit's Conversion.cs (C#) or conversion.py (Python), reading one routing table, exec\\conversions.inix, whose conversions are named source2target, such as pdf2txt. Office through COM is the last resort, with an Alert box when it is missing. help\\Conversions.md records the best engine for each conversion. *Implemented in kit 1.74.0, with FileDir moved; DbDo, EdSharp, HomerView, HomerScribe's PDF reader and 2htm follow, one each.* This was ruled on 9 October and missed from the first integration plan.
 
 ## The key families
 
