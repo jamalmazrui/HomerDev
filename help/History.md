@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.77.2 -- 19 October 2026
+
+- **Python finds the same Pandoc as C#.** conversion.py asked the PATH first and could pick an old Pandoc (2.19.2 in c:\bin on Jamal's computer) over the machine-wide 3.12.1 that Conversion.cs uses. Both now look in the machine-wide folder first, then the PATH.
+- **DbDo's suite commands are recorded as done** in the manifest: the clipboard family, Copy Log, Say Time, Say Path, Play Tutorials on Alt+F12, Export Data on Alt+Shift+X, the url and Go to names, and the second keys for Say Yield and Open Command Prompt.
+
 ## 1.77.1 -- 19 October 2026
 
 - **DbDo converts through the kit.** It compiles Conversion.cs, ConversionMedia.cs and Table.cs and ships conversions.inix, and the shared check now fails it, as it does EdSharp and FileDir, on any private conversion code.

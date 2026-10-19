@@ -51,7 +51,7 @@ keys=Control+Shift+Apostrophe
 change=new
 reason=clipboard family
 disposition=accepted
-status=proposed
+status=implemented
 
 [DbDo appendRecordToClipboard]
 name=Append Record to Clipboard
@@ -99,7 +99,7 @@ keys=Alt+Shift+Apostrophe
 change=new
 reason=clipboard family
 disposition=accepted
-status=proposed
+status=implemented
 
 [DbDo clearFilter]
 name=Clear Filter
@@ -170,7 +170,7 @@ keys=Control+F12
 change=new
 reason=suite Help key
 disposition=accepted
-status=proposed
+status=implemented
 
 [DbDo copyRecord]
 name=Copy Record
@@ -247,7 +247,7 @@ name=Edit url
 keys=Alt+Shift+U
 change=renamed from Edit URL, was Alt+Shift+U
 disposition=accepted
-status=proposed
+status=implemented
 
 [DbDo editView]
 name=Edit View
@@ -295,7 +295,7 @@ keys=Alt+Shift+X
 change=keys changed, was Alt+X
 reason=X for export, Alt+Shift as in the suite; Alt+X stays the editors' Cut Append
 disposition=accepted
-status=ruled
+status=implemented
 
 [DbDo extraSpeechToggle]
 name=Extra Speech Toggle
@@ -498,7 +498,7 @@ keys=Control+Backslash or Control+Slash
 change=keys changed, was Control+Slash
 reason=Control+Backslash added as the suite key
 disposition=accepted
-status=proposed
+status=implemented
 
 [DbDo openDatabase]
 name=Open Database
@@ -540,7 +540,7 @@ name=Open url
 keys=Control+Shift+U
 change=renamed from Open Url, was Control+Shift+U
 disposition=accepted
-status=proposed
+status=implemented
 
 [DbDo openWebsite]
 name=Open Website
@@ -565,7 +565,7 @@ status=current
 [DbDo playTutorials]
 name=Play Tutorials
 keys=Alt+F12
-status=proposed
+status=implemented
 reason=decision 1, the same key as EdSharp; free here
 
 [DbDo previousRecord]
@@ -693,7 +693,7 @@ keys=Control+Apostrophe
 change=new
 reason=clipboard family
 disposition=accepted
-status=proposed
+status=implemented
 
 [DbDo sayAdded]
 name=Say Added
@@ -756,7 +756,7 @@ keys=Shift+G
 change=renamed from Say Goto, was Shift+G
 reason=wording
 disposition=accepted
-status=proposed
+status=implemented
 
 [DbDo sayId]
 name=Say Id
@@ -814,7 +814,7 @@ keys=Alt+P
 change=new
 reason=the database path
 disposition=accepted
-status=proposed
+status=implemented
 
 [DbDo sayPosition]
 name=Say Position
@@ -890,14 +890,14 @@ keys=Alt+SemiColon
 change=new
 reason=suite Query key
 disposition=accepted
-status=proposed
+status=implemented
 
 [DbDo sayUrl]
 name=Say url
 keys=Shift+U
 change=renamed from Say URL, was Shift+U
 disposition=accepted
-status=proposed
+status=implemented
 
 [DbDo sayWindowsOpen]
 name=Say Windows Open
@@ -910,7 +910,7 @@ keys=Alt+Y or Shift+Y
 change=keys changed, was Shift+Y
 reason=Alt+Y added to match the suite
 disposition=accepted
-status=proposed
+status=implemented
 
 [DbDo searchNext]
 name=Search Next

@@ -85,12 +85,14 @@ def typeOf(sPath):
 # ---------- the engines: present or not ----------
 
 def findProgram(sName, lsWindowsPaths=()):
-    sFound = shutil.which(sName)
-    if sFound: return sFound
+    """The machine-wide install first, then the PATH, as Conversion.cs does (1.77.2). Asking the PATH first
+    picked an old Pandoc 2.19.2 in c:\\bin over the machine-wide 3.12.1 on Jamal's computer, so the same
+    conversion could differ between the C# and Python apps."""
     for sPattern in lsWindowsPaths:
         for sPath in glob.glob(os.path.expandvars(sPattern)):
             if os.path.isfile(sPath): return sPath
-    return ""
+    sFound = shutil.which(sName)
+    return sFound or ""
 
 
 def programFor(sEngine):
