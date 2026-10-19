@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.77.5 -- 19 October 2026
+
+- **PDFs keep their links, form answers and drop caps,** learned from FRAME PDF Studio (help\Conversions.md says what was taken and what was not). PdfReader makes a PDF's web and mail links into Markdown links on their words, lists a fillable form's fields with their values, and joins a large first letter back to its word instead of making it a heading. HomerScribe and Conversion's pdfstructure and ocr routes get all three; rebuild HomerScribe to take them up.
+
 ## 1.77.4 -- 19 October 2026
 
 - **A command whose name ends in Properties is not echoed,** since its window names itself, as Alt+Enter's does throughout Windows. This closes the Window group's gap that DbDo's Table Properties showed.

@@ -838,6 +838,7 @@ namespace Homer
             // Levels closed across the whole document, so what is returned is
             // what will be written, and the review reads that.
             oResult.sMarkdown = closedHeadingGaps(oWhole.ToString());
+            oResult.sMarkdown = withLinksAndFields(oResult.sMarkdown, lPages, o);
             oResult.bRead = true;
             oResult.bBuiltFromTags = bBuiltFromTags;
             oResult.iWithText = iWithText;
@@ -850,6 +851,160 @@ namespace Homer
             oResult.iUnread = iUnread;
             oResult.iFurniture = iFurniture;
             return oResult;
+        }
+
+        // ---- links and form fields (19 October 2026) ----------------------
+        //
+        // LEARNED FROM FRAME PDF STUDIO (MIT, ripplelearning), a browser tool for
+        // remediating PDFs, which reads a page's link annotations and its form
+        // fields as well as its text. HomerScribe's reader read neither, so a
+        // PDF's links became plain words and a filled form lost its answers.
+        //
+        // PdfPig's link and form readers are reached by reflection, so a PdfPig
+        // without one simply gives nothing here rather than breaking a build.
+
+        // The form fields of the document being read, each "label: value".
+        public static List<string> lFormFields = new List<string>();
+
+        static object propertyOf(object o, string sName)
+        {
+            if (o == null) return null;
+            try
+            {
+                System.Reflection.PropertyInfo oProp = o.GetType().GetProperty(sName);
+                return oProp == null ? null : oProp.GetValue(o, null);
+            }
+            catch (Exception) { return null; }
+        }
+
+        static string textOf(object o)
+        {
+            return o == null ? "" : Regex.Replace(o.ToString(), @"\s+", " ").Trim();
+        }
+
+        // linksOf: a page's links to the web or to mail, each {text, address}.
+        static List<string[]> linksOf(Page oPage)
+        {
+            List<string[]> lLinks = new List<string[]>();
+            try
+            {
+                System.Reflection.MethodInfo oMethod = oPage.GetType().GetMethod("GetHyperlinks", Type.EmptyTypes);
+                if (oMethod == null) return lLinks;
+                System.Collections.IEnumerable oAll = oMethod.Invoke(oPage, null) as System.Collections.IEnumerable;
+                if (oAll == null) return lLinks;
+                foreach (object oLink in oAll)
+                {
+                    string sUri = textOf(propertyOf(oLink, "Uri"));
+                    if (!Regex.IsMatch(sUri, @"^(https?:|mailto:|ftp:)", RegexOptions.IgnoreCase)) continue;
+                    lLinks.Add(new string[] { textOf(propertyOf(oLink, "Text")), sUri });
+                }
+            }
+            catch (Exception) { }
+            return lLinks;
+        }
+
+        // formFieldsOf: the document's form fields, as "label: value" or the label
+        // alone when the field is empty. The label is the field's tooltip where it
+        // has one, which is what its author wrote for a person, else its name.
+        static List<string> formFieldsOf(PdfDocument oDoc)
+        {
+            List<string> lFields = new List<string>();
+            try
+            {
+                System.Reflection.MethodInfo oMethod = oDoc.GetType().GetMethod("TryGetForm");
+                if (oMethod == null) return lFields;
+                object[] aArgs = new object[] { null };
+                object oGot = oMethod.Invoke(oDoc, aArgs);
+                if (!(oGot is bool) || !(bool) oGot || aArgs[0] == null) return lFields;
+                System.Collections.IEnumerable oAll = propertyOf(aArgs[0], "Fields") as System.Collections.IEnumerable;
+                if (oAll != null) foreach (object oField in oAll) addFormField(oField, "", lFields, 0);
+            }
+            catch (Exception) { }
+            return lFields;
+        }
+
+        static void addFormField(object oField, string sParent, List<string> lFields, int iDepth)
+        {
+            if (oField == null || iDepth > 8 || lFields.Count > 2000) return;
+            object oInfo = propertyOf(oField, "Information");
+            string sLabel = textOf(propertyOf(oInfo, "AlternateName"));
+            if (sLabel == "") sLabel = textOf(propertyOf(oInfo, "PartialName"));
+            if (sLabel == "") sLabel = sParent;
+            System.Collections.IEnumerable oChildren = propertyOf(oField, "Children") as System.Collections.IEnumerable;
+            if (oChildren != null && !(oChildren is string))
+            {
+                foreach (object oChild in oChildren) addFormField(oChild, sLabel, lFields, iDepth + 1);
+                return;
+            }
+            string sValue = "";
+            object oValue = propertyOf(oField, "Value");
+            object oChecked = propertyOf(oField, "IsChecked");
+            object oOptions = propertyOf(oField, "SelectedOptions");
+            // A radio button is one child of its group; only the chosen one is listed, under the group's label.
+            object oSelected = propertyOf(oField, "IsSelected");
+            if (oSelected is bool) { if (!(bool) oSelected) return; sValue = "selected"; }
+            else if (oChecked is bool) sValue = (bool) oChecked ? "checked" : "not checked";
+            else if (oOptions is System.Collections.IEnumerable && !(oOptions is string))
+            {
+                List<string> lPicked = new List<string>();
+                foreach (object oPick in (System.Collections.IEnumerable) oOptions) { string sPick = textOf(oPick); if (sPick != "") lPicked.Add(sPick); }
+                sValue = string.Join(", ", lPicked.ToArray());
+            }
+            else if (oValue != null && !(oValue is System.Collections.IEnumerable && !(oValue is string))) sValue = textOf(oValue);
+            if (sLabel == "") return;
+            lFields.Add(sValue == "" ? sLabel : sLabel + ": " + sValue);
+        }
+
+        // withLinksAndFields: each link's words made a Markdown link where they next
+        // occur in reading order, matched across line breaks and Markdown's escapes;
+        // a link whose words cannot be found is listed at the end so none is lost;
+        // then the form fields, when the document has any.
+        static string withLinksAndFields(string sMarkdown, List<PdfPage> lPages, Options o)
+        {
+            int iCursor = 0, iLinked = 0;
+            List<string> lUnplaced = new List<string>();
+            foreach (PdfPage oPage in lPages)
+            {
+                foreach (string[] aLink in oPage.lLinks)
+                {
+                    string sText = aLink[0], sUri = aLink[1];
+                    if (sText.Length == 0 || sText.Length > 200) { lUnplaced.Add(sUri); continue; }
+                    List<string> lWords = new List<string>();
+                    foreach (string sWord in sText.Split(' ')) if (sWord != "") lWords.Add(Regex.Escape(escapedForMarkdown(sWord)).Replace(@"\\", @"\\?"));
+                    Regex oFind = new Regex(@"(?<![\[\w])" + string.Join(@"\s+", lWords.ToArray()) + @"(?![\w\]])");
+                    Match oHit = oFind.Match(sMarkdown, Math.Min(iCursor, sMarkdown.Length));
+                    if (!oHit.Success) oHit = oFind.Match(sMarkdown);
+                    if (!oHit.Success || sMarkdown.Substring(oHit.Index + oHit.Length).StartsWith("](")) { lUnplaced.Add(sText + " " + sUri); continue; }
+                    string sLink = "[" + oHit.Value + "](" + sUri.Replace(")", "%29").Replace(" ", "%20") + ")";
+                    sMarkdown = sMarkdown.Substring(0, oHit.Index) + sLink + sMarkdown.Substring(oHit.Index + oHit.Length);
+                    iCursor = oHit.Index + sLink.Length;
+                    iLinked++;
+                }
+            }
+            StringBuilder oOut = new StringBuilder(sMarkdown.TrimEnd());
+            oOut.Append("\r\n");
+            if (lUnplaced.Count > 0)
+            {
+                oOut.Append("\r\n## Links\r\n\r\n");
+                foreach (string sOne in lUnplaced)
+                {
+                    int iSpace = sOne.LastIndexOf(' ');
+                    string sUri = iSpace < 0 ? sOne : sOne.Substring(iSpace + 1);
+                    string sWords = iSpace < 0 ? sOne : sOne.Substring(0, iSpace);
+                    oOut.Append("- [" + escapedForMarkdown(sWords) + "](" + sUri.Replace(")", "%29").Replace(" ", "%20") + ")\r\n");
+                }
+            }
+            if (lFormFields.Count > 0)
+            {
+                oOut.Append("\r\n## Form fields\r\n\r\n");
+                foreach (string sField in lFormFields) oOut.Append("- " + escapedForMarkdown(sField) + "\r\n");
+            }
+            int iAll = 0;
+            foreach (PdfPage oPage in lPages) iAll += oPage.lLinks.Count;
+            if (iAll > 0 || lFormFields.Count > 0)
+                say(o, "Links: " + iLinked + " of " + iAll + " placed on their words" + (lUnplaced.Count > 0 ? ", " + lUnplaced.Count + " listed at the end" : "")
+                       + "; form fields: " + lFormFields.Count + ".", "INFO", "");
+            return oOut.ToString();
         }
 
         // ---- Tesseract ---------------------------------------------------
@@ -1979,6 +2134,7 @@ namespace Homer
             {
                 using (PdfDocument oDoc = PdfDocument.Open(sPath))
                 {
+                    lFormFields = formFieldsOf(oDoc);
                     // The document's stated language, which a screen reader
                     // uses to decide how to pronounce it.
                     sDocumentLanguage = "";
@@ -2014,6 +2170,7 @@ namespace Homer
                         iAt = iAt + 1;
                         PdfPage oOut = new PdfPage();
                         oOut.iNumber = iAt;
+                        oOut.lLinks = linksOf(oPage);
 
                         // ---- the text layer, IN READING ORDER ----
                         //
@@ -2198,6 +2355,7 @@ namespace Homer
             public bool bScanned;
             public bool bFromOcr;      // read by Tesseract, so its lines have heights but no Markdown yet
             public int iSkippedPictures;   // found, but stored in a form nothing can open
+            public List<string[]> lLinks = new List<string[]>();   // each {text, address}, from the page's link annotations
             public string sMarkdown = "";
         }
 
@@ -2590,10 +2748,26 @@ namespace Homer
             StringBuilder oOut = new StringBuilder();
             StringBuilder oPara = new StringBuilder();
             bool bMarkerSeen = false;
+            string sDropCap = "";
             foreach (PageLine oLine in oPage.lLines)
             {
                 string sSaid = oLine.sText.Trim();
                 if (sSaid == "") continue;
+                // A DROP CAP IS THE FIRST LETTER OF A WORD (19 October 2026, a learning from
+                // FRAME PDF Studio's findDropCaps). A paragraph's opening letter set large
+                // across several lines is a line of one letter in a big size, which the
+                // heading test below would make "# T". It is held and joined to the start
+                // of the next line instead, so "T" and "he story began" read "The story began".
+                if (sSaid.Length == 1 && char.IsLetter(sSaid[0]) && oLine.nSize >= nBody * 1.5)
+                {
+                    sDropCap = sSaid;
+                    continue;
+                }
+                if (sDropCap != "")
+                {
+                    sSaid = sDropCap + sSaid;
+                    sDropCap = "";
+                }
                 double nAt = Math.Round(oLine.nSize * 2.0) / 2.0;
                 // A HEADING IS SHORT, whatever size it is set in.
                 //

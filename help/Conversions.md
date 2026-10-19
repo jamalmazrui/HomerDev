@@ -76,3 +76,21 @@ The shared check's conversion step scans an app's own C# for private conversion 
 - **FileDir:** moved in kit 1.74.0. Its Convert.cs and Table.cs became the kit's Conversion.cs and Table.cs.
 - **HomerScribe:** its PDF reader moved into the kit in 1.75.0 as PdfReader.cs, and HomerScribe calls it. Its Word version is still made by its own Pandoc call, which moves to Conversion when HomerScribe compiles it.
 - **2htm:** becomes a thin command-line and dialog face over Conversion, keeping its own csv and json readers until they move into the kit too, and its Office converters as the last resort.
+
+## Learnings from FRAME PDF Studio
+
+FRAME PDF Studio (MIT licensed, by ripplelearning) is a browser tool for remediating PDFs by hand. It reads a PDF with pdf.js, recognizes scanned pages with tesseract.js, and writes a tagged PDF with pdf-lib. It was reviewed on 19 October 2026 for what the kit's PdfReader should learn.
+
+### Taken into PdfReader (kit 1.77.5)
+
+- **Drop caps.** A paragraph's first letter set large across several lines came out as a one-letter heading. It is now joined back to its word.
+- **Form fields.** A fillable PDF's fields are listed at the end under Form fields, each with its label (its tooltip, else its name) and its value. Before, a filled form lost its answers.
+- **Links.** A PDF's links to the web or to mail become Markdown links on the words they cover, in reading order. Any link whose words cannot be found is listed at the end under Links, so none is lost.
+
+### Not taken, and why
+
+- **Column order by clustering line centers.** PdfReader already uses PdfPig's Docstrum blocks and reading-order detector, which handle columns and full-width headings more reliably than a fixed 60-point cluster.
+- **Headings by a fixed size ratio and list markers by pattern.** PdfReader already does both, with the body size measured by characters and a length test that FRAME's rule lacks.
+- **Tables built by hand, and writing a tagged PDF.** These are remediation, making a better PDF, rather than conversion. They would suit a future pdf2pdf route, not pdf2md.
+- **Its accessibility checker.** A list of a PDF's accessibility problems could become a kit report one day; it is not a conversion.
+

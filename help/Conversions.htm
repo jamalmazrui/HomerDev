@@ -332,6 +332,43 @@ HomerScribe compiles it.</li>
 over Conversion, keeping its own csv and json readers until they move
 into the kit too, and its Office converters as the last resort.</li>
 </ul>
+<h2 id="learnings-from-frame-pdf-studio">Learnings from FRAME PDF
+Studio</h2>
+<p>FRAME PDF Studio (MIT licensed, by ripplelearning) is a browser tool
+for remediating PDFs by hand. It reads a PDF with pdf.js, recognizes
+scanned pages with tesseract.js, and writes a tagged PDF with pdf-lib.
+It was reviewed on 19 October 2026 for what the kit’s PdfReader should
+learn.</p>
+<h3 id="taken-into-pdfreader-kit-1.77.5">Taken into PdfReader (kit
+1.77.5)</h3>
+<ul>
+<li><strong>Drop caps.</strong> A paragraph’s first letter set large
+across several lines came out as a one-letter heading. It is now joined
+back to its word.</li>
+<li><strong>Form fields.</strong> A fillable PDF’s fields are listed at
+the end under Form fields, each with its label (its tooltip, else its
+name) and its value. Before, a filled form lost its answers.</li>
+<li><strong>Links.</strong> A PDF’s links to the web or to mail become
+Markdown links on the words they cover, in reading order. Any link whose
+words cannot be found is listed at the end under Links, so none is
+lost.</li>
+</ul>
+<h3 id="not-taken-and-why">Not taken, and why</h3>
+<ul>
+<li><strong>Column order by clustering line centers.</strong> PdfReader
+already uses PdfPig’s Docstrum blocks and reading-order detector, which
+handle columns and full-width headings more reliably than a fixed
+60-point cluster.</li>
+<li><strong>Headings by a fixed size ratio and list markers by
+pattern.</strong> PdfReader already does both, with the body size
+measured by characters and a length test that FRAME’s rule lacks.</li>
+<li><strong>Tables built by hand, and writing a tagged PDF.</strong>
+These are remediation, making a better PDF, rather than conversion. They
+would suit a future pdf2pdf route, not pdf2md.</li>
+<li><strong>Its accessibility checker.</strong> A list of a PDF’s
+accessibility problems could become a kit report one day; it is not a
+conversion.</li>
+</ul>
 </main>
 </body>
 </html>
