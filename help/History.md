@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.77.3 -- 19 October 2026
+
+- **The build says when it starts packing HomerDev_setup.exe.** That last step runs quietly for minutes, and the console looked stuck after "Built exec\HomerDev.exe". It now says what it is doing, and that an app's build can start.
+
 ## 1.77.2 -- 19 October 2026
 
 - **Python finds the same Pandoc as C#.** conversion.py asked the PATH first and could pick an old Pandoc (2.19.2 in c:\bin on Jamal's computer) over the machine-wide 3.12.1 that Conversion.cs uses. Both now look in the machine-wide folder first, then the PATH.

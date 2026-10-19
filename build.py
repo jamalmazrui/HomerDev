@@ -869,6 +869,10 @@ def buildHomerDevSetup():
     # "EndUpdateResource" (error 110, a file held by another program while Inno writes into it) is tried again, at
     # most twice, ten seconds apart. Any other failure stops at once, and the last setup program is kept.
     sBuilding = os.path.join(sScriptDir, "HomerDev_setup.building.exe")
+    # SAY SO BEFORE A QUIET WAIT (1.77.2): Inno Setup runs with /Q and packs the whole kit, voices and tutorial
+    # audio included, so the console said nothing for minutes after "Built exec\\HomerDev.exe" and looked stuck.
+    sayLine("Building HomerDev_setup.exe, which packs the whole kit; this is quiet and takes a few minutes. "
+            "An app's build can start now: the kit's code, conversions and tutorials are done.")
     for iTry in range(1, 4):
         if os.path.exists(sBuilding): os.remove(sBuilding)
         iCode, sOutput = runCommand([sIscc, "/Q", "/DHomerDev=" + sScriptDir, "/FHomerDev_setup.building", sScript])
