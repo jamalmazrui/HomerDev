@@ -25,6 +25,9 @@
 //            Summary, F11 Elevate Version, Control+F12 Copy Log, and Play
 //            Tutorials in the Homer Player
 //
+// The bodies of the Say, clipboard, log and Help commands are SuiteCommands,
+// which an app with a frame of its own calls too (kit 1.74.0).
+//
 // Every key goes through KeyMap.route, so a key that types in a text box
 // types, a list keeps first-letter navigation, and a command that cannot run
 // says why. The rules are in KeyMap.cs and the guide is help\MdiFramework.md.
@@ -236,6 +239,226 @@ public static class ClipFile {
     }
 }
 
+// ------- the suite's shared commands -------
+
+// SuiteCommands: ONE NAME, KEY AND DESCRIPTION MEANS ONE PIECE OF CODE (the
+// suite contract, help\HomerSuite.md). Every Homer app's Say Clipboard, Say
+// Time, Copy Log, clipboard family and Help openers call these, whatever frame
+// the app has -- this kit's MdiFrame, or an app's own frame that has not moved
+// to it yet -- so the wording and the behavior are the same in every app.
+//
+// Each method takes only what it needs: an owner window for a dialog, a log
+// path for an app that keeps its own log. The Say methods answer through
+// KeyMap.answer, so one press speaks, two spell, and three show a read-only
+// window, wherever the kit's router counted the presses.
+//
+// The window family is MdiWindows, above; ClipFile does the file work. The
+// kit's checkKeys confirms, on every push, that each manifest command marked
+// shared= really calls the method named here.
+//
+// BEST OF THE APPS (kit 1.74.0): Say Clipboard reads a list of copied files
+// as FileDir did; Copy Log puts the log on the clipboard as a file AND as its
+// path, as EdSharp and FileDir did; everything else is the frame's.
+public static class SuiteCommands {
+
+    public const string sNoText = "The clipboard holds no text";
+
+    // ------- the Say family -------
+
+    // sayClipboard: Alt+Apostrophe. Copied files are counted and named, one
+    // utterance each; text is spoken as it is.
+    public static bool sayClipboard() {
+        List<string> lsFiles = new List<string>();
+        string sText = "";
+        try {
+            if (Clipboard.ContainsFileDropList()) {
+                foreach (string sPath in Clipboard.GetFileDropList()) lsFiles.Add(sPath);
+            }
+            else if (Clipboard.ContainsText()) {
+                sText = Clipboard.GetText();
+            }
+        }
+        catch (Exception oError) {
+            Log.exception(oError);
+        }
+        if (lsFiles.Count > 0) {
+            List<string> lsParts = new List<string>();
+            lsParts.Add(lsFiles.Count == 1 ? "1 file on the clipboard" : lsFiles.Count.ToString() + " files on the clipboard");
+            lsParts.AddRange(lsFiles);
+            return KeyMap.answer("Clipboard", lsParts.ToArray());
+        }
+        if (sText.Length == 0) return KeyMap.answer("Clipboard", sNoText);
+        return KeyMap.answer("Clipboard", sText);
+    }
+
+    // sayTime: Alt+SemiColon. The time, then the date, as two utterances.
+    public static bool sayTime() {
+        DateTime dtNow = DateTime.Now;
+        return KeyMap.answer("Time", dtNow.ToShortTimeString(), dtNow.ToLongDateString());
+    }
+
+    // ------- the clipboard family -------
+
+    // clearClipboard: Alt+Shift+Apostrophe.
+    public static bool clearClipboard() {
+        try {
+            Clipboard.Clear();
+            Say.sayForced("Clipboard cleared");
+        }
+        catch (Exception oError) {
+            Log.exception(oError);
+            Say.sayForced("The clipboard could not be cleared. The log has why.");
+        }
+        return true;
+    }
+
+    // saveClipboard: Control+Apostrophe. A name is proposed in the results
+    // folder; a name already taken is never replaced, and the question comes
+    // again.
+    public static bool saveClipboard(IWin32Window oOwner) {
+        string sText = ClipFile.clipboardText();
+        if (sText.Length == 0) { Say.sayForced(sNoText); return true; }
+        string sFolder = Paths.results();
+        string sName = System.IO.Path.GetFileName(ClipFile.proposedPath(sFolder));
+        while (true) {
+            using (LbcDialog dlg = new LbcDialog("Save Clipboard", oOwner)) {
+                TextBox tb = dlg.addInputBox("&File name:", sName, "The new file, in the results folder. A file already there is never replaced.");
+                if (!dlg.runOkCancel()) return true;
+                sName = tb.Text.Trim();
+            }
+            if (sName == "" || sName.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) >= 0) {
+                Say.sayForced("A file name cannot be empty or hold any of these: \\ / : * ? quote < > |");
+                continue;
+            }
+            if (System.IO.Path.GetExtension(sName) == "") sName += ".txt";
+            string sPath = System.IO.Path.Combine(sFolder, sName);
+            if (System.IO.File.Exists(sPath)) {
+                Say.sayForced(sName + " already exists. Choose another name.");
+                continue;
+            }
+            string sError;
+            if (ClipFile.writeNew(sPath, sText, out sError)) {
+                Log.info("Saved the clipboard to " + sPath);
+                Say.sayForced("Saved " + sName + " in the results folder");
+            }
+            else {
+                Say.sayForced(sName + " could not be saved: " + sError);
+            }
+            return true;
+        }
+    }
+
+    // appendClipboard: Control+Shift+Apostrophe. Pick a text file; the text
+    // goes at its end, by the suite's append rules.
+    public static bool appendClipboard(IWin32Window oOwner) {
+        string sText = ClipFile.clipboardText();
+        if (sText.Length == 0) { Say.sayForced(sNoText); return true; }
+        string sPath = "";
+        using (OpenFileDialog dlg = new OpenFileDialog()) {
+            dlg.Title = "Append Clipboard";
+            dlg.InitialDirectory = Paths.results();
+            dlg.Filter = "Text files (*.txt, *.md, *.inix, *.csv)|*.txt;*.md;*.inix;*.csv|All files (*.*)|*.*";
+            dlg.CheckFileExists = true;
+            if (dlg.ShowDialog(oOwner) != DialogResult.OK) return true;
+            sPath = dlg.FileName;
+        }
+        bool bAddedBreak;
+        string sError;
+        string sName = System.IO.Path.GetFileName(sPath);
+        if (ClipFile.append(sPath, sText, out bAddedBreak, out sError)) {
+            Log.info("Appended the clipboard to " + sPath + (bAddedBreak ? ", after a line break" : ""));
+            Say.sayForced("Appended to " + sName + (bAddedBreak ? ", starting a new line" : ""));
+        }
+        else {
+            Say.sayForced("Nothing was added to " + sName + ", because " + sError + ". Save Clipboard makes a new file instead.");
+        }
+        return true;
+    }
+
+    // ------- the log -------
+
+    // copyLog: Control+F12. The log on the clipboard as a FILE, so Control+V
+    // in an email attaches it, and as its PATH in text, so a program that
+    // reads only text gets the path. One DataObject carries both.
+    public static bool copyLog() {
+        return copyLog(Log.path);
+    }
+
+    // copyLog(sLogPath): for an app that keeps its own log file.
+    public static bool copyLog(string sLogPath) {
+        if (string.IsNullOrEmpty(sLogPath) || !System.IO.File.Exists(sLogPath)) {
+            Say.sayForced("There is no log for this session");
+            return true;
+        }
+        try {
+            DataObject oData = new DataObject();
+            StringCollection lsFiles = new StringCollection();
+            lsFiles.Add(sLogPath);
+            oData.SetFileDropList(lsFiles);
+            oData.SetText(sLogPath);
+            Clipboard.SetDataObject(oData, true);
+            Log.info("Copied the log to the clipboard: " + sLogPath);
+            Say.sayForced("Log copied as a file, ready to paste as an attachment");
+        }
+        catch (Exception oError) {
+            Log.exception(oError);
+            Say.sayForced("The log could not be copied. Its path is " + sLogPath);
+        }
+        return true;
+    }
+
+    // ------- the Help openers -------
+
+    // helpPath: a document from the shipped help folder, else from the top of
+    // the program folder, else "" when it is in neither.
+    public static string helpPath(string sFileName) {
+        string sPath = System.IO.Path.Combine(Paths.shippedHelp(), sFileName);
+        if (System.IO.File.Exists(sPath)) return sPath;
+        sPath = System.IO.Path.Combine(Paths.installedFolder, sFileName);
+        if (System.IO.File.Exists(sPath)) return sPath;
+        return "";
+    }
+
+    public static bool openHelp(string sFileName) {
+        string sPath = helpPath(sFileName);
+        if (sPath == "") {
+            Say.sayForced(sFileName + " was not found beside the program");
+            return true;
+        }
+        return openPath(sPath);
+    }
+
+    // openDocumentation: F1, the app's own guide, <App>.htm.
+    public static bool openDocumentation(string sAppName) {
+        return openHelp(sAppName + ".htm");
+    }
+
+    // openHistory: Shift+F1, History of Changes.
+    public static bool openHistory() {
+        return openHelp("History.htm");
+    }
+
+    // openReadMe: Alt+Shift+F1, the quick start.
+    public static bool openReadMe() {
+        return openHelp("ReadMe.htm");
+    }
+
+    // openHotkeys: Control+Shift+F1, the document of every command and key.
+    // When it is not installed, the Hotkey Summary window is shown instead.
+    public static bool openHotkeys(IWin32Window oOwner) {
+        string sPath = helpPath("Hotkeys.htm");
+        if (sPath != "") return openPath(sPath);
+        HelpDialog.show(oOwner, "Hotkey Summary", KeyMap.hotkeySummary());
+        return true;
+    }
+
+    public static bool openPath(string sPath) {
+        try { System.Diagnostics.Process.Start(sPath); }
+        catch (Exception oError) { Log.exception(oError); Say.sayForced("That could not be opened. The log has why."); }
+        return true;
+    }
+}
+
 // ------- the frame -------
 
 public class MdiFrame : LbcForm {
@@ -313,7 +536,8 @@ public class MdiFrame : LbcForm {
         LbcMenuItem item = new LbcMenuItem(uniqueTrigger(sCaption));
         item.ToolTipText = sSummary;
         if (oCommand.lsKeys.Count > 0) item.ShortcutKeyDisplayString = oCommand.keysText();
-        item.Click += delegate(object oSender, EventArgs evArgs) { KeyMap.runCommand(oCommand); };
+        // A menu choice is always a first press, whatever keys came before it.
+        item.Click += delegate(object oSender, EventArgs evArgs) { KeyMap.iPressCount = 1; KeyMap.runCommand(oCommand); };
         oCommand.oItem = item;
         oCommand.sMenu = menuNow == null ? "" : menuNow.Text.Replace("&", "");
         if (menuNow != null) {
@@ -391,12 +615,12 @@ public class MdiFrame : LbcForm {
 
         addMenu("&Help");
         addCommand("&Documentation", "F1", "Open the guide.", delegate() { return openHelp(sAppName + ".htm"); });
-        addCommand("&History of Changes", "Shift+F1", "Open the list of changes, newest first.", delegate() { return openHelp("History.htm"); });
+        addCommand("&History of Changes", "Shift+F1", "Open the list of changes, newest first.", SuiteCommands.openHistory);
         addCommand("&About", "Alt+F1", "The name, the version, and where this copy keeps its files.", showAbout);
         KeyMap.Command oDescriber = addCommand("&Key Describer Toggle", "Control+F1", "A key says what it would do instead of doing it.", toggleKeyDescriber);
         oDescriber.fChecked = delegate() { return KeyMap.bKeyDescriber; };
         addCommand("Hotkeys", "Control+Shift+F1", "Open the document of every command and key.", showHotkeys);
-        addCommand("&ReadMe", "Alt+Shift+F1", "Open the quick start.", delegate() { return openHelp("ReadMe.htm"); });
+        addCommand("&ReadMe", "Alt+Shift+F1", "Open the quick start.", SuiteCommands.openReadMe);
         addCommand("Alternate &Menu...", "Alt+F10", "Every command in one list you can search.", showAlternateMenu);
         addCommand("Hotkey &Summary", "Alt+Shift+H", "Every command, key and summary in a window.", showHotkeySummary);
         addCommand("&Play Tutorials...", "", "Play the spoken tutorials in the Homer Player.", playTutorials);
@@ -479,85 +703,26 @@ public class MdiFrame : LbcForm {
 
     // ------- query -------
 
+    // The Say, clipboard, log and Help commands are SuiteCommands's, so every
+    // app's copy of them is one piece of code (kit 1.74.0).
     public bool sayClipboard() {
-        string sText = "";
-        try { if (Clipboard.ContainsText()) sText = Clipboard.GetText(); } catch (Exception oError) { Log.exception(oError); }
-        if (sText.Length == 0) return KeyMap.answer("Clipboard", "The clipboard holds no text");
-        return KeyMap.answer("Clipboard", sText);
+        return SuiteCommands.sayClipboard();
     }
 
-    // saveClipboard: Control+Apostrophe. A name is proposed in the results
-    // folder; a name already taken is never replaced, and the question comes
-    // again.
     public bool saveClipboard() {
-        string sText = ClipFile.clipboardText();
-        if (sText.Length == 0) { Say.sayForced("The clipboard holds no text"); return true; }
-        string sFolder = Paths.results();
-        string sName = System.IO.Path.GetFileName(ClipFile.proposedPath(sFolder));
-        while (true) {
-            using (LbcDialog dlg = new LbcDialog("Save Clipboard", this)) {
-                TextBox tb = dlg.addInputBox("&File name:", sName, "The new file, in the results folder. A file already there is never replaced.");
-                if (!dlg.runOkCancel()) return true;
-                sName = tb.Text.Trim();
-            }
-            if (sName == "" || sName.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) >= 0) {
-                Say.sayForced("A file name cannot be empty or hold any of these: \\ / : * ? quote < > |");
-                continue;
-            }
-            if (System.IO.Path.GetExtension(sName) == "") sName += ".txt";
-            string sPath = System.IO.Path.Combine(sFolder, sName);
-            if (System.IO.File.Exists(sPath)) {
-                Say.sayForced(sName + " already exists. Choose another name.");
-                continue;
-            }
-            string sError;
-            if (ClipFile.writeNew(sPath, sText, out sError)) {
-                Log.info("Saved the clipboard to " + sPath);
-                Say.sayForced("Saved " + sName + " in the results folder");
-            }
-            else {
-                Say.sayForced(sName + " could not be saved: " + sError);
-            }
-            return true;
-        }
+        return SuiteCommands.saveClipboard(this);
     }
 
-    // appendClipboard: Control+Shift+Apostrophe. Pick a text file; the text
-    // goes at its end, by the suite's append rules.
     public bool appendClipboard() {
-        string sText = ClipFile.clipboardText();
-        if (sText.Length == 0) { Say.sayForced("The clipboard holds no text"); return true; }
-        string sPath = "";
-        using (OpenFileDialog dlg = new OpenFileDialog()) {
-            dlg.Title = "Append Clipboard";
-            dlg.InitialDirectory = Paths.results();
-            dlg.Filter = "Text files (*.txt, *.md, *.inix, *.csv)|*.txt;*.md;*.inix;*.csv|All files (*.*)|*.*";
-            dlg.CheckFileExists = true;
-            if (dlg.ShowDialog(this) != DialogResult.OK) return true;
-            sPath = dlg.FileName;
-        }
-        bool bAddedBreak;
-        string sError;
-        string sName = System.IO.Path.GetFileName(sPath);
-        if (ClipFile.append(sPath, sText, out bAddedBreak, out sError)) {
-            Log.info("Appended the clipboard to " + sPath + (bAddedBreak ? ", after a line break" : ""));
-            Say.sayForced("Appended to " + sName + (bAddedBreak ? ", starting a new line" : ""));
-        }
-        else {
-            Say.sayForced("Nothing was added to " + sName + ", because " + sError + ". Save Clipboard makes a new file instead.");
-        }
-        return true;
+        return SuiteCommands.appendClipboard(this);
     }
 
     public bool clearClipboard() {
-        try { Clipboard.Clear(); Say.sayForced("Clipboard cleared"); }
-        catch (Exception oError) { Log.exception(oError); Say.sayForced("The clipboard could not be cleared. The log has why."); }
-        return true;
+        return SuiteCommands.clearClipboard();
     }
 
     public bool sayTime() {
-        DateTime dtNow = DateTime.Now;
-        return KeyMap.answer("Time", dtNow.ToShortTimeString(), dtNow.ToLongDateString());
+        return SuiteCommands.sayTime();
     }
 
     // ------- scripts -------
@@ -712,9 +877,7 @@ public class MdiFrame : LbcForm {
     }
 
     public bool showHotkeys() {
-        string sPath = System.IO.Path.Combine(Paths.shippedHelp(), "Hotkeys.htm");
-        if (System.IO.File.Exists(sPath)) return openPath(sPath);
-        return showHotkeySummary();
+        return SuiteCommands.openHotkeys(this);
     }
 
     public bool showAbout() {
@@ -777,43 +940,16 @@ public class MdiFrame : LbcForm {
         return openHelp("Tutorials.htm");
     }
 
-    // copyLog: the log as a FILE on the clipboard, so Control+V in an email
-    // attaches it rather than pasting its name.
     public bool copyLog() {
-        string sLog = Log.path;
-        if (string.IsNullOrEmpty(sLog) || !System.IO.File.Exists(sLog)) {
-            Say.sayForced("There is no log for this session");
-            return true;
-        }
-        try {
-            StringCollection lsFiles = new StringCollection();
-            lsFiles.Add(sLog);
-            Clipboard.SetFileDropList(lsFiles);
-            Say.sayForced("Log copied as a file, ready to paste as an attachment");
-        }
-        catch (Exception oError) {
-            Log.exception(oError);
-            Say.sayForced("The log could not be copied. Its path is " + sLog);
-        }
-        return true;
+        return SuiteCommands.copyLog();
     }
 
-    // openHelp: a document from the shipped help folder, or the ReadMe from
-    // the top of the program folder.
     public bool openHelp(string sFileName) {
-        string sPath = System.IO.Path.Combine(Paths.shippedHelp(), sFileName);
-        if (!System.IO.File.Exists(sPath)) sPath = System.IO.Path.Combine(Paths.installedFolder, sFileName);
-        if (!System.IO.File.Exists(sPath)) {
-            Say.sayForced(sFileName + " was not found beside the program");
-            return true;
-        }
-        return openPath(sPath);
+        return SuiteCommands.openHelp(sFileName);
     }
 
     public bool openPath(string sPath) {
-        try { System.Diagnostics.Process.Start(sPath); }
-        catch (Exception oError) { Log.exception(oError); Say.sayForced("That could not be opened. The log has why."); }
-        return true;
+        return SuiteCommands.openPath(sPath);
     }
 
     // showDocumentation: the earlier name.

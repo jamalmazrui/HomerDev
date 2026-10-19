@@ -268,6 +268,10 @@ MDI sample’s export, and fails on a problem.</li>
 “suite” check exports the app’s own keys when it is on the Homer frame
 and checks that app’s manifest entries, and stops the push on a
 problem.</li>
+<li><strong>One name, one piece of code:</strong> a manifest command
+with a <code>shared=</code> line names a SuiteCommands method. The
+checker fails when the method does not exist and, on an app’s push, when
+the app’s own C# does not call it.</li>
 </ul>
 <p>A key shared on purpose carries an exception= line in the manifest
 saying why, and is counted as reviewed, not as a problem. Keys to test
@@ -388,17 +392,23 @@ for free first letters, with a recorded exception where none exists.
 These include Edit Settings File, Go to Special Folder, Say Folder,
 Folder to Clipboard, Say Font, Search for Topic, Toggle Indentation and
 the Tile commands. <em>Stage 4.</em></li>
-<li><strong>One piece of code for shared commands.</strong> A kit class
-will hold the suite’s shared commands, and each app’s handlers will call
-it:
+<li><strong>One piece of code for shared commands.</strong> The kit
+class SuiteCommands, in Mdi.cs, holds the suite’s shared commands, and
+each app’s handlers call it:
 <ul>
 <li>Say Clipboard, Say Time and Copy Log;</li>
 <li>Save, Append and Clear Clipboard;</li>
-<li>the window family;</li>
-<li>the Help openers: ReadMe, History and Hotkeys.</li>
+<li>the Help openers: Documentation, History, ReadMe and Hotkeys;</li>
+<li>the window family, which stays in MdiWindows.</li>
 </ul>
-<em>Next delivery, starting with the Say and clipboard
-families.</em></li>
+The frame calls them, and so do EdSharp and FileDir from their own
+frames. A manifest command with a <code>shared=</code> line names its
+method, and the suite check fails when the method is missing or the
+app’s code does not call it. <em>Implemented in kit 1.74.0 for the
+frame, EdSharp and FileDir. DbDo follows in stage 3, when its keys reach
+the kit’s router, which counts the presses the Say commands answer. The
+window family in EdSharp and FileDir follows in stage 4, since their
+close commands carry their own unsaved-work questions.</em></li>
 <li><strong>Regex in command names,</strong> as agreed. <em>Stage
 4.</em></li>
 <li><strong>Repeat presses: one, two or three.</strong> One press
@@ -471,7 +481,7 @@ DbDo keeps its Shift+letter say layer as a second set of keys.</li>
 <li><strong>Alt+Shift+Apostrophe:</strong> clear it.</li>
 <li><strong>Control+Apostrophe:</strong> save the clipboard to a new
 text file.</li>
-<li><strong>Alt+Shift+Apostrophe:</strong> append the clipboard to a
+<li><strong>Control+Shift+Apostrophe:</strong> append the clipboard to a
 text file.</li>
 </ul></li>
 <li><strong>Undo and Redo:</strong> Control+Z and Control+Shift+Z

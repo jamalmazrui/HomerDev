@@ -60,6 +60,7 @@ It runs inside the normal cycle, so nobody runs it by hand:
 
 - **The kit's build** checks the whole manifest and the MDI sample's export, and fails on a problem.
 - **Every app's push** runs the shared check, whose "suite" check exports the app's own keys when it is on the Homer frame and checks that app's manifest entries, and stops the push on a problem.
+- **One name, one piece of code:** a manifest command with a `shared=` line names a SuiteCommands method. The checker fails when the method does not exist and, on an app's push, when the app's own C# does not call it.
 
 A key shared on purpose carries an exception= line in the manifest saying why, and is counted as reviewed, not as a problem. Keys to test in their real control and first-letter misses are reported, never failed.
 
@@ -112,13 +113,13 @@ Jamal asked Claude to settle the pending decisions by best judgment, as optimiza
 - **Lbc's keys in the framework.** The router now leaves Lbc's text-box keys to any text box that is not the app's editor: copy, cut and delete the line, copy all, read all, and the rest. The full list of Lbc's text, list and dialog keys is in KeyMap.cs and in the guide. The fruit basket's Add moved from Control+Shift+A, which Lbc's text boxes use, to Alt+Shift+A. *Implemented in kit 1.73.8.*
 - **Mark rather than Tag in FileDir,** as both AIs agreed. Only the words change, not the keys. *Stage 4.*
 - **Menu-only moves are withdrawn.** Every command that was to lose its key gets a new key instead, chosen by the same search for free first letters, with a recorded exception where none exists. These include Edit Settings File, Go to Special Folder, Say Folder, Folder to Clipboard, Say Font, Search for Topic, Toggle Indentation and the Tile commands. *Stage 4.*
-- **One piece of code for shared commands.** A kit class will hold the suite's shared commands, and each app's handlers will call it:
+- **One piece of code for shared commands.** The kit class SuiteCommands, in Mdi.cs, holds the suite's shared commands, and each app's handlers call it:
   - Say Clipboard, Say Time and Copy Log;
   - Save, Append and Clear Clipboard;
-  - the window family;
-  - the Help openers: ReadMe, History and Hotkeys.
+  - the Help openers: Documentation, History, ReadMe and Hotkeys;
+  - the window family, which stays in MdiWindows.
   
-  *Next delivery, starting with the Say and clipboard families.*
+  The frame calls them, and so do EdSharp and FileDir from their own frames. A manifest command with a `shared=` line names its method, and the suite check fails when the method is missing or the app's code does not call it. *Implemented in kit 1.74.0 for the frame, EdSharp and FileDir. DbDo follows in stage 3, when its keys reach the kit's router, which counts the presses the Say commands answer. The window family in EdSharp and FileDir follows in stage 4, since their close commands carry their own unsaved-work questions.*
 - **Regex in command names,** as agreed. *Stage 4.*
 - **Repeat presses: one, two or three.** One press speaks, two spell, three show a read-only window. This follows NVDA, whose Report Current Line spells on two presses and spells phonetically on three. *Implemented in kit 1.73.8.*
 - **Say Status on Alt+Z in DbDo.** Read Only Toggle gets a new key rather than none. *Stage 3.*
@@ -165,7 +166,7 @@ Jamal asked Claude to settle the pending decisions by best judgment, as optimiza
   - **Alt+Apostrophe:** say the clipboard.
   - **Alt+Shift+Apostrophe:** clear it.
   - **Control+Apostrophe:** save the clipboard to a new text file.
-  - **Alt+Shift+Apostrophe:** append the clipboard to a text file.
+  - **Control+Shift+Apostrophe:** append the clipboard to a text file.
 - **Undo and Redo:** Control+Z and Control+Shift+Z everywhere.
 - **Export:** Alt+Shift+X. In the editors, Alt+X stays Cut Append.
 - **Repeat keys:** NVDA's pattern, one, two or three presses. One press of a Say key speaks the answer, a quick second press spells it, and a third shows it in a read-only window you can review, spell phonetically and copy. This keeps EdSharp's and HomerView's spelling on a second press and DbDo's review window, and follows NVDA, whose Report Current Line spells on two presses and spells phonetically on three. Control plus a letter asks; Alt plus the same letter repeats the last answer, but only where an app registers that pair. F3 and Shift+F3 repeat whichever search ran last in the window.

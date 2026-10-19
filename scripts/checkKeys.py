@@ -6,6 +6,9 @@ Usage (through checkKeys.cmd):
     checkKeys DbDo-keys.inix ...   also check files an app wrote with /exportkeys
     checkKeys --gate               exit 1 when a problem is found (for a build)
     checkKeys --app DbDo           check one app's manifest entries and exports
+    checkKeys --app DbDo --source C:\DbDo
+                                   also check that the app's source calls the
+                                   shared code its manifest entries name
 
 What it reads, all in the kit:
     data\SuiteCommands.inix    every command of the four apps, with its keys
@@ -15,8 +18,11 @@ What it reads, all in the kit:
 What it reports: duplicate identifiers; a key bound twice in one app; a key a
 system or a screen reader takes everywhere; keys to test in their real control
 (laptop-layout and table keys, input-method keys); hotkey letters that are not
-the first letter of a word; and, for each export, every difference between
-what the program declared and what the manifest says.
+the first letter of a word; for each export, every difference between
+what the program declared and what the manifest says; and ONE NAME, ONE PIECE
+OF CODE (kit 1.74.0): a manifest command with a shared= line names a method of
+SuiteCommands in exec\CSharp\Mdi.cs, which must exist, and which the app's own
+.cs files must call when --source gives the app's folder.
 
 The kit's build runs it on every build, with the export of the MDI sample, so
 nobody needs to run it by hand. Report-only unless --gate is given: stage 2 of
@@ -120,10 +126,13 @@ def main():
     lsArgs = sys.argv[1:]
     bGate = "--gate" in [s.lower() for s in lsArgs]
     sOnlyApp = ""
+    sSource = ""
     for i, sArg in enumerate(lsArgs):
         if sArg.lower() == "--app" and i + 1 < len(lsArgs):
             sOnlyApp = lsArgs[i + 1]
-    lsExports = [s for i, s in enumerate(lsArgs) if not s.startswith("--") and not (i > 0 and lsArgs[i - 1].lower() == "--app")]
+        if sArg.lower() == "--source" and i + 1 < len(lsArgs):
+            sSource = lsArgs[i + 1]
+    lsExports = [s for i, s in enumerate(lsArgs) if not s.startswith("--") and not (i > 0 and lsArgs[i - 1].lower() in ("--app", "--source"))]
     os.makedirs(os.path.dirname(sLogPath), exist_ok=True)
     oLog = open(sLogPath, "w", encoding="utf-8-sig", newline="\r\n")
     logLine("checkKeys start")
@@ -131,7 +140,7 @@ def main():
     logLine("python: " + platform.python_version() + ", " + platform.platform())
     logLine("working directory: " + os.getcwd())
     logLine("command line: " + " ".join(sys.argv))
-    logLine("kit: " + sKitDir + ", gate: " + str(bGate) + ", app: " + (sOnlyApp or "all"))
+    logLine("kit: " + sKitDir + ", gate: " + str(bGate) + ", app: " + (sOnlyApp or "all") + ", source: " + (sSource or "none"))
 
     lsProblems = []
     lsExceptions = []
@@ -197,6 +206,31 @@ def main():
             lsProblems.append("KeyMap.cs reserves %s, which KeyOwnership.inix does not list" % sKey)
         elif dOwner.get("kind") not in ("system", "reader global", "conditional"):
             lsProblems.append("KeyMap.cs reserves %s, which KeyOwnership.inix calls %s" % (sKey, dOwner.get("kind")))
+
+    # ONE NAME, ONE PIECE OF CODE (1.74.0). A shared= line names the
+    # SuiteCommands method the command must run. The method must exist in the
+    # kit, and, given the app's folder, the app's own C# must call it.
+    sMdi = open(os.path.join(sKitDir, "exec", "CSharp", "Mdi.cs"), "rb").read().decode("utf-8-sig")
+    oClass = re.search(r"public static class SuiteCommands \{(.*?)\n\}", sMdi, re.S)
+    setMethods = set(re.findall(r"public static bool (\w+)\(", oClass.group(1))) if oClass else set()
+    logLine("SuiteCommands methods: " + (", ".join(sorted(setMethods, key=str.lower)) or "none found"))
+    sAppCode = ""
+    if sSource and sOnlyApp:
+        for sName in sorted(os.listdir(sSource)) if os.path.isdir(sSource) else []:
+            if sName.lower().endswith(".cs"):
+                sAppCode += open(os.path.join(sSource, sName), "rb").read().decode("utf-8-sig", "replace") + "\n"
+        logLine("source: %s, %s of C#" % (sSource, plural(sAppCode.count("\n"), "line")))
+    iShared = 0
+    for (sApp, sId), d in sorted(dSeenIds.items()):
+        sMethod = d.get("shared", "").strip()
+        if not sMethod:
+            continue
+        iShared += 1
+        if sMethod not in setMethods:
+            lsProblems.append("%s %s: shared=%s, but SuiteCommands has no such method" % (sApp, d.get("name", sId), sMethod))
+        elif sAppCode and not re.search(r"\bSuiteCommands\." + re.escape(sMethod) + r"\b", sAppCode):
+            lsProblems.append("%s %s: its source does not call SuiteCommands.%s, the shared code its manifest entry names" % (sApp, d.get("name", sId), sMethod))
+    logLine("shared commands checked: %d" % iShared)
 
     # Exports written by the programs themselves.
     for sExport in lsExports:

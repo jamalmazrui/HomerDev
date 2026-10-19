@@ -8,6 +8,10 @@
 ;
 ; status: current (no change), proposed (both AIs agree; awaiting its stage),
 ;   ruled (follows a ruling of yours), implemented, verified.
+;
+; shared: the SuiteCommands method in exec\CSharp\Mdi.cs that the command runs
+;   (kit 1.74.0). scripts\checkKeys fails when the method is missing, or, on an
+;   app's push, when the app's source does not call it.
 
 [Suite]
 schema=1
@@ -1146,6 +1150,7 @@ status=current
 [EdSharp copyLog]
 name=Copy Log
 keys=Control+F12
+shared=copyLog
 status=current
 
 [EdSharp copyRichText]
@@ -1383,6 +1388,7 @@ status=current
 [EdSharp historyOfChanges]
 name=History of Changes
 keys=Shift+F1
+shared=openHistory
 status=current
 
 [EdSharp homeCharacter]
@@ -2014,6 +2020,7 @@ status=current
 [EdSharp sayClipboard]
 name=Say Clipboard
 keys=Alt+Apostrophe
+shared=sayClipboard
 status=current
 
 [EdSharp sayCompiler]
@@ -2065,6 +2072,7 @@ status=current
 [EdSharp sayTime]
 name=Say Time
 keys=Alt+SemiColon
+shared=sayTime
 status=current
 
 [EdSharp sayWindowsOpen]
@@ -2434,6 +2442,7 @@ status=current
 [FileDir clearClipboard]
 name=Clear Clipboard
 keys=Alt+Shift+Apostrophe
+shared=clearClipboard
 status=current
 
 [FileDir clearFilter]
@@ -2499,6 +2508,7 @@ status=current
 [FileDir copyLog]
 name=Copy Log
 keys=Control+F12
+shared=copyLog
 status=current
 
 [FileDir copyName]
@@ -2725,6 +2735,7 @@ status=current
 [FileDir historyOfChanges]
 name=History of Changes
 keys=Shift+F1
+shared=openHistory
 status=current
 
 [FileDir homerPlayer]
@@ -3251,6 +3262,7 @@ status=proposed
 [FileDir sayClipboard]
 name=Say Clipboard
 keys=Alt+Apostrophe
+shared=sayClipboard
 status=current
 
 [FileDir sayDate]
@@ -3312,6 +3324,7 @@ status=current
 [FileDir sayTime]
 name=Say Time
 keys=Alt+SemiColon
+shared=sayTime
 status=current
 
 [FileDir sayTimer]

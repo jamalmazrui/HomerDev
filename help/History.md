@@ -7,6 +7,17 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.74.0 -- 19 October 2026
+
+- **The suite's shared commands are one piece of code.** The new SuiteCommands class in Mdi.cs holds Say Clipboard, Say Time, Copy Log, Save, Append and Clear Clipboard, and the Help openers for the guide, History, ReadMe and Hotkeys. The frame calls it, and so do EdSharp and FileDir from frames of their own, so the words and behavior match in every app.
+- **The best of each app went in.**
+  - Say Clipboard says how many files are copied and names them, as FileDir did.
+  - Copy Log puts the log on the clipboard both as a file and as its path, as EdSharp and FileDir did.
+- **The suite check holds apps to it.** A manifest command can carry a `shared=` line naming its SuiteCommands method. checkKeys fails when the method is missing, and, on an app's push, when the app's code does not call it. The shared check now passes the project folder for this. Ten commands in EdSharp and FileDir are marked so far.
+- **A menu choice is always a first press.** A Say command picked from a menu no longer spells because the same key was pressed a moment before.
+- **The kit's own program speaks to NVDA.** HomerDev's log said the NVDA controller client was missing. The kit now carries NV Access's 64-bit nvdaControllerClient.dll in exec, beside HomerDev.exe, and an app's build can copy it from there, as FileDir's now does.
+- **Two documents corrected.** The suite contract and the framework guide both gave Alt+Shift+Apostrophe for Append Clipboard as well as Clear Clipboard. Append Clipboard is Control+Shift+Apostrophe, as the code always had it.
+
 ## 1.73.8 -- 19 October 2026
 
 - **Repeat presses follow NVDA: one, two or three.** A Say command speaks its answer on one press, spells it on a quick second press, and shows it in a read-only window on a third. NVDA's Report Current Line spells on two presses and spells phonetically on three, and its Read Window Title copies on three. So EdSharp's and HomerView's spelling on a second press and DbDo's review window are both kept. The window lets the screen reader spell phonetically and copy.

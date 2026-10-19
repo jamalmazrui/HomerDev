@@ -28,6 +28,7 @@
 !/data/
 !/exec/conversions.inix
 !/exec/CSharp/
+!/exec/nvdaControllerClient.dll
 !/exec/Python/
 !/GEMINI.md
 !/help/
@@ -71,6 +72,7 @@ HomerDev_setup.building.exe
 
 # Named in RepoFiles.txt, so put back after the patterns above.
 !/exec/conversions.inix
+!/exec/nvdaControllerClient.dll
 
 # Never pushed, whatever RepoFiles.txt says: private notes, maintainer
 # scripts, logs, and anything a build makes.
@@ -100,3 +102,4 @@ build_release.bat
 !/exec/CSharp/
 !/exec/Python/
 !/exec/conversions.inix
+!/exec/nvdaControllerClient.dll

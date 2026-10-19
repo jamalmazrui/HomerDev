@@ -9,6 +9,11 @@ exec/Python/
 # The routing table conversion.py reads (1.65.29): exec/ is otherwise never pushed, so the published kit had the
 # conversion module without its table.
 exec/conversions.inix
+# THE ONE BINARY (1.74.0). nvdaControllerClient.dll, NV Access's 64-bit client, beside exec\HomerDev.exe, so the
+# kit's Say speaks to NVDA; HomerDev's log said nvdaClient=missing without it. NV Access publishes it at an address
+# that carries the NVDA release number and dies every few months, so the kit carries it, as EdSharp does, and an
+# app's build copies it from here (FileDir does) rather than fetching or keeping a copy of its own.
+exec/nvdaControllerClient.dll
 Templates/
 # The suite contract's data (1.73.0): the command manifest and key ownership, read by scripts/checkKeys.
 data/

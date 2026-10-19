@@ -208,16 +208,17 @@ list.</li>
 with nothing to restart.</li>
 <li><strong>The clipboard and files.</strong>
 <ul>
-<li>Alt+Apostrophe says the clipboard.</li>
+<li>Alt+Apostrophe says the clipboard: its text, or how many files are
+copied and their names.</li>
 <li>Control+Apostrophe saves it in a new text file. It never replaces a
 file.</li>
-<li>Alt+Shift+Apostrophe adds it to the end of a text file you
+<li>Control+Shift+Apostrophe adds it to the end of a text file you
 pick.</li>
 <li>Alt+Shift+Apostrophe clears it.</li>
 </ul></li>
 <li><strong>Small conveniences.</strong> Alt+SemiColon says the time,
-and Control+F12 copies the log as a file, ready to attach to an
-email.</li>
+and Control+F12 copies the log both as a file, ready to attach to an
+email, and as its path.</li>
 <li><strong>Keys that never fight your screen reader.</strong> Typing in
 a text box always types, and a list keeps first-letter navigation.</li>
 </ul>
@@ -305,6 +306,33 @@ it phonetically, and Control+C copies it. Mark such a command with
 <code>.sRepeat = "review"</code> so the Hotkeys list says so.</p>
 <p>Speak only what the screen reader cannot know. It already says the
 window title and the focused control, so never repeat those.</p>
+<h2 id="use-the-suites-shared-commands">Use the Suite’s Shared
+Commands</h2>
+<p>The commands every Homer app has live once, in the kit’s
+SuiteCommands class in Mdi.cs. The frame calls them, and so does an app
+with a frame of its own, so the words and the behavior are the same
+everywhere. There are four families:</p>
+<ul>
+<li><strong>Clipboard:</strong> saveClipboard, appendClipboard and
+clearClipboard. The first two take the window that owns their
+dialog.</li>
+<li><strong>Help openers:</strong> openDocumentation, openHistory,
+openReadMe and openHotkeys. Each opens a document from the help folder
+and says so plainly when it is missing.</li>
+<li><strong>Log:</strong> copyLog. An app that keeps its own log passes
+the log’s path.</li>
+<li><strong>Say:</strong> sayClipboard and sayTime. They answer through
+KeyMap.answer, so one press speaks, two spell and three show a
+window.</li>
+</ul>
+<p>An app that is not on the frame calls them from its own handlers:</p>
+<pre><code>void menuQueryClipboard_Click(object sender, EventArgs e) {
+Homer.SuiteCommands.sayClipboard();
+}</code></pre>
+<p>The command manifest, data.inix, marks such a command with a
+<code>shared=</code> line naming the method. On every push, the suite
+check confirms that the method exists and that the app’s own code calls
+it, so a command cannot drift back to a private copy.</p>
 <h2 id="lists-with-shiftletter-commands">Lists with Shift+Letter
 Commands</h2>
 <p>In a list, letters move by first letter. If you want Shift plus a

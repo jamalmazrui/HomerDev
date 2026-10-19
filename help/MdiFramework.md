@@ -12,11 +12,11 @@ A new app on the frame already has all of this:
 - **A Help menu.** F1 opens the guide, Shift+F1 the history, and Alt+F1 About. Control+F1 makes every key describe itself instead of running. Alt+F10 lists every command in one searchable list.
 - **Settings.** Alt+Shift+E changes a setting at once, with nothing to restart.
 - **The clipboard and files.**
-  - Alt+Apostrophe says the clipboard.
+  - Alt+Apostrophe says the clipboard: its text, or how many files are copied and their names.
   - Control+Apostrophe saves it in a new text file. It never replaces a file.
-  - Alt+Shift+Apostrophe adds it to the end of a text file you pick.
+  - Control+Shift+Apostrophe adds it to the end of a text file you pick.
   - Alt+Shift+Apostrophe clears it.
-- **Small conveniences.** Alt+SemiColon says the time, and Control+F12 copies the log as a file, ready to attach to an email.
+- **Small conveniences.** Alt+SemiColon says the time, and Control+F12 copies the log both as a file, ready to attach to an email, and as its path.
 - **Keys that never fight your screen reader.** Typing in a text box always types, and a list keeps first-letter navigation.
 
 ## C# or Python
@@ -85,6 +85,25 @@ return KeyMap.answer("Position", "Item 3 of 10", "30 percent");
 One press speaks each part, as its own utterance. A quick second press spells it, letter by letter, as NVDA's own reading commands do. A third shows the same text in a window, where the screen reader can spell it phonetically, and Control+C copies it. Mark such a command with `.sRepeat = "review"` so the Hotkeys list says so.
 
 Speak only what the screen reader cannot know. It already says the window title and the focused control, so never repeat those.
+
+## Use the Suite's Shared Commands
+
+The commands every Homer app has live once, in the kit's SuiteCommands class in Mdi.cs. The frame calls them, and so does an app with a frame of its own, so the words and the behavior are the same everywhere. There are four families:
+
+- **Clipboard:** saveClipboard, appendClipboard and clearClipboard. The first two take the window that owns their dialog.
+- **Help openers:** openDocumentation, openHistory, openReadMe and openHotkeys. Each opens a document from the help folder and says so plainly when it is missing.
+- **Log:** copyLog. An app that keeps its own log passes the log's path.
+- **Say:** sayClipboard and sayTime. They answer through KeyMap.answer, so one press speaks, two spell and three show a window.
+
+An app that is not on the frame calls them from its own handlers:
+
+```
+void menuQueryClipboard_Click(object sender, EventArgs e) {
+Homer.SuiteCommands.sayClipboard();
+}
+```
+
+The command manifest, data\SuiteCommands.inix, marks such a command with a `shared=` line naming the method. On every push, the suite check confirms that the method exists and that the app's own code calls it, so a command cannot drift back to a private copy.
 
 ## Lists with Shift+Letter Commands
 
