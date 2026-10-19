@@ -257,6 +257,19 @@ var
 begin
   Result := '';
   if (sPath = '') or (not FileExists(sPath)) then exit;
+  // A VERSION.TXT BESIDE THE FILE ANSWERS FIRST (kit 1.78.2). EPUBCheck is a .jar with no --version an
+  // installer can run, so its version was never known ("its version could not be read" at every install).
+  // Its install script writes version.txt beside the jar; any component whose script does the same is read
+  // the same way. Only a program, .exe or .cmd, is asked for --version.
+  sTemp := ExtractFilePath(sPath) + 'version.txt';
+  if FileExists(sTemp) and LoadStringsFromFile(sTemp, lsLines) then
+    for i := 0 to GetArrayLength(lsLines) - 1 do
+      if homerVersionIn(lsLines[i]) <> '' then
+      begin
+        Result := homerVersionIn(lsLines[i]);
+        exit;
+      end;
+  if (CompareText(ExtractFileExt(sPath), '.exe') <> 0) and (CompareText(ExtractFileExt(sPath), '.cmd') <> 0) then exit;
   sTemp := ExpandConstant('{tmp}\homerVersion.txt');
   if not Exec(ExpandConstant('{cmd}'), '/c ""' + sPath + '" --version > "' + sTemp + '" 2>&1"',
               '', SW_HIDE, ewWaitUntilTerminated, iCode) then exit;

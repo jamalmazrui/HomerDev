@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.78.2 -- 19 October 2026
+
+- **An installer knows EPUBCheck's version.** It is a .jar, which cannot answer --version, so every install said "its version could not be read". HomerComponents now reads a version.txt beside a component's file first, which EPUBCheck's install script already writes, and asks only a program (.exe or .cmd) for --version.
+
 ## 1.78.1 -- 19 October 2026
 
 - **The shared check catches an install script that can leave a console waiting.** A finish-page entry that runs an install script must pass noPause (or, for installJawsScripts, -bQuiet) and must not use nowait. Inno runs these entries after the wizard has closed, so a script that pauses at its end leaves a console waiting for a key with nothing behind it. DbDo's Ollama and model entries did exactly that.

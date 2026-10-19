@@ -3092,7 +3092,7 @@ keys=Alt+F12
 change=new
 reason=decision 1, the same key as EdSharp; free here
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir previousMarked]
 name=Previous Marked
