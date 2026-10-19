@@ -332,7 +332,17 @@ begin
     begin
       gHomer[iAt].sLocal := sInstalled;
       gHomer[iAt].sRemote := sAvailable;
-      if sAvailable <> '' then Result := 1 else Result := 2;
+      if sAvailable <> '' then Result := 1
+      else
+      begin
+        Result := 2;
+        // WINGET'S SILENCE IS AN ANSWER (kit 1.77.7, from Jamal's setup logs of 19 October
+        // 2026). winget list fills its Available column only when an upgrade exists, so a
+        // package it lists with nothing there is the newest winget knows. That is a real
+        // comparison; 17 of 19 components were logged "no newer version could be looked up"
+        // when each was in fact current, as ImageMagick showed: Update on 18 October, then this.
+        gHomer[iAt].sRemote := sInstalled;
+      end;
     end;
   end;
 

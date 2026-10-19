@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.77.7 -- 19 October 2026
+
+- **An installer says "current" when winget says so.** winget's list fills its Available column only when an upgrade exists, so a component it lists with that column empty is the newest it knows. HomerComponents.iss logged each such component as "no newer version could be looked up": 17 of 19 in Jamal's setup log of 19 October, though ImageMagick, offered as an Update the day before, showed the comparison works. They are now logged "found, current (version is the newest)". The boxes were already right: Reinstall, unticked.
+
 ## 1.77.6 -- 19 October 2026
 
 - **FileDir's suite names and keys are recorded as done** in the manifest: 51 entries, from Tag to Mark and Regular Expression to Regex, to the clipboard family, Edit Settings and Edit Settings File. Its F6 family, Play Tutorials and Open in DbDo are still to come.
