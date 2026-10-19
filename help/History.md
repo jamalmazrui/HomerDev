@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.77.1 -- 19 October 2026
+
+- **DbDo converts through the kit.** It compiles Conversion.cs, ConversionMedia.cs and Table.cs and ships conversions.inix, and the shared check now fails it, as it does EdSharp and FileDir, on any private conversion code.
+- **A tutorial build no longer hangs joining its pieces.** EdSharp's build of 18 October stopped for good after speaking a walk's 128 pieces, in the ffmpeg run that joins them into the mp3. Without -nostdin, ffmpeg watches its standard input for a keypress, and run from a script with no input given it can wait there forever. Every ffmpeg run in buildTutorials now passes -nostdin, and the log says when the join starts.
+
 ## 1.77.0 -- 19 October 2026
 
 - **Every pending key decision is settled,** by best judgment under the Homer rules, in help\KeyDecisions.md: what was weighed, why each choice won, and how to take each one back. The suite manifest records each decision, with the key it replaced.

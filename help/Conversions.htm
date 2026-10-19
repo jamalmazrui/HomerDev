@@ -311,9 +311,12 @@ data\SuiteCommands.inix, fails on any such line; others get a warning
 that counts them until their move.</p>
 <h2 id="moves">Moves</h2>
 <ul>
-<li><strong>DbDo and HomerView:</strong> next. Each still has its own
-Pandoc finder, 2htm calls or Office COM code: 13 lines in DbDo and 5 in
-HomerView.</li>
+<li><strong>DbDo:</strong> moved in kit 1.77.1. Its Word export goes
+through the kit from Markdown; it reads .xls with NPOI, which it already
+used to write spreadsheets, so no Office is needed; Excel remains only
+for its native charts, marked as not conversions.</li>
+<li><strong>HomerView:</strong> next. It still has 5 lines of its own
+conversion code.</li>
 <li><strong>EdSharp:</strong> moved in kit 1.76.0. Import and Export
 offer and use the kit’s routes first; its [Import] and [Export] sections
 serve only the targets the kit does not cover, such as MediaWiki, LaTeX

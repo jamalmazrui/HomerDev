@@ -70,7 +70,8 @@ The shared check's conversion step scans an app's own C# for private conversion 
 
 ## Moves
 
-- **DbDo and HomerView:** next. Each still has its own Pandoc finder, 2htm calls or Office COM code: 13 lines in DbDo and 5 in HomerView.
+- **DbDo:** moved in kit 1.77.1. Its Word export goes through the kit from Markdown; it reads .xls with NPOI, which it already used to write spreadsheets, so no Office is needed; Excel remains only for its native charts, marked as not conversions.
+- **HomerView:** next. It still has 5 lines of its own conversion code.
 - **EdSharp:** moved in kit 1.76.0. Import and Export offer and use the kit's routes first; its [Import] and [Export] sections serve only the targets the kit does not cover, such as MediaWiki, LaTeX and braille. Its Word conversion code is gone; Word remains only for its optional Word spelling, thesaurus and mail.
 - **FileDir:** moved in kit 1.74.0. Its Convert.cs and Table.cs became the kit's Conversion.cs and Table.cs.
 - **HomerScribe:** its PDF reader moved into the kit in 1.75.0 as PdfReader.cs, and HomerScribe calls it. Its Word version is still made by its own Pandoc call, which moves to Conversion when HomerScribe compiles it.
