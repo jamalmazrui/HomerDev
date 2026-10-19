@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.78.1 -- 19 October 2026
+
+- **The shared check catches an install script that can leave a console waiting.** A finish-page entry that runs an install script must pass noPause (or, for installJawsScripts, -bQuiet) and must not use nowait. Inno runs these entries after the wizard has closed, so a script that pauses at its end leaves a console waiting for a key with nothing behind it. DbDo's Ollama and model entries did exactly that.
+
 ## 1.78.0 -- 19 October 2026
 
 - **A new skill, convention-walking-guide,** researches and writes a walking guide to a convention's hotel for blind white cane and guide dog users, with a separate organizer worksheet. It was developed with ChatGPT on two 2026 Virginia state conventions, whose guides and worksheets are its worked examples. Every main section of a guide is a task a traveler sets out to do; a sort by place is allowed only in an appendix that links back to the tasks.
