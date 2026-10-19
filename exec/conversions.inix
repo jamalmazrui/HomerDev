@@ -206,6 +206,13 @@ note = Structure matters more than speed: the PDF's own tags where they carry it
 ways = pdftext, ocr, officecom
 note = FileDir's ? key and every quick read: the text layer only, no structure. C# reads it in-process with PdfPig when PdfPig is beside the program, else PyMuPDF's plain text; Python uses pypdf.
 
+[ppt2htm]
+ways = officecom:pptx > zipxml:md > pandoc
+note = An old PowerPoint file made a .pptx by PowerPoint, the last resort, then read as the .pptx route reads it.
+
+[ppt2md]
+ways = officecom:pptx > zipxml
+
 [ppt2pdf]
 ways = officecom
 
@@ -268,6 +275,13 @@ ways = copy
 
 [xls2csv]
 ways = officecom
+
+[xls2htm]
+ways = officecom:xlsx > table, officecom:xlsx > zipxml:md > pandoc
+note = An old Excel file made an .xlsx by Excel, the last resort, then read as the .xlsx route reads it.
+
+[xls2md]
+ways = officecom:xlsx > table, officecom:xlsx > zipxml
 
 [xls2txt]
 ways = officecom:xlsx > zipxml

@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.79.1 -- 19 October 2026
+
+- **Old PowerPoint and Excel files convert to Markdown and web pages:** ppt2md, ppt2htm, xls2md and xls2htm. Office makes the newer format, its last resort, then the kit reads that as its .pptx or .xlsx route does. They let EdSharp retire its last private converters.
+
 ## 1.79.0 -- 19 October 2026
 
 - **One Homer app can hand a file to another.** SuiteCommands.homerProgram finds another Homer app's program, under its Program Files folder or in Windows' App Paths, and openInHomerApp starts it on a path; each app is a single instance, so a running copy is handed the path. When the app is not installed, a message says so and points to the HomerDev dialog. FileDir's Open in DbDo and DbDo's Show in FileDir use it, both on Control+Shift+Backslash.
