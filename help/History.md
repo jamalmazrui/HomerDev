@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.77.6 -- 19 October 2026
+
+- **FileDir's suite names and keys are recorded as done** in the manifest: 51 entries, from Tag to Mark and Regular Expression to Regex, to the clipboard family, Edit Settings and Edit Settings File. Its F6 family, Play Tutorials and Open in DbDo are still to come.
+
 ## 1.77.5 -- 19 October 2026
 
 - **PDFs keep their links, form answers and drop caps,** learned from FRAME PDF Studio (help\Conversions.md says what was taken and what was not). PdfReader makes a PDF's web and mail links into Markdown links on their words, lists a fillable form's fields with their values, and joins a large first letter back to its word instead of making it a heading. HomerScribe and Conversion's pdfstructure and ocr routes get all three; rebuild HomerScribe to take them up.

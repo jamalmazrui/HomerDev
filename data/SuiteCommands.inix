@@ -2394,7 +2394,7 @@ keys=Control+Shift+Apostrophe
 change=new
 reason=clipboard family
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir appendToClipboard]
 name=Append to Clipboard
@@ -2422,7 +2422,7 @@ keys=Shift+B or Control+Shift+Home
 change=renamed from Beginning Tagged, was Shift+B or Control+Home
 reason=Control+Home is the first item, as in DbDo; first marked moves to Control+Shift+Home, as in DbDo
 disposition=accepted with correction: verified against the list control's native behavior
-status=proposed
+status=implemented
 
 [FileDir burnToCD]
 name=Burn to CD
@@ -2481,14 +2481,14 @@ name=Complete Mark
 keys=Shift+F8
 change=renamed from Complete Tag, was Shift+F8
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir completeUnmark]
 name=Complete Unmark
 keys=Alt+Shift+F8
 change=renamed from Complete Untag, was Alt+Shift+F8
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir contextMenu]
 name=Context Menu
@@ -2587,7 +2587,7 @@ keys=Alt+Shift+E
 change=renamed from Configuration Options, was Alt+Shift+C
 reason=E for edit, as in DbDo
 disposition=accepted
-status=ruled
+status=implemented
 
 [FileDir editSettingsFile]
 name=Edit Settings File
@@ -2595,7 +2595,7 @@ keys=Alt+Shift+F2
 change=renamed from Manual Options, was Alt+Shift+M
 reason=as in EdSharp: F2 edits, Alt+Shift pairs it with Edit Settings
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir elevateVersion]
 name=Elevate Version
@@ -2608,7 +2608,7 @@ keys=Shift+E or Control+Shift+End
 change=renamed from End Tagged, was Shift+E or Control+End
 reason=Control+End is the last item; last marked moves to Control+Shift+End, as in DbDo
 disposition=accepted with correction: as Beginning Marked
-status=proposed
+status=implemented
 
 [FileDir environmentVariables]
 name=Environment Variables
@@ -2636,7 +2636,7 @@ keys=Alt+Shift+F12
 change=keys changed, was Alt+Shift+X
 reason=decision 2, as in EdSharp: beside Copy Log in the F12 family
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir extraSpeechToggle]
 name=Extra Speech Toggle
@@ -2644,14 +2644,14 @@ keys=Alt+Shift+Z
 change=keys changed, was Control+Shift+X
 reason=Z toggles, as in DbDo
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir extractWithRegex]
 name=Extract with Regex
 keys=Control+Shift+E
 change=renamed from Extract with Regular Expression, was Control+Shift+E
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir fileFind]
 name=File Find
@@ -2665,11 +2665,11 @@ status=current
 
 [FileDir folderToClipboard]
 name=Folder to Clipboard
-keys=
+keys=Alt+Shift+C
 change=keys changed, was Control+Shift+Apostrophe
-reason=frees Control+Shift+Apostrophe for Append Clipboard
+reason=C starts Clipboard; freed this round when Edit Settings left it; Alt+Shift is the app-command pattern
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir ftpPut]
 name=FTP Put
@@ -2764,7 +2764,7 @@ keys=Control+Shift+F1
 change=new
 reason=suite Help key
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir initialChange]
 name=Initial Change
@@ -2781,7 +2781,7 @@ name=Invert Marked
 keys=Control+I
 change=renamed from Invert Tagged, was Control+I
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir iterateProcesses]
 name=Iterate Processes
@@ -2804,7 +2804,7 @@ keys=Control+F1
 change=renamed from Key Describer, was Control+F1
 reason=wording
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir keywords]
 name=Keywords
@@ -2836,7 +2836,7 @@ name=List Marked
 keys=Shift+L
 change=renamed from List Tagged, was Shift+L
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir mailAttachment]
 name=Mail Attachment
@@ -2854,70 +2854,70 @@ keys=SemiColon
 change=renamed from Tag, was SemiColon or Shift+NumPad5
 reason=Shift+NumPad5 is a JAWS key
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir markAll]
 name=Mark All
 keys=Control+A
 change=renamed from Tag All, was Control+A
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir markAllFiles]
 name=Mark All Files
 keys=Alt+Period
 change=renamed from Tag All Files, was Alt+Period
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir markAndNext]
 name=Mark and Next
 keys=Shift+Period or Shift+DownArrow
 change=renamed from Tag and Next, was Shift+Period or Shift+DownArrow
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir markAndPrevious]
 name=Mark and Previous
 keys=Shift+UpArrow
 change=renamed from Tag and Previous, was Shift+UpArrow
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir markDuplicateFiles]
 name=Mark Duplicate Files
 keys=Alt+Shift+Period
 change=renamed from Tag Duplicate Files, was Alt+Shift+Period
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir markSimilarFiles]
 name=Mark Similar Files
 keys=Alt+Shift+Comma
 change=renamed from Tag Similar Files, was Alt+Shift+Comma
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir markToBottom]
 name=Mark to Bottom
 keys=Shift+End
 change=renamed from Tag to Bottom, was Shift+End
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir markToTop]
 name=Mark to Top
 keys=Shift+Home
 change=renamed from Tag to Top, was Shift+Home
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir markWithRegex]
 name=Mark with Regex
 keys=Control+Shift+Period
 change=renamed from Tag with Regular Expression, was Control+Shift+Period
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir moveToFolder]
 name=Move to Folder
@@ -2944,7 +2944,7 @@ name=Next Marked
 keys=Shift+N or Control+DownArrow
 change=renamed from Next Tagged, was Shift+N or Control+DownArrow
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir nextPart]
 name=Next Part
@@ -2981,7 +2981,7 @@ keys=Control+Backslash or Control+Slash
 change=renamed from Command Prompt, was Control+Slash or Control+Backslash
 reason=wording; Backslash first
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir openDrive]
 name=Open Drive
@@ -3007,7 +3007,7 @@ keys=Alt+Backslash or Alt+Slash
 change=renamed from Explorer Directory, was Alt+Slash or Alt+Backslash
 reason=wording; Backslash first
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir openItem]
 name=Open Item
@@ -3099,7 +3099,7 @@ name=Previous Marked
 keys=Shift+P or Control+UpArrow
 change=renamed from Previous Tagged, was Shift+P or Control+UpArrow
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir previousPart]
 name=Previous Part
@@ -3150,7 +3150,7 @@ name=Quick url
 keys=Alt+Shift+Q
 change=renamed from Quick URL, was Alt+Shift+Q
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir readme]
 name=ReadMe
@@ -3158,7 +3158,7 @@ keys=Alt+Shift+F1
 change=new
 reason=suite Help key
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir readonly]
 name=ReadOnly
@@ -3205,7 +3205,7 @@ name=Rename with Regex
 keys=Control+Shift+R
 change=renamed from Rename with Regular Expression, was Control+Shift+R
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir renameWithWildcards]
 name=Rename with Wildcards
@@ -3227,7 +3227,7 @@ name=Restore Marks
 keys=Control+Shift+S
 change=renamed from Restore Tags, was Control+Shift+S
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir reverseAlphaOrder]
 name=Reverse Alpha Order
@@ -3260,14 +3260,14 @@ keys=Control+Apostrophe
 change=renamed from Export Clipboard to File, was Alt+Shift+E
 reason=joins the clipboard family; frees Alt+Shift+E
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir saveMarks]
 name=Save Marks
 keys=Control+S
 change=renamed from Save Tags, was Control+S
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir sayClipboard]
 name=Say Clipboard
@@ -3288,15 +3288,16 @@ status=current
 [FileDir sayFolder]
 name=Say Folder
 keys=
-change=keys changed, was Control+Apostrophe
-reason=frees Control+Apostrophe for Save Clipboard
+change=removed, was Control+Apostrophe; Say Folder Name (Shift+Apostrophe) now says the name, then the full path
+reason=no word-initial key was free; one press answers both, as DbDo's Say Database gives a name and where it is
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir sayFolderName]
 name=Say Folder Name
 keys=Shift+Apostrophe
-status=current
+status=implemented
+reason=says the folder's name, then its full path (19 October 2026), taking in Say Folder
 
 [FileDir sayItemName]
 name=Say Item Name
@@ -3314,7 +3315,7 @@ keys=Alt+Delete or Shift+5
 change=renamed from Say Percent Through, was Shift+5 or Alt+Delete
 reason=suite name; Alt+Delete first, passed through by the JAWS key map
 disposition=accepted with correction: states its denominator; handles empty and one-item lists
-status=ruled
+status=implemented
 
 [FileDir saySelected]
 name=Say Selected
@@ -3363,7 +3364,7 @@ keys=F3
 change=renamed from Search Again, was F3
 reason=wording
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir searchPrevious]
 name=Search Previous
@@ -3371,7 +3372,7 @@ keys=Shift+F3
 change=renamed from Reverse Search Again, was Shift+F3
 reason=wording
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir sendToTextEditor]
 name=Send to Text Editor
@@ -3418,7 +3419,7 @@ name=Start Mark or Unmark
 keys=F8
 change=renamed from Start Tag or Untag, was F8
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir startTimer]
 name=Start Timer
@@ -3441,7 +3442,7 @@ keys=Alt+Shift+F11
 change=keys changed, was Alt+Shift+F11
 reason=as in EdSharp
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir tileVertical]
 name=Tile Vertical
@@ -3449,7 +3450,7 @@ keys=Shift+F11
 change=keys changed, was Control+Shift+F11
 reason=as in EdSharp: free in every app, beside Cascade (Control+F11)
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir timer]
 name=Timer
@@ -3462,7 +3463,7 @@ keys=Space or Control+Space
 change=renamed from Toggle Tag, was Space
 reason=Control+Space added, the Windows list-view key
 disposition=accepted with correction: Control+Space is recorded as an input-method exception and tested
-status=proposed
+status=implemented
 
 [FileDir translateFile]
 name=Translate File
@@ -3509,51 +3510,51 @@ name=Unmark
 keys=Slash or Alt+Shift+NumPad5
 change=renamed from Untag, was Slash or Alt+Shift+NumPad5
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir unmarkAll]
 name=Unmark All
 keys=Control+Shift+A
 change=renamed from Untag All, was Control+Shift+A
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir unmarkAllButCurrent]
 name=Unmark All But Current
 keys=Alt+Comma
 change=renamed from Untag All But Current, was Alt+Comma
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir unmarkAndNext]
 name=Unmark and Next
-keys=Shift+Comma
-change=renamed from Untag and Next, was Shift+Comma or Alt+Shift+DownArrow
-reason=Alt+Shift+DownArrow is a JAWS mouse key
+keys=Shift+Comma or Control+Shift+DownArrow
+change=renamed from Untag and Next; keys changed, was Shift+Comma or Alt+Shift+DownArrow
+reason=the same pair as Unmark and Previous
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir unmarkAndPrevious]
 name=Unmark and Previous
-keys=
-change=renamed from Untag and Previous, was Alt+Shift+UpArrow
-reason=Alt+Shift+UpArrow is a JAWS mouse key
+keys=Control+Shift+UpArrow
+change=renamed from Untag and Previous; keys changed, was Alt+Shift+UpArrow
+reason=Alt+Shift+arrows are JAWS mouse keys; Control+Shift+arrow unmarks and moves as Shift+arrow marks and moves; the file list is single-select, so Windows gives these keys no meaning there
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir unmarkToBottom]
 name=Unmark to Bottom
 keys=Alt+Shift+End
 change=renamed from Untag to Bottom, was Alt+Shift+End
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir unmarkToTop]
 name=Unmark to Top
 keys=Alt+Shift+Home
 change=renamed from Untag to Top, was Alt+Shift+Home
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir volumeFormat]
 name=Volume Format
@@ -3595,7 +3596,7 @@ name=Yield Marked
 keys=Shift+Y
 change=renamed from Yield Tagged, was Shift+Y
 disposition=accepted
-status=proposed
+status=implemented
 
 [FileDir yieldOnDrive]
 name=Yield on Drive
