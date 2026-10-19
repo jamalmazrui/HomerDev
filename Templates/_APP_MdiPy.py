@@ -17,7 +17,7 @@ If you are an AI asked to turn this into a working program, keep these rules.
 
   * DECLARE, DON'T HANDLE KEYS. Every command is one mdi.addCommand call: the
     frame, a caption with its ampersand letter, its keys in Homer spelling
-    ("Control+Shift+A", "Shift+R or F2", "" for none), a one-line summary, and
+    ("Alt+Shift+A", "Shift+R or F2", "" for none), a one-line summary, and
     the Python function that does the work. Never handle a key yourself: the
     kit's router decides where every key goes, keeps typing in text boxes, and
     keeps first-letter navigation in lists.
@@ -29,12 +29,12 @@ If you are an AI asked to turn this into a working program, keep these rules.
     Control+F1, Control+Shift+F1, Alt+Shift+F1, F4, Shift+F4, Control+F4,
     Control+Shift+F4, Control+Tab, Alt+F10, Alt+Shift+H, Alt+Shift+E,
     Control+Shift+I, Alt+Apostrophe, Control+Apostrophe,
-    Control+Shift+Apostrophe, Alt+Shift+Apostrophe, Alt+SemiColon, F11,
+    Alt+Shift+Apostrophe, Alt+Shift+Apostrophe, Alt+SemiColon, F11,
     Control+F12.
   * A COMMAND THAT CANNOT RUN SAYS WHY: pass fnUnavailable, a function
     returning "" when it can run, or the reason when it cannot.
   * SAY COMMANDS USE mdi.answer(sTitle, part, part...): one press speaks the
-    parts, a quick second press shows them in a window to review.
+    parts, a quick second press spells them, a third shows them in a window.
   * A LIST WHERE SHIFT PLUS A LETTER RUNS COMMANDS is passed to the window's
     manageList, and those commands get sContext=Homer.KeyMap.sListContext.
   * THE TITLE RULE: the frame is titled with the app name only; a window with
@@ -60,7 +60,7 @@ class AppWindow:
         from System import String
         from System.Collections.Generic import List
         self.child = Homer.MdiChild(app.frm)
-        self.txtItem = self.child.lbc.addInputBox("&Item:", "", "Type an item, then press Control+Shift+A to add it.")
+        self.txtItem = self.child.lbc.addInputBox("&Item:", "", "Type an item, then press Alt+Shift+A to add it.")
         self.lbItems = self.child.lbc.addPickBox("&List:", List[String](), "", "The items in this window.")
         self.child.finishLayout()
         self.child.manageList(self.lbItems)
@@ -102,7 +102,7 @@ class App:
         mdi.addCommand(frm, "&New Window", "Control+N", "Open another window.", self.newWindow)
         mdi.addCommand(frm, "&Exit", "Alt+F4", "Close every window and leave.", lambda: frm.Close())
         frm.addMenu("&Edit")
-        mdi.addCommand(frm, "&Add Item", "Control+Shift+A", "Put what is in the item field into the list.",
+        mdi.addCommand(frm, "&Add Item", "Alt+Shift+A", "Put what is in the item field into the list.",
                        lambda: self.withWindow(lambda w: w.addItem()),
                        fnUnavailable=lambda: "no window is open" if self.active() is None else "")
         frm.addMenu("&Query")

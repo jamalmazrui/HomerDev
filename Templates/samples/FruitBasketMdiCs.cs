@@ -23,8 +23,8 @@
 //   Unavailable        Delete Fruit in an empty basket says why it cannot run.
 //                      Add Fruit in a full basket says so too.
 //   A modal dialog     F2 renames the basket. Its own keys come first.
-//   Double press       Alt+Delete says the position; press it twice quickly
-//                      and the same appears in a window to review and copy.
+//   Repeat presses     Alt+Delete says the position; pressed twice quickly
+//                      it spells it; three times shows it in a window.
 //   Again              Control+J asks which fruit to jump to; Alt+J jumps to
 //                      the next one with no question; F3 repeats it too.
 //   Parts              F6 moves between the Fruit field and the basket list.
@@ -33,7 +33,7 @@
 //   Key Describer      Control+F1, then any key, says what it would do.
 //   Settings           Alt+Shift+E changes the basket size limit at once.
 //   Clipboard          Control+Apostrophe saves the clipboard to a new file,
-//                      Control+Shift+Apostrophe appends it to one.
+//                      Alt+Shift+Apostrophe appends it to one.
 //   Export             FruitBasketMdiCs.exe /exportkeys keys.inix writes every
 //                      command and key, then closes.
 //
@@ -71,7 +71,7 @@ public class fruitFrame : MdiFrame
         addCommand("&Exit", "Alt+F4", "Close every basket and leave.", delegate() { this.Close(); return true; });
 
         addMenu("&Basket");
-        KeyMap.Command oAdd = addCommand("&Add Fruit", "Control+Shift+A", "Put what is in the fruit field into this basket.",
+        KeyMap.Command oAdd = addCommand("&Add Fruit", "Alt+Shift+A", "Put what is in the fruit field into this basket.",
             delegate() { return withBasket(delegate(fruitChild c) { return c.addFruit(); }); });
         oAdd.fUnavailable = delegate() { fruitChild c = activeBasket(); return c != null && c.isFull() ? "the basket is full" : ""; };
 

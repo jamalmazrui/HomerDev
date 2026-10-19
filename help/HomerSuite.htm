@@ -300,6 +300,116 @@ transition code for existing users, beyond a History note. (Ruled)</li>
 <li><strong>No c_ prefix on constants,</strong> and url is written in
 lower case. (Ruled)</li>
 </ul>
+<h2 id="principles-and-judgments-of-19-october-2026">Principles and
+judgments of 19 October 2026</h2>
+<p>Jamal asked Claude to settle the pending decisions by best judgment,
+as optimization under constraints rather than perfection.</p>
+<h3 id="the-constraints">The constraints</h3>
+<ul>
+<li><strong>Functionality is never lost.</strong> A legacy key may move,
+but a command that becomes menu-only has lost something. Every command
+keeps a key.</li>
+<li><strong>Agreed changes are implemented.</strong> Where ChatGPT and
+Claude both recommended a change at the end of their exchanges, it is
+carried out.</li>
+<li><strong>Lbc’s patterns are part of the framework.</strong> The keys,
+control names and sequences of Lbc dialogs hold in every Homer
+window.</li>
+<li><strong>Control+PageUp and Control+PageDown serve a unique purpose,
+or none.</strong> They never repeat what Control+Tab or the F6 family
+does.</li>
+<li><strong>One name, key and description means one piece of
+code.</strong> A command with the same name, key and description in
+several apps runs the same HomerDev code, so its wording and behavior
+are identical in documents and in use.</li>
+<li><strong>Everything else is a preference, to be balanced.</strong>
+For example, Alt+C for append is a habit, not a law: FileDir’s Shift+A
+appends too, and both stay.</li>
+</ul>
+<h3 id="judgments">Judgments</h3>
+<ul>
+<li><strong>Append keys.</strong> Both kept: Alt+C appends the current
+item in every app, and FileDir’s Shift+A stays in its list layer.
+<em>Implemented: no change needed.</em></li>
+<li><strong>Compiler.</strong> Roslyn at C# 7.3, as both AIs agreed. The
+kit classes stay in C# 5 syntax until the change lands, so nothing
+breaks meanwhile. <em>Next kit delivery.</em></li>
+<li><strong>Control+PageUp and Control+PageDown.</strong>
+<ul>
+<li>DbDo keeps them for the first and last row of a column, a purpose no
+other key has.</li>
+<li>EdSharp keeps them for the previous and next section, so EdSharp
+leaves Control+F6 undefined rather than repeat them.</li>
+<li>FileDir binds them only if a unique purpose appears.</li>
+</ul>
+<em>Recorded; applied as each app moves.</em></li>
+<li><strong>DbDo’s proposals from DbDialog.</strong> Clone Table, Count
+by Columns, defining a table as text, the duplicate-letter warning, and
+Invert and Marked as filter buttons. These await Jamal’s word, as he
+asked. <em>Stage 3.</em></li>
+<li><strong>EdSharp’s JAWS key map lines for Alt+Control+PageUp and
+PageDown.</strong> Both AIs agreed to drop them, so JAWS keeps its
+voice-rate keys. The EdSharp commands those lines served keep their
+function on new keys, found as FileDir’s were today. <em>Stage
+4.</em></li>
+<li><strong>Extra Speech Toggle on Alt+Shift+Z in every app,</strong> as
+agreed (Z keys are toggles). FileDir is done. EdSharp’s commands now on
+Alt+Shift+Z and its Extra Speech Log keep keys of their own. <em>FileDir
+implemented; EdSharp in stage 4.</em></li>
+<li><strong>FileDir’s F6 family:</strong> Next and Previous Part,
+Sibling Folder and Visited Folder, as both AIs agreed. <em>Stage
+4.</em></li>
+<li><strong>FileDir’s zip commands.</strong>
+<ul>
+<li>Zip then Delete moved from Control+Z, which is Undo, to
+Control+Shift+Delete, beside FileDir’s other delete keys.</li>
+<li>Zip List keeps Control+Shift+Z as a recorded exception: FileDir has
+no Undo or Redo for it to meet, it only makes or updates an archive, and
+every first-letter key is taken.</li>
+</ul>
+<em>Implemented.</em></li>
+<li><strong>HomerView.</strong> The catalog and Choose Active Browsers
+were agreed, and wait for its stage. Control+F1 stays HomerView’s User
+Guide, as agreed, and NVDA’s own input help covers key describing there.
+<em>Stage 5.</em></li>
+<li><strong>“Homer Suite” as the name,</strong> as both AIs recommend.
+<em>Adopted in the documents.</em></li>
+<li><strong>Lbc’s keys in the framework.</strong> The router now leaves
+Lbc’s text-box keys to any text box that is not the app’s editor: copy,
+cut and delete the line, copy all, read all, and the rest. The full list
+of Lbc’s text, list and dialog keys is in KeyMap.cs and in the guide.
+The fruit basket’s Add moved from Control+Shift+A, which Lbc’s text
+boxes use, to Alt+Shift+A. <em>Implemented in kit 1.73.8.</em></li>
+<li><strong>Mark rather than Tag in FileDir,</strong> as both AIs
+agreed. Only the words change, not the keys. <em>Stage 4.</em></li>
+<li><strong>Menu-only moves are withdrawn.</strong> Every command that
+was to lose its key gets a new key instead, chosen by the same search
+for free first letters, with a recorded exception where none exists.
+These include Edit Settings File, Go to Special Folder, Say Folder,
+Folder to Clipboard, Say Font, Search for Topic, Toggle Indentation and
+the Tile commands. <em>Stage 4.</em></li>
+<li><strong>One piece of code for shared commands.</strong> A kit class
+will hold the suite’s shared commands, and each app’s handlers will call
+it:
+<ul>
+<li>Say Clipboard, Say Time and Copy Log;</li>
+<li>Save, Append and Clear Clipboard;</li>
+<li>the window family;</li>
+<li>the Help openers: ReadMe, History and Hotkeys.</li>
+</ul>
+<em>Next delivery, starting with the Say and clipboard
+families.</em></li>
+<li><strong>Regex in command names,</strong> as agreed. <em>Stage
+4.</em></li>
+<li><strong>Repeat presses: one, two or three.</strong> One press
+speaks, two spell, three show a read-only window. This follows NVDA,
+whose Report Current Line spells on two presses and spells phonetically
+on three. <em>Implemented in kit 1.73.8.</em></li>
+<li><strong>Say Status on Alt+Z in DbDo.</strong> Read Only Toggle gets
+a new key rather than none. <em>Stage 3.</em></li>
+<li><strong>.inix only in EdSharp and FileDir.</strong> Already ruled.
+<em>Next delivery.</em></li>
+</ul>
 <h2 id="the-key-families">The key families</h2>
 <ul>
 <li><strong>Levels of next and previous:</strong>
@@ -361,18 +471,22 @@ DbDo keeps its Shift+letter say layer as a second set of keys.</li>
 <li><strong>Alt+Shift+Apostrophe:</strong> clear it.</li>
 <li><strong>Control+Apostrophe:</strong> save the clipboard to a new
 text file.</li>
-<li><strong>Control+Shift+Apostrophe:</strong> append the clipboard to a
+<li><strong>Alt+Shift+Apostrophe:</strong> append the clipboard to a
 text file.</li>
 </ul></li>
 <li><strong>Undo and Redo:</strong> Control+Z and Control+Shift+Z
 everywhere.</li>
 <li><strong>Export:</strong> Alt+Shift+X. In the editors, Alt+X stays
 Cut Append.</li>
-<li><strong>Repeat keys:</strong> a quick second press of a Say key
-shows the same information in a read-only window you can review and
-copy. Control plus a letter asks; Alt plus the same letter repeats the
-last answer, but only where an app registers that pair. F3 and Shift+F3
-repeat whichever search ran last in the window.</li>
+<li><strong>Repeat keys:</strong> NVDA’s pattern, one, two or three
+presses. One press of a Say key speaks the answer, a quick second press
+spells it, and a third shows it in a read-only window you can review,
+spell phonetically and copy. This keeps EdSharp’s and HomerView’s
+spelling on a second press and DbDo’s review window, and follows NVDA,
+whose Report Current Line spells on two presses and spells phonetically
+on three. Control plus a letter asks; Alt plus the same letter repeats
+the last answer, but only where an app registers that pair. F3 and
+Shift+F3 repeat whichever search ran last in the window.</li>
 <li><strong>Managed lists</strong> (the DbDo grid, the FileDir list):
 <ul>
 <li>unshifted letters move by first letter or by typed sequence;</li>
@@ -597,7 +711,7 @@ results. Then start Templates\samples\FruitBasketMdiCs.exe.</li>
 baskets, Shift+F4 says them, and Control+Tab moves between them.</li>
 <li><strong>Typing:</strong> in the Fruit field, type a word with
 capital letters; capitals and Shift+F type.</li>
-<li><strong>The list:</strong> Control+Shift+A adds fruit. In the basket
+<li><strong>The list:</strong> Alt+Shift+A adds fruit. In the basket
 list, typing the start of a fruit goes to it, Shift+F says the fruit,
 Shift+Y the count, and Shift+Q says it has no command.</li>
 <li><strong>The alias:</strong> Delete in the list deletes the fruit;
@@ -606,8 +720,9 @@ Delete in the Fruit field deletes a character.</li>
 Control+Shift+D; it says the basket is empty.</li>
 <li><strong>Modal:</strong> F2 renames the basket in a dialog, and the
 dialog’s own keys work.</li>
-<li><strong>Double press:</strong> Alt+Delete says the position; press
-it twice quickly to review it in a window, and Escape returns.</li>
+<li><strong>Repeat presses:</strong> Alt+Delete says the position;
+pressed twice quickly it spells it; three times shows it in a window,
+and Escape returns.</li>
 <li><strong>Again:</strong> Control+J asks for a fruit, Alt+J and F3 go
 to the next match without asking, and the other basket has its own
 answer.</li>

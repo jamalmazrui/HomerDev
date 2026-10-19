@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.73.8 -- 19 October 2026
+
+- **Repeat presses follow NVDA: one, two or three.** A Say command speaks its answer on one press, spells it on a quick second press, and shows it in a read-only window on a third. NVDA's Report Current Line spells on two presses and spells phonetically on three, and its Read Window Title copies on three. So EdSharp's and HomerView's spelling on a second press and DbDo's review window are both kept. The window lets the screen reader spell phonetically and copy.
+- **Lbc's text-box keys belong to the text box in every MDI window.** In a text box that is not the app's editor, the keys Lbc's text boxes answer go to the control rather than to a frame command, so an Lbc field behaves as it does in an Lbc dialog. The keys are copy and cut the line, Alt+C and Alt+X to append, delete the line, the F8 family, Alt+Y, Alt+Apostrophe, Shift+F1, and the multi-line commands. KeyMap.cs lists Lbc's text, list and dialog keys in one place.
+- **The fruit baskets add on Alt+Shift+A.** Control+Shift+A is Lbc's unselect in a text box, so it no longer reached Add Fruit from the fruit field. The starters' Add Item moved too. Enter still adds.
+- **The suite contract records the principles and judgments of 19 October:** functionality is never lost to a key change, agreed changes are carried out, Lbc's patterns hold in the framework, Control+PageUp and PageDown have a purpose of their own or none, and one name, key and description means one piece of code. Each pending decision is settled there, with its stage.
+- **FileDir's zip commands keep keys** in the manifest: Zip then Delete on Control+Shift+Delete, and Zip List keeping Control+Shift+Z as a recorded exception.
+
 ## 1.73.7 -- 18 October 2026
 
 - **The suite check really runs in every app's push.** It found the kit through the kind.py already loaded, which can be the installed kit's in Program Files, older than the development kit and without checkKeys.py, so DbDo's, EdSharp's and FileDir's pushes all reported "the kit's checkKeys.py was not found" and skipped it. It now finds the kit with kind.findKit, which prefers the development kit, as tidy already did.

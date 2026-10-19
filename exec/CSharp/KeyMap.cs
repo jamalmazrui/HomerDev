@@ -408,9 +408,19 @@ public static class KeyMap {
         if (oCommand == null && !(bTypingInText && !bEditor) && !bTypingInList) oCommand = findCommand(sAnywhere, keyData);
         // A plain or shifted key in an unmarked text box always types.
         if (sKind == sTextContext && !bEditor && bTypingInText) oCommand = null;
+        // LBC'S OWN KEYS BELONG TO LBC'S TEXT BOXES (kit 1.73.8). In a text box
+        // that is not the app's editor, the keys Lbc's text boxes answer --
+        // copy and cut the line, copy all, read all and the rest -- go to the
+        // control, so an Lbc field in an MDI window behaves exactly as it does
+        // in an Lbc dialog. A list is the app's to decide: lists in Lbc dialogs
+        // never reach this router, and an app's own list (FileDir's, DbDo's
+        // grid) keeps the keys the app binds there.
+        bool bLbcKey = sKind == sTextContext && !bEditor && isLbcTextKey(oFocus, keyData);
+        if (bLbcKey) oCommand = null;
 
         notePress(keyData, oWindow, bAutoRepeat);
 
+        if (bLbcKey) return false;
         if (bKeyDescriber) {
             if (oCommand != null && oCommand.sId == "keyDescriberToggle") return runCommand(oCommand);
             if (bTypingInText && !bEditor && oCommand == null) return false;
@@ -427,6 +437,44 @@ public static class KeyMap {
             return true;
         }
         return false;
+    }
+
+    // ------------------------------------------------------------- Lbc keys
+
+    // THE LBC KEY PATTERNS (kit 1.73.8), the keys Lbc's controls answer
+    // themselves, listed once so the router and the documents agree with
+    // Lbc.cs. In any text box: Control+A select all, Control+Shift+A unselect,
+    // Control+C copy the line or selection, Alt+C append it, Control+X cut,
+    // Alt+X cut and append, Control+D delete the line, F8 start selection,
+    // Shift+F8 complete it, Control+F8 copy all, Alt+F8 read all, Alt+Y say
+    // the yield, Alt+Apostrophe say the clipboard, Shift+F1 the field's help.
+    // In a multi-line box also Alt+Shift+O sort lines, Alt+Shift+Z reverse,
+    // Alt+Shift+K keep unique, Alt+Shift+N number, Control+Shift+Enter trim.
+    // In a list: Control+J and Control+Shift+J jump forward and back,
+    // Control+K and Control+Shift+K the same by keyword, F3 and Shift+F3 again,
+    // Control+F and Control+Shift+F filter the list. Dialog-wide, which an MDI
+    // window does not take: Control+Enter OK, Escape Cancel, F1 help, F7
+    // spelling, Control+Home and Control+End first and last field.
+    public static readonly Keys[] aLbcTextKeys = new Keys[] {
+        Keys.Control | Keys.A, Keys.Control | Keys.Shift | Keys.A, Keys.Control | Keys.C, Keys.Alt | Keys.C,
+        Keys.Control | Keys.X, Keys.Alt | Keys.X, Keys.Control | Keys.D, Keys.F8, Keys.Shift | Keys.F8,
+        Keys.Control | Keys.F8, Keys.Alt | Keys.F8, Keys.Alt | Keys.Y, Keys.Alt | Keys.OemQuotes, Keys.Shift | Keys.F1 };
+    public static readonly Keys[] aLbcMemoKeys = new Keys[] {
+        Keys.Alt | Keys.Shift | Keys.O, Keys.Alt | Keys.Shift | Keys.Z, Keys.Alt | Keys.Shift | Keys.K,
+        Keys.Alt | Keys.Shift | Keys.N, Keys.Control | Keys.Shift | Keys.Enter };
+    public static readonly Keys[] aLbcListKeys = new Keys[] {
+        Keys.Control | Keys.J, Keys.Control | Keys.Shift | Keys.J, Keys.Control | Keys.K,
+        Keys.Control | Keys.Shift | Keys.K, Keys.F3, Keys.Shift | Keys.F3, Keys.Control | Keys.F,
+        Keys.Control | Keys.Shift | Keys.F };
+
+    public static bool isLbcTextKey(Control oFocus, Keys keyData) {
+        if (Array.IndexOf(aLbcTextKeys, keyData) >= 0) return true;
+        TextBoxBase tb = oFocus as TextBoxBase;
+        return tb != null && tb.Multiline && Array.IndexOf(aLbcMemoKeys, keyData) >= 0;
+    }
+
+    public static bool isLbcListKey(Keys keyData) {
+        return Array.IndexOf(aLbcListKeys, keyData) >= 0;
     }
 
     // ------------------------------------------------------------- presses
@@ -457,19 +505,43 @@ public static class KeyMap {
         return iPressCount;
     }
 
-    // answer: what every Say command calls. The first press speaks the parts
-    // as separate utterances, at once. A quick second press shows the same
-    // information in a read-only window, where the screen reader can review,
-    // spell and copy it; Escape returns to where you were.
+    // answer: what every Say command calls -- ONE, TWO OR THREE PRESSES (kit
+    // 1.73.8), the pattern NVDA's own reading commands use. NVDA's Report
+    // Current Line speaks on one press, spells on two, and spells phonetically
+    // on three; Read Window Title spells on two and copies on three. Homer
+    // keeps one and two as NVDA does, and makes three show the answer in a
+    // read-only window, where the screen reader can spell it phonetically,
+    // review it and copy it -- so EdSharp's and HomerView's spelling on a
+    // second press and DbDo's review window both survive. The first press
+    // speaks the parts as separate utterances, at once; Escape closes the
+    // window and returns to where you were.
     public static bool answer(string sTitle, params string[] aParts) {
         if (aParts == null) aParts = new string[0];
-        if (iPressCount >= 2) {
+        if (iPressCount >= 3) {
             HelpDialog.show(Form.ActiveForm, sTitle, string.Join("\r\n", aParts));
             iPressCount = 1;
             return true;
         }
+        if (iPressCount == 2) {
+            Say.sayForced(spelled(string.Join(" ", aParts)));
+            return true;
+        }
         Say.say(aParts);
         return true;
+    }
+
+    // spelled: text a screen reader reads one character at a time -- each
+    // character followed by a space, and a space itself said as "space", so
+    // "Fruit 3" is read "F r u i t space 3".
+    public static string spelled(string sText) {
+        if (string.IsNullOrEmpty(sText)) return "";
+        StringBuilder sb = new StringBuilder();
+        foreach (char ch in sText) {
+            if (ch == '\r') continue;
+            if (ch == ' ' || ch == '\t' || ch == '\n') sb.Append("space ");
+            else { sb.Append(ch); sb.Append(' '); }
+        }
+        return sb.ToString().TrimEnd();
     }
 
     // ------------------------------------------------------------- again

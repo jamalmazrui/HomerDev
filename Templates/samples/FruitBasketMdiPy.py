@@ -5,7 +5,7 @@ implementations of one design but one framework used from two languages. This
 program builds the very Homer.MdiFrame, Homer.MdiChild and Homer.KeyMap the C#
 sample builds, loaded from the kit's exec\Homer.dll through pythonnet (the kit's
 mdi.py and lbcnet.py). The menus, keys, router, Say commands, clipboard family,
-double press, settings and help are therefore the same by construction, and
+repeat presses, settings and help are therefore the same by construction, and
 the kit's build checks it: it exports both samples' commands and fails if they
 differ.
 
@@ -25,8 +25,8 @@ sample, since it is the same program:
   Unavailable        Delete Fruit in an empty basket says why it cannot run.
                      Add Fruit in a full basket says so too.
   A modal dialog     F2 renames the basket. Its own keys come first.
-  Double press       Alt+Delete says the position; press it twice quickly
-                     and the same appears in a window to review and copy.
+  Repeat presses     Alt+Delete says the position; pressed twice quickly
+                     it spells it; three times shows it in a window.
   Again              Control+J asks which fruit to jump to; Alt+J jumps to
                      the next one with no question; F3 repeats it too.
   Parts              F6 moves between the Fruit field and the basket list.
@@ -35,7 +35,7 @@ sample, since it is the same program:
   Key Describer      Control+F1, then any key, says what it would do.
   Settings           Alt+Shift+E changes the basket size limit at once.
   Clipboard          Control+Apostrophe saves the clipboard to a new file,
-                     Control+Shift+Apostrophe appends it to one.
+                     Alt+Shift+Apostrophe appends it to one.
   Export             FruitBasketMdiPy.exe /exportkeys keys.inix writes every
                      command and key, then ends without a window.
 
@@ -248,7 +248,7 @@ class FruitApp:
         mdi.addCommand(frm, "&Exit", "Alt+F4", "Close every basket and leave.", lambda: frm.Close())
 
         frm.addMenu("&Basket")
-        mdi.addCommand(frm, "&Add Fruit", "Control+Shift+A", "Put what is in the fruit field into this basket.",
+        mdi.addCommand(frm, "&Add Fruit", "Alt+Shift+A", "Put what is in the fruit field into this basket.",
                        lambda: self.withBasket(lambda b: b.addFruit()),
                        fnUnavailable=lambda: "the basket is full" if self.active() is not None and self.active().isFull() else "")
         oDelete = mdi.addCommand(frm, "&Delete Fruit", "Control+Shift+D", "Take the fruit you are on out of this basket.",

@@ -14,7 +14,7 @@ A new app on the frame already has all of this:
 - **The clipboard and files.**
   - Alt+Apostrophe says the clipboard.
   - Control+Apostrophe saves it in a new text file. It never replaces a file.
-  - Control+Shift+Apostrophe adds it to the end of a text file you pick.
+  - Alt+Shift+Apostrophe adds it to the end of a text file you pick.
   - Alt+Shift+Apostrophe clears it.
 - **Small conveniences.** Alt+SemiColon says the time, and Control+F12 copies the log as a file, ready to attach to an email.
 - **Keys that never fight your screen reader.** Typing in a text box always types, and a list keeps first-letter navigation.
@@ -34,19 +34,19 @@ The frame is written once, in C#. A Python app uses that same frame, not a copy:
 A command is one line where you build your frame. In C#:
 
 ```
-addCommand("&Add Item", "Control+Shift+A", "Put the typed item in the list.", addItem);
+addCommand("&Add Item", "Alt+Shift+A", "Put the typed item in the list.", addItem);
 ```
 
 In Python, the frame comes first:
 
 ```
-mdi.addCommand(frm, "&Add Item", "Control+Shift+A", "Put the typed item in the list.", addItem)
+mdi.addCommand(frm, "&Add Item", "Alt+Shift+A", "Put the typed item in the list.", addItem)
 ```
 
 The four parts are:
 
 - **The caption,** with an ampersand before its menu letter.
-- **The keys,** in Homer spelling: "Control+Shift+A", "Shift+R or F2" for two keys, or "" for a command found only on its menu.
+- **The keys,** in Homer spelling: "Alt+Shift+A", "Shift+R or F2" for two keys, or "" for a command found only on its menu.
 - **A one-line summary** that starts with a verb. The menu, the Key Describer and the Alternate Menu all speak it.
 - **The function that does the work.** It returns true when it has dealt with the command.
 
@@ -82,7 +82,7 @@ A command that tells the person something calls KeyMap.answer with a title and t
 return KeyMap.answer("Position", "Item 3 of 10", "30 percent");
 ```
 
-One press speaks each part, as its own utterance. A quick second press shows the same text in a window, where the screen reader can spell it, and Control+C copies it. Mark such a command with `.sRepeat = "review"` so the Hotkeys list says so.
+One press speaks each part, as its own utterance. A quick second press spells it, letter by letter, as NVDA's own reading commands do. A third shows the same text in a window, where the screen reader can spell it phonetically, and Control+C copies it. Mark such a command with `.sRepeat = "review"` so the Hotkeys list says so.
 
 Speak only what the screen reader cannot know. It already says the window title and the focused control, so never repeat those.
 

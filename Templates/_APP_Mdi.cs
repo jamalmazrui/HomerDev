@@ -15,7 +15,7 @@
 //
 //   * DECLARE, DON'T HANDLE KEYS. Every command is one addCommand line: a
 //     caption with its ampersand letter, its keys in Homer spelling
-//     ("Control+Shift+A", "Shift+R or F2", "" for none), a one-line summary,
+//     ("Alt+Shift+A", "Shift+R or F2", "" for none), a one-line summary,
 //     and the function that does the work. Never write a KeyDown handler or
 //     a ProcessCmdKey override: the kit's router decides where every key goes,
 //     keeps typing in text boxes, and keeps first-letter navigation in lists.
@@ -27,12 +27,12 @@
 //     Control+F1, Control+Shift+F1, Alt+Shift+F1, F4, Shift+F4, Control+F4,
 //     Control+Shift+F4, Control+Tab, Alt+F10, Alt+Shift+H, Alt+Shift+E,
 //     Control+Shift+I, Alt+Apostrophe, Control+Apostrophe,
-//     Control+Shift+Apostrophe, Alt+Shift+Apostrophe, Alt+SemiColon, F11,
+//     Alt+Shift+Apostrophe, Alt+Shift+Apostrophe, Alt+SemiColon, F11,
 //     Control+F12.
 //   * A COMMAND THAT CANNOT RUN SAYS WHY: set its fUnavailable to a function
 //     returning "" when it can run, or the reason when it cannot.
 //   * SAY COMMANDS USE KeyMap.answer(sTitle, part, part...): one press speaks
-//     the parts, a quick second press shows them in a window to review.
+//     the parts, a quick second press spells them, a third shows them in a window.
 //   * A LIST WHERE SHIFT PLUS A LETTER RUNS COMMANDS is passed to manageList,
 //     and those commands are declared with KeyMap.sListContext.
 //   * THE TITLE RULE: the frame is titled with the app name only; a window
@@ -69,7 +69,7 @@ public class appFrame : MdiFrame
         addCommand("&Exit", "Alt+F4", "Close every window and leave.", delegate() { this.Close(); return true; });
 
         addMenu("&Edit");
-        KeyMap.Command oAdd = addCommand("&Add Item", "Control+Shift+A", "Put what is in the item field into the list.",
+        KeyMap.Command oAdd = addCommand("&Add Item", "Alt+Shift+A", "Put what is in the item field into the list.",
             delegate() { appWindow w = this.ActiveMdiChild as appWindow; return w == null || w.addItem(); });
         oAdd.fUnavailable = delegate() { return this.ActiveMdiChild == null ? "no window is open" : ""; };
 
@@ -97,7 +97,7 @@ public class appWindow : MdiChild
 
     public appWindow(MdiFrame frmParent, string sName) : base(frmParent)
     {
-        txtItem = lbc.addInputBox("&Item:", "", "Type an item, then press Control+Shift+A to add it.");
+        txtItem = lbc.addInputBox("&Item:", "", "Type an item, then press Alt+Shift+A to add it.");
         lbItems = lbc.addPickBox("&List:", new List<string>(), "", "The items in this window.");
         finishLayout();
         manageList(lbItems);

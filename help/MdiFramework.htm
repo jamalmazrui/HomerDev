@@ -211,7 +211,7 @@ with nothing to restart.</li>
 <li>Alt+Apostrophe says the clipboard.</li>
 <li>Control+Apostrophe saves it in a new text file. It never replaces a
 file.</li>
-<li>Control+Shift+Apostrophe adds it to the end of a text file you
+<li>Alt+Shift+Apostrophe adds it to the end of a text file you
 pick.</li>
 <li>Alt+Shift+Apostrophe clears it.</li>
 </ul></li>
@@ -244,14 +244,14 @@ and try the keys above.</li>
 </ol>
 <h2 id="add-a-command">Add a Command</h2>
 <p>A command is one line where you build your frame. In C#:</p>
-<pre><code>addCommand(&quot;&amp;Add Item&quot;, &quot;Control+Shift+A&quot;, &quot;Put the typed item in the list.&quot;, addItem);</code></pre>
+<pre><code>addCommand(&quot;&amp;Add Item&quot;, &quot;Alt+Shift+A&quot;, &quot;Put the typed item in the list.&quot;, addItem);</code></pre>
 <p>In Python, the frame comes first:</p>
-<pre><code>mdi.addCommand(frm, &quot;&amp;Add Item&quot;, &quot;Control+Shift+A&quot;, &quot;Put the typed item in the list.&quot;, addItem)</code></pre>
+<pre><code>mdi.addCommand(frm, &quot;&amp;Add Item&quot;, &quot;Alt+Shift+A&quot;, &quot;Put the typed item in the list.&quot;, addItem)</code></pre>
 <p>The four parts are:</p>
 <ul>
 <li><strong>The caption,</strong> with an ampersand before its menu
 letter.</li>
-<li><strong>The keys,</strong> in Homer spelling: “Control+Shift+A”,
+<li><strong>The keys,</strong> in Homer spelling: “Alt+Shift+A”,
 “Shift+R or F2” for two keys, or “” for a command found only on its
 menu.</li>
 <li><strong>A one-line summary</strong> that starts with a verb. The
@@ -299,8 +299,9 @@ unavailable: the list is empty”.</p>
 title and the parts to say:</p>
 <pre><code>return KeyMap.answer(&quot;Position&quot;, &quot;Item 3 of 10&quot;, &quot;30 percent&quot;);</code></pre>
 <p>One press speaks each part, as its own utterance. A quick second
-press shows the same text in a window, where the screen reader can spell
-it, and Control+C copies it. Mark such a command with
+press spells it, letter by letter, as NVDA’s own reading commands do. A
+third shows the same text in a window, where the screen reader can spell
+it phonetically, and Control+C copies it. Mark such a command with
 <code>.sRepeat = "review"</code> so the Hotkeys list says so.</p>
 <p>Speak only what the screen reader cannot know. It already says the
 window title and the focused control, so never repeat those.</p>

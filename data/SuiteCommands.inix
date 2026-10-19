@@ -3586,19 +3586,17 @@ status=current
 
 [FileDir zipList]
 name=Zip List
-keys=
-change=keys changed, was Control+Shift+Z
-reason=Control+Shift+Z is reserved for Redo
-disposition=accepted
-status=proposed
+keys=Control+Shift+Z
+status=current
+exception=keeps Redo's key: FileDir has no Undo or Redo, Zip List only makes or updates an archive, and every first-letter key is taken (Jamal, 19 October 2026: a command keeps a key)
 
 [FileDir zipThenDelete]
 name=Zip then Delete
-keys=
+keys=Control+Shift+Delete
 change=keys changed, was Control+Z
-reason=Control+Z is reserved for Undo
+reason=Control+Z is Undo, and a destructive command must not sit on a reflex key; beside FileDir's other delete keys
 disposition=accepted
-status=proposed
+status=implemented
 
 [HomerView aboutHomerView]
 name=About HomerView

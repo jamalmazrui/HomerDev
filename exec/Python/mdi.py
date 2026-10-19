@@ -87,7 +87,8 @@ def addCommand(frm, sCaption, sKeys, sSummary, fnRun, sContext="", fnUnavailable
 
 def answer(sTitle, *lsParts):
     """KeyMap.answer: one press speaks the parts as separate utterances; a
-    quick second press shows them in a window to review and copy."""
+    quick second press spells them, and a third shows them in a window to review
+    and copy."""
     return Homer.KeyMap.answer(sTitle, lbcnet.strings([str(s) for s in lsParts]))
 
 
