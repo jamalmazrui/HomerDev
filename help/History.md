@@ -16,6 +16,7 @@ Each version is a level-2 heading, newest first, so your screen reader's heading
 - **Office is the last resort, and says so.** When a conversion needs Microsoft Office and it is missing, an Alert box explains it once per session and names the free way around it. A console program gets the same words as an error instead.
 - **Every conversion is timed.** The log names the route and the milliseconds it took, so the order of the ways can be tuned from measurements.
 - **The shared check has a conversion step.** It counts an app's private conversion code: its own Pandoc finder, a 2htm call, an Office COM object or pymupdf4llm. Apps listed as moved fail on it; FileDir is the first. The others are warned until they move.
+- **Files are recognized by their bytes as well as their extension.** Conversion.recognize and Conversion.describe tell text from binary by magic numbers, byte order marks and zero bytes, and name the encoding through Ude when Ude.dll is beside the program. A .inix, a .m3u, or a file with an extension nobody listed is read as text when its bytes are text.
 - **help\\Conversions.md** records the review of every app's conversions and the best engine for each.
 
 - **The suite's shared commands are one piece of code.** The new SuiteCommands class in Mdi.cs holds Say Clipboard, Say Time, Copy Log, Save, Append and Clear Clipboard, and the Help openers for the guide, History, ReadMe and Hotkeys. The frame calls it, and so do EdSharp and FileDir from frames of their own, so the words and behavior match in every app.

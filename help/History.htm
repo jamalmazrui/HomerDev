@@ -223,6 +223,12 @@ counts an app’s private conversion code: its own Pandoc finder, a 2htm
 call, an Office COM object or pymupdf4llm. Apps listed as moved fail on
 it; FileDir is the first. The others are warned until they
 move.</p></li>
+<li><p><strong>Files are recognized by their bytes as well as their
+extension.</strong> Conversion.recognize and Conversion.describe tell
+text from binary by magic numbers, byte order marks and zero bytes, and
+name the encoding through Ude when Ude.dll is beside the program. A
+.inix, a .m3u, or a file with an extension nobody listed is read as text
+when its bytes are text.</p></li>
 <li><p><strong>help\Conversions.md</strong> records the review of every
 app’s conversions and the best engine for each.</p></li>
 <li><p><strong>The suite’s shared commands are one piece of

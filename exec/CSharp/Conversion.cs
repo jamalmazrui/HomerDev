@@ -225,7 +225,9 @@ return "the engine " + sEngine + " is unknown";
 public static string toText(string sPath, out string sError) {
 sError = "";
 if (!File.Exists(sPath)) { sError = "the file was not found"; return ""; }
-if (Array.IndexOf(aPlainSources, Path.GetExtension(sPath).ToLowerInvariant()) >= 0) {
+// Text by its extension, or by its bytes when the extension is unknown, is read
+// as it is, in the encoding it is in.
+if (Array.IndexOf(aPlainSources, Path.GetExtension(sPath).ToLowerInvariant()) >= 0 || (!hasAnyRoute(sPath) && recognize(sPath).bText)) {
 try { return Util.file2String(sPath); }
 catch (Exception ex) { sError = ex.Message; return ""; }
 }
@@ -250,6 +252,168 @@ return toText(sPath, out sError);
 private static string tempPath(string sSource, string sExt) {
 return Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(sSource) + "_" + Guid.NewGuid().ToString("N").Substring(0, 8) + sExt);
 } // tempPath method
+
+// ------- recognizing a file (kit 1.74.0) -------
+
+// FileKind: what a file is, worked out from its extension AND its bytes, so a
+// .inix, .m3u or any file with no known extension is still recognized as text,
+// and a binary file wearing a .txt name is not read aloud as gibberish.
+public class FileKind {
+public bool bText = false;
+public int iLines = 0;
+public string sEncoding = "";
+public string sHow = "";
+public string sName = "";
+public string sType = "";
+} // FileKind class
+
+// The names a person hears for the common types, by extension.
+private static readonly string[,] aTypeNames = {
+{"bat", "Windows batch script"}, {"cmd", "Windows command script"}, {"cs", "C# source"}, {"css", "style sheet"},
+{"csv", "comma separated table"}, {"cue", "CD cue sheet"}, {"doc", "Word 97 document"}, {"docx", "Word document"},
+{"epub", "EPUB book"}, {"exe", "program"}, {"htm", "web page"}, {"ini", "settings file"}, {"inix", "Homer settings file"},
+{"iss", "Inno Setup script"}, {"jkm", "JAWS key map"}, {"jpg", "JPEG picture"}, {"js", "JavaScript source"},
+{"jsd", "JAWS script documentation"}, {"jsh", "JAWS script header"}, {"json", "JSON data"}, {"jss", "JAWS script source"},
+{"log", "log"}, {"m3u", "M3U play list"}, {"m3u8", "M3U play list"}, {"md", "Markdown document"}, {"mp3", "MP3 audio"},
+{"mp4", "MP4 video"}, {"odt", "OpenDocument text"}, {"pdf", "PDF document"}, {"pls", "PLS play list"}, {"png", "PNG picture"},
+{"ppt", "PowerPoint 97 presentation"}, {"pptx", "PowerPoint presentation"}, {"ps1", "PowerShell script"}, {"py", "Python script"},
+{"rtf", "rich text document"}, {"sql", "SQL script"}, {"srt", "subtitles"}, {"tsv", "tab separated table"},
+{"txt", "plain text"}, {"url", "internet shortcut"}, {"vbs", "VBScript"}, {"vtt", "subtitles"}, {"wav", "WAV audio"},
+{"xls", "Excel 97 workbook"}, {"xlsx", "Excel workbook"}, {"xml", "XML data"}, {"yaml", "YAML data"}, {"yml", "YAML data"},
+{"zip", "zip archive"}
+};
+
+private const int iSniffBytes = 65536;
+
+// recognize: the extension says what a file claims to be; the first bytes say
+// what it is. A byte-order mark, a magic number or a zero byte settles it; text
+// with no mark gets its encoding from Ude, the NuGet port of Mozilla's detector,
+// when Ude.dll is beside the program, and otherwise from a strict UTF-8 test.
+public static FileKind recognize(string sPath) {
+FileKind oKind = new FileKind();
+oKind.sType = typeOf(sPath);
+oKind.sName = typeName(oKind.sType);
+byte[] ab = new byte[0];
+try {
+using (FileStream oStream = new FileStream(sPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
+ab = new byte[(int) Math.Min(oStream.Length, (long) iSniffBytes)];
+int iRead = 0;
+while (iRead < ab.Length) { int i = oStream.Read(ab, iRead, ab.Length - iRead); if (i <= 0) break; iRead += i; }
+}
+}
+catch (Exception ex) { oKind.sHow = "could not be read: " + ex.Message; return oKind; }
+if (ab.Length == 0) { oKind.bText = true; oKind.sHow = "empty"; return oKind; }
+string sMagic = magicType(ab);
+if (sMagic != "") {
+oKind.sHow = "by content";
+if (oKind.sName == "" || (sMagic != "zip" && sMagic != oKind.sType)) { oKind.sType = sMagic; oKind.sName = typeName(sMagic); }
+return oKind;
+}
+string sBom = bomEncoding(ab);
+if (sBom != "" || Array.IndexOf(ab, (byte) 0) < 0) {
+oKind.bText = true;
+oKind.sEncoding = sBom != "" ? sBom : guessEncoding(ab);
+oKind.sHow = Array.IndexOf(aPlainSources, "." + oKind.sType) >= 0 ? "by extension and content" : "by content";
+if (oKind.sName == "") oKind.sName = "text file";
+oKind.iLines = countLines(sPath, ab.Length < iSniffBytes ? ab : null);
+return oKind;
+}
+oKind.sHow = "by content: it holds zero bytes, so it is not text";
+if (oKind.sName == "" || Array.IndexOf(aPlainSources, "." + oKind.sType) >= 0) oKind.sName = "binary file";
+return oKind;
+} // recognize method
+
+// describe: one line a person hears, such as "M3U play list, text in UTF-8, 12 lines".
+public static string describe(string sPath) {
+FileKind o = recognize(sPath);
+string sName = o.sName == "" ? (o.sType == "" ? "file with no type" : o.sType + " file") : o.sName;
+if (!o.bText) return sName;
+if (o.sHow == "empty") return sName + ", empty";
+string sLine = sName + (sName.EndsWith("text") ? "" : ", text") + (o.sEncoding != "" ? " in " + o.sEncoding : "");
+if (o.iLines > 0) sLine += ", " + (o.iLines == 1 ? "1 line" : o.iLines + " lines");
+return sLine;
+} // describe method
+
+public static string typeName(string sType) {
+for (int i = 0; i < aTypeNames.GetLength(0); i++) if (aTypeNames[i, 0] == sType) return aTypeNames[i, 1];
+return "";
+} // typeName method
+
+private static string magicType(byte[] ab) {
+if (startsWith(ab, 0x25, 0x50, 0x44, 0x46)) return "pdf";
+if (startsWith(ab, 0x50, 0x4B, 0x03, 0x04)) return "zip";
+if (startsWith(ab, 0x89, 0x50, 0x4E, 0x47)) return "png";
+if (startsWith(ab, 0xFF, 0xD8, 0xFF)) return "jpg";
+if (startsWith(ab, 0x4D, 0x5A)) return "exe";
+if (startsWith(ab, 0xD0, 0xCF, 0x11, 0xE0)) return "doc";
+if (startsWith(ab, 0x49, 0x44, 0x33)) return "mp3";
+return "";
+} // magicType method
+
+private static bool startsWith(byte[] ab, params int[] aWant) {
+if (ab.Length < aWant.Length) return false;
+for (int i = 0; i < aWant.Length; i++) if (ab[i] != aWant[i]) return false;
+return true;
+} // startsWith method
+
+private static string bomEncoding(byte[] ab) {
+if (startsWith(ab, 0xEF, 0xBB, 0xBF)) return "UTF-8 with byte order mark";
+if (startsWith(ab, 0xFF, 0xFE)) return "UTF-16";
+if (startsWith(ab, 0xFE, 0xFF)) return "UTF-16 big endian";
+return "";
+} // bomEncoding method
+
+// guessEncoding: Ude when it is present; else UTF-8 if every byte sequence is
+// valid UTF-8, else the Windows code page.
+private static string guessEncoding(byte[] ab) {
+string sUde = udeCharset(ab);
+if (sUde != "") return sUde.ToUpperInvariant() == "ASCII" ? "ASCII" : sUde;
+try {
+new UTF8Encoding(false, true).GetString(ab);
+foreach (byte b in ab) if (b > 127) return "UTF-8";
+return "ASCII";
+}
+catch (Exception) { return "Windows code page " + Encoding.Default.CodePage; }
+} // guessEncoding method
+
+private static string udeCharset(byte[] ab) {
+try {
+string sUde = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Ude.dll");
+if (!File.Exists(sUde)) return "";
+Type tDetector = Assembly.LoadFrom(sUde).GetType("Ude.CharsetDetector", false);
+if (tDetector == null) return "";
+object oDetector = Activator.CreateInstance(tDetector);
+tDetector.GetMethod("Feed", new Type[] { typeof(byte[]), typeof(int), typeof(int) }).Invoke(oDetector, new object[] { ab, 0, ab.Length });
+tDetector.GetMethod("DataEnd", Type.EmptyTypes).Invoke(oDetector, null);
+return "" + tDetector.GetProperty("Charset").GetValue(oDetector, null);
+}
+catch (Exception) { return ""; }
+} // udeCharset method
+
+// countLines: from the bytes already read when the file is small, else by
+// streaming, so a large log is counted without loading it whole.
+private static int countLines(string sPath, byte[] abWhole) {
+int iLines = 0;
+bool bLastBreak = true;
+try {
+if (abWhole != null) {
+foreach (byte b in abWhole) { if (b == 0x0A) iLines++; }
+bLastBreak = abWhole.Length > 0 && abWhole[abWhole.Length - 1] == 0x0A;
+}
+else {
+using (FileStream oStream = new FileStream(sPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
+byte[] abBuffer = new byte[iSniffBytes];
+int iRead;
+while ((iRead = oStream.Read(abBuffer, 0, abBuffer.Length)) > 0) {
+for (int i = 0; i < iRead; i++) if (abBuffer[i] == 0x0A) iLines++;
+bLastBreak = abBuffer[iRead - 1] == 0x0A;
+}
+}
+}
+}
+catch (Exception) { return 0; }
+return bLastBreak ? iLines : iLines + 1;
+} // countLines method
 
 // ------- what a file can become (the lists FileDir's Convert command offers) -------
 
@@ -293,8 +457,18 @@ return Array.IndexOf(aPandocReadable, Path.GetExtension(sPath).ToLowerInvariant(
 public static bool readableAsText(string sPath) {
 string sExt = Path.GetExtension(sPath).ToLowerInvariant();
 if (Array.IndexOf(aPlainSources, sExt) >= 0) return true;
-return hasRoute(sPath, "txt");
+if (hasRoute(sPath, "txt")) return true;
+// An extension nobody listed: the bytes decide.
+return !hasAnyRoute(sPath) && File.Exists(sPath) && recognize(sPath).bText;
 } // readableAsText method
+
+// hasAnyRoute: whether the routing table names any conversion from this type.
+public static bool hasAnyRoute(string sPath) {
+loadTable();
+string sPrefix = typeOf(sPath) + "2";
+foreach (string sKey in dWays.Keys) if (sKey.StartsWith(sPrefix, StringComparison.OrdinalIgnoreCase)) return true;
+return false;
+} // hasAnyRoute method
 
 public static bool hasRichForm(string sPath) {
 return Array.IndexOf(aRichForms, Path.GetExtension(sPath).ToLowerInvariant()) >= 0;

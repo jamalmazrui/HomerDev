@@ -227,6 +227,26 @@ kit’s Table class, with cells placed by their references.</li>
 <li><strong>zipxml</strong> (internal): the text inside a Word, Excel,
 PowerPoint or OpenDocument file, read straight from its XML.</li>
 </ul>
+<h2 id="recognizing-a-file">Recognizing a File</h2>
+<p>Before converting, the kit works out what a file is, from its
+extension and from its first bytes:</p>
+<ul>
+<li><strong>A magic number settles it.</strong> A file that starts like
+a PDF, a zip, a PNG, a JPEG, a program or a 1997 Office file is that,
+whatever its name.</li>
+<li><strong>A byte order mark or no zero bytes means text.</strong> So a
+.inix, a .m3u, or a file with an extension nobody listed is read as text
+when its bytes are text.</li>
+<li><strong>The encoding comes from Ude</strong> when Ude.dll is beside
+the program. Ude is the NuGet port of Mozilla’s encoding detector.
+Without it, a strict UTF-8 test decides between UTF-8 and the Windows
+code page.</li>
+<li><strong>Zero bytes with no byte order mark mean binary.</strong> So
+a binary file wearing a .txt name is not read aloud as gibberish.</li>
+</ul>
+<p>Conversion.recognize returns what was found, and Conversion.describe
+turns it into one line a person hears, such as “M3U play list, text in
+UTF-8, 12 lines”.</p>
 <h2 id="the-best-engine-for-each-conversion">The Best Engine for Each
 Conversion</h2>
 <p>This is the review of October 2026, across DbDo, EdSharp, FileDir,

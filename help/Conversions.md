@@ -24,6 +24,17 @@ Each engine is either internal code, which starts no program and is the quickest
 - **table** (internal): rows and columns, through the kit's Table class, with cells placed by their references.
 - **zipxml** (internal): the text inside a Word, Excel, PowerPoint or OpenDocument file, read straight from its XML.
 
+## Recognizing a File
+
+Before converting, the kit works out what a file is, from its extension and from its first bytes:
+
+- **A magic number settles it.** A file that starts like a PDF, a zip, a PNG, a JPEG, a program or a 1997 Office file is that, whatever its name.
+- **A byte order mark or no zero bytes means text.** So a .inix, a .m3u, or a file with an extension nobody listed is read as text when its bytes are text.
+- **The encoding comes from Ude** when Ude.dll is beside the program. Ude is the NuGet port of Mozilla's encoding detector. Without it, a strict UTF-8 test decides between UTF-8 and the Windows code page.
+- **Zero bytes with no byte order mark mean binary.** So a binary file wearing a .txt name is not read aloud as gibberish.
+
+Conversion.recognize returns what was found, and Conversion.describe turns it into one line a person hears, such as "M3U play list, text in UTF-8, 12 lines".
+
 ## The Best Engine for Each Conversion
 
 This is the review of October 2026, across DbDo, EdSharp, FileDir, HomerScribe, HomerView and 2htm. Each choice is the best way any app had, with Office last.
