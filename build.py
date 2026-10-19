@@ -36,6 +36,7 @@ lsExpected = [
     "exec/CSharp/Elevate.cs", "exec/CSharp/Inix.cs", "exec/CSharp/KeyName.cs", "exec/CSharp/KeyMap.cs", "exec/CSharp/Lbc.cs",
     "exec/CSharp/Log.cs", "exec/CSharp/Mdi.cs", "exec/CSharp/Media.cs", "exec/CSharp/MediaPlayer.cs", "exec/CSharp/Mpv.cs", "exec/CSharp/Paths.cs",
     "exec/CSharp/Say.cs", "exec/CSharp/Util.cs", "exec/CSharp/Web.cs",
+    "exec/CSharp/ConversionPdf.cs", "exec/CSharp/PdfReader.cs",
     "exec/CSharp/inixVert.cs",
     "exec/Python/inix.py", "exec/Python/kdpEpub.py", "scripts/buildBooks.cmd", "scripts/buildBooks.py", "scripts/kdpBooks.cmd", "scripts/kdpBooks.py", "scripts/kdpSubmit.cmd", "scripts/kdpSubmit.py", "scripts/kdpUpdate.cmd", "scripts/kdpUpdate.py", "scripts/testKdpUpdate.py", "Templates/books/Book_KDP.inix", "Templates/books/books.inix", "Templates/books/buildBooks.inix", "Templates/books/epub.css", "Templates/books/tocEpub.lua", ".claude/skills/homer-books/SKILL.md", "exec/Python/lbc.py", "exec/Python/lbcnet.py", "exec/Python/log.py", "exec/Python/media.py",
     "exec/Python/mdi.py", "exec/Python/elevate.py", "exec/Python/paths.py", "exec/Python/say.py", "exec/Python/util.py", "exec/Python/web.py",

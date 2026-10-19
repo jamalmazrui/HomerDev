@@ -15,8 +15,9 @@
 //   copy, zipxml, table   internal: no program starts, so they are the quickest
 //   pdftext               PdfPig in-process when it is beside the program; else
 //                         PyMuPDF's plain text through Python
-//   pdfstructure          pymupdf4llm through Python, until HomerScribe's reader
-//                         moves into the kit as this engine
+//   pdfstructure          HomerScribe's reader, PdfReader.cs (kit 1.75.0), where an
+//                         app compiles it with ConversionPdf.cs; else pymupdf4llm
+//   ocr                   the same reader with Tesseract, for scanned pages
 //   pandoc                Pandoc, which no internal code could match
 //   officecom             Microsoft Office: the LAST RESORT, used only when nothing
 //                         approved will do, with an Alert box when it is missing
@@ -25,7 +26,8 @@
 // order of the ways is tuned from measurements, not guesses.
 //
 // REQUIRES: Log.cs, Paths.cs, Table.cs, Util.cs. Media conversions (audio, video,
-// pictures) are in ConversionMedia.cs, for apps that compile Media.cs.
+// pictures) are in ConversionMedia.cs, for apps that compile Media.cs. The PDF
+// reader is in PdfReader.cs and ConversionPdf.cs, for apps that reference PdfPig.
 //
 // Copyright 2006-2026 by Jamal Mazrui. MIT License.
 
@@ -194,6 +196,7 @@ case "officecom": return officeCom(sSource, sTarget, out sError);
 case "pandoc": return pandoc(sSource, sTarget, out sError);
 case "pdfstructure": return pdfStructure(sSource, sTarget, out sError);
 case "pdftext": return pdfText(sSource, sTarget, out sError);
+case "ocr": return ocrEngine(sSource, sTarget, out sError);
 case "table": return tableEngine(sSource, sTarget, out sError);
 case "zipxml": return zipXml(sSource, sTarget, out sError);
 }
@@ -213,8 +216,8 @@ switch (sEngine) {
 case "copy": case "table": case "zipxml": return "";
 case "pandoc": return havePandoc() ? "" : "Pandoc is not installed";
 case "pdftext": return havePdfPig() || pythonProgram() != "" ? "" : "neither PdfPig nor Python is present";
-case "pdfstructure": return pythonProgram() != "" ? "" : "Python is not installed";
-case "ocr": return "OCR comes to the C# code with HomerScribe's PDF reader";
+case "pdfstructure": return haveReader() || pythonProgram() != "" ? "" : "neither the PDF reader nor Python is present";
+case "ocr": return !haveReader() ? "this program does not include the PDF reader, which OCR needs" : haveTesseract() ? "" : "Tesseract is not installed";
 case "officecom": return officeApp(sSource) == "" ? "Office cannot open this type" : "";
 }
 return "the engine " + sEngine + " is unknown";
@@ -695,11 +698,53 @@ return false;
 }
 } // pdfPigText method
 
-// pdfStructure: headings, lists and tables, through pymupdf4llm. Until
-// HomerScribe's reader becomes this engine, the reader FileDir and EdSharp used.
+// ------- the PDF reader: pdfstructure and ocr -------
+
+// Filled by ConversionPdf.cs, in apps that compile PdfReader.cs with PdfPig.
+// Left out, they compile to nothing and the Python readers are used instead.
+static partial void readerState(ref bool bReader, ref bool bTesseract);
+static partial void readerConvert(string sSource, string sTarget, bool bOcr, ref bool bMade, ref bool bScans, ref string sError);
+
+// haveReader: true when this program compiled HomerScribe's PDF reader in.
+public static bool haveReader() {
+bool bReader = false, bTesseract = false;
+readerState(ref bReader, ref bTesseract);
+return bReader;
+} // haveReader method
+
+// haveTesseract: true when the reader is here and Tesseract is installed.
+public static bool haveTesseract() {
+bool bReader = false, bTesseract = false;
+readerState(ref bReader, ref bTesseract);
+return bReader && bTesseract;
+} // haveTesseract method
+
+// pdfStructure: headings, lists, tables and reading order. HomerScribe's reader
+// when it is compiled in, the best there is; otherwise pymupdf4llm. A document of
+// scans is not handed to pymupdf4llm, which would return almost nothing and stop
+// the ocr way being tried.
 private static bool pdfStructure(string sSource, string sTarget, out string sError) {
+sError = "";
+if (haveReader()) {
+bool bMade = false, bScans = false;
+string sReaderError = "";
+readerConvert(sSource, sTarget, false, ref bMade, ref bScans, ref sReaderError);
+if (bMade) return true;
+sError = sReaderError;
+if (bScans || pythonProgram() == "") return false;
+Log.info("The PDF reader could not read " + Path.GetFileName(sSource) + ": " + sReaderError + "; trying pymupdf4llm");
+}
 return runPython(sPyMuPdfMarkdown, sSource, sTarget, out sError);
 } // pdfStructure method
+
+// ocrEngine: the reader again, with Tesseract reading every scanned page.
+private static bool ocrEngine(string sSource, string sTarget, out string sError) {
+sError = "";
+if (!haveReader()) { sError = engineMissing("ocr", sSource); return false; }
+bool bMade = false, bScans = false;
+readerConvert(sSource, sTarget, true, ref bMade, ref bScans, ref sError);
+return bMade;
+} // ocrEngine method
 
 private const string sPyMuPdfText =
 "import sys\n" +

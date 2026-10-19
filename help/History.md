@@ -7,6 +7,13 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.75.0 -- 19 October 2026
+
+- **HomerScribe's PDF reader is now the kit's.** The new PdfReader.cs is the reader from HomerScribe's PdfRead.cs and the PDF half of HomerScribe.cs, moved whole into one shared class. It reads the PDF's own tags where they carry the document, otherwise the text layer in reading order with headings from type sizes, and reads scanned pages with Tesseract above a confidence floor. A picture model for pages and descriptions of figures are optional, supplied by the app. HomerScribe calls it, and so can any app.
+- **It is Conversion's pdfstructure and ocr engine.** An app that compiles PdfReader.cs and the new ConversionPdf.cs, with PdfPig, gets it for pdf2md, pdf2docx and pdf2htm, and gets OCR in C# for the first time. An app that does not still uses pymupdf4llm, so nothing breaks.
+- **Scanned documents get a second chance.** pdf2docx and pdf2htm now try OCR before Office. pdfstructure fails on a document of scans, so the OCR way is tried rather than an almost empty result.
+- **Two faults fixed on the way.** The Markdown written was the version before its heading levels were closed; only the screen reader review saw the corrected one. Now the closed version is written. And a document read from its own tags no longer says its headings were worked out from the layout.
+
 ## 1.74.1 -- 19 October 2026
 
 - **Command names are spoken if and only if they help.** The new KeyMap.shouldEcho decides, so every Homer app decides alike. A command that opens a dialog, opens a window that names itself, moves the focus, or speaks its own answer or state does not say its name. Every other command, such as Clear Filter, says its name at once, before its work. The kit's frame follows the rule; a frame command that speaks its own result, such as Clear Clipboard, carries bNoEcho. DbDo's Command Echo Toggle is retired.

@@ -18,10 +18,12 @@
 ; nothing approved will do; when it is needed and missing, an Alert box says so.
 ; Engines:
 ;   copy          the file as it is
-;   ocr           a scanned PDF read by Tesseract (Python; C# with HomerScribe's reader)
+;   ocr           a scanned PDF read by Tesseract (Python; C# through the kit's PdfReader)
 ;   officecom     Microsoft Office, the last resort
 ;   pandoc        Pandoc
-;   pdfstructure  a PDF's text with headings, lists and tables worked out
+;   pdfstructure  a PDF's text with headings, lists and tables worked out: C# uses
+;                 the kit's PdfReader (HomerScribe's reader) where an app compiles
+;                 it, else pymupdf4llm; Python uses pdfminer
 ;   pdftext       a PDF's text layer as it is, the quickest
 ;   table         rows and columns, through the kit's Table class (C#)
 ;   zipxml        the text of a Word, Excel, PowerPoint or OpenDocument file, read
@@ -177,15 +179,15 @@ ways = officecom
 ways = zipxml, pandoc
 
 [pdf2docx]
-ways = pdfstructure:md > pandoc, officecom
-note = As pdf2md, then Pandoc writes the Word file; Office only when nothing else can.
+ways = pdfstructure:md > pandoc, ocr:md > pandoc, officecom
+note = As pdf2md, then Pandoc writes the Word file; a document of scans is read by OCR first; Office only when nothing else can.
 
 [pdf2htm]
-ways = pdfstructure:md > pandoc, officecom
+ways = pdfstructure:md > pandoc, ocr:md > pandoc, officecom
 
 [pdf2md]
 ways = pdfstructure, ocr
-note = Structure matters more than speed: headings from type sizes, lists, tables, reading order. HomerScribe's reader becomes this engine next; until then pymupdf4llm (C#) or pdfminer (Python).
+note = Structure matters more than speed: the PDF's own tags where they carry it, else headings from type sizes, lists and reading order. C# uses the kit's PdfReader, HomerScribe's reader, where an app compiles it (kit 1.75.0), else pymupdf4llm; Python uses pdfminer. A document of scans fails pdfstructure so ocr reads it.
 
 [pdf2txt]
 ways = pdftext, ocr, officecom

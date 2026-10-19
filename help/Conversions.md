@@ -16,10 +16,10 @@ Both the source and the target decide the way. A plain text target wants speed, 
 Each engine is either internal code, which starts no program and is the quickest, or an outside program, used where its quality is worth the start-up time.
 
 - **copy** (internal): the file as it is.
-- **ocr** (outside): Tesseract reads a scanned page. Never used for a quick read, since it can take minutes.
+- **ocr** (outside): Tesseract reads a scanned page. In C#, the kit's PdfReader runs it, so a scanned page gets headings and lists too; in Python, pypdfium2 draws each page for it. Never used for a quick read, since it can take minutes.
 - **officecom** (outside, last resort): Microsoft Office through COM. Used only where nothing free will do. When Office is needed and missing, an Alert box says so once per session, and says how to avoid it.
 - **pandoc** (outside): Pandoc, for the markup and document formats it reads and writes.
-- **pdfstructure** (outside): a PDF's headings, lists and tables, through Python.
+- **pdfstructure** (internal where it can be): a PDF's headings, lists and reading order. In C#, the kit's PdfReader, HomerScribe's reader, in an app that compiles PdfReader.cs and ConversionPdf.cs with PdfPig; otherwise pymupdf4llm through Python. A document of scans fails it, so OCR reads it next.
 - **pdftext** (internal when it can be): a PDF's text layer. PdfPig in-process when PdfPig is beside the program; otherwise PyMuPDF's plain text through Python.
 - **table** (internal): rows and columns, through the kit's Table class, with cells placed by their references.
 - **zipxml** (internal): the text inside a Word, Excel, PowerPoint or OpenDocument file, read straight from its XML.
@@ -44,7 +44,7 @@ This is the review of October 2026, across DbDo, EdSharp, FileDir, HomerScribe, 
 - **docx2htm, docx2md, docx2epub and docx2odt:** Pandoc. 2htm used Word for docx2htm; Pandoc needs no Office and keeps the structure.
 - **docx2txt and odt2txt:** zipxml, new in kit 1.74.0, since no program starts; then Pandoc.
 - **md2docx, md2htm and md2epub:** Pandoc, with the page-break filter where the program ships it, as HomerScribe does.
-- **pdf2md, pdf2docx and pdf2htm:** HomerScribe's reader is the best in the suite. It uses PdfPig's layout analysis and reading order, so a two-column page reads down each column. It uses the PDF's own tag tree when there is one, infers headings from type size, reads scanned pages with Tesseract above a confidence floor, and describes pictures with a local model. It is still part of HomerScribe's own program, so until it moves into the kit as the pdfstructure engine, pymupdf4llm is used, as FileDir and EdSharp did.
+- **pdf2md, pdf2docx and pdf2htm:** HomerScribe's reader is the best in the suite. It uses PdfPig's layout analysis and reading order, so a two-column page reads down each column. It uses the PDF's own tag tree when there is one, infers headings from type size, reads scanned pages with Tesseract above a confidence floor, and describes pictures with a local model. Since kit 1.75.0 it is the kit's PdfReader class, the pdfstructure and ocr engines in any app that compiles it; apps that do not yet still get pymupdf4llm.
 - **pdf2txt:** pdftext, for speed. This is what FileDir's ? key uses. It replaces pymupdf4llm, which worked out the whole structure only to throw it away, and 2htm, which read PDFs through Word.
 - **pptx2md and pptx2txt:** zipxml, with a heading for each slide in Markdown. PowerPoint only for the old .ppt.
 - **xlsx2csv, xlsx2md and xlsx2txt:** the table engine, then zipxml. Excel only for the old .xls.
@@ -72,5 +72,5 @@ The shared check's conversion step scans an app's own C# for private conversion 
 
 - **DbDo, EdSharp and HomerView:** next. Each still has its own Pandoc finder, 2htm calls or Office COM code: 13 lines in DbDo, 6 in EdSharp and 5 in HomerView.
 - **FileDir:** moved in kit 1.74.0. Its Convert.cs and Table.cs became the kit's Conversion.cs and Table.cs.
-- **HomerScribe:** its PDF reader moves into the kit as a class of its own, so HomerScribe and every other app call the same code.
+- **HomerScribe:** its PDF reader moved into the kit in 1.75.0 as PdfReader.cs, and HomerScribe calls it. Its Word version is still made by its own Pandoc call, which moves to Conversion when HomerScribe compiles it.
 - **2htm:** becomes a thin command-line and dialog face over Conversion, keeping its own csv and json readers until they move into the kit too, and its Office converters as the last resort.

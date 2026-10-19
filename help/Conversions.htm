@@ -209,16 +209,21 @@ the quickest, or an outside program, used where its quality is worth the
 start-up time.</p>
 <ul>
 <li><strong>copy</strong> (internal): the file as it is.</li>
-<li><strong>ocr</strong> (outside): Tesseract reads a scanned page.
-Never used for a quick read, since it can take minutes.</li>
+<li><strong>ocr</strong> (outside): Tesseract reads a scanned page. In
+C#, the kit’s PdfReader runs it, so a scanned page gets headings and
+lists too; in Python, pypdfium2 draws each page for it. Never used for a
+quick read, since it can take minutes.</li>
 <li><strong>officecom</strong> (outside, last resort): Microsoft Office
 through COM. Used only where nothing free will do. When Office is needed
 and missing, an Alert box says so once per session, and says how to
 avoid it.</li>
 <li><strong>pandoc</strong> (outside): Pandoc, for the markup and
 document formats it reads and writes.</li>
-<li><strong>pdfstructure</strong> (outside): a PDF’s headings, lists and
-tables, through Python.</li>
+<li><strong>pdfstructure</strong> (internal where it can be): a PDF’s
+headings, lists and reading order. In C#, the kit’s PdfReader,
+HomerScribe’s reader, in an app that compiles PdfReader.cs and
+ConversionPdf.cs with PdfPig; otherwise pymupdf4llm through Python. A
+document of scans fails it, so OCR reads it next.</li>
 <li><strong>pdftext</strong> (internal when it can be): a PDF’s text
 layer. PdfPig in-process when PdfPig is beside the program; otherwise
 PyMuPDF’s plain text through Python.</li>
@@ -271,9 +276,9 @@ is the best in the suite. It uses PdfPig’s layout analysis and reading
 order, so a two-column page reads down each column. It uses the PDF’s
 own tag tree when there is one, infers headings from type size, reads
 scanned pages with Tesseract above a confidence floor, and describes
-pictures with a local model. It is still part of HomerScribe’s own
-program, so until it moves into the kit as the pdfstructure engine,
-pymupdf4llm is used, as FileDir and EdSharp did.</li>
+pictures with a local model. Since kit 1.75.0 it is the kit’s PdfReader
+class, the pdfstructure and ocr engines in any app that compiles it;
+apps that do not yet still get pymupdf4llm.</li>
 <li><strong>pdf2txt:</strong> pdftext, for speed. This is what FileDir’s
 ? key uses. It replaces pymupdf4llm, which worked out the whole
 structure only to throw it away, and 2htm, which read PDFs through
@@ -311,9 +316,10 @@ its own Pandoc finder, 2htm calls or Office COM code: 13 lines in DbDo,
 6 in EdSharp and 5 in HomerView.</li>
 <li><strong>FileDir:</strong> moved in kit 1.74.0. Its Convert.cs and
 Table.cs became the kit’s Conversion.cs and Table.cs.</li>
-<li><strong>HomerScribe:</strong> its PDF reader moves into the kit as a
-class of its own, so HomerScribe and every other app call the same
-code.</li>
+<li><strong>HomerScribe:</strong> its PDF reader moved into the kit in
+1.75.0 as PdfReader.cs, and HomerScribe calls it. Its Word version is
+still made by its own Pandoc call, which moves to Conversion when
+HomerScribe compiles it.</li>
 <li><strong>2htm:</strong> becomes a thin command-line and dialog face
 over Conversion, keeping its own csv and json readers until they move
 into the kit too, and its Office converters as the last resort.</li>
