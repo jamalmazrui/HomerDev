@@ -381,35 +381,29 @@ before any script runs; homerOutcomeLine(i) and
 homerModelOutcomeLine(model, use, size) each return a line when that box
 was ticked and an empty string when it was not. The app adds each result
 to the box and skips the empty ones.</p>
-<h2 id="installing-with-every-default-verysilent-defaults">Installing
-with every default: /verysilent /defaults</h2>
-<p>Every Homer installer takes <code>/defaults</code> beside a silent
-switch, and then installs with no screens, doing what pressing Enter at
-every step would do: it runs each finish-page entry whose box is ticked
-by default, writes the Results box to the setup log, and starts the
-program when Launch is ticked.</p>
-<p><code>DbDo_setup.exe /verysilent /defaults</code></p>
-<p><code>/silent /defaults</code> does the same with a progress window.
-Switches can be typed in any case. Administrator approval is still asked
-for, as by every Homer installer, unless setup is started from an
-elevated Command Prompt.</p>
+<h2 id="installing-with-every-default-default">Installing with every
+default: /default</h2>
+<p><code>/default</code> installs exactly as pressing Enter on every
+screen would, with nothing to press: every page keeps its default, each
+finish-page entry ticked by default runs, the Results box goes to the
+setup log instead of waiting for OK, and the program starts when Launch
+is ticked.</p>
+<p><code>DbDo_setup.exe /default</code></p>
 <ul>
-<li><strong>The ticks are the decision.</strong> Install and Update
-entries run; Reinstall entries, ticked off by default, do not; nor does
-opening the user guide. Each entry’s own test still decides whether it
-appears at all, as on the finish page.</li>
-<li><strong><code>/defaults</code> alone changes nothing.</strong> Inno
-Setup decides whether to show screens from the command line, before any
-of the installer’s code runs, so no code can turn them off for the run
-under way. The setup log says to add <code>/verysilent</code>. (Until 13
-October 2026, <code>/defaults</code> alone started setup again with
-<code>/verysilent</code> added; that start failed on DbDo with no reason
-given, and two installers never tried it.)</li>
-<li><strong>Plain <code>/silent</code> and <code>/verysilent</code> are
-unchanged:</strong> they install the program and run no finish-page
-entry.</li>
-<li><strong>No box waits in a silent install.</strong> The Results box
-goes to the setup log instead.</li>
+<li><strong>Any spelling:</strong> <code>/default</code>,
+<code>/defaults</code>, <code>-d</code> or <code>--default</code>, in
+any case.</li>
+<li><strong>A progress window shows; nothing else does.</strong> Inno
+Setup decides whether to show screens before any of the installer’s code
+runs, so setup started with screens starts itself again silently with
+the same switches, and the first copy steps aside. The second copy is
+already approved as administrator, so Windows does not ask again.</li>
+<li><strong>A running copy of the program is closed</strong> for the
+update, as the install would otherwise stop on it.</li>
+<li><strong>The second copy keeps its own log,</strong> in %TEMP% as
+HomerSetupDefault-<date>.log; the first copy’s log names it.</li>
+<li><strong><code>/verysilent /default</code></strong> shows no progress
+window either.</li>
 </ul>
 <p>In the <code>.iss</code>, each finish-page entry says
 <code>Check: homerFinishRuns</code>, or

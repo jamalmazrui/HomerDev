@@ -185,18 +185,17 @@ before any script runs; homerOutcomeLine(i) and homerModelOutcomeLine(model,
 use, size) each return a line when that box was ticked and an empty string
 when it was not. The app adds each result to the box and skips the empty ones.
 
-## Installing with every default: /verysilent /defaults
+## Installing with every default: /default
 
-Every Homer installer takes `/defaults` beside a silent switch, and then installs with no screens, doing what pressing Enter at every step would do: it runs each finish-page entry whose box is ticked by default, writes the Results box to the setup log, and starts the program when Launch is ticked.
+`/default` installs exactly as pressing Enter on every screen would, with nothing to press: every page keeps its default, each finish-page entry ticked by default runs, the Results box goes to the setup log instead of waiting for OK, and the program starts when Launch is ticked.
 
-`DbDo_setup.exe /verysilent /defaults`
+`DbDo_setup.exe /default`
 
-`/silent /defaults` does the same with a progress window. Switches can be typed in any case. Administrator approval is still asked for, as by every Homer installer, unless setup is started from an elevated Command Prompt.
-
-- **The ticks are the decision.** Install and Update entries run; Reinstall entries, ticked off by default, do not; nor does opening the user guide. Each entry's own test still decides whether it appears at all, as on the finish page.
-- **`/defaults` alone changes nothing.** Inno Setup decides whether to show screens from the command line, before any of the installer's code runs, so no code can turn them off for the run under way. The setup log says to add `/verysilent`. (Until 13 October 2026, `/defaults` alone started setup again with `/verysilent` added; that start failed on DbDo with no reason given, and two installers never tried it.)
-- **Plain `/silent` and `/verysilent` are unchanged:** they install the program and run no finish-page entry.
-- **No box waits in a silent install.** The Results box goes to the setup log instead.
+- **Any spelling:** `/default`, `/defaults`, `-d` or `--default`, in any case.
+- **A progress window shows; nothing else does.** Inno Setup decides whether to show screens before any of the installer's code runs, so setup started with screens starts itself again silently with the same switches, and the first copy steps aside. The second copy is already approved as administrator, so Windows does not ask again.
+- **A running copy of the program is closed** for the update, as the install would otherwise stop on it.
+- **The second copy keeps its own log,** in %TEMP% as HomerSetupDefault-<date>.log; the first copy's log names it.
+- **`/verysilent /default`** shows no progress window either.
 
 In the `.iss`, each finish-page entry says `Check: homerFinishRuns`, or `Check: homerFinishRuns and` its own test, in place of the `skipifsilent` flag. `homerFinishRuns` and `homerDefaults` live in HomerComponents.iss.
 

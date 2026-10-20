@@ -491,9 +491,20 @@ function homerMessageBox(hWnd: Integer; sText, sCaption: String; iType: Cardinal
    own test) in place of skipifsilent; Inno itself then runs a ticked entry in a
    silent install, leaves an unticked one, and evaluates each entry's own Check as
    the finish page would. *)
+(* ONE SWITCH, ANY SPELLING (kit 1.85.0, the author's request of 20 October 2026): /default,
+   /defaults, -d and --default, in any case, each read as a whole argument. *)
 function homerDefaults(): Boolean;
+var
+  i: Integer;
+  sArg: String;
 begin
-  Result := Pos('/DEFAULTS', Uppercase(GetCmdTail)) > 0;
+  Result := False;
+  for i := 1 to ParamCount do
+  begin
+    sArg := Uppercase(ParamStr(i));
+    if (sArg = '/DEFAULT') or (sArg = '/DEFAULTS') or (sArg = '-D') or (sArg = '-DEFAULT') or (sArg = '-DEFAULTS')
+      or (sArg = '--DEFAULT') or (sArg = '--DEFAULTS') then Result := True;
+  end;
 end;
 
 function homerFinishRuns(): Boolean;
@@ -503,11 +514,37 @@ begin
 end;
 
 function homerStartForDefaults(): Boolean;
-(* Called first in InitializeSetup; it starts nothing. Always False, so setup goes on. *)
+(* /DEFAULT IS ENTER ALL THE WAY (kit 1.85.0): the run a user gets by pressing Enter on every
+   screen, the finish page and the Results box included. Inno decides before any code runs
+   whether a run shows screens, so a run started with screens starts setup again here,
+   silently, with the same switches -- /SILENT, so a progress window still shows -- and
+   returns True, so this copy steps aside. The new copy is silent and sees /default, so it
+   runs every finish-page entry ticked by default (homerFinishRuns) and logs the Results box.
+   It is already elevated, so Windows does not ask again; /CLOSEAPPLICATIONS closes a running
+   copy of the program, which a silent install otherwise stops on without saying why -- the
+   likeliest reason the first restart failed on DbDo on 13 October 2026, its AppMutex held.
+   The new copy writes its own log in %TEMP%, named here, so whatever stops it is on disk.
+   ROLLBACK: return False without starting anything, and /default skips pages as before. *)
+var
+  i, iCode: Integer;
+  sArg, sLog, sParams: String;
 begin
   Result := False;
-  if homerDefaults() and not WizardSilent then
-    Log('/defaults: every page that can be skipped is skipped, each keeping its default; the finish page shows with its default boxes ticked, and Enter finishes. For no screens at all, run setup with /verysilent /defaults.');
+  if not homerDefaults() or WizardSilent then exit;
+  sParams := '';
+  for i := 1 to ParamCount do
+  begin
+    sArg := ParamStr(i);
+    if Pos(' ', sArg) > 0 then sArg := '"' + sArg + '"';
+    sParams := sParams + ' ' + sArg;
+  end;
+  sLog := ExpandConstant('{tmp}\..\HomerSetupDefault-' + GetDateTimeString('yyyymmdd-hhnnss', #0, #0) + '.log');
+  sParams := sParams + ' /SILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS /LOG="' + sLog + '"';
+  Log('/default: starting setup again silently, every default taken, as Enter on every screen: ' + ExpandConstant('{srcexe}') + sParams);
+  if Exec(ExpandConstant('{srcexe}'), sParams, '', SW_SHOW, ewNoWait, iCode) then
+    Result := True
+  else
+    Log('/default: setup could not be started again (' + SysErrorMessage(iCode) + '); this run goes on with its screens');
 end;
 
 function ShouldSkipPage(PageID: Integer): Boolean;

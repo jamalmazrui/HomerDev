@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.85.0 -- 20 October 2026
+
+- **/default installs as Enter on every screen would, with nothing to press,** in every Homer installer: `/default`, `/defaults`, `-d` or `--default`, in any case. Setup started with screens starts itself again silently with the same switches -- a progress window, every default taken, each default-ticked finish-page entry run, the Results box logged -- closing a running copy of the program first, which is the likeliest reason the first such restart failed on DbDo on 13 October. The second copy writes its own log in %TEMP%, named in the first's. In HomerComponents.iss, so every installer gains it at its next build. FinishPage.md says how.
+- **Correction:** the kit build does not compile an app made by newHomerApp; the logs that suggested it came from a test outside the build. A build self-test that does is queued.
+
 ## 1.84.1 -- 20 October 2026
 
 - **The app template's dialog is 2htm's and extCheck's,** the pattern of every Homer launchpad app, after the author's audit found BatCon had drifted from it by following the template. Source files and Output directory share a band with Browse source and Choose output; a separator; the app's own options; Force replacements, View output, Log session and Use configuration; then OK, Guide, Default settings and Cancel, with Lbc's Help and its version check, and F11. Source files starts at Documents, and Output directory follows the source until the user chooses another. Settings are kept only when Use configuration is checked at OK. The AI note now says to convert only through Conversion.convert, and gives Camel Type's c_ prefix for constants, which it had denied.
