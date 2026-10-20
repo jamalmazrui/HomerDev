@@ -543,6 +543,18 @@ return mediaCategoryOf(sExt);
 static partial void mediaCategory(string sExt, ref string sCategory);
 static partial void mediaTargets(string sCategory, ref string[,] aTargets);
 static partial void mediaConvert(string sSource, string sTarget, ref bool bHandled, ref bool bMade, ref string sError);
+static partial void mediaCan(string sSource, string sTarget, ref bool bCan);
+static partial void mediaAllTargets(List<string[]> lsAll);
+
+// canConvert: whether convert can make sTarget's type from sSource's (kit 1.84.0): the route
+// table, or the media half -- media to media, speech to text, text to speech -- when the app
+// compiles ConversionMedia. The question to ask before a batch, as BatCon does.
+public static bool canConvert(string sSource, string sTarget) {
+if (hasRoute(sSource, sTarget)) return true;
+bool bCan = false;
+mediaCan(sSource, sTarget, ref bCan);
+return bCan;
+} // canConvert method
 
 private static string mediaCategoryOf(string sExt) {
 string sCategory = "";
@@ -610,6 +622,15 @@ if (string.IsNullOrEmpty(sName) || sName == sTo) sName = sTo.ToUpperInvariant() 
 lsAll.Add(new string[] { char.ToUpperInvariant(sName[0]) + sName.Substring(1) + " (" + sTo + ")", sTo });
 }
 } catch (Exception oError) { Log.warn("allTargets: the route table could not be read: " + oError.Message); }
+// The media half's targets too (1.84.0), when the app compiles ConversionMedia.
+List<string[]> lsMedia = new List<string[]>();
+mediaAllTargets(lsMedia);
+foreach (string[] aOne in lsMedia) {
+if (!hsSeen.Add(aOne[1])) continue;
+string sName = typeName(aOne[1]);
+if (string.IsNullOrEmpty(sName)) sName = aOne[0];
+lsAll.Add(new string[] { char.ToUpperInvariant(sName[0]) + sName.Substring(1) + " (" + aOne[1] + ")", aOne[1] });
+}
 lsAll.Sort(delegate(string[] a, string[] b) { return string.Compare(a[0], b[0], StringComparison.OrdinalIgnoreCase); });
 aLabels = new string[lsAll.Count];
 string[] aExtensions = new string[lsAll.Count];

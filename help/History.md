@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.84.0 -- 20 October 2026
+
+- **Speech becomes text, and text becomes speech, through the one conversion technique.** An audio or video file converts to a transcript as plain text, Markdown, a web page, Word, PDF, OpenDocument, rich text, EPUB or Word 97: ffmpeg takes the sound, Whisper transcribes it on this computer (Voice.transcribe), and the route table takes the Markdown to the target. A document converts to MP3, M4A, WAV, Ogg, FLAC or Opus by Windows' speech synthesis and ffmpeg, or to MP4, Matroska, WebM or QuickTime video, the speech over a plain black picture. Describing what a video shows is still HomerScribe's own, to move into the kit next.
+- **Conversion.canConvert** answers for the route table and the media half together, and **allTargets** now lists the media formats too, so a picker or a batch sees everything the kit can make.
+- **An app that compiles ConversionMedia compiles Voice.cs too;** DbDo's and FileDir's builds do. Speech synthesis is reached by reflection, so no build needs a new reference.
+
 ## 1.83.0 -- 20 October 2026
 
 - **Conversion.allTargets lists every type the kit can make,** with its readable name, alphabetically by name, for a picker that offers every target before any source is known. BatCon's Target format is filled from it, and asks hasRoute for each file at run time.

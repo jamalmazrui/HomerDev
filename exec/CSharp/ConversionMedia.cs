@@ -11,6 +11,7 @@
 // Copyright 2006-2026 by Jamal Mazrui. MIT License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -47,19 +48,143 @@ else if (Array.IndexOf(aImageSources, sExt) >= 0 || Array.IndexOf(aMagickSources
 static partial void mediaTargets(string sCategory, ref string[,] aTargets) {
 if (sCategory == "audio")
 aTargets = new string[,] {{"MP3 audio", "mp3"}, {"M4A audio (AAC)", "m4a"}, {"WAV audio, uncompressed", "wav"},
-{"FLAC audio, lossless", "flac"}, {"Ogg Vorbis audio", "ogg"}, {"Opus audio", "opus"}, {"Play list of these files", "m3u"}};
+{"FLAC audio, lossless", "flac"}, {"Ogg Vorbis audio", "ogg"}, {"Opus audio", "opus"}, {"Play list of these files", "m3u"},
+{"Transcript, Markdown document", "md"}, {"Transcript, plain text", "txt"}, {"Transcript, web page", "htm"}, {"Transcript, Word document", "docx"}, {"Transcript, PDF document", "pdf"}};
 else if (sCategory == "video")
 aTargets = new string[,] {{"MP4 video", "mp4"}, {"Matroska video", "mkv"}, {"WebM video", "webm"}, {"QuickTime video", "mov"},
 {"AVI video", "avi"}, {"MP3 audio, sound only", "mp3"}, {"M4A audio, sound only", "m4a"}, {"WAV audio, sound only", "wav"},
-{"Play list of these files", "m3u"}};
+{"Play list of these files", "m3u"},
+{"Transcript, Markdown document", "md"}, {"Transcript, plain text", "txt"}, {"Transcript, web page", "htm"}, {"Transcript, Word document", "docx"}, {"Transcript, PDF document", "pdf"}};
 else if (sCategory == "image")
 aTargets = new string[,] {{"PNG image", "png"}, {"JPEG image", "jpg"}, {"WebP image", "webp"}, {"BMP image", "bmp"},
 {"GIF image", "gif"}, {"TIFF image", "tif"}, {"Windows icon", "ico"}, {"AVIF image", "avif"}};
 } // mediaTargets method
 
+// ------- speech to text, and text to speech (kit 1.84.0) -------
+//
+// THE UNCONVENTIONAL CONVERSIONS, the author's request of 20 October 2026: sound and video
+// become documents by transcription, and documents become sound or video by speech, all
+// through the kit's one conversion technique, so BatCon and every app share them.
+//   audio or video -> txt, md, htm, docx, pdf, odt, rtf, epub, doc: ffmpeg takes the sound as
+//     the 16 kHz mono WAV Whisper wants; Voice.transcribe runs Whisper on this computer; the
+//     transcript becomes Markdown, which the route table takes to the target.
+//   a document -> mp3, m4a, wav, ogg, flac, opus: its text, by the route table; Windows' own
+//     speech synthesis speaks it into a WAV; ffmpeg encodes it.
+//   a document -> mp4, mkv, webm, mov: the same speech over a plain black picture, since the kit
+//     makes no pictures of its own.
+// NOT YET: describing what a video shows. That is HomerScribe's vision-model pipeline, still in
+// HomerScribe's own code; once it moves into the kit, video sources gain it here.
+private static readonly string[] aTranscriptTargets = { "doc", "docx", "epub", "htm", "md", "odt", "pdf", "rtf", "txt" };
+private static readonly string[] aSpeechAudioTargets = { "flac", "m4a", "mp3", "ogg", "opus", "wav" };
+private static readonly string[] aSpeechVideoTargets = { "mkv", "mov", "mp4", "webm" };
+
+// textAvailable: whether the kit can take a file's words out as text.
+private static bool textAvailable(string sSource) {
+string sType = typeOf(sSource);
+if (sType == "txt" || sType == "md") return true;
+return hasRoute(sSource, "x.txt") || hasRoute(sSource, "x.md");
+} // textAvailable method
+
+static partial void mediaCan(string sSource, string sTarget, ref bool bCan) {
+string sCategory = "";
+mediaCategory(Path.GetExtension(sSource).ToLowerInvariant(), ref sCategory);
+string sTo = typeOf(sTarget);
+if ((sCategory == "audio" || sCategory == "video") && Array.IndexOf(aTranscriptTargets, sTo) >= 0) { bCan = true; return; }
+if (sCategory == "" && (Array.IndexOf(aSpeechAudioTargets, sTo) >= 0 || Array.IndexOf(aSpeechVideoTargets, sTo) >= 0)) { bCan = textAvailable(sSource); return; }
+if (sCategory == "") return;
+string[,] aTargets = null;
+mediaTargets(sCategory, ref aTargets);
+if (aTargets != null) for (int i = 0; i < aTargets.GetLength(0); i++) if (aTargets[i, 1] == sTo) { bCan = true; return; }
+} // mediaCan method
+
+static partial void mediaAllTargets(List<string[]> lsAll) {
+foreach (string sCategory in new string[] { "audio", "video", "image" }) {
+string[,] aTargets = null;
+mediaTargets(sCategory, ref aTargets);
+if (aTargets == null) continue;
+for (int i = 0; i < aTargets.GetLength(0); i++) if (aTargets[i, 1] != "m3u") lsAll.Add(new string[] { aTargets[i, 0], aTargets[i, 1] });
+}
+} // mediaAllTargets method
+
+// transcribeTo: the words spoken in a recording, as a document of the target's type.
+private static bool transcribeTo(string sSource, string sTarget, out string sError) {
+sError = "";
+string sFfmpeg = Media.ffmpegProgram();
+if (sFfmpeg.Length == 0) { sError = "ffmpeg is not installed, and it is what takes the sound out for Whisper"; return false; }
+string sWav = tempPath(sSource, ".wav");
+string sMd = tempPath(sSource, ".md");
+try {
+string sOut, sErr;
+int iCode = Media.run(sFfmpeg, "-nostdin -y -i \"" + sSource + "\" -vn -ar 16000 -ac 1 -c:a pcm_s16le \"" + sWav + "\"", out sOut, out sErr, 120);
+if (iCode != 0 || !File.Exists(sWav)) { sError = "ffmpeg could not take the sound out (exit code " + iCode + ")"; Log.info("ffmpeg: " + sErr.Trim()); return false; }
+// Six hours is the longest a recording may take to transcribe; Whisper runs at many times real time.
+string sText = Voice.transcribe(sWav, 6 * 60 * 60 * 1000, out sError);
+if (sText.Length == 0) { if (sError == "") sError = "Whisper heard no words"; return false; }
+StringBuilder oMd = new StringBuilder("# Transcript of " + Path.GetFileNameWithoutExtension(sSource) + "\r\n\r\n");
+string[] aSentences = System.Text.RegularExpressions.Regex.Split(sText, @"(?<=[.!?])\s+");
+for (int i = 0; i < aSentences.Length; i += 5)
+oMd.Append(string.Join(" ", aSentences, i, Math.Min(5, aSentences.Length - i)) + "\r\n\r\n");
+File.WriteAllText(sMd, oMd.ToString(), new UTF8Encoding(true));
+string sTo = typeOf(sTarget);
+if (sTo == "md" || sTo == "txt") { File.Copy(sMd, sTarget, true); return true; }
+return convert(sMd, sTarget, out sError);
+}
+finally { try { File.Delete(sWav); } catch (Exception) { } try { File.Delete(sMd); } catch (Exception) { } }
+} // transcribeTo method
+
+// speakTo: a document's words spoken by Windows' speech synthesis, as sound or as video.
+// Reached by reflection, so no app's build needs a reference to System.Speech.
+private static bool speakTo(string sSource, string sTarget, out string sError) {
+sError = "";
+string sFfmpeg = Media.ffmpegProgram();
+if (sFfmpeg.Length == 0) { sError = "ffmpeg is not installed, and it is what encodes the speech"; return false; }
+string sTxt = tempPath(sSource, ".txt");
+string sWav = tempPath(sSource, ".wav");
+try {
+string sText;
+string sType = typeOf(sSource);
+if (sType == "txt" || sType == "md") sText = decodeText(File.ReadAllBytes(sSource));
+else {
+if (!convert(sSource, sTxt, out sError)) return false;
+sText = decodeText(File.ReadAllBytes(sTxt));
+}
+if (sType == "md") sText = System.Text.RegularExpressions.Regex.Replace(sText, @"(?m)^#+\s*|[*_`>|]", "");
+if (sText.Trim().Length == 0) { sError = "the document has no words to speak"; return false; }
+Type oSynthType = Type.GetType("System.Speech.Synthesis.SpeechSynthesizer, System.Speech, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35");
+if (oSynthType == null) { sError = "Windows speech synthesis is not available"; return false; }
+object oSynth = Activator.CreateInstance(oSynthType);
+try {
+oSynthType.GetMethod("SetOutputToWaveFile", new Type[] { typeof(string) }).Invoke(oSynth, new object[] { sWav });
+oSynthType.GetMethod("Speak", new Type[] { typeof(string) }).Invoke(oSynth, new object[] { sText });
+oSynthType.GetMethod("SetOutputToNull").Invoke(oSynth, null);
+}
+finally { ((IDisposable) oSynth).Dispose(); }
+if (!File.Exists(sWav) || new FileInfo(sWav).Length < 1000) { sError = "Windows speech synthesis made no sound"; return false; }
+string sTo = typeOf(sTarget);
+string sArgs;
+if (Array.IndexOf(aSpeechVideoTargets, sTo) >= 0)
+sArgs = "-nostdin -y -f lavfi -i color=c=black:s=1280x720:r=1 -i \"" + sWav + "\" -shortest "
++ (sTo == "webm" ? "-c:v libvpx-vp9 -c:a libopus " : "-c:v libx264 -tune stillimage -pix_fmt yuv420p -c:a aac ") + "\"" + sTarget + "\"";
+else sArgs = "-nostdin -y -i \"" + sWav + "\" \"" + sTarget + "\"";
+string sOut, sErr;
+int iCode = Media.run(sFfmpeg, sArgs, out sOut, out sErr, 120);
+if (iCode != 0 || !File.Exists(sTarget)) { sError = "ffmpeg could not encode the speech (exit code " + iCode + ")"; Log.info("ffmpeg: " + sErr.Trim()); return false; }
+return true;
+}
+catch (Exception oError) { sError = "speech synthesis failed: " + (oError.InnerException != null ? oError.InnerException.Message : oError.Message); return false; }
+finally { try { File.Delete(sTxt); } catch (Exception) { } try { File.Delete(sWav); } catch (Exception) { } }
+} // speakTo method
+
 static partial void mediaConvert(string sSource, string sTarget, ref bool bHandled, ref bool bMade, ref string sError) {
 string sCategory = "";
 mediaCategory(Path.GetExtension(sSource).ToLowerInvariant(), ref sCategory);
+string sToType = typeOf(sTarget);
+if ((sCategory == "audio" || sCategory == "video") && Array.IndexOf(aTranscriptTargets, sToType) >= 0) {
+bHandled = true; bMade = transcribeTo(sSource, sTarget, out sError); return;
+}
+if (sCategory == "" && (Array.IndexOf(aSpeechAudioTargets, sToType) >= 0 || Array.IndexOf(aSpeechVideoTargets, sToType) >= 0) && textAvailable(sSource)) {
+bHandled = true; bMade = speakTo(sSource, sTarget, out sError); return;
+}
 if (sCategory == "") return;
 bHandled = true;
 bMade = convertMedia(sSource, sTarget, out sError);

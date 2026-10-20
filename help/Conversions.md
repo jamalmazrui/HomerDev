@@ -94,3 +94,10 @@ FRAME PDF Studio (MIT licensed, by ripplelearning) is a browser tool for remedia
 - **Tables built by hand, and writing a tagged PDF.** These are remediation, making a better PDF, rather than conversion. They would suit a future pdf2pdf route, not pdf2md.
 - **Its accessibility checker.** A list of a PDF's accessibility problems could become a kit report one day; it is not a conversion.
 
+## Speech and text (kit 1.84.0)
+
+- **Audio or video to a document:** a transcript, by Whisper on this computer, as plain text, Markdown, a web page, Word, PDF, OpenDocument, rich text, EPUB or Word 97. It needs ffmpeg and Whisper, both offered by the Homer installers.
+- **A document to audio:** its words spoken by Windows' speech synthesis, as MP3, M4A, WAV, Ogg, FLAC or Opus. It needs ffmpeg.
+- **A document to video:** the same speech over a plain black picture, as MP4, Matroska, WebM or QuickTime, since the kit makes no pictures of its own.
+- **Not yet:** a description of what a video shows, which HomerScribe makes with a vision model in its own code; it moves into the kit next.
+
