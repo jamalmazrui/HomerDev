@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.84.1 -- 20 October 2026
+
+- **The app template's dialog is 2htm's and extCheck's,** the pattern of every Homer launchpad app, after the author's audit found BatCon had drifted from it by following the template. Source files and Output directory share a band with Browse source and Choose output; a separator; the app's own options; Force replacements, View output, Log session and Use configuration; then OK, Guide, Default settings and Cancel, with Lbc's Help and its version check, and F11. Source files starts at Documents, and Output directory follows the source until the user chooses another. Settings are kept only when Use configuration is checked at OK. The AI note now says to convert only through Conversion.convert, and gives Camel Type's c_ prefix for constants, which it had denied.
+- **A new app's build no longer stops on its tutorial fingerprints.** buildTutorials writes <walk>.sha256 beside each mp3 to know whether a walk changed; the build's check that every help file is installed now leaves those out. BatCon's first build that spoke its walks stopped on all ten.
+
 ## 1.84.0 -- 20 October 2026
 
 - **Speech becomes text, and text becomes speech, through the one conversion technique.** An audio or video file converts to a transcript as plain text, Markdown, a web page, Word, PDF, OpenDocument, rich text, EPUB or Word 97: ffmpeg takes the sound, Whisper transcribes it on this computer (Voice.transcribe), and the route table takes the Markdown to the target. A document converts to MP3, M4A, WAV, Ogg, FLAC or Opus by Windows' speech synthesis and ffmpeg, or to MP4, Matroska, WebM or QuickTime video, the speech over a plain black picture. Describing what a video shows is still HomerScribe's own, to move into the kit next.

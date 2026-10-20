@@ -568,6 +568,9 @@ if exist "help\Tutorial_*.inix" (
 
 rem ---- installer ----------------------------------------------------------
 if not defined useInstaller goto :done
+rem THE TUTORIAL FINGERPRINTS STAY HOME (kit 1.84.1): buildTutorials writes <walk>.sha256 beside each
+rem mp3, to know next time whether the walk changed; it is build state, never installed, so the
+rem check leaves it out. BatCon's first build that spoke its walks stopped on all ten.
 rem EVERY FILE IN help\ AND EVERY scripts\install*.cmd MUST BE SHIPPED. The
 rem Source: lines are read, {#Name} tokens resolved from #define lines, and
 rem each file matched against them; recursesubdirs lets a line reach into
@@ -582,7 +585,7 @@ powershell -NoProfile -Command ^
   "  $sAny = '[^\\]*'; if ($s -match 'recursesubdirs') { $sAny = '.*' };" ^
   "  $lPat += ('^' + [regex]::Escape($p).Replace('\*', $sAny).Replace('\?', '.') + '$') } };" ^
   "$iRoot = (Get-Location).Path.Length + 1;" ^
-  "$lFiles = @(Get-ChildItem -LiteralPath 'help' -Recurse -File -ErrorAction SilentlyContinue) + @(Get-ChildItem -LiteralPath 'scripts' -Filter 'install*.cmd' -File -ErrorAction SilentlyContinue);" ^
+  "$lFiles = @(Get-ChildItem -LiteralPath 'help' -Recurse -File -ErrorAction SilentlyContinue | Where-Object { $_.Extension -ne '.sha256' }) + @(Get-ChildItem -LiteralPath 'scripts' -Filter 'install*.cmd' -File -ErrorAction SilentlyContinue);" ^
   "$iMissing = 0; foreach ($f in $lFiles) { $r = $f.FullName.Substring($iRoot); $bHit = $false; foreach ($p in $lPat) { if ($r -match $p) { $bHit = $true; break } };" ^
   "  if (-not $bHit) { 'NOT IN THE INSTALLER: ' + $r; $iMissing++ } };" ^
   "'Files checked against the installer: ' + $lFiles.Count + ', missing: ' + $iMissing;" ^
