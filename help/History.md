@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.82.1 -- 20 October 2026
+
+- **Python converts as C# does, for web pages.** conversion.py has the markdown engine too, ported line for line from Conversion.cs, so a Python app without Pandoc also makes a web page from Markdown or a PDF. Tested on Markdown like PdfReader's: its page matches Pandoc's in structure, and adds a main landmark, column headers in tables, and the title from the first heading.
+
 ## 1.82.0 -- 20 October 2026
 
 - **A new app's first push makes its repository.** A new kit script, createRepo, runs the app's own create<App>Repo.cmd, or first writes one from the kit's Templates\create_APP_Repo.cmd and .ps1, with the app's name in place, as newHomerApp does. Those templates stay local-only, by the author's rule, so createRepo holds no account details; where they are absent it says so and stops. push calls createRepo by itself when a folder is not yet a repository, so a new app's first build_release goes all the way through. BatCon, made from a zip rather than newHomerApp, showed the gap: its push could only say to run a script it did not have.

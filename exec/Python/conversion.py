@@ -102,7 +102,7 @@ def programFor(sEngine):
 
 
 def engineAvailable(sEngine):
-    if sEngine in ("copy", "zipxml"): return True
+    if sEngine in ("copy", "markdown", "zipxml"): return True
     if sEngine == "pandoc": return bool(programFor(sEngine))
     if sEngine == "ocr":
         try: import pypdfium2
@@ -406,7 +406,97 @@ def engineOfficeComSave(sApp, sSource, sOut, iFormat):
         finally: oApp.Quit()
 
 
-dEngines = {"copy": engineCopy, "ocr": engineOcr, "officecom": engineOfficeCom,
+def engineMarkdown(sSource, sTo, sOut):
+    """The kit's own writer of Markdown as an accessible web page (1.82.1), as Conversion.cs's markdown
+    engine does, line for line: a second way after Pandoc for md2htm and pdf2htm, so a computer without
+    Pandoc still gets a page. Headings, paragraphs, bullet and numbered lists, pipe tables, quotes,
+    fenced code, rules; inline links, images with their alt text, bold, italic and code; lang and title
+    from front matter, else the first heading, else the file name; the body inside main."""
+    if sTo not in ("htm", "html"): raise ValueError("the markdown engine writes web pages only")
+    sText = decodeText(open(sSource, "rb").read()).replace("\r\n", "\n").replace("\r", "\n")
+    lsLines = sText.split("\n")
+    sTitle, sLang, iAt = "", "en", 0
+    if lsLines and lsLines[0].strip() == "---":
+        iAt = 1
+        while iAt < len(lsLines) and lsLines[iAt].strip() != "---":
+            oMeta = re.match(r'^\s*(title|lang)\s*:\s*"?(.*?)"?\s*$', lsLines[iAt], re.I)
+            if oMeta:
+                if oMeta.group(1).lower() == "title": sTitle = oMeta.group(2)
+                else: sLang = oMeta.group(2)
+            iAt += 1
+        iAt += 1
+    lsBody, lsPara, dList = [], [], {"kind": ""}
+    def closeList():
+        if dList["kind"]: lsBody.append("</%s>" % dList["kind"]); dList["kind"] = ""
+    def flush():
+        if lsPara: lsBody.append("<p>" + markdownInline(" ".join(lsPara)) + "</p>"); del lsPara[:]
+    i = iAt
+    while i < len(lsLines):
+        sLine = lsLines[i]; sTrim = sLine.strip()
+        if sTrim.startswith("```"):
+            flush(); closeList(); lsCode = []; i += 1
+            while i < len(lsLines) and not lsLines[i].strip().startswith("```"): lsCode.append(htmlEscape(lsLines[i])); i += 1
+            lsBody.append("<pre><code>" + "\r\n".join(lsCode) + "\r\n</code></pre>"); i += 1; continue
+        if sTrim == "": flush(); closeList(); i += 1; continue
+        oHead = re.match(r"^(#{1,6})\s+(.*?)\s*#*$", sTrim)
+        if oHead:
+            flush(); closeList(); iLevel = len(oHead.group(1))
+            if not sTitle and iLevel == 1: sTitle = re.sub(r"[*_`]", "", oHead.group(2))
+            lsBody.append("<h%d>%s</h%d>" % (iLevel, markdownInline(oHead.group(2)), iLevel)); i += 1; continue
+        if re.match(r"^(\*\s*\*\s*\*|-\s*-\s*-|_\s*_\s*_)[\s*_-]*$", sTrim): flush(); closeList(); lsBody.append("<hr>"); i += 1; continue
+        if sTrim.startswith("|") and i + 1 < len(lsLines) and re.match(r"^\|?\s*:?-{1,}:?\s*(\|\s*:?-{1,}:?\s*)*\|?$", lsLines[i + 1].strip()):
+            flush(); closeList()
+            lsBody.append("<table>\r\n<thead><tr>" + "".join('<th scope="col">%s</th>' % markdownInline(c) for c in markdownCells(sTrim)) + "</tr></thead>\r\n<tbody>")
+            i += 2
+            while i < len(lsLines) and lsLines[i].strip().startswith("|"):
+                lsBody.append("<tr>" + "".join("<td>%s</td>" % markdownInline(c) for c in markdownCells(lsLines[i].strip())) + "</tr>"); i += 1
+            lsBody.append("</tbody>\r\n</table>"); continue
+        oBullet = re.match(r"^\s*[-*+]\s+(.*)$", sLine); oNumber = re.match(r"^\s*\d+[.)]\s+(.*)$", sLine)
+        if oBullet or oNumber:
+            flush(); sKind = "ul" if oBullet else "ol"
+            if dList["kind"] != sKind: closeList(); lsBody.append("<%s>" % sKind); dList["kind"] = sKind
+            lsBody.append("<li>" + markdownInline((oBullet or oNumber).group(1)) + "</li>"); i += 1; continue
+        if sTrim.startswith(">"): flush(); closeList(); lsBody.append("<blockquote><p>" + markdownInline(sTrim.lstrip(">").strip()) + "</p></blockquote>"); i += 1; continue
+        closeList(); lsPara.append(sTrim); i += 1
+    flush(); closeList()
+    if not sTitle: sTitle = os.path.splitext(os.path.basename(sSource))[0]
+    sPage = ('<!DOCTYPE html>\r\n<html lang="%s">\r\n<head>\r\n<meta charset="utf-8">\r\n'
+             '<meta name="viewport" content="width=device-width, initial-scale=1">\r\n<title>%s</title>\r\n</head>\r\n<body>\r\n<main>\r\n'
+             % (htmlEscape(sLang), htmlEscape(sTitle))) + "".join(s + "\r\n" for s in lsBody) + "</main>\r\n</body>\r\n</html>\r\n"
+    open(sOut, "w", encoding="utf-8-sig", newline="").write(sPage)
+
+
+def markdownCells(sRow):
+    s = sRow.strip()
+    if s.startswith("|"): s = s[1:]
+    if s.endswith("|") and not s.endswith("\\|"): s = s[:-1]
+    return [c.strip().replace("\\|", "|") for c in re.split(r"(?<!\\)\|", s)]
+
+
+def markdownInline(sText):
+    """Code spans and escaped characters set aside first, so neither becomes emphasis; then images,
+    links, bold and italic -- the order Conversion.cs uses."""
+    lsCode, lsEscaped = [], []
+    def keepCode(m): lsCode.append(m.group(1)); return "\x01%d\x02" % (len(lsCode) - 1)
+    def keepEscaped(m): lsEscaped.append(m.group(1)); return "\x03%d\x04" % (len(lsEscaped) - 1)
+    s = re.sub(r"`([^`]+)`", keepCode, sText)
+    s = re.sub(r"\\([\\`*_{}\[\]()#+\-.!|>])", keepEscaped, s)
+    s = htmlEscape(s)
+    s = re.sub(r'!\[([^\]]*)\]\(([^)\s]+)(?:\s+&quot;[^&]*&quot;)?\)', r'<img src="\2" alt="\1">', s)
+    s = re.sub(r'\[([^\]]+)\]\(([^)\s]+)(?:\s+&quot;[^&]*&quot;)?\)', r'<a href="\2">\1</a>', s)
+    s = re.sub(r"(\*\*|__)(?=\S)(.+?)(?<=\S)\1", r"<strong>\2</strong>", s)
+    s = re.sub(r"(?<![\w*])\*(?=\S)(.+?)(?<=\S)\*(?![\w*])", r"<em>\1</em>", s)
+    s = re.sub(r"(?<![\w_])_(?=\S)(.+?)(?<=\S)_(?![\w_])", r"<em>\1</em>", s)
+    s = re.sub("\x03(\\d+)\x04", lambda m: htmlEscape(lsEscaped[int(m.group(1))]), s)
+    s = re.sub("\x01(\\d+)\x02", lambda m: "<code>" + htmlEscape(lsCode[int(m.group(1))]) + "</code>", s)
+    return s
+
+
+def htmlEscape(s):
+    return (s or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+
+
+dEngines = {"copy": engineCopy, "markdown": engineMarkdown, "ocr": engineOcr, "officecom": engineOfficeCom,
               "pandoc": enginePandoc, "pdfstructure": enginePdfStructure, "pdftext": enginePdfText, "zipxml": engineZipXml}
 
 
