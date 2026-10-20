@@ -137,6 +137,26 @@ public static class Paths
     public static string shippedConfigs() { return Path.Combine(installedFolder, "configs"); }
     public static string shippedData() { return Path.Combine(installedFolder, "data"); }
     public static string shippedExec() { return Path.Combine(installedFolder, "exec"); }
+    // homerProgram: another Homer app's program -- its Program Files folder, under exec as the
+    // Homer layout puts it or at the top as EdSharp's does, then Windows' registered App Paths;
+    // "" when it is not installed. Here since 1.85.2, so media conversion can ask for HomerScribe
+    // without the window frame; SuiteCommands.homerProgram calls this.
+    public static string homerProgram(string sApp) {
+        foreach (Environment.SpecialFolder oFolder in new Environment.SpecialFolder[] { Environment.SpecialFolder.ProgramFiles, Environment.SpecialFolder.ProgramFilesX86 }) {
+            string sRoot = Environment.GetFolderPath(oFolder);
+            if (string.IsNullOrEmpty(sRoot)) continue;
+            foreach (string sTry in new string[] { System.IO.Path.Combine(sRoot, sApp, "exec", sApp + ".exe"), System.IO.Path.Combine(sRoot, sApp, sApp + ".exe") })
+                if (System.IO.File.Exists(sTry)) return sTry;
+        }
+        try {
+            using (Microsoft.Win32.RegistryKey oKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\" + sApp + ".exe")) {
+                string sValue = oKey == null ? null : oKey.GetValue("") as string;
+                if (!string.IsNullOrEmpty(sValue) && System.IO.File.Exists(sValue.Trim('"'))) return sValue.Trim('"');
+            }
+        } catch (Exception) { }
+        return "";
+    }
+
     public static string shippedHelp() { return Path.Combine(installedFolder, "help"); }
     public static string shippedScripts() { return Path.Combine(installedFolder, "scripts"); }
         public static string shippedTemplates() { return Path.Combine(installedFolder, "templates"); }

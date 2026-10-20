@@ -72,8 +72,11 @@ aTargets = new string[,] {{"PNG image", "png"}, {"JPEG image", "jpg"}, {"WebP im
 //     speech synthesis speaks it into a WAV; ffmpeg encodes it.
 //   a document -> mp4, mkv, webm, mov: the same speech over a plain black picture, since the kit
 //     makes no pictures of its own.
-// NOT YET: describing what a video shows. That is HomerScribe's vision-model pipeline, still in
-// HomerScribe's own code; once it moves into the kit, video sources gain it here.
+//   video -> any of those, DESCRIBED (1.85.2): HomerScribe, when installed, is the kit's engine
+//     for what a video shows, as Pandoc and Office are engines for documents. It is asked for
+//     both halves -- what is said and what can be seen -- and the two become one document. Its
+//     description is the suite's one technique for it, kept in one program rather than copied
+//     here; without HomerScribe, a video gets the transcript alone, and the log says why.
 private static readonly string[] aTranscriptTargets = { "doc", "docx", "epub", "htm", "md", "odt", "pdf", "rtf", "txt" };
 private static readonly string[] aSpeechAudioTargets = { "flac", "m4a", "mp3", "ogg", "opus", "wav" };
 private static readonly string[] aSpeechVideoTargets = { "mkv", "mov", "mp4", "webm" };
@@ -105,6 +108,44 @@ if (aTargets == null) continue;
 for (int i = 0; i < aTargets.GetLength(0); i++) if (aTargets[i, 1] != "m3u") lsAll.Add(new string[] { aTargets[i, 0], aTargets[i, 1] });
 }
 } // mediaAllTargets method
+
+// describeVideoTo: what a video says and shows, as one document, by HomerScribe. A context file
+// named after the video, beside it, is found by HomerScribe itself, as in its guide.
+private static bool describeVideoTo(string sSource, string sTarget, out string sError) {
+sError = "";
+string sScribe = Paths.homerProgram("HomerScribe");
+if (sScribe.Length == 0) { sError = "HomerScribe is not installed"; return false; }
+string sDir = Path.Combine(Path.GetTempPath(), "HomerDescribe-" + Guid.NewGuid().ToString("N").Substring(0, 8));
+string sMd = tempPath(sSource, ".md");
+try {
+Directory.CreateDirectory(sDir);
+string sOut, sErr;
+// Ten hours at most: a long film is described scene by scene by a local vision model.
+int iCode = Media.run(sScribe, "\"" + sSource + "\" --describe --transcribe --output-dir \"" + sDir + "\"", out sOut, out sErr, 600);
+string sFolder = Path.Combine(sDir, Path.GetFileNameWithoutExtension(sSource));
+string sDescribed = Path.Combine(sFolder, "described.md"), sTranscribed = Path.Combine(sFolder, "transcribed.md");
+if (!File.Exists(sDescribed)) {
+sError = "HomerScribe made no description (exit code " + iCode + ")";
+Log.info("HomerScribe: " + (sErr + " " + sOut).Trim());
+return false;
+}
+StringBuilder oMd = new StringBuilder("# " + Path.GetFileNameWithoutExtension(sSource) + "\r\n\r\n");
+if (File.Exists(sTranscribed)) oMd.Append("## What is said\r\n\r\n" + demoted(decodeText(File.ReadAllBytes(sTranscribed))) + "\r\n\r\n");
+oMd.Append("## What can be seen\r\n\r\n" + demoted(decodeText(File.ReadAllBytes(sDescribed))) + "\r\n");
+File.WriteAllText(sMd, oMd.ToString(), new UTF8Encoding(true));
+string sTo = typeOf(sTarget);
+if (sTo == "md" || sTo == "txt") { File.Copy(sMd, sTarget, true); return true; }
+return convert(sMd, sTarget, out sError);
+}
+catch (Exception oError) { sError = "HomerScribe could not be used: " + oError.Message; return false; }
+finally { try { Directory.Delete(sDir, true); } catch (Exception) { } try { File.Delete(sMd); } catch (Exception) { } }
+} // describeVideoTo method
+
+// demoted: a document's headings moved down two levels, under "## What is said" or "## What can be
+// seen", so the combined document keeps one outline.
+private static string demoted(string sMarkdown) {
+return System.Text.RegularExpressions.Regex.Replace(sMarkdown.Replace("\r\n", "\n"), @"(?m)^(#{1,4})(\s)", "##$1$2").Replace("\n", "\r\n").Trim();
+} // demoted method
 
 // transcribeTo: the words spoken in a recording, as a document of the target's type.
 private static bool transcribeTo(string sSource, string sTarget, out string sError) {
@@ -179,7 +220,13 @@ static partial void mediaConvert(string sSource, string sTarget, ref bool bHandl
 string sCategory = "";
 mediaCategory(Path.GetExtension(sSource).ToLowerInvariant(), ref sCategory);
 string sToType = typeOf(sTarget);
-if ((sCategory == "audio" || sCategory == "video") && Array.IndexOf(aTranscriptTargets, sToType) >= 0) {
+if (sCategory == "video" && Array.IndexOf(aTranscriptTargets, sToType) >= 0) {
+bHandled = true;
+bMade = describeVideoTo(sSource, sTarget, out sError);
+if (!bMade) { Log.info("Described video: " + sError + "; the transcript alone instead"); bMade = transcribeTo(sSource, sTarget, out sError); }
+return;
+}
+if (sCategory == "audio" && Array.IndexOf(aTranscriptTargets, sToType) >= 0) {
 bHandled = true; bMade = transcribeTo(sSource, sTarget, out sError); return;
 }
 if (sCategory == "" && (Array.IndexOf(aSpeechAudioTargets, sToType) >= 0 || Array.IndexOf(aSpeechVideoTargets, sToType) >= 0) && textAvailable(sSource)) {

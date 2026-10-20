@@ -390,21 +390,7 @@ public static class SuiteCommands {
     // homerProgram: another Homer app's program -- its Program Files folder, under exec as the
     // Homer layout puts it or at the top as EdSharp's does, then Windows' registered App Paths.
     // "" when it is not installed.
-    public static string homerProgram(string sApp) {
-        foreach (Environment.SpecialFolder oFolder in new Environment.SpecialFolder[] { Environment.SpecialFolder.ProgramFiles, Environment.SpecialFolder.ProgramFilesX86 }) {
-            string sRoot = Environment.GetFolderPath(oFolder);
-            if (string.IsNullOrEmpty(sRoot)) continue;
-            foreach (string sTry in new string[] { System.IO.Path.Combine(sRoot, sApp, "exec", sApp + ".exe"), System.IO.Path.Combine(sRoot, sApp, sApp + ".exe") })
-                if (System.IO.File.Exists(sTry)) return sTry;
-        }
-        try {
-            using (Microsoft.Win32.RegistryKey oKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\" + sApp + ".exe")) {
-                string sValue = oKey == null ? null : oKey.GetValue("") as string;
-                if (!string.IsNullOrEmpty(sValue) && System.IO.File.Exists(sValue.Trim('"'))) return sValue.Trim('"');
-            }
-        } catch (Exception) { }
-        return "";
-    }
+    public static string homerProgram(string sApp) { return Paths.homerProgram(sApp); }
 
     // openInHomerApp: start another Homer app on a path. Each is a single instance, so when it is
     // already running, Windows hands it the path and it opens it there. When the app is not

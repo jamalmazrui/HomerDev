@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.85.2 -- 20 October 2026
+
+- **A video becomes a described document.** When HomerScribe is installed, the kit asks it for both halves of a video -- what is said and what can be seen -- and makes them one document, with headings for each, in any document format. HomerScribe is the kit's engine for description as Pandoc and Office are for documents, so the suite keeps one technique for it, in one program, rather than a copy here. Without HomerScribe, a video gets its transcript alone, and the log says why. A context file named after the video, beside it, still tells HomerScribe what it is watching.
+- **Paths.homerProgram** finds another Homer app's program; SuiteCommands.homerProgram calls it, so media conversion can find HomerScribe without the window frame.
+
 ## 1.85.1 -- 20 October 2026
 
 - **The kit build proves the app template.** It makes a throwaway app with newHomerApp in the temporary folder and compiles it as a new app's build would: its source, a Version.cs like the build's, and the kit modules the build template names. A template that would not compile now fails the kit's build, before anyone makes an app from it. It runs only when the template, newHomerApp or one of those modules has changed. BatCon, the first app made from the template in weeks, showed why: each of its first builds found one more thing the template had wrong.

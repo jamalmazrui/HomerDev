@@ -99,5 +99,5 @@ FRAME PDF Studio (MIT licensed, by ripplelearning) is a browser tool for remedia
 - **Audio or video to a document:** a transcript, by Whisper on this computer, as plain text, Markdown, a web page, Word, PDF, OpenDocument, rich text, EPUB or Word 97. It needs ffmpeg and Whisper, both offered by the Homer installers.
 - **A document to audio:** its words spoken by Windows' speech synthesis, as MP3, M4A, WAV, Ogg, FLAC or Opus. It needs ffmpeg.
 - **A document to video:** the same speech over a plain black picture, as MP4, Matroska, WebM or QuickTime, since the kit makes no pictures of its own.
-- **Not yet:** a description of what a video shows, which HomerScribe makes with a vision model in its own code; it moves into the kit next.
+- **A video to a described document:** with HomerScribe installed, what is said and what can be seen, as one document with a heading for each; HomerScribe describes, as the kit's engine for it. Without HomerScribe, the transcript alone.
 
