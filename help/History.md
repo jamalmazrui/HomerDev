@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.81.0 -- 20 October 2026
+
+- **A PDF becomes a web page without Pandoc.** A new engine, markdown, writes the Markdown the kit makes as an accessible page: headings, paragraphs, lists, tables, quotes, code, links, images with their alt text, and the language and title from front matter, inside main. It is the second way for md2htm and pdf2htm, after Pandoc, so a computer with Pandoc keeps Pandoc's page. It let bookFido move its companion PDFs onto the kit's one conversion technique without needing Pandoc on every computer.
+- **A PDF's language travels with its Markdown.** PdfReader.toFile writes it as front matter, which Pandoc and the markdown engine both put on the page, so a screen reader picks the right voice.
+
 ## 1.80.3 -- 19 October 2026
 
 - **A new app's first build keeps its version.** Before any release there is no tag, and cmd turns a substitution on an undefined variable into literal text, so the build template set the version to "v=" and the compiler refused "v=.0.1" (the first BatCon's build). The template now strips the v only from a tag that exists and ignores a tag that is not a version number; DbDo's and EdSharp's builds carry the same fix.

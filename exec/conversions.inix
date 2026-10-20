@@ -158,7 +158,8 @@ ways = pandoc
 ways = pandoc
 
 [md2htm]
-ways = pandoc
+ways = pandoc, markdown
+note = markdown is the kit's own writer (1.81.0), for a computer without Pandoc.
 
 [md2inix]
 ways = table
@@ -220,7 +221,7 @@ ways = pdfstructure:md > pandoc, ocr:md > pandoc, officecom
 note = As pdf2md, then Pandoc writes the Word file; a document of scans is read by OCR first; Office only when nothing else can.
 
 [pdf2htm]
-ways = pdfstructure:md > pandoc, ocr:md > pandoc, officecom
+ways = pdfstructure:md > pandoc, pdfstructure:md > markdown, ocr:md > pandoc, ocr:md > markdown, officecom
 
 [pdf2md]
 ways = pdfstructure, ocr

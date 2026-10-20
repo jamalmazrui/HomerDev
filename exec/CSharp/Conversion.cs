@@ -245,6 +245,7 @@ try {
 switch (sEngine) {
 case "copy": File.Copy(sSource, sTarget, true); return true;
 case "officecom": return officeCom(sSource, sTarget, out sError);
+case "markdown": return markdownToHtml(sSource, sTarget, out sError);
 case "pandoc": return pandoc(sSource, sTarget, out sError);
 case "pdfstructure": return pdfStructure(sSource, sTarget, out sError);
 case "pdftext": return pdfText(sSource, sTarget, out sError);
@@ -265,7 +266,7 @@ return false;
 // engineMissing: "" when the engine can run here, else why it cannot.
 public static string engineMissing(string sEngine, string sSource) {
 switch (sEngine) {
-case "copy": case "table": case "zipxml": return "";
+case "copy": case "markdown": case "table": case "zipxml": return "";
 case "pandoc": return havePandoc() ? "" : "Pandoc is not installed";
 case "pdftext": return havePdfPig() || pythonProgram() != "" ? "" : "neither PdfPig nor Python is present";
 case "pdfstructure": return haveReader() || pythonProgram() != "" ? "" : "neither the PDF reader nor Python is present";
@@ -957,6 +958,129 @@ return true;
 }
 return oTable.write(sTarget, out sError);
 } // tableEngine method
+
+// ------- engine: markdown, a web page without Pandoc (kit 1.81.0) -------
+//
+// WHY. A PDF became a web page only through Pandoc, so an app that had always made
+// its pages itself -- bookFido, from Audible's companion PDFs -- could not move onto the
+// kit's one conversion technique without needing Pandoc on every computer. This writes
+// the Markdown the kit makes (PdfReader, Table, zipxml) as an accessible page: headings,
+// paragraphs, bullet and numbered lists, pipe tables, quotes, fenced code, rules, and
+// inline links, images with their alt text, bold, italic and code. It is a second way
+// after Pandoc, never in place of it, so a computer with Pandoc keeps Pandoc's page.
+// The page: lang and title from front matter (title:, lang:), else the first heading,
+// else the file name; the body inside main, as every Homer page is.
+private static bool markdownToHtml(string sSource, string sTarget, out string sError) {
+sError = "";
+try {
+string sText = decodeText(File.ReadAllBytes(sSource)).Replace("\r\n", "\n").Replace("\r", "\n");
+string sTitle = "", sLang = "en";
+string[] aLines = sText.Split('\n');
+int iAt = 0;
+if (aLines.Length > 0 && aLines[0].Trim() == "---") {
+for (iAt = 1; iAt < aLines.Length && aLines[iAt].Trim() != "---"; iAt++) {
+Match oMeta = Regex.Match(aLines[iAt], @"^\s*(title|lang)\s*:\s*""?(.*?)""?\s*$", RegexOptions.IgnoreCase);
+if (!oMeta.Success) continue;
+if (oMeta.Groups[1].Value.ToLowerInvariant() == "title") sTitle = oMeta.Groups[2].Value; else sLang = oMeta.Groups[2].Value;
+}
+iAt++;
+}
+StringBuilder oBody = new StringBuilder();
+List<string> lsPara = new List<string>();
+string sList = "";
+Action closeList = delegate() { if (sList != "") { oBody.Append("</" + sList + ">\r\n"); sList = ""; } };
+Action flush = delegate() {
+if (lsPara.Count == 0) return;
+oBody.Append("<p>" + markdownInline(string.Join(" ", lsPara.ToArray())) + "</p>\r\n");
+lsPara.Clear();
+};
+for (int i = iAt; i < aLines.Length; i++) {
+string sLine = aLines[i];
+string sTrim = sLine.Trim();
+if (sTrim.StartsWith("```")) {
+flush(); closeList();
+StringBuilder oCode = new StringBuilder();
+for (i++; i < aLines.Length && !aLines[i].Trim().StartsWith("```"); i++) oCode.Append(htmlEscape(aLines[i]) + "\r\n");
+oBody.Append("<pre><code>" + oCode + "</code></pre>\r\n");
+continue;
+}
+if (sTrim == "") { flush(); closeList(); continue; }
+Match oHead = Regex.Match(sTrim, @"^(#{1,6})\s+(.*?)\s*#*$");
+if (oHead.Success) {
+flush(); closeList();
+int iLevel = oHead.Groups[1].Value.Length;
+if (sTitle == "" && iLevel == 1) sTitle = Regex.Replace(oHead.Groups[2].Value, @"[*_`]", "");
+oBody.Append("<h" + iLevel + ">" + markdownInline(oHead.Groups[2].Value) + "</h" + iLevel + ">\r\n");
+continue;
+}
+if (Regex.IsMatch(sTrim, @"^(\*\s*\*\s*\*|-\s*-\s*-|_\s*_\s*_)[\s*_-]*$")) { flush(); closeList(); oBody.Append("<hr>\r\n"); continue; }
+if (sTrim.StartsWith("|") && i + 1 < aLines.Length && Regex.IsMatch(aLines[i + 1].Trim(), @"^\|?\s*:?-{1,}:?\s*(\|\s*:?-{1,}:?\s*)*\|?$")) {
+flush(); closeList();
+oBody.Append("<table>\r\n<thead><tr>");
+foreach (string sCell in markdownCells(sTrim)) oBody.Append("<th scope=\"col\">" + markdownInline(sCell) + "</th>");
+oBody.Append("</tr></thead>\r\n<tbody>\r\n");
+for (i += 2; i < aLines.Length && aLines[i].Trim().StartsWith("|"); i++) {
+oBody.Append("<tr>");
+foreach (string sCell in markdownCells(aLines[i].Trim())) oBody.Append("<td>" + markdownInline(sCell) + "</td>");
+oBody.Append("</tr>\r\n");
+}
+i--;
+oBody.Append("</tbody>\r\n</table>\r\n");
+continue;
+}
+Match oBullet = Regex.Match(sLine, @"^\s*[-*+]\s+(.*)$");
+Match oNumber = Regex.Match(sLine, @"^\s*\d+[.)]\s+(.*)$");
+if (oBullet.Success || oNumber.Success) {
+flush();
+string sKind = oBullet.Success ? "ul" : "ol";
+if (sList != sKind) { closeList(); oBody.Append("<" + sKind + ">\r\n"); sList = sKind; }
+oBody.Append("<li>" + markdownInline((oBullet.Success ? oBullet : oNumber).Groups[1].Value) + "</li>\r\n");
+continue;
+}
+if (sTrim.StartsWith(">")) { flush(); closeList(); oBody.Append("<blockquote><p>" + markdownInline(sTrim.TrimStart('>').Trim()) + "</p></blockquote>\r\n"); continue; }
+closeList();
+lsPara.Add(sTrim);
+}
+flush(); closeList();
+if (sTitle == "") sTitle = Path.GetFileNameWithoutExtension(sSource);
+string sPage = "<!DOCTYPE html>\r\n<html lang=\"" + htmlEscape(sLang) + "\">\r\n<head>\r\n<meta charset=\"utf-8\">\r\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\r\n"
++ "<title>" + htmlEscape(sTitle) + "</title>\r\n</head>\r\n<body>\r\n<main>\r\n" + oBody + "</main>\r\n</body>\r\n</html>\r\n";
+File.WriteAllText(sTarget, sPage, new UTF8Encoding(true));
+return true;
+}
+catch (Exception oError) { sError = "the Markdown could not be written as a web page: " + oError.Message; return false; }
+} // markdownToHtml method
+
+private static string[] markdownCells(string sRow) {
+string s = sRow.Trim();
+if (s.StartsWith("|")) s = s.Substring(1);
+if (s.EndsWith("|") && !s.EndsWith("\\|")) s = s.Substring(0, s.Length - 1);
+string[] aCells = Regex.Split(s, @"(?<!\\)\|");
+for (int i = 0; i < aCells.Length; i++) aCells[i] = aCells[i].Trim().Replace("\\|", "|");
+return aCells;
+} // markdownCells method
+
+// markdownInline: code spans first, kept literal; then images, links, bold and italic.
+private static string markdownInline(string sText) {
+List<string> lsCode = new List<string>();
+string s = Regex.Replace(sText, @"`([^`]+)`", delegate(Match m) { lsCode.Add(m.Groups[1].Value); return "\u0001" + (lsCode.Count - 1) + "\u0002"; });
+// An escaped character is set aside too, so \*not\* stays two asterisks, not italics.
+List<string> lsEscaped = new List<string>();
+s = Regex.Replace(s, @"\\([\\`*_{}\[\]()#+\-.!|>])", delegate(Match m) { lsEscaped.Add(m.Groups[1].Value); return "\u0003" + (lsEscaped.Count - 1) + "\u0004"; });
+s = htmlEscape(s);
+s = Regex.Replace(s, @"!\[([^\]]*)\]\(([^)\s]+)(?:\s+&quot;[^&]*&quot;)?\)", "<img src=\"$2\" alt=\"$1\">");
+s = Regex.Replace(s, @"\[([^\]]+)\]\(([^)\s]+)(?:\s+&quot;[^&]*&quot;)?\)", "<a href=\"$2\">$1</a>");
+s = Regex.Replace(s, @"(\*\*|__)(?=\S)(.+?)(?<=\S)\1", "<strong>$2</strong>");
+s = Regex.Replace(s, @"(?<![\w*])\*(?=\S)(.+?)(?<=\S)\*(?![\w*])", "<em>$1</em>");
+s = Regex.Replace(s, @"(?<![\w_])_(?=\S)(.+?)(?<=\S)_(?![\w_])", "<em>$1</em>");
+s = Regex.Replace(s, "\u0003(\\d+)\u0004", delegate(Match m) { return htmlEscape(lsEscaped[int.Parse(m.Groups[1].Value)]); });
+s = Regex.Replace(s, "\u0001(\\d+)\u0002", delegate(Match m) { return "<code>" + htmlEscape(lsCode[int.Parse(m.Groups[1].Value)]) + "</code>"; });
+return s;
+} // markdownInline method
+
+private static string htmlEscape(string s) {
+return (s ?? "").Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;");
+} // htmlEscape method
 
 // ------- engine: officecom, the last resort -------
 

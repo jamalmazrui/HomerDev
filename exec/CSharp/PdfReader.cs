@@ -1231,6 +1231,11 @@ namespace Homer
             }
             string sText = oResult.sMarkdown;
             if (!Path.GetExtension(sTarget).Equals(".md", StringComparison.OrdinalIgnoreCase)) sText = plainFrom(sText);
+            // THE PDF'S LANGUAGE TRAVELS WITH ITS MARKDOWN (kit 1.81.0): a front matter block
+            // that Pandoc and the kit's markdown engine both read, so a web page made from the PDF
+            // tells a screen reader which voice to use, as bookFido's own pages always did.
+            else if (!string.IsNullOrEmpty(oResult.sLanguage) && !sText.StartsWith("---"))
+                sText = "---\r\nlang: " + oResult.sLanguage + "\r\n---\r\n\r\n" + sText;
             File.WriteAllText(sTarget, sText, new UTF8Encoding(true));
             return true;
         }
