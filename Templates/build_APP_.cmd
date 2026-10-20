@@ -551,7 +551,15 @@ if exist "help\Tutorial_*.inix" (
     if exist "scripts\buildTutorials.cmd" (
       echo Making sure the spoken tutorials are current
       call "scripts\buildTutorials.cmd" -build
-      if errorlevel 1 echo Not every tutorial could be spoken. The tutorials log in logs\ says why.
+      rem A WALK THAT CANNOT BE SPOKEN STOPS THE BUILD (kit 1.82.2), as DbDo's does: the checker
+      rem found something wrong and spoke nothing, and BatCon's first release went out without its
+      rem tutorials while the cycle said every step had passed.
+      if errorlevel 1 (
+        echo The tutorials were not built, so the installer is not made. The checker listed what is wrong with the walks:
+        echo   logs\%app%-tutorials-check-*.log
+        >> "%log%" echo ERROR: the tutorials were not built; see logs\%app%-tutorials-check-*.log
+        goto :failed
+      )
     ) else (
       echo This app has walks but its kitTools do not name buildTutorials.
     )

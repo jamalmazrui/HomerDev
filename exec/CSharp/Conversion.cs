@@ -584,6 +584,39 @@ for (int i = 0; i < lsAll.Count; i++) { aAll[i, 0] = lsAll[i][0]; aAll[i, 1] = l
 return aAll;
 }
 
+// allTargets: every type some route in the table can make, as extensions with the kit's
+// readable name for each, sorted alphabetically by that name (kit 1.83.0). For a picker that
+// offers every target at once, before any source is known -- BatCon's Target format -- with
+// hasRoute(source, target) asked per file at run time.
+public static string[] allTargets(out string[] aLabels) {
+List<string[]> lsAll = new List<string[]>();
+HashSet<string> hsSeen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+try {
+loadTable();
+if (dWays != null)
+foreach (string sRoute in dWays.Keys) {
+// The joint is the first 2 whose left side is a type the kit names; a type may hold a
+// digit (an mp32wav route would), so the first 2 alone is only the fallback.
+int iJoint = sRoute.IndexOf('2');
+for (int iTry = iJoint; iTry > 0; iTry = sRoute.IndexOf('2', iTry + 1)) {
+string sLeft = sRoute.Substring(0, iTry);
+if (typeName(sLeft) != "") { iJoint = iTry; break; }
+}
+if (iJoint <= 0 || iJoint >= sRoute.Length - 1) continue;
+string sTo = typeOf(sRoute.Substring(iJoint + 1));
+if (sTo == "" || !hsSeen.Add(sTo)) continue;
+string sName = typeName(sTo);
+if (string.IsNullOrEmpty(sName) || sName == sTo) sName = sTo.ToUpperInvariant() + " file";
+lsAll.Add(new string[] { char.ToUpperInvariant(sName[0]) + sName.Substring(1) + " (" + sTo + ")", sTo });
+}
+} catch (Exception oError) { Log.warn("allTargets: the route table could not be read: " + oError.Message); }
+lsAll.Sort(delegate(string[] a, string[] b) { return string.Compare(a[0], b[0], StringComparison.OrdinalIgnoreCase); });
+aLabels = new string[lsAll.Count];
+string[] aExtensions = new string[lsAll.Count];
+for (int i = 0; i < lsAll.Count; i++) { aLabels[i] = lsAll[i][0]; aExtensions[i] = lsAll[i][1]; }
+return aExtensions;
+} // allTargets method
+
 // curatedTargetsFor: the hand-ordered list for each kind of file, before the route table adds to it.
 private static string[,] curatedTargetsFor(string sPath) {
 string sCategory = categoryOf(sPath);

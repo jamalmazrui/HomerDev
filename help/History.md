@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.83.0 -- 20 October 2026
+
+- **Conversion.allTargets lists every type the kit can make,** with its readable name, alphabetically by name, for a picker that offers every target before any source is known. BatCon's Target format is filled from it, and asks hasRoute for each file at run time.
+
+## 1.82.2 -- 20 October 2026
+
+- **A new app's build stops when its tutorials cannot be spoken,** as DbDo's always has. The build template only said "Not every tutorial could be spoken" and went on, so BatCon's first release went out without its tutorials while the cycle reported that every step had passed. Now the build names the checker's log and stops before the installer.
+
 ## 1.82.1 -- 20 October 2026
 
 - **Python converts as C# does, for web pages.** conversion.py has the markdown engine too, ported line for line from Conversion.cs, so a Python app without Pandoc also makes a web page from Markdown or a PDF. Tested on Markdown like PdfReader's: its page matches Pandoc's in structure, and adds a main landmark, column headers in tables, and the title from the first heading.
