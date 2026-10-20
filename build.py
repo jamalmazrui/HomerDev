@@ -837,6 +837,58 @@ def buildHomerDevApp():
     return ""
 
 
+def checkTemplateApp():
+    """THE TEMPLATE IS PROVED BY USE (kit 1.85.1). newHomerApp makes a throwaway app in the temporary folder, and it
+    is compiled exactly as a new app's build compiles it: its <App>.cs, a Version.cs like the build's, and the kit
+    modules its build.cmd names, with the build template's references. BatCon was the first app made from the
+    template in weeks, and each of its first builds found one more thing the template had wrong; this finds a
+    template that does not compile before an app is made from it. Run when the template, newHomerApp or a module it
+    names has changed. Returns a problem or "".
+    """
+    if os.name != "nt": return ""
+    sTemplates = os.path.join(sScriptDir, "Templates")
+    sBuildTemplate = os.path.join(sTemplates, "build_APP_.cmd")
+    if not os.path.isfile(os.path.join(sTemplates, "_APP_.cs")) or not os.path.isfile(sBuildTemplate): return ""
+    oModules = re.search(r'set "homerModules=([^"\r\n]*)"', open(sBuildTemplate, encoding="utf-8", errors="replace").read())
+    lsModules = oModules.group(1).split() if oModules else []
+    oCache = kitCache()
+    sPrint = oCache.fingerprint(["Templates/_APP_.cs", "Templates/build_APP_.cmd", "newHomerApp.py", "version.txt"]
+                                + ["exec/CSharp/" + sModule + ".cs" for sModule in lsModules])
+    if oCache.isCurrent("template app", sPrint, []):
+        unchangedLine("the template app")
+        return ""
+    sCsc = findRoslyn()
+    if sCsc == "": return "the template app was not compiled: no Roslyn C# compiler"
+    sDir = tempfile.mkdtemp(prefix="HomerTemplateApp-")
+    sApp = "SelfTestApp"
+    sAppDir = os.path.join(sDir, sApp)
+    iCode, sOutput = runCommand([sys.executable, os.path.join(sScriptDir, "newHomerApp.py"), sApp, sAppDir])
+    sSource = os.path.join(sAppDir, sApp + ".cs")
+    if iCode != 0 or not os.path.isfile(sSource):
+        return "newHomerApp could not make the template app; the log has its output"
+    sVersionCs = os.path.join(sAppDir, "Version.cs")
+    with open(sVersionCs, "w", encoding="utf-8") as fVersion:
+        fVersion.write('public static class BuildVersion\n{\n    public const string Version = "1.0.0";\n}\n')
+    lsRefs = []
+    for sName in ("System.Speech.dll", "UIAutomationProvider.dll", "UIAutomationTypes.dll"):
+        sPath = findReference(sName)
+        if sPath: lsRefs.append("/reference:" + sPath)
+    for sName in ("System.dll", "System.Core.dll", "System.Data.dll", "System.Drawing.dll", "System.Windows.Forms.dll",
+                  "System.Web.dll", "System.Web.Extensions.dll", "System.Net.Http.dll", "System.Xml.dll",
+                  "System.IO.Compression.dll", "System.IO.Compression.FileSystem.dll", "Microsoft.VisualBasic.dll"):
+        lsRefs.append("/reference:" + sName)
+    lsSources = [sSource, sVersionCs] + [os.path.join(sScriptDir, "exec", "CSharp", sModule + ".cs") for sModule in lsModules]
+    sOut = os.path.join(sAppDir, sApp + ".exe")
+    iCode, sOutput = runCommand([sCsc, "/nologo", "/target:winexe", "/platform:x64", "/out:" + sOut] + lsRefs + lsSources)
+    if iCode != 0 or not os.path.isfile(sOut):
+        return "the template app did not compile: an app made by newHomerApp would not build; the log has the compiler's messages"
+    oCache.record("template app", sPrint, [])
+    sayLine("Made and compiled an app from the template, as newHomerApp makes them.")
+    try: shutil.rmtree(sDir, ignore_errors=True)
+    except Exception: pass
+    return ""
+
+
 def findIscc():
     """Inno Setup's compiler, installed with winget when missing, as every app's build does. "" when unavailable."""
     def look():
@@ -2027,6 +2079,12 @@ def main():
             sayLine(sAppProblem)
             iSamplesFailed += 1
             lsFailedParts.append("HomerDev.exe")
+        # THE TEMPLATE IS PROVED HERE (1.85.1): an app made by newHomerApp must compile.
+        sTemplateProblem = checkTemplateApp()
+        if sTemplateProblem != "":
+            sayLine(sTemplateProblem)
+            iSamplesFailed += 1
+            lsFailedParts.append("the template app")
         # THE SHARED CONVERSION ROUTES ARE PROVED HERE (1.65.0), on sample files made
         # at the time, before any app relies on them: a failing route fails the kit's
         # build; a route whose engine is not on this computer is reported, not passed.

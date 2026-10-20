@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.85.1 -- 20 October 2026
+
+- **The kit build proves the app template.** It makes a throwaway app with newHomerApp in the temporary folder and compiles it as a new app's build would: its source, a Version.cs like the build's, and the kit modules the build template names. A template that would not compile now fails the kit's build, before anyone makes an app from it. It runs only when the template, newHomerApp or one of those modules has changed. BatCon, the first app made from the template in weeks, showed why: each of its first builds found one more thing the template had wrong.
+
 ## 1.85.0 -- 20 October 2026
 
 - **/default installs as Enter on every screen would, with nothing to press,** in every Homer installer: `/default`, `/defaults`, `-d` or `--default`, in any case. Setup started with screens starts itself again silently with the same switches -- a progress window, every default taken, each default-ticked finish-page entry run, the Results box logged -- closing a running copy of the program first, which is the likeliest reason the first such restart failed on DbDo on 13 October. The second copy writes its own log in %TEMP%, named in the first's. In HomerComponents.iss, so every installer gains it at its next build. FinishPage.md says how.
