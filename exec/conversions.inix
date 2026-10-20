@@ -33,7 +33,8 @@
 ways = table
 
 [csv2htm]
-ways = table
+ways = table, table:md > markdown
+note = The second way needs no Pandoc, as 2htm never did (1.87.4).
 
 [csv2inix]
 ways = table
@@ -293,7 +294,8 @@ ways = pandoc, officecom
 ways = table
 
 [tsv2htm]
-ways = table
+ways = table, table:md > markdown
+note = The second way needs no Pandoc, as 2htm never did (1.87.4).
 
 [tsv2inix]
 ways = table

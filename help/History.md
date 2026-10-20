@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.87.4 -- 20 October 2026
+
+- **2htm is a face over Conversion.convert,** the third and last step of its move onto the kit: its 3,338 lines of its own converters are retired into its notes\\retired, and Markdig is no longer fetched. Comma and tab separated tables reach a web page without Pandoc, through the table as Markdown and the markdown engine, as 2htm always did.
+
 ## 1.87.3 -- 20 October 2026
 
 - **ConversionPage.cs is C# 5,** so DbDo, EdSharp and FileDir, which compile with the .NET Framework's own compiler, build again. Moved from 2htm, it used out var, patterns such as `is bool b`, the discard `out _` and expression-bodied members, which that compiler rejects; BatCon and bookFido, compiled with Roslyn, had accepted them. Each is rewritten with the same logic.
