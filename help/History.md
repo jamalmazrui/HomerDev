@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.81.1 -- 20 October 2026
+
+- **A new app's installer ships its tutorial walks.** The installer template shipped the help pages, the spoken tutorials and their feed, but not the Tutorial_*.inix walks themselves, so the build's check that every app file is installed stopped BatCon's first build on all ten. FileDir already shipped them; the template now does too.
+
 ## 1.81.0 -- 20 October 2026
 
 - **A PDF becomes a web page without Pandoc.** A new engine, markdown, writes the Markdown the kit makes as an accessible page: headings, paragraphs, lists, tables, quotes, code, links, images with their alt text, and the language and title from front matter, inside main. It is the second way for md2htm and pdf2htm, after Pandoc, so a computer with Pandoc keeps Pandoc's page. It let bookFido move its companion PDFs onto the kit's one conversion technique without needing Pandoc on every computer.

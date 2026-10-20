@@ -186,6 +186,9 @@ Source: "Developer.htm"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoes
 ; build_APP_Py.cmd stops when a file in help\ matches no Source: line here.
 Source: "help\*.md"; DestDir: "{app}\help"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "help\*.htm"; DestDir: "{app}\help"; Flags: ignoreversion skipifsourcedoesntexist
+; The tutorial walks themselves (kit 1.81.1): the build checks that every app file ships, and
+; BatCon's first build stopped on these ten, which the template had left out.
+Source: "help\Tutorial_*.inix"; DestDir: "{app}\help"; Flags: ignoreversion skipifsourcedoesntexist
 ; The spoken tutorials, when the app has any: the written walks, the feed,
 ; and one .mp3 per walk in help\tutorials with a playlist beside them.
 Source: "help\Tutorials.md"; DestDir: "{app}\help"; Flags: ignoreversion skipifsourcedoesntexist
