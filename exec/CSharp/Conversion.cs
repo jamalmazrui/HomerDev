@@ -29,7 +29,7 @@
 //   targetsFor(path)                 the same as [label, extension] pairs
 //   hasAnyRoute(path)                whether a file can be converted at all
 //   hasRoute(source, target)         whether one particular conversion exists
-//   convertFile(source, target, out error)  convert one file, by the best way that works
+//   convert(source, target, out error)  convert one file: the one technique every app uses
 //   typeOf(pathOrType)               the type a path or a name stands for (html -> htm)
 // ChatGPT's BatCon parsed conversions.inix with a regular expression to find targets,
 // because this list was not here to find; a picker built that way shows bare extensions.
@@ -131,14 +131,44 @@ return waysFor(routeName(sSource, sTarget)).Count > 0;
 
 // ------- converting -------
 
-// convert: sSource to the path sTarget, by the first way whose engines are all
-// present. bQuick passes over engines that can take minutes (ocr), for a key
-// that must answer at once.
+// ONE CONVERSION TECHNIQUE (kit 1.80.2, Jamal's rule of 19 October 2026): converting between any
+// two formats is done one way in every Homer app, and this is it. convert takes, in order:
+//   1. media -- audio, video and pictures -- in an app that compiles ConversionMedia;
+//   2. the route table, exec\conversions.inix, each route's ways best first;
+//   3. for a type the table does not name, its text, then Pandoc to the target.
+// convertAny and convertFile are the same function under older names, kept so callers compile:
+// convertAny had this order, convertFile was Pandoc alone, and DbDo, EdSharp, FileDir and BatCon
+// each called a different one. bQuick passes over engines that can take minutes (ocr), for a
+// key that must answer at once.
 public static bool convert(string sSource, string sTarget, out string sError) {
 return convert(sSource, sTarget, false, out sError);
 } // convert method
 
 public static bool convert(string sSource, string sTarget, bool bQuick, out string sError) {
+sError = "";
+if (!File.Exists(sSource)) { sError = "the file was not found"; return false; }
+bool bHandled = false, bMade = false;
+mediaConvert(sSource, sTarget, ref bHandled, ref bMade, ref sError);
+if (bHandled) return bMade;
+if (hasRoute(sSource, sTarget)) return convertByRoute(sSource, sTarget, bQuick, out sError);
+// A type the table does not name: its text, then Pandoc to the target.
+string sText = toText(sSource, out sError);
+if (sText.Length == 0) {
+if (sError == "") sError = "no way to convert " + typeOf(sSource) + " to " + typeOf(sTarget) + " is known (" + routeName(sSource, sTarget) + ")";
+return false;
+}
+string sMd = tempPath(sSource, ".md");
+try {
+File.WriteAllText(sMd, sText, new UTF8Encoding(true));
+if (typeOf(sTarget) == "md" || typeOf(sTarget) == "txt") { File.Copy(sMd, sTarget, true); return true; }
+return pandoc(sMd, sTarget, out sError);
+}
+finally { try { File.Delete(sMd); } catch (Exception) { } }
+} // convert method
+
+// convertByRoute: the route table's ways for this pair, best first, the first whose engines are
+// all present; the middle step of convert.
+private static bool convertByRoute(string sSource, string sTarget, bool bQuick, out string sError) {
 sError = "";
 if (!File.Exists(sSource)) { sError = "the file was not found"; return false; }
 string sRoute = routeName(sSource, sTarget);
@@ -180,7 +210,7 @@ lsWhy.Add(sWay + ": " + sStepError);
 }
 sError = lsWhy.Count == 1 ? lsWhy[0] : "every way failed: " + String.Join("; ", lsWhy.ToArray());
 return false;
-} // convert method
+} // convertByRoute method
 
 // runWay: one way's steps, each handing a temporary file to the next.
 private static bool runWay(string[] aSteps, string sSource, string sTarget, out string sError) {
@@ -519,7 +549,42 @@ mediaCategory(sExt, ref sCategory);
 return sCategory;
 } // mediaCategoryOf method
 
+// targetsFor: what a file can become, as [label, extension] pairs (kit 1.80.1). First the
+// category's curated list, in the order FileDir's Convert offers it; then every other target
+// the route table has for this file's type, by the kit's name for that type, alphabetically.
+// THE LIST NOW FOLLOWS THE ROUTES. It was only the curated menu, so a route added to
+// conversions.inix -- inix2xlsx, md2pptx -- never appeared in a picker; ChatGPT's BatCon read
+// conversions.inix itself for that reason, which was a fair reading of a real gap.
 public static string[,] targetsFor(string sPath) {
+string[,] aCurated = curatedTargetsFor(sPath);
+List<string[]> lsAll = new List<string[]>();
+HashSet<string> hsSeen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+for (int i = 0; i < aCurated.GetLength(0); i++)
+if (hsSeen.Add(typeOf(aCurated[i, 1]))) lsAll.Add(new string[] { aCurated[i, 0], aCurated[i, 1] });
+string sFrom = typeOf(sPath);
+List<string[]> lsMore = new List<string[]>();
+try {
+loadTable();
+if (dWays != null && sFrom != "")
+foreach (string sRoute in dWays.Keys) {
+// Split by the known source type: a type may hold a digit (mp3, epub3), so the first 2 is not the joint.
+if (!sRoute.StartsWith(sFrom + "2", StringComparison.OrdinalIgnoreCase)) continue;
+string sTo = typeOf(sRoute.Substring(sFrom.Length + 1));
+if (sTo == "" || sTo == sFrom || !hsSeen.Add(sTo)) continue;
+string sName = typeName(sTo);
+if (string.IsNullOrEmpty(sName) || sName == sTo) sName = sTo.ToUpperInvariant() + " file";
+lsMore.Add(new string[] { char.ToUpperInvariant(sName[0]) + sName.Substring(1), sTo });
+}
+} catch (Exception oError) { Log.warn("targetsFor: the route table could not be read: " + oError.Message); }
+lsMore.Sort(delegate(string[] a, string[] b) { return string.Compare(a[0], b[0], StringComparison.OrdinalIgnoreCase); });
+lsAll.AddRange(lsMore);
+string[,] aAll = new string[lsAll.Count, 2];
+for (int i = 0; i < lsAll.Count; i++) { aAll[i, 0] = lsAll[i][0]; aAll[i, 1] = lsAll[i][1]; }
+return aAll;
+}
+
+// curatedTargetsFor: the hand-ordered list for each kind of file, before the route table adds to it.
+private static string[,] curatedTargetsFor(string sPath) {
 string sCategory = categoryOf(sPath);
 if (sCategory == "document") return aDocumentTargets;
 if (sCategory == "table")
@@ -533,7 +598,7 @@ return new string[,] {{"Plain text", "txt"}, {"Web page", "htm"}};
 string[,] aMedia = new string[0, 2];
 mediaTargets(sCategory, ref aMedia);
 return aMedia;
-} // targetsFor method
+} // curatedTargetsFor method
 
 public static string[] targetLabelsFor(string sPath, out string[] aExtensions) {
 string[,] aTargets = targetsFor(sPath);
@@ -554,30 +619,15 @@ return lsLabels.ToArray();
 
 // convertAny: whatever the source, to the target path. Documents and tables go
 // by the routing table, media through ConversionMedia.cs.
+// convertAny: convert, under the name FileDir has always called (1.80.2).
 public static bool convertAny(string sSource, string sTarget, out string sError) {
-sError = "";
-bool bHandled = false, bMade = false;
-mediaConvert(sSource, sTarget, ref bHandled, ref bMade, ref sError);
-if (bHandled) return bMade;
-if (hasRoute(sSource, sTarget)) return convert(sSource, sTarget, out sError);
-// A type the table does not name: its text, then Pandoc to the target.
-string sText = toText(sSource, out sError);
-if (sText.Length == 0) return false;
-string sMd = tempPath(sSource, ".md");
-try {
-File.WriteAllText(sMd, sText, new UTF8Encoding(true));
-if (typeOf(sTarget) == "md" || typeOf(sTarget) == "txt") { File.Copy(sMd, sTarget, true); return true; }
-return pandoc(sMd, sTarget, out sError);
-}
-finally { try { File.Delete(sMd); } catch (Exception) { } }
+return convert(sSource, sTarget, false, out sError);
 } // convertAny method
 
-// convertFile: Pandoc, for a type it reads, as FileDir's callers expect.
+// convertFile: convert, under an older name (1.80.2). It was Pandoc alone, which gave a
+// caller a different conversion from every other app's; now it is the same one.
 public static bool convertFile(string sSource, string sTarget, out string sError) {
-sError = "";
-if (!havePandoc()) { sError = "Pandoc is not installed. Install the program again and leave the Pandoc box ticked."; return false; }
-if (!canRead(sSource)) { sError = "Pandoc cannot read " + Path.GetExtension(sSource).ToLowerInvariant() + " files"; return false; }
-return pandoc(sSource, sTarget, out sError);
+return convert(sSource, sTarget, false, out sError);
 } // convertFile method
 
 // toHtmlFragment: a file as HTML, for the clipboard.

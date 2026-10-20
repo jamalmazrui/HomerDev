@@ -158,6 +158,8 @@ Name: "{app}\templates"
 ; (1.43.1), so one template serves both while builds move over.
 #if FileExists(AddBackslash(SourcePath) + "exec\" + AppExeName)
 Source: "exec\{#AppExeName}"; DestDir: "{app}\exec"; Flags: ignoreversion
+; The kit's conversion routes, for an app that compiles Conversion (1.80.1).
+Source: "exec\conversions.inix"; DestDir: "{app}\exec"; Flags: ignoreversion skipifsourcedoesntexist
 #else
 Source: "{#AppExeName}"; DestDir: "{app}\exec"; Flags: ignoreversion
 #endif

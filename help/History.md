@@ -7,6 +7,23 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.80.3 -- 19 October 2026
+
+- **A new app's first build keeps its version.** Before any release there is no tag, and cmd turns a substitution on an undefined variable into literal text, so the build template set the version to "v=" and the compiler refused "v=.0.1" (the first BatCon's build). The template now strips the v only from a tag that exists and ignores a tag that is not a version number; DbDo's and EdSharp's builds carry the same fix.
+
+## 1.80.2 -- 19 October 2026
+
+- **One conversion technique, in every app.** Conversion had three entry points that did different things: convert used the route table alone (DbDo, EdSharp), convertAny tried media, then the table, then text through Pandoc (FileDir), and convertFile was Pandoc alone (BatCon's first build, a mistake the 1.80.0 documents repeated). Now convert does the whole sequence, and convertAny and convertFile are the same function under older names. AGENTS.md states the rule: an app converts only through the kit, and a missing or poor conversion is fixed in the kit.
+
+## 1.80.1 -- 19 October 2026
+
+Found while making BatCon with newHomerApp, the way the kit now tells every agent to.
+
+- **A picker lists every format a file converts to.** Conversion.targetsFor gave only a fixed menu per kind of file, so routes in conversions.inix such as inix2xlsx and md2pptx never appeared; ChatGPT's BatCon read the table itself because of it. The menu still comes first, in FileDir's order; every other route for the file's type follows, by the kit's name for that type.
+- **The app templates do what homer-new-app says.** _APP_.cs starts the log, Paths and Elevate first, keeps its settings through Paths, and reads switches through the new Util.switchName, documented as /switch; the acceptance checks use /help and /source. newHomerApp sets kitNeeded to the kit it was made from, not a version weeks old, and its closing hint names runJob().
+- **A new app's build and installer agree.** The build template copies the scripts its installer runs (installCommon, installOllama, installScreenReaderSupport), and an app that compiles Conversion gets exec\conversions.inix copied by its build and shipped by its installer. A stray bare line feed in the installer template is gone.
+- **Util.switchName** gives a switch's name in lowercase whatever its prefix, /, - or --, so every app follows the one convention through one copy.
+
 ## 1.80.0 -- 19 October 2026
 
 Learned from BatCon, an app another AI (ChatGPT) built from the kit's documents alone. It did much right, and showed where the kit did not describe itself.

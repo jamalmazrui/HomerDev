@@ -110,7 +110,7 @@ If the kit lacks something the app needs, do not add it to the app: describe the
 Use these rather than writing your own; each is one shared copy across the suite.
 
 - **A list of the formats a file converts to:** `Conversion.targetLabelsFor(path, out extensions)`, labels a person reads.
-- **Converting a file:** `Conversion.convertFile(source, target, out error)`, with `hasRoute` and `hasAnyRoute` to ask first.
+- **Converting a file:** `Conversion.convert(source, target, out error)`, the one conversion technique every Homer app uses, with `hasRoute` and `hasAnyRoute` to ask first. Never convert any other way.
 - **Settings saved as soon as they are answered:** `Paths.configFile("<App>.inix")` with `InixCodec.readValue` and `InixCodec.writeValue`.
 - **A dialog:** `LbcDialog`, built by add order: `addInputBox`, `addPickBox`, `addCheckBox`, `addButton`, between `addBand` and `endBand`; `Lbc` names a control by its label.
 - **Speaking to the screen reader:** `Say.say`, one utterance per part.

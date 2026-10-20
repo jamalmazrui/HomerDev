@@ -30,18 +30,18 @@
 // order the user tabs through them. Each has a command-line equivalent so the
 // same program can be scripted, and the two are named the same thing:
 //
-//   Source          text box   &Source          --source <path>
+//   Source          text box   &Source          /source <path>
 //   Browse source   button     &Browse source   (no switch: the path is
-//                                                the --source value)
+//                                                the /source value)
 //   <options>       checkboxes                  --<option>
-//   Output          text box   &Output          --output <path>
+//   Output          text box   &Output          /output <path>
 //   Choose output   button     &Choose output   (no switch, as above)
-//   Use configuration  check   &Use configuration  --config <file>
-//   View output     check      &View output     --view
+//   Use configuration  check   &Use configuration  /config <file>
+//   View output     check      &View output     /view
 //   OK              button     accepts, Enter or Control+Enter
 //   Cancel          button     cancels, Escape
 //   Help            button     &Help, or F1
-//   Default settings button    &Default settings  --defaults
+//   Default settings button    &Default settings  /defaults
 //
 // Lbc puts the button row at the bottom with Help rightmost, wires Enter to OK
 // wherever OK sits in the row, Escape to Cancel, and Control+Enter to OK from
@@ -68,6 +68,8 @@ public static class Program
 {
     // ---- constants --------------------------------------------------------
     private const string sAppName = "_APP_";
+    // CHANGE ME: the GitHub account that publishes this app's releases, for Elevate's update check.
+    private const string sGitHubOwner = "JamalMazrui";
     private const string sSettingsFile = "_APP_.inix";
     private const string sSection = "Settings";
 
@@ -80,6 +82,12 @@ public static class Program
     [STAThread]
     public static int Main(string[] aArguments)
     {
+        // FIRST, THE KIT'S SERVICES (1.80.1): the session log, the app's own folders, and Elevate,
+        // which lets the Help box offer an update from GitHub. homer-new-app had promised these;
+        // the template now does them.
+        Log.start(sAppName);
+        Paths.start(sAppName);
+        Elevate.configure(sGitHubOwner, sAppName, BuildVersion.Version);
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
         loadSettings();
@@ -101,20 +109,9 @@ public static class Program
     // in Program Files cannot write beside its own .exe.
     private static string settingsPath()
     {
-        string sBeside = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, sSettingsFile);
-        try
-        {
-            if (File.Exists(sBeside)) return sBeside;
-            File.AppendAllText(sBeside, "");
-            return sBeside;
-        }
-        catch (Exception)
-        {
-        }
-        string sLocal = Path.Combine(Environment.GetFolderPath(
-            Environment.SpecialFolder.LocalApplicationData), sAppName);
-        try { Directory.CreateDirectory(sLocal); } catch (Exception) { }
-        return Path.Combine(sLocal, sSettingsFile);
+        // The kit's Paths (1.80.1): the user's copy under %LOCALAPPDATA%\_APP_\configs, seeded from a
+        // shipped one in configs when there is one.
+        return Paths.configFile(sSettingsFile);
     }
 
     private static bool loadSettings()
@@ -227,22 +224,24 @@ public static class Program
         for (int i = 0; i < aArguments.Length; i++)
         {
             string sArgument = aArguments[i];
+            // ONE SWITCH CONVENTION (1.80.1, homer-code): /switch, -switch and --switch alike, in any case.
+            string sSwitch = Util.switchName(sArgument);
             string sNext = (i + 1 < aArguments.Length) ? aArguments[i + 1] : "";
-            if (sArgument == "--help" || sArgument == "-h" || sArgument == "/?")
+            if (sSwitch == "help" || sSwitch == "h" || sArgument == "/?")
             {
                 Console.WriteLine(helpText());
                 return 0;
             }
-            else if (sArgument == "--source") { sSource = sNext; i++; }
-            else if (sArgument == "--output") { sOutput = sNext; i++; }
-            else if (sArgument == "--config") { bUseConfig = true; }
-            else if (sArgument == "--view") { bViewOutput = true; }
-            else if (sArgument == "--defaults") { restoreDefaults(); }
+            else if (sSwitch == "source") { sSource = sNext; i++; }
+            else if (sSwitch == "output") { sOutput = sNext; i++; }
+            else if (sSwitch == "config") { bUseConfig = true; }
+            else if (sSwitch == "view") { bViewOutput = true; }
+            else if (sSwitch == "defaults") { restoreDefaults(); }
             else if (sSource == "") { sSource = sArgument; }
             else
             {
                 Console.WriteLine("I do not know the option " + sArgument + ".");
-                Console.WriteLine("Run with --help to see the options.");
+                Console.WriteLine("Run with /help to see the options.");
                 return 1;
             }
         }
@@ -302,9 +301,9 @@ public static class Program
         sbText.AppendLine("  Help shows this. F1 does the same.");
         sbText.AppendLine("");
         sbText.AppendLine("Command line, which does everything the dialog does");
-        sbText.AppendLine("  " + sAppName + " --source <path> [--output <path>] [--config] [--view]");
-        sbText.AppendLine("  " + sAppName + " --defaults");
-        sbText.AppendLine("  " + sAppName + " --help");
+        sbText.AppendLine("  " + sAppName + " /source <path> [/output <path>] [/config] [/view]");
+        sbText.AppendLine("  " + sAppName + " /defaults");
+        sbText.AppendLine("  " + sAppName + " /help");
         return sbText.ToString();
     }
 

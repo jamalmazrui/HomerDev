@@ -184,6 +184,19 @@ public static bool stringEqual(string s1, string s2) {
 return String.Compare(s1, s2, false) == 0;
 } // stringEqual method
 
+// switchName: a command-line switch's name in lowercase, whatever its prefix (kit 1.80.1): "/Force",
+// "-force" and "--force" all give "force"; anything else, a path or a value, gives "". The suite's one
+// convention (homer-code): a switch is documented as /switch and accepted with /, - or --.
+public static string switchName(string sArgument) {
+if (string.IsNullOrEmpty(sArgument) || sArgument.Length < 2) return "";
+string sName;
+if (sArgument.StartsWith("--")) sName = sArgument.Substring(2);
+else if (sArgument[0] == '/' || sArgument[0] == '-') sName = sArgument.Substring(1);
+else return "";
+if (sName.Length == 0 || !char.IsLetter(sName[0])) return "";
+return sName.ToLowerInvariant();
+} // switchName method
+
 public static bool stringEquiv(string s1, string s2) {
 return String.Compare(s1, s2, true) == 0;
 } // stringEquiv method

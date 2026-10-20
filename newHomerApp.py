@@ -47,6 +47,7 @@ import datetime
 import glob
 import os
 import platform
+import re
 import sys
 import traceback
 
@@ -336,6 +337,15 @@ def main():
             logLine("SKIPPED, already there: %s" % sToPath)
             continue
         sText = readTemplate(sFromPath).replace(sToken, sApp)
+        # A NEW APP NEEDS THE KIT IT WAS MADE FROM (1.80.1): the build template carried a fixed kitNeeded,
+        # weeks behind the kit, so a new app did not require the kit whose classes it was written against.
+        if sTo == "build.cmd":
+            try:
+                sKitVersion = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "version.txt"), encoding="utf-8-sig").read().strip()
+                if re.match(r"^\d+\.\d+\.\d+$", sKitVersion):
+                    sText = re.sub(r'(?m)^set "kitNeeded=[0-9.]+"', 'set "kitNeeded=%s"' % sKitVersion, sText, count=1)
+            except Exception:
+                pass
         # THE PYTHON MDI BUILD (1.73.6): it bundles exec\\Homer.dll, the C# frame, and
         # pythonnet to reach it -- set in the build's own settings lines, so the
         # new project builds as written with nothing to edit.
@@ -395,7 +405,7 @@ def main():
         sayLine("Next: add your commands to %s.cs with addCommand -- help\\MdiFramework.md in the kit explains --" % sApp)
         sayLine("set the AppId and hotkey in %s_setup.iss, then run build." % sApp)
     else:
-        sayLine("Next: fill in runScript() in %s.cs, set the AppId and hotkey in %s_setup.iss, then run build."
+        sayLine("Next: fill in runJob() in %s.cs, set the AppId and hotkey in %s_setup.iss, then run build."
                 % (sApp, sApp))
     logLine("newHomerApp end")
     return 0

@@ -90,7 +90,10 @@ rem The kit tools this app uses, refreshed into scripts\ on every build.
 rem Name each; add one the day it is used (installCommon.cmd for install
 rem scripts written in cmd, buildTutorials and its fellows once a walk exists,
 rem post.cmd and post.ps1 once the app publishes a page).
-set "kitTools=check.cmd check.py fixEncoding.cmd fixEncoding.py kind.cmd kind.py push.cmd release.cmd release.ps1 tidy.cmd tidy.py unpushed.cmd unpushed.py"
+rem THE INSTALLER'S OWN SCRIPTS ARE HERE FROM THE START (1.80.1): the installer template runs
+rem installScreenReaderSupport and installOllama, so a new app's build copies them; an app that
+rem drops a component from its installer drops its script here too.
+set "kitTools=check.cmd check.py fixEncoding.cmd fixEncoding.py installCommon.cmd installOllama.cmd installScreenReaderSupport.cmd kind.cmd kind.py push.cmd release.cmd release.ps1 tidy.cmd tidy.py unpushed.cmd unpushed.py"
 set "useDocs=1"
 set "useInstaller=1"
 set "useVersionSteps=1"
@@ -251,7 +254,12 @@ rem app's own number: when version.txt's first two parts differ from the tag's,
 rem the tag wins, and the log says so.
 set "tagVer="
 for /f "usebackq delims=" %%t in (`git describe --tags --abbrev^=0 2^>nul`) do set "tagVer=%%t"
-set "tagVer=!tagVer:v=!"
+rem A NEW APP HAS NO TAG YET (1.80.3): with tagVer undefined, cmd turns !tagVer:v=!
+rem into the literal "v=", which then won over version.txt and made the version
+rem "v=.0.1" (the first BatCon's build, 19 October 2026). So the v is stripped only
+rem from a tag that exists, and a tag of anything but digits and dots is ignored.
+if defined tagVer set "tagVer=!tagVer:v=!"
+if defined tagVer for /f "delims=0123456789." %%x in ("!tagVer!") do set "tagVer="
 if not "!tagVer!"=="" (
   for /f "tokens=1,2 delims=." %%a in ("!ver!") do set "verSeries=%%a.%%b"
   for /f "tokens=1,2 delims=." %%a in ("!tagVer!") do set "tagSeries=%%a.%%b"
@@ -350,6 +358,22 @@ echo Install the .NET Framework 4.8 targeting pack with the Visual Studio Instal
 >> "%log%" echo ERROR: speech=!speech! uiaProv=!uiaProv! uiaTypes=!uiaTypes!
 goto :failed
 :haveRefs
+
+rem ---- the kit's conversion routes, when the app converts (1.80.1) ----------
+rem An app that compiles Conversion reads exec\conversions.inix to choose each
+rem conversion's way; without it nothing converts, so its absence stops here.
+set "bConversion="
+for %%m in (!homerModules!) do if /i "%%m"=="Conversion" set "bConversion=1"
+if defined bConversion (
+  if not exist "exec" mkdir "exec"
+  if not exist "!homerDev!\exec\conversions.inix" (
+    echo The kit has no exec\conversions.inix. Update HomerDev to !kitNeeded! or later.
+    >> "%log%" echo ERROR: NOT IN THE KIT: exec\conversions.inix
+    goto :failed
+  )
+  copy /y "!homerDev!\exec\conversions.inix" "exec\conversions.inix" >nul
+  >> "%log%" echo Copied conversions.inix from the kit into exec, since the app compiles Conversion.
+)
 
 rem ---- the kit's classes, and the stale copies they replace ---------------
 set "homerSources="
