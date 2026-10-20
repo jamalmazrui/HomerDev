@@ -79,6 +79,8 @@ notebook `self.md`. It overwrites nothing. The kit's scripts arrive in
 
 ## 4. First build, repository and release
 
+The repository needs no step of its own (1.82.0): the first push finds the folder is not a repository and runs scripts\createRepo, which makes it from the app's create<App>Repo.cmd, writing that first from the kit's local-only template when the app has none, as an app made outside newHomerApp does not.
+
 ```
 cd \<App>
 build

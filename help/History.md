@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.82.0 -- 20 October 2026
+
+- **A new app's first push makes its repository.** A new kit script, createRepo, runs the app's own create<App>Repo.cmd, or first writes one from the kit's Templates\create_APP_Repo.cmd and .ps1, with the app's name in place, as newHomerApp does. Those templates stay local-only, by the author's rule, so createRepo holds no account details; where they are absent it says so and stops. push calls createRepo by itself when a folder is not yet a repository, so a new app's first build_release goes all the way through. BatCon, made from a zip rather than newHomerApp, showed the gap: its push could only say to run a script it did not have.
+- **The app templates take createRepo with the other kit scripts,** and list the generated create<App>Repo.cmd and .ps1 as local files, never pushed.
+
 ## 1.81.1 -- 20 October 2026
 
 - **A new app's installer ships its tutorial walks.** The installer template shipped the help pages, the spoken tutorials and their feed, but not the Tutorial_*.inix walks themselves, so the build's check that every app file is installed stopped BatCon's first build on all ten. FileDir already shipped them; the template now does too.

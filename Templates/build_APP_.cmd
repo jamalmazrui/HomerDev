@@ -93,7 +93,7 @@ rem post.cmd and post.ps1 once the app publishes a page).
 rem THE INSTALLER'S OWN SCRIPTS ARE HERE FROM THE START (1.80.1): the installer template runs
 rem installScreenReaderSupport and installOllama, so a new app's build copies them; an app that
 rem drops a component from its installer drops its script here too.
-set "kitTools=check.cmd check.py fixEncoding.cmd fixEncoding.py installCommon.cmd installOllama.cmd installScreenReaderSupport.cmd kind.cmd kind.py push.cmd release.cmd release.ps1 tidy.cmd tidy.py unpushed.cmd unpushed.py"
+set "kitTools=check.cmd check.py createRepo.cmd fixEncoding.cmd fixEncoding.py installCommon.cmd installOllama.cmd installScreenReaderSupport.cmd kind.cmd kind.py push.cmd release.cmd release.ps1 tidy.cmd tidy.py unpushed.cmd unpushed.py"
 set "useDocs=1"
 set "useInstaller=1"
 set "useVersionSteps=1"
