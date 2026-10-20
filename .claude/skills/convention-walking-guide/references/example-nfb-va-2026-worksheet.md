@@ -84,3 +84,14 @@ Use one H1, logical H2/H3 headings, linked contents, short descriptive links, an
 ## Task Revision Source Checks
 
 The [hotel dining page](https://www.crowneplaza.com/hotels/us/en/herndon/washv/hoteldetail/dining) places Houlihan’s in the main lobby just beyond reception and describes a 24-hour market and room service. The [amenities page](https://www.crowneplaza.com/hotels/us/en/herndon/washv/hoteldetail/amenities) describes a 24-hour fitness center. Its shuttle section names Innovation Center station, while the convention travel page names Herndon. Resolve the actual convention pickup station with hotel operations; the attendee guide therefore directs travelers to agree on the station before selecting a stop. Neither station name establishes the pickup side or the walking connection.
+
+## Host Handout Received Later
+
+On October 20, 2026, the host affiliate's own handout, "Getting Around the Crowne Plaza Dulles Airport Hotel", was received. It is a walkthrough by members and outranks this guide's map reasoning for order and procedure. Facts the guide lacked, for its next revision:
+
+- One continuous building; the front desk, restaurant and every meeting room on the first floor, so all are reachable without stairs or going outside. Sleeping rooms on the first floor, floors two to four of the main building, and floors three to seven of a tower whose first two floors are a parking garage.
+- A key card calls every elevator; inside, the floor buttons work without it.
+- Carpet begins at the first elevators and ends at an intersection: to the right, registration and the Grand Ballroom pre-function area, then the Grand Ballroom (Salons C, B and A in that order); to the left, restrooms, then the Junior Ballroom pre-function area and the Junior Ballroom (Salons D and E in that order); straight on, the Studio (the convention office, first door on the right), the Stapleton Board Room (third door on the right), then the tower elevators.
+- Two relief areas: through the last door on the left at the end of the first-floor guest hallway, a hard right to an outside door, right, and three steps down to a grass-and-dirt area; and through a door on the right of the Junior Ballroom pre-function area, near the restrooms, to a large grassy area.
+- Each room's events, the Newsline information and auction display tables in the Junior Ballroom pre-function area, Houlihan's hours (daily, 6 AM to 10 PM), and volunteers serving as talking signs at major events.
+

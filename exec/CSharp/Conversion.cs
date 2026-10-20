@@ -196,6 +196,14 @@ oClock.Stop();
 Log.info("Conversion " + sRoute + " by " + sWay + ": " + (bMade ? "made" : "failed") + " in " + oClock.ElapsedMilliseconds + " ms, " + Path.GetFileName(sSource)
 + (sStepError != "" ? " -- " + sStepError : ""));
 if (bMade) {
+// EVERY WEB PAGE IN THE HOMER FORM (1.87.1): a page made by any way but the page and json
+// engines, which write it already, is finished as 2htm finishes its pages -- one H1, main
+// labelled by it, the base stylesheet -- when the app compiles ConversionPage.cs.
+if (typeOf(sTarget) == "htm" && !sWay.TrimEnd().EndsWith("page") && !sWay.TrimEnd().EndsWith("json")) {
+string sPageError = "";
+pageFinish(sTarget, ref sPageError);
+if (sPageError != "") Log.info("Page form not applied to " + Path.GetFileName(sTarget) + ": " + sPageError);
+}
 // TEXT IN THE HOMER ENCODING (kit 1.80.0, from ChatGPT's BatCon work): whatever an engine wrote,
 // a text result ends as UTF-8 with a byte order mark and CRLF, as every Homer text file is.
 string sMadeType = typeOf(sTarget);
@@ -252,6 +260,12 @@ case "pdftext": return pdfText(sSource, sTarget, out sError);
 case "ocr": return ocrEngine(sSource, sTarget, out sError);
 case "table": return tableEngine(sSource, sTarget, out sError);
 case "zipxml": return zipXml(sSource, sTarget, out sError);
+case "json": case "page": {
+bool bMade = false; string sPageError = "";
+pageConvert(sEngine, sSource, sTarget, ref bMade, ref sPageError);
+sError = sPageError;
+return bMade;
+}
 }
 sError = "the engine " + sEngine + " is not part of the C# conversion code";
 return false;
@@ -272,6 +286,7 @@ case "pdftext": return havePdfPig() || pythonProgram() != "" ? "" : "neither Pdf
 case "pdfstructure": return haveReader() || pythonProgram() != "" ? "" : "neither the PDF reader nor Python is present";
 case "ocr": return !haveReader() ? "this program does not include the PDF reader, which OCR needs" : haveTesseract() ? "" : "Tesseract is not installed";
 case "officecom": return officeApp(sSource) == "" ? "Office cannot open this type" : "";
+case "json": case "page": { bool bPage = false; pageState(ref bPage); return bPage ? "" : "this program does not include the Homer page writer (ConversionPage.cs)"; }
 }
 return "the engine " + sEngine + " is unknown";
 } // engineMissing method
@@ -833,6 +848,10 @@ return false;
 // Filled by ConversionPdf.cs, in apps that compile PdfReader.cs with PdfPig.
 // Left out, they compile to nothing and the Python readers are used instead.
 static partial void readerState(ref bool bReader, ref bool bTesseract);
+// The Homer page writer, 2htm's page form (1.87.0), in ConversionPage.cs when the app compiles it.
+static partial void pageState(ref bool bPage);
+static partial void pageConvert(string sEngine, string sSource, string sTarget, ref bool bMade, ref string sError);
+static partial void pageFinish(string sPath, ref string sError);
 static partial void readerConvert(string sSource, string sTarget, bool bOcr, ref bool bMade, ref bool bScans, ref string sError);
 
 // haveReader: true when this program compiled HomerScribe's PDF reader in.

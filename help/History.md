@@ -7,6 +7,31 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.87.3 -- 20 October 2026
+
+- **ConversionPage.cs is C# 5,** so DbDo, EdSharp and FileDir, which compile with the .NET Framework's own compiler, build again. Moved from 2htm, it used out var, patterns such as `is bool b`, the discard `out _` and expression-bodied members, which that compiler rejects; BatCon and bookFido, compiled with Roslyn, had accepted them. Each is rewritten with the same logic.
+- **The kit's build checks that its C# is C# 5:** a scan of exec\\CSharp, comments and strings set aside, fails the build on any C# 6 or 7 form and names the file, since the kit's own Roslyn compile cannot notice what the older compiler rejects.
+- **Python's table engine writes documents as C# does,** Word, web page, OpenDocument, rich text and EPUB, through Markdown and Pandoc; a new inix2txt route takes an inix table to text. The conversion test's sample table gains the marker row its workbook sample already had. Six table routes failed the test on the author's computer; all 54 routes this computer can test pass.
+
+## 1.87.2 -- 20 October 2026
+
+- **The convention-walking-guide skill learns from the host's own walkthrough.** The NFB of Virginia's own handout for its 2026 hotel, written by members who walked it, knew what the skill's map-based example did not: where the carpet starts and ends, that a key card calls the elevators, the building's one-floor shape, a central intersection described right, left and straight, doors by their order, steps and surface at relief, and volunteers as talking signs -- in 800 words. A new section tells the skill to ask for such a handout early, prefer it for route order and procedure, and adopt its strengths within a tasks-first guide; the template opens with the basics and names people who help; the handout is a method example; and the NFB example's worksheet lists the facts for its next revision.
+
+## 1.87.1 -- 20 October 2026
+
+- **Every web page the kit makes is in the Homer page form,** 2htm's: a page made by Pandoc, the markdown engine or any other way is finished with the base stylesheet, one H1, main labelled by it, headings moved under it, and images inlined or removed (images on the web are removed, as 2htm always has, so a page stands alone). The body's first H1 becomes the title first, so a Pandoc page titled by its file name still reads H1 the real title. In C# and Python alike; every converting app (BatCon, bookFido, DbDo, EdSharp, FileDir) now compiles ConversionPage.cs, so the same conversion makes the same page in every app.
+- **Python has the page and json engines,** ported line for line. Tested here: Markdown through Pandoc came out with one H1, the real title, French kept; JSON became nested lists; a messy page lost its script, style, comment and web image, its German kept.
+
+## 1.87.0 -- 20 October 2026
+
+- **2htm's page form joins the kit,** the first step of 2htm becoming a face over Conversion.convert. ConversionPage.cs holds 2htm's page writer (the base stylesheet, a head with title and language, main labelled by the title, headings shifted under one H1, images inlined or removed, tables with headers), its clean-up of an existing web page, and its JSON converter, as two engines: page (htm to htm or txt) and json (json to htm or txt). An app that compiles the file has them; BatCon does from now on.
+- **Routes 2htm needed:** htm2htm, json2htm and json2txt are new; text, OpenDocument, PowerPoint and Excel reach a web page without Pandoc through the markdown engine, a web page reaches text through the page engine, and Markdown reaches text by a copy.
+
+## 1.86.0 -- 20 October 2026
+
+- **Python converts as C# does.** conversion.py gains the table engine, reading and writing comma separated, tab separated, inix, Markdown tables and Excel workbooks in the same layouts as Table.cs, with the same formula guard and every workbook value kept as text; and the media half, with the same tools called the same way: Whisper for transcripts, HomerScribe for described video, Windows' own speech synthesis (through PowerShell) for audio and video from documents, and ffmpeg between media. canConvert answers for both halves. Tested here: a CSV with leading zeros, formula-like text and accented letters went to a workbook and back, to inix, Markdown and tab separated, and openpyxl read the workbook exactly; WAV became MP3 by ffmpeg; a missing Whisper was reported by name.
+- **A missing tool is named.** A program the converter cannot start, or one that runs too long, is reported in words, not as Python's own error.
+
 ## 1.85.2 -- 20 October 2026
 
 - **A video becomes a described document.** When HomerScribe is installed, the kit asks it for both halves of a video -- what is said and what can be seen -- and makes them one document, with headings for each, in any document format. HomerScribe is the kit's engine for description as Pandoc and Office are for documents, so the suite keeps one technique for it, in one program, rather than a copy here. Without HomerScribe, a video gets its transcript alone, and the log says why. A context file named after the video, beside it, still tells HomerScribe what it is watching.

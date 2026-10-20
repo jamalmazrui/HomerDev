@@ -102,7 +102,7 @@ def programFor(sEngine):
 
 
 def engineAvailable(sEngine):
-    if sEngine in ("copy", "markdown", "zipxml"): return True
+    if sEngine in ("copy", "json", "markdown", "page", "table", "zipxml"): return True
     if sEngine == "pandoc": return bool(programFor(sEngine))
     if sEngine == "ocr":
         try: import pypdfium2
@@ -496,11 +496,548 @@ def htmlEscape(s):
     return (s or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
 
 
+# ---------- engine: table, as Table.cs does it (1.86.0) ----------
+#
+# PYTHON CONVERTS TABLES AS C# DOES: the same five forms -- comma separated, tab separated,
+# a Homer inix file, a Markdown table and an Excel workbook -- read and written to the same
+# layouts as Table.cs, so a table converts alike in every Homer app, whatever its language.
+#   inix: one section a row, named Record1, Record2 and so on, padded to the width of the
+#     count; a row's empty values are left out; the Global section is not a row.
+#   csv and tsv: a value beginning =, @, a tab or a return, or + or - when not a number, gets a
+#     leading apostrophe, so no spreadsheet takes it for a formula; quoted only when it must be.
+#   xlsx: the first sheet read; written as a minimal workbook, every value an inline string,
+#     so leading zeros stay, within Excel's limits of rows, columns and cell length.
+
+def tableRead(sSource):
+    """[fields], [[values]] of the first table in a file of one of the five forms."""
+    sType = typeOf(sSource)
+    if sType in ("csv", "tsv"):
+        import csv, io
+        sText = decodeText(open(sSource, "rb").read()).replace("\r\n", "\n").replace("\r", "\n")
+        llAll = [r for r in csv.reader(io.StringIO(sText), delimiter="," if sType == "csv" else "\t")]
+        llAll = [r for r in llAll if r]
+        return (llAll[0], llAll[1:]) if llAll else ([], [])
+    if sType == "inix":
+        import inix
+        lsFields, ldRows = [], []
+        for oSection in inix.read(sSource):
+            if oSection.sName.lower() == "global": continue
+            dRow = oSection.asDictionary()
+            for sKey in dRow:
+                if sKey.lower() not in [s.lower() for s in lsFields]: lsFields.append(sKey)
+            ldRows.append({k.lower(): v for k, v in dRow.items()})
+        return lsFields, [[d.get(f.lower(), "") for f in lsFields] for d in ldRows]
+    if sType == "md":
+        llCells = []
+        for sRaw in decodeText(open(sSource, "rb").read()).replace("\r\n", "\n").split("\n"):
+            sLine = sRaw.strip()
+            if "|" not in sLine:
+                if llCells: break
+                continue
+            if re.match(r"^\|?[\s:\-|]+\|?$", sLine): continue
+            llCells.append([c.strip() for c in sLine.strip("|").split("|")])
+        if not llCells: raise ValueError("no table was found in this Markdown file")
+        return llCells[0], llCells[1:]
+    if sType == "xlsx":
+        import zipfile
+        with zipfile.ZipFile(sSource) as oZip:
+            lsShared = []
+            if "xl/sharedStrings.xml" in oZip.namelist():
+                for oItem in ET.fromstring(oZip.read("xl/sharedStrings.xml")).iter(sS + "si"):
+                    lsShared.append("".join(o.text or "" for o in oItem.iter(sS + "t")))
+            llRows = []
+            for oRow in ET.fromstring(oZip.read("xl/worksheets/sheet1.xml")).iter(sS + "row"):
+                lsCells = []
+                for oCell in oRow.iter(sS + "c"):
+                    iColumn = xlsxIndex(oCell.get("r", ""))
+                    while iColumn > len(lsCells): lsCells.append("")
+                    oValue = oCell.find(sS + "v"); oInline = oCell.find(sS + "is")
+                    sValue = oValue.text if oValue is not None else ("".join(o.text or "" for o in oInline.iter(sS + "t")) if oInline is not None else "")
+                    if oCell.get("t") == "s" and sValue: sValue = lsShared[int(sValue)]
+                    lsCells.append(sValue or "")
+                llRows.append(lsCells)
+        llRows = [r for r in llRows if any(c != "" for c in r)]
+        return (llRows[0], llRows[1:]) if llRows else ([], [])
+    raise ValueError("the table engine reads csv, tsv, inix, md and xlsx, not " + sType)
+
+
+def xlsxIndex(sReference):
+    """The zero-based column of a cell reference such as C7; -1 when there is none."""
+    iColumn = 0
+    for sChar in sReference:
+        if not sChar.isalpha(): break
+        iColumn = iColumn * 26 + (ord(sChar.upper()) - 64)
+    return iColumn - 1
+
+
+def xlsxColumn(iColumn):
+    sColumn = ""
+    iColumn += 1
+    while iColumn > 0:
+        iColumn, iRest = divmod(iColumn - 1, 26)
+        sColumn = chr(65 + iRest) + sColumn
+    return sColumn
+
+
+def separatedValue(sValue, sSeparator):
+    if sValue:
+        try:
+            float(sValue); bNumber = True
+        except ValueError:
+            bNumber = False
+        if sValue[0] in "=@\t\r" or (sValue[0] in "+-" and not bNumber): sValue = "'" + sValue
+    if sSeparator in sValue or '"' in sValue or "\n" in sValue or "\r" in sValue:
+        sValue = '"' + sValue.replace('"', '""') + '"'
+    return sValue
+
+
+def tableWrite(sOut, sTo, lsFields, llRows):
+    llRows = [(list(r) + [""] * len(lsFields))[:len(lsFields)] for r in llRows]
+    if sTo in ("csv", "tsv"):
+        sSep = "," if sTo == "csv" else "\t"
+        sText = "".join(sSep.join(separatedValue(v, sSep) for v in r) + "\r\n" for r in [lsFields] + llRows)
+        open(sOut, "w", encoding="utf-8-sig", newline="").write(sText)
+    elif sTo in ("md", "txt"):
+        def mdRow(lsValues): return "|" + "".join(" " + (v or "").replace("|", "\\|").replace("\r\n", " ").replace("\n", " ").replace("\r", " ") + " |" for v in lsValues) + "\r\n"
+        open(sOut, "w", encoding="utf-8-sig", newline="").write(mdRow(lsFields) + mdRow(["---"] * len(lsFields)) + "".join(mdRow(r) for r in llRows))
+    elif sTo == "inix":
+        import inix
+        iWidth = len(str(len(llRows))) if llRows else 1
+        lSections = []
+        for i, lsRow in enumerate(llRows):
+            oSection = inix.Section("Record" + str(i + 1).zfill(iWidth))
+            for sField, sValue in zip(lsFields, lsRow):
+                if sValue != "": oSection.set(sField, sValue)
+            if i < len(llRows) - 1: oSection.lPairs.append(inix.Pair(sRaw=""))
+            lSections.append(oSection)
+        inix.write(sOut, lSections)
+    elif sTo == "xlsx":
+        if len(llRows) + 1 > 1048576 or len(lsFields) > 16384: raise ValueError("the table is larger than Excel allows")
+        import zipfile
+        from xml.sax.saxutils import escape
+        lsXml = ['<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
+                 '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>']
+        for iRow, lsRow in enumerate([lsFields] + llRows, 1):
+            lsXml.append('<row r="%d">' % iRow)
+            for iCol, sValue in enumerate(lsRow):
+                if sValue == "": continue
+                if len(sValue) > 32767: raise ValueError("a value is longer than an Excel cell holds")
+                lsXml.append('<c r="%s%d" t="inlineStr"><is><t xml:space="preserve">%s</t></is></c>' % (xlsxColumn(iCol), iRow, escape(sValue)))
+            lsXml.append("</row>")
+        lsXml.append("</sheetData></worksheet>")
+        with zipfile.ZipFile(sOut, "w", zipfile.ZIP_DEFLATED) as oZip:
+            oZip.writestr("[Content_Types].xml", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>')
+            oZip.writestr("_rels/.rels", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>')
+            oZip.writestr("xl/workbook.xml", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Sheet1" sheetId="1" r:id="rId1"/></sheets></workbook>')
+            oZip.writestr("xl/_rels/workbook.xml.rels", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>')
+            oZip.writestr("xl/worksheets/sheet1.xml", "".join(lsXml))
+    elif sTo in ("docx", "epub", "htm", "html", "odt", "rtf"):
+        # As Table.cs does (its aViaPandoc): the table as Markdown, then Pandoc to the document.
+        sMd = sOut + ".table.md"
+        try:
+            tableWrite(sMd, "md", lsFields, llRows)
+            enginePandoc(sMd, sTo, sOut)
+        finally:
+            try: os.remove(sMd)
+            except OSError: pass
+    else:
+        raise ValueError("the table engine writes csv, tsv, inix, md, txt, xlsx, and through Pandoc docx, epub, htm, odt and rtf; not " + sTo)
+
+
+def engineTable(sSource, sTo, sOut):
+    lsFields, llRows = tableRead(sSource)
+    if not lsFields: raise ValueError("no table was found in " + os.path.basename(sSource))
+    tableWrite(sOut, sTo, lsFields, llRows)
+
+
+# ---------- the Homer web page, as ConversionPage.cs makes it (1.87.1) ----------
+#
+# 2htm's page form, ported line for line from ConversionPage.cs, so a Python app's pages are
+# the same as a C# app's: the base stylesheet, a head with title, language and Dublin Core,
+# one H1, main labelled by it, headings moved under it, images inlined or removed. Engines
+# page (htm to htm or txt) and json (json to htm or txt), and pageFinish, which convert runs
+# on every page another engine made.
+
+sPageCss = "html{font-size:100%}body{font-family:sans-serif;max-width:80ch;margin:1em auto;padding:0 1em;line-height:1.6;color:#000;text-align:left}p{margin:1em 0}h1,h2,h3,h4,h5,h6{line-height:1.3;margin-top:1.5em}a{color:#00529b;text-decoration:underline}a:hover,a:focus{text-decoration:underline;text-decoration-thickness:2px}*:focus{outline:3px solid #00529b;outline-offset:2px}.visually-hidden{position:absolute !important;clip:rect(1px,1px,1px,1px);width:1px;height:1px;overflow:hidden;white-space:nowrap}table{border-collapse:collapse;margin:1em 0}th,td{border:1px solid #595959;padding:.4em .6em;text-align:left;vertical-align:top}th{background:#e8e8e8}td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}caption{caption-side:top;font-weight:bold;text-align:left;padding:.25em 0;font-size:1.05em}nav ol{list-style:decimal;padding-left:2em}figure{margin:1em 0}img{max-width:100%;height:auto}aside.slide-notes{border-left:4px solid #595959;padding-left:1em;margin:1em 0}.byline{font-style:italic;color:#333;margin:0 0 1em 0}p.subtitle{font-style:italic;color:#333;margin:0 0 1em 0}pre{background:#f4f4f4;border:1px solid #595959;padding:.5em;overflow-x:auto;font-family:monospace;white-space:pre-wrap;word-break:break-word}code{font-family:monospace;background:#f4f4f4;padding:0 .2em;border:1px solid #d0d0d0}pre code{background:transparent;border:0;padding:0}.json-value{font-family:monospace}.json-value.num{color:#004d00}.json-value.str::before{content:'\"'}.json-value.str::after{content:'\"'}.json-value.null,.json-value.bool{font-style:italic}dl.json-obj{margin-left:1.5em;border-left:2px solid #d0d0d0;padding-left:1em}ol.json-arr{margin-left:1.5em}"
+bStripImages = False
+
+
+def pageEscape(sIn):
+    return (sIn or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+
+
+def pageHtmlToText(sHtml):
+    s = re.sub(r"<[^>]+>", "", sHtml)
+    return s.replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", '"').replace("&#39;", "'").replace("&nbsp;", " ")
+
+
+def pageExtractMeta(sHtml):
+    d = {}
+    oTitle = re.search(r"<title[^>]*>(?P<t>.*?)</title>", sHtml, re.S | re.I)
+    if oTitle and pageHtmlToText(oTitle.group("t")).strip(): d["title"] = pageHtmlToText(oTitle.group("t")).strip()
+    oLang = re.search(r"""<html[^>]+lang\s*=\s*['"]?(?P<l>[A-Za-z\-]+)""", sHtml, re.I)
+    if oLang: d["language"] = oLang.group("l")
+    for oMeta in re.finditer(r"<meta\s+(?P<a>[^>]*)>", sHtml, re.I):
+        def attr(sName):
+            m = re.search(sName + r"""\s*=\s*(?:"(?P<v>[^"]*)"|'(?P<w>[^']*)'|(?P<x>[^\s>]+))""", oMeta.group("a"), re.I)
+            return (m.group("v") or m.group("w") or m.group("x") or "") if m else ""
+        sName, sContent = attr("name").lower(), attr("content")
+        if not sName or not sContent.strip(): continue
+        if sName in ("author", "description", "keywords"): d[sName] = sContent
+        for sDc, sKey in (("dc.title", "title"), ("dc.creator", "author"), ("dc.subject", "subject"), ("dc.description", "description"), ("dc.language", "language")):
+            if sName == sDc and sKey not in d: d[sKey] = sContent
+    return d
+
+
+def pageDate(sIso):
+    return sIso[:sIso.index("T")] if sIso and sIso.find("T") > 0 else sIso
+
+
+def pageHead(dMeta, sDocTitle=None):
+    sLang = dMeta.get("language") or "en"
+    sTitle = dMeta.get("title") or "Converted document"
+    if dMeta.get("subtitle"): sTitle += ": " + dMeta["subtitle"]
+    sDocTitle = sDocTitle or sTitle
+    lsOut = ["<!DOCTYPE html>", '<html lang="%s">' % pageEscape(sLang), "<head>", '<meta charset="utf-8">',
+             '<meta name="viewport" content="width=device-width,initial-scale=1">', '<meta name="generator" content="Homer">',
+             "<title>%s</title>" % pageEscape(sTitle)]
+    for sKey in ("author", "description", "keywords"):
+        if dMeta.get(sKey, "").strip(): lsOut.append('<meta name="%s" content="%s">' % (sKey, pageEscape(dMeta[sKey])))
+    for sDc, sKey in (("DC.title", "title"), ("DC.creator", "author"), ("DC.subject", "subject"), ("DC.description", "description"),
+                      ("DC.date.created", "created"), ("DC.date.modified", "modified"), ("DC.language", "language")):
+        if dMeta.get(sKey, "").strip(): lsOut.append('<meta name="%s" content="%s">' % (sDc, pageEscape(dMeta[sKey])))
+    lsOut += ["<style>" + sPageCss + "</style>", "</head>", "<body>", '<h1 id="doc-title">%s</h1>' % pageEscape(sDocTitle)]
+    bAuthor, bCreated = bool(dMeta.get("author", "").strip()), bool(dMeta.get("created", "").strip())
+    if bAuthor or bCreated:
+        sLine = '<p class="byline">'
+        if bAuthor: sLine += "By " + pageEscape(dMeta["author"]) + (" \u2014 " if bCreated else "")
+        if bCreated: sLine += '<time datetime="%s">%s</time>' % (pageEscape(dMeta["created"]), pageEscape(pageDate(dMeta["created"])))
+        lsOut.append(sLine + "</p>")
+    for sKey, sLabel in (("subject", "Subject"), ("description", "Description"), ("keywords", "Keywords")):
+        if dMeta.get(sKey, "").strip(): lsOut.append("<p>%s: %s.</p>" % (pageEscape(sLabel), pageEscape(dMeta[sKey])))
+    if dMeta.get("modified", "").strip():
+        lsOut.append('<p>Last modified: <time datetime="%s">%s</time>.</p>' % (pageEscape(dMeta["modified"]), pageEscape(pageDate(dMeta["modified"]))))
+    return "\r\n".join(lsOut) + "\r\n"
+
+
+def pageShiftHeadings(sFragment, iTargetMin):
+    lsLevels = [int(m.group(2)) for m in re.finditer(r"<(/?)h([1-6])([^>]*)>", sFragment, re.I)]
+    if not lsLevels: return sFragment
+    iShift = iTargetMin - min(lsLevels)
+    def shift(m): return "<%sh%d%s>" % (m.group(1), min(6, max(iTargetMin, int(m.group(2)) + iShift)), m.group(3))
+    return re.sub(r"<(/?)h([1-6])([^>]*)>", shift, sFragment, flags=re.I)
+
+
+def pageImages(sFragment, sBaseDir):
+    import base64, urllib.parse
+    dMime = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".gif": "image/gif", ".bmp": "image/bmp", ".svg": "image/svg+xml", ".webp": "image/webp"}
+    def one(m):
+        sTag = m.group(0)
+        if bStripImages: return ""
+        oSrc = re.search(r"""\bsrc\s*=\s*(?:"([^"]*)"|'([^']*)')""", sTag, re.I)
+        if not oSrc: return ""
+        sRel = oSrc.group(1) if oSrc.group(1) is not None else oSrc.group(2)
+        if not sRel.strip(): return ""
+        if sRel.lower().startswith("data:"): return sTag
+        if re.match(r"^[a-zA-Z][a-zA-Z0-9+\-.]*:", sRel): return ""
+        sFull = os.path.join(sBaseDir, urllib.parse.unquote(sRel))
+        sMime = dMime.get(os.path.splitext(sFull)[1].lower())
+        if not os.path.isfile(sFull) or not sMime: return ""
+        sData = "data:%s;base64,%s" % (sMime, base64.b64encode(open(sFull, "rb").read()).decode("ascii"))
+        return sTag[:oSrc.start()] + 'src="%s"' % sData + sTag[oSrc.end():]
+    return re.sub(r"<img\b[^>]*>", one, sFragment, flags=re.I)
+
+
+def pageBody(sHtml):
+    m = re.search(r"<body[^>]*>(?P<b>.*?)</body>", sHtml, re.S | re.I)
+    sBody = m.group("b") if m else sHtml
+    for sPattern in (r"<style.*?</style>", r"<script.*?</script>", r"<!--.*?-->"):
+        sBody = re.sub(sPattern, "", sBody, flags=re.S | re.I)
+    return sBody
+
+
+def pageBlocksToText(sHtml):
+    s = re.sub(r"<figure\b[^>]*>.*?</figure>", "", sHtml, flags=re.S | re.I)
+    sBreak = "\ue000"
+    s = re.sub(r"<br\s*/?>", sBreak, s, flags=re.I)
+    s = re.sub(r"</(p|div|blockquote|pre|section|article|header|footer|nav|aside|figcaption)\s*>", sBreak * 2, s, flags=re.I)
+    s = re.sub(r"</(li|dt|dd|tr)\s*>", sBreak, s, flags=re.I)
+    s = re.sub(r"</(h[1-6])\s*>", sBreak * 2, s, flags=re.I)
+    s = re.sub(r"<(h[1-6])\b[^>]*>", sBreak, s, flags=re.I)
+    s = re.sub(r"<li\b[^>]*>", sBreak + "- ", s, flags=re.I)
+    s = re.sub(r"<[^>]+>", "", s)
+    for a, b in (("&amp;", "&"), ("&lt;", "<"), ("&gt;", ">"), ("&quot;", '"'), ("&apos;", "'"), ("&#39;", "'"), ("&nbsp;", " "),
+                 ("&mdash;", "\u2014"), ("&ndash;", "\u2013"), ("&hellip;", "\u2026")):
+        s = s.replace(a, b)
+    s = re.sub(r"&#(\d+);", lambda m: chr(int(m.group(1))) if 0 < int(m.group(1)) <= 0x10FFFF else m.group(0), s)
+    s = re.sub(r"[ \t\r\n\f\v]+", " ", s)
+    s = re.sub(sBreak + "+", lambda m: "\n\n" if len(m.group(0)) >= 2 else "\n", s)
+    lsOut, bSaw, iBlank = [], False, 0
+    for sLine in s.split("\n"):
+        t = sLine.strip()
+        if not t:
+            if bSaw: iBlank += 1
+            continue
+        if iBlank > 0: lsOut.append("")
+        lsOut.append(t); bSaw = True; iBlank = 0
+    return "\r\n".join(lsOut) + ("\r\n" if lsOut else "")
+
+
+def pageHtml(sIn, sOut):
+    sRaw = decodeText(open(sIn, "rb").read())
+    dMeta = pageExtractMeta(sRaw)
+    if not dMeta.get("title", "").strip(): dMeta["title"] = os.path.splitext(os.path.basename(sIn))[0]
+    sBody = pageShiftHeadings(pageImages(pageBody(sRaw), os.path.dirname(sIn)), 2)
+    open(sOut, "w", encoding="utf-8", newline="").write(pageHead(dMeta) + '<main aria-labelledby="doc-title">\r\n' + sBody + "\r\n</main>\r\n</body>\r\n</html>\r\n")
+
+
+class JsonObject(list):
+    """A JSON object's pairs, in order, told apart from an array."""
+
+
+def pageJsonValue(v, lsOut):
+    if v is None: lsOut.append('<span class="json-value null">null</span>')
+    elif isinstance(v, bool): lsOut.append('<span class="json-value bool">%s</span>' % ("true" if v else "false"))
+    elif isinstance(v, (int, float)): lsOut.append('<span class="json-value num">%s</span>' % pageEscape(repr(v)))
+    elif isinstance(v, str): lsOut.append('<span class="json-value str">%s</span>' % pageEscape(v))
+    elif isinstance(v, list) and not isinstance(v, JsonObject):
+        if not v: lsOut.append('<span class="json-value">[] <em>(empty array)</em></span>'); return
+        lsOut.append('<ol class="json-arr">')
+        for x in v: lsOut.append("<li>"); pageJsonValue(x, lsOut); lsOut.append("</li>")
+        lsOut.append("</ol>")
+    else:
+        if not v: lsOut.append('<span class="json-value">{} <em>(empty object)</em></span>'); return
+        lsOut.append('<dl class="json-obj">')
+        for k, x in v: lsOut.append("<dt>%s:</dt>" % pageEscape(k)); lsOut.append("<dd>"); pageJsonValue(x, lsOut); lsOut.append("</dd>")
+        lsOut.append("</dl>")
+
+
+def engineJson(sSource, sTo, sOut):
+    import json
+    if sTo == "txt": shutil.copyfile(sSource, sOut); return
+    sJson = decodeText(open(sSource, "rb").read())
+    dMeta = {"title": os.path.splitext(os.path.basename(sSource))[0]}
+    lsOut = []
+    try:
+        pageJsonValue(json.loads(sJson, object_pairs_hook=JsonObject), lsOut)
+        sMain = "\r\n".join(lsOut)
+    except ValueError as oError:
+        sMain = "<h2>Parse error</h2>\r\n<p>%s</p>\r\n<h2>Raw content</h2>\r\n<pre>%s</pre>" % (pageEscape(str(oError)), pageEscape(sJson))
+    open(sOut, "w", encoding="utf-8", newline="").write(pageHead(dMeta) + '<main aria-labelledby="doc-title">\r\n' + sMain + "\r\n</main>\r\n</body>\r\n</html>\r\n")
+
+
+def enginePage(sSource, sTo, sOut):
+    if sTo == "txt": open(sOut, "w", encoding="utf-8-sig", newline="").write(pageBlocksToText(pageBody(decodeText(open(sSource, "rb").read()))))
+    else: pageHtml(sSource, sOut)
+
+
+def pageFinish(sPath):
+    """A page another engine made, put in the Homer form in place; the body's first H1 becomes its title first."""
+    sWork = sPath + ".homerpage.htm"
+    try:
+        sHtml = decodeText(open(sPath, "rb").read())
+        oH1 = re.search(r"<h1\b[^>]*>(?P<t>.*?)</h1>", sHtml, re.S | re.I)
+        if oH1:
+            sTitle = re.sub(r"<[^>]+>", "", oH1.group("t")).strip()
+            if sTitle:
+                import html as htmlLib
+                sHtml = sHtml[:oH1.start()] + sHtml[oH1.end():]
+                sTag = "<title>" + pageEscape(htmlLib.unescape(sTitle)) + "</title>"
+                if re.search(r"<title[^>]*>.*?</title>", sHtml, re.S | re.I): sHtml = re.sub(r"<title[^>]*>.*?</title>", lambda m: sTag, sHtml, count=1, flags=re.S | re.I)
+                else: sHtml = re.sub(r"<head[^>]*>", lambda m: m.group(0) + sTag, sHtml, count=1, flags=re.I)
+        open(sWork, "w", encoding="utf-8", newline="").write(sHtml)
+        pageHtml(sWork, sPath)
+    finally:
+        try: os.remove(sWork)
+        except OSError: pass
+
+
 dEngines = {"copy": engineCopy, "markdown": engineMarkdown, "ocr": engineOcr, "officecom": engineOfficeCom,
-              "pandoc": enginePandoc, "pdfstructure": enginePdfStructure, "pdftext": enginePdfText, "zipxml": engineZipXml}
+              "json": engineJson, "page": enginePage, "pandoc": enginePandoc, "table": engineTable, "pdfstructure": enginePdfStructure, "pdftext": enginePdfText, "zipxml": engineZipXml}
 
 
 # ---------- converting ----------
+
+# ---------- the media half, as ConversionMedia.cs does it (1.86.0) ----------
+#
+# PYTHON CONVERTS MEDIA AS C# DOES, with the same tools called the same way:
+#   audio or video -> a document: ffmpeg takes the sound as 16 kHz mono WAV, Whisper transcribes
+#     it (whisper-cli -m <model> -f <wav> -nt -np -l auto), and the transcript, as Markdown, goes
+#     to the target through the route table. A video goes first to HomerScribe, when installed,
+#     for what is said and what can be seen; without it, the transcript alone.
+#   a document -> audio: its text spoken by Windows' own speech synthesis, through PowerShell,
+#     encoded by ffmpeg; -> video: the same speech over a plain black picture.
+#   audio or video -> audio or video: ffmpeg.
+
+lsAudioSources = ["aac", "aif", "aiff", "flac", "m4a", "mp3", "ogg", "opus", "wav", "wma"]
+lsVideoSources = ["3gp", "avi", "flv", "m2ts", "m4v", "mkv", "mov", "mp4", "mpeg", "mpg", "ogv", "ts", "webm", "wmv"]
+lsTranscriptTargets = ["doc", "docx", "epub", "htm", "md", "odt", "pdf", "rtf", "txt"]
+lsSpeechAudioTargets = ["flac", "m4a", "mp3", "ogg", "opus", "wav"]
+lsSpeechVideoTargets = ["mkv", "mov", "mp4", "webm"]
+lsWhisperModels = ["ggml-small.bin", "ggml-small.en.bin", "ggml-base.bin", "ggml-base.en.bin", "ggml-medium.bin", "ggml-large-v3-turbo.bin"]
+
+
+def mediaCategory(sPath):
+    sType = typeOf(sPath)
+    return "audio" if sType in lsAudioSources else ("video" if sType in lsVideoSources else "")
+
+
+def ffmpegProgram():
+    try:
+        import media
+        return media.findInstalled("ffmpeg") or ""
+    except Exception:
+        return shutil.which("ffmpeg") or ""
+
+
+def whisperProgram():
+    sPath = os.path.join(os.environ.get("ProgramFiles", r"C:\Program Files"), "Whisper", "whisper-cli.exe")
+    return sPath if os.path.isfile(sPath) else (shutil.which("whisper-cli") or "")
+
+
+def whisperModel():
+    sProgram = whisperProgram()
+    if not sProgram: return ""
+    sDir = os.path.dirname(sProgram)
+    for sName in lsWhisperModels:
+        if os.path.isfile(os.path.join(sDir, sName)): return os.path.join(sDir, sName)
+    for sPath in sorted(glob.glob(os.path.join(sDir, "ggml-*.bin"))):
+        if "silero" not in os.path.basename(sPath).lower(): return sPath
+    return ""
+
+
+def homerProgram(sApp):
+    """Another Homer app's program, as Paths.homerProgram finds it; "" when it is not installed."""
+    for sRoot in (os.environ.get("ProgramFiles", ""), os.environ.get("ProgramFiles(x86)", "")):
+        if not sRoot: continue
+        for sTry in (os.path.join(sRoot, sApp, "exec", sApp + ".exe"), os.path.join(sRoot, sApp, sApp + ".exe")):
+            if os.path.isfile(sTry): return sTry
+    try:
+        import winreg
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths" + "\\" + sApp + ".exe") as oKey:
+            sValue = winreg.QueryValue(oKey, None).strip('"')
+            if os.path.isfile(sValue): return sValue
+    except Exception:
+        pass
+    return ""
+
+
+def runTool(lsCommand, sWhat, iMinutes):
+    try: oDone = subprocess.run(lsCommand, capture_output=True, text=True, errors="replace", timeout=iMinutes * 60)
+    except FileNotFoundError: raise RuntimeError("%s could not be started: %s was not found" % (sWhat, os.path.basename(lsCommand[0])))
+    except subprocess.TimeoutExpired: raise RuntimeError("%s took longer than %d minutes and was stopped" % (sWhat, iMinutes))
+    if oDone.returncode != 0: raise RuntimeError("%s failed (exit code %d): %s" % (sWhat, oDone.returncode, (oDone.stderr or oDone.stdout).strip()[-300:]))
+    return oDone.stdout
+
+
+def textCanBeSpoken(sSource):
+    sType = typeOf(sSource)
+    if sType in ("txt", "md"): return True
+    dTable = loadTable()
+    return bool(dTable.get(sType, {}).get("txt") or dTable.get(sType, {}).get("md"))
+
+
+def mediaCan(sSource, sTo):
+    sCategory = mediaCategory(sSource)
+    if sCategory and sTo in lsTranscriptTargets: return True
+    if sCategory and sTo in lsAudioSources + lsVideoSources: return sCategory == "video" or sTo in lsAudioSources
+    if not sCategory and sTo in lsSpeechAudioTargets + lsSpeechVideoTargets: return textCanBeSpoken(sSource)
+    return False
+
+
+def transcribeTo(sSource, sOut, sTo, sDir):
+    sFfmpeg = ffmpegProgram()
+    if not sFfmpeg: raise RuntimeError("ffmpeg is not installed, and it is what takes the sound out for Whisper")
+    sProgram, sModel = whisperProgram(), whisperModel()
+    if not sProgram: raise RuntimeError("Whisper is not installed; HomerDev's setup program offers it")
+    if not sModel: raise RuntimeError("Whisper has no speech model; run HomerDev's setup program again and leave Whisper ticked")
+    sWav = os.path.join(sDir, "sound.wav")
+    runTool([sFfmpeg, "-nostdin", "-y", "-i", sSource, "-vn", "-ar", "16000", "-ac", "1", "-c:a", "pcm_s16le", sWav], "ffmpeg", 120)
+    sText = runTool([sProgram, "-m", sModel, "-f", sWav, "-nt", "-np", "-l", "auto"], "Whisper", 360).strip()
+    if not sText: raise RuntimeError("Whisper heard no words")
+    lsSentences = re.split(r"(?<=[.!?])\s+", sText)
+    sMd = "# Transcript of %s\r\n\r\n" % os.path.splitext(os.path.basename(sSource))[0]
+    sMd += "".join(" ".join(lsSentences[i:i + 5]) + "\r\n\r\n" for i in range(0, len(lsSentences), 5))
+    return finishFromMarkdown(sMd, sOut, sTo, sDir)
+
+
+def describeVideoTo(sSource, sOut, sTo, sDir):
+    sScribe = homerProgram("HomerScribe")
+    if not sScribe: raise RuntimeError("HomerScribe is not installed")
+    sResults = os.path.join(sDir, "scribe")
+    os.makedirs(sResults, exist_ok=True)
+    try: runTool([sScribe, sSource, "--describe", "--transcribe", "--output-dir", sResults], "HomerScribe", 600)
+    except RuntimeError: pass
+    sFolder = os.path.join(sResults, os.path.splitext(os.path.basename(sSource))[0])
+    sDescribed, sTranscribed = os.path.join(sFolder, "described.md"), os.path.join(sFolder, "transcribed.md")
+    if not os.path.isfile(sDescribed): raise RuntimeError("HomerScribe made no description")
+    def demoted(sText): return re.sub(r"(?m)^(#{1,4})(\s)", r"##\1\2", sText.replace("\r\n", "\n")).replace("\n", "\r\n").strip()
+    sMd = "# %s\r\n\r\n" % os.path.splitext(os.path.basename(sSource))[0]
+    if os.path.isfile(sTranscribed): sMd += "## What is said\r\n\r\n" + demoted(decodeText(open(sTranscribed, "rb").read())) + "\r\n\r\n"
+    sMd += "## What can be seen\r\n\r\n" + demoted(decodeText(open(sDescribed, "rb").read())) + "\r\n"
+    return finishFromMarkdown(sMd, sOut, sTo, sDir)
+
+
+def finishFromMarkdown(sMd, sOut, sTo, sDir):
+    sMdPath = os.path.join(sDir, "made.md")
+    open(sMdPath, "w", encoding="utf-8-sig", newline="").write(sMd)
+    if sTo in ("md", "txt"): shutil.copyfile(sMdPath, sOut)
+    else: convert(sMdPath, sOut)
+    return True
+
+
+def speakTo(sSource, sOut, sTo, sDir):
+    sFfmpeg = ffmpegProgram()
+    if not sFfmpeg: raise RuntimeError("ffmpeg is not installed, and it is what encodes the speech")
+    sType = typeOf(sSource)
+    sText = decodeText(open(sSource, "rb").read()) if sType in ("txt", "md") else toText(sSource)
+    if sType == "md": sText = re.sub(r"(?m)^#+\s*|[*_`>|]", "", sText)
+    if not sText.strip(): raise RuntimeError("the document has no words to speak")
+    sTxt, sWav = os.path.join(sDir, "words.txt"), os.path.join(sDir, "speech.wav")
+    open(sTxt, "w", encoding="utf-8-sig").write(sText)
+    sScript = ("Add-Type -AssemblyName System.Speech; $o = New-Object System.Speech.Synthesis.SpeechSynthesizer; "
+               "$o.SetOutputToWaveFile('%s'); $o.Speak([IO.File]::ReadAllText('%s')); $o.SetOutputToNull(); $o.Dispose()"
+               % (sWav.replace("'", "''"), sTxt.replace("'", "''")))
+    runTool(["powershell", "-NoProfile", "-NonInteractive", "-Command", sScript], "Windows speech synthesis", 120)
+    if not os.path.isfile(sWav) or os.path.getsize(sWav) < 1000: raise RuntimeError("Windows speech synthesis made no sound")
+    if sTo in lsSpeechVideoTargets:
+        lsVideo = ["-c:v", "libvpx-vp9", "-c:a", "libopus"] if sTo == "webm" else ["-c:v", "libx264", "-tune", "stillimage", "-pix_fmt", "yuv420p", "-c:a", "aac"]
+        runTool([sFfmpeg, "-nostdin", "-y", "-f", "lavfi", "-i", "color=c=black:s=1280x720:r=1", "-i", sWav, "-shortest"] + lsVideo + [sOut], "ffmpeg", 120)
+    else:
+        runTool([sFfmpeg, "-nostdin", "-y", "-i", sWav, sOut], "ffmpeg", 120)
+    return True
+
+
+def mediaConvert(sSource, sOut, sTo):
+    """The media half's way for this pair, run; "" when the pair is not media's, so the table is tried."""
+    sCategory = mediaCategory(sSource)
+    sDir = tempfile.mkdtemp(prefix="homerMedia-")
+    try:
+        if sCategory == "video" and sTo in lsTranscriptTargets:
+            try:
+                describeVideoTo(sSource, sOut, sTo, sDir); return "describe (HomerScribe)"
+            except Exception as oError:
+                say("Described video: %s; the transcript alone instead" % oError)
+                transcribeTo(sSource, sOut, sTo, sDir); return "transcribe (Whisper)"
+        if sCategory == "audio" and sTo in lsTranscriptTargets:
+            transcribeTo(sSource, sOut, sTo, sDir); return "transcribe (Whisper)"
+        if not sCategory and sTo in lsSpeechAudioTargets + lsSpeechVideoTargets and textCanBeSpoken(sSource):
+            speakTo(sSource, sOut, sTo, sDir); return "speak (Windows)"
+        if sCategory and sTo in lsAudioSources + lsVideoSources and (sCategory == "video" or sTo in lsAudioSources):
+            sFfmpeg = ffmpegProgram()
+            if not sFfmpeg: raise RuntimeError("ffmpeg is not installed")
+            runTool([sFfmpeg, "-nostdin", "-y", "-i", sSource] + (["-vn"] if sTo in lsAudioSources else []) + [sOut], "ffmpeg", 240)
+            return "ffmpeg"
+        return ""
+    finally:
+        shutil.rmtree(sDir, ignore_errors=True)
+
+
+def canConvert(sSource, sTarget):
+    """Whether convert can make sTarget's type from sSource's: the route table, or the media half."""
+    sTo = typeOf(sTarget) if (os.path.splitext(sTarget)[1] or "/" in sTarget or os.sep in sTarget) else sTarget.lstrip(".").lower()
+    return bool(loadTable().get(typeOf(sSource), {}).get(sTo)) or mediaCan(sSource, sTo)
+
 
 def convert(sSource, sTarget, dOptions=None):
     """Convert sSource; sTarget is a path, or a type such as "md" for a file beside the source.
@@ -510,6 +1047,13 @@ def convert(sSource, sTarget, dOptions=None):
         sOut = sTarget; sTo = typeOf(sTarget)
     else:
         sTo = sTarget.lstrip(".").lower(); sOut = os.path.splitext(sSource)[0] + "." + sTo
+    # THE MEDIA HALF FIRST, as Conversion.cs's convert does (1.86.0).
+    dtMedia = time.time()
+    sMediaWay = mediaConvert(sSource, sOut, sTo)
+    if sMediaWay:
+        iMs = int((time.time() - dtMedia) * 1000)
+        say("%s -> %s by %s in %d ms" % (sSource, sOut, sMediaWay, iMs))
+        return {"path": sOut, "route": sMediaWay, "ms": iMs, "skipped": []}
     dTable = loadTable()
     lRoutes = dTable.get(typeOf(sSource), {}).get(sTo)
     if not lRoutes: raise ValueError("no route from .%s to .%s" % (typeOf(sSource), sTo))
@@ -528,6 +1072,10 @@ def convert(sSource, sTarget, dOptions=None):
                 dEngines[sEngine](sCurrent, sStepTo, sStepOut)
                 sCurrent = sStepOut
             os.replace(sOut + ".part", sOut)
+            # Every web page in the Homer form (1.87.1), unless page or json made it already.
+            if typeOf(sOut) == "htm" and lSteps[-1][0] not in ("page", "json"):
+                try: pageFinish(sOut)
+                except Exception as oError: say("Page form not applied to %s: %s" % (os.path.basename(sOut), oError))
             # Text in the Homer encoding (1.80.0), as Conversion.cs does: UTF-8 with a byte order mark and CRLF.
             if typeOf(sOut) in ("csv", "htm", "html", "inix", "md", "tsv", "txt"):
                 sMade = decodeText(open(sOut, "rb").read()).replace("\r\n", "\n").replace("\r", "\n")

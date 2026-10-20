@@ -111,6 +111,10 @@ ways = officecom
 [htm2docx]
 ways = pandoc
 
+[htm2htm]
+ways = page
+note = A web page put in the Homer page form, 2htm's (1.87.0): styles, scripts and comments removed, one H1, main labelled by it.
+
 [htm2md]
 ways = pandoc
 
@@ -118,7 +122,7 @@ ways = pandoc
 ways = officecom
 
 [htm2txt]
-ways = pandoc
+ways = pandoc, page
 
 [html2docx]
 ways = pandoc
@@ -141,9 +145,20 @@ ways = table
 [inix2tsv]
 ways = table
 
+[inix2txt]
+ways = table
+note = An inix table as a Markdown table, plain text a reader takes in order (1.87.3).
+
 [inix2xlsx]
 ways = table
 note = A table written by the kit's Table class (1.80.0), every value kept as text.
+
+[json2htm]
+ways = json
+note = A JSON file as a readable page of nested lists and tables, 2htm's (1.87.0).
+
+[json2txt]
+ways = json
 
 [md2csv]
 ways = table
@@ -180,7 +195,7 @@ ways = pandoc
 ways = table
 
 [md2txt]
-ways = pandoc
+ways = pandoc, copy
 
 [md2xlsx]
 ways = table
@@ -205,7 +220,7 @@ ways = officecom
 ways = pandoc
 
 [odt2htm]
-ways = pandoc
+ways = pandoc, zipxml:md > markdown
 
 [odt2md]
 ways = pandoc
@@ -248,7 +263,7 @@ ways = officecom
 ways = officecom:pptx > zipxml
 
 [pptx2htm]
-ways = zipxml:md > pandoc
+ways = zipxml:md > pandoc, zipxml:md > markdown
 
 [pptx2md]
 ways = zipxml
@@ -300,7 +315,7 @@ ways = officecom
 ways = pandoc
 
 [txt2htm]
-ways = pandoc
+ways = pandoc, markdown
 
 [txt2md]
 ways = copy
@@ -328,7 +343,7 @@ ways = table, zipxml
 ways = table
 
 [xlsx2htm]
-ways = table, zipxml:md > pandoc
+ways = table, zipxml:md > pandoc, zipxml:md > markdown
 
 [xlsx2inix]
 ways = table

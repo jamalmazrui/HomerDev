@@ -21,6 +21,21 @@ Seek current convention agenda/program, organizer orientation text, Braille Foru
 
 Keep route evidence status in the organizer worksheet. In attendee text, use a brief source attribution where it helps distinguish published directions from map relationships; avoid a repeated tag taxonomy or an inventory of absent information. Reserve Walked for an actual documented walkthrough, not remote map inspection. Do not call a map-derived route verified merely because the map is official. Never invent distances, door counts, compass orientation, sensory cues, or a clear path through an unlabeled connection. Distinguish sighted map adjacency from a usable pedestrian connection. Do not interpret fire-egress arrows as ordinary accessible travel routes.
 
+## Learn from the host's own walkthrough
+
+Ask early for the host's own orientation handout: often a short document titled like "Getting Around the Hotel", sent to attendees and never posted. Written by members who walked the building, it holds what no map or program shows: where carpet begins and ends; whether a key card calls the elevator or is also needed inside; which door or opening to take, by its order ("the third door on your right", "the last door on the left"); how many steps lead down to a relief area and what its surface is; the order of partitioned salons as you approach them; whether every convention space is on one level, reachable without stairs or going outside; and where people help -- the convention office, the information table, volunteers serving as talking signs. Record it in the worksheet as a walkthrough with its date and its author's role, never a name. Check its rooms against the current program, and prefer it to map reasoning for route order and procedures. A 2026 NFB of Virginia handout to the Crowne Plaza Dulles Airport, received after that guide was written, supplied every one of these, and the map-based guide had none of them.
+
+Adopt its strengths in a tasks-first guide:
+
+- **Open with the basics.** One building or several; which floor holds the convention; where the sleeping floors and any tower are; whether everything is reachable without stairs or going outside. That paragraph is the mental map every route then fills in.
+- **Describe a central intersection as spokes:** what lies to the right, to the left and straight ahead, one branch at a time.
+- **Use surface changes and ordered doors as decision landmarks** when a walkthrough reports them ("when the carpet ends, you reach the intersection").
+- **Name each room's convention uses and times where its route arrives,** so a traveler who learns where the banquet is also learns when.
+- **Say where to find people as well as places.**
+- **Keep it short.** Such a handout covers a whole hotel in about 800 words; a guide can come close.
+
+Keep this skill's standards where a handout falls short: task headings rather than one continuous narrative, a stated start and facing direction for each route, days as well as hours, and consistent spelling and punctuation.
+
 ## Organize by traveler task
 
 Make tasks the primary structure: arrive from transit or by rideshare; check in at the hotel; reach the assigned room; collect convention registration; use elevators/stairs; find a public restroom; get ice, soda, meals or takeaway; attend general sessions and workshops/committees; visit exhibits; use the gym; take a dog to relief. Distinguish hotel reception from convention registration, and seated dining from counter service, pickup, markets, and delivery. Use clear action headings and a linked contents list. Preserve the mental map within task explanations or offer a compact location index as an appendix. Avoid duplicating directions across sorts.

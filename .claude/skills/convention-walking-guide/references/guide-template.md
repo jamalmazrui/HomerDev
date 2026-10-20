@@ -6,6 +6,7 @@ Use this outline flexibly; omit empty sections rather than filling them with ass
 
 - H1: Event walking guide.
 - Opening: dates, timezone, venue/address, as-of date, direct help number.
+- The basics, one short paragraph: one building or several, which floor holds the convention, where the sleeping floors and any tower are, and whether everything is reachable without stairs or going outside. Every route then fills in this map.
 - H2 Contents: links to main sections.
 - H2 Get to the hotel: H3 transit, rideshare/taxi, and overflow transfer when supported.
 - H2 Check in and reach your room: hotel reception, elevators, room-floor orientation.
@@ -17,7 +18,7 @@ Use this outline flexibly; omit empty sections rather than filling them with ass
 - H2 Get meals, drinks, and food to go: seated/counter service, pickup, market, delivery, and supported nearby routes.
 - H2 Use gym or other amenities.
 - H2 Take your guide dog to relief: supported directions, surface, bins, steps and return access.
-- H2 Get assistance or report a change.
+- H2 Get assistance or report a change: where people help -- the convention office, the information table, volunteers serving as talking signs -- as well as the help number.
 - Optional appendix: compact location index cross-linking to tasks.
 - Optional appendix: general discovery/route-learning suggestions.
 - Appendix: free mobile tools with platform, cost, practical use, user evidence, limits and sources.

@@ -30,6 +30,7 @@ The Harborlight survey found three things worth telling.
 |------|-------|
 | North | 12 |
 | South | 9 |
+| Harborlight | 1 |
 """
 lsLog = []
 def logLine(s): lsLog.append(datetime.datetime.now().strftime("%H:%M:%S ") + s)

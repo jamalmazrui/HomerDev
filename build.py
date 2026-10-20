@@ -22,6 +22,7 @@ by the run that followed it.
 
 import datetime
 import fnmatch
+import glob
 import os
 import platform
 import re
@@ -834,6 +835,30 @@ def buildHomerDevApp():
         return "exec\\HomerDev.exe did not compile; the log has the compiler's messages"
     oCache.record("HomerDev.exe", sPrint, ["exec/HomerDev.exe"])
     sayLine("Built exec\\HomerDev.exe, the HomerDev dialog.")
+    return ""
+
+
+def checkCSharp5():
+    """THE KIT'S C# IS C# 5 (kit 1.87.3). DbDo, EdSharp and FileDir compile with the .NET Framework's own csc, which
+    knows C# 5 only; the kit's build compiles with Roslyn, which accepts later syntax, so it cannot notice what that
+    compiler rejects. ConversionPage.cs, moved from 2htm, broke FileDir's build on 20 October 2026 with out var and
+    patterns. This scan of exec\\CSharp, comments and strings set aside, fails the build on any C# 6 or 7 form.
+    Returns a problem or "".
+    """
+    dForms = {"out var": r"\bout var \w", "the discard out _": r"\bout _\b",
+              "a pattern (is Type name)": r"\bis (?:[A-Z][\w<>, \[\]]*|bool|int|long|double|string|char|object) [a-z]\w*\)",
+              "an expression-bodied member": r"\)\s*=>\s*[^{\s]", "string interpolation": r"\$\"",
+              "the null-conditional ?.": r"\w\?\.\w", "nameof": r"\bnameof\(", "a throw expression": r"\?\?\s*throw\b"}
+    lsFound = []
+    for sPath in sorted(glob.glob(os.path.join(sScriptDir, "exec", "CSharp", "*.cs"))):
+        sText = open(sPath, encoding="utf-8-sig", errors="replace").read()
+        sText = re.sub(r"//[^\n]*", "", sText)
+        sText = re.sub(r'@"(?:[^"]|"")*"|"(?:[^"\\\n]|\\.)*"', '""', sText)
+        for sForm, sPattern in dForms.items():
+            if re.search(sPattern, sText): lsFound.append("%s uses %s" % (os.path.basename(sPath), sForm))
+    for sLine in lsFound: logLine("C# 5: " + sLine)
+    if lsFound: return "the kit's C# is not all C# 5, which DbDo, EdSharp and FileDir compile with: " + "; ".join(lsFound)
+    sayLine("The kit's C# is all C# 5, so every app's compiler accepts it.")
     return ""
 
 
@@ -2080,6 +2105,11 @@ def main():
             iSamplesFailed += 1
             lsFailedParts.append("HomerDev.exe")
         # THE TEMPLATE IS PROVED HERE (1.85.1): an app made by newHomerApp must compile.
+        sCSharpProblem = checkCSharp5()
+        if sCSharpProblem != "":
+            sayLine(sCSharpProblem)
+            iSamplesFailed += 1
+            lsFailedParts.append("C# 5")
         sTemplateProblem = checkTemplateApp()
         if sTemplateProblem != "":
             sayLine(sTemplateProblem)
