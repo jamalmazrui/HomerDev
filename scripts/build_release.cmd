@@ -141,16 +141,27 @@ if not exist "%~2" (
   >> "%sLog%" echo %~1: %~2 not found
   exit /b 1
 )
-for /f %%t in ('powershell -NoProfile -Command "[int][double]::Parse((Get-Date -UFormat %%s))"') do set "iCycleStepStart=%%t"
+rem THE STEP'S TIME, MEASURED BY POWERSHELL ITSELF (kit 1.88.2). The epoch seconds this took,
+rem subtracted in cmd, came out -33s and then -36s for steps of fifty and eighty minutes, the same
+rem for every step of a cycle, so the values were plainly not being renewed -- and nothing showed
+rem why. Now the start is a full timestamp, PowerShell computes the seconds since it, and both go
+rem in this log, so a wrong time can be traced.
+set "sCycleStepStart="
+for /f "delims=" %%t in ('powershell -NoProfile -Command "(Get-Date).ToString('o')"') do set "sCycleStepStart=%%t"
+>> "%sLog%" echo %~1: start stamp [!sCycleStepStart!]
 >> "%sLog%" echo %~1: started %time%, running %~2
 echo %~1 ...
 call "%~2" %~3
 set "iCode=!errorlevel!"
-for /f %%t in ('powershell -NoProfile -Command "[int][double]::Parse((Get-Date -UFormat %%s))"') do set "iCycleStepEnd=%%t"
-rem THE STEP'S OWN TIMER NAMES (kit 1.87.6): the build is called in this environment, and DbDo's
-rem build sets iStart for itself, so a 50-minute step was timed as -33s on 20 October 2026.
-set /a "iSeconds=iCycleStepEnd-iCycleStepStart, iMin=iSeconds/60, iSec=iSeconds %% 60"
-if !iMin! gtr 0 (set "sTook=!iMin!m !iSec!s") else (set "sTook=!iSec!s")
+set "iSeconds="
+if defined sCycleStepStart for /f %%t in ('powershell -NoProfile -Command "[int]((Get-Date) - [DateTime]::Parse('!sCycleStepStart!')).TotalSeconds"') do set "iSeconds=%%t"
+>> "%sLog%" echo %~1: seconds measured [!iSeconds!]
+if defined iSeconds (
+  set /a "iMin=iSeconds/60, iSec=iSeconds %% 60"
+  if !iMin! gtr 0 (set "sTook=!iMin!m !iSec!s") else (set "sTook=!iSec!s")
+) else (
+  set "sTook=an unmeasured time"
+)
 >> "%sLog%" echo %~1: exit code !iCode!, !sTook!
 if not "!iCode!"=="0" exit /b !iCode!
 set "sSummary=!sSummary! %~1 !sTook!;"

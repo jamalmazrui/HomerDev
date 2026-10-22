@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.88.2 -- 22 October 2026
+
+- **The PdfPig step runs the kit's own getPdfPig,** not the copy refreshed into an app's scripts: 2htm's and FileDir's builds refresh their kit scripts after compiling, so the step found nothing and stopped.
+- **A cycle's step time is measured by PowerShell itself,** from a full timestamp, and both the stamp and the seconds go in the cycle log. Renaming the timers (1.87.6) did not cure the negative times: every step of a cycle still read -36s, so the values were not being renewed, and nothing showed why. A wrong time can now be traced; a time that cannot be measured says so.
+
 ## 1.88.1 -- 22 October 2026
 
 - **getPdfPig keeps an app's own config.** -Base names a config the app authors (FileDir.exe.config): its settings are kept, and the binding redirects go into its runtime section; FileDir's build used to copy its config over the written one after compiling, which would have dropped PdfPig's redirects.
