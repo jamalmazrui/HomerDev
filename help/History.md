@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.88.3 -- 22 October 2026
+
+- **The FruitBasket samples find the Build Tools' Roslyn.** Their compiler paths said Buildscripts for BuildTools, the remnant of a replace that turned Tools into scripts, so on a computer with only the Build Tools they fell back to the .NET Framework's C# 5 compiler. FileDir had the same fault, which is why it alone rejected ConversionPage.cs's newer syntax.
+- **The kit's C# stays C# 5,** decided for the plan's Roslyn item and written in AGENTS.md: every build prefers Roslyn, and the kit's code still builds with the older compiler should a build fall back to it.
+
 ## 1.88.2 -- 22 October 2026
 
 - **The PdfPig step runs the kit's own getPdfPig,** not the copy refreshed into an app's scripts: 2htm's and FileDir's builds refresh their kit scripts after compiling, so the step found nothing and stopped.
