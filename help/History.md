@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.88.0 -- 22 October 2026
+
+- **One PDF reader for every app: scripts\\getPdfPig.** PDFs were read two ways across the suite -- the kit's own PdfReader in bookFido and HomerScribe, PyMuPDF4LLM in the rest -- so a PDF could come out differently by app. getPdfPig, taken from HomerScribe where it was proven, fetches PdfPig 0.1.16 with every assembly its packages name into exec, and writes <App>.exe.config with the binding redirects they need; -App names the program, and packages unpack under work\\packages. BatCon is the first to use it, compiling ConversionPdf and PdfReader; DbDo, EdSharp, FileDir and 2htm follow once BatCon's build proves it.
+
 ## 1.87.7 -- 20 October 2026
 
 - **KeyMap.bRunningCommand** is true while runCommand clicks a command's menu item for a key. An app whose menu items are its commands resets the press count to one on a click only when it is false, so a menu chosen by hand is one press while a routed key keeps its count of two or three. DbDo uses it as its Say keys move onto KeyMap.answer.
