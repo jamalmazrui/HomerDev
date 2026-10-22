@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.88.4 -- 22 October 2026
+
+- **The suite manifest lists DbDo's Count by Columns,** Alt+Shift+B, the first of the four DbDialog features accepted on 19 October.
+
 ## 1.88.3 -- 22 October 2026
 
 - **The FruitBasket samples find the Build Tools' Roslyn.** Their compiler paths said Buildscripts for BuildTools, the remnant of a replace that turned Tools into scripts, so on a computer with only the Build Tools they fell back to the .NET Framework's C# 5 compiler. FileDir had the same fault, which is why it alone rejected ConversionPage.cs's newer syntax.

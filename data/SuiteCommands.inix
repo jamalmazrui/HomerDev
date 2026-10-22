@@ -965,6 +965,12 @@ name=Statistics from Column
 keys=Alt+Shift+S
 status=current
 
+[DbDo countByColumns]
+name=Count by Columns
+keys=Alt+Shift+B
+status=current
+change=new 22 October 2026, DbDialog's Count, accepted 19 October
+
 [DbDo tableProperties]
 name=Table Properties
 keys=Alt+Enter
