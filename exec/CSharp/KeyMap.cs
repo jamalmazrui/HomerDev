@@ -249,7 +249,11 @@ public static class KeyMap {
             if (bEchoCommands && !oCommand.bNoEcho && shouldEcho(oCommand.sName, oCommand.oItem != null && oCommand.oItem.Text.TrimEnd().EndsWith("...")))
                 Say.say(oCommand.sName);
             if (oCommand.fRun != null) return oCommand.fRun();
-            if (oCommand.oItem != null) { oCommand.oItem.PerformClick(); return true; }
+            if (oCommand.oItem != null) {
+                bRunningCommand = true;
+                try { oCommand.oItem.PerformClick(); } finally { bRunningCommand = false; }
+                return true;
+            }
         }
         catch (Exception oError) {
             Log.exception(oError);
@@ -539,6 +543,11 @@ public static class KeyMap {
     // Windows double-click time in the same window, and so on. A key held
     // down is not a second press. Read it from inside a command.
     public static int iPressCount = 1;
+    // bRunningCommand: true while runCommand clicks a command's menu item for a key (kit 1.87.7).
+    // An app whose menu items are its commands (DbDo) resets iPressCount to 1 on a click only
+    // when this is false -- a menu chosen by hand is one press -- and never for a routed key,
+    // whose count of two or three must reach the command.
+    public static bool bRunningCommand = false;
     private static Keys keyLast = Keys.None;
     private static int iTickLast = 0;
     private static object oWindowLast = null;

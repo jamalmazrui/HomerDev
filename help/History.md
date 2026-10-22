@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.87.7 -- 20 October 2026
+
+- **KeyMap.bRunningCommand** is true while runCommand clicks a command's menu item for a key. An app whose menu items are its commands resets the press count to one on a click only when it is false, so a menu chosen by hand is one press while a routed key keeps its count of two or three. DbDo uses it as its Say keys move onto KeyMap.answer.
+
+## 1.87.6 -- 20 October 2026
+
+- **A cycle times its steps correctly.** build_release timed each step with variables named iStart and iEnd, in the same environment as the build it calls, and something the build runs set one of them, so DbDo's 50-minute build was logged as -33s. The runner's timers now have names of their own.
+
 ## 1.87.5 -- 20 October 2026
 
 - **Every converting app compiles the whole conversion bundle:** Conversion with ConversionMedia, ConversionPage, Media, Table and Voice. EdSharp, bookFido and 2htm gain the media half, so a recording becomes a transcript and a document becomes speech in them as in every app. check.py's conversion check now fails an app whose build compiles Conversion without the rest of the bundle, and names what is missing; all six converting apps pass. The manifest lists all six as moved onto the kit's Conversion, 2htm, BatCon and bookFido among them.

@@ -141,13 +141,15 @@ if not exist "%~2" (
   >> "%sLog%" echo %~1: %~2 not found
   exit /b 1
 )
-for /f %%t in ('powershell -NoProfile -Command "[int][double]::Parse((Get-Date -UFormat %%s))"') do set "iStart=%%t"
+for /f %%t in ('powershell -NoProfile -Command "[int][double]::Parse((Get-Date -UFormat %%s))"') do set "iCycleStepStart=%%t"
 >> "%sLog%" echo %~1: started %time%, running %~2
 echo %~1 ...
 call "%~2" %~3
 set "iCode=!errorlevel!"
-for /f %%t in ('powershell -NoProfile -Command "[int][double]::Parse((Get-Date -UFormat %%s))"') do set "iEnd=%%t"
-set /a "iSeconds=iEnd-iStart, iMin=iSeconds/60, iSec=iSeconds %% 60"
+for /f %%t in ('powershell -NoProfile -Command "[int][double]::Parse((Get-Date -UFormat %%s))"') do set "iCycleStepEnd=%%t"
+rem THE STEP'S OWN TIMER NAMES (kit 1.87.6): the build is called in this environment, and DbDo's
+rem build sets iStart for itself, so a 50-minute step was timed as -33s on 20 October 2026.
+set /a "iSeconds=iCycleStepEnd-iCycleStepStart, iMin=iSeconds/60, iSec=iSeconds %% 60"
 if !iMin! gtr 0 (set "sTook=!iMin!m !iSec!s") else (set "sTook=!iSec!s")
 >> "%sLog%" echo %~1: exit code !iCode!, !sTook!
 if not "!iCode!"=="0" exit /b !iCode!
