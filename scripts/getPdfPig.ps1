@@ -8,7 +8,10 @@
 # -App names the program whose .exe.config is written, BatCon.exe.config for BatCon. Packages
 # are unpacked under work\packages, the build's own cache, rather than a packages folder at
 # the project's top, which the kit's layout check would flag. The rest is HomerScribe's.
-param([string] $App = "HomerScribe")
+# -Base names a config the app authors itself (FileDir.exe.config): it is the starting point,
+# its own settings kept, and the binding redirects go into its runtime section, replacing any
+# there; without -Base the config is written whole.
+param([string] $App = "HomerScribe", [string] $Base = "")
 $ErrorActionPreference = 'Stop'
 function Say($m) { Write-Output ("  [pdfpig] " + $m) }
 
@@ -73,6 +76,9 @@ function WriteConfig {
       Say ('could not read the version of ' + $need); continue
     }
     $token = ($an.GetPublicKeyToken() | ForEach-Object { $_.ToString('x2') }) -join ''
+    # A library without a strong name takes no redirect, and an empty token would make the
+    # config malformed, which can stop the program from starting (FileDir's Ude, Tektosyne).
+    if ($token -eq '') { Say ($need + ' has no strong name, so it needs no redirect'); continue }
     $ver = $an.Version.ToString()
     Say ($need + ' is version ' + $ver + ', token ' + $token)
     $redirects += @"
@@ -95,6 +101,14 @@ $redirects    </assemblyBinding>
   </runtime>
 </configuration>
 "@
+  if ($Base -ne '' -and (Test-Path -LiteralPath $Base)) {
+    $authored = [IO.File]::ReadAllText((Resolve-Path -LiteralPath $Base))
+    $binding = "    <assemblyBinding xmlns=`"urn:schemas-microsoft-com:asm.v1`">`r`n" + $redirects + "    </assemblyBinding>`r`n"
+    $authored = [regex]::Replace($authored, '(?s)\s*<assemblyBinding\b.*?</assemblyBinding>', '')
+    if ($authored -match '</runtime>') { $config = $authored -replace '</runtime>', ($binding + '  </runtime>') }
+    else { $config = $authored -replace '</configuration>', ("  <runtime>`r`n" + $binding + "  </runtime>`r`n</configuration>") }
+    Say ('starting from ' + $Base + ', its own settings kept')
+  }
   Set-Content -Path (Join-Path $out ($App + '.exe.config')) -Value $config -Encoding UTF8
 
   # THE BUILD READS pdfpig.name TO LEARN WHICH DLL TO REFERENCE, and this

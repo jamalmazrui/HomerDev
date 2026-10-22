@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.88.1 -- 22 October 2026
+
+- **getPdfPig keeps an app's own config.** -Base names a config the app authors (FileDir.exe.config): its settings are kept, and the binding redirects go into its runtime section; FileDir's build used to copy its config over the written one after compiling, which would have dropped PdfPig's redirects.
+- **getPdfPig writes no redirect for a library without a strong name.** It wrote one for every library beside the program, and an unsigned one, such as FileDir's Ude or Tektosyne, would have given an empty public key token, a malformed config that can stop the program from starting.
+- **2htm and FileDir read PDFs with the kit's PdfReader,** after BatCon proved the way on 22 October.
+
 ## 1.88.0 -- 22 October 2026
 
 - **One PDF reader for every app: scripts\\getPdfPig.** PDFs were read two ways across the suite -- the kit's own PdfReader in bookFido and HomerScribe, PyMuPDF4LLM in the rest -- so a PDF could come out differently by app. getPdfPig, taken from HomerScribe where it was proven, fetches PdfPig 0.1.16 with every assembly its packages name into exec, and writes <App>.exe.config with the binding redirects they need; -App names the program, and packages unpack under work\\packages. BatCon is the first to use it, compiling ConversionPdf and PdfReader; DbDo, EdSharp, FileDir and 2htm follow once BatCon's build proves it.
