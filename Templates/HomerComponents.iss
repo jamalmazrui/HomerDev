@@ -491,8 +491,12 @@ function homerMessageBox(hWnd: Integer; sText, sCaption: String; iType: Cardinal
    own test) in place of skipifsilent; Inno itself then runs a ticked entry in a
    silent install, leaves an unticked one, and evaluates each entry's own Check as
    the finish page would. *)
-(* ONE SWITCH, ANY SPELLING (kit 1.85.0, the author's request of 20 October 2026): /default,
-   /defaults, -d and --default, in any case, each read as a whole argument. *)
+(* ONE SWITCH, ANY SPELLING (kit 1.85.0; any leading punctuation, kit 1.88.7, the author's
+   request of 23 October 2026): d, default or defaults, in any case, with or without leading
+   slashes or hyphens -- /default, -d, --default and plain default alike. Each is read as a whole
+   argument once the punctuation is stripped, so none of Inno Setup's own switches can match:
+   /DIR=, /LOG= and the rest are other words. Inno ignores arguments it does not know, so a bare
+   word reaches this code without complaint. Docs show /default, the form of Inno's own switches. *)
 function homerDefaults(): Boolean;
 var
   i: Integer;
@@ -501,9 +505,9 @@ begin
   Result := False;
   for i := 1 to ParamCount do
   begin
-    sArg := Uppercase(ParamStr(i));
-    if (sArg = '/DEFAULT') or (sArg = '/DEFAULTS') or (sArg = '-D') or (sArg = '-DEFAULT') or (sArg = '-DEFAULTS')
-      or (sArg = '--DEFAULT') or (sArg = '--DEFAULTS') then Result := True;
+    sArg := Uppercase(Trim(ParamStr(i)));
+    while (Length(sArg) > 0) and ((sArg[1] = '/') or (sArg[1] = '-')) do sArg := Copy(sArg, 2, Length(sArg) - 1);
+    if (sArg = 'D') or (sArg = 'DEFAULT') or (sArg = 'DEFAULTS') then Result := True;
   end;
 end;
 

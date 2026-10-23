@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.88.7 -- 23 October 2026
+
+- **Install with every default however it is typed.** An installer's default switch is now d, default or defaults, in any case, with or without leading slashes or hyphens: /default, -d, --default and plain default all work, where /d, --d and a bare word did not. The punctuation is stripped and the whole word compared, so none of Inno Setup's own switches, such as /dir=, can match.
+
 ## 1.88.6 -- 22 October 2026
 
 - **The kit's Python starts no console windows.** Every tool conversion.py runs -- Pandoc, Whisper, ffmpeg, Tesseract, PowerShell -- now runs without one, so a windowed program converting through it, such as NVDA running HomerView, shows nothing over the user's work.

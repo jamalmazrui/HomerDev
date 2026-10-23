@@ -191,7 +191,7 @@ when it was not. The app adds each result to the box and skips the empty ones.
 
 `DbDo_setup.exe /default`
 
-- **Any spelling:** `/default`, `/defaults`, `-d` or `--default`, in any case.
+- **Any spelling:** `d`, `default` or `defaults`, in any case, with or without a leading slash or hyphens: `/default`, `-d`, `--default` and plain `default` all work. None of Inno Setup's own switches, such as `/dir=`, can be mistaken for it.
 - **A progress window shows; nothing else does.** Inno Setup decides whether to show screens before any of the installer's code runs, so setup started with screens starts itself again silently with the same switches, and the first copy steps aside. The second copy is already approved as administrator, so Windows does not ask again.
 - **A running copy of the program is closed** for the update, as the install would otherwise stop on it.
 - **The second copy keeps its own log,** in %TEMP% as HomerSetupDefault-<date>.log; the first copy's log names it.

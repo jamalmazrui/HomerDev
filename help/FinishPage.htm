@@ -390,9 +390,12 @@ setup log instead of waiting for OK, and the program starts when Launch
 is ticked.</p>
 <p><code>DbDo_setup.exe /default</code></p>
 <ul>
-<li><strong>Any spelling:</strong> <code>/default</code>,
-<code>/defaults</code>, <code>-d</code> or <code>--default</code>, in
-any case.</li>
+<li><strong>Any spelling:</strong> <code>d</code>, <code>default</code>
+or <code>defaults</code>, in any case, with or without a leading slash
+or hyphens: <code>/default</code>, <code>-d</code>,
+<code>--default</code> and plain <code>default</code> all work. None of
+Inno Setup’s own switches, such as <code>/dir=</code>, can be mistaken
+for it.</li>
 <li><strong>A progress window shows; nothing else does.</strong> Inno
 Setup decides whether to show screens before any of the installer’s code
 runs, so setup started with screens starts itself again silently with
