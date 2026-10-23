@@ -41,7 +41,25 @@ rem for only one process; a lock older than four hours is the trace of a window 
 set "sLock=%TEMP%\Homer-%sName%-cycle.lock"
 rem build_release unlock: YOU KNOW NOTHING IS RUNNING (12 October 2026). A lock the rules below cannot prove stale
 rem refused every cycle until it was four hours old. Typed with unlock, the cycle clears it first and starts.
+rem UNLOCK DOES NOT CLEAR A CYCLE THAT IS RUNNING (kit 1.88.5). On 22 October a FileDir cycle speaking its tutorials
+rem for over an hour looked stuck, a second cycle started beside it, and when the second ended it replaced
+rem build_release.bat under the first, which then ran its steps again from the middle of the new file. So unlock
+rem now clears only a lock whose holder is gone; for a holder that is alive and older than the lock it says so, and
+rem names what that cycle is doing. "build_release unlock force" clears it all the same.
 if /i "%~1"=="unlock" (
+  set "sUnlockAlive=no"
+  set "iUnlockHolder="
+  if exist "!sLock!\pid.txt" set /p iUnlockHolder=<"!sLock!\pid.txt"
+  if defined iUnlockHolder for /f %%a in ('powershell -NoProfile -Command "$p = Get-Process -Id !iUnlockHolder! -ErrorAction SilentlyContinue; if ($p -and $p.StartTime -le (Get-Item -LiteralPath '!sLock!').CreationTime) { 'yes' } else { 'no' }"') do set "sUnlockAlive=%%a"
+  if /i "!sUnlockAlive!"=="yes" if /i not "%~2"=="force" (
+    set "sUnlockLog="
+    if exist "!sLock!\holder.txt" for /f "usebackq tokens=3*" %%a in ("!sLock!\holder.txt") do set "sUnlockLog=%%b"
+    echo A %sName% cycle is still running ^(process !iUnlockHolder!^), so the lock stays.
+    if defined sUnlockLog for /f "usebackq delims=" %%l in (`powershell -NoProfile -Command "Get-Content -LiteralPath '!sUnlockLog!' -Tail 1 -ErrorAction SilentlyContinue"`) do echo Its latest line: %%l
+    echo A long step, such as speaking tutorials, can run an hour. To clear it regardless: build_release unlock force
+    >> "%sLog%" echo Unlock refused: the holder ^(process !iUnlockHolder!^) is still running
+    exit /b 1
+  )
   if exist "!sLock!" rmdir /s /q "!sLock!" 2>nul
   >> "%sLog%" echo Unlock asked: !sLock! removed before the cycle
   echo The lock was cleared, as asked, and the cycle starts.
@@ -81,6 +99,7 @@ if errorlevel 1 (
     echo If that cycle's Command Prompt window is still open, look there: it may be waiting for
     echo you, for instance at a sign-in window. Closing that window ends the cycle, and the
     echo next build_release then starts at once. A lock older than four hours is cleared by itself.
+    if defined sHolderLog for /f "tokens=3*" %%a in ("!sHolderLog!") do for /f "usebackq delims=" %%l in (`powershell -NoProfile -Command "Get-Content -LiteralPath '%%b' -Tail 1 -ErrorAction SilentlyContinue"`) do echo Its latest line: %%l
     echo If you are sure no %sName% cycle is running, type: build_release unlock
     >> "%sLog%" echo Refused: another cycle holds !sLock!, made !iAge! minutes ago ^(holder process !iHolder!, alive: !sAlive!; !sHolderLog!^)
     exit /b 1
@@ -127,10 +146,16 @@ echo(
 set "sSummary=!sSummary:~0,-1!"
 echo Built, tidied, pushed and released:!sSummary!.
 >> "%sLog%" echo Finished %date% %time%: every step passed:!sSummary!
+rem THE RUNNER IS REPLACED ONLY BY THE CYCLE THAT HOLDS THE LOCK (kit 1.88.5): replacing it under another cycle of
+rem this project makes that cycle read the new file from the middle.
+set "bOwnLock="
+if exist "!sLock!\pid.txt" (set /p iOwner=<"!sLock!\pid.txt") else (set "iOwner=")
+if "!iOwner!"=="!iMine!" set "bOwnLock=1"
+if not exist "!sLock!" set "bOwnLock="
 rmdir /s /q "!sLock!" 2>nul
 rem The kit's own copy is replaced here, on the same line as the exit: Windows reads the whole line before running
 rem it, so nothing of the old file is read after the copy (1.65.26). A project's copy is written by the kit's build.
-if defined sRunner copy /y "!sRunner!" "build_release.bat" >nul & exit /b 0
+if defined sRunner if defined bOwnLock copy /y "!sRunner!" "build_release.bat" >nul & exit /b 0
 exit /b 0
 
 :step
@@ -172,6 +197,12 @@ echo(
 echo Stopped: %sStep% failed, so the steps after it did not run. Its own log is in logs, and this cycle's is
 echo logs\%sName%-build_release-%sStamp%.log.
 >> "%sLog%" echo Stopped %date% %time%: %sStep% failed; steps passed before it:!sSummary!
-rmdir /s /q "!sLock!" 2>nul
-if defined sRunner copy /y "!sRunner!" "build_release.bat" >nul & exit /b 1
+rem THE RUNNER IS REPLACED ONLY BY THE CYCLE THAT HOLDS THE LOCK (kit 1.88.5): replacing it under another cycle of
+rem this project makes that cycle read the new file from the middle.
+set "bOwnLock="
+if exist "!sLock!\pid.txt" (set /p iOwner=<"!sLock!\pid.txt") else (set "iOwner=")
+if "!iOwner!"=="!iMine!" set "bOwnLock=1"
+if not exist "!sLock!" set "bOwnLock="
+if defined bOwnLock rmdir /s /q "!sLock!" 2>nul
+if defined sRunner if defined bOwnLock copy /y "!sRunner!" "build_release.bat" >nul & exit /b 1
 exit /b 1

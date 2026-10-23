@@ -34,6 +34,9 @@ except ImportError:
     homerLog = None
 
 sTableName = "conversions.inix"
+# NO CONSOLE WINDOWS (kit 1.88.6): a tool started from a windowed program -- NVDA, which runs HomerView
+# -- would flash a console over the user's work, so every tool runs without one.
+iNoWindow = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 iTimeoutSeconds = 600
 
 
@@ -139,7 +142,7 @@ def plan(sSource, sTargetType):
 # ---------- running each engine: (source path, target type, output path) ----------
 
 def run(lsCommand, sWhat):
-    oDone = subprocess.run(lsCommand, capture_output=True, timeout=iTimeoutSeconds)
+    oDone = subprocess.run(lsCommand, capture_output=True, timeout=iTimeoutSeconds, creationflags=iNoWindow)
     if oDone.returncode != 0:
         raise RuntimeError("%s failed (exit %d): %s" % (sWhat, oDone.returncode, oDone.stderr.decode("utf-8", "replace")[:400]))
 
@@ -218,7 +221,7 @@ def engineOcr(sSource, sTo, sOut):
         oPdf.close()
         lsText = []
         for sImage in sorted(glob.glob(os.path.join(sDir, "page*.png"))):
-            oDone = subprocess.run([programFor("tesseract"), sImage, "stdout"], capture_output=True, timeout=iTimeoutSeconds)
+            oDone = subprocess.run([programFor("tesseract"), sImage, "stdout"], capture_output=True, timeout=iTimeoutSeconds, creationflags=iNoWindow)
             lsText.append(oDone.stdout.decode("utf-8", "replace").strip())
         open(sOut, "w", encoding="utf-8-sig", newline="\r\n").write("\n\n".join(lsText) + "\n")
     finally:
@@ -923,7 +926,7 @@ def homerProgram(sApp):
 
 
 def runTool(lsCommand, sWhat, iMinutes):
-    try: oDone = subprocess.run(lsCommand, capture_output=True, text=True, errors="replace", timeout=iMinutes * 60)
+    try: oDone = subprocess.run(lsCommand, capture_output=True, text=True, errors="replace", timeout=iMinutes * 60, creationflags=iNoWindow)
     except FileNotFoundError: raise RuntimeError("%s could not be started: %s was not found" % (sWhat, os.path.basename(lsCommand[0])))
     except subprocess.TimeoutExpired: raise RuntimeError("%s took longer than %d minutes and was stopped" % (sWhat, iMinutes))
     if oDone.returncode != 0: raise RuntimeError("%s failed (exit code %d): %s" % (sWhat, oDone.returncode, (oDone.stderr or oDone.stdout).strip()[-300:]))

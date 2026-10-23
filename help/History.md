@@ -7,6 +7,16 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.88.6 -- 22 October 2026
+
+- **The kit's Python starts no console windows.** Every tool conversion.py runs -- Pandoc, Whisper, ffmpeg, Tesseract, PowerShell -- now runs without one, so a windowed program converting through it, such as NVDA running HomerView, shows nothing over the user's work.
+- **HomerView converts through the kit,** carrying conversion.py and conversions.inix in its add-on.
+
+## 1.88.5 -- 22 October 2026
+
+- **Two cycles of one project cannot corrupt each other's runner.** On 22 October a FileDir cycle spent over an hour speaking its tutorials; a second started beside it, and when the second failed it replaced build_release.bat under the first. Windows reads a running batch file a piece at a time, so the first went on from the middle of the new file: it ran its build again, wrote into the wrong log, and lost its timers -- the cause, too, of the earlier -33s and -36s step times. Now a cycle replaces build_release.bat, and removes the lock, only if it still holds the lock itself.
+- **Unlock does not clear a cycle that is running.** build_release unlock clears a lock whose holder is gone; for a holder that is alive and older than the lock, it says a cycle is running and shows that cycle's latest log line, so a long step is seen to be working. build_release unlock force clears it regardless. A refusal shows the running cycle's latest line too.
+
 ## 1.88.4 -- 22 October 2026
 
 - **The suite manifest lists DbDo's Count by Columns,** Alt+Shift+B, the first of the four DbDialog features accepted on 19 October.
