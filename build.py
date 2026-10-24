@@ -70,7 +70,7 @@ lsExpected = [
     ".claude/skills/homer-installer/references/components.md",
     ".claude/skills/homer-tutorial/SKILL.md", ".claude/skills/podcast-directory/SKILL.md",
     ".claude/skills/convention-walking-guide/SKILL.md",
-    ".claude/skills/homer-launch-dialog/SKILL.md", ".claude/skills/homer-launch-dialog/scripts/checkLaunch.cmd",
+    ".claude/skills/homer-launch-dialog/SKILL.md", "exec/CSharp/Quality.cs", ".claude/skills/homer-launch-dialog/scripts/checkLaunch.cmd",
     ".claude/skills/homer-launch-dialog/scripts/checkLaunch.py", "help/LaunchDialog.md",
     "Templates/makeHotkeys.py",
     "Templates/LocalFiles.txt",
@@ -787,6 +787,46 @@ def buildHomerDll():
         return "exec\\Homer.dll did not compile; the log has the compiler's messages"
     oCache.record("Homer.dll", sPrint, ["exec/Homer.dll"])
     sayLine("Built exec\\Homer.dll for Python apps (%s)." % ", ".join(lsHomerDllClasses))
+    return ""
+
+
+# THE CONVERSION CLASSES COMPILE IN THE KIT (1.92.0). No kit step compiled Conversion.cs: the C# 5 scan read it
+# and the conversion test ran the Python twin, so an error in the shared C# surfaced only in the next app's build.
+# They are now compiled as a library, as BatCon compiles them, with Quality, from exec\\CSharp; the PDF reader's
+# two files join when PdfPig is in exec. Nothing is kept: the library is written to the temporary folder.
+lsConversionClasses = ["Conversion", "ConversionMedia", "ConversionPage", "Elevate", "Inix", "KeyName", "Lbc", "Log", "Media",
+                       "Paths", "Quality", "Say", "Table", "Util", "Voice", "Web"]
+
+
+def compileConversion(sCsc):
+    """Compile the conversion classes as a library. Returns "" when they compile, else the problem."""
+    if not sCsc: return ""
+    oCache = kitCache()
+    lsNames = list(lsConversionClasses)
+    lsPdfPig = sorted(glob.glob(os.path.join(sScriptDir, "exec", "UglyToad.PdfPig*.dll")))
+    if lsPdfPig: lsNames += ["ConversionPdf", "PdfReader"]
+    sPrint = oCache.fingerprint(["exec/CSharp/" + s + ".cs" for s in lsNames])
+    if oCache.isCurrent("conversion classes", sPrint, []):
+        unchangedLine("the conversion classes")
+        return ""
+    lsRefs = []
+    for sName in ("System.Speech.dll", "UIAutomationProvider.dll", "UIAutomationTypes.dll"):
+        sPath = findReference(sName)
+        if sPath: lsRefs.append("/reference:" + sPath)
+    for sName in ("System.dll", "System.Core.dll", "System.Data.dll", "System.Drawing.dll", "System.Windows.Forms.dll",
+                  "System.Web.dll", "System.Web.Extensions.dll", "System.Net.Http.dll", "System.Xml.dll",
+                  "System.IO.Compression.dll", "System.IO.Compression.FileSystem.dll", "Microsoft.VisualBasic.dll"):
+        lsRefs.append("/reference:" + sName)
+    lsRefs += ["/reference:" + s for s in lsPdfPig]
+    sOut = os.path.join(tempfile.gettempdir(), "HomerConversionCheck.dll")
+    iCode, sOutput = runCommand([sCsc, "/nologo", "/target:library", "/platform:x64", "/out:" + sOut] + lsRefs
+                                + [os.path.join(sScriptDir, "exec", "CSharp", s + ".cs") for s in lsNames])
+    try:
+        if os.path.isfile(sOut): os.remove(sOut)
+    except OSError: pass
+    if iCode != 0: return "the conversion classes did not compile (%s); the log has the compiler's messages" % ", ".join(lsNames)
+    oCache.record("conversion classes", sPrint, [])
+    sayLine("The conversion classes compile: %s." % ", ".join(lsNames))
     return ""
 
 
@@ -2129,6 +2169,11 @@ def main():
             sayLine(sCSharpProblem)
             iSamplesFailed += 1
             lsFailedParts.append("C# 5")
+        sConversionProblem = compileConversion(findRoslyn())
+        if sConversionProblem != "":
+            sayLine(sConversionProblem)
+            iSamplesFailed += 1
+            lsFailedParts.append("conversion classes")
         sSqliteProblem = checkSqliteSame()
         if sSqliteProblem != "":
             sayLine(sSqliteProblem)

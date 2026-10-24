@@ -132,16 +132,16 @@ for /f "delims=" %%v in ('ver') do >> "%log%" echo Windows: %%v
 echo Building %app%. The log is %log%
 
 rem ---- the Homer Development Kit -------------------------------------
-rem THE HOMERDEV VARIABLE IS READ BEFORE ANYTHING IS SET (24 October 2026). Names in cmd
-rem ignore case, so set "homerDev=" also emptied a HomerDev environment variable, and
-rem the variable was never honoured. A kit is a folder with HomerDev.cs at its top
-rem and exec\CSharp\Lbc.cs inside, so no other folder can pass for it.
+rem THE NEWEST KIT FOUND IS USED (24 October 2026). The HomerDev variable, C:\HomerDev and the
+rem folders above this one are each considered, and the highest version wins. The variable was
+rem never honoured before 1.89.1, since set "homerDev=" also emptied it (names in cmd ignore
+rem case); once honoured, it named an installed kit in Program Files at 1.77.6, older than
+rem C:\HomerDev, and the build stopped. The log names every kit considered.
 set "sKitFromEnv=%HomerDev%"
 set "homerDev="
-if defined sKitFromEnv if exist "!sKitFromEnv!\exec\CSharp\Lbc.cs" if exist "!sKitFromEnv!\HomerDev.cs" set "homerDev=!sKitFromEnv!"
-rem C:\HomerDev, where the kit is usually kept, before any climbing (24 October 2026):
-rem BatCon's climb from C:\batcon took C:\ itself for the kit and stopped there.
-if not defined homerDev if exist "C:\HomerDev\exec\CSharp\Lbc.cs" if exist "C:\HomerDev\HomerDev.cs" set "homerDev=C:\HomerDev"
+set "sKitVersion="
+call :considerKit "%sKitFromEnv%"
+call :considerKit "C:\HomerDev"
 rem FOUND WHEREVER IT IS (1.46.0): only Windows and the folder name HomerDev
 rem are assumed, never a drive or a depth. After the HomerDev variable: the
 rem current folder and every folder above it, then this script's folder and
@@ -825,3 +825,19 @@ if "!sNext:~-1!"=="\" set "sNext=!sNext:~0,-1!"
 if /i "!sNext!"=="!sUp!" goto :eof
 set "sUp=!sNext!"
 goto :findKitUp
+
+:considerKit
+rem One kit candidate: used when it is a kit (HomerDev.cs at its top, exec\CSharp\Lbc.cs
+rem inside) and newer than the kit chosen so far.
+set "sTry=%~1"
+if not defined sTry goto :eof
+if "!sTry:~-1!"=="\" set "sTry=!sTry:~0,-1!"
+if not exist "!sTry!\HomerDev.cs" goto :eof
+if not exist "!sTry!\exec\CSharp\Lbc.cs" goto :eof
+set "sTryVersion=0.0.0"
+if exist "!sTry!\version.txt" for /f "usebackq delims=" %%v in (`powershell -NoProfile -Command "(Get-Content -Raw -LiteralPath '!sTry!\version.txt').Trim([char]0xFEFF, ' ', [char]13, [char]10)"`) do set "sTryVersion=%%v"
+>> "%log%" echo Kit candidate: !sTry! version !sTryVersion!
+if not defined homerDev (set "homerDev=!sTry!" & set "sKitVersion=!sTryVersion!" & goto :eof)
+powershell -NoProfile -Command "try { if ([version]'!sTryVersion!' -gt [version]'!sKitVersion!') { exit 0 } else { exit 1 } } catch { exit 1 }"
+if not errorlevel 1 (set "homerDev=!sTry!" & set "sKitVersion=!sTryVersion!")
+goto :eof

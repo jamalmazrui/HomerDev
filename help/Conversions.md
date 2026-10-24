@@ -49,6 +49,9 @@ Whatever engine makes a file -- the kit's own writers, Pandoc, Edge or Office --
 - **Web pages (.htm):** the Homer page form, as before: one H1, main, language and title. Pictures without alternative text are reported.
 - **Word (.docx):** title from the first heading, author and language, and the language in the default style, so every run of text is read in it. A document without headings, and pictures without alternative text, are reported.
 
+- **Every rule extCheck has for Markdown** judges every .md the kit makes, in an app that compiles the kit's Quality.cs, where those rules now live (kit 1.92.0). extCheck runs them from there too, so a Markdown file is judged the same everywhere. The rest of extCheck's rules, for Word, Excel and PowerPoint, are moving into Quality.cs next, without Office.
+- **Every PDF is checked for tags and a language,** from IsTagged in KeyLine: a structure tree, the marked-content flag and /Lang. A PDF whose catalog is packed in a compressed stream could hide them, so the finding asks you to listen to it before taking it as untagged.
+
 The title is the document's first heading where it has one, else its file's name with underscores read as spaces. The language is Windows' own, and the author is the Windows user.
 
 ### Header names in a workbook
@@ -61,6 +64,14 @@ JAWS and NVDA read a table's column or row headers as you move through it when t
 - **A header must be text,** so a row of different numbers is not taken for headers.
 - **A table already named** keeps its name. A new name takes the next free two-digit number: ColumnTitle01, ColumnTitle02.
 - **The first named table's headers are frozen,** so they stay in view while a sighted reader scrolls.
+
+### A workbook laid out for reading
+
+From the author's xlFormat.vbs in KeyLine (kit 1.91.1). A workbook the kit's own writer made, which has no styles of its own, is also laid out: each column as wide as its longest text, up to 40 characters, with longer text wrapped; the header row bold; and every row set to the top, so a wrapped row reads in step with its neighbors. A workbook that already has styles keeps them. xlFormat also deleted any column with a blank header; the kit keeps the column, since deleting it loses data, and reports it (BlankOrGenericColumnHeader).
+
+### Tables in a Word file
+
+From docxIt's FormatTables in KeyLine (kit 1.91.1). A table whose first row is all text, every cell different, has that row marked as its header row, so Word repeats it on each page and a screen reader announces it as headers, and its header-row style is turned on. It also gets a bookmark JAWS reads as it does an Excel name: ColumnTitle01, or Title01 when its first column is distinct text too. docxIt gave every table the same bookmark, ColumnTitle, so each replaced the last; the kit numbers them. A table without such a first row is reported (TableMissingHeaderRow).
 
 ### Databases in DbDo's form
 

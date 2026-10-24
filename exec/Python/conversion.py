@@ -1424,6 +1424,8 @@ def finishOffice(sPath, sKind, lsFindings):
             if sStyle != "title" and not sStyle.startswith("heading"): continue
             sText = "".join(xmlText(m.group(1)) for m in re.finditer(r"<w:t\b[^>]*>(.*?)</w:t>", oPara.group(0), re.S)).strip()
             if sText: sTitle = sText; break
+        sTabled = finishWordTables(sBody, lsFindings)
+        if sTabled != sBody: setPart(dParts, lsOrder, "word/document.xml", sTabled); sBody = sTabled
         if not re.search(r'<w:pStyle w:val="(?:[Hh]eading|Title)', sBody): lsFindings.append("NoHeadings: the document has no headings, so a screen reader cannot move by them")
         for oPicture in re.finditer(r"<wp:docPr\b[^>]*>", sBody):
             if not re.search(r'\bdescr="[^"]+"', oPicture.group(0)): lsFindings.append("MissingAltText: a picture has no alternative text")
@@ -1490,6 +1492,15 @@ def finishMarkdown(sPath, lsFindings):
         sText = '---\ntitle: "%s"\nlang: %s\n---\n\n' % (sTitle.replace("\\", "\\\\").replace('"', '\\"'), documentLanguage()) + sText
         open(sPath, "w", encoding="utf-8-sig", newline="\r\n").write(sText)
         lsFindings.append("NoYamlFrontMatter: fixed, title and lang added")
+
+
+def checkPdfTags(sPath, lsFindings):
+    """Whether a PDF carries tags (1.92.0, from IsTagged in KeyLine), as Conversion.cs's checkPdfTags."""
+    sBytes = open(sPath, "rb").read().decode("latin-1")
+    bTree = "/StructTreeRoot" in sBytes; bMarked = bool(re.search(r"/Marked\s*true", sBytes))
+    if not bTree or not bMarked:
+        lsFindings.append("UntaggedPdf: no %s was found, so a screen reader may read it as plain text; listen to it to be sure" % ("structure tree" if not bTree else "marked-content flag"))
+    if not re.search(r"/Lang\s*\(", sBytes): lsFindings.append("MissingDocumentLanguage: the PDF names no language")
 
 
 def checkPage(sPath, lsFindings):
@@ -1564,9 +1575,106 @@ def headerStem(lBox, dText, setIsText):
     return "Title" if bColumns and bRows else "ColumnTitle" if bColumns else "RowTitle" if bRows else ""
 
 
+# ---- a workbook laid out for reading (1.91.1, from xlFormat.vbs in KeyLine), as Conversion.cs ----
+iWidestColumn = 40
+sReadingStyles = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+    '<fonts count="2"><font><sz val="11"/><name val="Calibri"/><family val="2"/></font><font><b/><sz val="11"/><name val="Calibri"/><family val="2"/></font></fonts>'
+    '<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>'
+    '<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>'
+    '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
+    '<cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="top"/></xf>'
+    '<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>'
+    '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf></cellXfs>'
+    '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>')
+
+
+def addReadingStyles(dParts, lsOrder):
+    setPart(dParts, lsOrder, "xl/styles.xml", sReadingStyles)
+    sTypes = partText(dParts, "[Content_Types].xml")
+    if "/xl/styles.xml" not in sTypes:
+        setPart(dParts, lsOrder, "[Content_Types].xml", sTypes.replace("</Types>", '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>'))
+    sRels = partText(dParts, "xl/_rels/workbook.xml.rels")
+    if '/styles"' not in sRels:
+        setPart(dParts, lsOrder, "xl/_rels/workbook.xml.rels", sRels.replace("</Relationships>", '<Relationship Id="rIdHomerStyles" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'))
+
+
+def layOutSheet(sXml, dText, setHeaderRows):
+    dWidest = {}
+    for (iRow, iColumn), sValue in dText.items():
+        iLongest = max(len(s) for s in sValue.replace("\r", "").split("\n"))
+        if iLongest > dWidest.get(iColumn, -1): dWidest[iColumn] = iLongest
+    if "<cols>" not in sXml and dWidest:
+        sCols = "<cols>" + "".join('<col min="%d" max="%d" width="%d" customWidth="1"/>' % (c, c, min(max(dWidest[c], 6), iWidestColumn) + 2) for c in sorted(dWidest)) + "</cols>"
+        iData = sXml.find("<sheetData")
+        if iData >= 0: sXml = sXml[:iData] + sCols + sXml[iData:]
+    def styled(oCell):
+        sAttributes = oCell.group(1)
+        oRef = re.search(r'\br="([^"]+)"', sAttributes)
+        tPosition = cellPosition(oRef.group(1)) if oRef else None
+        if not tPosition or re.search(r'\bs="', sAttributes): return oCell.group(0)
+        sStyle = "1" if tPosition[0] in setHeaderRows else "2" if dWidest.get(tPosition[1], 0) > iWidestColumn else ""
+        if not sStyle: return oCell.group(0)
+        return "<c" + sAttributes + ' s="%s"' % sStyle + oCell.group(0)[2 + len(sAttributes):]
+    return re.sub(r"<c\b([^>]*?)(?:/>|>(.*?)</c>)", styled, sXml, flags=re.S)
+
+
+# ---- tables in a Word file (1.91.1, from docxIt's FormatTables in KeyLine), as Conversion.cs ----
+def wordCells(sRow):
+    return ["".join(xmlText(t) for t in re.findall(r"<w:t\b[^>]*>(.*?)</w:t>", m, re.S)).strip() for m in re.findall(r"<w:tc>.*?</w:tc>", sRow, re.S)]
+
+
+def uniqueText(lsValues):
+    if not lsValues: return False
+    setSeen = set()
+    for sValue in lsValues:
+        try:
+            float(sValue); return False
+        except ValueError: pass
+        if not sValue or sValue.lower() in setSeen: return False
+        setSeen.add(sValue.lower())
+    return True
+
+
+def finishWordTables(sBody, lsFindings):
+    lsIds = [int(s) for s in re.findall(r'<w:bookmarkStart\b[^>]*\bw:id="(\d+)"', sBody)]
+    dState = {"table": 0, "bookmark": max(lsIds) if lsIds else 0}
+    setNames = set(s.lower() for s in re.findall(r'<w:bookmarkStart\b[^>]*\bw:name="([^"]+)"', sBody))
+    def finished(oTable):
+        dState["table"] += 1; iTable = dState["table"]
+        sTable = oTable.group(0)
+        lsRows = re.findall(r"<w:tr\b.*?</w:tr>", sTable, re.S)
+        if len(lsRows) < 2: return sTable
+        bColumns = uniqueText(wordCells(lsRows[0]))
+        bRows = uniqueText([(wordCells(r) or [""])[0] for r in lsRows[1:]])
+        if not bColumns:
+            lsFindings.append("TableMissingHeaderRow: table %d has no first row of distinct headers" % iTable); return sTable
+        sRow = lsRows[0]
+        if "<w:tblHeader" not in sRow:
+            sNewRow = sRow.replace("<w:trPr>", "<w:trPr><w:tblHeader/>", 1) if "<w:trPr>" in sRow else re.sub(r"^<w:tr\b[^>]*>", lambda m: m.group(0) + "<w:trPr><w:tblHeader/></w:trPr>", sRow)
+            sTable = sTable.replace(sRow, sNewRow); sRow = sNewRow
+            lsFindings.append("TableMissingHeaderRow: fixed, table %d's first row marked as its header row" % iTable)
+        sTable = re.sub(r"<w:tblLook\b[^>]*/>", lambda m: m.group(0) if 'w:firstRow="1"' in m.group(0) else re.sub(r'\s*w:firstRow="[^"]*"', "", m.group(0)).replace("<w:tblLook", '<w:tblLook w:firstRow="1"'), sTable)
+        if re.search(r'<w:bookmarkStart\b[^>]*\bw:name="(?:Column|Row)?Title', sTable, re.I): return sTable
+        sStem = "Title" if bRows else "ColumnTitle"
+        iNumber = 1
+        while ("%s%02d" % (sStem, iNumber)).lower() in setNames: iNumber += 1
+        sName = "%s%02d" % (sStem, iNumber); setNames.add(sName.lower())
+        dState["bookmark"] += 1
+        oFirstPara = re.search(r"<w:p\b[^>]*>(?:<w:pPr>.*?</w:pPr>)?", sRow, re.S)
+        if not oFirstPara: return sTable
+        sMarked = sRow[:oFirstPara.end()] + '<w:bookmarkStart w:id="%d" w:name="%s"/><w:bookmarkEnd w:id="%d"/>' % (dState["bookmark"], sName, dState["bookmark"]) + sRow[oFirstPara.end():]
+        lsFindings.append("Header names: bookmark %s in table %d" % (sName, iTable))
+        return sTable.replace(sRow, sMarked)
+    return re.sub(r"<w:tbl>.*?</w:tbl>", finished, sBody, flags=re.S)
+
+
 def finishXlsx(sPath, lsFindings):
     lsOrder, dParts = readPackage(sPath)
-    sBook = partText(dParts, "xl/workbook.xml"); sBookRels = partText(dParts, "xl/_rels/workbook.xml.rels")
+    sBook = partText(dParts, "xl/workbook.xml")
+    # A workbook with no styles of its own is laid out for reading, as xlFormat did; any other is left as formatted.
+    bFresh = "xl/styles.xml" not in dParts
+    if bFresh: addReadingStyles(dParts, lsOrder)
+    sBookRels = partText(dParts, "xl/_rels/workbook.xml.rels")
     lsShared = ["".join(xmlText(t) for t in re.findall(r"<t\b[^>]*>(.*?)</t>", m, re.S)) for m in re.findall(r"<si>(.*?)</si>", partText(dParts, "xl/sharedStrings.xml"), re.S)]
     setNames = set(); setNamedCells = set()
     for sAttrs, sRef in re.findall(r"<definedName\b([^>]*)>(.*?)</definedName>", sBook, re.S):
@@ -1606,8 +1714,15 @@ def finishXlsx(sPath, lsFindings):
             dText[tPosition] = sValue.strip()
             if sType in ("s", "inlineStr", "str"): setIsText.add(tPosition)
         bFrozen = "<pane " in sXml
+        setHeaderRows = set()
         for lBox in findRegions(dText):
             sStem = headerStem(lBox, dText, setIsText)
+            if sStem in ("ColumnTitle", "Title"): setHeaderRows.add(lBox[0])
+            if sStem in ("", "RowTitle"):
+                iBlank = sum(1 for c in range(lBox[1] + 1, lBox[3] + 1) if (lBox[0], c) not in dText)
+                iTextual = sum(1 for c in range(lBox[1] + 1, lBox[3] + 1) if (lBox[0], c) in setIsText)
+                if iBlank and iTextual >= iBlank and lBox[2] > lBox[0]:
+                    lsFindings.append("BlankOrGenericColumnHeader: %s row %d has %d %s without a header; each was kept" % (sSheetName, lBox[0], iBlank, "column" if iBlank == 1 else "columns"))
             if not sStem: continue
             sCell = "$%s$%d" % (columnName(lBox[1]), lBox[0])
             if (sSheetName + "!" + sCell).lower() in setNamedCells: continue
@@ -1629,6 +1744,9 @@ def finishXlsx(sPath, lsFindings):
                     if oBefore: sXml = sXml[:oBefore.start()] + '<sheetViews><sheetView workbookViewId="0">' + sPane + "</sheetView></sheetViews>" + sXml[oBefore.start():]
                 bFrozen = True
                 setPart(dParts, lsOrder, sPart, sXml)
+        if bFresh:
+            sXml = layOutSheet(sXml, dText, setHeaderRows)
+            setPart(dParts, lsOrder, sPart, sXml)
     if lsNewNames:
         sNew = "".join(lsNewNames)
         if "</definedNames>" in sBook: sBook = sBook.replace("</definedNames>", sNew + "</definedNames>")
@@ -1649,6 +1767,7 @@ def finishOutput(sPath):
         elif sType == "epub": finishEpub(sPath, lsFindings)
         elif sType == "md": finishMarkdown(sPath, lsFindings)
         elif sType == "htm": checkPage(sPath, lsFindings)
+        elif sType == "pdf": checkPdfTags(sPath, lsFindings)
     except Exception as oError:
         say("Finishing %s for a screen reader failed: %s" % (os.path.basename(sPath), oError))
     for sFinding in lsFindings: say("Quality %s: %s" % (os.path.basename(sPath), sFinding))

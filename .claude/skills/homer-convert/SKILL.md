@@ -20,7 +20,9 @@ page) in two of its own steps, and a PDF is printed by Edge, so no Office is
 needed (kit 1.90.0; help\Conversions.md). Every file made is then finished for a
 screen reader and checked, with extCheck's rule names in the log: workbook header
 names (from xlHeaders.vbs, without Office), titles, authors, languages, front
-matter and tagged PDFs; a .db is in DbDo's form (kit 1.91.0). Web pages are `.htm`, never `.html`; settings and data
+matter and tagged PDFs; a .db is in DbDo's form (kit 1.91.0). extCheck's Markdown rules live in
+Quality.cs (Homer.MarkdownCheck); an app that converts compiles it, by adding
+Quality to homerModules, and every PDF is checked for tags (kit 1.92.0). Web pages are `.htm`, never `.html`; settings and data
 in INI form are `.inix`.
 
 ## Which tool

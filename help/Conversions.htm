@@ -282,30 +282,41 @@ findings use extCheck’s rule names, so a log reads like an extCheck
 report. A middle file of a two-step conversion is left alone, since a
 program reads it next, not a person.</p>
 <ul>
-<li><strong>Excel (.xlsx):</strong> header names for every table, a
+<li><p><strong>Excel (.xlsx):</strong> header names for every table, a
 frozen header row, a sheet name from the file’s name in place of a lone
 “Sheet1” or “Data”, and the workbook’s title, author and language.
-Merged cells are reported.</li>
-<li><strong>EPUB (.epub):</strong> a title from the book’s first heading
-and a language, when the package has none.</li>
-<li><strong>Markdown (.md):</strong> front matter with a title from the
-first heading and a language, when there is none. Skipped heading
+Merged cells are reported.</p></li>
+<li><p><strong>EPUB (.epub):</strong> a title from the book’s first
+heading and a language, when the package has none.</p></li>
+<li><p><strong>Markdown (.md):</strong> front matter with a title from
+the first heading and a language, when there is none. Skipped heading
 levels, no headings at all, and pictures without alternative text are
-reported.</li>
-<li><strong>PDF (.pdf):</strong> tagged. Edge prints a page that has its
-language and title; Word now exports with its structure tags and heading
-bookmarks rather than Save As, whose tags depend on a setting in
-Word.</li>
-<li><strong>PowerPoint (.pptx):</strong> title, author and language.
+reported.</p></li>
+<li><p><strong>PDF (.pdf):</strong> tagged. Edge prints a page that has
+its language and title; Word now exports with its structure tags and
+heading bookmarks rather than Save As, whose tags depend on a setting in
+Word.</p></li>
+<li><p><strong>PowerPoint (.pptx):</strong> title, author and language.
 Slides without a title and pictures without alternative text are
-reported.</li>
-<li><strong>Web pages (.htm):</strong> the Homer page form, as before:
-one H1, main, language and title. Pictures without alternative text are
-reported.</li>
-<li><strong>Word (.docx):</strong> title from the first heading, author
-and language, and the language in the default style, so every run of
-text is read in it. A document without headings, and pictures without
-alternative text, are reported.</li>
+reported.</p></li>
+<li><p><strong>Web pages (.htm):</strong> the Homer page form, as
+before: one H1, main, language and title. Pictures without alternative
+text are reported.</p></li>
+<li><p><strong>Word (.docx):</strong> title from the first heading,
+author and language, and the language in the default style, so every run
+of text is read in it. A document without headings, and pictures without
+alternative text, are reported.</p></li>
+<li><p><strong>Every rule extCheck has for Markdown</strong> judges
+every .md the kit makes, in an app that compiles the kit’s Quality.cs,
+where those rules now live (kit 1.92.0). extCheck runs them from there
+too, so a Markdown file is judged the same everywhere. The rest of
+extCheck’s rules, for Word, Excel and PowerPoint, are moving into
+Quality.cs next, without Office.</p></li>
+<li><p><strong>Every PDF is checked for tags and a language,</strong>
+from IsTagged in KeyLine: a structure tree, the marked-content flag and
+/Lang. A PDF whose catalog is packed in a compressed stream could hide
+them, so the finding asks you to listen to it before taking it as
+untagged.</p></li>
 </ul>
 <p>The title is the document’s first heading where it has one, else its
 file’s name with underscores read as spaces. The language is Windows’
@@ -335,6 +346,26 @@ takes the next free two-digit number: ColumnTitle01, ColumnTitle02.</li>
 <li><strong>The first named table’s headers are frozen,</strong> so they
 stay in view while a sighted reader scrolls.</li>
 </ul>
+<h3 id="a-workbook-laid-out-for-reading">A workbook laid out for
+reading</h3>
+<p>From the author’s xlFormat.vbs in KeyLine (kit 1.91.1). A workbook
+the kit’s own writer made, which has no styles of its own, is also laid
+out: each column as wide as its longest text, up to 40 characters, with
+longer text wrapped; the header row bold; and every row set to the top,
+so a wrapped row reads in step with its neighbors. A workbook that
+already has styles keeps them. xlFormat also deleted any column with a
+blank header; the kit keeps the column, since deleting it loses data,
+and reports it (BlankOrGenericColumnHeader).</p>
+<h3 id="tables-in-a-word-file">Tables in a Word file</h3>
+<p>From docxIt’s FormatTables in KeyLine (kit 1.91.1). A table whose
+first row is all text, every cell different, has that row marked as its
+header row, so Word repeats it on each page and a screen reader
+announces it as headers, and its header-row style is turned on. It also
+gets a bookmark JAWS reads as it does an Excel name: ColumnTitle01, or
+Title01 when its first column is distinct text too. docxIt gave every
+table the same bookmark, ColumnTitle, so each replaced the last; the kit
+numbers them. A table without such a first row is reported
+(TableMissingHeaderRow).</p>
 <h3 id="databases-in-dbdos-form">Databases in DbDo’s form</h3>
 <p>A database the kit makes is one DbDo opens with nothing to set up, as
 the homer-db skill describes. Its table is named for the file, plural

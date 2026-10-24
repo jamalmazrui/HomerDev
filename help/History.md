@@ -7,6 +7,19 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.92.0 -- 24 October 2026
+
+- **An app's build uses the newest kit it finds.** Once the HomerDev variable was honoured (1.89.1), it named an installed kit in Program Files at 1.77.6, and BatCon's build stopped although C:\HomerDev held 1.91.0. Every build now considers the variable, C:\HomerDev and the folders above it, logs each kit it finds with its version, and uses the highest. Fixed in both build templates and in 2htm, BatCon, extCheck, HomerScribe, urlCheck and urlFido.
+- **extCheck's Markdown rules live in the kit,** as MarkdownCheck in a new Quality.cs, moved word for word but for its two calls out. extCheck runs them from there, and Conversion runs them on every Markdown file it makes, finding them in the program at run time, so Quality.cs stands alone and an app without it still builds. The kit's check warns an app that compiles Conversion without Quality.
+- **The conversion classes compile in the kit's build.** Nothing in the kit compiled Conversion.cs before: the C# 5 scan read it and the conversion test ran its Python twin. A compiler error in the shared C# now stops the kit's build instead of the next app's.
+- **Every PDF made is checked for tags and a language,** from IsTagged in KeyLine: a structure tree, the marked-content flag and /Lang, reported as UntaggedPdf and MissingDocumentLanguage.
+
+## 1.91.1 -- 24 October 2026
+
+- **Workbooks laid out for reading, from xlFormat.vbs in KeyLine.** A workbook with no styles of its own -- one the kit's writer made -- gets columns as wide as their text up to 40 characters, longer text wrapped, a bold header row and every row set to the top. A formatted workbook is left alone. xlFormat deleted columns with blank headers; the kit keeps them and reports BlankOrGenericColumnHeader.
+- **Word tables with header rows and header bookmarks, from docxIt in KeyLine.** A table whose first row is distinct text has it marked as the header row, its header-row style on, and a numbered ColumnTitle or Title bookmark for JAWS; docxIt's one ColumnTitle name for every table could hold only the last. A table without such a row is reported, TableMissingHeaderRow.
+- Tested in Python: openpyxl and python-docx read the finished files, and finishing a file twice changes nothing the second time.
+
 ## 1.91.0 -- 24 October 2026
 
 - **Every file a Homer app makes is finished for a screen reader, then checked.** Whatever engine wrote it, the kit opens it once more, in Conversion.cs and conversion.py alike, gives it a title, an author and a language where it has none, and logs what it cannot fix under extCheck's own rule names: a document without headings, a skipped heading level, a picture without alternative text, a slide without a title, merged cells. Markdown gets front matter; an EPUB gets a title from its first heading; Word's PDF export now asks for structure tags and heading bookmarks.

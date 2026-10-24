@@ -1558,6 +1558,24 @@ private static readonly Regex rxCell = new Regex("<c\\b([^>]*?)(?:/>|>(.*?)</c>)
 private static readonly Regex rxAttr = new Regex("\\b([A-Za-z:]+)=\"([^\"]*)\"");
 private static readonly Regex rxT = new Regex("<t\\b[^>]*>(.*?)</t>", RegexOptions.Singleline);
 
+// EXTCHECK'S RULES, FROM QUALITY.CS (kit 1.92.0): an app that compiles Quality.cs has every file it makes
+// judged by the extCheck rules moved there -- all of Markdown's so far. Conversion finds Homer.MarkdownCheck
+// in the program at run time rather than naming it, so Quality.cs stands alone (extCheck compiles it
+// without Conversion) and an app that does not compile it still builds, with the short checks below.
+private static MethodInfo markdownCheck() {
+Type oType = typeof(Conversion).Assembly.GetType("Homer.MarkdownCheck");
+return oType == null ? null : oType.GetMethod("check", BindingFlags.Public | BindingFlags.Static);
+} // markdownCheck method
+
+private static void qualityCheck(string sPath, List<string> lsFindings) {
+if (typeOf(sPath) != "md") return;
+MethodInfo oCheck = markdownCheck();
+if (oCheck == null) return;
+List<string[]> lsRows = oCheck.Invoke(null, new object[] { sPath }) as List<string[]>;
+if (lsRows == null) return;
+foreach (string[] aRow in lsRows) lsFindings.Add(aRow[0] + ": " + aRow[3] + ", " + aRow[5]);
+} // qualityCheck method
+
 // finishOutput: the step every route ends with. Never fails a conversion: a finishing problem is logged.
 public static bool finishOutput(string sPath) {
 string sType = typeOf(sPath);
@@ -1569,6 +1587,8 @@ else if (sType == "pptx") finishOffice(sPath, "ppt", lsFindings);
 else if (sType == "epub") finishEpub(sPath, lsFindings);
 else if (sType == "md") finishMarkdown(sPath, lsFindings);
 else if (sType == "htm") checkPage(sPath, lsFindings);
+else if (sType == "pdf") checkPdfTags(sPath, lsFindings);
+qualityCheck(sPath, lsFindings);
 foreach (string sFinding in lsFindings) Log.info("Quality " + Path.GetFileName(sPath) + ": " + sFinding);
 return true;
 }
@@ -1681,6 +1701,8 @@ StringBuilder sbText = new StringBuilder();
 foreach (Match oRun in Regex.Matches(oPara.Value, "<w:t\\b[^>]*>(.*?)</w:t>", RegexOptions.Singleline)) sbText.Append(xmlText(oRun.Groups[1].Value));
 if (sbText.ToString().Trim().Length > 0) { sTitle = sbText.ToString().Trim(); break; }
 }
+string sTabled = finishWordTables(sBody, lsFindings);
+if (sTabled != sBody) { setPart(dParts, lsOrder, "word/document.xml", sTabled); sBody = sTabled; }
 if (!Regex.IsMatch(sBody, "<w:pStyle w:val=\"(?:[Hh]eading|Title)")) lsFindings.Add("NoHeadings: the document has no headings, so a screen reader cannot move by them");
 foreach (Match oPicture in Regex.Matches(sBody, "<wp:docPr\\b[^>]*>"))
 if (!Regex.IsMatch(oPicture.Value, "\\bdescr=\"[^\"]+\"")) lsFindings.Add("MissingAltText: a picture has no alternative text");
@@ -1752,16 +1774,19 @@ return true;
 // finishMarkdown: front matter with a title and a language when it has none; what extCheck reports.
 private static bool finishMarkdown(string sPath, List<string> lsFindings) {
 string sText = decodeText(File.ReadAllBytes(sPath)).Replace("\r\n", "\n");
+// With Quality.cs, extCheck's own Markdown rules judge the file after it is finished; these few are the
+// fallback for an app that does not compile it.
+bool bDeep = markdownCheck() != null;
 int iLast = 0;
-bool bHeading = false;
-foreach (Match oHeading in Regex.Matches(sText, "^(#{1,6})[ \\t]+\\S", RegexOptions.Multiline)) {
+bool bHeading = bDeep;
+if (!bDeep) foreach (Match oHeading in Regex.Matches(sText, "^(#{1,6})[ \\t]+\\S", RegexOptions.Multiline)) {
 int iLevel = oHeading.Groups[1].Value.Length;
 if (iLast > 0 && iLevel > iLast + 1) lsFindings.Add("SkippedHeadingLevel: a level " + iLevel + " heading follows a level " + iLast);
 iLast = iLevel;
 bHeading = true;
 }
 if (!bHeading) lsFindings.Add("NoHeadings: the document has no headings, so a screen reader cannot move by them");
-if (Regex.IsMatch(sText, "!\\[\\s*\\]\\(")) lsFindings.Add("MissingAltText: a picture has no alternative text");
+if (!bDeep && Regex.IsMatch(sText, "!\\[\\s*\\]\\(")) lsFindings.Add("MissingAltText: a picture has no alternative text");
 if (!sText.StartsWith("---\n")) {
 Match oFirst = Regex.Match(sText, "^#[ \\t]+(.+)$", RegexOptions.Multiline);
 string sTitle = oFirst.Success ? oFirst.Groups[1].Value.Trim() : documentTitle(sPath);
@@ -1771,6 +1796,20 @@ lsFindings.Add("NoYamlFrontMatter: fixed, title and lang added");
 }
 return true;
 } // finishMarkdown method
+
+// checkPdfTags: whether a PDF carries tags (kit 1.92.0, from IsTagged in KeyLine). A tagged PDF has a
+// structure tree and says it is marked; Edge and Word's export both write them in plain text, so the file's
+// bytes show them. A PDF whose catalog is packed in a compressed stream could hide them, so the finding says
+// to listen to the file before taking it as untagged.
+private static bool checkPdfTags(string sPath, List<string> lsFindings) {
+string sBytes = Encoding.ASCII.GetString(File.ReadAllBytes(sPath));
+bool bTree = sBytes.IndexOf("/StructTreeRoot", StringComparison.Ordinal) >= 0;
+bool bMarked = Regex.IsMatch(sBytes, "/Marked\\s*true");
+if (!bTree || !bMarked) lsFindings.Add("UntaggedPdf: no " + (!bTree ? "structure tree" : "marked-content flag") + " was found, so a screen reader may read it as plain text; listen to it to be sure");
+bool bLanguage = Regex.IsMatch(sBytes, "/Lang\\s*\\(");
+if (!bLanguage) lsFindings.Add("MissingDocumentLanguage: the PDF names no language");
+return true;
+} // checkPdfTags method
 
 // checkPage: what extCheck would report in a web page the page form cannot fix.
 private static bool checkPage(string sPath, List<string> lsFindings) {
@@ -1789,6 +1828,9 @@ private static bool finishXlsx(string sPath, List<string> lsFindings) {
 Dictionary<string, byte[]> dParts = new Dictionary<string, byte[]>();
 List<string> lsOrder = readPackage(sPath, dParts);
 string sBook = partText(dParts, "xl/workbook.xml");
+// A WORKBOOK WITH NO STYLES OF ITS OWN is laid out for reading, as xlFormat did; any other is left as formatted.
+bool bFresh = !dParts.ContainsKey("xl/styles.xml");
+if (bFresh) addReadingStyles(dParts, lsOrder);
 string sBookRels = partText(dParts, "xl/_rels/workbook.xml.rels");
 // The shared strings, each its runs joined.
 List<string> lsShared = new List<string>();
@@ -1855,8 +1897,19 @@ if (sType == "s" || sType == "inlineStr" || sType == "str") hsIsText.Add(iKey);
 }
 List<HeaderRegion> lsRegions = findRegions(dText);
 bool bFrozen = sXml.IndexOf("<pane ", StringComparison.Ordinal) >= 0;
+HashSet<int> hsHeaderRows = new HashSet<int>();
 foreach (HeaderRegion oRegion in lsRegions) {
 oRegion.sStem = headerStem(oRegion, dText, hsIsText);
+if (oRegion.sStem == "ColumnTitle" || oRegion.sStem == "Title") hsHeaderRows.Add(oRegion.iTop);
+if (oRegion.sStem == "" || oRegion.sStem == "RowTitle") {
+// BlankOrGenericColumnHeader: a top row of text headers with gaps, which xlFormat would have deleted.
+int iBlank = 0, iTextual = 0;
+for (int iColumn = oRegion.iLeft + 1; iColumn <= oRegion.iRight; iColumn++) {
+long iKey = cellKey(oRegion.iTop, iColumn);
+if (!dText.ContainsKey(iKey)) iBlank++; else if (hsIsText.Contains(iKey)) iTextual++;
+}
+if (iBlank > 0 && iTextual >= iBlank && oRegion.iBottom > oRegion.iTop) lsFindings.Add("BlankOrGenericColumnHeader: " + sSheetName + " row " + oRegion.iTop + " has " + iBlank + (iBlank == 1 ? " column" : " columns") + " without a header; each was kept");
+}
 if (oRegion.sStem == "") continue;
 string sCell = "$" + columnName(oRegion.iLeft) + "$" + oRegion.iTop;
 if (hsNamedCells.Contains(sSheetName + "!" + sCell)) continue;
@@ -1883,6 +1936,10 @@ bFrozen = true;
 setPart(dParts, lsOrder, sPart, sXml);
 }
 }
+if (bFresh) {
+sXml = layOutSheet(sXml, dText, hsHeaderRows);
+setPart(dParts, lsOrder, sPart, sXml);
+}
 }
 if (sbNewNames.Length > 0) {
 if (sBook.IndexOf("</definedNames>", StringComparison.Ordinal) >= 0) sBook = sBook.Replace("</definedNames>", sbNewNames.ToString() + "</definedNames>");
@@ -1894,6 +1951,138 @@ ensureCoreProperties(dParts, lsOrder, documentTitle(sPath), lsFindings);
 writePackage(sPath, lsOrder, dParts);
 return true;
 } // finishXlsx method
+
+// ---- a workbook laid out for reading (kit 1.91.1, from the author's xlFormat.vbs in KeyLine) ----
+//
+// xlFormat drove Excel to fit each column to its longest text up to 40 characters, wrap what is longer,
+// bold the header row and set every row to the top, so wrapped rows read in step. The same is done here
+// from the XML, only for a workbook with no styles of its own -- one the kit's table writer made -- so a
+// workbook someone formatted is never disturbed. xlFormat also deleted every column whose header was
+// blank; that loses data, so the kit reports such a column (BlankOrGenericColumnHeader) and keeps it.
+// Its sheet-wide ColumnTitle name is covered by the region names above, which test for headers first.
+private const int iWidestColumn = 40;
+private const string sReadingStyles = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><styleSheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\">"
++ "<fonts count=\"2\"><font><sz val=\"11\"/><name val=\"Calibri\"/><family val=\"2\"/></font><font><b/><sz val=\"11\"/><name val=\"Calibri\"/><family val=\"2\"/></font></fonts>"
++ "<fills count=\"2\"><fill><patternFill patternType=\"none\"/></fill><fill><patternFill patternType=\"gray125\"/></fill></fills>"
++ "<borders count=\"1\"><border><left/><right/><top/><bottom/><diagonal/></border></borders>"
++ "<cellStyleXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\"/></cellStyleXfs>"
++ "<cellXfs count=\"3\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\" applyAlignment=\"1\"><alignment vertical=\"top\"/></xf>"
++ "<xf numFmtId=\"0\" fontId=\"1\" fillId=\"0\" borderId=\"0\" xfId=\"0\" applyFont=\"1\" applyAlignment=\"1\"><alignment vertical=\"top\" wrapText=\"1\"/></xf>"
++ "<xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\" applyAlignment=\"1\"><alignment vertical=\"top\" wrapText=\"1\"/></xf></cellXfs>"
++ "<cellStyles count=\"1\"><cellStyle name=\"Normal\" xfId=\"0\" builtinId=\"0\"/></cellStyles></styleSheet>";
+
+// addReadingStyles: the three styles a fresh workbook gets -- plain and top-aligned (0), a bold
+// wrapped header (1), and a wrapped cell (2) -- with their part registered.
+private static bool addReadingStyles(Dictionary<string, byte[]> dParts, List<string> lsOrder) {
+setPart(dParts, lsOrder, "xl/styles.xml", sReadingStyles);
+string sTypes = partText(dParts, "[Content_Types].xml");
+if (sTypes.IndexOf("/xl/styles.xml", StringComparison.Ordinal) < 0)
+setPart(dParts, lsOrder, "[Content_Types].xml", sTypes.Replace("</Types>", "<Override PartName=\"/xl/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml\"/></Types>"));
+string sRels = partText(dParts, "xl/_rels/workbook.xml.rels");
+if (sRels.IndexOf("/styles\"", StringComparison.Ordinal) < 0)
+setPart(dParts, lsOrder, "xl/_rels/workbook.xml.rels", sRels.Replace("</Relationships>", "<Relationship Id=\"rIdHomerStyles\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles\" Target=\"styles.xml\"/></Relationships>"));
+return true;
+} // addReadingStyles method
+
+// layOutSheet: column widths, the bold header rows and wrapped long columns, for one fresh sheet.
+private static string layOutSheet(string sXml, Dictionary<long, string> dText, HashSet<int> hsHeaderRows) {
+Dictionary<int, int> dWidest = new Dictionary<int, int>();
+foreach (KeyValuePair<long, string> oCell in dText) {
+int iColumn = (int)(oCell.Key % 100000L);
+int iLongest = 0;
+foreach (string sLine in oCell.Value.Replace("\r", "").Split('\n')) if (sLine.Length > iLongest) iLongest = sLine.Length;
+int iWas;
+if (!dWidest.TryGetValue(iColumn, out iWas) || iLongest > iWas) dWidest[iColumn] = iLongest;
+}
+if (sXml.IndexOf("<cols>", StringComparison.Ordinal) < 0 && dWidest.Count > 0) {
+List<int> lsColumns = new List<int>(dWidest.Keys);
+lsColumns.Sort();
+StringBuilder sbCols = new StringBuilder("<cols>");
+foreach (int iColumn in lsColumns) {
+int iWidth = Math.Min(Math.Max(dWidest[iColumn], 6), iWidestColumn) + 2;
+sbCols.Append("<col min=\"" + iColumn + "\" max=\"" + iColumn + "\" width=\"" + iWidth + "\" customWidth=\"1\"/>");
+}
+sbCols.Append("</cols>");
+int iData = sXml.IndexOf("<sheetData", StringComparison.Ordinal);
+if (iData >= 0) sXml = sXml.Substring(0, iData) + sbCols.ToString() + sXml.Substring(iData);
+}
+return rxCell.Replace(sXml, delegate(Match oCell) {
+string sAttributes = oCell.Groups[1].Value;
+Match oRef = Regex.Match(sAttributes, "\\br=\"([^\"]+)\"");
+int iRow, iColumn;
+if (!oRef.Success || Regex.IsMatch(sAttributes, "\\bs=\"") || !cellPosition(oRef.Groups[1].Value, out iRow, out iColumn)) return oCell.Value;
+int iWidest;
+string sStyle = hsHeaderRows.Contains(iRow) ? "1" : dWidest.TryGetValue(iColumn, out iWidest) && iWidest > iWidestColumn ? "2" : "";
+if (sStyle == "") return oCell.Value;
+return "<c" + sAttributes + " s=\"" + sStyle + "\"" + oCell.Value.Substring(2 + sAttributes.Length);
+});
+} // layOutSheet method
+
+// ---- tables in a Word file (kit 1.91.1, from docxIt's FormatTables in KeyLine) ----
+//
+// docxIt marked each table's first row as its header row (repeated on every page, and announced as
+// headers), turned on the header-row style, and put a bookmark named ColumnTitle in the table, which
+// JAWS reads as it does an Excel name. A bookmark name must be unique, so docxIt's second table took
+// the first's name; here each gets a number, ColumnTitle01, and a table whose first column is unique
+// text as well gets Title01, as in a workbook. The header row is marked only when every cell of the
+// first row holds text, all different; otherwise the table is reported (TableMissingHeaderRow).
+private static string finishWordTables(string sBody, List<string> lsFindings) {
+int iTable = 0, iBookmark = 0;
+foreach (Match oId in Regex.Matches(sBody, "<w:bookmarkStart\\b[^>]*\\bw:id=\"(\\d+)\"")) iBookmark = Math.Max(iBookmark, int.Parse(oId.Groups[1].Value));
+HashSet<string> hsNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+foreach (Match oName in Regex.Matches(sBody, "<w:bookmarkStart\\b[^>]*\\bw:name=\"([^\"]+)\"")) hsNames.Add(oName.Groups[1].Value);
+return Regex.Replace(sBody, "<w:tbl>.*?</w:tbl>", delegate(Match oTable) {
+iTable++;
+string sTable = oTable.Value;
+MatchCollection oRows = Regex.Matches(sTable, "<w:tr\\b.*?</w:tr>", RegexOptions.Singleline);
+if (oRows.Count < 2) return sTable;
+List<string> lsFirstRow = wordCells(oRows[0].Value);
+List<string> lsFirstColumn = new List<string>();
+for (int i = 1; i < oRows.Count; i++) { List<string> lsCells = wordCells(oRows[i].Value); lsFirstColumn.Add(lsCells.Count > 0 ? lsCells[0] : ""); }
+bool bColumns = uniqueText(lsFirstRow), bRows = uniqueText(lsFirstColumn);
+if (!bColumns) { lsFindings.Add("TableMissingHeaderRow: table " + iTable + " has no first row of distinct headers"); return sTable; }
+string sRow = oRows[0].Value;
+if (sRow.IndexOf("<w:tblHeader", StringComparison.Ordinal) < 0) {
+Match oRowProps = Regex.Match(sRow, "<w:trPr>");
+string sNewRow = oRowProps.Success ? sRow.Replace("<w:trPr>", "<w:trPr><w:tblHeader/>") : Regex.Replace(sRow, "^<w:tr\\b[^>]*>", delegate(Match m) { return m.Value + "<w:trPr><w:tblHeader/></w:trPr>"; });
+sTable = sTable.Replace(sRow, sNewRow);
+sRow = sNewRow;
+lsFindings.Add("TableMissingHeaderRow: fixed, table " + iTable + "'s first row marked as its header row");
+}
+sTable = Regex.Replace(sTable, "<w:tblLook\\b[^>]*/>", delegate(Match m) { return Regex.IsMatch(m.Value, "w:firstRow=\"1\"") ? m.Value : Regex.Replace(m.Value, "\\s*w:firstRow=\"[^\"]*\"", "").Replace("<w:tblLook", "<w:tblLook w:firstRow=\"1\""); });
+if (Regex.IsMatch(sTable, "<w:bookmarkStart\\b[^>]*\\bw:name=\"(?:Column|Row)?Title", RegexOptions.IgnoreCase)) return sTable;
+string sStem = bRows ? "Title" : "ColumnTitle";
+int iNumber = 1;
+while (hsNames.Contains(sStem + iNumber.ToString("00"))) iNumber++;
+string sName = sStem + iNumber.ToString("00");
+hsNames.Add(sName);
+iBookmark++;
+Match oFirstPara = Regex.Match(sRow, "<w:p\\b[^>]*>(?:<w:pPr>.*?</w:pPr>)?", RegexOptions.Singleline);
+if (!oFirstPara.Success) return sTable;
+string sMarked = sRow.Substring(0, oFirstPara.Index + oFirstPara.Length) + "<w:bookmarkStart w:id=\"" + iBookmark + "\" w:name=\"" + sName + "\"/><w:bookmarkEnd w:id=\"" + iBookmark + "\"/>" + sRow.Substring(oFirstPara.Index + oFirstPara.Length);
+lsFindings.Add("Header names: bookmark " + sName + " in table " + iTable);
+return sTable.Replace(sRow, sMarked);
+}, RegexOptions.Singleline);
+} // finishWordTables method
+
+private static List<string> wordCells(string sRow) {
+List<string> lsCells = new List<string>();
+foreach (Match oCell in Regex.Matches(sRow, "<w:tc>.*?</w:tc>", RegexOptions.Singleline)) {
+StringBuilder sbText = new StringBuilder();
+foreach (Match oRun in Regex.Matches(oCell.Value, "<w:t\\b[^>]*>(.*?)</w:t>", RegexOptions.Singleline)) sbText.Append(xmlText(oRun.Groups[1].Value));
+lsCells.Add(sbText.ToString().Trim());
+}
+return lsCells;
+} // wordCells method
+
+private static bool uniqueText(List<string> lsValues) {
+if (lsValues.Count == 0) return false;
+HashSet<string> hsSeen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+double nNumber;
+foreach (string sValue in lsValues)
+if (sValue == "" || double.TryParse(sValue, out nNumber) || !hsSeen.Add(sValue)) return false;
+return true;
+} // uniqueText method
 
 private static long cellKey(int iRow, int iColumn) { return (long)iRow * 100000L + iColumn; }
 
