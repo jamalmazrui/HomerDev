@@ -1563,12 +1563,13 @@ private static readonly Regex rxT = new Regex("<t\\b[^>]*>(.*?)</t>", RegexOptio
 // in the program at run time rather than naming it, so Quality.cs stands alone (extCheck compiles it
 // without Conversion) and an app that does not compile it still builds, with the short checks below.
 private static MethodInfo markdownCheck() {
-Type oType = typeof(Conversion).Assembly.GetType("Homer.MarkdownCheck");
+Type oType = typeof(Conversion).Assembly.GetType("Homer.QualityCheck");
 return oType == null ? null : oType.GetMethod("check", BindingFlags.Public | BindingFlags.Static);
 } // markdownCheck method
 
 private static void qualityCheck(string sPath, List<string> lsFindings) {
-if (typeOf(sPath) != "md") return;
+string sType = typeOf(sPath);
+if (sType != "md" && sType != "docx" && sType != "xlsx" && sType != "pptx") return;
 MethodInfo oCheck = markdownCheck();
 if (oCheck == null) return;
 List<string[]> lsRows = oCheck.Invoke(null, new object[] { sPath }) as List<string[]>;

@@ -667,4 +667,214 @@ public static class MarkdownCheck {
     }
 }
 
+// =====================================================================
+// OfficeCheck: extCheck's Word, Excel and PowerPoint rules, read from each file's own XML (kit 1.92.1).
+//
+// extCheck drives Word, Excel and PowerPoint through COM to judge their files; the kit does not depend on
+// Office, so each rule here reads the file's XML instead, keeping extCheck's rule name, its wording and its
+// threshold: an 18-point floor for slide text, 3 seconds for a slide that advances by itself, 20 paragraphs
+// before a first heading, 5 blank rows in a row. The rules the kit's finishing step already fixes or
+// reports -- title, author and language, alternative text for pictures, a table's header row, a default
+// sheet name, merged cells, a frozen header row and a slide's title -- are not repeated here. Two rules need
+// Office's rendering and stay in extCheck for now: ColorUsedAlone, and the help text Word gives a form
+// field beyond what the file holds.
+public static class OfficeCheck {
+    static readonly string[] aBullets = { "\u2022", "\u25CF", "-", "*" };
+    static readonly string[] aVague = { "click here", "here", "link", "read more", "more", "this", "url", "learn more", "continue", "details", "info", "information", "go" };
+    const int iMaxParasBetweenHeadings = 20;
+    const int iMaxConsecutiveEmptyRows = 5;
+    const int iMaxSheetNameLength = 31;
+    const int iSmallestFontHundredths = 1800;
+    const int iShortestAdvanceMs = 3000;
+
+    static List<string[]> lsRows = new List<string[]>();
+
+    static string trunc(string s) { return s.Length > 60 ? s.Substring(0, 60) + "..." : s; }
+
+    static void add(string sRule, string sCategory, string sLocation, string sContext, string sMessage, string sRemedy) {
+        lsRows.Add(new string[] { sRule, "MSAC", sCategory, sLocation, trunc(sContext), sMessage, sRemedy });
+    }
+
+    static string text(string sXml, string sTag) {
+        StringBuilder sb = new StringBuilder();
+        foreach (Match m in Regex.Matches(sXml, "<" + sTag + "\\b[^>]*>(.*?)</" + sTag + ">", RegexOptions.Singleline)) sb.Append(System.Net.WebUtility.HtmlDecode(m.Groups[1].Value));
+        return sb.ToString();
+    }
+
+    static bool vague(string s) {
+        string sLower = s.Trim().ToLowerInvariant();
+        if (sLower == "" || sLower.StartsWith("http") || sLower.StartsWith("www")) return true;
+        return Array.IndexOf(aVague, sLower) >= 0;
+    }
+
+    static bool allCaps(string s) { return s.Length > 4 && s == s.ToUpperInvariant() && s != s.ToLowerInvariant(); }
+
+    static Dictionary<string, string> parts(string sPath) {
+        Dictionary<string, string> d = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        using (FileStream oFile = File.OpenRead(sPath))
+        using (System.IO.Compression.ZipArchive zip = new System.IO.Compression.ZipArchive(oFile, System.IO.Compression.ZipArchiveMode.Read))
+            foreach (System.IO.Compression.ZipArchiveEntry e in zip.Entries)
+                if (e.FullName.EndsWith(".xml", StringComparison.OrdinalIgnoreCase) || e.FullName.EndsWith(".rels", StringComparison.OrdinalIgnoreCase))
+                    using (StreamReader r = new StreamReader(e.Open(), Encoding.UTF8)) d[e.FullName] = r.ReadToEnd();
+        return d;
+    }
+
+    // check: extCheck's rules for one Word, Excel or PowerPoint file; rows as MarkdownCheck gives them.
+    public static List<string[]> check(string sPath) {
+        lsRows = new List<string[]>();
+        string sExt = Path.GetExtension(sPath).ToLowerInvariant();
+        Dictionary<string, string> dParts = parts(sPath);
+        if (sExt == ".docx") word(dParts);
+        else if (sExt == ".xlsx") excel(dParts);
+        else if (sExt == ".pptx") powerPoint(dParts);
+        return lsRows;
+    }
+
+    static void word(Dictionary<string, string> d) {
+        string sBody;
+        if (!d.TryGetValue("word/document.xml", out sBody)) return;
+        int iLast = 0, iBeforeFirst = 0;
+        bool bLongFired = false;
+        HashSet<string> hsHeadings = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (Match oPara in Regex.Matches(sBody, "<w:p\\b(?:(?!<w:p\\b).)*?</w:p>", RegexOptions.Singleline)) {
+            string sXml = oPara.Value, sText = text(sXml, "w:t").Trim();
+            Match oStyle = Regex.Match(sXml, "<w:pStyle w:val=\"([^\"]+)\"");
+            string sStyle = oStyle.Success ? oStyle.Groups[1].Value : "";
+            Match oLevel = Regex.Match(sStyle, "^[Hh]eading ?(\\d)$");
+            if (oLevel.Success) {
+                int iLevel = int.Parse(oLevel.Groups[1].Value);
+                if (iLast > 0 && iLevel > iLast + 1) add("SkippedHeadingLevel", "Heading issues", "(Document)", sText, "Heading level " + iLevel + " follows level " + iLast + ", skipping a level.", "Use each heading level in turn.");
+                if (sText != "" && !hsHeadings.Add(sText)) add("DuplicateHeadingText", "Heading issues", "(Document)", sText, "Two headings have the same text, so a list of headings cannot tell them apart.", "Make each heading distinct.");
+                iLast = iLevel;
+                continue;
+            }
+            if (sText == "") continue;
+            if (iLast == 0 && ++iBeforeFirst > iMaxParasBetweenHeadings && !bLongFired) {
+                bLongFired = true;
+                add("LongSectionWithoutHeading", "Heading issues", "(Document)", sText, "More than " + iMaxParasBetweenHeadings + " paragraphs come before the first heading.", "Add headings so a screen reader can move by them.");
+            }
+            if (sText.Contains("  ")) add("RepeatedBlankCharacters", "Formatting", "(Document)", sText, "Paragraph contains consecutive spaces likely used for visual layout.", "Remove repeated spaces. Use paragraph indentation or tab stops for layout instead.");
+            if (allCaps(sText)) add("AllCapsText", "Formatting", "(Document)", sText, "Text is typed in capital letters, which some screen readers spell out.", "Type it in normal case; use the All Caps font setting if it must look so.");
+            string sFirst = sText.Substring(0, 1);
+            if (Array.IndexOf(aBullets, sFirst) >= 0 && sStyle.ToLowerInvariant().IndexOf("list", StringComparison.Ordinal) < 0 && sXml.IndexOf("<w:numPr>", StringComparison.Ordinal) < 0)
+                add("FakeListBullet", "List not used correctly", "(Document)", sText, "Paragraph uses a manually typed bullet instead of a Word list style.", "Apply the 'List Bullet' built-in style from the Home tab Styles gallery.");
+        }
+        int iTable = 0;
+        foreach (Match oTable in Regex.Matches(sBody, "<w:tbl>.*?</w:tbl>", RegexOptions.Singleline)) {
+            iTable++;
+            bool bHeader = oTable.Value.IndexOf("<w:tblHeader", StringComparison.Ordinal) >= 0;
+            if (bHeader && Regex.IsMatch(oTable.Value, "<w:tblLook\\b[^>]*w:firstColumn=\"1\"")) add("ComplexTableHeaders", "Table issues", "Table " + iTable, "", "The table has both a header row and a header column.", "Split it into simpler tables, or describe it in a caption.");
+            int iRow = 0;
+            foreach (Match oRow in Regex.Matches(oTable.Value, "<w:tr\\b.*?</w:tr>", RegexOptions.Singleline)) {
+                iRow++;
+                foreach (Match oCell in Regex.Matches(oRow.Value, "<w:tc>.*?</w:tc>", RegexOptions.Singleline))
+                    if (text(oCell.Value, "w:t").Trim() == "" && !(iRow == 1 && bHeader)) { add("EmptyTableCell", "Table issues", "Table " + iTable + " row " + iRow, "", "A table cell is empty, which a screen reader announces as blank.", "Fill it, or write a word such as none."); break; }
+            }
+        }
+        foreach (Match oLink in Regex.Matches(sBody, "<w:hyperlink\\b.*?</w:hyperlink>", RegexOptions.Singleline)) {
+            string sText = text(oLink.Value, "w:t").Trim();
+            if (vague(sText)) add("NonDescriptiveHyperlinkText", "Link issues", "(Document)", sText, "Link text does not say where the link goes.", "Use words that name the destination.");
+            if (oLink.Value.IndexOf("<w:u ", StringComparison.Ordinal) < 0 && oLink.Value.IndexOf("w:val=\"Hyperlink\"", StringComparison.Ordinal) < 0)
+                add("HyperlinkNotUnderlined", "Link issues", "(Document)", sText, "A link is not underlined, so color alone marks it.", "Apply the Hyperlink character style.");
+        }
+        if (Regex.IsMatch(sBody, "<wp:anchor\\b(?:(?!</wp:anchor>).)*?(?:wps:txbx|v:textbox)", RegexOptions.Singleline)) add("FloatingTextBox", "Reading order", "(Document)", "", "A floating text box may be read out of order, or not at all.", "Put the text in the body, in line with the rest.");
+        foreach (Match oField in Regex.Matches(sBody, "<w:ffData>.*?</w:ffData>", RegexOptions.Singleline))
+            if (!Regex.IsMatch(oField.Value, "<w:(?:helpText|statusText)\\b[^>]*w:val=\"[^\"]+\"")) add("UnlabeledFormField", "Form issues", "(Document)", text(oField.Value, "w:name"), "A form field has no help text to say what it is for.", "Give it help text, through its Properties.");
+    }
+
+    static void excel(Dictionary<string, string> d) {
+        string sBook;
+        if (!d.TryGetValue("xl/workbook.xml", out sBook)) return;
+        foreach (Match oSheet in Regex.Matches(sBook, "<sheet\\b[^>]*\\bname=\"([^\"]*)\"")) {
+            string sName = System.Net.WebUtility.HtmlDecode(oSheet.Groups[1].Value);
+            if (sName.Length > iMaxSheetNameLength) add("SheetNameTooLong", "Sheet issues", sName, sName, "The sheet name is longer than " + iMaxSheetNameLength + " characters.", "Shorten it.");
+        }
+        foreach (KeyValuePair<string, string> oPart in d) {
+            if (Regex.IsMatch(oPart.Key, "^xl/worksheets/sheet\\d+\\.xml$")) {
+                string sName = Path.GetFileNameWithoutExtension(oPart.Key);
+                if (Regex.IsMatch(oPart.Value, "<col\\b[^>]*\\bhidden=\"(?:1|true)\"")) add("HiddenColumns", "Sheet issues", sName, "", "The sheet has hidden columns, which a screen reader user may not know are there.", "Show them, or say in the sheet that they are hidden.");
+                if (Regex.IsMatch(oPart.Value, "<row\\b[^>]*\\bhidden=\"(?:1|true)\"")) add("HiddenRows", "Sheet issues", sName, "", "The sheet has hidden rows, which a screen reader user may not know are there.", "Show them, or say in the sheet that they are hidden.");
+                List<int> lsUsed = new List<int>();
+                foreach (Match oRow in Regex.Matches(oPart.Value, "<row\\b[^>]*\\br=\"(\\d+)\"[^>]*>(.*?)</row>", RegexOptions.Singleline))
+                    if (Regex.IsMatch(oRow.Groups[2].Value, "<(?:v|t)\\b[^>]*>[^<]")) lsUsed.Add(int.Parse(oRow.Groups[1].Value));
+                for (int i = 1; i < lsUsed.Count; i++)
+                    if (lsUsed[i] - lsUsed[i - 1] - 1 >= iMaxConsecutiveEmptyRows) { add("BlankRowsUsedForLayout", "Sheet issues", sName, "", (lsUsed[i] - lsUsed[i - 1] - 1) + " blank rows in a row separate the data.", "Remove the blank rows, or put the parts on sheets of their own."); break; }
+                foreach (Match oLink in Regex.Matches(oPart.Value, "<hyperlink\\b[^>]*\\bdisplay=\"([^\"]*)\""))
+                    if (vague(System.Net.WebUtility.HtmlDecode(oLink.Groups[1].Value))) add("NonDescriptiveHyperlinkText", "Link issues", sName, oLink.Groups[1].Value, "Link text does not say where the link goes.", "Use words that name the destination.");
+            }
+            else if (Regex.IsMatch(oPart.Key, "^xl/tables/table\\d+\\.xml$")) {
+                Match oName = Regex.Match(oPart.Value, "<table\\b[^>]*\\bdisplayName=\"([^\"]*)\"");
+                if (oName.Success && Regex.IsMatch(oName.Groups[1].Value, "^Table\\d+$")) add("DefaultTableName", "Table issues", oName.Groups[1].Value, oName.Groups[1].Value, "The table keeps its default name.", "Name it for what it holds.");
+                if (Regex.IsMatch(oPart.Value, "<table\\b[^>]*\\bheaderRowCount=\"0\"")) add("TableMissingHeaders", "Table issues", oName.Success ? oName.Groups[1].Value : "", "", "The table has no header row.", "Turn on its Header Row.");
+            }
+            else if (Regex.IsMatch(oPart.Key, "^xl/drawings/drawing\\d+\\.xml$")) {
+                foreach (Match oFrame in Regex.Matches(oPart.Value, "<xdr:graphicFrame\\b.*?</xdr:graphicFrame>", RegexOptions.Singleline))
+                    if (oFrame.Value.IndexOf("/chart\"", StringComparison.Ordinal) >= 0 && !Regex.IsMatch(oFrame.Value, "<xdr:cNvPr\\b[^>]*\\bdescr=\"[^\"]+\"")) add("ChartMissingAltText", "Missing alternative text", Path.GetFileNameWithoutExtension(oPart.Key), "", "A chart has no alternative text.", "Describe what the chart shows.");
+                foreach (Match oPicture in Regex.Matches(oPart.Value, "<xdr:pic>.*?</xdr:pic>", RegexOptions.Singleline))
+                    if (!Regex.IsMatch(oPicture.Value, "<xdr:cNvPr\\b[^>]*\\bdescr=\"[^\"]+\"")) add("MissingAltText", "Missing alternative text", Path.GetFileNameWithoutExtension(oPart.Key), "", "A picture has no alternative text.", "Describe the picture.");
+            }
+        }
+    }
+
+    static void powerPoint(Dictionary<string, string> d) {
+        int iSlides = 0, iWithNotes = 0;
+        List<string> lsSlides = new List<string>();
+        foreach (string sKey in d.Keys) if (Regex.IsMatch(sKey, "^ppt/slides/slide\\d+\\.xml$")) lsSlides.Add(sKey);
+        lsSlides.Sort(delegate(string a, string b) { return int.Parse(Regex.Match(a, "\\d+").Value).CompareTo(int.Parse(Regex.Match(b, "\\d+").Value)); });
+        foreach (string sKey in lsSlides) {
+            iSlides++;
+            string sSlide = d[sKey], sLabel = "Slide " + Regex.Match(sKey, "\\d+").Value;
+            // The notes, through the slide's relationships.
+            string sRels, sNotes = "";
+            if (d.TryGetValue("ppt/slides/_rels/" + Path.GetFileName(sKey) + ".rels", out sRels)) {
+                Match oNotes = Regex.Match(sRels, "Target=\"\\.\\./notesSlides/([^\"]+)\"");
+                string sNotesXml;
+                if (oNotes.Success && d.TryGetValue("ppt/notesSlides/" + oNotes.Groups[1].Value, out sNotesXml)) {
+                    foreach (Match oShape in Regex.Matches(sNotesXml, "<p:sp>.*?</p:sp>", RegexOptions.Singleline))
+                        if (oShape.Value.IndexOf("type=\"body\"", StringComparison.Ordinal) >= 0) sNotes += text(oShape.Value, "a:t");
+                }
+            }
+            if (sNotes.Trim() != "") iWithNotes++;
+            else if (Regex.IsMatch(sSlide, "<p:pic>|<p:graphicFrame>")) add("VisualContentWithoutNotes", "Missing alternative text", sLabel, "", "The slide has a picture or chart and no speaker notes to describe it.", "Describe it in the notes.");
+            Match oTransition = Regex.Match(sSlide, "<p:transition\\b[^>]*>");
+            if (oTransition.Success) {
+                Match oAdvance = Regex.Match(oTransition.Value, "\\badvTm=\"(\\d+)\"");
+                if (oAdvance.Success && int.Parse(oAdvance.Groups[1].Value) > 0 && int.Parse(oAdvance.Groups[1].Value) < iShortestAdvanceMs) add("FastAutoAdvance", "Timing", sLabel, "", "The slide advances by itself in under 3 seconds.", "Advance on a click, or give it more time.");
+                if (oTransition.Value.IndexOf("spd=\"fast\"", StringComparison.Ordinal) >= 0) add("FastTransitionSpeed", "Timing", sLabel, "", "The slide's transition is set to fast.", "Use a medium or slow transition, or none.");
+            }
+            if (Regex.IsMatch(sSlide, "\\brepeatCount=\"(?:indefinite|[2-9]\\d{3,}|\\d{5,})\"")) add("RepeatingAnimation", "Moving content", sLabel, "", "An animation repeats.", "Let it play once.");
+            int iAuto = 0;
+            foreach (Match oNode in Regex.Matches(sSlide, "<p:cTn\\b[^>]*\\bnodeType=\"(?:afterEffect|withEffect)\"[^>]*>(?:(?!</p:cTn>).)*?<p:cond\\b[^>]*\\bdelay=\"(\\d+)\"", RegexOptions.Singleline))
+                if (int.Parse(oNode.Groups[1].Value) < 1000) iAuto++;
+            if (iAuto > 3) add("RapidAutoAnimation", "Moving content", sLabel, "", iAuto + " animations start by themselves less than a second apart.", "Start them on a click, or space them out.");
+            // Reading order: the title should be the first shape in the slide's shape tree.
+            Match oFirst = Regex.Match(sSlide, "<p:spTree>.*?(<p:sp>.*?</p:sp>)", RegexOptions.Singleline);
+            if (Regex.IsMatch(sSlide, "type=\"(?:ctrTitle|title)\"") && oFirst.Success && !Regex.IsMatch(oFirst.Groups[1].Value, "type=\"(?:ctrTitle|title)\""))
+                add("TitleNotFirstInReadingOrder", "Reading order", sLabel, "", "The slide's title is not the first thing a screen reader reads.", "Move the title to the top of the Selection Pane's reading order.");
+            foreach (Match oPara in Regex.Matches(sSlide, "<a:p>.*?</a:p>", RegexOptions.Singleline)) {
+                string sText = text(oPara.Value, "a:t").Trim();
+                if (sText == "") continue;
+                if (allCaps(sText)) add("AllCapsText", "Formatting", sLabel, sText, "Text is typed in capital letters, which some screen readers spell out.", "Type it in normal case.");
+                if (Array.IndexOf(aBullets, sText.Substring(0, 1)) >= 0 && oPara.Value.IndexOf("<a:buChar", StringComparison.Ordinal) < 0 && oPara.Value.IndexOf("<a:buAutoNum", StringComparison.Ordinal) < 0)
+                    add("FakeListBullet", "List not used correctly", sLabel, sText, "Text uses a manually typed bullet instead of a PowerPoint list style.", "Apply a bullet list style from the Home tab Paragraph group.");
+                Match oSize = Regex.Match(oPara.Value, "<a:rPr\\b[^>]*\\bsz=\"(\\d+)\"");
+                if (oSize.Success && int.Parse(oSize.Groups[1].Value) < iSmallestFontHundredths) add("SmallFontSize", "Formatting", sLabel, sText, "Text is smaller than 18 points.", "Make it 18 points or larger.");
+            }
+        }
+        if (iSlides > 0 && iWithNotes == 0) add("NoSpeakerNotes", "Missing alternative text", "(Presentation)", "", "No slide has speaker notes.", "Add notes that say what each slide shows.");
+    }
+}
+
+// QualityCheck: the one door to every rule moved from extCheck, by the file's type. Conversion finds this
+// class in the program at run time, so Quality.cs stays optional for an app (kit 1.92.1).
+public static class QualityCheck {
+    public static List<string[]> check(string sPath) {
+        string sExt = Path.GetExtension(sPath).ToLowerInvariant();
+        if (sExt == ".md" || sExt == ".markdown") return MarkdownCheck.check(sPath);
+        if (sExt == ".docx" || sExt == ".xlsx" || sExt == ".pptx") return OfficeCheck.check(sPath);
+        return new List<string[]>();
+    }
+}
+
+
 } // namespace Homer (Quality.cs)

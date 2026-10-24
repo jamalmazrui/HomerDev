@@ -306,12 +306,22 @@ text are reported.</p></li>
 author and language, and the language in the default style, so every run
 of text is read in it. A document without headings, and pictures without
 alternative text, are reported.</p></li>
-<li><p><strong>Every rule extCheck has for Markdown</strong> judges
-every .md the kit makes, in an app that compiles the kit’s Quality.cs,
-where those rules now live (kit 1.92.0). extCheck runs them from there
-too, so a Markdown file is judged the same everywhere. The rest of
-extCheck’s rules, for Word, Excel and PowerPoint, are moving into
-Quality.cs next, without Office.</p></li>
+<li><p><strong>extCheck’s rules judge every file the kit makes,</strong>
+in an app that compiles the kit’s Quality.cs, where they now live.
+Markdown has all of extCheck’s rules (kit 1.92.0), and extCheck runs
+them from there too. Word, Excel and PowerPoint have extCheck’s rules
+read from the file’s own XML, with extCheck’s names, wording and
+thresholds, so no Office is needed (kit 1.92.1): capitals, typed
+bullets, repeated spaces, skipped or repeated headings, a long stretch
+before the first heading, empty table cells, two-way table headers,
+vague or plain links, floating text boxes and unlabeled form fields in
+Word; hidden rows and columns, blank rows used for layout, default table
+names, tables without headers, long sheet names, and charts and pictures
+without alternative text in Excel; small text, typed bullets, capitals,
+fast or automatic advancing, repeating or rapid animation, a title not
+read first, and missing speaker notes in PowerPoint. Two need Office’s
+rendering and stay in extCheck for now: color used alone, and a form
+field’s help text beyond what the file holds.</p></li>
 <li><p><strong>Every PDF is checked for tags and a language,</strong>
 from IsTagged in KeyLine: a structure tree, the marked-content flag and
 /Lang. A PDF whose catalog is packed in a compressed stream could hide

@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.92.1 -- 24 October 2026
+
+- **extCheck's Word, Excel and PowerPoint rules are in the kit,** as OfficeCheck in Quality.cs, reading each file's XML rather than driving Office, with extCheck's rule names, wording and thresholds. Every Word, Excel and PowerPoint file the kit makes is now judged by them, as Markdown already was, through one door, QualityCheck. ColorUsedAlone and Word's own help text for a form field need Office and stay in extCheck for now. extCheck itself still uses Office for those files; moving it onto OfficeCheck waits until the two have been compared on the same files.
+- The 1.92.0 build compiled the conversion classes with Quality.cs for the first time: the finishing code of 1.91.0 and 1.91.1 is sound.
+
 ## 1.92.0 -- 24 October 2026
 
 - **An app's build uses the newest kit it finds.** Once the HomerDev variable was honoured (1.89.1), it named an installed kit in Program Files at 1.77.6, and BatCon's build stopped although C:\HomerDev held 1.91.0. Every build now considers the variable, C:\HomerDev and the folders above it, logs each kit it finds with its version, and uses the highest. Fixed in both build templates and in 2htm, BatCon, extCheck, HomerScribe, urlCheck and urlFido.
