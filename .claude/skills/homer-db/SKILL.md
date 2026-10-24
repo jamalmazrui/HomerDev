@@ -68,6 +68,13 @@ and Lbc gives it Alt+2. `scripts/contactPattern.py` holds the list and rebuilds
 an existing table into the pattern, keeping every row, value, computed field,
 index and trigger; ContactTrail, JobTrail and Convention.db were built with it.
 
+## A database made by conversion
+
+The kit's sqlite engine (Conversion.cs and conversion.py, one script) makes
+a .db from any table in exactly this form, and checkDb passes it with no
+warnings. Irregular plurals -- people, children, men, women -- take their true
+singular, person_id, in the engine and in checkDb alike (kit 1.91.0).
+
 ## Names and types
 
 - Lower case with underscores; plural for a table, singular for its id.

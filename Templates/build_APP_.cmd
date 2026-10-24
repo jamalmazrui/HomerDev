@@ -132,8 +132,16 @@ for /f "delims=" %%v in ('ver') do >> "%log%" echo Windows: %%v
 echo Building %app%. The log is %log%
 
 rem ---- the Homer Development Kit -------------------------------------
+rem THE HOMERDEV VARIABLE IS READ BEFORE ANYTHING IS SET (24 October 2026). Names in cmd
+rem ignore case, so set "homerDev=" also emptied a HomerDev environment variable, and
+rem the variable was never honoured. A kit is a folder with HomerDev.cs at its top
+rem and exec\CSharp\Lbc.cs inside, so no other folder can pass for it.
+set "sKitFromEnv=%HomerDev%"
 set "homerDev="
-if defined HomerDev if exist "%HomerDev%\exec\CSharp\Lbc.cs" set "homerDev=%HomerDev%"
+if defined sKitFromEnv if exist "!sKitFromEnv!\exec\CSharp\Lbc.cs" if exist "!sKitFromEnv!\HomerDev.cs" set "homerDev=!sKitFromEnv!"
+rem C:\HomerDev, where the kit is usually kept, before any climbing (24 October 2026):
+rem BatCon's climb from C:\batcon took C:\ itself for the kit and stopped there.
+if not defined homerDev if exist "C:\HomerDev\exec\CSharp\Lbc.cs" if exist "C:\HomerDev\HomerDev.cs" set "homerDev=C:\HomerDev"
 rem FOUND WHEREVER IT IS (1.46.0): only Windows and the folder name HomerDev
 rem are assumed, never a drive or a depth. After the HomerDev variable: the
 rem current folder and every folder above it, then this script's folder and
@@ -808,9 +816,12 @@ goto :eof
 :findKitUp
 rem Climbs from sUp to the top of its drive (1.46.0), looking for the kit
 rem itself or for a folder named HomerDev that holds it.
-if exist "!sUp!\exec\CSharp\Lbc.cs" (set "homerDev=!sUp!" & goto :eof)
-if exist "!sUp!\HomerDev\exec\CSharp\Lbc.cs" (set "homerDev=!sUp!\HomerDev" & goto :eof)
+rem A drive's top, "C:\", is held as "C:", so no path doubles its backslash.
+if "!sUp:~-1!"=="\" set "sUp=!sUp:~0,-1!"
+if exist "!sUp!\exec\CSharp\Lbc.cs" if exist "!sUp!\HomerDev.cs" (set "homerDev=!sUp!" & goto :eof)
+if exist "!sUp!\HomerDev\exec\CSharp\Lbc.cs" if exist "!sUp!\HomerDev\HomerDev.cs" (set "homerDev=!sUp!\HomerDev" & goto :eof)
 for %%I in ("!sUp!\..") do set "sNext=%%~fI"
+if "!sNext:~-1!"=="\" set "sNext=!sNext:~0,-1!"
 if /i "!sNext!"=="!sUp!" goto :eof
 set "sUp=!sNext!"
 goto :findKitUp

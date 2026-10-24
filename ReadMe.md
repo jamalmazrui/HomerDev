@@ -261,7 +261,7 @@ own notebook, is in the never-pushed list and stays on your machine.
 
 - `HomerDev.md` -- the complete guide: the four kinds of Homer resource (app, collection, kit and page), the `.inix` format, AI-assisted coding
   and how to teach with the samples, Camel Type, direct speech across screen
-  readers, Lbc and the standard dialogs, the launchpad app conventions, keys,
+  readers, Lbc and the standard dialogs, the launch app conventions, keys,
   scripts and logs, and the installer.
 - `Developer.md` -- how to change the kit itself and how a fix reaches the apps.
 - `Hotkeys.md` -- the keys every Homer dialog and text box gives you.

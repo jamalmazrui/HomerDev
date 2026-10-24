@@ -16,9 +16,11 @@ Each conversion is logged with its route, its steps and its time.
 """
 import glob
 import os
+import pathlib
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
 import zipfile
@@ -82,7 +84,13 @@ def loadTable():
 
 
 def typeOf(sPath):
-    return os.path.splitext(sPath)[1].lstrip(".").lower()
+    """The type by extension, as Conversion.cs's typeOf: .html is .htm and .markdown is .md (1.90.0), so a
+    Python app and a C# app take the same route for the same file. A bare type ("pdf") is its own type."""
+    sType = os.path.splitext(sPath)[1] if "." in sPath else sPath
+    sType = sType.lstrip(".").lower()
+    if sType == "html": return "htm"
+    if sType == "markdown": return "md"
+    return sType
 
 
 # ---------- the engines: present or not ----------
@@ -101,12 +109,14 @@ def findProgram(sName, lsWindowsPaths=()):
 def programFor(sEngine):
     if sEngine == "pandoc": return findProgram("pandoc", [r"%ProgramFiles%\Pandoc\pandoc.exe", r"%LOCALAPPDATA%\Pandoc\pandoc.exe"])
     if sEngine == "tesseract": return findProgram("tesseract", [r"%ProgramFiles%\Tesseract-OCR\tesseract.exe"])
+    if sEngine == "edge": return findProgram("msedge", [r"%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe",
+        r"%ProgramFiles%\Microsoft\Edge\Application\msedge.exe", r"%LOCALAPPDATA%\Microsoft\Edge\Application\msedge.exe"])
     return ""
 
 
 def engineAvailable(sEngine):
-    if sEngine in ("copy", "json", "markdown", "page", "table", "zipxml"): return True
-    if sEngine == "pandoc": return bool(programFor(sEngine))
+    if sEngine in ("copy", "json", "markdown", "page", "sqlite", "table", "zipxml"): return True
+    if sEngine in ("edge", "pandoc"): return bool(programFor(sEngine))
     if sEngine == "ocr":
         try: import pypdfium2
         except ImportError: return False
@@ -395,7 +405,11 @@ def engineOfficeComSave(sApp, sSource, sOut, iFormat):
     if sApp == "word":
         oApp = win32com.client.DispatchEx("Word.Application"); oApp.Visible = False
         try:
-            oDoc = oApp.Documents.Open(os.path.abspath(sSource), ReadOnly=True); oDoc.SaveAs2(os.path.abspath(sOut), FileFormat=iFormat); oDoc.Close(False)
+            oDoc = oApp.Documents.Open(os.path.abspath(sSource), ReadOnly=True)
+            # A tagged PDF (1.91.0): Word's export with structure tags and heading bookmarks, as Conversion.cs.
+            if iFormat == 17: oDoc.ExportAsFixedFormat(os.path.abspath(sOut), 17, OpenAfterExport=False, IncludeDocProps=True, CreateBookmarks=1, DocStructureTags=True)
+            else: oDoc.SaveAs2(os.path.abspath(sOut), FileFormat=iFormat)
+            oDoc.Close(False)
         finally: oApp.Quit()
     elif sApp == "excel":
         oApp = win32com.client.DispatchEx("Excel.Application"); oApp.Visible = False; oApp.DisplayAlerts = False
@@ -855,7 +869,173 @@ def pageFinish(sPath):
         except OSError: pass
 
 
-dEngines = {"copy": engineCopy, "markdown": engineMarkdown, "ocr": engineOcr, "officecom": engineOfficeCom,
+# THE SQLITE ENGINE (1.90.0): the same script, word for word, as Conversion.cs's sSqliteScript; the kit's build
+# fails if the two ever differ. A table to an SQLite database, or a database to Markdown.
+sSqliteScript = r'''import csv, io, os, re, sqlite3, sys
+sIn, sOut = sys.argv[1], sys.argv[2]
+# A DATABASE IN DBDO'S FORM (kit 1.91.0, the homer-db skill): a plural lower-case table named for the
+# file, <singular>_id, added and edited, the data fields, url, notes, tags, look, prime and marked in
+# that order, the edited and maps triggers, a unique prime index, and DbDo's lookups, maps and views.
+lsTypes = ['BLOB', 'BOOLEAN', 'INTEGER', 'NUMERIC', 'REAL', 'TEXT', 'TEXTLINE', 'TEXTMARKDOWN', 'TEXTMEMO', 'TEXTTIME']
+lsKinds = ['affiliated_with', 'located_at', 'member_of', 'part_of', 'related_to']
+lsHousekeeping = ['added', 'edited', 'look', 'prime', 'marked']
+dIrregular = {'people': 'person', 'children': 'child', 'men': 'man', 'women': 'woman', 'data': 'data'}
+def decode(ab):
+    for sCodec in ('utf-8-sig', 'cp1252'):
+        try: return ab.decode(sCodec)
+        except UnicodeDecodeError: pass
+    return ab.decode('utf-8', 'replace')
+def cell(v):
+    return ('' if v is None else str(v)).replace('|', '\\|').replace('\r', ' ').replace('\n', ' ')
+def snake(s):
+    s = re.sub(r'[^0-9a-z]+', '_', re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', s.strip()).lower()).strip('_')
+    return ('f_' + s) if s[:1].isdigit() else s
+def plural(s):
+    if s in dIrregular or s.endswith('s') and not s.endswith('ss'): return s
+    if s.endswith('y') and s[-2:-1] not in ('a', 'e', 'i', 'o', 'u'): return s[:-1] + 'ies'
+    if s.endswith(('x', 'ch', 'sh', 'ss', 'z')): return s + 'es'
+    return s + 's'
+def singular(s):
+    if s in dIrregular: return dIrregular[s]
+    if s.endswith('ies'): return s[:-3] + 'y'
+    if s.endswith(('ches', 'shes', 'xes', 'sses', 'zes')): return s[:-2]
+    if s.endswith('s') and not s.endswith('ss'): return s[:-1]
+    return s
+def q(s):
+    return '"' + s.replace('"', '""') + '"'
+def joined(lsFields, sJoin, bSkipBlank):
+    if not bSkipBlank: return " || '|' || ".join("coalesce(CAST(%s AS TEXT),'')" % q(s) for s in lsFields)
+    return "rtrim(" + " || ".join("iif(%s IS NOT NULL AND length(CAST(%s AS TEXT))>0, CAST(%s AS TEXT) || ' | ', '')" % (q(s), q(s), q(s)) for s in lsFields) + ", ' | ')"
+def kind(lsValues):
+    lsFilled = [v for v in lsValues if v.strip()]
+    if any('\n' in v for v in lsFilled): return 'TEXTMEMO'
+    if lsFilled and all(re.match(r'^-?\d{1,15}$', v.strip()) for v in lsFilled): return 'INTEGER'
+    if lsFilled and all(re.match(r'^-?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$', v.strip()) for v in lsFilled): return 'REAL'
+    return 'TEXTLINE'
+def standardTable(oDb, sTable, lsData, dTypes, lsLook, bMaps):
+    sId = singular(sTable) + '_id'
+    lsColumns = [q(sId) + ' INTEGER PRIMARY KEY AUTOINCREMENT', 'added TEXTTIME NOT NULL DEFAULT CURRENT_TIMESTAMP', 'edited TEXTTIME NOT NULL DEFAULT CURRENT_TIMESTAMP']
+    lsColumns += [q(s) + ' ' + dTypes.get(s, 'TEXTLINE') for s in lsData]
+    lsColumns += ['url TEXTLINE', 'notes TEXTMARKDOWN', 'tags TEXTMEMO']
+    lsColumns += ['look TEXT GENERATED ALWAYS AS (%s) STORED' % joined(lsLook, ' | ', True), 'prime TEXT GENERATED ALWAYS AS (%s) STORED' % joined(lsData, '|', False), 'marked INTEGER NOT NULL DEFAULT 0']
+    oDb.execute('CREATE TABLE %s (%s)' % (q(sTable), ', '.join(lsColumns)))
+    lsWatched = lsData + ['notes', 'tags']
+    oDb.execute('CREATE TRIGGER %s AFTER UPDATE OF %s ON %s FOR EACH ROW WHEN %s BEGIN UPDATE %s SET edited = CURRENT_TIMESTAMP WHERE %s = NEW.%s; END'
+        % (q('trg_' + sTable + '_edited'), ', '.join(q(s) for s in lsWatched), q(sTable), ' OR '.join('OLD.%s IS NOT NEW.%s' % (q(s), q(s)) for s in lsWatched), q(sTable), q(sId), q(sId)))
+    oDb.execute('CREATE UNIQUE INDEX %s ON %s (prime)' % (q('idx_' + sTable + '_prime'), q(sTable)))
+    if bMaps:
+        oDb.execute("CREATE TRIGGER %s AFTER UPDATE ON %s FOR EACH ROW WHEN OLD.prime IS NOT NEW.prime BEGIN UPDATE maps SET prime1 = NEW.prime WHERE tbl1 = '%s' AND prime1 = OLD.prime; UPDATE maps SET prime2 = NEW.prime WHERE tbl2 = '%s' AND prime2 = OLD.prime; END"
+            % (q('trg_' + sTable + '_maps'), q(sTable), sTable, sTable))
+        oDb.execute("CREATE TRIGGER %s AFTER DELETE ON %s FOR EACH ROW BEGIN DELETE FROM maps WHERE (tbl1 = '%s' AND prime1 = OLD.prime) OR (tbl2 = '%s' AND prime2 = OLD.prime); END"
+            % (q('trg_' + sTable + '_maps_delete'), q(sTable), sTable, sTable))
+if open(sIn, 'rb').read(16) != b'SQLite format 3\x00':
+    llAll = [r for r in csv.reader(io.StringIO(decode(open(sIn, 'rb').read())))]
+    llAll = [r for r in llAll if any(v.strip() for v in r)]
+    if not llAll: raise SystemExit('the table is empty')
+    sTable = plural(snake(os.path.basename(sOut).split('.')[0]) or 'record')
+    if sTable in ('lookups', 'maps', 'views'): sTable = 'user_' + sTable
+    lsReserved = lsHousekeeping + [singular(sTable) + '_id']
+    lsFields = []
+    for i, sField in enumerate(llAll[0]):
+        sField = snake(sField) or 'column_%d' % (i + 1)
+        if sField in lsReserved: sField += '_value'
+        while sField in lsFields: sField += '_'
+        lsFields.append(sField)
+    iWidth = len(lsFields)
+    llRows = [(list(r) + [''] * iWidth)[:iWidth] for r in llAll[1:]]
+    lsData = [s for s in lsFields if s not in ('url', 'notes', 'tags')]
+    if not lsData: raise SystemExit('the table has no field but url, notes and tags')
+    dTypes = {s: kind([r[i] for r in llRows]) for i, s in enumerate(lsFields)}
+    if os.path.exists(sOut): os.remove(sOut)
+    oDb = sqlite3.connect(sOut)
+    oDb.execute('CREATE TABLE lookups (lookup_id INTEGER PRIMARY KEY AUTOINCREMENT, added TEXTTIME NOT NULL DEFAULT CURRENT_TIMESTAMP, edited TEXTTIME NOT NULL DEFAULT CURRENT_TIMESTAMP, '
+        'src TEXTLINE, tbl TEXTLINE, fld TEXTLINE, val TEXTLINE, ordinal INTEGER, descrip TEXTMEMO, url TEXTLINE, notes TEXTMARKDOWN, tags TEXTMEMO, '
+        "look TEXT GENERATED ALWAYS AS (rtrim(iif(tbl IS NOT NULL AND length(tbl)>0, tbl || ' | ', '') || iif(fld IS NOT NULL AND length(fld)>0, fld || ' | ', '') || iif(val IS NOT NULL AND length(val)>0, val || ' | ', ''), ' | ')) STORED, "
+        "prime TEXT GENERATED ALWAYS AS (coalesce(src,'') || '|' || coalesce(tbl,'') || '|' || coalesce(fld,'') || '|' || coalesce(val,'')) STORED, marked INTEGER NOT NULL DEFAULT 0)")
+    oDb.execute('CREATE UNIQUE INDEX idx_lookups_prime ON lookups (prime)')
+    oDb.execute('CREATE TABLE maps (map_id INTEGER PRIMARY KEY AUTOINCREMENT, added TEXTTIME NOT NULL DEFAULT CURRENT_TIMESTAMP, edited TEXTTIME NOT NULL DEFAULT CURRENT_TIMESTAMP, '
+        'tbl1 TEXTLINE, prime1 TEXTLINE, kind TEXTLINE, tbl2 TEXTLINE, prime2 TEXTLINE, notes TEXTMARKDOWN, tags TEXTMEMO, '
+        "look TEXT GENERATED ALWAYS AS (coalesce(tbl1,'') || ' ' || coalesce(prime1,'') || ' | ' || coalesce(kind,'') || ' | ' || coalesce(tbl2,'') || ' ' || coalesce(prime2,'')) STORED, "
+        "prime TEXT GENERATED ALWAYS AS (coalesce(tbl1,'') || '|' || coalesce(prime1,'') || '|' || coalesce(kind,'') || '|' || coalesce(tbl2,'') || '|' || coalesce(prime2,'')) STORED, marked INTEGER NOT NULL DEFAULT 0)")
+    oDb.execute('CREATE UNIQUE INDEX idx_maps_prime ON maps (prime)')
+    oDb.execute('CREATE INDEX idx_maps_1 ON maps (tbl1, prime1)')
+    oDb.execute('CREATE INDEX idx_maps_2 ON maps (tbl2, prime2)')
+    oDb.execute('CREATE TABLE views (tbl TEXTLINE NOT NULL, fld TEXTLINE NOT NULL, val TEXTLINE, PRIMARY KEY (tbl, fld))')
+    for sOwn, sOwnId, lsOwn in (('lookups', 'lookup_id', ['src', 'tbl', 'fld', 'val', 'ordinal', 'descrip', 'url', 'notes', 'tags']), ('maps', 'map_id', ['tbl1', 'prime1', 'kind', 'tbl2', 'prime2', 'notes', 'tags'])):
+        oDb.execute('CREATE TRIGGER %s AFTER UPDATE OF %s ON %s FOR EACH ROW WHEN %s BEGIN UPDATE %s SET edited = CURRENT_TIMESTAMP WHERE %s = NEW.%s; END'
+            % (q('trg_' + sOwn + '_edited'), ', '.join(lsOwn), sOwn, ' OR '.join('OLD.%s IS NOT NEW.%s' % (s, s) for s in lsOwn), sOwn, sOwnId, sOwnId))
+    lsSeeds = [('DbDo', '*', 'type', s) for s in lsTypes] + [('DbDo', 'maps', 'kind', s) for s in lsKinds]
+    for sTbl, sFld in sorted(set((t, f) for _, t, f, _ in lsSeeds)):
+        lsVals = sorted(v for _, t, f, v in lsSeeds if t == sTbl and f == sFld)
+        oDb.executemany('INSERT INTO lookups (src, tbl, fld, val, ordinal) VALUES (?, ?, ?, ?, ?)', [('DbDo', sTbl, sFld, v, i + 1) for i, v in enumerate(lsVals)])
+    standardTable(oDb, sTable, lsData, dTypes, lsData[:3], True)
+    iSkipped = 0
+    for r in llRows:
+        dRow = dict(zip(lsFields, r))
+        lsCols = lsData + [s for s in ('url', 'notes', 'tags') if s in lsFields]
+        lsVals = [None if not dRow[s].strip() else (int(dRow[s]) if dTypes[s] == 'INTEGER' else float(dRow[s]) if dTypes[s] == 'REAL' else dRow[s]) for s in lsCols]
+        oCur = oDb.execute('INSERT OR IGNORE INTO %s (%s) VALUES (%s)' % (q(sTable), ', '.join(q(s) for s in lsCols), ', '.join('?' * len(lsCols))), lsVals)
+        if oCur.rowcount == 0: iSkipped += 1
+    oDb.commit()
+    oDb.close()
+    print('%s: %d %s in table %s%s' % (os.path.basename(sOut), len(llRows) - iSkipped, 'record' if len(llRows) - iSkipped == 1 else 'records', sTable,
+        '; %d duplicate %s left out' % (iSkipped, 'row' if iSkipped == 1 else 'rows') if iSkipped else ''))
+else:
+    oDb = sqlite3.connect('file:' + os.path.abspath(sIn).replace('\\', '/') + '?mode=ro', uri=True)
+    lsOut = ['# ' + os.path.splitext(os.path.basename(sIn))[0], '']
+    for (sTable,) in oDb.execute("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name COLLATE NOCASE"):
+        # DbDo's own tables are kept off every list, as DbDo keeps them.
+        if sTable in ('lookups', 'maps', 'views'): continue
+        oCursor = oDb.execute('SELECT * FROM %s' % q(sTable))
+        lsFields = [d[0] for d in oCursor.description]
+        llRows = oCursor.fetchall()
+        # A DbDo table gives its data: not its id, its times, look, prime or marked, nor url, notes or tags left empty.
+        bDbDo = 'prime' in lsFields and 'look' in lsFields
+        lsKeep = [i for i, s in enumerate(lsFields) if not bDbDo or (s not in lsHousekeeping and s != singular(sTable) + '_id'
+            and not (s in ('url', 'notes', 'tags') and not any(r[i] not in (None, '') for r in llRows)))]
+        lsOut += ['## ' + sTable, '', '| ' + ' | '.join(cell(lsFields[i]) for i in lsKeep) + ' |', '|' + ' --- |' * len(lsKeep)]
+        lsOut += ['| ' + ' | '.join(cell(r[i]) for i in lsKeep) + ' |' for r in llRows]
+        lsOut.append('')
+    oDb.close()
+    open(sOut, 'w', encoding='utf-8-sig', newline='\r\n').write('\n'.join(lsOut))
+'''
+
+
+def engineSqlite(sSource, sTo, sOut):
+    """Run sSqliteScript, as Conversion.cs does, with the Python running this module."""
+    sScript = os.path.join(tempfile.mkdtemp(prefix="homerSqlite-"), "sqlite.py")
+    try:
+        open(sScript, "w", encoding="utf-8").write(sSqliteScript)
+        run([sys.executable, sScript, sSource, sOut], "SQLite")
+    finally:
+        shutil.rmtree(os.path.dirname(sScript), ignore_errors=True)
+
+
+def engineEdge(sSource, sTo, sOut):
+    """A PDF from a web page by Microsoft Edge (1.90.0), as Conversion.cs's edge engine: headless, a fresh
+    profile of its own so it never joins the person's open Edge, no header or footer, a tagged PDF with an
+    outline where Edge makes one."""
+    if typeOf(sSource) != "htm": raise ValueError("Edge prints only a web page to PDF")
+    sEdge = programFor("edge")
+    if not sEdge: raise RuntimeError("Microsoft Edge is not installed")
+    sProfile = tempfile.mkdtemp(prefix="HomerEdgePdf_")
+    sTarget = os.path.abspath(sOut)
+    try:
+        if os.path.exists(sTarget): os.remove(sTarget)
+        sUrl = pathlib.Path(os.path.abspath(sSource)).as_uri()
+        lsCommand = [sEdge, "--headless", "--disable-gpu", "--no-first-run", "--no-default-browser-check", "--disable-extensions",
+                     "--user-data-dir=" + sProfile, "--no-pdf-header-footer", "--generate-pdf-document-outline", "--export-tagged-pdf",
+                     "--print-to-pdf=" + sTarget, sUrl]
+        try: run(lsCommand, "Edge")
+        except Exception as oError: say("Edge reported a problem: %s" % oError)
+        if not os.path.isfile(sTarget) or os.path.getsize(sTarget) < 5: raise RuntimeError("Edge wrote no PDF")
+        with open(sTarget, "rb") as oIn:
+            if oIn.read(4) != b"%PDF": raise RuntimeError("Edge wrote something that is not a PDF")
+    finally:
+        shutil.rmtree(sProfile, ignore_errors=True)
+
+
+dEngines = {"copy": engineCopy, "edge": engineEdge, "sqlite": engineSqlite, "markdown": engineMarkdown, "ocr": engineOcr, "officecom": engineOfficeCom,
               "json": engineJson, "page": enginePage, "pandoc": enginePandoc, "table": engineTable, "pdfstructure": enginePdfStructure, "pdftext": enginePdfText, "zipxml": engineZipXml}
 
 
@@ -1037,9 +1217,25 @@ def mediaConvert(sSource, sOut, sTo):
 
 
 def canConvert(sSource, sTarget):
-    """Whether convert can make sTarget's type from sSource's: the route table, or the media half."""
-    sTo = typeOf(sTarget) if (os.path.splitext(sTarget)[1] or "/" in sTarget or os.sep in sTarget) else sTarget.lstrip(".").lower()
-    return bool(loadTable().get(typeOf(sSource), {}).get(sTo)) or mediaCan(sSource, sTo)
+    """Whether convert can make sTarget's type from sSource's: the route table, through a hub, or the media half."""
+    sTo = typeOf(sTarget) if (os.path.splitext(sTarget)[1] or "/" in sTarget or os.sep in sTarget) else typeOf(sTarget.lstrip("."))
+    return bool(loadTable().get(typeOf(sSource), {}).get(sTo)) or bool(hubFor(typeOf(sSource), sTo)) or mediaCan(sSource, sTo)
+
+
+# THROUGH MARKDOWN (1.90.0), as Conversion.cs does: a pair the table does not name, or whose every way fails,
+# goes in two of the table's own steps through Markdown, else a web page. Each step is an ordinary route.
+lsHubs = ["md", "htm"]
+setIntermediates = set()
+
+
+def hubFor(sFrom, sTo):
+    """The hub a pair would go through, or "" when it cannot be made that way."""
+    if not sFrom or not sTo or sFrom == sTo: return ""
+    dTable = loadTable()
+    for sHub in lsHubs:
+        if sHub in (sFrom, sTo): continue
+        if dTable.get(sFrom, {}).get(sHub) and dTable.get(sHub, {}).get(sTo): return sHub
+    return ""
 
 
 def convert(sSource, sTarget, dOptions=None):
@@ -1057,9 +1253,34 @@ def convert(sSource, sTarget, dOptions=None):
         iMs = int((time.time() - dtMedia) * 1000)
         say("%s -> %s by %s in %d ms" % (sSource, sOut, sMediaWay, iMs))
         return {"path": sOut, "route": sMediaWay, "ms": iMs, "skipped": []}
-    dTable = loadTable()
-    lRoutes = dTable.get(typeOf(sSource), {}).get(sTo)
-    if not lRoutes: raise ValueError("no route from .%s to .%s" % (typeOf(sSource), sTo))
+    sTo = typeOf(sTo)
+    sHub = hubFor(typeOf(sSource), sTo)
+    lRoutes = loadTable().get(typeOf(sSource), {}).get(sTo)
+    if not lRoutes and not sHub: raise ValueError("no route from .%s to .%s" % (typeOf(sSource), sTo))
+    sDirect = ""
+    if lRoutes:
+        try: return convertByRoute(sSource, sOut, sTo, lRoutes)
+        except Exception as oError:
+            if not sHub: raise
+            sDirect = str(oError)
+            say("%s: its own route could not, so through %s -- %s" % (os.path.basename(sSource), sHub, sDirect))
+    sDir = tempfile.mkdtemp(prefix="homerHub-")
+    try:
+        sMiddle = os.path.join(sDir, os.path.splitext(os.path.basename(sSource))[0] + "." + sHub)
+        setIntermediates.add(os.path.abspath(sMiddle))
+        dFirst = convertByRoute(sSource, sMiddle, sHub, loadTable()[typeOf(sSource)][sHub])
+        dSecond = convertByRoute(sMiddle, sOut, sTo, loadTable()[sHub][sTo])
+        return {"path": sOut, "route": dFirst["route"] + " then " + dSecond["route"] + " (through " + sHub + ")",
+                "ms": dFirst["ms"] + dSecond["ms"], "skipped": dFirst["skipped"] + dSecond["skipped"]}
+    except Exception as oError:
+        raise RuntimeError(("%s; and through %s: %s" % (sDirect, sHub, oError)) if sDirect else str(oError))
+    finally:
+        setIntermediates.discard(os.path.abspath(sMiddle)) if "sMiddle" in locals() else None
+        shutil.rmtree(sDir, ignore_errors=True)
+
+
+def convertByRoute(sSource, sOut, sTo, lRoutes):
+    """One route's ways, best first, the first whose engines are present; the middle of convert."""
     lsTried = []
     for lSteps in lRoutes:
         sName = " > ".join(e for e, _ in lSteps)
@@ -1083,6 +1304,9 @@ def convert(sSource, sTarget, dOptions=None):
             if typeOf(sOut) in ("csv", "htm", "html", "inix", "md", "tsv", "txt"):
                 sMade = decodeText(open(sOut, "rb").read()).replace("\r\n", "\n").replace("\r", "\n")
                 open(sOut, "w", encoding="utf-8-sig", newline="\r\n").write(sMade)
+            # Every file finished for a screen reader, then checked (1.91.0): see finishOutput. The middle file of a
+            # two-step conversion is not, since the next step reads it, not a person.
+            if os.path.abspath(sOut) not in setIntermediates: finishOutput(sOut)
             iMs = int((time.time() - dtStart) * 1000)
             say("%s -> %s by %s in %d ms" % (sSource, sOut, sName, iMs))
             return {"path": sOut, "route": sName, "ms": iMs, "skipped": lsTried}
@@ -1103,6 +1327,332 @@ def decodeText(abText):
     if abText[:3] == b"\xef\xbb\xbf": return abText[3:].decode("utf-8", "replace")
     try: return abText.decode("utf-8")
     except UnicodeDecodeError: return abText.decode("cp1252", "replace")
+
+
+# ---------- accessible output (1.91.0), as Conversion.cs's finishOutput ----------
+#
+# EVERY FILE A HOMER APP MAKES IS FINISHED FOR A SCREEN READER, THEN CHECKED. Conversion.cs explains each
+# step; this is the same, rule for rule, so a Python app's file is finished as a C# app's is. Findings use
+# extCheck's rule names. Header names follow the author's xlHeaders.vbs, improved: an empty top-left corner
+# no longer hides a two-way table, and a header must be text.
+
+import html as htmlModule
+import locale
+
+
+def documentTitle(sPath):
+    sStem = os.path.splitext(os.path.basename(sPath))[0].replace("_", " ").strip()
+    return sStem or "Untitled"
+
+
+def documentLanguage():
+    try:
+        sName = locale.getlocale()[0] or ""
+    except Exception:
+        sName = ""
+    sName = sName.split(".")[0].replace("_", "-")
+    return sName if re.match(r"^[a-z]{2}-[A-Z]{2}$", sName) else "en-US"
+
+
+def documentAuthor():
+    return os.environ.get("USERNAME") or os.environ.get("USER") or ""
+
+
+def xmlEscape(s):
+    return (s or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+
+
+def xmlText(s):
+    return htmlModule.unescape(s or "")
+
+
+def readPackage(sPath):
+    with zipfile.ZipFile(sPath) as oZip:
+        lsOrder = oZip.namelist()
+        dParts = {s: oZip.read(s) for s in lsOrder}
+    return lsOrder, dParts
+
+
+def writePackage(sPath, lsOrder, dParts):
+    sTemp = sPath + ".finishing"
+    with zipfile.ZipFile(sTemp, "w", zipfile.ZIP_DEFLATED) as oZip:
+        for sName in lsOrder:
+            oZip.writestr(sName, dParts[sName], zipfile.ZIP_STORED if sName == "mimetype" else zipfile.ZIP_DEFLATED)
+    os.replace(sTemp, sPath)
+
+
+def partText(dParts, sName):
+    return dParts[sName].decode("utf-8", "replace").lstrip("\ufeff") if sName in dParts else ""
+
+
+def setPart(dParts, lsOrder, sName, sText):
+    if sName not in dParts: lsOrder.append(sName)
+    dParts[sName] = sText.encode("utf-8")
+
+
+def ensureCoreProperties(dParts, lsOrder, sTitle, lsFindings):
+    sCore = partText(dParts, "docProps/core.xml")
+    if not sCore:
+        sCore = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" '
+                 'xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"></cp:coreProperties>')
+        sTypes = partText(dParts, "[Content_Types].xml")
+        if "/docProps/core.xml" not in sTypes:
+            setPart(dParts, lsOrder, "[Content_Types].xml", sTypes.replace("</Types>", '<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>'))
+        sRels = partText(dParts, "_rels/.rels")
+        if "core-properties" not in sRels:
+            setPart(dParts, lsOrder, "_rels/.rels", sRels.replace("</Relationships>", '<Relationship Id="rIdHomerCore" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/></Relationships>'))
+    for sTag, sValue, sRule in (("dc:title", sTitle, "MissingDocumentTitle"), ("dc:creator", documentAuthor(), "MissingAuthor"), ("dc:language", documentLanguage(), "MissingDocumentLanguage")):
+        oHas = re.search("<" + sTag + r"(?:\s[^>]*)?>(.*?)</" + sTag + ">", sCore, re.S)
+        if oHas and xmlText(oHas.group(1)).strip(): continue
+        if not sValue: lsFindings.append(sRule + ": left blank, nothing to fill it with"); continue
+        sElement = "<%s>%s</%s>" % (sTag, xmlEscape(sValue), sTag)
+        if oHas: sCore = sCore[:oHas.start()] + sElement + sCore[oHas.end():]
+        else: sCore = re.sub("<" + sTag + r"\s*/>", "", sCore).replace("</cp:coreProperties>", sElement + "</cp:coreProperties>")
+        lsFindings.append("%s: fixed, %s set to %s" % (sRule, sTag, sValue))
+    setPart(dParts, lsOrder, "docProps/core.xml", sCore)
+
+
+def finishOffice(sPath, sKind, lsFindings):
+    lsOrder, dParts = readPackage(sPath)
+    sTitle = ""
+    if sKind == "word":
+        sBody = partText(dParts, "word/document.xml")
+        for oPara in re.finditer(r"<w:p\b.*?</w:p>", sBody, re.S):
+            oStyle = re.search(r'<w:pStyle w:val="([^"]+)"', oPara.group(0))
+            if not oStyle: continue
+            sStyle = oStyle.group(1).lower()
+            if sStyle != "title" and not sStyle.startswith("heading"): continue
+            sText = "".join(xmlText(m.group(1)) for m in re.finditer(r"<w:t\b[^>]*>(.*?)</w:t>", oPara.group(0), re.S)).strip()
+            if sText: sTitle = sText; break
+        if not re.search(r'<w:pStyle w:val="(?:[Hh]eading|Title)', sBody): lsFindings.append("NoHeadings: the document has no headings, so a screen reader cannot move by them")
+        for oPicture in re.finditer(r"<wp:docPr\b[^>]*>", sBody):
+            if not re.search(r'\bdescr="[^"]+"', oPicture.group(0)): lsFindings.append("MissingAltText: a picture has no alternative text")
+        sStyles = partText(dParts, "word/styles.xml")
+        oDefault = re.search(r"<w:rPrDefault>\s*<w:rPr>(.*?)</w:rPr>", sStyles, re.S)
+        if oDefault and "<w:lang" not in oDefault.group(1):
+            sStyles = sStyles[:oDefault.start(1)] + oDefault.group(1) + '<w:lang w:val="%s"/>' % documentLanguage() + sStyles[oDefault.end(1):]
+            setPart(dParts, lsOrder, "word/styles.xml", sStyles)
+            lsFindings.append("MissingLanguage: fixed, the default style's language set to " + documentLanguage())
+    else:
+        for sName in list(lsOrder):
+            if not re.match(r"^ppt/slides/slide\d+\.xml$", sName): continue
+            sSlide = partText(dParts, sName)
+            oTitle = re.search(r'<p:sp>(?:(?!</p:sp>).)*?type="(?:ctrTitle|title)".*?</p:sp>', sSlide, re.S)
+            if not oTitle: lsFindings.append("SlideMissingTitle: %s has no title" % os.path.splitext(os.path.basename(sName))[0])
+            elif not sTitle: sTitle = "".join(xmlText(m.group(1)) for m in re.finditer(r"<a:t>(.*?)</a:t>", oTitle.group(0), re.S)).strip()
+            for oPicture in re.finditer(r"<p:pic>.*?</p:pic>", sSlide, re.S):
+                if not re.search(r'<p:cNvPr\b[^>]*\bdescr="[^"]+"', oPicture.group(0)):
+                    lsFindings.append("MissingAltText: a picture on %s has no alternative text" % os.path.splitext(os.path.basename(sName))[0])
+    ensureCoreProperties(dParts, lsOrder, sTitle or documentTitle(sPath), lsFindings)
+    writePackage(sPath, lsOrder, dParts)
+
+
+def finishEpub(sPath, lsFindings):
+    lsOrder, dParts = readPackage(sPath)
+    for sName in lsOrder:
+        if not sName.lower().endswith(".opf"): continue
+        sOpf = partText(dParts, sName); sWas = sOpf
+        oTitle = re.search(r"<dc:title\b[^>]*>(.*?)</dc:title>", sOpf, re.S)
+        if not oTitle or not xmlText(oTitle.group(1)).strip() or xmlText(oTitle.group(1)).strip().upper() == "UNTITLED":
+            # The book's first heading, as a Word file's title is found, else the file's name.
+            sBookTitle = ""
+            for sPage in lsOrder:
+                if not re.search(r"\.x?html?$", sPage, re.I): continue
+                oHeading = re.search(r'<h1\b(?![^>]*class="title")[^>]*>(.*?)</h1>', partText(dParts, sPage), re.S | re.I)
+                if oHeading:
+                    sBookTitle = xmlText(re.sub(r"<[^>]+>", "", oHeading.group(1))).strip()
+                    # Pandoc's own title page says UNTITLED when the source had no title, so that heading is no title.
+                    if sBookTitle.upper() == "UNTITLED": sBookTitle = ""
+                    if sBookTitle: break
+            sBookTitle = sBookTitle or documentTitle(sPath)
+            sElement = '<dc:title id="epub-title-1">%s</dc:title>' % xmlEscape(sBookTitle)
+            sOpf = sOpf[:oTitle.start()] + sElement + sOpf[oTitle.end():] if oTitle else sOpf.replace("</metadata>", sElement + "</metadata>")
+            lsFindings.append("MissingTitle: fixed, the book's title set to " + sBookTitle)
+        if not re.search(r"<dc:language\b[^>]*>\s*\S", sOpf):
+            sOpf = re.sub(r"<dc:language\b[^>]*>\s*</dc:language>|<dc:language\s*/>", "", sOpf).replace("</metadata>", "<dc:language>%s</dc:language></metadata>" % documentLanguage())
+            lsFindings.append("MissingLanguage: fixed, the book's language set to " + documentLanguage())
+        if sOpf != sWas: setPart(dParts, lsOrder, sName, sOpf)
+    writePackage(sPath, lsOrder, dParts)
+
+
+def finishMarkdown(sPath, lsFindings):
+    sText = decodeText(open(sPath, "rb").read()).replace("\r\n", "\n")
+    iLast = 0; bHeading = False
+    for oHeading in re.finditer(r"^(#{1,6})[ \t]+\S", sText, re.M):
+        iLevel = len(oHeading.group(1))
+        if iLast and iLevel > iLast + 1: lsFindings.append("SkippedHeadingLevel: a level %d heading follows a level %d" % (iLevel, iLast))
+        iLast = iLevel; bHeading = True
+    if not bHeading: lsFindings.append("NoHeadings: the document has no headings, so a screen reader cannot move by them")
+    if re.search(r"!\[\s*\]\(", sText): lsFindings.append("MissingAltText: a picture has no alternative text")
+    if not sText.startswith("---\n"):
+        oFirst = re.search(r"^#[ \t]+(.+)$", sText, re.M)
+        sTitle = oFirst.group(1).strip() if oFirst else documentTitle(sPath)
+        sText = '---\ntitle: "%s"\nlang: %s\n---\n\n' % (sTitle.replace("\\", "\\\\").replace('"', '\\"'), documentLanguage()) + sText
+        open(sPath, "w", encoding="utf-8-sig", newline="\r\n").write(sText)
+        lsFindings.append("NoYamlFrontMatter: fixed, title and lang added")
+
+
+def checkPage(sPath, lsFindings):
+    sHtml = decodeText(open(sPath, "rb").read())
+    for oImage in re.finditer(r"<img\b[^>]*>", sHtml, re.I):
+        if not re.search(r'\balt="', oImage.group(0), re.I): lsFindings.append("MissingAltText: a picture has no alternative text")
+    if not re.search(r'<html\b[^>]*\blang="[^"]+"', sHtml, re.I): lsFindings.append("MissingDocumentLanguage: the page names no language")
+
+
+def cellPosition(sRef):
+    oRef = re.match(r"^\$?([A-Za-z]+)\$?(\d+)$", sRef)
+    if not oRef: return None
+    iColumn = 0
+    for c in oRef.group(1).upper(): iColumn = iColumn * 26 + (ord(c) - ord("A") + 1)
+    return int(oRef.group(2)), iColumn
+
+
+def columnName(iColumn):
+    sName = ""
+    while iColumn > 0:
+        iRest = (iColumn - 1) % 26; sName = chr(ord("A") + iRest) + sName; iColumn = (iColumn - 1) // 26
+    return sName
+
+
+def findRegions(dText):
+    """[top, left, bottom, right] rectangles, as Excel's CurrentRegion gives them."""
+    lRegions = []; setSeen = set()
+    for tStart in dText:
+        if tStart in setSeen: continue
+        lBox = [tStart[0], tStart[1], tStart[0], tStart[1]]
+        lQueue = [tStart]; setSeen.add(tStart)
+        while lQueue:
+            iRow, iColumn = lQueue.pop()
+            lBox = [min(lBox[0], iRow), min(lBox[1], iColumn), max(lBox[2], iRow), max(lBox[3], iColumn)]
+            for iDown in (-1, 0, 1):
+                for iAcross in (-1, 0, 1):
+                    tNear = (iRow + iDown, iColumn + iAcross)
+                    if tNear in dText and tNear not in setSeen: setSeen.add(tNear); lQueue.append(tNear)
+        lRegions.append(lBox)
+    bMerged = True
+    while bMerged:
+        bMerged = False
+        for i in range(len(lRegions)):
+            for j in range(i + 1, len(lRegions)):
+                a, b = lRegions[i], lRegions[j]
+                if a[1] - 1 <= b[3] and b[1] - 1 <= a[3] and a[0] - 1 <= b[2] and b[0] - 1 <= a[2]:
+                    lRegions[i] = [min(a[0], b[0]), min(a[1], b[1]), max(a[2], b[2]), max(a[3], b[3])]
+                    del lRegions[j]; bMerged = True; break
+            if bMerged: break
+    return sorted(lRegions)
+
+
+def labelsRun(dText, setIsText, iRow, iColumn, iDown, iAcross, iCount):
+    if iCount < 1: return False
+    setSeen = set()
+    for i in range(iCount):
+        tKey = (iRow + i * iDown, iColumn + i * iAcross)
+        sValue = dText.get(tKey)
+        if sValue is None or tKey not in setIsText or sValue.lower() in setSeen: return False
+        setSeen.add(sValue.lower())
+    return True
+
+
+def headerStem(lBox, dText, setIsText):
+    iTop, iLeft, iBottom, iRight = lBox
+    if iBottom - iTop < 1 or iRight - iLeft < 1: return ""
+    bCorner = (iTop, iLeft) in dText
+    iFirstColumn = iLeft if bCorner else iLeft + 1
+    iFirstRow = iTop if bCorner else iTop + 1
+    bColumns = labelsRun(dText, setIsText, iTop, iFirstColumn, 0, 1, iRight - iFirstColumn + 1)
+    bRows = labelsRun(dText, setIsText, iFirstRow, iLeft, 1, 0, iBottom - iFirstRow + 1)
+    return "Title" if bColumns and bRows else "ColumnTitle" if bColumns else "RowTitle" if bRows else ""
+
+
+def finishXlsx(sPath, lsFindings):
+    lsOrder, dParts = readPackage(sPath)
+    sBook = partText(dParts, "xl/workbook.xml"); sBookRels = partText(dParts, "xl/_rels/workbook.xml.rels")
+    lsShared = ["".join(xmlText(t) for t in re.findall(r"<t\b[^>]*>(.*?)</t>", m, re.S)) for m in re.findall(r"<si>(.*?)</si>", partText(dParts, "xl/sharedStrings.xml"), re.S)]
+    setNames = set(); setNamedCells = set()
+    for sAttrs, sRef in re.findall(r"<definedName\b([^>]*)>(.*?)</definedName>", sBook, re.S):
+        oName = re.search(r'\bname="([^"]+)"', sAttrs)
+        if oName: setNames.add(oName.group(1).lower())
+        setNamedCells.add(xmlText(sRef).replace("'", "").strip().lower())
+    lsSheets = re.findall(r"<sheet\b[^>]*/>", sBook)
+    lsNewNames = []
+    for sSheetTag in lsSheets:
+        sSheetName = xmlText(re.search(r'\bname="([^"]*)"', sSheetTag).group(1))
+        sRid = re.search(r'\br:id="([^"]*)"', sSheetTag).group(1)
+        oRel = re.search(r'<Relationship\b[^>]*\bId="%s"[^>]*>' % re.escape(sRid), sBookRels)
+        sTarget = re.search(r'\bTarget="([^"]*)"', oRel.group(0)).group(1) if oRel else ""
+        sPart = sTarget.lstrip("/") if sTarget.startswith("/") else "xl/" + sTarget
+        sXml = partText(dParts, sPart)
+        if not sXml: continue
+        if len(lsSheets) == 1 and re.match(r"^(Sheet\d*|Data)$", sSheetName) and "<f" not in sXml and not setNames:
+            sNewName = re.sub(r"[\[\]:*?/\\]", " ", documentTitle(sPath)).strip()[:31].strip()
+            if sNewName and sNewName != sSheetName:
+                sBook = sBook.replace(sSheetTag, sSheetTag.replace('name="%s"' % xmlEscape(sSheetName), 'name="%s"' % xmlEscape(sNewName)))
+                lsFindings.append("DefaultSheetName: fixed, %s renamed %s" % (sSheetName, sNewName)); sSheetName = sNewName
+        if "<mergeCell " in sXml: lsFindings.append("MergedCells: %s has merged cells, which screen readers announce poorly" % sSheetName)
+        dText = {}; setIsText = set()
+        for sAttrs, sInner in re.findall(r"<c\b([^>]*?)(?:/>|>(.*?)</c>)", sXml, re.S):
+            dAttrs = dict(re.findall(r'\b([A-Za-z:]+)="([^"]*)"', sAttrs))
+            sRef, sType = dAttrs.get("r", ""), dAttrs.get("t", "")
+            if not sRef or not sInner: continue
+            if sType == "inlineStr": sValue = "".join(xmlText(t) for t in re.findall(r"<t\b[^>]*>(.*?)</t>", sInner, re.S))
+            else:
+                oV = re.search(r"<v>(.*?)</v>", sInner, re.S)
+                if not oV: continue
+                sValue = xmlText(oV.group(1))
+                if sType == "s": sValue = lsShared[int(sValue)] if sValue.isdigit() and int(sValue) < len(lsShared) else ""
+            if not sValue.strip(): continue
+            tPosition = cellPosition(sRef)
+            if not tPosition: continue
+            dText[tPosition] = sValue.strip()
+            if sType in ("s", "inlineStr", "str"): setIsText.add(tPosition)
+        bFrozen = "<pane " in sXml
+        for lBox in findRegions(dText):
+            sStem = headerStem(lBox, dText, setIsText)
+            if not sStem: continue
+            sCell = "$%s$%d" % (columnName(lBox[1]), lBox[0])
+            if (sSheetName + "!" + sCell).lower() in setNamedCells: continue
+            iNumber = 1
+            while ("%s%02d" % (sStem, iNumber)).lower() in setNames: iNumber += 1
+            sName = "%s%02d" % (sStem, iNumber); setNames.add(sName.lower())
+            lsNewNames.append('<definedName name="%s">%s</definedName>' % (sName, xmlEscape("'%s'!%s" % (sSheetName.replace("'", "''"), sCell))))
+            lsFindings.append("Header names: %s for %s %s%d:%s%d" % (sName, sSheetName, columnName(lBox[1]), lBox[0], columnName(lBox[3]), lBox[2]))
+            if not bFrozen:
+                iYSplit = lBox[0] if sStem != "RowTitle" else 0
+                iXSplit = lBox[1] if sStem != "ColumnTitle" else 0
+                sPane = ("<pane" + (' xSplit="%d"' % iXSplit if iXSplit else "") + (' ySplit="%d"' % iYSplit if iYSplit else "")
+                         + ' topLeftCell="%s%d" activePane="%s" state="frozen"/>' % (columnName(iXSplit + 1), iYSplit + 1, "bottomRight" if iXSplit and iYSplit else "bottomLeft" if iYSplit else "topRight"))
+                oView = re.search(r"<sheetView\b[^>]*?(/?)>", sXml)
+                if oView and oView.group(1) == "/": sXml = sXml[:oView.start()] + oView.group(0)[:-2] + ">" + sPane + "</sheetView>" + sXml[oView.end():]
+                elif oView: sXml = sXml[:oView.end()] + sPane + sXml[oView.end():]
+                else:
+                    oBefore = re.search(r"<(?:sheetFormatPr|cols|sheetData)\b", sXml)
+                    if oBefore: sXml = sXml[:oBefore.start()] + '<sheetViews><sheetView workbookViewId="0">' + sPane + "</sheetView></sheetViews>" + sXml[oBefore.start():]
+                bFrozen = True
+                setPart(dParts, lsOrder, sPart, sXml)
+    if lsNewNames:
+        sNew = "".join(lsNewNames)
+        if "</definedNames>" in sBook: sBook = sBook.replace("</definedNames>", sNew + "</definedNames>")
+        elif re.search(r"<definedNames\s*/>", sBook): sBook = re.sub(r"<definedNames\s*/>", "<definedNames>" + sNew + "</definedNames>", sBook)
+        else: sBook = sBook.replace("</sheets>", "</sheets><definedNames>" + sNew + "</definedNames>")
+    setPart(dParts, lsOrder, "xl/workbook.xml", sBook)
+    ensureCoreProperties(dParts, lsOrder, documentTitle(sPath), lsFindings)
+    writePackage(sPath, lsOrder, dParts)
+
+
+def finishOutput(sPath):
+    """The step every route ends with. Never fails a conversion: a finishing problem is said and logged."""
+    sType = typeOf(sPath); lsFindings = []
+    try:
+        if sType == "xlsx": finishXlsx(sPath, lsFindings)
+        elif sType == "docx": finishOffice(sPath, "word", lsFindings)
+        elif sType == "pptx": finishOffice(sPath, "ppt", lsFindings)
+        elif sType == "epub": finishEpub(sPath, lsFindings)
+        elif sType == "md": finishMarkdown(sPath, lsFindings)
+        elif sType == "htm": checkPage(sPath, lsFindings)
+    except Exception as oError:
+        say("Finishing %s for a screen reader failed: %s" % (os.path.basename(sPath), oError))
+    for sFinding in lsFindings: say("Quality %s: %s" % (os.path.basename(sPath), sFinding))
+    return lsFindings
 
 
 def toText(sSource):

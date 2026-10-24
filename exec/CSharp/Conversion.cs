@@ -150,7 +150,20 @@ if (!File.Exists(sSource)) { sError = "the file was not found"; return false; }
 bool bHandled = false, bMade = false;
 mediaConvert(sSource, sTarget, ref bHandled, ref bMade, ref sError);
 if (bHandled) return bMade;
-if (hasRoute(sSource, sTarget)) return convertByRoute(sSource, sTarget, bQuick, out sError);
+if (hasRoute(sSource, sTarget)) {
+if (convertByRoute(sSource, sTarget, bQuick, out sError)) return true;
+string sDirect = sError;
+string sHub = hubFor(sSource, sTarget);
+if (sHub == "") return false;
+Log.info("Conversion " + routeName(sSource, sTarget) + ": its own route could not, so through " + sHub + " -- " + sDirect);
+if (convertByHub(sSource, sTarget, sHub, bQuick, out sError)) return true;
+sError = sDirect + "; and through " + sHub + ": " + sError;
+return false;
+}
+{
+string sHub = hubFor(sSource, sTarget);
+if (sHub != "") return convertByHub(sSource, sTarget, sHub, bQuick, out sError);
+}
 // A type the table does not name: its text, then Pandoc to the target.
 string sText = toText(sSource, out sError);
 if (sText.Length == 0) {
@@ -165,6 +178,43 @@ return pandoc(sMd, sTarget, out sError);
 }
 finally { try { File.Delete(sMd); } catch (Exception) { } }
 } // convert method
+
+// THROUGH MARKDOWN (kit 1.90.0, Jamal's rule of 24 October 2026): every Homer app converts between
+// ANY two of the types the kit knows, PDF included, with the same code. The table names 104 pairs
+// and cannot name them all, so a pair it does not name -- or whose every way fails, as docx2pdf
+// does without Office -- goes in two of the table's own steps through a hub: Markdown, which
+// nearly every type reads into and writes out of, else a web page (json2pdf: json2htm, htm2pdf).
+// Each step is an ordinary route, so each keeps its best-first ways, its logging, and its own
+// finishing; nothing here is a second way of converting.
+private static readonly string[] aHubs = { "md", "htm" };
+
+// hubFor: the hub a pair would go through, or "" when the pair cannot be made that way.
+public static string hubFor(string sSource, string sTarget) {
+string sFrom = typeOf(sSource), sTo = typeOf(sTarget);
+if (sFrom == "" || sTo == "" || sFrom == sTo) return "";
+foreach (string sHub in aHubs) {
+if (sFrom == sHub || sTo == sHub) continue;
+if (hasRoute(sFrom, sHub) && hasRoute(sHub, sTo)) return sHub;
+}
+return "";
+} // hubFor method
+
+private static HashSet<string> hsIntermediates = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+private static bool convertByHub(string sSource, string sTarget, string sHub, bool bQuick, out string sError) {
+string sMiddle = tempPath(sSource, "." + sHub);
+hsIntermediates.Add(Path.GetFullPath(sMiddle));
+try {
+if (!convertByRoute(sSource, sMiddle, bQuick, out sError)) { sError = routeName(sSource, sHub) + ": " + sError; return false; }
+if (!convertByRoute(sMiddle, sTarget, bQuick, out sError)) { sError = routeName(sHub, sTarget) + ": " + sError; return false; }
+Log.info("Conversion " + routeName(sSource, sTarget) + " made through " + sHub + ", " + Path.GetFileName(sSource));
+return true;
+}
+finally {
+hsIntermediates.Remove(Path.GetFullPath(sMiddle));
+try { if (File.Exists(sMiddle)) File.Delete(sMiddle); } catch (Exception) { }
+}
+} // convertByHub method
 
 // convertByRoute: the route table's ways for this pair, best first, the first whose engines are
 // all present; the middle step of convert.
@@ -212,6 +262,9 @@ string sMadeText = decodeText(File.ReadAllBytes(sTarget));
 sMadeText = sMadeText.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "\r\n");
 File.WriteAllText(sTarget, sMadeText, new UTF8Encoding(true));
 }
+// EVERY FILE FINISHED FOR A SCREEN READER, THEN CHECKED (kit 1.91.0): see finishOutput. The
+// middle file of a two-step conversion is not, since the next step reads it, not a person.
+if (!hsIntermediates.Contains(Path.GetFullPath(sTarget))) finishOutput(sTarget);
 return true;
 }
 lsWhy.Add(sWay + ": " + sStepError);
@@ -253,6 +306,8 @@ try {
 switch (sEngine) {
 case "copy": File.Copy(sSource, sTarget, true); return true;
 case "officecom": return officeCom(sSource, sTarget, out sError);
+case "edge": return edgePdf(sSource, sTarget, out sError);
+case "sqlite": return runPython(sSqliteScript, sSource, sTarget, out sError);
 case "markdown": return markdownToHtml(sSource, sTarget, out sError);
 case "pandoc": return pandoc(sSource, sTarget, out sError);
 case "pdfstructure": return pdfStructure(sSource, sTarget, out sError);
@@ -286,6 +341,8 @@ case "pdftext": return havePdfPig() || pythonProgram() != "" ? "" : "neither Pdf
 case "pdfstructure": return haveReader() || pythonProgram() != "" ? "" : "neither the PDF reader nor Python is present";
 case "ocr": return !haveReader() ? "this program does not include the PDF reader, which OCR needs" : haveTesseract() ? "" : "Tesseract is not installed";
 case "officecom": return officeApp(sSource) == "" ? "Office cannot open this type" : "";
+case "edge": return edgePath() != "" ? "" : "Microsoft Edge is not installed";
+case "sqlite": return pythonProgram() != "" ? "" : "Python is not installed, and an SQLite database is read and written by it";
 case "json": case "page": { bool bPage = false; pageState(ref bPage); return bPage ? "" : "this program does not include the Homer page writer (ConversionPage.cs)"; }
 }
 return "the engine " + sEngine + " is unknown";
@@ -342,7 +399,7 @@ public string sType = "";
 private static readonly string[,] aTypeNames = {
 {"bat", "Windows batch script"}, {"cmd", "Windows command script"}, {"cs", "C# source"}, {"css", "style sheet"},
 {"csv", "comma separated table"}, {"cue", "CD cue sheet"}, {"doc", "Word 97 document"}, {"docx", "Word document"},
-{"epub", "EPUB book"}, {"exe", "program"}, {"htm", "web page"}, {"ini", "settings file"}, {"inix", "Homer settings file"},
+{"db", "SQLite database"}, {"epub", "EPUB book"}, {"exe", "program"}, {"htm", "web page"}, {"ini", "settings file"}, {"inix", "Homer settings file"},
 {"iss", "Inno Setup script"}, {"jkm", "JAWS key map"}, {"jpg", "JPEG picture"}, {"js", "JavaScript source"},
 {"jsd", "JAWS script documentation"}, {"jsh", "JAWS script header"}, {"json", "JSON data"}, {"jss", "JAWS script source"},
 {"log", "log"}, {"m3u", "M3U play list"}, {"m3u8", "M3U play list"}, {"md", "Markdown document"}, {"mp3", "MP3 audio"},
@@ -566,6 +623,7 @@ static partial void mediaAllTargets(List<string[]> lsAll);
 // compiles ConversionMedia. The question to ask before a batch, as BatCon does.
 public static bool canConvert(string sSource, string sTarget) {
 if (hasRoute(sSource, sTarget)) return true;
+if (hubFor(sSource, sTarget) != "") return true;
 bool bCan = false;
 mediaCan(sSource, sTarget, ref bCan);
 return bCan;
@@ -895,6 +953,141 @@ readerConvert(sSource, sTarget, true, ref bMade, ref bScans, ref sError);
 return bMade;
 } // ocrEngine method
 
+// THE SQLITE ENGINE (kit 1.90.0): a table to an SQLite database -- one table named after the file,
+// its first row the field names, every field text -- and a database to Markdown, each table under its
+// own heading, so the Markdown hub takes a database anywhere. Python has SQLite built in and the kit
+// has no SQLite of its own, so both languages run THIS SAME SCRIPT: exec\Python\conversion.py holds
+// it word for word as sSqliteScript, and the kit's build fails if the two ever differ.
+private const string sSqliteScript =
+@"import csv, io, os, re, sqlite3, sys
+sIn, sOut = sys.argv[1], sys.argv[2]
+# A DATABASE IN DBDO'S FORM (kit 1.91.0, the homer-db skill): a plural lower-case table named for the
+# file, <singular>_id, added and edited, the data fields, url, notes, tags, look, prime and marked in
+# that order, the edited and maps triggers, a unique prime index, and DbDo's lookups, maps and views.
+lsTypes = ['BLOB', 'BOOLEAN', 'INTEGER', 'NUMERIC', 'REAL', 'TEXT', 'TEXTLINE', 'TEXTMARKDOWN', 'TEXTMEMO', 'TEXTTIME']
+lsKinds = ['affiliated_with', 'located_at', 'member_of', 'part_of', 'related_to']
+lsHousekeeping = ['added', 'edited', 'look', 'prime', 'marked']
+dIrregular = {'people': 'person', 'children': 'child', 'men': 'man', 'women': 'woman', 'data': 'data'}
+def decode(ab):
+    for sCodec in ('utf-8-sig', 'cp1252'):
+        try: return ab.decode(sCodec)
+        except UnicodeDecodeError: pass
+    return ab.decode('utf-8', 'replace')
+def cell(v):
+    return ('' if v is None else str(v)).replace('|', '\\|').replace('\r', ' ').replace('\n', ' ')
+def snake(s):
+    s = re.sub(r'[^0-9a-z]+', '_', re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', s.strip()).lower()).strip('_')
+    return ('f_' + s) if s[:1].isdigit() else s
+def plural(s):
+    if s in dIrregular or s.endswith('s') and not s.endswith('ss'): return s
+    if s.endswith('y') and s[-2:-1] not in ('a', 'e', 'i', 'o', 'u'): return s[:-1] + 'ies'
+    if s.endswith(('x', 'ch', 'sh', 'ss', 'z')): return s + 'es'
+    return s + 's'
+def singular(s):
+    if s in dIrregular: return dIrregular[s]
+    if s.endswith('ies'): return s[:-3] + 'y'
+    if s.endswith(('ches', 'shes', 'xes', 'sses', 'zes')): return s[:-2]
+    if s.endswith('s') and not s.endswith('ss'): return s[:-1]
+    return s
+def q(s):
+    return '""' + s.replace('""', '""""') + '""'
+def joined(lsFields, sJoin, bSkipBlank):
+    if not bSkipBlank: return "" || '|' || "".join(""coalesce(CAST(%s AS TEXT),'')"" % q(s) for s in lsFields)
+    return ""rtrim("" + "" || "".join(""iif(%s IS NOT NULL AND length(CAST(%s AS TEXT))>0, CAST(%s AS TEXT) || ' | ', '')"" % (q(s), q(s), q(s)) for s in lsFields) + "", ' | ')""
+def kind(lsValues):
+    lsFilled = [v for v in lsValues if v.strip()]
+    if any('\n' in v for v in lsFilled): return 'TEXTMEMO'
+    if lsFilled and all(re.match(r'^-?\d{1,15}$', v.strip()) for v in lsFilled): return 'INTEGER'
+    if lsFilled and all(re.match(r'^-?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$', v.strip()) for v in lsFilled): return 'REAL'
+    return 'TEXTLINE'
+def standardTable(oDb, sTable, lsData, dTypes, lsLook, bMaps):
+    sId = singular(sTable) + '_id'
+    lsColumns = [q(sId) + ' INTEGER PRIMARY KEY AUTOINCREMENT', 'added TEXTTIME NOT NULL DEFAULT CURRENT_TIMESTAMP', 'edited TEXTTIME NOT NULL DEFAULT CURRENT_TIMESTAMP']
+    lsColumns += [q(s) + ' ' + dTypes.get(s, 'TEXTLINE') for s in lsData]
+    lsColumns += ['url TEXTLINE', 'notes TEXTMARKDOWN', 'tags TEXTMEMO']
+    lsColumns += ['look TEXT GENERATED ALWAYS AS (%s) STORED' % joined(lsLook, ' | ', True), 'prime TEXT GENERATED ALWAYS AS (%s) STORED' % joined(lsData, '|', False), 'marked INTEGER NOT NULL DEFAULT 0']
+    oDb.execute('CREATE TABLE %s (%s)' % (q(sTable), ', '.join(lsColumns)))
+    lsWatched = lsData + ['notes', 'tags']
+    oDb.execute('CREATE TRIGGER %s AFTER UPDATE OF %s ON %s FOR EACH ROW WHEN %s BEGIN UPDATE %s SET edited = CURRENT_TIMESTAMP WHERE %s = NEW.%s; END'
+        % (q('trg_' + sTable + '_edited'), ', '.join(q(s) for s in lsWatched), q(sTable), ' OR '.join('OLD.%s IS NOT NEW.%s' % (q(s), q(s)) for s in lsWatched), q(sTable), q(sId), q(sId)))
+    oDb.execute('CREATE UNIQUE INDEX %s ON %s (prime)' % (q('idx_' + sTable + '_prime'), q(sTable)))
+    if bMaps:
+        oDb.execute(""CREATE TRIGGER %s AFTER UPDATE ON %s FOR EACH ROW WHEN OLD.prime IS NOT NEW.prime BEGIN UPDATE maps SET prime1 = NEW.prime WHERE tbl1 = '%s' AND prime1 = OLD.prime; UPDATE maps SET prime2 = NEW.prime WHERE tbl2 = '%s' AND prime2 = OLD.prime; END""
+            % (q('trg_' + sTable + '_maps'), q(sTable), sTable, sTable))
+        oDb.execute(""CREATE TRIGGER %s AFTER DELETE ON %s FOR EACH ROW BEGIN DELETE FROM maps WHERE (tbl1 = '%s' AND prime1 = OLD.prime) OR (tbl2 = '%s' AND prime2 = OLD.prime); END""
+            % (q('trg_' + sTable + '_maps_delete'), q(sTable), sTable, sTable))
+if open(sIn, 'rb').read(16) != b'SQLite format 3\x00':
+    llAll = [r for r in csv.reader(io.StringIO(decode(open(sIn, 'rb').read())))]
+    llAll = [r for r in llAll if any(v.strip() for v in r)]
+    if not llAll: raise SystemExit('the table is empty')
+    sTable = plural(snake(os.path.basename(sOut).split('.')[0]) or 'record')
+    if sTable in ('lookups', 'maps', 'views'): sTable = 'user_' + sTable
+    lsReserved = lsHousekeeping + [singular(sTable) + '_id']
+    lsFields = []
+    for i, sField in enumerate(llAll[0]):
+        sField = snake(sField) or 'column_%d' % (i + 1)
+        if sField in lsReserved: sField += '_value'
+        while sField in lsFields: sField += '_'
+        lsFields.append(sField)
+    iWidth = len(lsFields)
+    llRows = [(list(r) + [''] * iWidth)[:iWidth] for r in llAll[1:]]
+    lsData = [s for s in lsFields if s not in ('url', 'notes', 'tags')]
+    if not lsData: raise SystemExit('the table has no field but url, notes and tags')
+    dTypes = {s: kind([r[i] for r in llRows]) for i, s in enumerate(lsFields)}
+    if os.path.exists(sOut): os.remove(sOut)
+    oDb = sqlite3.connect(sOut)
+    oDb.execute('CREATE TABLE lookups (lookup_id INTEGER PRIMARY KEY AUTOINCREMENT, added TEXTTIME NOT NULL DEFAULT CURRENT_TIMESTAMP, edited TEXTTIME NOT NULL DEFAULT CURRENT_TIMESTAMP, '
+        'src TEXTLINE, tbl TEXTLINE, fld TEXTLINE, val TEXTLINE, ordinal INTEGER, descrip TEXTMEMO, url TEXTLINE, notes TEXTMARKDOWN, tags TEXTMEMO, '
+        ""look TEXT GENERATED ALWAYS AS (rtrim(iif(tbl IS NOT NULL AND length(tbl)>0, tbl || ' | ', '') || iif(fld IS NOT NULL AND length(fld)>0, fld || ' | ', '') || iif(val IS NOT NULL AND length(val)>0, val || ' | ', ''), ' | ')) STORED, ""
+        ""prime TEXT GENERATED ALWAYS AS (coalesce(src,'') || '|' || coalesce(tbl,'') || '|' || coalesce(fld,'') || '|' || coalesce(val,'')) STORED, marked INTEGER NOT NULL DEFAULT 0)"")
+    oDb.execute('CREATE UNIQUE INDEX idx_lookups_prime ON lookups (prime)')
+    oDb.execute('CREATE TABLE maps (map_id INTEGER PRIMARY KEY AUTOINCREMENT, added TEXTTIME NOT NULL DEFAULT CURRENT_TIMESTAMP, edited TEXTTIME NOT NULL DEFAULT CURRENT_TIMESTAMP, '
+        'tbl1 TEXTLINE, prime1 TEXTLINE, kind TEXTLINE, tbl2 TEXTLINE, prime2 TEXTLINE, notes TEXTMARKDOWN, tags TEXTMEMO, '
+        ""look TEXT GENERATED ALWAYS AS (coalesce(tbl1,'') || ' ' || coalesce(prime1,'') || ' | ' || coalesce(kind,'') || ' | ' || coalesce(tbl2,'') || ' ' || coalesce(prime2,'')) STORED, ""
+        ""prime TEXT GENERATED ALWAYS AS (coalesce(tbl1,'') || '|' || coalesce(prime1,'') || '|' || coalesce(kind,'') || '|' || coalesce(tbl2,'') || '|' || coalesce(prime2,'')) STORED, marked INTEGER NOT NULL DEFAULT 0)"")
+    oDb.execute('CREATE UNIQUE INDEX idx_maps_prime ON maps (prime)')
+    oDb.execute('CREATE INDEX idx_maps_1 ON maps (tbl1, prime1)')
+    oDb.execute('CREATE INDEX idx_maps_2 ON maps (tbl2, prime2)')
+    oDb.execute('CREATE TABLE views (tbl TEXTLINE NOT NULL, fld TEXTLINE NOT NULL, val TEXTLINE, PRIMARY KEY (tbl, fld))')
+    for sOwn, sOwnId, lsOwn in (('lookups', 'lookup_id', ['src', 'tbl', 'fld', 'val', 'ordinal', 'descrip', 'url', 'notes', 'tags']), ('maps', 'map_id', ['tbl1', 'prime1', 'kind', 'tbl2', 'prime2', 'notes', 'tags'])):
+        oDb.execute('CREATE TRIGGER %s AFTER UPDATE OF %s ON %s FOR EACH ROW WHEN %s BEGIN UPDATE %s SET edited = CURRENT_TIMESTAMP WHERE %s = NEW.%s; END'
+            % (q('trg_' + sOwn + '_edited'), ', '.join(lsOwn), sOwn, ' OR '.join('OLD.%s IS NOT NEW.%s' % (s, s) for s in lsOwn), sOwn, sOwnId, sOwnId))
+    lsSeeds = [('DbDo', '*', 'type', s) for s in lsTypes] + [('DbDo', 'maps', 'kind', s) for s in lsKinds]
+    for sTbl, sFld in sorted(set((t, f) for _, t, f, _ in lsSeeds)):
+        lsVals = sorted(v for _, t, f, v in lsSeeds if t == sTbl and f == sFld)
+        oDb.executemany('INSERT INTO lookups (src, tbl, fld, val, ordinal) VALUES (?, ?, ?, ?, ?)', [('DbDo', sTbl, sFld, v, i + 1) for i, v in enumerate(lsVals)])
+    standardTable(oDb, sTable, lsData, dTypes, lsData[:3], True)
+    iSkipped = 0
+    for r in llRows:
+        dRow = dict(zip(lsFields, r))
+        lsCols = lsData + [s for s in ('url', 'notes', 'tags') if s in lsFields]
+        lsVals = [None if not dRow[s].strip() else (int(dRow[s]) if dTypes[s] == 'INTEGER' else float(dRow[s]) if dTypes[s] == 'REAL' else dRow[s]) for s in lsCols]
+        oCur = oDb.execute('INSERT OR IGNORE INTO %s (%s) VALUES (%s)' % (q(sTable), ', '.join(q(s) for s in lsCols), ', '.join('?' * len(lsCols))), lsVals)
+        if oCur.rowcount == 0: iSkipped += 1
+    oDb.commit()
+    oDb.close()
+    print('%s: %d %s in table %s%s' % (os.path.basename(sOut), len(llRows) - iSkipped, 'record' if len(llRows) - iSkipped == 1 else 'records', sTable,
+        '; %d duplicate %s left out' % (iSkipped, 'row' if iSkipped == 1 else 'rows') if iSkipped else ''))
+else:
+    oDb = sqlite3.connect('file:' + os.path.abspath(sIn).replace('\\', '/') + '?mode=ro', uri=True)
+    lsOut = ['# ' + os.path.splitext(os.path.basename(sIn))[0], '']
+    for (sTable,) in oDb.execute(""SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name COLLATE NOCASE""):
+        # DbDo's own tables are kept off every list, as DbDo keeps them.
+        if sTable in ('lookups', 'maps', 'views'): continue
+        oCursor = oDb.execute('SELECT * FROM %s' % q(sTable))
+        lsFields = [d[0] for d in oCursor.description]
+        llRows = oCursor.fetchall()
+        # A DbDo table gives its data: not its id, its times, look, prime or marked, nor url, notes or tags left empty.
+        bDbDo = 'prime' in lsFields and 'look' in lsFields
+        lsKeep = [i for i, s in enumerate(lsFields) if not bDbDo or (s not in lsHousekeeping and s != singular(sTable) + '_id'
+            and not (s in ('url', 'notes', 'tags') and not any(r[i] not in (None, '') for r in llRows)))]
+        lsOut += ['## ' + sTable, '', '| ' + ' | '.join(cell(lsFields[i]) for i in lsKeep) + ' |', '|' + ' --- |' * len(lsKeep)]
+        lsOut += ['| ' + ' | '.join(cell(r[i]) for i in lsKeep) + ' |' for r in llRows]
+        lsOut.append('')
+    oDb.close()
+    open(sOut, 'w', encoding='utf-8-sig', newline='\r\n').write('\n'.join(lsOut))
+";
+
 private const string sPyMuPdfText =
 "import sys\n" +
 "try:\n    import pymupdf\nexcept ImportError:\n    import fitz as pymupdf\n" +
@@ -1204,7 +1397,10 @@ object oDoc = call(oDocs, "Open", sFull, false, true);
 // .doc, .rtf and .odt as well (kit 1.76.0), for an editor's Export to a 1997 Word file.
 int iFormat = sTo == "doc" ? iWordFormatDoc : sTo == "docx" ? iWordFormatDocx : sTo == "htm" ? iWordFormatFilteredHtml
 : sTo == "odt" ? iWordFormatOdt : sTo == "pdf" ? iWordFormatPdf : sTo == "rtf" ? iWordFormatRtf : iWordFormatUnicodeText;
-call(oDoc, "SaveAs2", sOut, iFormat);
+// A TAGGED PDF (kit 1.91.0): Word's export with its structure tags and heading bookmarks, rather
+// than Save As, whose tags depend on the last choice someone made in Word's own dialog.
+if (iFormat == iWordFormatPdf) call(oDoc, "ExportAsFixedFormat", sOut, iFormat, false, 0, 0, 1, 1, 0, true, true, 1, true, true, false);
+else call(oDoc, "SaveAs2", sOut, iFormat);
 call(oDoc, "Close", false);
 // WORD'S TEXT IN THE HOMER ENCODING (1.76.1): Word writes UTF-16 from some documents and the
 // Windows code page from others, so its text is rewritten as UTF-8 with a byte order mark.
@@ -1329,6 +1525,513 @@ Log.info("Could not start " + sExe + ": " + ex.Message);
 return false;
 }
 } // run method
+
+// ------- accessible output (kit 1.91.0) -------
+//
+// EVERY FILE A HOMER APP MAKES IS FINISHED FOR A SCREEN READER, then checked (the author's rule of 24
+// October 2026). Whatever engine wrote it -- the kit's own writers, Pandoc, Edge or Office -- the file is
+// opened once more and given what extCheck would otherwise report as missing, and what cannot be fixed
+// without a person is logged under extCheck's own rule names, so a log reads like an extCheck report:
+//
+//   xlsx  header names for every table region (below), a frozen header row, a sheet name for a lone
+//         default sheet, and the workbook's title, author and language
+//   docx  title, author and language, and the document language in its default style
+//   pptx  title, author and language
+//   epub  a title and a language in the package
+//   md    YAML front matter with title and lang, when it has none
+//   htm   the Homer page form, as before (ConversionPage): one H1, main, lang and title
+//   pdf   tagged, from an htm that has lang and title (Edge), or Word's export with structure tags
+//
+// HEADER NAMES IN A WORKBOOK, from the author's xlHeaders.vbs (2024), improved. JAWS and NVDA read a
+// region's column or row headers when the region's top-left cell carries a workbook name beginning
+// ColumnTitle, RowTitle or Title (both). xlHeaders drove Excel to find the regions and test them; here
+// the file's own XML is read, so no Office is needed. A region is a rectangle of filled cells bounded by
+// blank rows and columns, as Excel's CurrentRegion. A region of at least two rows and two columns has
+// column headers when every cell of its top row is filled, is text and is unique (ignoring case); row
+// headers likewise down its first column. Two improvements on xlHeaders: an EMPTY TOP-LEFT CORNER no
+// longer hides a two-way table -- the top row is tested from the second column and the first column
+// from the second row, and both passing makes a Title -- and a header must be TEXT, so a row of unique
+// numbers is not taken for headers. A region whose top-left cell already has a name keeps it; a new
+// name takes the next free two-digit number, ColumnTitle01, ColumnTitle02.
+
+private static readonly Regex rxCell = new Regex("<c\\b([^>]*?)(?:/>|>(.*?)</c>)", RegexOptions.Singleline);
+private static readonly Regex rxAttr = new Regex("\\b([A-Za-z:]+)=\"([^\"]*)\"");
+private static readonly Regex rxT = new Regex("<t\\b[^>]*>(.*?)</t>", RegexOptions.Singleline);
+
+// finishOutput: the step every route ends with. Never fails a conversion: a finishing problem is logged.
+public static bool finishOutput(string sPath) {
+string sType = typeOf(sPath);
+try {
+List<string> lsFindings = new List<string>();
+if (sType == "xlsx") finishXlsx(sPath, lsFindings);
+else if (sType == "docx") finishOffice(sPath, "word", lsFindings);
+else if (sType == "pptx") finishOffice(sPath, "ppt", lsFindings);
+else if (sType == "epub") finishEpub(sPath, lsFindings);
+else if (sType == "md") finishMarkdown(sPath, lsFindings);
+else if (sType == "htm") checkPage(sPath, lsFindings);
+foreach (string sFinding in lsFindings) Log.info("Quality " + Path.GetFileName(sPath) + ": " + sFinding);
+return true;
+}
+catch (Exception oError) { Log.warn("Finishing " + Path.GetFileName(sPath) + " for a screen reader failed: " + oError.Message); return false; }
+} // finishOutput method
+
+// documentTitle: a title from a file's name, when it has none of its own.
+public static string documentTitle(string sPath) {
+string sStem = Path.GetFileNameWithoutExtension(sPath).Replace('_', ' ').Trim();
+return sStem.Length == 0 ? "Untitled" : sStem;
+} // documentTitle method
+
+public static string documentLanguage() {
+string sName = System.Globalization.CultureInfo.CurrentUICulture.Name;
+return string.IsNullOrEmpty(sName) ? "en-US" : sName;
+} // documentLanguage method
+
+public static string documentAuthor() {
+return Environment.UserName ?? "";
+} // documentAuthor method
+
+private static string xmlEscape(string s) {
+return (s ?? "").Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;");
+} // xmlEscape method
+
+private static string xmlText(string s) {
+return System.Net.WebUtility.HtmlDecode(s ?? "");
+} // xmlText method
+
+// The package as names and texts, so a part can be read and replaced and the whole written back.
+private static List<string> readPackage(string sPath, Dictionary<string, byte[]> dParts) {
+List<string> lsOrder = new List<string>();
+using (FileStream oFile = File.OpenRead(sPath))
+using (System.IO.Compression.ZipArchive zip = new System.IO.Compression.ZipArchive(oFile, System.IO.Compression.ZipArchiveMode.Read)) {
+foreach (System.IO.Compression.ZipArchiveEntry entry in zip.Entries) {
+using (Stream oIn = entry.Open()) using (MemoryStream oBuffer = new MemoryStream()) { oIn.CopyTo(oBuffer); dParts[entry.FullName] = oBuffer.ToArray(); }
+lsOrder.Add(entry.FullName);
+}
+}
+return lsOrder;
+} // readPackage method
+
+private static void writePackage(string sPath, List<string> lsOrder, Dictionary<string, byte[]> dParts) {
+string sTemp = sPath + ".finishing";
+if (File.Exists(sTemp)) File.Delete(sTemp);
+using (FileStream oOut = File.Create(sTemp))
+using (System.IO.Compression.ZipArchive zip = new System.IO.Compression.ZipArchive(oOut, System.IO.Compression.ZipArchiveMode.Create)) {
+foreach (string sName in lsOrder) {
+// An EPUB's mimetype stays first and unpacked, as the standard asks.
+System.IO.Compression.CompressionLevel oLevel = sName == "mimetype" ? System.IO.Compression.CompressionLevel.NoCompression : System.IO.Compression.CompressionLevel.Optimal;
+using (Stream oIn = zip.CreateEntry(sName, oLevel).Open()) oIn.Write(dParts[sName], 0, dParts[sName].Length);
+}
+}
+File.Copy(sTemp, sPath, true);
+File.Delete(sTemp);
+} // writePackage method
+
+private static string partText(Dictionary<string, byte[]> dParts, string sName) {
+byte[] ab;
+return dParts.TryGetValue(sName, out ab) ? Encoding.UTF8.GetString(ab).TrimStart('\uFEFF') : "";
+} // partText method
+
+private static void setPart(Dictionary<string, byte[]> dParts, List<string> lsOrder, string sName, string sText) {
+if (!dParts.ContainsKey(sName)) lsOrder.Add(sName);
+dParts[sName] = Encoding.UTF8.GetBytes(sText);
+} // setPart method
+
+// ensureCoreProperties: docProps/core.xml with a title, an author and a language, made when missing.
+private static bool ensureCoreProperties(Dictionary<string, byte[]> dParts, List<string> lsOrder, string sTitle, List<string> lsFindings) {
+string sCore = partText(dParts, "docProps/core.xml");
+string sLanguage = documentLanguage(), sAuthor = documentAuthor();
+if (sCore == "") {
+sCore = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><cp:coreProperties xmlns:cp=\"http://schemas.openxmlformats.org/package/2006/metadata/core-properties\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"></cp:coreProperties>";
+string sTypes = partText(dParts, "[Content_Types].xml");
+if (sTypes.IndexOf("/docProps/core.xml", StringComparison.Ordinal) < 0)
+setPart(dParts, lsOrder, "[Content_Types].xml", sTypes.Replace("</Types>", "<Override PartName=\"/docProps/core.xml\" ContentType=\"application/vnd.openxmlformats-package.core-properties+xml\"/></Types>"));
+string sRels = partText(dParts, "_rels/.rels");
+if (sRels.IndexOf("core-properties", StringComparison.Ordinal) < 0)
+setPart(dParts, lsOrder, "_rels/.rels", sRels.Replace("</Relationships>", "<Relationship Id=\"rIdHomerCore\" Type=\"http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties\" Target=\"docProps/core.xml\"/></Relationships>"));
+}
+string[,] aWanted = { { "dc:title", sTitle, "MissingDocumentTitle" }, { "dc:creator", sAuthor, "MissingAuthor" }, { "dc:language", sLanguage, "MissingDocumentLanguage" } };
+for (int i = 0; i < aWanted.GetLength(0); i++) {
+string sTag = aWanted[i, 0];
+Match oHas = Regex.Match(sCore, "<" + sTag + "(?:\\s[^>]*)?>(.*?)</" + sTag + ">", RegexOptions.Singleline);
+if (oHas.Success && xmlText(oHas.Groups[1].Value).Trim().Length > 0) continue;
+if (aWanted[i, 1] == "") { lsFindings.Add(aWanted[i, 2] + ": left blank, nothing to fill it with"); continue; }
+string sElement = "<" + sTag + ">" + xmlEscape(aWanted[i, 1]) + "</" + sTag + ">";
+sCore = oHas.Success ? sCore.Substring(0, oHas.Index) + sElement + sCore.Substring(oHas.Index + oHas.Length)
+: Regex.Replace(sCore, "<" + sTag + "\\s*/>", "") .Replace("</cp:coreProperties>", sElement + "</cp:coreProperties>");
+lsFindings.Add(aWanted[i, 2] + ": fixed, " + sTag + " set to " + aWanted[i, 1]);
+}
+setPart(dParts, lsOrder, "docProps/core.xml", sCore);
+return true;
+} // ensureCoreProperties method
+
+// finishOffice: a Word or PowerPoint file's properties, its language, and what extCheck would report.
+private static bool finishOffice(string sPath, string sKind, List<string> lsFindings) {
+Dictionary<string, byte[]> dParts = new Dictionary<string, byte[]>();
+List<string> lsOrder = readPackage(sPath, dParts);
+string sTitle = "";
+if (sKind == "word") {
+string sBody = partText(dParts, "word/document.xml");
+// The title is the Title paragraph, else the first heading, else the file's name.
+foreach (Match oPara in Regex.Matches(sBody, "<w:p\\b.*?</w:p>", RegexOptions.Singleline)) {
+Match oStyle = Regex.Match(oPara.Value, "<w:pStyle w:val=\"([^\"]+)\"");
+if (!oStyle.Success) continue;
+string sStyle = oStyle.Groups[1].Value.ToLowerInvariant();
+if (sStyle != "title" && !sStyle.StartsWith("heading")) continue;
+StringBuilder sbText = new StringBuilder();
+foreach (Match oRun in Regex.Matches(oPara.Value, "<w:t\\b[^>]*>(.*?)</w:t>", RegexOptions.Singleline)) sbText.Append(xmlText(oRun.Groups[1].Value));
+if (sbText.ToString().Trim().Length > 0) { sTitle = sbText.ToString().Trim(); break; }
+}
+if (!Regex.IsMatch(sBody, "<w:pStyle w:val=\"(?:[Hh]eading|Title)")) lsFindings.Add("NoHeadings: the document has no headings, so a screen reader cannot move by them");
+foreach (Match oPicture in Regex.Matches(sBody, "<wp:docPr\\b[^>]*>"))
+if (!Regex.IsMatch(oPicture.Value, "\\bdescr=\"[^\"]+\"")) lsFindings.Add("MissingAltText: a picture has no alternative text");
+// The language of the default style, so every run of text is read in it.
+string sStyles = partText(dParts, "word/styles.xml");
+Match oDefault = Regex.Match(sStyles, "<w:rPrDefault>\\s*<w:rPr>(.*?)</w:rPr>", RegexOptions.Singleline);
+if (oDefault.Success && oDefault.Groups[1].Value.IndexOf("<w:lang", StringComparison.Ordinal) < 0) {
+sStyles = sStyles.Substring(0, oDefault.Groups[1].Index) + oDefault.Groups[1].Value + "<w:lang w:val=\"" + documentLanguage() + "\"/>" + sStyles.Substring(oDefault.Groups[1].Index + oDefault.Groups[1].Length);
+setPart(dParts, lsOrder, "word/styles.xml", sStyles);
+lsFindings.Add("MissingLanguage: fixed, the default style's language set to " + documentLanguage());
+}
+}
+else {
+int iSlide = 0;
+foreach (string sName in lsOrder) {
+if (!Regex.IsMatch(sName, "^ppt/slides/slide\\d+\\.xml$")) continue;
+iSlide++;
+string sSlide = partText(dParts, sName);
+Match oTitle = Regex.Match(sSlide, "<p:sp>(?:(?!</p:sp>).)*?type=\"(?:ctrTitle|title)\".*?</p:sp>", RegexOptions.Singleline);
+if (!oTitle.Success) lsFindings.Add("SlideMissingTitle: " + Path.GetFileNameWithoutExtension(sName) + " has no title");
+else if (sTitle == "") {
+StringBuilder sbText = new StringBuilder();
+foreach (Match oRun in Regex.Matches(oTitle.Value, "<a:t>(.*?)</a:t>", RegexOptions.Singleline)) sbText.Append(xmlText(oRun.Groups[1].Value));
+sTitle = sbText.ToString().Trim();
+}
+foreach (Match oPicture in Regex.Matches(sSlide, "<p:pic>.*?</p:pic>", RegexOptions.Singleline))
+if (!Regex.IsMatch(oPicture.Value, "<p:cNvPr\\b[^>]*\\bdescr=\"[^\"]+\"")) lsFindings.Add("MissingAltText: a picture on " + Path.GetFileNameWithoutExtension(sName) + " has no alternative text");
+}
+}
+if (sTitle == "") sTitle = documentTitle(sPath);
+ensureCoreProperties(dParts, lsOrder, sTitle, lsFindings);
+writePackage(sPath, lsOrder, dParts);
+return true;
+} // finishOffice method
+
+// finishEpub: a title and a language in the package, which Pandoc leaves out when the source has none.
+private static bool finishEpub(string sPath, List<string> lsFindings) {
+Dictionary<string, byte[]> dParts = new Dictionary<string, byte[]>();
+List<string> lsOrder = readPackage(sPath, dParts);
+foreach (string sName in lsOrder) {
+if (!sName.EndsWith(".opf", StringComparison.OrdinalIgnoreCase)) continue;
+string sOpf = partText(dParts, sName), sWas = sOpf;
+Match oTitle = Regex.Match(sOpf, "<dc:title\\b[^>]*>(.*?)</dc:title>", RegexOptions.Singleline);
+if (!oTitle.Success || xmlText(oTitle.Groups[1].Value).Trim().Length == 0 || xmlText(oTitle.Groups[1].Value).Trim().ToUpperInvariant() == "UNTITLED") {
+// The book's first heading, as a Word file's title is found, else the file's name.
+string sBookTitle = "";
+foreach (string sPage in lsOrder) {
+if (!Regex.IsMatch(sPage, "\\.x?html?$", RegexOptions.IgnoreCase)) continue;
+Match oHeading = Regex.Match(partText(dParts, sPage), "<h1\\b(?![^>]*class=\"title\")[^>]*>(.*?)</h1>", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+// Pandoc's own title page says UNTITLED when the source had no title, so that heading is no title.
+if (oHeading.Success) { sBookTitle = xmlText(Regex.Replace(oHeading.Groups[1].Value, "<[^>]+>", "")).Trim(); if (sBookTitle.ToUpperInvariant() == "UNTITLED") sBookTitle = ""; if (sBookTitle != "") break; }
+}
+if (sBookTitle == "") sBookTitle = documentTitle(sPath);
+string sElement = "<dc:title id=\"epub-title-1\">" + xmlEscape(sBookTitle) + "</dc:title>";
+sOpf = oTitle.Success ? sOpf.Substring(0, oTitle.Index) + sElement + sOpf.Substring(oTitle.Index + oTitle.Length) : sOpf.Replace("</metadata>", sElement + "</metadata>");
+lsFindings.Add("MissingTitle: fixed, the book's title set to " + sBookTitle);
+}
+if (!Regex.IsMatch(sOpf, "<dc:language\\b[^>]*>\\s*\\S")) {
+sOpf = Regex.Replace(sOpf, "<dc:language\\b[^>]*>\\s*</dc:language>|<dc:language\\s*/>", "");
+sOpf = sOpf.Replace("</metadata>", "<dc:language>" + documentLanguage() + "</dc:language></metadata>");
+lsFindings.Add("MissingLanguage: fixed, the book's language set to " + documentLanguage());
+}
+if (sOpf != sWas) setPart(dParts, lsOrder, sName, sOpf);
+}
+writePackage(sPath, lsOrder, dParts);
+return true;
+} // finishEpub method
+
+// finishMarkdown: front matter with a title and a language when it has none; what extCheck reports.
+private static bool finishMarkdown(string sPath, List<string> lsFindings) {
+string sText = decodeText(File.ReadAllBytes(sPath)).Replace("\r\n", "\n");
+int iLast = 0;
+bool bHeading = false;
+foreach (Match oHeading in Regex.Matches(sText, "^(#{1,6})[ \\t]+\\S", RegexOptions.Multiline)) {
+int iLevel = oHeading.Groups[1].Value.Length;
+if (iLast > 0 && iLevel > iLast + 1) lsFindings.Add("SkippedHeadingLevel: a level " + iLevel + " heading follows a level " + iLast);
+iLast = iLevel;
+bHeading = true;
+}
+if (!bHeading) lsFindings.Add("NoHeadings: the document has no headings, so a screen reader cannot move by them");
+if (Regex.IsMatch(sText, "!\\[\\s*\\]\\(")) lsFindings.Add("MissingAltText: a picture has no alternative text");
+if (!sText.StartsWith("---\n")) {
+Match oFirst = Regex.Match(sText, "^#[ \\t]+(.+)$", RegexOptions.Multiline);
+string sTitle = oFirst.Success ? oFirst.Groups[1].Value.Trim() : documentTitle(sPath);
+sText = "---\ntitle: \"" + sTitle.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"\nlang: " + documentLanguage() + "\n---\n\n" + sText;
+File.WriteAllText(sPath, sText.Replace("\n", "\r\n"), new UTF8Encoding(true));
+lsFindings.Add("NoYamlFrontMatter: fixed, title and lang added");
+}
+return true;
+} // finishMarkdown method
+
+// checkPage: what extCheck would report in a web page the page form cannot fix.
+private static bool checkPage(string sPath, List<string> lsFindings) {
+string sHtml = decodeText(File.ReadAllBytes(sPath));
+foreach (Match oImage in Regex.Matches(sHtml, "<img\\b[^>]*>", RegexOptions.IgnoreCase))
+if (!Regex.IsMatch(oImage.Value, "\\balt=\"", RegexOptions.IgnoreCase)) lsFindings.Add("MissingAltText: a picture has no alternative text");
+if (!Regex.IsMatch(sHtml, "<html\\b[^>]*\\blang=\"[^\"]+\"", RegexOptions.IgnoreCase)) lsFindings.Add("MissingDocumentLanguage: the page names no language");
+return true;
+} // checkPage method
+
+// ---- workbooks ----
+
+private class HeaderRegion { public int iTop, iLeft, iBottom, iRight; public string sStem = ""; }
+
+private static bool finishXlsx(string sPath, List<string> lsFindings) {
+Dictionary<string, byte[]> dParts = new Dictionary<string, byte[]>();
+List<string> lsOrder = readPackage(sPath, dParts);
+string sBook = partText(dParts, "xl/workbook.xml");
+string sBookRels = partText(dParts, "xl/_rels/workbook.xml.rels");
+// The shared strings, each its runs joined.
+List<string> lsShared = new List<string>();
+foreach (Match oItem in Regex.Matches(partText(dParts, "xl/sharedStrings.xml"), "<si>(.*?)</si>", RegexOptions.Singleline)) {
+StringBuilder sbItem = new StringBuilder();
+foreach (Match oRun in rxT.Matches(oItem.Groups[1].Value)) sbItem.Append(xmlText(oRun.Groups[1].Value));
+lsShared.Add(sbItem.ToString());
+}
+// The names the workbook already has.
+HashSet<string> hsNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+HashSet<string> hsNamedCells = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+foreach (Match oName in Regex.Matches(sBook, "<definedName\\b([^>]*)>(.*?)</definedName>", RegexOptions.Singleline)) {
+Match oAttr = Regex.Match(oName.Groups[1].Value, "\\bname=\"([^\"]+)\"");
+if (oAttr.Success) hsNames.Add(oAttr.Groups[1].Value);
+hsNamedCells.Add(xmlText(oName.Groups[2].Value).Replace("'", "").Trim());
+}
+MatchCollection oSheets = Regex.Matches(sBook, "<sheet\\b[^>]*/>");
+bool bOneSheet = oSheets.Count == 1;
+StringBuilder sbNewNames = new StringBuilder();
+foreach (Match oSheet in oSheets) {
+string sSheetName = xmlText(Regex.Match(oSheet.Value, "\\bname=\"([^\"]*)\"").Groups[1].Value);
+string sRid = Regex.Match(oSheet.Value, "\\br:id=\"([^\"]*)\"").Groups[1].Value;
+Match oTarget = Regex.Match(sBookRels, "<Relationship\\b[^>]*\\bId=\"" + Regex.Escape(sRid) + "\"[^>]*>");
+string sTarget = Regex.Match(oTarget.Value, "\\bTarget=\"([^\"]*)\"").Groups[1].Value;
+string sPart = sTarget.StartsWith("/") ? sTarget.TrimStart('/') : "xl/" + sTarget;
+string sXml = partText(dParts, sPart);
+if (sXml == "") continue;
+// A lone sheet with a default name takes the file's name, where no formula could refer to the old one.
+if (bOneSheet && Regex.IsMatch(sSheetName, "^(Sheet\\d*|Data)$") && sXml.IndexOf("<f", StringComparison.Ordinal) < 0 && hsNames.Count == 0) {
+string sNewName = Regex.Replace(documentTitle(sPath), "[\\[\\]:*?/\\\\]", " ").Trim();
+if (sNewName.Length > 31) sNewName = sNewName.Substring(0, 31).Trim();
+if (sNewName.Length > 0 && sNewName != sSheetName) {
+sBook = sBook.Replace(oSheet.Value, oSheet.Value.Replace("name=\"" + xmlEscape(sSheetName) + "\"", "name=\"" + xmlEscape(sNewName) + "\""));
+lsFindings.Add("DefaultSheetName: fixed, " + sSheetName + " renamed " + sNewName);
+sSheetName = sNewName;
+}
+}
+if (sXml.IndexOf("<mergeCell ", StringComparison.Ordinal) >= 0) lsFindings.Add("MergedCells: " + sSheetName + " has merged cells, which screen readers announce poorly");
+// The cells, by row and column: text or not.
+Dictionary<long, string> dText = new Dictionary<long, string>();
+HashSet<long> hsIsText = new HashSet<long>();
+foreach (Match oCell in rxCell.Matches(sXml)) {
+string sRef = "", sType = "";
+foreach (Match oAttr in rxAttr.Matches(oCell.Groups[1].Value)) {
+if (oAttr.Groups[1].Value == "r") sRef = oAttr.Groups[2].Value;
+else if (oAttr.Groups[1].Value == "t") sType = oAttr.Groups[2].Value;
+}
+string sInner = oCell.Groups[2].Value;
+if (sRef == "" || sInner == "") continue;
+string sValue;
+if (sType == "inlineStr") { StringBuilder sb = new StringBuilder(); foreach (Match oRun in rxT.Matches(sInner)) sb.Append(xmlText(oRun.Groups[1].Value)); sValue = sb.ToString(); }
+else {
+Match oV = Regex.Match(sInner, "<v>(.*?)</v>", RegexOptions.Singleline);
+if (!oV.Success) continue;
+sValue = xmlText(oV.Groups[1].Value);
+if (sType == "s") { int iIndex; sValue = int.TryParse(sValue, out iIndex) && iIndex >= 0 && iIndex < lsShared.Count ? lsShared[iIndex] : ""; }
+}
+if (sValue.Trim().Length == 0) continue;
+int iRow, iColumn;
+if (!cellPosition(sRef, out iRow, out iColumn)) continue;
+long iKey = cellKey(iRow, iColumn);
+dText[iKey] = sValue.Trim();
+if (sType == "s" || sType == "inlineStr" || sType == "str") hsIsText.Add(iKey);
+}
+List<HeaderRegion> lsRegions = findRegions(dText);
+bool bFrozen = sXml.IndexOf("<pane ", StringComparison.Ordinal) >= 0;
+foreach (HeaderRegion oRegion in lsRegions) {
+oRegion.sStem = headerStem(oRegion, dText, hsIsText);
+if (oRegion.sStem == "") continue;
+string sCell = "$" + columnName(oRegion.iLeft) + "$" + oRegion.iTop;
+if (hsNamedCells.Contains(sSheetName + "!" + sCell)) continue;
+int iNumber = 1;
+while (hsNames.Contains(oRegion.sStem + iNumber.ToString("00"))) iNumber++;
+string sName = oRegion.sStem + iNumber.ToString("00");
+hsNames.Add(sName);
+sbNewNames.Append("<definedName name=\"" + sName + "\">" + xmlEscape("'" + sSheetName.Replace("'", "''") + "'!" + sCell) + "</definedName>");
+lsFindings.Add("Header names: " + sName + " for " + sSheetName + " " + columnName(oRegion.iLeft) + oRegion.iTop + ":" + columnName(oRegion.iRight) + oRegion.iBottom);
+// HeaderRowNotFrozen: the sheet's first table keeps its headers in view.
+if (!bFrozen) {
+bool bColumns = oRegion.sStem != "RowTitle", bRows = oRegion.sStem != "ColumnTitle";
+int iYSplit = bColumns ? oRegion.iTop : 0, iXSplit = bRows ? oRegion.iLeft : 0;
+string sPane = "<pane" + (iXSplit > 0 ? " xSplit=\"" + iXSplit + "\"" : "") + (iYSplit > 0 ? " ySplit=\"" + iYSplit + "\"" : "")
++ " topLeftCell=\"" + columnName(iXSplit + 1) + (iYSplit + 1) + "\" activePane=\"" + (iXSplit > 0 && iYSplit > 0 ? "bottomRight" : iYSplit > 0 ? "bottomLeft" : "topRight") + "\" state=\"frozen\"/>";
+Match oView = Regex.Match(sXml, "<sheetView\\b[^>]*?(/?)>");
+if (oView.Success && oView.Groups[1].Value == "/") sXml = sXml.Substring(0, oView.Index) + oView.Value.Substring(0, oView.Value.Length - 2) + ">" + sPane + "</sheetView>" + sXml.Substring(oView.Index + oView.Length);
+else if (oView.Success) sXml = sXml.Substring(0, oView.Index + oView.Length) + sPane + sXml.Substring(oView.Index + oView.Length);
+else {
+Match oBefore = Regex.Match(sXml, "<(?:sheetFormatPr|cols|sheetData)\\b");
+if (oBefore.Success) sXml = sXml.Substring(0, oBefore.Index) + "<sheetViews><sheetView workbookViewId=\"0\">" + sPane + "</sheetView></sheetViews>" + sXml.Substring(oBefore.Index);
+}
+bFrozen = true;
+setPart(dParts, lsOrder, sPart, sXml);
+}
+}
+}
+if (sbNewNames.Length > 0) {
+if (sBook.IndexOf("</definedNames>", StringComparison.Ordinal) >= 0) sBook = sBook.Replace("</definedNames>", sbNewNames.ToString() + "</definedNames>");
+else if (Regex.IsMatch(sBook, "<definedNames\\s*/>")) sBook = Regex.Replace(sBook, "<definedNames\\s*/>", "<definedNames>" + sbNewNames.ToString() + "</definedNames>");
+else sBook = sBook.Replace("</sheets>", "</sheets><definedNames>" + sbNewNames.ToString() + "</definedNames>");
+}
+setPart(dParts, lsOrder, "xl/workbook.xml", sBook);
+ensureCoreProperties(dParts, lsOrder, documentTitle(sPath), lsFindings);
+writePackage(sPath, lsOrder, dParts);
+return true;
+} // finishXlsx method
+
+private static long cellKey(int iRow, int iColumn) { return (long)iRow * 100000L + iColumn; }
+
+private static bool cellPosition(string sRef, out int iRow, out int iColumn) {
+iRow = 0; iColumn = 0;
+Match oRef = Regex.Match(sRef, "^\\$?([A-Za-z]+)\\$?(\\d+)$");
+if (!oRef.Success) return false;
+foreach (char c in oRef.Groups[1].Value.ToUpperInvariant()) iColumn = iColumn * 26 + (c - 'A' + 1);
+iRow = int.Parse(oRef.Groups[2].Value);
+return true;
+} // cellPosition method
+
+private static string columnName(int iColumn) {
+string sName = "";
+while (iColumn > 0) { int iRest = (iColumn - 1) % 26; sName = (char)('A' + iRest) + sName; iColumn = (iColumn - 1) / 26; }
+return sName;
+} // columnName method
+
+// findRegions: the rectangles Excel's CurrentRegion would give -- filled cells joined across rows,
+// columns and corners, each group's bounds grown until no filled cell touches them from outside.
+private static List<HeaderRegion> findRegions(Dictionary<long, string> dText) {
+List<HeaderRegion> lsRegions = new List<HeaderRegion>();
+HashSet<long> hsSeen = new HashSet<long>();
+foreach (long iStart in dText.Keys) {
+if (hsSeen.Contains(iStart)) continue;
+HeaderRegion oRegion = new HeaderRegion();
+oRegion.iTop = oRegion.iBottom = (int)(iStart / 100000L);
+oRegion.iLeft = oRegion.iRight = (int)(iStart % 100000L);
+Queue<long> qNext = new Queue<long>();
+qNext.Enqueue(iStart); hsSeen.Add(iStart);
+while (qNext.Count > 0) {
+long iKey = qNext.Dequeue();
+int iRow = (int)(iKey / 100000L), iColumn = (int)(iKey % 100000L);
+if (iRow < oRegion.iTop) oRegion.iTop = iRow;
+if (iRow > oRegion.iBottom) oRegion.iBottom = iRow;
+if (iColumn < oRegion.iLeft) oRegion.iLeft = iColumn;
+if (iColumn > oRegion.iRight) oRegion.iRight = iColumn;
+for (int iDown = -1; iDown <= 1; iDown++)
+for (int iAcross = -1; iAcross <= 1; iAcross++) {
+long iNear = cellKey(iRow + iDown, iColumn + iAcross);
+if (dText.ContainsKey(iNear) && hsSeen.Add(iNear)) qNext.Enqueue(iNear);
+}
+}
+lsRegions.Add(oRegion);
+}
+// Rectangles that touch, even at a corner, are one region, as CurrentRegion makes them.
+bool bMerged = true;
+while (bMerged) {
+bMerged = false;
+for (int i = 0; i < lsRegions.Count && !bMerged; i++)
+for (int j = i + 1; j < lsRegions.Count && !bMerged; j++) {
+HeaderRegion a = lsRegions[i], b = lsRegions[j];
+if (a.iLeft - 1 <= b.iRight && b.iLeft - 1 <= a.iRight && a.iTop - 1 <= b.iBottom && b.iTop - 1 <= a.iBottom) {
+a.iTop = Math.Min(a.iTop, b.iTop); a.iBottom = Math.Max(a.iBottom, b.iBottom);
+a.iLeft = Math.Min(a.iLeft, b.iLeft); a.iRight = Math.Max(a.iRight, b.iRight);
+lsRegions.RemoveAt(j);
+bMerged = true;
+}
+}
+}
+lsRegions.Sort(delegate(HeaderRegion a, HeaderRegion b) { return a.iTop != b.iTop ? a.iTop.CompareTo(b.iTop) : a.iLeft.CompareTo(b.iLeft); });
+return lsRegions;
+} // findRegions method
+
+// headerStem: ColumnTitle, RowTitle, Title, or "" when the region has no headers to name.
+private static string headerStem(HeaderRegion oRegion, Dictionary<long, string> dText, HashSet<long> hsIsText) {
+if (oRegion.iBottom - oRegion.iTop < 1 || oRegion.iRight - oRegion.iLeft < 1) return "";
+bool bCorner = dText.ContainsKey(cellKey(oRegion.iTop, oRegion.iLeft));
+int iFirstColumn = bCorner ? oRegion.iLeft : oRegion.iLeft + 1;
+int iFirstRow = bCorner ? oRegion.iTop : oRegion.iTop + 1;
+bool bColumns = labelsRun(dText, hsIsText, oRegion.iTop, iFirstColumn, 0, 1, oRegion.iRight - iFirstColumn + 1);
+bool bRows = labelsRun(dText, hsIsText, iFirstRow, oRegion.iLeft, 1, 0, oRegion.iBottom - iFirstRow + 1);
+if (bColumns && bRows) return "Title";
+if (bColumns) return "ColumnTitle";
+if (bRows) return "RowTitle";
+return "";
+} // headerStem method
+
+// labelsRun: iCount cells from a start, stepping down or across, each filled, text and unique.
+private static bool labelsRun(Dictionary<long, string> dText, HashSet<long> hsIsText, int iRow, int iColumn, int iDown, int iAcross, int iCount) {
+if (iCount < 1) return false;
+HashSet<string> hsSeen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+for (int i = 0; i < iCount; i++) {
+long iKey = cellKey(iRow + i * iDown, iColumn + i * iAcross);
+string sValue;
+if (!dText.TryGetValue(iKey, out sValue) || !hsIsText.Contains(iKey) || !hsSeen.Add(sValue)) return false;
+}
+return true;
+} // labelsRun method
+
+// ------- PDF from a web page, by Microsoft Edge (kit 1.90.0) -------
+//
+// A PDF WITHOUT OFFICE. Every route that made a PDF needed Microsoft Office, so a computer
+// without Office could make none. Edge comes with Windows, and Homer apps already drive it
+// (HomerView, urlFido), so it prints a Homer web page to PDF: headless, with a fresh profile of
+// its own so it never joins the person's open Edge, and no header or footer. Chromium writes a
+// tagged PDF with an outline from the page's headings (unconfirmed for every Edge version: test a
+// result with a screen reader). Office stays the first way for Word and PowerPoint files, whose
+// own PDF export keeps more of their layout.
+public static string edgePath() {
+string sX86 = Environment.GetEnvironmentVariable("ProgramFiles(x86)") ?? "";
+string sAll = Environment.GetEnvironmentVariable("ProgramFiles") ?? "";
+string sLocal = Environment.GetEnvironmentVariable("LOCALAPPDATA") ?? "";
+return findProgram("msedge.exe", new string[] {
+sX86 == "" ? "" : Path.Combine(sX86, @"Microsoft\Edge\Application\msedge.exe"),
+sAll == "" ? "" : Path.Combine(sAll, @"Microsoft\Edge\Application\msedge.exe"),
+sLocal == "" ? "" : Path.Combine(sLocal, @"Microsoft\Edge\Application\msedge.exe") });
+} // edgePath method
+
+private static bool edgePdf(string sSource, string sTarget, out string sError) {
+sError = "";
+if (typeOf(sSource) != "htm") { sError = "Edge prints only a web page to PDF"; return false; }
+string sEdge = edgePath();
+if (sEdge == "") { sError = "Microsoft Edge is not installed"; return false; }
+string sProfile = Path.Combine(Path.GetTempPath(), "HomerEdgePdf_" + Guid.NewGuid().ToString("N").Substring(0, 8));
+string sOut = Path.GetFullPath(sTarget);
+try {
+if (File.Exists(sOut)) File.Delete(sOut);
+string sUrl = new Uri(Path.GetFullPath(sSource)).AbsoluteUri;
+string sArguments = "--headless --disable-gpu --no-first-run --no-default-browser-check --disable-extensions"
++ " --user-data-dir=\"" + sProfile + "\" --no-pdf-header-footer --generate-pdf-document-outline --export-tagged-pdf"
++ " --print-to-pdf=\"" + sOut + "\" \"" + sUrl + "\"";
+string sSaid;
+bool bRan = run(sEdge, sArguments, out sSaid, out sError);
+if (!File.Exists(sOut) || new FileInfo(sOut).Length < 5) {
+if (sError == "") sError = "Edge wrote no PDF";
+return false;
+}
+byte[] abHead = new byte[4];
+using (FileStream oIn = File.OpenRead(sOut)) oIn.Read(abHead, 0, 4);
+if (Encoding.ASCII.GetString(abHead) != "%PDF") { sError = "Edge wrote something that is not a PDF"; return false; }
+if (!bRan) Log.info("Edge reported a problem but wrote a whole PDF: " + sError);
+sError = "";
+return true;
+}
+catch (Exception ex) { sError = ex.Message; return false; }
+finally { try { if (Directory.Exists(sProfile)) Directory.Delete(sProfile, true); } catch (Exception) { } }
+} // edgePdf method
 
 private static string firstLine(string sText) {
 foreach (string sLine in sText.Replace("\r\n", "\n").Split('\n')) if (sLine.Trim().Length > 0) return sLine.Trim();

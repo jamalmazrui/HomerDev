@@ -71,6 +71,10 @@ HomerDev.md, under "Claude skills".
 - **homer-installer**: the Inno Setup installer -- machine-wide installs, which
   components to offer, the finish page's wording, defaults and order, the
   Results box, and component logging. Carries FinishPage.md from help.
+- **homer-launch-dialog**: the one dialog of a launch app -- source, output,
+  operation and command bands, OK and Cancel alone, the Results box, automatic
+  logs and matching switches -- with a checkLaunch script the kit's check runs
+  on every app.
 - **homer-migrate**: bring an existing app onto the kit, or audit one that
   has drifted, one app at a time, with a checklist of every area and what each
   looked like when it was wrong.

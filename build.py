@@ -70,6 +70,8 @@ lsExpected = [
     ".claude/skills/homer-installer/references/components.md",
     ".claude/skills/homer-tutorial/SKILL.md", ".claude/skills/podcast-directory/SKILL.md",
     ".claude/skills/convention-walking-guide/SKILL.md",
+    ".claude/skills/homer-launch-dialog/SKILL.md", ".claude/skills/homer-launch-dialog/scripts/checkLaunch.cmd",
+    ".claude/skills/homer-launch-dialog/scripts/checkLaunch.py", "help/LaunchDialog.md",
     "Templates/makeHotkeys.py",
     "Templates/LocalFiles.txt",
     "Templates/_APP_.cmd",
@@ -835,6 +837,23 @@ def buildHomerDevApp():
         return "exec\\HomerDev.exe did not compile; the log has the compiler's messages"
     oCache.record("HomerDev.exe", sPrint, ["exec/HomerDev.exe"])
     sayLine("Built exec\\HomerDev.exe, the HomerDev dialog.")
+    return ""
+
+
+def checkSqliteSame():
+    """THE SAME SQLITE SCRIPT IN BOTH LANGUAGES (1.90.0). Conversion.cs and conversion.py each hold the SQLite
+    engine's Python script, so a database converts the same way in a C# app and a Python app. Returns "" when
+    the two are word for word the same, else the problem; the build fails on it, as on C# 5."""
+    import re as reLocal
+    sCs = open(os.path.join(sScriptDir, "exec", "CSharp", "Conversion.cs"), encoding="utf-8-sig").read()
+    sPy = open(os.path.join(sScriptDir, "exec", "Python", "conversion.py"), encoding="utf-8-sig").read()
+    oCs = reLocal.search(r'sSqliteScript =\s*@"((?:[^"]|"")*)";', sCs)
+    oPy = reLocal.search(r"sSqliteScript = r'''(.*?)'''", sPy, reLocal.S)
+    if not oCs or not oPy: return "the SQLite script was not found in " + ("Conversion.cs" if not oCs else "conversion.py")
+    sOne = oCs.group(1).replace('""', '"').replace("\r\n", "\n")
+    sTwo = oPy.group(1).replace("\r\n", "\n")
+    if sOne != sTwo: return "the SQLite script differs between Conversion.cs and conversion.py; make them the same"
+    sayLine("The SQLite script is the same in Conversion.cs and conversion.py.")
     return ""
 
 
@@ -2110,6 +2129,11 @@ def main():
             sayLine(sCSharpProblem)
             iSamplesFailed += 1
             lsFailedParts.append("C# 5")
+        sSqliteProblem = checkSqliteSame()
+        if sSqliteProblem != "":
+            sayLine(sSqliteProblem)
+            iSamplesFailed += 1
+            lsFailedParts.append("SQLite script")
         sTemplateProblem = checkTemplateApp()
         if sTemplateProblem != "":
             sayLine(sTemplateProblem)

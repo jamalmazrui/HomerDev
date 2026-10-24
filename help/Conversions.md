@@ -16,13 +16,59 @@ Both the source and the target decide the way. A plain text target wants speed, 
 Each engine is either internal code, which starts no program and is the quickest, or an outside program, used where its quality is worth the start-up time.
 
 - **copy** (internal): the file as it is.
+- **edge** (outside, comes with Windows): Microsoft Edge prints a web page to a tagged PDF, headless and with a profile of its own, so a PDF needs no Office (kit 1.90.0). Whether every Edge version tags the PDF is unconfirmed; test a result with a screen reader.
 - **ocr** (outside): Tesseract reads a scanned page. In C#, the kit's PdfReader runs it, so a scanned page gets headings and lists too; in Python, pypdfium2 draws each page for it. Never used for a quick read, since it can take minutes.
 - **officecom** (outside, last resort): Microsoft Office through COM. Used only where nothing free will do. When Office is needed and missing, an Alert box says so once per session, and says how to avoid it.
 - **pandoc** (outside): Pandoc, for the markup and document formats it reads and writes.
 - **pdfstructure** (internal where it can be): a PDF's headings, lists and reading order. In C#, the kit's PdfReader, HomerScribe's reader, in an app that compiles PdfReader.cs and ConversionPdf.cs with PdfPig; otherwise pymupdf4llm through Python. A document of scans fails it, so OCR reads it next.
 - **pdftext** (internal when it can be): a PDF's text layer. PdfPig in-process when PdfPig is beside the program; otherwise PyMuPDF's plain text through Python.
+- **sqlite** (outside, Python): a table to an SQLite database, one table named after the file with its fields from the first row, or a database to Markdown, each table under its own heading (kit 1.90.0). Python has SQLite built in and the kit has none of its own, so both languages run the same short script; the kit's build fails if the two copies ever differ.
 - **table** (internal): rows and columns, through the kit's Table class, with cells placed by their references.
 - **zipxml** (internal): the text inside a Word, Excel, PowerPoint or OpenDocument file, read straight from its XML.
+
+## Any Two Types, PDF Included
+
+Every Homer app converts between any two of the types the kit knows, with the same code (kit 1.90.0, the author's rule of 24 October 2026). The types are known by their usual Windows extensions, plus .inix.
+
+- **Through Markdown.** The table names 100 pairs and cannot name every one. A pair it does not name goes in two of its own steps through Markdown, which nearly every type reads into and writes out of: pdf to xlsx is pdf2md, then md2xlsx. A type with no Markdown route goes through a web page instead: json to pdf is json2htm, then htm2pdf. Each step is an ordinary route, with its own best-first ways and its own log lines.
+- **Even when a route exists.** When every way of a named pair fails, as docx2pdf's Word does on a computer without Office, the same two steps are tried before giving up, and the error says what each attempt found.
+- **PDF in and out.** A PDF is read by pdfstructure, with OCR for scans. A PDF is made by Edge from a web page, so md2pdf, htm2pdf and anything that reaches them need no Office. Word stays first for docx2pdf and odt2pdf, since its own export keeps the most of a Word file's layout.
+- **Databases in and out.** The sqlite engine makes and reads SQLite databases, so a table becomes a .db and a .db becomes anything Markdown can.
+- **What cannot be made.** JSON to a table, EPUB or PowerPoint, since JSON has no single table and those two would need a third step. A type to itself.
+- **Asking first.** Conversion.canConvert, and canConvert in Python, answer for the hub too, so BatCon's list and every app's picker offer exactly what convert can do.
+
+## Every File Finished for a Screen Reader
+
+Whatever engine makes a file -- the kit's own writers, Pandoc, Edge or Office -- the kit opens it once more when it is done, gives it what a screen reader needs, and logs what it could not fix (kit 1.91.0). The findings use extCheck's rule names, so a log reads like an extCheck report. A middle file of a two-step conversion is left alone, since a program reads it next, not a person.
+
+- **Excel (.xlsx):** header names for every table, a frozen header row, a sheet name from the file's name in place of a lone "Sheet1" or "Data", and the workbook's title, author and language. Merged cells are reported.
+- **EPUB (.epub):** a title from the book's first heading and a language, when the package has none.
+- **Markdown (.md):** front matter with a title from the first heading and a language, when there is none. Skipped heading levels, no headings at all, and pictures without alternative text are reported.
+- **PDF (.pdf):** tagged. Edge prints a page that has its language and title; Word now exports with its structure tags and heading bookmarks rather than Save As, whose tags depend on a setting in Word.
+- **PowerPoint (.pptx):** title, author and language. Slides without a title and pictures without alternative text are reported.
+- **Web pages (.htm):** the Homer page form, as before: one H1, main, language and title. Pictures without alternative text are reported.
+- **Word (.docx):** title from the first heading, author and language, and the language in the default style, so every run of text is read in it. A document without headings, and pictures without alternative text, are reported.
+
+The title is the document's first heading where it has one, else its file's name with underscores read as spaces. The language is Windows' own, and the author is the Windows user.
+
+### Header names in a workbook
+
+JAWS and NVDA read a table's column or row headers as you move through it when the table's top-left cell carries a workbook name beginning ColumnTitle, RowTitle or Title (both). This comes from the author's xlHeaders.vbs of 2024, which drove Excel to do it. The kit reads and writes the workbook's own XML instead, so no Office is needed, and it improves the test in two ways.
+
+- **A table is a region:** a rectangle of filled cells set apart by blank rows and columns, as Excel's own CurrentRegion finds it. It needs at least two rows and two columns.
+- **Column headers** are a top row whose every cell is filled, text, and different from the rest, ignoring case. **Row headers** are the same, down the first column.
+- **An empty top-left corner** no longer hides a two-way table: the top row is tested from its second cell and the first column from its second cell, and both passing makes a Title. xlHeaders found no headers in such a table.
+- **A header must be text,** so a row of different numbers is not taken for headers.
+- **A table already named** keeps its name. A new name takes the next free two-digit number: ColumnTitle01, ColumnTitle02.
+- **The first named table's headers are frozen,** so they stay in view while a sighted reader scrolls.
+
+### Databases in DbDo's form
+
+A database the kit makes is one DbDo opens with nothing to set up, as the homer-db skill describes. Its table is named for the file, plural and in lower case, with the English singular for its id: people.db holds people, with person_id. Its fields come in DbDo's order: the id, added and edited, the data fields with DbDo's types (TEXTLINE, TEXTMEMO, INTEGER or REAL, from what the column holds), url, notes and tags, look (the first three fields, joined with " | "), prime (every data field) and marked. It has the edited and maps triggers, a unique index on prime, and DbDo's own lookups, maps and views tables, seeded with DbDo's field types and link kinds. A row that repeats another exactly is left out and counted. checkDb passes such a database with no warnings. Turning a database back into Markdown leaves out DbDo's own tables and the fields DbDo keeps for itself.
+
+## .htm, Never .html
+
+A web page a Homer app makes is .htm. Every Homer app reads .html as .htm, in C# and in Python alike, so the table has no html2 sections; four were removed in 1.90.0, since they could never be reached. A picker offers "htm" and never "html".
 
 ## Recognizing a File
 

@@ -18,7 +18,7 @@ schema=1
 apps=DbDo, EdSharp, FileDir, HomerView
 ; conversionsMoved: apps that convert files only through the kit's Conversion
 ; (1.74.0); the shared check fails on private conversion code in these.
-conversionsMoved=2htm, BatCon, bookFido, DbDo, EdSharp, FileDir
+conversionsMoved=2htm, BatCon, bookFido, DbDo, EdSharp, extCheck, FileDir, HomerScribe, HomerView, urlCheck, urlFido
 
 [DbDo about]
 name=About

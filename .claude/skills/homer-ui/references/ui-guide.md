@@ -69,12 +69,16 @@ By default each control sits on its own row. A band puts several on one row,
 which is what you want for a field and the button that fills it in:
 
     dlg.addBand();
-    TextBox tbSource = dlg.addInputBox("&Source:", sSource, "The file to work on.");
-    Button btnBrowse = dlg.addButton("&Browse source...", "Pick it from a dialog.");
+    TextBox tbPicture = dlg.addInputBox("&Picture:", sPicture, "The picture to describe.");
+    Button btnPick = dlg.addButton("Pick &file", "Choose it from an Open dialog.");
     dlg.endBand();
 
 A band changes only the arrangement. The tab order is still the order of the
-calls.
+calls. A field's label goes inside the band, just before its box, which is
+what lets a screen reader name the box (Insert+Tab says "Picture"). A band
+reads left to right and wraps onto a second line only when it is wider than
+the dialog can grow. A launch app does not build its bands this way: the
+kit's LaunchDialog builds them, as the next part of this guide says.
 
 ### Showing it
 
@@ -82,9 +86,10 @@ calls.
 - `runWithButtons(new string[] { "Default settings", "OK", "Cancel" })` --
   returns the label of the button pressed, or an empty string if the user
   pressed Escape or closed the window.
-- A **Help** button is added for you and placed rightmost, per Windows layout.
-  It lists every field with its tip, then the universal dialog keys. F1 does
-  the same.
+- A **Help** button is added for you at the end of the button row. It lists
+  every field with its tip, then the universal dialog keys. F1 does the same.
+  A launch dialog puts Help in a band of its own instead, above OK and Cancel,
+  with `addHelpButton`.
 - **Enter** presses the button that means accept, wherever it sits in the row,
   and **Control+Enter** does it from any control including a memo.
   **Escape** cancels.

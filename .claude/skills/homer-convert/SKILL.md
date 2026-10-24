@@ -14,7 +14,13 @@ description: >-
 # Converting files
 
 Pick the tool by what is converted, write the output in the Homer encoding,
-and check the result. Web pages are `.htm`, never `.html`; settings and data
+and check the result. Any two of the kit's types convert, PDF and SQLite
+included: a pair the route table does not name goes through Markdown (else a web
+page) in two of its own steps, and a PDF is printed by Edge, so no Office is
+needed (kit 1.90.0; help\Conversions.md). Every file made is then finished for a
+screen reader and checked, with extCheck's rule names in the log: workbook header
+names (from xlHeaders.vbs, without Office), titles, authors, languages, front
+matter and tagged PDFs; a .db is in DbDo's form (kit 1.91.0). Web pages are `.htm`, never `.html`; settings and data
 in INI form are `.inix`.
 
 ## Which tool
@@ -47,10 +53,10 @@ in INI form are `.inix`.
   2htm --plain-text C:\docs\*.pdf
   ```
 
-  It reads .docx .doc .rtf .odt, .pdf (through Word's PDF Reflow, so Word
-  must be installed), .xlsx .xls, .pptx .ppt, .csv, .json, .htm .html, .md and
-  .txt. It skips an output that exists unless `--force`; `--strip-images` drops
-  images; `-l` writes 2htm.log beside the output.
+  It reads .docx .doc .rtf .odt, .pdf (through the kit's PDF reader, with OCR
+  for scans; no Word needed), .xlsx .xls, .pptx .ppt, .csv, .json, .htm .html,
+  .md and .txt. It skips an output that exists unless `-f`
+  (`--force-replacements`); `-i` drops images; logging is automatic.
 - **A table between .inix, .csv, .tsv, Markdown and .xlsx**, in any direction:
   inixVert. `.inix` is the screen-reader-friendly form: one `[RecordNNN]`
   section per row, one `field = value` line per field.

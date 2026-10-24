@@ -218,7 +218,7 @@ HomerDev</a></li>
 <li><a href="#direct-speech-across-screen-readers">Direct speech across
 screen readers</a></li>
 <li><a href="#lbc-building-a-dialog">Lbc: building a dialog</a></li>
-<li><a href="#the-launchpad-app">The launchpad app</a></li>
+<li><a href="#the-launch-app">The launch app</a></li>
 <li><a href="#keys-and-key-names">Keys and key names</a></li>
 <li><a href="#every-file-in-the-kit-and-why-it-is-here">Every file in
 the kit, and why it is here</a></li>
@@ -824,20 +824,26 @@ band.</li>
 one row, which is what you want for a field and the button that fills it
 in:</p>
 <pre><code>dlg.addBand();
-TextBox tbSource = dlg.addInputBox(&quot;&amp;Source:&quot;, sSource, &quot;The file to work on.&quot;);
-Button btnBrowse = dlg.addButton(&quot;&amp;Browse source...&quot;, &quot;Pick it from a dialog.&quot;);
+TextBox tbPicture = dlg.addInputBox(&quot;&amp;Picture:&quot;, sPicture, &quot;The picture to describe.&quot;);
+Button btnPick = dlg.addButton(&quot;Pick &amp;file&quot;, &quot;Choose it from an Open dialog.&quot;);
 dlg.endBand();</code></pre>
 <p>A band changes only the arrangement. The tab order is still the order
-of the calls.</p>
+of the calls. A field’s label goes inside the band, just before its box,
+which is what lets a screen reader name the box (Insert+Tab says
+“Picture”). A band reads left to right and wraps onto a second line only
+when it is wider than the dialog can grow. A launch app does not build
+its bands this way: the kit’s LaunchDialog builds them, as the next part
+of this guide says.</p>
 <h3 id="showing-it">Showing it</h3>
 <ul>
 <li><code>runOkCancel()</code> – OK and Cancel; returns true on OK.</li>
 <li><code>runWithButtons(new string[] { "Default settings", "OK", "Cancel" })</code>
 – returns the label of the button pressed, or an empty string if the
 user pressed Escape or closed the window.</li>
-<li>A <strong>Help</strong> button is added for you and placed
-rightmost, per Windows layout. It lists every field with its tip, then
-the universal dialog keys. F1 does the same.</li>
+<li>A <strong>Help</strong> button is added for you at the end of the
+button row. It lists every field with its tip, then the universal dialog
+keys. F1 does the same. A launch dialog puts Help in a band of its own
+instead, above OK and Cancel, with <code>addHelpButton</code>.</li>
 <li><strong>Enter</strong> presses the button that means accept,
 wherever it sits in the row, and <strong>Control+Enter</strong> does it
 from any control including a memo. <strong>Escape</strong> cancels.</li>
@@ -870,68 +876,60 @@ focus.</li>
 or pasting replaces it and Tab leaves it alone. A
 <strong>multi-line</strong> box is the exception: its caret opens on the
 first line, because its value is a document rather than a field.</p>
-<h2 id="the-launchpad-app">The launchpad app</h2>
-<p>Most Homer tools are one dialog with one job: 2htm, extCheck,
-urlCheck, bookFido, urlFido, HomerScribe. They share a shape, and a user
-who learns one has learnt them all. <code>Templates\_APP_.cs</code> is
-that shape, ready to fill in.</p>
-<h3 id="the-controls-in-order">The controls, in order</h3>
-<p>The order below is the order they are added, which is the order they
-are tabbed through and read.</p>
+<h2 id="the-launch-app">The launch app</h2>
+<p>Many Homer tools are one dialog with one job: 2htm, BatCon, extCheck,
+HomerScribe, urlCheck and urlFido. Each takes source paths and settings,
+runs a process, writes results into an output directory, shows a Results
+box and closes. They share one dialog, built by the kit’s
+<code>LaunchDialog</code> class, so a user who learns one has learnt
+them all. <code>Templates\_APP_.cs</code> is that shape, ready to fill
+in, and <a href="LaunchDialog.htm">LaunchDialog.md</a> says why each
+part is where it is.</p>
+<h3 id="the-bands-in-order">The bands, in order</h3>
 <ol type="1">
-<li><strong>Source</strong> – a text box named <code>&amp;Source</code>.
-What to work on.</li>
-<li><strong>Browse source</strong> – a button named
-<code>&amp;Browse source...</code> on the same band, opening a standard
-Open dialog.</li>
-<li><strong>Options</strong> – whatever check boxes this app needs, each
-with its own access key and tip.</li>
-<li><strong>Output</strong> – a text box named <code>&amp;Output</code>.
-Where the result goes. Blank means beside the source.</li>
-<li><strong>Choose output</strong> – a button named
-<code>&amp;Choose output...</code> on the same band, opening a standard
-folder dialog.</li>
-<li><strong>Use configuration</strong> – a check box named
-<code>&amp;Use configuration</code>. Take the saved answers next time
-without asking.</li>
-<li><strong>View output</strong> – a check box named
-<code>&amp;View output</code>. Open the result when the work
-finishes.</li>
-<li><strong>Default settings</strong> – a button that puts every field
-back as it started.</li>
-<li><strong>OK</strong> – starts the work. Enter and Control+Enter do
-the same.</li>
-<li><strong>Cancel</strong> – closes without doing anything. Escape does
-the same.</li>
-<li><strong>Help</strong> – shows the help box. F1 does the same. Lbc
-adds it and places it rightmost.</li>
+<li><strong>Source:</strong> the “Source paths” box, then the “Browse
+local source” button.</li>
+<li><strong>Transformations:</strong> the app’s own checkboxes choosing
+what is done.</li>
+<li><strong>More choices:</strong> the app’s other controls shaping that
+work.</li>
+<li><strong>Output:</strong> the “Output directory” box, then the
+“Choose output directory” button.</li>
+<li><strong>Operation:</strong> “Force replacements”, “Use
+configuration” and “View output directory”.</li>
+<li><strong>Commands:</strong> “Default settings” and “Help”.</li>
+<li><strong>Commit:</strong> OK and Cancel, alone at the bottom
+right.</li>
 </ol>
-<h3 id="the-two-boxes">The two boxes</h3>
-<ul>
-<li>The <strong>help box</strong> says what the program does, what each
-field means, what each button does, and the command line that matches.
-It is the same text the <code>--help</code> switch prints.</li>
-<li>The <strong>results box</strong> says what this run actually did,
-one short line per fact. Only actions actually taken are listed. Counts
-match their nouns.</li>
-</ul>
+<p>Control+Enter is OK and Escape is Cancel from any control. F1 is
+Help, and F11 checks the web for a newer version from anywhere. There is
+no Guide button and no log checkbox: logging is automatic, and Help says
+where the logs are.</p>
+<h3 id="the-results-box">The Results box</h3>
+<p>Every run from the dialog ends with <code>LaunchDialog.finish</code>:
+a box titled with the app’s name and Results, whose one OK button has
+the focus, so Enter, Space or Escape closes it. Then the output
+directory opens if View output directory is checked, and the app closes.
+Only actions actually taken are listed, and counts match their
+nouns.</p>
 <h3 id="the-command-line-does-everything-the-dialog-does">The command
 line does everything the dialog does</h3>
-<p>Each field has a switch, and the switch is named after the field:</p>
-<pre><code>&lt;App&gt; --source &lt;path&gt; [--output &lt;path&gt;] [--config] [--view]
-&lt;App&gt; --defaults
-&lt;App&gt; --help</code></pre>
+<p>A switch’s long form is the control’s label and its short form the
+control’s Alt letter, written /switch, -switch or –switch, in any
+case:</p>
+<pre><code>&lt;app&gt; &lt;paths&gt; [-o &lt;folder&gt;] [-f] [-u] [-v]
+&lt;app&gt; -d
+&lt;app&gt; -h</code></pre>
 <p>With any argument the program runs without opening a window, so it
 can be driven from a batch file, a scheduled task, or another program. A
-bare path with no switch is taken as the source, because that is what
-dropping a file on the program means.</p>
-<h3 id="settings-are-saved-as-they-are-answered">Settings are saved as
-they are answered</h3>
-<p>Every answer is written to <code>&lt;App&gt;.inix</code> the moment
-it is given, not at exit, so a crash or a kill loses nothing. The file
-sits beside the executable when that folder is writable, which is the
-portable case, and under <code>%LOCALAPPDATA%\&lt;App&gt;</code>
-otherwise, which is the installed case.</p>
+bare path with no switch is a source, because that is what dropping a
+file on the program means.</p>
+<h3 id="settings-are-saved-when-use-configuration-is-checked">Settings
+are saved when Use configuration is checked</h3>
+<p>When Use configuration is checked at OK, every field is written to
+<code>%LOCALAPPDATA%\&lt;App&gt;\configs\&lt;App&gt;.inix</code> and
+loaded next time; when it is not, that file is removed. Default
+settings, or <code>-d</code>, removes it too.</p>
 <h2 id="keys-and-key-names">Keys and key names</h2>
 <h3 id="one-spelling">One spelling</h3>
 <p><code>KeyName.cs</code> holds the one spelling for every key, taken

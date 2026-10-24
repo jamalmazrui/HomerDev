@@ -1,0 +1,552 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.12.1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>LaunchDialog</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      color: light-dark(#1a1a1a, #fdfdfd);
+      background-color: #fdfdfd;
+      background-color: light-dark(#fdfdfd, #1a1a1a);
+      color-scheme: light dark;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a, a:visited {
+      color: inherit;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid;
+      border-color: #e6e6e6;
+      border-color: light-dark(#e6e6e6, #4c4c4c);
+      color: #606060;
+      color: light-dark(#606060, #b6b6b6);
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid currentColor;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+    }
+    th {
+      border-top: 1px solid currentColor;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+</head>
+<body>
+<main>
+<h1 id="the-homer-launch-dialog">The Homer launch dialog</h1>
+<p>A <strong>launch app</strong> takes some source paths and a few
+settings, runs a process, and writes files and folders into an output
+directory you name. 2htm, BatCon, extCheck, HomerScribe, urlCheck and
+urlFido are launch apps. They all show one dialog, built by the kit’s
+<code>LaunchDialog</code> class in <code>exec\CSharp\Lbc.cs</code>, so
+they look, sound and behave alike. This page says what that dialog is
+and why.</p>
+<h2 id="the-bands">The bands</h2>
+<p>A <strong>band</strong> is one row of controls, read and tabbed left
+to right. The bands come in this order. A band with nothing in it is
+left out.</p>
+<ol type="1">
+<li><strong>Source.</strong> The “Source paths” box, then the “Browse
+local source” button. The box holds one or more files, folders, patterns
+or web addresses, separated by spaces, with quotes around any that has a
+space. “Paths” is the word even for web addresses, because a list file
+or playlist can be given too.</li>
+<li><strong>Transformations.</strong> Checkboxes that choose what is
+done to the sources, such as HomerScribe’s “Transcribe audio” and
+“Describe video”.</li>
+<li><strong>More choices.</strong> Other controls that shape that work,
+such as BatCon’s “Target format” list or urlFido’s “File extensions”
+box.</li>
+<li><strong>Output.</strong> The “Output directory” box, then the
+“Choose output directory” button.</li>
+<li><strong>Operation.</strong> Checkboxes for the run as a whole, in
+alphabetical order: “Force replacements”, “Use configuration” and “View
+output directory”.</li>
+<li><strong>Commands.</strong> The “Default settings” and “Help”
+buttons, in alphabetical order. Neither closes the dialog for good: Help
+shows a box and returns, and Default settings opens the dialog again
+with everything as it was out of the box.</li>
+<li><strong>Commit.</strong> OK and Cancel, alone, at the bottom
+right.</li>
+</ol>
+<h2 id="force-replacements">Force replacements</h2>
+<p>Force replacements works the same way in every launch app.</p>
+<ul>
+<li><strong>Unchecked,</strong> a source whose result is already in the
+output directory is skipped and its result kept. The Results box counts
+them and says how to replace them: “Skipped 2 files whose results were
+already there. Check Force replacements, or use -f, to replace
+them.”</li>
+<li><strong>Checked,</strong> the work is done again, and the old result
+is kept aside until the new one is complete, so a run that fails never
+loses both. 2htm and urlFido move the old result aside and put it back
+on failure, BatCon writes the new result before replacing the old,
+urlCheck moves earlier reports aside, and extCheck writes its report
+only once checking is done.</li>
+<li><strong>On the command line</strong> it is <code>-f</code> or
+<code>--force-replacements</code> (<code>--force</code> still
+works).</li>
+<li><strong>Its tip</strong> is the same in every app, the kit’s
+<code>LaunchDialog.forceTip</code>, and the Results line is the kit’s
+<code>LaunchDialog.keptLine</code>.</li>
+</ul>
+<p><strong>Where it sits.</strong> It is the first checkbox of the
+operation band, before Use configuration and View output directory, in
+alphabetical order. The other place considered was the output band,
+after Choose output directory, since it is about results already in the
+output directory. It stays in the operation band for three reasons.
+First, View output directory is about the output too, and it is in the
+operation band by the author’s own layout; the two belong together.
+Second, the output band then stays a box and its button, like the source
+band, which keeps the two easy to learn as a pair. Third, Force
+replacements changes how the whole run treats every source, which is
+what the operation band is for.</p>
+<h2 id="why-ok-and-cancel-stand-alone">Why OK and Cancel stand
+alone</h2>
+<p>Microsoft’s guidance for Windows dialogs (confirmed: the Windows 7
+“Dialog Boxes” and “Command Buttons” design guides, which Microsoft
+still publishes) says three things that settle the last bands:</p>
+<ul>
+<li>Commit buttons go in one row along the bottom, aligned to the
+right.</li>
+<li>Only buttons that act on the whole window go in that row, and no
+other kind of control.</li>
+<li>Buttons that close the window should be clearly apart from buttons
+that do not.</li>
+</ul>
+<p>OK and Cancel close the dialog. Help and Default settings do not, so
+they get a band of their own above the row. The checkboxes are not
+buttons, so they never sit in the row.</p>
+<h2 id="letters-and-keys">Letters and keys</h2>
+<ul>
+<li><strong>Alt letters.</strong> The standard controls use the same
+letters in every app: S for Source paths, B for Browse local source, O
+for Output directory, C for Choose output directory, F for Force
+replacements, U for Use configuration, V for View output directory, D
+for Default settings and H for Help. An app’s own control that comes
+earlier and already has one of these letters keeps it, by the Homer rule
+that the first control to claim a letter keeps it. The standard control
+then takes the first letter of its next word, or none.</li>
+<li><strong>OK and Cancel have no letter.</strong> Control+Enter presses
+OK and Escape presses Cancel, from any control in the dialog.</li>
+<li><strong>F1</strong> opens Help, the same as the Help button.</li>
+<li><strong>F11</strong> checks the web for a newer version and offers
+to install it. It works from any control, though no control shows it,
+and the Help box says so.</li>
+</ul>
+<h2 id="opening-and-choosing-folders">Opening and choosing folders</h2>
+<ul>
+<li>The dialog opens with the focus in the Source paths box and its text
+selected, so typing replaces it and Tab leaves it alone. Insert+Tab says
+“Source paths” and the value.</li>
+<li>“Browse local source” and “Choose output directory” open where the
+box already points. When the box is empty or names a web address, they
+open in the Windows known folder for the kind of content: Documents for
+most apps, Videos for HomerScribe.</li>
+</ul>
+<h2 id="logs-and-results">Logs and results</h2>
+<ul>
+<li><strong>Logging is automatic.</strong> There is no log checkbox and
+no log switch. Every run writes a log in
+<code>%LOCALAPPDATA%\&lt;App&gt;\logs</code>, named
+<code>&lt;App&gt;-yyyyMMdd-HHmmss.log</code> for the date and time it
+started, so the newest is last in alphabetical order. The Help box says
+where.</li>
+<li><strong>Every run ends with a Results box</strong>, titled “<App>
+Results”. Its only button is OK, which has the focus, so Enter, Space or
+Escape closes it. Then the output directory opens, if View output
+directory is checked, and the app closes. The folder opens after the box
+rather than before it, so File Explorer does not take the focus away
+from the results. A long report shows its first 15 lines and gives the
+path of a file that holds the rest.</li>
+</ul>
+<h2 id="while-the-work-runs">While the work runs</h2>
+<p>After OK, a launch app shows the kit’s progress window,
+<code>LaunchProgress</code>, until the Results box. It follows these
+rules.</p>
+<ul>
+<li><strong>One window, named for where things stand.</strong> Its title
+is the app’s name and the latest status, such as “BatCon, Budget.pdf, 2
+of 5 done”. Alt+Tab, or the screen reader’s Say Title command
+(Insert+T), answers “how far?” at any time.</li>
+<li><strong>A status box that holds the focus.</strong> The window opens
+on a read-only “Status” box with the latest status, so Insert+Tab reads
+it again. The focus does not start on Cancel, because Microsoft’s
+keyboard guidance says the opening focus should never be on a control
+with a destructive result.</li>
+<li><strong>Cancel, from anywhere.</strong> The window’s one button is
+Cancel, with no Alt letter; Escape presses it, and so does the window’s
+close box. The app stops after the current item and says how many were
+left. Microsoft asks for a way to cancel any blocking job that takes
+longer than ten seconds.</li>
+<li><strong>Spoken only while the app is in front.</strong> The screen
+reader speaks the status only while a window of the app is the one you
+are using. Switch to another program and the window keeps its title and
+status box up to date, but says nothing, so you can work without being
+talked over. Come back with Alt+Tab and it speaks the latest status
+once.</li>
+<li><strong>Not a torrent.</strong> The first three messages, and every
+change of phase such as “Starting Edge”, are spoken at once, so a run is
+never silent at the start. After that a step is spoken at most every
+five seconds, and the newest waiting message is the one you hear.
+Nothing spoken is longer than 300 characters.</li>
+<li><strong>Counts say work done, with the percentage.</strong>
+“Budget.pdf, 2 of 5 done, 40%” while the third file runs, so 100 percent
+never shows while work is still going on. Work measured another way,
+such as minutes of a recording, says where it is and the percentage:
+“Film.mp4, 11 min, 23%”.</li>
+<li><strong>Time left, when it can be estimated honestly.</strong> Once
+a job has run 20 seconds and finished something, the status adds “about
+3 min left”, or “under a minute left” near the end. Times are said the
+way HomerScribe says them: “11 min”, “1 hour 5 min”.</li>
+<li><strong>A progress bar, and the percentage spoken anyway.</strong>
+The window has a real progress bar, as Microsoft asks. Microsoft keeps
+the percentage out of status text because the bar beside it already
+shows it. But a screen reader user hears a progress bar as a percentage,
+and “40%” is the quickest way to know how much is done and how much
+remains, which is what planning needs. So the percentage is in the
+spoken status, the title and the Status box. This is a deliberate
+departure from Microsoft’s guidance, kept as small as it can be
+(confirmed: the author’s ruling of 24 October 2026).</li>
+<li><strong>The message pump.</strong> Setting text is not enough: until
+the message queue is pumped, Windows has not repainted the window or
+told the screen reader the title changed. Every status update pumps
+(<code>Application.DoEvents</code>), at most ten times a second, and a
+long silent step should call <code>pump()</code> now and then. The
+window’s only command sets a flag, so pumping cannot start the work a
+second time.</li>
+<li><strong>Every status is logged,</strong> with a note when it was not
+spoken because the app was not in front, so the log shows exactly what
+you heard.</li>
+</ul>
+<p>HomerScribe built these rules over months of describing films, and it
+keeps its own richer window: it groups descriptions that arrive every
+few seconds, and it can show its progress in the dialog itself. It uses
+the kit’s <code>LaunchProgress.isInFront</code> test, so all six apps
+decide when to speak the same way.</p>
+<h2 id="the-command-line">The command line</h2>
+<p>The command line uses the same names as the dialog. A switch’s long
+form is the control’s label, and its short form is the control’s Alt
+letter. Switches may be written with a slash, one hyphen or two, in any
+case, and the guides show them in lowercase.</p>
+<ul>
+<li><strong>Sources</strong> are the paths given without a switch.</li>
+<li><code>-o</code>, <code>--output-directory</code> names the output
+directory.</li>
+<li><code>-f</code>, <code>--force-replacements</code> replaces results
+that are already there.</li>
+<li><code>-u</code>, <code>--use-configuration</code> loads the saved
+settings, and in the dialog saves them at OK.</li>
+<li><code>-v</code>, <code>--view-output-directory</code> opens the
+output directory when the run is done.</li>
+<li><code>-d</code>, <code>--default-settings</code> forgets the saved
+settings.</li>
+<li><code>-h</code>, <code>--help</code> shows the switches.</li>
+</ul>
+<p>An app keeps its older spellings, such as <code>--force</code> or
+<code>--view-output</code>, as other names for the same switch.</p>
+<h2 id="learnings-from-microsofts-uwp-guidelines">Learnings from
+Microsoft’s UWP guidelines</h2>
+<p>Microsoft’s 2015 guidelines for Universal Windows Platform apps were
+mined for what fits a Homer launch app (confirmed: the August 2015 PDF
+of the guidelines). These points shaped the rules above or confirm
+them:</p>
+<ul>
+<li><strong>Progress after two seconds.</strong> Show progress for
+anything that takes more than two seconds; the progress window opens at
+OK.</li>
+<li><strong>Cancel after ten.</strong> A blocking job longer than ten
+seconds needs a way to cancel from the moment it starts.</li>
+<li><strong>Status text says what is happening.</strong> Show the
+subject of the task and its status. Microsoft leaves the percentage to
+the progress bar; Homer speaks it too, because that is how a screen
+reader user receives a progress bar (see above).</li>
+<li><strong>Give time remaining, without false precision.</strong>
+Microsoft’s Windows 7 progress guidance asks for time remaining in plain
+units, rounded.</li>
+<li><strong>Opening focus is never destructive.</strong> Put the first
+focus where the user will most likely act, and never on a control that
+loses work.</li>
+<li><strong>Tab order follows reading order,</strong> and static text is
+not a tab stop. A band’s label is in its band, just before its field,
+but is not a tab stop.</li>
+<li><strong>Space activates the focused control, Enter the default,
+Escape closes.</strong> The Results box and the launch dialog follow
+this.</li>
+<li><strong>Every control has a name, role, value and state</strong> a
+screen reader can read, and dynamic content uses a live region (in
+WinForms, the kit’s Say, which raises a UI Automation
+notification).</li>
+<li><strong>Don’t change context without the user.</strong> Nothing
+moves the focus or opens a window while the work runs, except the
+Results box at the end, which the user is waiting for.</li>
+<li><strong>Don’t refresh what has not changed.</strong> The window
+repeats nothing: a status that has not changed is not set, spoken or
+logged again.</li>
+<li><strong>Use dialogs for what must be read and acknowledged;</strong>
+the Results box is one. Notifications that pop up elsewhere are for
+things the user did not start, so launch apps do not use them.</li>
+<li><strong>Labels go above controls or to their left, the same way
+throughout.</strong> The launch dialog puts each label to the left of
+its box, in its band.</li>
+</ul>
+<h2 id="building-one">Building one</h2>
+<p>In C#:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode csharp"><code class="sourceCode cs"><span id="cb1-1"><span class="kw">using</span> <span class="op">(</span>LaunchDialog oLaunch <span class="op">=</span> <span class="kw">new</span> <span class="fu">LaunchDialog</span><span class="op">(</span><span class="st">&quot;BatCon&quot;</span><span class="op">))</span></span>
+<span id="cb1-2"><span class="op">{</span></span>
+<span id="cb1-3">    oLaunch<span class="op">.</span><span class="fu">sourcePick</span> <span class="op">=</span> <span class="st">&quot;folder&quot;</span><span class="op">;</span></span>
+<span id="cb1-4">    oLaunch<span class="op">.</span><span class="fu">addSourceBand</span><span class="op">(</span>sSource<span class="op">,</span> <span class="st">&quot;Files, folders or patterns.&quot;</span><span class="op">,</span> <span class="st">&quot;Choose a folder of files.&quot;</span><span class="op">);</span></span>
+<span id="cb1-5">    oLaunch<span class="op">.</span><span class="fu">dialog</span><span class="op">.</span><span class="fu">addBand</span><span class="op">();</span></span>
+<span id="cb1-6">    ListBox lbTarget <span class="op">=</span> oLaunch<span class="op">.</span><span class="fu">dialog</span><span class="op">.</span><span class="fu">addPickBox</span><span class="op">(</span><span class="st">&quot;&amp;Target format:&quot;</span><span class="op">,</span> lsTargets<span class="op">,</span> sTarget<span class="op">,</span> <span class="st">&quot;The format to make.&quot;</span><span class="op">);</span></span>
+<span id="cb1-7">    oLaunch<span class="op">.</span><span class="fu">dialog</span><span class="op">.</span><span class="fu">endBand</span><span class="op">();</span></span>
+<span id="cb1-8">    oLaunch<span class="op">.</span><span class="fu">addOutputBand</span><span class="op">(</span>sOutput<span class="op">,</span> <span class="st">&quot;Where results go.&quot;</span><span class="op">,</span> <span class="st">&quot;Choose the output directory.&quot;</span><span class="op">);</span></span>
+<span id="cb1-9">    oLaunch<span class="op">.</span><span class="fu">addOperationBands</span><span class="op">(</span>bForce<span class="op">,</span> <span class="st">&quot;Replace results.&quot;</span><span class="op">,</span> bUseConfig<span class="op">,</span> <span class="st">&quot;Save settings.&quot;</span><span class="op">,</span> bView<span class="op">,</span> <span class="st">&quot;Open the folder.&quot;</span><span class="op">);</span></span>
+<span id="cb1-10">    <span class="dt">string</span> sButton <span class="op">=</span> oLaunch<span class="op">.</span><span class="fu">run</span><span class="op">();</span>   <span class="co">// &quot;OK&quot;, &quot;Cancel&quot; or &quot;Default settings&quot;</span></span>
+<span id="cb1-11"><span class="op">}</span></span>
+<span id="cb1-12"><span class="kw">using</span> <span class="op">(</span>LaunchProgress oProgress <span class="op">=</span> <span class="kw">new</span> <span class="fu">LaunchProgress</span><span class="op">(</span><span class="st">&quot;BatCon&quot;</span><span class="op">,</span> <span class="st">&quot;Converting 5 files&quot;</span><span class="op">,</span> <span class="kw">delegate</span><span class="op">(</span><span class="dt">string</span> s<span class="op">)</span> <span class="op">{</span> Log<span class="op">.</span><span class="fu">info</span><span class="op">(</span>s<span class="op">);</span> <span class="op">}))</span></span>
+<span id="cb1-13"><span class="op">{</span></span>
+<span id="cb1-14">    <span class="kw">foreach</span> <span class="op">(</span><span class="dt">string</span> sFile <span class="kw">in</span> lsFiles<span class="op">)</span></span>
+<span id="cb1-15">    <span class="op">{</span></span>
+<span id="cb1-16">        <span class="kw">if</span> <span class="op">(</span>oProgress<span class="op">.</span><span class="fu">cancelled</span><span class="op">)</span> <span class="kw">break</span><span class="op">;</span></span>
+<span id="cb1-17">        oProgress<span class="op">.</span><span class="fu">step</span><span class="op">(</span>Path<span class="op">.</span><span class="fu">GetFileName</span><span class="op">(</span>sFile<span class="op">),</span> iDone<span class="op">,</span> lsFiles<span class="op">.</span><span class="fu">Count</span><span class="op">);</span>   <span class="co">// &quot;Budget.pdf, 2 of 5 done, 40%&quot;</span></span>
+<span id="cb1-18">        <span class="fu">convert</span><span class="op">(</span>sFile<span class="op">);</span></span>
+<span id="cb1-19">        iDone<span class="op">++;</span></span>
+<span id="cb1-20">    <span class="op">}</span></span>
+<span id="cb1-21"><span class="op">}</span></span>
+<span id="cb1-22">LaunchDialog<span class="op">.</span><span class="fu">finish</span><span class="op">(</span><span class="st">&quot;BatCon&quot;</span><span class="op">,</span> sReport<span class="op">,</span> iFailed <span class="op">&gt;</span> <span class="dv">0</span><span class="op">,</span> bView <span class="op">?</span> sOutput <span class="op">:</span> <span class="st">&quot;&quot;</span><span class="op">);</span></span></code></pre></div>
+<p>From Python through Homer.dll (urlCheck), the same calls work on
+<code>Homer.LaunchDialog</code>. Set <code>ownPickers</code> to
+<code>True</code> before adding the bands and wire the two buttons
+yourself, because the Windows shell pickers can hang under
+pythonnet.</p>
+<h2 id="the-check">The check</h2>
+<p>The kit’s homer-launch-dialog skill carries
+<code>checkLaunch.py</code>, which the kit’s check runs on every app. A
+launch app fails it when it does not build its dialog with
+<code>LaunchDialog</code>, does not end with
+<code>LaunchDialog.finish</code> or
+<code>LaunchDialog.showResults</code>, or still has a retired control: a
+Guide button, a Log session checkbox, an Include subfolders checkbox, or
+the old Browse source and Choose output captions. It also fails an app
+that does not use <code>LaunchProgress</code>, or that still builds a
+progress label with the StatusBar role, which screen readers do not
+reliably speak.</p>
+</main>
+</body>
+</html>

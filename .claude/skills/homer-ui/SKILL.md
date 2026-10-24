@@ -45,6 +45,10 @@ and can reach any command by a key they can guess.
 - Dialog-wide keys come with Lbc: Control+Enter accepts from anywhere, Escape
   cancels, F1 is Help (ending with the version, see homer-elevate), F7 lists
   the controls.
+- **A launch app's dialog is the kit's LaunchDialog**, never built by hand:
+  its bands, letters, Results box and switches are in homer-launch-dialog.
+- **A field inside a band has its label inside the band, just before it**;
+  Lbc does this, which is what lets Insert+Tab name the field.
 
 ## Menus
 

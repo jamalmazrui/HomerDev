@@ -45,10 +45,16 @@ def logPathFor(sPath):
     return os.path.join(os.path.dirname(sPath), "logs", "%s-checkDb-%s.log" % (sName, sStamp))
 
 
+dIrregular = {"children": "child", "data": "data", "men": "man", "people": "person", "women": "woman"}
+
+
 def singular(sTable):
     """The English singular of a plural table name: stories gives story,
     boxes gives box, jobs gives job. (DbDo's generator only drops a trailing s,
     which makes storie_id; the templates use story_id, which is right.)"""
+    # IRREGULAR PLURALS (kit 1.91.0), the same list as the kit's SQLite engine, so a table of people
+    # made by any Homer app is people with person_id.
+    if sTable in dIrregular: return dIrregular[sTable]
     if sTable.endswith("ies"): return sTable[:-3] + "y"
     if sTable.endswith(("sses", "xes", "ches", "shes")): return sTable[:-2]
     if sTable.endswith("s") and not sTable.endswith("ss"): return sTable[:-1]
@@ -58,6 +64,7 @@ def singular(sTable):
 def plurals(sSingular):
     """The table names an id field may refer to."""
     lsNames = [sSingular + "s", sSingular + "es"]
+    lsNames += [sPlural for sPlural, sOne in dIrregular.items() if sOne == sSingular]
     if sSingular.endswith("y"): lsNames.append(sSingular[:-1] + "ies")
     return lsNames
 
@@ -87,7 +94,7 @@ def checkDatabase(sPath):
             continue
         sSub = sTable
         if not re.fullmatch(r"[a-z][a-z0-9_]*", sTable): note("warn", sSub, "name is not lower case with underscores")
-        if not sTable.endswith("s"): note("warn", sSub, "name is not plural, so the id is %s_id" % singular(sTable))
+        if not sTable.endswith("s") and sTable not in dIrregular: note("warn", sSub, "name is not plural, so the id is %s_id" % singular(sTable))
         sPk = singular(sTable) + "_id"
         oFirst = lsCols[0] if lsCols else None
         if oFirst and oFirst[1] == sPk and oFirst[5] == 1 and (oFirst[2] or "").upper() == "INTEGER":

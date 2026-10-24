@@ -33,7 +33,7 @@ holding the keyboard knows what a good program is before the AI writes one.
 - [The .inix format](#the-.inix-format)
 - [Direct speech across screen readers](#direct-speech-across-screen-readers)
 - [Lbc: building a dialog](#lbc-building-a-dialog)
-- [The launchpad app](#the-launchpad-app)
+- [The launch app](#the-launch-app)
 - [Keys and key names](#keys-and-key-names)
 - [Every file in the kit, and why it is here](#every-file-in-the-kit-and-why-it-is-here)
 - [Four kinds of Homer resource](#four-kinds-of-homer-resource)
@@ -614,12 +614,16 @@ By default each control sits on its own row. A band puts several on one row,
 which is what you want for a field and the button that fills it in:
 
     dlg.addBand();
-    TextBox tbSource = dlg.addInputBox("&Source:", sSource, "The file to work on.");
-    Button btnBrowse = dlg.addButton("&Browse source...", "Pick it from a dialog.");
+    TextBox tbPicture = dlg.addInputBox("&Picture:", sPicture, "The picture to describe.");
+    Button btnPick = dlg.addButton("Pick &file", "Choose it from an Open dialog.");
     dlg.endBand();
 
 A band changes only the arrangement. The tab order is still the order of the
-calls.
+calls. A field's label goes inside the band, just before its box, which is
+what lets a screen reader name the box (Insert+Tab says "Picture"). A band
+reads left to right and wraps onto a second line only when it is wider than
+the dialog can grow. A launch app does not build its bands this way: the
+kit's LaunchDialog builds them, as the next part of this guide says.
 
 ### Showing it
 
@@ -627,9 +631,10 @@ calls.
 - `runWithButtons(new string[] { "Default settings", "OK", "Cancel" })` --
   returns the label of the button pressed, or an empty string if the user
   pressed Escape or closed the window.
-- A **Help** button is added for you and placed rightmost, per Windows layout.
-  It lists every field with its tip, then the universal dialog keys. F1 does
-  the same.
+- A **Help** button is added for you at the end of the button row. It lists
+  every field with its tip, then the universal dialog keys. F1 does the same.
+  A launch dialog puts Help in a band of its own instead, above OK and Cancel,
+  with `addHelpButton`.
 - **Enter** presses the button that means accept, wherever it sits in the row,
   and **Control+Enter** does it from any control including a memo.
   **Escape** cancels.
@@ -660,63 +665,59 @@ pasting replaces it and Tab leaves it alone. A **multi-line** box is the
 exception: its caret opens on the first line, because its value is a document
 rather than a field.
 
-## The launchpad app
+## The launch app
 
-Most Homer tools are one dialog with one job: 2htm, extCheck, urlCheck,
-bookFido, urlFido, HomerScribe. They share a shape, and a user who learns one
-has learnt them all. `Templates\_APP_.cs` is that shape, ready to fill in.
+Many Homer tools are one dialog with one job: 2htm, BatCon, extCheck,
+HomerScribe, urlCheck and urlFido. Each takes source paths and settings, runs a
+process, writes results into an output directory, shows a Results box and
+closes. They share one dialog, built by the kit's `LaunchDialog` class, so a
+user who learns one has learnt them all. `Templates\_APP_.cs` is that shape,
+ready to fill in, and [LaunchDialog.md](LaunchDialog.htm) says why each part
+is where it is.
 
-### The controls, in order
+### The bands, in order
 
-The order below is the order they are added, which is the order they are
-tabbed through and read.
+1. **Source:** the "Source paths" box, then the "Browse local source" button.
+2. **Transformations:** the app's own checkboxes choosing what is done.
+3. **More choices:** the app's other controls shaping that work.
+4. **Output:** the "Output directory" box, then the "Choose output directory"
+   button.
+5. **Operation:** "Force replacements", "Use configuration" and "View output
+   directory".
+6. **Commands:** "Default settings" and "Help".
+7. **Commit:** OK and Cancel, alone at the bottom right.
 
-1. **Source** -- a text box named `&Source`. What to work on.
-2. **Browse source** -- a button named `&Browse source...` on the same band,
-   opening a standard Open dialog.
-3. **Options** -- whatever check boxes this app needs, each with its own access
-   key and tip.
-4. **Output** -- a text box named `&Output`. Where the result goes. Blank means
-   beside the source.
-5. **Choose output** -- a button named `&Choose output...` on the same band,
-   opening a standard folder dialog.
-6. **Use configuration** -- a check box named `&Use configuration`. Take the
-   saved answers next time without asking.
-7. **View output** -- a check box named `&View output`. Open the result when
-   the work finishes.
-8. **Default settings** -- a button that puts every field back as it started.
-9. **OK** -- starts the work. Enter and Control+Enter do the same.
-10. **Cancel** -- closes without doing anything. Escape does the same.
-11. **Help** -- shows the help box. F1 does the same. Lbc adds it and places it
-    rightmost.
+Control+Enter is OK and Escape is Cancel from any control. F1 is Help, and F11
+checks the web for a newer version from anywhere. There is no Guide button and
+no log checkbox: logging is automatic, and Help says where the logs are.
 
-### The two boxes
+### The Results box
 
-- The **help box** says what the program does, what each field means, what each
-  button does, and the command line that matches. It is the same text the
-  `--help` switch prints.
-- The **results box** says what this run actually did, one short line per fact.
-  Only actions actually taken are listed. Counts match their nouns.
+Every run from the dialog ends with `LaunchDialog.finish`: a box titled with
+the app's name and Results, whose one OK button has the focus, so Enter, Space
+or Escape closes it. Then the output directory opens if View output directory
+is checked, and the app closes. Only actions actually taken are listed, and
+counts match their nouns.
 
 ### The command line does everything the dialog does
 
-Each field has a switch, and the switch is named after the field:
+A switch's long form is the control's label and its short form the control's
+Alt letter, written /switch, -switch or --switch, in any case:
 
-    <App> --source <path> [--output <path>] [--config] [--view]
-    <App> --defaults
-    <App> --help
+    <app> <paths> [-o <folder>] [-f] [-u] [-v]
+    <app> -d
+    <app> -h
 
 With any argument the program runs without opening a window, so it can be
 driven from a batch file, a scheduled task, or another program. A bare path
-with no switch is taken as the source, because that is what dropping a file on
-the program means.
+with no switch is a source, because that is what dropping a file on the
+program means.
 
-### Settings are saved as they are answered
+### Settings are saved when Use configuration is checked
 
-Every answer is written to `<App>.inix` the moment it is given, not at exit, so
-a crash or a kill loses nothing. The file sits beside the executable when that
-folder is writable, which is the portable case, and under
-`%LOCALAPPDATA%\<App>` otherwise, which is the installed case.
+When Use configuration is checked at OK, every field is written to
+`%LOCALAPPDATA%\<App>\configs\<App>.inix` and loaded next time; when it is
+not, that file is removed. Default settings, or `-d`, removes it too.
 
 ## Keys and key names
 

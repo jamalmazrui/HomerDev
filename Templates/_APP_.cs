@@ -1,8 +1,8 @@
-﻿// _APP_.cs -- a Homer LAUNCHPAD APP: one dialog, one job, one result.
+﻿// _APP_.cs -- a Homer LAUNCH APP: one dialog, one job, one Results box.
 //
 // This is the HomerDev starter. newHomerApp writes a copy of it with _APP_
 // replaced by a real app name. It compiles and runs as it stands: it collects the
-// source files and an output folder, takes the options every launchpad app shares,
+// source paths and an output directory, takes the options every launch app shares,
 // and reports what it did. The only thing missing is the work itself, which goes
 // in runJob().
 //
@@ -10,43 +10,49 @@
 // If you are an AI asked to turn this into a working program, these are the
 // rules the file already follows. Keep them.
 //
-//   * `using Homer;` gives you Lbc, Say, InixCodec, Util, Web, Paths, Log and
-//     Elevate. Build on those rather than writing your own: they are shared,
-//     tested, and tuned for screen readers. To convert files, use the kit's
-//     Conversion.convert, never a converter of your own.
-//   * Build every dialog from Lbc primitives. Never place a control by hand
-//     and never use a visual designer. ADD ORDER IS FOCUS ORDER.
+//   * `using Homer;` gives you Lbc, LaunchDialog, Say, InixCodec, Util, Web,
+//     Paths, Log and Elevate. Build on those rather than writing your own: they
+//     are shared, tested, and tuned for screen readers. To convert files, use
+//     the kit's Conversion.convert, never a converter of your own.
+//   * THE DIALOG IS THE KIT'S LaunchDialog (kit 1.89.0, help\LaunchDialog.md and
+//     the homer-launch-dialog skill). Never build its standard bands by hand. Put
+//     the app's own controls between addSourceBand and addOutputBand, in bands
+//     of their own: first the checkboxes choosing the transformations, then any
+//     other controls shaping the work. Add no Guide button and no Log session
+//     checkbox: logging is automatic and Help says where the logs are.
+//   * ADD ORDER IS FOCUS ORDER. Never place a control by hand, never use a
+//     visual designer, never set TabIndex.
 //   * Camel Type naming: sString, iInteger, bBoolean, lsList, dDictionary,
-//     oObject; lowerCamel methods; constants prefixed c_ (iSpeakGap); double
-//     quotes; declarations alphabetical; functions, not subprocedures.
-//   * THE DIALOG IS 2htm's AND extCheck's, the pattern of every Homer launchpad
-//     app (kit 1.84.1, from the author's audit of BatCon): keep each control's
-//     name, its ampersand letter, its place and its command-line switch. Add an
-//     app's own options after the separator, before Force replacements; add no
-//     other buttons beside the fields.
+//     oObject; lowerCamel methods; constants named like variables, on lines of
+//     their own; double quotes; declarations alphabetical; functions, not
+//     subprocedures.
 //   * Speak only what the screen reader cannot know. It already announces the
 //     window title and the focused control; do not repeat either.
+//   * Every run from the dialog ends with LaunchDialog.finish: the Results box,
+//     then the output directory if View output directory is checked, then the
+//     app closes.
 // ---------------------------------------------------------------------------
 //
-// THE STANDARD LAUNCHPAD CONTROLS, in the order Tab moves through them:
+// THE STANDARD CONTROLS, in the order Tab moves through them, with the
+// command-line switch for each (a long switch is the label, a short one the
+// Alt letter; /switch, -switch or --switch, in any case):
 //
-//   Source files        text box   &Source files       a path, or /source <path>
-//   Browse source       button     &Browse source...   (a folder; the path is the /source value)
-//   Output directory    text box   &Output directory   /output <folder>
-//   Choose output       button     &Choose output...
-//   -- separator --
-//   <the app's own options>
-//   Force replacements  check      &Force replacements /force
-//   View output         check      &View output        /view
-//   Log session         check      &Log session        /log
-//   Use configuration   check      &Use configuration
-//   OK, Guide, Default settings, Cancel               /defaults restores
+//   Source paths             text box  &Source paths            bare paths, -s
+//   Browse local source      button    &Browse local source
+//   <the app's own bands>
+//   Output directory         text box  &Output directory        -o, --output-directory
+//   Choose output directory  button    &Choose output directory
+//   Force replacements       check     &Force replacements      -f, --force-replacements
+//   Use configuration        check     &Use configuration       -u, --use-configuration
+//   View output directory    check     &View output directory   -v, --view-output-directory
+//   Default settings, Help   buttons                            -d, --default-settings
+//   OK and Cancel, alone at the bottom right.
 //
-// Lbc puts the buttons in a row at the bottom and adds Help (F1), whose box lists
-// each field with its tip and ends with the version check; F11 checks at once.
-// Enter, or Control+Enter from any control, is OK; Escape is Cancel.
+// Control+Enter is OK and Escape is Cancel from any control; F1 is Help, whose box
+// lists each field with its tip, names F11 and the log folder, and ends with the
+// version check; F11 checks at once from anywhere.
 //
-// THE DEFAULTS ARE DELIBERATE: Source files starts at the user's Documents
+// THE DEFAULTS ARE DELIBERATE: Source paths starts at the user's Documents
 // folder; Output directory is derived from the source -- the folder itself, or
 // the folder of a single file or pattern -- and follows the source while it still
 // mirrors it, typed or browsed, until the user chooses another. Blank means each
@@ -57,9 +63,8 @@
 // that file is removed and the app starts from its defaults. Default settings
 // restores the defaults and removes it too.
 //
-// THE RESULTS BOX, a plain read-only dialog a screen reader arrows through, says
-// what this run actually did. A count says "1 file", never "1 files", and
-// "0 files" is a real answer.
+// THE RESULTS BOX says what this run actually did. A count says "1 file", never
+// "1 files", and "0 files" is a real answer.
 
 using System;
 using System.Collections.Generic;
@@ -78,12 +83,10 @@ public static class Program
     private const string sAppName = "_APP_";
     // CHANGE ME: the GitHub account that publishes this app's releases, for Elevate's update check.
     private const string sGitHubOwner = "JamalMazrui";
-    private const string sSessionLogName = "_APP_.log";
     private const string sSection = "Settings";
     private const string sSettingsFile = "_APP_.inix";
 
     private static bool bForce = false;
-    private static bool bLogSession = false;
     private static bool bUseConfig = false;
     private static bool bViewOutput = false;
     private static string sOutput = "";
@@ -119,8 +122,7 @@ public static class Program
 
     private static string defaultSource()
     {
-        try { return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments); }
-        catch (Exception) { return ""; }
+        return LaunchDialog.knownFolderPath(Environment.SpecialFolder.MyDocuments);
     }
 
     // deriveOutput: the Output directory a source implies: one folder gives itself, one
@@ -148,7 +150,7 @@ public static class Program
     {
         sSource = defaultSource();
         sOutput = deriveOutput(sSource);
-        bForce = false; bViewOutput = false; bLogSession = false; bUseConfig = false;
+        bForce = false; bViewOutput = false; bUseConfig = false;
         return true;
     }
 
@@ -161,7 +163,6 @@ public static class Program
         sOutput = InixCodec.readValue(sPath, sSection, "Output", sOutput);
         bForce = InixCodec.readValue(sPath, sSection, "Force", "0") == "1";
         bViewOutput = InixCodec.readValue(sPath, sSection, "ViewOutput", "0") == "1";
-        bLogSession = InixCodec.readValue(sPath, sSection, "LogSession", "0") == "1";
         bUseConfig = true;
         Log.info("Configuration loaded from " + sPath);
         return true;
@@ -178,7 +179,6 @@ public static class Program
             InixCodec.writeValue(sPath, sSection, "Output", sOutput);
             InixCodec.writeValue(sPath, sSection, "Force", bForce ? "1" : "0");
             InixCodec.writeValue(sPath, sSection, "ViewOutput", bViewOutput ? "1" : "0");
-            InixCodec.writeValue(sPath, sSection, "LogSession", bLogSession ? "1" : "0");
             Log.info("Configuration saved in " + sPath);
         }
         catch (Exception oError) { Log.error("Configuration: " + oError.Message); }
@@ -192,16 +192,23 @@ public static class Program
         while (true)
         {
             string sButton;
-            using (LbcDialog dlg = new LbcDialog(sAppName, null))
+            using (LaunchDialog oLaunch = new LaunchDialog(sAppName))
             {
-                dlg.addBand();
-                TextBox tbSource = dlg.addInputBox("&Source files:", sSource,
-                    "One or more files, folders or wildcard patterns such as *.docx, separated by spaces, each in quotes if it has a space.");
-                Button btnBrowse = dlg.addButton("&Browse source...", "Choose a folder of files to work on.");
-                dlg.addBand();
-                TextBox tbOutput = dlg.addInputBox("&Output directory:", sOutput, "Where each result is written. Blank means beside its source.");
-                Button btnChoose = dlg.addButton("&Choose output...", "Choose the folder the results go to.");
-                dlg.endBand();
+                // CHANGE ME: "files" (the default), "folder" or "list", and a filter for files.
+                oLaunch.sourcePick = "folder";
+                TextBox tbSource = oLaunch.addSourceBand(sSource,
+                    "One or more files, folders or wildcard patterns such as *.docx, separated by spaces, each in quotes if it has a space.",
+                    "Choose a folder of files to work on. It opens where Source paths points, else in Documents.");
+
+                // CHANGE ME: the app's own bands go here -- first the checkboxes choosing the
+                // transformations, then any other controls shaping the work. For example:
+                //     oLaunch.dialog.addBand();
+                //     CheckBox cbPlain = oLaunch.dialog.addCheckBox("&Plain text", bPlain, "Write .txt instead of .htm.");
+                //     oLaunch.dialog.endBand();
+
+                TextBox tbOutput = oLaunch.addOutputBand(sOutput,
+                    "Where each result is written. Blank means beside its source.",
+                    "Choose the folder the results go to.");
 
                 // The output follows the source while it still mirrors it, typed or browsed;
                 // a folder the user chose stays put.
@@ -212,58 +219,24 @@ public static class Program
                     sMirror = deriveOutput(tbSource.Text);
                     if (bMirrors) tbOutput.Text = sMirror;
                 };
-                btnBrowse.Click += delegate(object oSender, EventArgs evArgs)
-                {
-                    string sPicked = pickFolder(dlg.form, "Choose a folder of files to work on", tbSource.Text);
-                    if (sPicked == null) return;
-                    tbSource.Text = sPicked.Contains(" ") ? "\"" + sPicked + "\"" : sPicked;
-                    followSource();
-                    tbSource.Focus();
-                };
+                oLaunch.sourceChosen = followSource;
                 tbSource.Leave += delegate(object oSender, EventArgs evArgs) { followSource(); };
-                btnChoose.Click += delegate(object oSender, EventArgs evArgs)
-                {
-                    string sPicked = pickFolder(dlg.form, "Choose the output directory", tbOutput.Text);
-                    if (sPicked == null) return;
-                    tbOutput.Text = sPicked;
-                    tbOutput.Focus();
-                };
 
-                dlg.addSeparator();
-                // CHANGE ME: the app's own options go here, before Force replacements.
-                CheckBox cbForce = dlg.addCheckBox("&Force replacements", bForce, "Replace a result already there instead of keeping it.");
-                CheckBox cbView = dlg.addCheckBox("&View output", bViewOutput, "Open the output folder in File Explorer when the run is done.");
-                CheckBox cbLog = dlg.addCheckBox("&Log session", bLogSession,
-                    "Also write " + sSessionLogName + " in the output folder. A session log is always kept in %LOCALAPPDATA%\\" + sAppName + "\\logs.");
-                CheckBox cbUseConfig = dlg.addCheckBox("&Use configuration", bUseConfig,
-                    "Load these settings next time, and save them when you press OK, in %LOCALAPPDATA%\\" + sAppName + "\\configs\\" + sSettingsFile + ".");
+                oLaunch.addOperationBands(bForce, "Replace a result already there instead of keeping it.",
+                    bUseConfig, "Load these settings next time, and save them when you press OK, in %LOCALAPPDATA%\\" + sAppName + "\\configs\\" + sSettingsFile + ".",
+                    bViewOutput, "Open the output directory in File Explorer when the run is done.");
 
-                // F11: is there a newer version on the web? (Elevate sounds like eleven.)
-                dlg.commandKey = delegate(Keys k)
-                {
-                    if (k != Keys.F11) return false;
-                    Log.info("F11: checking the web for a newer version");
-                    if (Elevate.offer(dlg.form))
-                    {
-                        dlg.form.DialogResult = DialogResult.Cancel;
-                        dlg.form.Close();
-                    }
-                    return true;
-                };
-
-                sButton = dlg.runWithButtons(new string[] { "OK", "Guide", "Default settings", "Cancel" });
+                sButton = oLaunch.run();
 
                 // Harvest every field before the dialog is disposed, so a return keeps what was typed.
                 sSource = (tbSource.Text ?? "").Trim();
                 sOutput = (tbOutput.Text ?? "").Trim();
-                bForce = cbForce.Checked;
-                bViewOutput = cbView.Checked;
-                bLogSession = cbLog.Checked;
-                bUseConfig = cbUseConfig.Checked;
+                bForce = oLaunch.forceBox.Checked;
+                bViewOutput = oLaunch.viewOutputBox.Checked;
+                bUseConfig = oLaunch.useConfigBox.Checked;
             }
-            if (string.IsNullOrEmpty(sButton) || string.Equals(sButton, "Cancel", StringComparison.OrdinalIgnoreCase)) return 0;
-            if (string.Equals(sButton, "Guide", StringComparison.OrdinalIgnoreCase)) { openGuide(); continue; }
-            if (string.Equals(sButton, "Default settings", StringComparison.OrdinalIgnoreCase))
+            if (sButton == "Cancel") return 0;
+            if (sButton == "Default settings")
             {
                 restoreDefaults();
                 try { if (File.Exists(settingsPath())) File.Delete(settingsPath()); } catch (Exception) { }
@@ -276,20 +249,9 @@ public static class Program
         }
         List<string> lsReport = new List<string>();
         int iResult = runJob(lsReport);
-        showResults(lsReport);
+        string sOpen = sOutput.Trim('"');
+        LaunchDialog.finish(sAppName, string.Join("\r\n", lsReport.ToArray()), iResult == 3, bViewOutput ? sOpen : "");
         return iResult;
-    }
-
-    private static string pickFolder(IWin32Window owner, string sTitle, string sFieldText)
-    {
-        using (FolderBrowserDialog dlgFolder = new FolderBrowserDialog())
-        {
-            dlgFolder.Description = sTitle;
-            dlgFolder.ShowNewFolderButton = true;
-            string sStart = deriveOutput(sFieldText);
-            dlgFolder.SelectedPath = sStart != "" ? sStart : defaultSource();
-            return dlgFolder.ShowDialog(owner) == DialogResult.OK ? dlgFolder.SelectedPath : null;
-        }
     }
 
     // confirmOutput: offer to make an output directory that does not exist yet, Yes by default.
@@ -308,23 +270,17 @@ public static class Program
         }
     }
 
-    // openGuide: help\_APP_.htm beside exec, in the installed tree and the project alike.
-    private static bool openGuide()
-    {
-        foreach (string sName in new string[] { "help\\" + sAppName + ".htm", "ReadMe.htm", "help\\" + sAppName + ".md" })
-        {
-            string sPath = Path.Combine(Paths.installedFolder, sName);
-            if (!File.Exists(sPath)) continue;
-            try { Process.Start(sPath); return true; } catch (Exception oError) { Log.error("Guide: " + oError.Message); }
-        }
-        Say.say("The guide was not found");
-        return false;
-    }
-
     // ---- the command line ---------------------------------------------------
 
     private static int runFromCommandLine(string[] aArguments)
     {
+        // USE CONFIGURATION FIRST, wherever it is written, so the switches after it can
+        // still change any setting it loads.
+        foreach (string sArgument in aArguments)
+        {
+            string sSwitch = Util.switchName(sArgument);
+            if (sSwitch == "use-configuration" || sSwitch == "u") { loadConfiguration(); break; }
+        }
         for (int i = 0; i < aArguments.Length; i++)
         {
             string sArgument = aArguments[i];
@@ -332,12 +288,12 @@ public static class Program
             string sSwitch = Util.switchName(sArgument);
             string sNext = (i + 1 < aArguments.Length) ? aArguments[i + 1] : "";
             if (sSwitch == "help" || sSwitch == "h" || sArgument == "/?") { Console.WriteLine(helpText()); return 0; }
-            else if (sSwitch == "source") { sSource = (sSource + " " + sNext).Trim(); i++; }
-            else if (sSwitch == "output") { sOutput = sNext; i++; }
-            else if (sSwitch == "force") bForce = true;
-            else if (sSwitch == "view") bViewOutput = true;
-            else if (sSwitch == "log") bLogSession = true;
-            else if (sSwitch == "defaults")
+            else if (sSwitch == "source-paths" || sSwitch == "source" || sSwitch == "s") { sSource = (sSource + " " + sNext).Trim(); i++; }
+            else if (sSwitch == "output-directory" || sSwitch == "output" || sSwitch == "o") { sOutput = sNext; i++; }
+            else if (sSwitch == "force-replacements" || sSwitch == "force" || sSwitch == "f") bForce = true;
+            else if (sSwitch == "use-configuration" || sSwitch == "u") { }
+            else if (sSwitch == "view-output-directory" || sSwitch == "view-output" || sSwitch == "view" || sSwitch == "v") bViewOutput = true;
+            else if (sSwitch == "default-settings" || sSwitch == "defaults" || sSwitch == "d")
             {
                 try { if (File.Exists(settingsPath())) File.Delete(settingsPath()); } catch (Exception) { }
                 Console.WriteLine("Default settings restored.");
@@ -354,13 +310,18 @@ public static class Program
         List<string> lsReport = new List<string>();
         int iResult = runJob(lsReport);
         foreach (string sLine in lsReport) Console.WriteLine(sLine);
+        string sOpen = sOutput.Trim('"');
+        if (bViewOutput && sOpen != "" && Directory.Exists(sOpen))
+        {
+            try { Process.Start("explorer.exe", "\"" + sOpen + "\""); } catch (Exception oError) { Log.error("View output directory: " + oError.Message); }
+        }
         return iResult;
     }
 
     // ---- the work -----------------------------------------------------------
     //
     // AI NOTE: this is the one method to replace. Everything above and below it is
-    // the shape every launchpad app shares. Add to lsReport only what was actually
+    // the shape every launch app shares. Add to lsReport only what was actually
     // done this run, one short line each, the summary first; return 0 on success,
     // 1 when there was nothing to do, 3 when some of the work failed.
     private static int runJob(List<string> lsReport)
@@ -373,24 +334,10 @@ public static class Program
             return 1;
         }
         lsReport.Add("0 files written. The work itself is not written yet.");
-        lsReport.Add("Source files: " + sSource);
+        lsReport.Add("Source paths: " + sSource);
         lsReport.Add("Output directory: " + (sOutput == "" ? "beside each source" : sOutput));
         lsReport.Add("The log: " + Log.path);
-        if (bLogSession && sOutput != "")
-        {
-            try { File.Copy(Log.path, Path.Combine(sOutput.Trim('"'), sSessionLogName), true); } catch (Exception oError) { Log.error("Log session: " + oError.Message); }
-        }
-        if (bViewOutput && sOutput != "" && Directory.Exists(sOutput.Trim('"')))
-        {
-            try { Process.Start(sOutput.Trim('"')); } catch (Exception oError) { Log.error("View output: " + oError.Message); }
-        }
         return 0;
-    }
-
-    private static bool showResults(List<string> lsReport)
-    {
-        HelpDialog.show(null, sAppName + " results", string.Join("\r\n", lsReport.ToArray()));
-        return true;
     }
 
     private static string helpText()
@@ -398,14 +345,21 @@ public static class Program
         StringBuilder sbText = new StringBuilder();
         sbText.AppendLine(sAppName + " " + BuildVersion.Version + " -- one dialog, one job, one result.");
         sbText.AppendLine("");
-        sbText.AppendLine("  " + sAppName + "                                 the dialog");
-        sbText.AppendLine("  " + sAppName + " <paths> [/output <folder>] [/force] [/view] [/log]");
-        sbText.AppendLine("  " + sAppName + " /source <path>                  names a source, as a bare path does");
-        sbText.AppendLine("  " + sAppName + " /defaults                       settings back to their defaults");
-        sbText.AppendLine("  " + sAppName + " /help");
+        sbText.AppendLine("  " + sAppName.ToLowerInvariant() + "                               the dialog");
+        sbText.AppendLine("  " + sAppName.ToLowerInvariant() + " <paths> [-o <folder>] [-f] [-u] [-v]");
+        sbText.AppendLine("  " + sAppName.ToLowerInvariant() + " -d                            settings back to their defaults");
+        sbText.AppendLine("  " + sAppName.ToLowerInvariant() + " -h");
         sbText.AppendLine("");
-        sbText.AppendLine("Switches may be written /switch, -switch or --switch, in any case.");
-        sbText.AppendLine("Each run writes a log under %LOCALAPPDATA%\\" + sAppName + "\\logs.");
+        sbText.AppendLine("  <paths>                         files, folders or patterns (or -s <path>)");
+        sbText.AppendLine("  -o, --output-directory <folder> where results go; without it, beside each source");
+        sbText.AppendLine("  -f, --force-replacements        replace results that are already there");
+        sbText.AppendLine("  -u, --use-configuration         start from the settings the dialog saved");
+        sbText.AppendLine("  -v, --view-output-directory     open the output directory when done");
+        sbText.AppendLine("  -d, --default-settings          forget the saved settings");
+        sbText.AppendLine("  -h, --help                      this list");
+        sbText.AppendLine("");
+        sbText.AppendLine("Switches may be written /switch, -switch or --switch, in any case. Logging is");
+        sbText.AppendLine("automatic: each run writes %LOCALAPPDATA%\\" + sAppName + "\\logs\\" + sAppName + "-yyyyMMdd-HHmmss.log.");
         return sbText.ToString();
     }
 }

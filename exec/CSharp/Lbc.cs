@@ -738,12 +738,17 @@ public class LbcDialog : IDisposable
     // padding makes the dialog readable without crowding labels.
     private const int DefaultButtonHeight = 28;
     private const int DefaultBandGap      = 6;
+    // A text box inside a band shares its row with its label and its button,
+    // so it cannot take the stack's full width (23 October 2026).
+    private const int DefaultBandBoxWidth = 320;
     private const int DefaultButtonWidth  = 90;
     private const int DefaultDialogWidth  = 520;
     private const int DefaultLabelHeight  = 18;
     private const int DefaultLineHeight   = 24;
     private const int DefaultListHeight   = 100;
     private const int DefaultMaxHeight    = 600;
+    // The widest a dialog grows to fit its widest band, before the band wraps.
+    private const int DefaultMaxWidth     = 900;
     private const int DefaultMemoHeight   = 96;
     private const int DefaultNumericWidth = 100;
     private const int DefaultPadding      = 12;
@@ -775,6 +780,19 @@ public class LbcDialog : IDisposable
     private string                      sStatusExtra = "";
     private string                      sStatusTip = "";
     private FlowLayoutPanel             pnlBand = null;
+
+    // A BAND BUTTON THAT CLOSES THE DIALOG -- Default settings in a launch
+    // dialog -- reports its label here, and runWithButtons returns it as if it
+    // were a button of the bottom row (23 October 2026).
+    private string                      sBandResult = null;
+
+    // True once a Help button has been placed in a band, so runWithButtons
+    // does not add a second one to the bottom row. F1 still opens Help.
+    private bool                        bHelpPlaced = false;
+
+    // helpNote: lines a caller adds to the Help box, after the fields and
+    // before the dialog keys -- a launch dialog's F11 and log locations.
+    public string                       helpNote = "";
     private Label                       lblStatusBar;
     private int                         iTabIndex;
     // Most-recent case-insensitive substring searched via Ctrl+J
@@ -980,9 +998,9 @@ public class LbcDialog : IDisposable
     {
         LbcTextBox tb = new LbcTextBox();
         tb.Text = sValue ?? "";
-        tb.Size = new Size(innerWidth(), DefaultLineHeight);
+        tb.Size = new Size(pnlBand != null ? DefaultBandBoxWidth : innerWidth(), DefaultLineHeight);
         tb.TabIndex = iTabIndex++;
-        tb.Margin = new Padding(0, 0, 0, DefaultRowGap);
+        tb.Margin = new Padding(0, 0, pnlBand != null ? DefaultBandGap : 0, DefaultRowGap);
         // Inherit the AccessibleName from the most recent Label,
         // if one was just added. Mirrors Homer LbC.
         Label lblLast = currentLabelOrNull();
@@ -1900,7 +1918,11 @@ public class LbcDialog : IDisposable
         pnlBand.AccessibleRole = AccessibleRole.Grouping;
         pnlBand.AccessibleName = "";
         pnlBand.FlowDirection = FlowDirection.LeftToRight;
-        pnlBand.WrapContents = false;
+        // A BAND READS LEFT TO RIGHT AND WRAPS ONLY WHEN IT MUST. The dialog
+        // widens to fit its widest band, up to DefaultMaxWidth; a band wider
+        // than that continues on the next line, in the same reading order.
+        pnlBand.WrapContents = true;
+        pnlBand.MaximumSize = new Size(DefaultMaxWidth - DefaultPadding * 2 - 24, 0);
         pnlBand.AutoSize = true;
         pnlBand.AutoSizeMode = AutoSizeMode.GrowAndShrink;
         pnlBand.Margin = new Padding(0, 0, 0, DefaultRowGap);
@@ -1944,6 +1966,34 @@ public class LbcDialog : IDisposable
         registerWidget(btn, "Button", sPlain);
         if (!string.IsNullOrEmpty(sTip)) { dFocusTips[btn] = sTip; }
         bandTarget().Controls.Add(btn);
+        return btn;
+    }
+
+    // addClosingButton: a button in a band that closes the dialog and reports
+    // its label, as a bottom-row button does -- Default settings, which is not
+    // a commit button and so, following Microsoft's dialog guidance, does not
+    // sit with OK and Cancel (23 October 2026).
+    public Button addClosingButton(string sLabel, string sTip)
+    {
+        Button btn = addButton(sLabel, sTip);
+        string sPlain = (sLabel ?? "").Replace("&", "");
+        btn.Click += delegate(object o, EventArgs e)
+        {
+            sBandResult = sPlain;
+            frm.DialogResult = DialogResult.OK;
+            frm.Close();
+        };
+        return btn;
+    }
+
+    // addHelpButton: Help as a button in a band rather than in the bottom row.
+    // It opens the same Help box as F1 and leaves the dialog standing; with it
+    // placed, runWithButtons adds no second Help button (23 October 2026).
+    public Button addHelpButton(string sLabel, string sTip)
+    {
+        Button btn = addButton(string.IsNullOrEmpty(sLabel) ? "&Help" : sLabel, sTip);
+        btn.Click += delegate(object o, EventArgs e) { showHelp(); };
+        bHelpPlaced = true;
         return btn;
     }
 
@@ -2197,7 +2247,7 @@ public class LbcDialog : IDisposable
     public string runWithButtons(string[] aButtonLabels, bool bAddHelp, string sDefaultLabel)
     {
         string[] aGivenLabels = aButtonLabels;
-        if (bAddHelp && Array.IndexOf(aButtonLabels, "Help") < 0)
+        if (bAddHelp && !bHelpPlaced && Array.IndexOf(aButtonLabels, "Help") < 0)
         {
             List<string> lsAll = new List<string>(aButtonLabels);
             lsAll.Add("Help");
@@ -2344,7 +2394,7 @@ public class LbcDialog : IDisposable
                          + lblStatusBar.Height + 8;
         if (iTotalHeight > DefaultMaxHeight) iTotalHeight = DefaultMaxHeight;
         if (iTotalHeight < 200) iTotalHeight = 200;
-        frm.ClientSize = new Size(DefaultDialogWidth, iTotalHeight);
+        frm.ClientSize = new Size(computeStackWidth(), iTotalHeight);
 
         if (ctlFirstFocusable != null) frm.ActiveControl = ctlFirstFocusable;
         // THE FIELD THAT OPENS WITH THE FOCUS HAS ITS TEXT SELECTED.
@@ -2382,6 +2432,7 @@ public class LbcDialog : IDisposable
             };
         }
         frm.ShowDialog(owner);
+        if (sResult == "" && sBandResult != null) return sBandResult;
         return sResult;
     }
 
@@ -2414,9 +2465,10 @@ public class LbcDialog : IDisposable
     // gets the label's AccessibleName.
     private Label currentLabelOrNull()
     {
-        int iCount = pnlStack.Controls.Count;
+        Control ctlWhere = bandTarget();
+        int iCount = ctlWhere.Controls.Count;
         if (iCount == 0) return null;
-        return pnlStack.Controls[iCount - 1] as Label;
+        return ctlWhere.Controls[iCount - 1] as Label;
     }
 
     // handleGotFocus: status-bar tip update on focus.
@@ -2431,7 +2483,7 @@ public class LbcDialog : IDisposable
         string sTip;
         StringBuilder sbHelp = new StringBuilder();
         sbHelp.AppendLine("Fields in this dialog:");
-        foreach (Control ctl in pnlStack.Controls)
+        foreach (Control ctl in stackFields())
         {
             if (ctl is Label) continue;
             string sName = fieldName(ctl);
@@ -2439,6 +2491,11 @@ public class LbcDialog : IDisposable
             if (dFocusTips.TryGetValue(ctl, out sTip) && !string.IsNullOrEmpty(sTip))
                 sbHelp.Append(" -- ").Append(sTip);
             sbHelp.AppendLine();
+        }
+        if (!string.IsNullOrEmpty(helpNote))
+        {
+            sbHelp.AppendLine();
+            sbHelp.AppendLine(helpNote.TrimEnd());
         }
         sbHelp.AppendLine();
         sbHelp.AppendLine("Dialog keys:");
@@ -2496,7 +2553,7 @@ public class LbcDialog : IDisposable
         Dictionary<string, Control> dByName = new Dictionary<string, Control>();
         List<string> lsNames = new List<string>();
         string sCurrent = null;
-        foreach (Control ctl in pnlStack.Controls)
+        foreach (Control ctl in stackFields())
             addFocusEntry(ctl, lsNames, dByName);
         // The button row is a sibling FlowLayoutPanel whose
         // Controls collection is stored right-to-left (see
@@ -2572,7 +2629,7 @@ public class LbcDialog : IDisposable
     private void focusFieldEdge(bool bFirst)
     {
         Control ctlTarget = null;
-        foreach (Control ctl in pnlStack.Controls)
+        foreach (Control ctl in stackFields())
         {
             if (ctl is Label || !ctl.CanSelect) continue;
             ctlTarget = ctl;
@@ -3152,16 +3209,36 @@ public class LbcDialog : IDisposable
     // addFieldLabel: emit a Label above a field control. Reused
     // by every labeled-control adder (addInputBox, addMemoBox,
     // addPickBox, addComboPickBox, addNumericUpDown).
+    //
+    // THE LABEL GOES WHERE ITS FIELD GOES, JUST BEFORE IT (23 October 2026).
+    // It used to go on the stack whatever was open, so a field inside a band
+    // had its label AFTER the band: the screen reader met the box with no
+    // name, then the band's button, then the stray label -- which is why a
+    // launch dialog's Source paths box said nothing on Insert+Tab, Browse
+    // seemed to come first, and the Output directory box seemed missing.
+    // Windows names an edit box from the label just before it in the same
+    // parent, in creation and tab order, so the label is put in the band and
+    // numbered just ahead of the box. AccessibleName stays empty, so the name
+    // is read once.
     private void addFieldLabel(string sText)
     {
         if (string.IsNullOrEmpty(sText)) return;
         Label lbl = new Label();
         lbl.Text = sText;
-        lbl.AutoSize = false;
-        lbl.Size = new Size(innerWidth(), DefaultLabelHeight);
-        lbl.Margin = new Padding(0, 0, 0, 0);
         lbl.TextAlign = ContentAlignment.MiddleLeft;
-        pnlStack.Controls.Add(lbl);
+        lbl.TabIndex = iTabIndex++;
+        if (pnlBand != null)
+        {
+            lbl.AutoSize = true;
+            lbl.Margin = new Padding(0, 4, DefaultBandGap, 0);
+        }
+        else
+        {
+            lbl.AutoSize = false;
+            lbl.Size = new Size(innerWidth(), DefaultLabelHeight);
+            lbl.Margin = new Padding(0, 0, 0, 0);
+        }
+        bandTarget().Controls.Add(lbl);
     }
 
     // populateListBox: shared logic for filling a ListBox with
@@ -3205,6 +3282,22 @@ public class LbcDialog : IDisposable
 
     // computeStackHeight: sum heights of stack children plus
     // margins. Used to choose an initial dialog height.
+    // computeStackWidth: wide enough for the widest band, never narrower than
+    // the usual dialog and never wider than DefaultMaxWidth (23 October 2026).
+    private int computeStackWidth()
+    {
+        int iWidest = DefaultDialogWidth - DefaultPadding * 2 - 24;
+        foreach (Control c in pnlStack.Controls)
+        {
+            int iWidth = (c.AutoSize ? c.PreferredSize.Width : c.Width) + c.Margin.Horizontal;
+            if (iWidth > iWidest) iWidest = iWidth;
+        }
+        int iDialog = iWidest + DefaultPadding * 2 + 24;
+        if (iDialog > DefaultMaxWidth) iDialog = DefaultMaxWidth;
+        if (iDialog < DefaultDialogWidth) iDialog = DefaultDialogWidth;
+        return iDialog;
+    }
+
     private int computeStackHeight()
     {
         int iTotal = pnlStack.Padding.Vertical;
@@ -4460,6 +4553,742 @@ public class LbcListView : ListView
             SendMessage(this.Handle, iLvmSetItemState, (IntPtr)iIndex, ref lvi);
         }
         catch { }
+    }
+}
+
+// =====================================================================
+// LaunchDialog: the one dialog of every Homer LAUNCH APP (23 October 2026).
+//
+// A launch app takes source paths and settings, runs a process, writes files
+// and folders into an output directory the user names, reports in a Results
+// box and closes: 2htm, BatCon, extCheck, HomerScribe, urlCheck and urlFido.
+// Their dialogs had drifted apart. This class builds the parts they share, so
+// every one has the same bands, names, letters and keys; an app adds only its
+// own transformation controls between the source and output bands.
+//
+// THE BANDS, in reading and tab order (help\LaunchDialog.md has the reasons):
+//   1. Source:      "&Source paths:" box, "&Browse local source" button
+//   2. Transforms:  the app's checkboxes choosing what is done to the sources
+//   3. More:        the app's other controls shaping that work
+//   4. Output:      "&Output directory:" box, "&Choose output directory" button
+//   5. Operation:   "&Force replacements", "&Use configuration",
+//                   "&View output directory" checkboxes (alphabetical)
+//   6. Commands:    "&Default settings", "&Help" buttons (alphabetical)
+//   7. Commit:      OK and Cancel alone, right-aligned, no access keys
+// An empty band is simply not added.
+//
+// WHY OK AND CANCEL STAND ALONE. Microsoft's Windows dialog guidance puts
+// commit buttons in one right-aligned row along the bottom, allows only
+// buttons that act on the whole window there, and asks for a clear
+// separation between buttons that close the window and buttons that do not.
+// Help and Default settings leave the dialog open (Default settings reopens it
+// with the defaults), so they have a band of their own above the row.
+//
+// LETTERS. The standard controls keep the same Alt letters in every app:
+// S, B, O, C, F, U, V, D and H. An app's own control that comes first and
+// claims one of them keeps it, by the Homer rule that the first control to
+// claim a letter keeps it; the standard control then takes its next word's
+// initial, or goes without. OK and Cancel have no letter: Control+Enter and
+// Escape press them from any control.
+//
+// KEYS. Control+Enter presses OK and Escape presses Cancel from any control;
+// F1 opens Help; F11 checks the web for a newer version from anywhere, though
+// no control shows it. The Help box says so, and says where the runtime logs
+// are kept, since logging is automatic.
+//
+// RESULTS. Every run ends with showResults: a message box titled
+// "<App> Results" whose one OK button has the focus, so Enter, Space or
+// Escape dismisses it, after which the app closes.
+public class LaunchDialog : IDisposable
+{
+    // The Results box shows at most this many lines; the rest are written to
+    // a file whose path the box gives.
+    private const int iResultsLineLimit = 15;
+
+    public string appName;
+    public Button browseButton;
+    public Button chooseButton;
+    public Button defaultSettingsButton;
+    public LbcDialog dialog;
+    public CheckBox forceBox;
+    public Button helpButton;
+    public Environment.SpecialFolder knownFolder = Environment.SpecialFolder.MyDocuments;
+    public TextBox outputBox;
+    public bool ownPickers = false;
+    public TextBox sourceBox;
+    public Action sourceChosen;
+    public string sourceFilter = "All files (*.*)|*.*";
+    public string sourcePick = "files";
+    public CheckBox useConfigBox;
+    public CheckBox viewOutputBox;
+
+    // appKey: a key the app claims for itself, after Escape and F11.
+    public Func<Keys, bool> appKey;
+
+    public LaunchDialog(string sAppName)
+    {
+        appName = sAppName ?? "";
+        dialog = new LbcDialog(appName, null);
+        dialog.helpNote = helpNote(appName);
+    }
+
+    // ---- the standard bands ----------------------------------------------
+
+    // Band 1. sPick says what Browse local source picks: "files" (several
+    // files, filtered by sourceFilter), "list" (one file, such as a url list)
+    // or "folder". Set ownPickers when the app wires Browse and Choose itself
+    // (urlCheck does, because the shell pickers hang under pythonnet).
+    public TextBox addSourceBand(string sValue, string sTip, string sBrowseTip)
+    {
+        dialog.addBand();
+        sourceBox = dialog.addInputBox(markFree("&Source paths:"), sValue, sTip);
+        browseButton = dialog.addButton(markFree("&Browse local source"), sBrowseTip);
+        dialog.endBand();
+        if (!ownPickers) browseButton.Click += delegate(object o, EventArgs e) { browseSource(); };
+        return sourceBox;
+    }
+
+    // Band 4.
+    public TextBox addOutputBand(string sValue, string sTip, string sChooseTip)
+    {
+        dialog.addBand();
+        outputBox = dialog.addInputBox(markFree("&Output directory:"), sValue, sTip);
+        chooseButton = dialog.addButton(markFree("&Choose output directory"), sChooseTip);
+        dialog.endBand();
+        if (!ownPickers) chooseButton.Click += delegate(object o, EventArgs e) { chooseOutput(); };
+        return outputBox;
+    }
+
+    // FORCE REPLACEMENTS, THE SAME IN EVERY APP (24 October 2026). Unchecked, a
+    // source whose result is already in the output directory is skipped, its
+    // result kept, and counted in the Results box with keptLine's hint.
+    // Checked, the work is done again, and the old result is kept aside until
+    // the new one is complete, so a failed run never loses both. It is the first
+    // checkbox of the operation band, beside Use configuration and View output
+    // directory, because, like them, it governs the run as a whole rather than
+    // what is done to each source; help\LaunchDialog.md weighs the other place.
+    public const string forceTip = "Do the work again for a source whose result is already there, replacing the old result once the new one is complete. Unchecked, that source is skipped and its result kept.";
+
+    // keptLine: the Results box's line for results kept because Force
+    // replacements was off -- "Skipped 2 files whose results were already
+    // there. Check Force replacements, or use -f, to replace them." Empty for 0.
+    public static string keptLine(int iCount, string sNoun)
+    {
+        if (iCount <= 0) return "";
+        string sNouns = iCount == 1 ? sNoun : sNoun + "s";
+        return "Skipped " + iCount + " " + sNouns + (iCount == 1 ? " whose result was" : " whose results were")
+            + " already there. Check Force replacements, or use -f, to replace " + (iCount == 1 ? "it." : "them.");
+    }
+
+    // Bands 5 and 6. A null tip leaves that checkbox out, for an app with no
+    // such choice; an empty Force tip gives the standard one, forceTip.
+    public bool addOperationBands(bool bForce, string sForceTip, bool bUseConfig, string sConfigTip,
+        bool bViewOutput, string sViewTip)
+    {
+        if (sForceTip != null || sConfigTip != null || sViewTip != null)
+        {
+            dialog.addBand();
+            if (sForceTip != null) forceBox = dialog.addCheckBox(markFree("&Force replacements"), bForce, sForceTip == "" ? forceTip : sForceTip);
+            if (sConfigTip != null) useConfigBox = dialog.addCheckBox(markFree("&Use configuration"), bUseConfig, sConfigTip);
+            if (sViewTip != null) viewOutputBox = dialog.addCheckBox(markFree("&View output directory"), bViewOutput, sViewTip);
+            dialog.endBand();
+        }
+        dialog.addBand();
+        defaultSettingsButton = dialog.addClosingButton(markFree("&Default settings"),
+            "Put every field back as it was out of the box, and forget any saved configuration.");
+        helpButton = dialog.addHelpButton(markFree("&Help"),
+            "Each field with its tip, the dialog keys, where the logs are kept, and the version check (F1 here too).");
+        dialog.endBand();
+        return true;
+    }
+
+    // run: show the dialog. Returns "OK", "Cancel" or "Default settings".
+    public string run()
+    {
+        dialog.commandKey = delegate(Keys k)
+        {
+            if (k == Keys.Escape)
+            {
+                // ESCAPE CANCELS FROM ANY CONTROL, claimed before a control can
+                // keep it for itself.
+                dialog.form.DialogResult = DialogResult.Cancel;
+                dialog.form.Close();
+                return true;
+            }
+            if (k == Keys.F11)
+            {
+                // F11: is there a newer version on the web? (Elevate sounds
+                // like eleven.) When its setup program starts, this copy steps
+                // aside.
+                if (!Elevate.isConfigured) { Say.say("No version check is set up"); return true; }
+                if (Elevate.offer(dialog.form))
+                {
+                    dialog.form.DialogResult = DialogResult.Cancel;
+                    dialog.form.Close();
+                }
+                return true;
+            }
+            return appKey != null && appKey(k);
+        };
+        string sButton = dialog.runWithButtons(new string[] { "OK", "Cancel" }, true);
+        if (string.IsNullOrEmpty(sButton)) sButton = "Cancel";
+        return sButton;
+    }
+
+    public void Dispose()
+    {
+        if (dialog != null) dialog.Dispose();
+        dialog = null;
+    }
+
+    // ---- pickers -----------------------------------------------------------
+
+    // browseSource: Browse local source, starting where the field points,
+    // else in the app's known folder (Documents unless the app says).
+    public bool browseSource()
+    {
+        string sStart = startFolder(sourceBox.Text, knownFolder);
+        string sPicked = null;
+        if (sourcePick == "folder")
+        {
+            using (FolderBrowserDialog dlgFolder = new FolderBrowserDialog())
+            {
+                dlgFolder.Description = "Choose a folder of sources";
+                dlgFolder.ShowNewFolderButton = false;
+                dlgFolder.SelectedPath = sStart;
+                if (dlgFolder.ShowDialog(dialog.form) == DialogResult.OK) sPicked = quoted(dlgFolder.SelectedPath);
+            }
+        }
+        else
+        {
+            using (OpenFileDialog dlgFile = new OpenFileDialog())
+            {
+                dlgFile.Title = sourcePick == "list" ? "Choose a list of sources" : "Choose sources";
+                dlgFile.Filter = sourceFilter;
+                dlgFile.Multiselect = sourcePick != "list";
+                dlgFile.CheckFileExists = true;
+                dlgFile.InitialDirectory = sStart;
+                if (dlgFile.ShowDialog(dialog.form) == DialogResult.OK)
+                {
+                    List<string> lsPicked = new List<string>();
+                    foreach (string sOne in dlgFile.FileNames) lsPicked.Add(quoted(sOne));
+                    sPicked = string.Join(" ", lsPicked.ToArray());
+                }
+            }
+        }
+        if (sPicked != null)
+        {
+            sourceBox.Text = sPicked;
+            if (sourceChosen != null) sourceChosen();
+        }
+        sourceBox.Focus();
+        return sPicked != null;
+    }
+
+    // chooseOutput: Choose output directory, starting at the field's folder,
+    // else the app's known folder.
+    public bool chooseOutput()
+    {
+        bool bChosen = false;
+        using (FolderBrowserDialog dlgFolder = new FolderBrowserDialog())
+        {
+            dlgFolder.Description = "Choose the output directory";
+            dlgFolder.ShowNewFolderButton = true;
+            dlgFolder.SelectedPath = startFolder(outputBox.Text, knownFolder);
+            if (dlgFolder.ShowDialog(dialog.form) == DialogResult.OK)
+            {
+                outputBox.Text = dlgFolder.SelectedPath;
+                bChosen = true;
+            }
+        }
+        outputBox.Focus();
+        return bChosen;
+    }
+
+    // ---- shared helpers ----------------------------------------------------
+
+    // markFree: a standard label with its usual letter, or the next free word
+    // initial when an earlier control holds that letter, or none.
+    private string markFree(string sLabel)
+    {
+        string sTaken = takenLetters(dialog.form);
+        int iAmp = sLabel.IndexOf('&');
+        if (iAmp >= 0 && iAmp + 1 < sLabel.Length && sTaken.IndexOf(Char.ToUpper(sLabel[iAmp + 1])) < 0) return sLabel;
+        return LbcDialog.markTriggerLetter(sLabel, sTaken);
+    }
+
+    private static string takenLetters(Control ctlParent)
+    {
+        StringBuilder sbTaken = new StringBuilder();
+        foreach (Control ctl in ctlParent.Controls)
+        {
+            string sText = ctl.Text ?? "";
+            int iAmp = sText.IndexOf('&');
+            if (iAmp >= 0 && iAmp + 1 < sText.Length && !(ctl is TextBox)) sbTaken.Append(Char.ToUpper(sText[iAmp + 1]));
+            if (ctl.Controls.Count > 0) sbTaken.Append(takenLetters(ctl));
+        }
+        return sbTaken.ToString();
+    }
+
+    private static string quoted(string sPath)
+    {
+        return (sPath ?? "").IndexOf(' ') >= 0 ? "\"" + sPath + "\"" : (sPath ?? "");
+    }
+
+    // knownFolderPath: a Windows known folder, or the current folder when it
+    // cannot be found.
+    public static string knownFolderPath(Environment.SpecialFolder oFolder)
+    {
+        try
+        {
+            string sPath = Environment.GetFolderPath(oFolder);
+            if (!string.IsNullOrEmpty(sPath) && Directory.Exists(sPath)) return sPath;
+            sPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            if (!string.IsNullOrEmpty(sPath) && Directory.Exists(sPath)) return sPath;
+        }
+        catch (Exception) { }
+        return Directory.GetCurrentDirectory();
+    }
+
+    // startFolder: where a picker opens -- the folder the field's first path
+    // names or lies in, else the known folder. Microsoft's advice is to open
+    // where the user already is, and otherwise in the known folder for the
+    // kind of content.
+    public static string startFolder(string sFieldText, Environment.SpecialFolder oFolder)
+    {
+        try
+        {
+            string sText = (sFieldText ?? "").Trim();
+            string sFirst = sText;
+            if (sText.StartsWith("\""))
+            {
+                int iClose = sText.IndexOf('"', 1);
+                sFirst = iClose > 0 ? sText.Substring(1, iClose - 1) : sText.Trim('"');
+            }
+            else if (sText.IndexOf(' ') >= 0) sFirst = sText.Substring(0, sText.IndexOf(' '));
+            sFirst = Environment.ExpandEnvironmentVariables(sFirst);
+            // A web address is not a folder to start in; a drive's colon is the second character, a scheme's comes later.
+            if (sFirst != "" && sFirst.IndexOf(':') <= 1)
+            {
+                if (sFirst.IndexOfAny(new char[] { '*', '?' }) >= 0) sFirst = Path.GetDirectoryName(sFirst) ?? "";
+                if (sFirst != "" && Directory.Exists(sFirst)) return Path.GetFullPath(sFirst);
+                string sParent = sFirst != "" ? Path.GetDirectoryName(sFirst) : "";
+                if (!string.IsNullOrEmpty(sParent) && Directory.Exists(sParent)) return Path.GetFullPath(sParent);
+            }
+        }
+        catch (Exception) { }
+        return knownFolderPath(oFolder);
+    }
+
+    // logFolder: where a launch app's runtime logs are kept.
+    public static string logFolder(string sAppName)
+    {
+        return Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), sAppName), "logs");
+    }
+
+    // helpNote: the lines a launch dialog adds to its Help box.
+    public static string helpNote(string sAppName)
+    {
+        return "F11 checks the web for a newer version of " + sAppName + " and offers to install it. It works from any control, though no control shows it.\r\n"
+             + "Logging is automatic: every run writes a log in %LOCALAPPDATA%\\" + sAppName + "\\logs, named "
+             + sAppName + "-yyyyMMdd-HHmmss.log for the date and time it started, so the newest is last in alphabetical order.";
+    }
+
+    // finish: the end of every GUI launch -- the Results box, then, once it is
+    // closed, the output directory in File Explorer when View output directory
+    // was checked. The folder opens after the box rather than before it, so
+    // Explorer does not take the focus away from the results. The caller exits
+    // when this returns.
+    public static bool finish(string sAppName, string sText, bool bProblem, string sViewFolder)
+    {
+        showResults(sAppName, sText, bProblem);
+        if (string.IsNullOrEmpty(sViewFolder)) return true;
+        try
+        {
+            if (Directory.Exists(sViewFolder)) Process.Start("explorer.exe", "\"" + sViewFolder + "\"");
+        }
+        catch (Exception) { }
+        return true;
+    }
+
+    // showResults: the Results box that ends every launch. One OK button,
+    // focused, so Enter, Space or Escape closes it; the caller then exits.
+    // A long report is cut to its first lines in the box, and written whole
+    // to a file in the log folder whose path the box gives.
+    public static bool showResults(string sAppName, string sText, bool bProblem)
+    {
+        string sBody = string.IsNullOrEmpty(sText) ? "Done." : sText.TrimEnd();
+        string[] aLines = sBody.Replace("\r\n", "\n").Split('\n');
+        if (aLines.Length > iResultsLineLimit)
+        {
+            string sFile = "";
+            try
+            {
+                string sFolder = logFolder(sAppName);
+                Directory.CreateDirectory(sFolder);
+                sFile = Path.Combine(sFolder, sAppName + "-" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + "-results.txt");
+                File.WriteAllText(sFile, sBody.Replace("\r\n", "\n").Replace("\n", "\r\n") + "\r\n", new UTF8Encoding(true));
+            }
+            catch (Exception) { sFile = ""; }
+            StringBuilder sbShort = new StringBuilder();
+            for (int i = 0; i < iResultsLineLimit; i++) sbShort.Append(aLines[i]).Append("\r\n");
+            int iMore = aLines.Length - iResultsLineLimit;
+            sbShort.Append("\r\n").Append(iMore).Append(iMore == 1 ? " more line" : " more lines");
+            if (sFile != "") sbShort.Append(" in the full results:\r\n").Append(sFile);
+            else sbShort.Append(" in the log.");
+            sBody = sbShort.ToString();
+        }
+        // A hidden topmost owner brings the box to the front, since the app's
+        // own dialog has already closed and Windows may not give it the focus.
+        using (Form frmOwner = new Form())
+        {
+            frmOwner.ShowInTaskbar = false;
+            frmOwner.TopMost = true;
+            frmOwner.StartPosition = FormStartPosition.CenterScreen;
+            frmOwner.Size = new Size(1, 1);
+            frmOwner.Opacity = 0;
+            frmOwner.Show();
+            frmOwner.Activate();
+            MessageBox.Show(frmOwner, sBody, sAppName + " Results", MessageBoxButtons.OK,
+                bProblem ? MessageBoxIcon.Warning : MessageBoxIcon.Information);
+        }
+        return true;
+    }
+}
+
+// =====================================================================
+// LaunchProgress: the one progress window of every Homer launch app
+// (23 October 2026, help\LaunchDialog.md). Between OK and the Results box a
+// launch app shows this window, says what it is doing, keeps Windows
+// responsive, and lets the person work elsewhere without being talked over.
+//
+// THE RULES, from HomerScribe's months of use, 2htm's and urlFido's progress
+// windows, and Microsoft's progress guidance:
+//   * ONE WINDOW, "<App>, <status>". Its title always says where things stand,
+//     so Alt+Tab and the reader's Say Title (Insert+T) answer "how far?" at any
+//     moment without waiting to be told.
+//   * A STATUS BOX that takes the focus: a read-only line holding the latest
+//     status, so Insert+Tab reads it again. It is the first control, rather than
+//     Cancel, because Microsoft's keyboard guidance says the opening focus must
+//     not be on a control with a destructive result.
+//   * CANCEL, with no access key: Escape presses it from anywhere in the window.
+//     Microsoft asks for a way to cancel any blocking job longer than ten
+//     seconds. The app checks `cancelled` between items and stops cleanly.
+//   * SPOKEN ONLY WHILE THIS PROGRAM IS IN FRONT. Say speaks through JAWS or NVDA
+//     whatever window has the focus, so the window asks first: when the person
+//     has gone to another program, the title and status box are still updated
+//     but nothing is said. Coming back (Alt+Tab) speaks the latest status once.
+//   * NOT A TORRENT. The first three messages and every change of phase are
+//     spoken at once, so the start of a run is never silent; after that, a step
+//     is spoken at most every `speakGapSeconds` (5 by default), and the newest
+//     waiting message wins. Nothing spoken is longer than 300 characters.
+//   * THE MESSAGE PUMP. Setting text is not enough: until the message queue is
+//     pumped, Windows has not repainted the window or told anyone its title
+//     changed. Every status call pumps (Application.DoEvents), at most ten times
+//     a second, and a long silent step should call pump() now and then. The
+//     window's only command sets a flag, so pumping cannot re-enter the work.
+//   * EVERY STATUS IS LOGGED, with whether it was spoken, so a log shows exactly
+//     what the person heard.
+// Counts say work DONE: "Budget.pdf, 2 of 5 done, 40%" while the third file
+// runs, so 100 percent never shows while the last item is still in progress.
+//
+// THE PERCENTAGE IS SPOKEN (24 October 2026, the author's ruling, departing from
+// Microsoft's guidance as little as possible). Microsoft keeps the percentage out
+// of status text because the progress bar beside it already shows it. This window
+// has that progress bar, as Microsoft asks; but a screen reader user hears a
+// progress bar as a percentage, and "40%" is the quickest way to know how much is
+// done and how much remains, which is what planning needs. So the percentage goes
+// where a screen reader user meets it: in the spoken status, the title and the
+// status box.
+//
+// TIME LEFT, as Microsoft's Windows 7 progress guidance recommends: once a counted
+// job has run 20 seconds and finished something, the status adds an estimate,
+// "about 3 min left", in HomerScribe's words for time ("11 min", "1 hour 5 min"),
+// and "under a minute left" near the end. It is rounded, never falsely precise.
+public class LaunchProgress : IDisposable
+{
+    private const int iEarlyMessages = 3;
+    private const int iPumpGapMs = 100;
+    private const int iSpokenLimit = 300;
+    private const int iEstimateAfterSeconds = 20;
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll")]
+    private static extern uint GetWindowThreadProcessId(IntPtr hWindow, out uint iProcessId);
+
+    private string appName = "";
+    private Button btnCancel;
+    private bool bCancelled = false;
+    private DateTime dtLastPump = DateTime.MinValue;
+    private DateTime dtLastSpoken = DateTime.MinValue;
+    private DateTime dtCountedSince = DateTime.MinValue;
+    private Form frm;
+    private ProgressBar pbDone;
+    private int iSpokenSoFar = 0;
+    private string sLatest = "";
+    private string sPending = "";
+    private string sPhase = "";
+    private TextBox tbStatus;
+    private System.Windows.Forms.Timer tmrFlush;
+
+    // logLine: where each status goes in the app's log -- the app's Log.info,
+    // or its own logger from Python. Lbc does not write to Log itself, because
+    // not every program that compiles Lbc compiles Log.
+    public Action<string> logLine;
+
+    // speakGapSeconds: the least time between spoken steps.
+    public int speakGapSeconds = 5;
+
+    // cancelled: true once Cancel or Escape is pressed. Check it between items.
+    public bool cancelled { get { return bCancelled; } }
+
+    // latest: the last status shown.
+    public string latest { get { return sLatest; } }
+
+    public LaunchProgress(string sAppName, string sFirstStatus) : this(sAppName, sFirstStatus, null)
+    {
+    }
+
+    public LaunchProgress(string sAppName, string sFirstStatus, Action<string> logTo)
+    {
+        appName = sAppName ?? "";
+        logLine = logTo;
+        frm = new Form();
+        frm.FormBorderStyle = FormBorderStyle.FixedDialog;
+        frm.StartPosition = FormStartPosition.CenterScreen;
+        frm.MaximizeBox = false;
+        frm.MinimizeBox = true;
+        frm.ShowInTaskbar = true;
+        frm.ClientSize = new Size(520, 120);
+        frm.Font = SystemFonts.MessageBoxFont;
+        frm.KeyPreview = true;
+
+        Label lblStatus = new Label();
+        lblStatus.Text = "&Status:";
+        lblStatus.AutoSize = true;
+        lblStatus.Location = new Point(12, 16);
+        lblStatus.TabIndex = 0;
+        frm.Controls.Add(lblStatus);
+
+        tbStatus = new TextBox();
+        tbStatus.ReadOnly = true;
+        tbStatus.Location = new Point(80, 12);
+        tbStatus.Size = new Size(428, 24);
+        tbStatus.TabIndex = 1;
+        frm.Controls.Add(tbStatus);
+
+        // The progress bar Microsoft asks for. It has no visible text, so it is
+        // the one control here given an accessible name. Marquee until a count
+        // or fraction is known.
+        pbDone = new ProgressBar();
+        pbDone.Location = new Point(12, 48);
+        pbDone.Size = new Size(496, 18);
+        pbDone.Minimum = 0;
+        pbDone.Maximum = 100;
+        pbDone.Style = ProgressBarStyle.Marquee;
+        pbDone.AccessibleName = "Progress";
+        pbDone.TabStop = false;
+        frm.Controls.Add(pbDone);
+
+        btnCancel = new Button();
+        btnCancel.Text = "Cancel";
+        btnCancel.Size = new Size(96, 28);
+        btnCancel.Location = new Point(412, 80);
+        btnCancel.TabIndex = 2;
+        btnCancel.UseVisualStyleBackColor = true;
+        btnCancel.Click += delegate(object o, EventArgs e) { cancel(); };
+        frm.Controls.Add(btnCancel);
+        frm.CancelButton = btnCancel;
+        // The close box cancels too, rather than leaving the work running unseen.
+        frm.FormClosing += delegate(object o, FormClosingEventArgs e)
+        {
+            if (e.CloseReason == CloseReason.UserClosing && frm != null && !bClosing) { e.Cancel = true; cancel(); }
+        };
+        // Coming back to the window says where things stand, once.
+        frm.Activated += delegate(object o, EventArgs e)
+        {
+            if (sLatest != "" && iSpokenSoFar > 0) speakNow(sLatest, "on return");
+        };
+
+        Say.attach(frm);
+        tmrFlush = new System.Windows.Forms.Timer();
+        tmrFlush.Interval = 1000;
+        tmrFlush.Tick += delegate(object o, EventArgs e) { flushIfDue(); };
+        tmrFlush.Start();
+
+        frm.Text = appName;
+        frm.Show();
+        frm.Activate();
+        tbStatus.Focus();
+        status(string.IsNullOrEmpty(sFirstStatus) ? "Starting" : sFirstStatus);
+    }
+
+    private bool bClosing = false;
+
+    // status: a new phase, with no count -- "Starting Edge", "Reading the page".
+    // Spoken at once (when in front), since a change of phase is news.
+    public bool status(string sText)
+    {
+        if (string.IsNullOrEmpty(sText)) return false;
+        sPhase = sText;
+        show(sText);
+        speakNow(sText, "phase");
+        return true;
+    }
+
+    // step: one item of a counted job. iDone counts items already finished.
+    // "Budget.pdf, 2 of 5 done, 40%, about 3 min left".
+    public bool step(string sItem, int iDone, int iTotal)
+    {
+        string sText = (string.IsNullOrEmpty(sItem) ? "" : sItem + ", ") + iDone + " of " + iTotal + " done"
+            + measured((double)iDone, (double)iTotal);
+        return report(sText);
+    }
+
+    // fraction: progress measured some other way -- seconds of a recording,
+    // bytes of a download. "Film.mp4, 11 min, 23%, about 36 min left" when
+    // sWhere is "Film.mp4, 11 min".
+    public bool fraction(string sWhere, double nDone, double nTotal)
+    {
+        string sText = (sWhere ?? "") + measured(nDone, nTotal);
+        if (sText.StartsWith(", ")) sText = sText.Substring(2);
+        return report(sText);
+    }
+
+    private bool report(string sText)
+    {
+        show(sText);
+        if (iSpokenSoFar < iEarlyMessages) { speakNow(sText, "early"); return true; }
+        sPending = sText;
+        flushIfDue();
+        return true;
+    }
+
+    // measured: ", 40%" and, when it can be estimated honestly, the time left;
+    // also moves the progress bar.
+    private string measured(double nDone, double nTotal)
+    {
+        if (nTotal <= 0) return "";
+        if (nDone < 0) nDone = 0;
+        if (nDone > nTotal) nDone = nTotal;
+        int iPercent = (int)(nDone * 100.0 / nTotal);
+        try
+        {
+            if (pbDone != null)
+            {
+                if (pbDone.Style != ProgressBarStyle.Continuous) pbDone.Style = ProgressBarStyle.Continuous;
+                pbDone.Value = iPercent;
+            }
+        }
+        catch (Exception) { }
+        if (dtCountedSince == DateTime.MinValue) dtCountedSince = DateTime.Now;
+        string sText = ", " + iPercent + "%";
+        double nSeconds = DateTime.Now.Subtract(dtCountedSince).TotalSeconds;
+        if (nDone > 0 && nDone < nTotal && nSeconds >= iEstimateAfterSeconds)
+        {
+            double nLeft = nSeconds * (nTotal - nDone) / nDone;
+            sText += nLeft < 60.0 ? ", under a minute left" : ", about " + spokenTime(nLeft) + " left";
+        }
+        return sText;
+    }
+
+    // spokenTime: HomerScribe's words for a length of time -- "11 min",
+    // "1 hour", "2 hours 5 min" -- shared so every launch app says time alike.
+    // Under a minute gives "".
+    public static string spokenTime(double nSeconds)
+    {
+        if (nSeconds < 60.0) return "";
+        if (nSeconds < 3600.0) return ((int)Math.Round(nSeconds / 60.0)).ToString() + " min";
+        int iHours = (int)(nSeconds / 3600.0);
+        int iMinutes = (int)Math.Round((nSeconds - iHours * 3600.0) / 60.0);
+        if (iMinutes >= 60) { iHours = iHours + 1; iMinutes = 0; }
+        string sSaid = iHours.ToString() + (iHours == 1 ? " hour" : " hours");
+        if (iMinutes > 0) sSaid = sSaid + " " + iMinutes.ToString() + " min";
+        return sSaid;
+    }
+
+    // pump: let Windows repaint and deliver messages during a long silent step.
+    public bool pump()
+    {
+        if (DateTime.Now.Subtract(dtLastPump).TotalMilliseconds < iPumpGapMs) return false;
+        dtLastPump = DateTime.Now;
+        try { Application.DoEvents(); } catch (Exception) { }
+        return true;
+    }
+
+    public bool cancel()
+    {
+        if (bCancelled) return false;
+        bCancelled = true;
+        try { btnCancel.Enabled = false; } catch (Exception) { }
+        status("Cancelling after the current item");
+        return true;
+    }
+
+    public void Dispose()
+    {
+        bClosing = true;
+        try { if (tmrFlush != null) { tmrFlush.Stop(); tmrFlush.Dispose(); } } catch (Exception) { }
+        try { if (frm != null) { frm.Close(); frm.Dispose(); } } catch (Exception) { }
+        frm = null;
+        try { Application.DoEvents(); } catch (Exception) { }
+    }
+
+    // isInFront: is a window of this program the one the person is using?
+    public static bool isInFront()
+    {
+        try
+        {
+            IntPtr hFront = GetForegroundWindow();
+            if (hFront == IntPtr.Zero) return false;
+            uint iOwner = 0;
+            GetWindowThreadProcessId(hFront, out iOwner);
+            return iOwner == (uint)Process.GetCurrentProcess().Id;
+        }
+        catch (Exception) { return false; }
+    }
+
+    private void show(string sText)
+    {
+        if (sText == sLatest) { pump(); return; }
+        sLatest = sText;
+        try { if (logLine != null) logLine("Status: " + sText); } catch (Exception) { }
+        try
+        {
+            if (frm != null)
+            {
+                tbStatus.Text = sText;
+                frm.Text = appName + ", " + sText;
+            }
+        }
+        catch (Exception) { }
+        dtLastPump = DateTime.MinValue;
+        pump();
+    }
+
+    private void flushIfDue()
+    {
+        if (sPending == "") return;
+        if (DateTime.Now.Subtract(dtLastSpoken).TotalSeconds < speakGapSeconds) return;
+        string sText = sPending;
+        sPending = "";
+        speakNow(sText, "step");
+    }
+
+    private void speakNow(string sText, string sWhy)
+    {
+        string sSaid = sText.Length > iSpokenLimit ? sText.Substring(0, iSpokenLimit) : sText;
+        if (!isInFront())
+        {
+            try { if (logLine != null) logLine("  not spoken (" + sWhy + "): " + appName + " is not the window in front"); } catch (Exception) { }
+            return;
+        }
+        sPending = "";
+        dtLastSpoken = DateTime.Now;
+        iSpokenSoFar++;
+        try { Say.say(sSaid); } catch (Exception) { }
     }
 }
 
