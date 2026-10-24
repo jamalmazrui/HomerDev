@@ -48,7 +48,24 @@ public static class MarkdownCheck {
         lsRows = new List<string[]>();
         open(sPath);
         checkAll(sPath);
+        topHeadings();
         return lsRows;
+    }
+
+    // MORE THAN ONE TOP HEADING (kit 1.92.2, from GLOW's MD-MULTIPLE-H1, and a Homer rule of its own: one
+    // H1 per document). Front matter and fenced code are passed over.
+    static void topHeadings() {
+        int iTop = 0, iSecond = 0;
+        bool bFence = false;
+        for (int i = iYamlEndLine; i < aLines.Length; i++) {
+            if (reFence.IsMatch(aLines[i].TrimStart())) { bFence = !bFence; continue; }
+            if (bFence || !Regex.IsMatch(aLines[i], "^#[ \\t]+\\S")) continue;
+            iTop++;
+            if (iTop == 2) iSecond = i + 1;
+        }
+        if (iTop > 1) addRow("MultipleTopHeadings", "MSAC", "Heading issues", "Line " + iSecond, "(document)",
+            "The document has " + iTop + " top-level headings; a document has one, its title.",
+            "Keep one level-1 heading and make the others level 2.");
     }
 
     public static bool open(string sPath) {
@@ -707,6 +724,39 @@ public static class OfficeCheck {
         return Array.IndexOf(aVague, sLower) >= 0;
     }
 
+    // FAUX HEADINGS (kit 1.92.2, from GLOW's heading_detector.py): a paragraph without a heading style that
+    // looks like one, scored by GLOW's signals and weights -- bold 20, large type 25 (22 points) or 20 (20
+    // points), short 15, no closing punctuation 10, all capitals or title case 10, a single line 5, a
+    // numbering pattern 5; a signature-like name -20, a callout such as "Note:" -15. GLOW treats 50 as a
+    // candidate and 75 as certain. GLOW's signals that need the paragraphs around it (a blank before 10, body
+    // after 5, a size unlike the body's 5) are left out here, so GLOW's 75 is this check's 55; the kit reports
+    // from 60, and only for bold or large text, so a report is a likely heading, not a guess.
+    const int iFauxHeadingThreshold = 60;
+
+    static int fauxHeadingScore(string sXml, string sText, string sStyle) {
+        if (sStyle.ToLowerInvariant().StartsWith("list") || sStyle.ToLowerInvariant() == "title" || sText.Length > 200) return 0;
+        int iScore = 0;
+        bool bBold = Regex.IsMatch(sXml, "<w:b/>|<w:b w:val=\"(?:1|true)\"/>");
+        if (bBold) iScore += 20;
+        Match oSize = Regex.Match(sXml, "<w:sz w:val=\"(\\d+)\"");
+        if (oSize.Success) {
+            double nPoints = int.Parse(oSize.Groups[1].Value) / 2.0;
+            if (nPoints >= 22) iScore += 25; else if (nPoints >= 20) iScore += 20;
+        }
+        if (sText.Length <= 80) iScore += 15;
+        if (!Regex.IsMatch(sText, "[.,;:!?]$")) iScore += 10;
+        bool bCaps = sText == sText.ToUpperInvariant() && sText != sText.ToLowerInvariant();
+        bool bTitleCase = !bCaps && Regex.IsMatch(sText, "^(?:[A-Z][a-z'\\-]*\\s*)+$");
+        if (bCaps || bTitleCase) iScore += 10;
+        if (sXml.IndexOf("<w:br/>", StringComparison.Ordinal) < 0) iScore += 5;
+        if (Regex.IsMatch(sText, "^(?:\\d+(?:\\.\\d+)*\\.?|[IVXLC]+\\.|[A-Z]\\.)\\s")) iScore += 5;
+        if (sText.Length <= 40 && Regex.IsMatch(sText, "^[A-Z][a-z]+(?:\\s+[A-Z]\\.?)?\\s+[A-Z][a-z]+$")) iScore -= 20;
+        if (sText.Length <= 80 && Regex.IsMatch(sText, "^(?:Note|Please note|Dear|Hello|Hi|Thank you|Thanks|Sincerely|Regards)\\b", RegexOptions.IgnoreCase)) iScore -= 15;
+        // Without bold or large type nothing marks it as a heading to a sighted reader either.
+        if (!bBold && iScore < 100 && !(oSize.Success && int.Parse(oSize.Groups[1].Value) >= 40)) return 0;
+        return iScore;
+    }
+
     static bool allCaps(string s) { return s.Length > 4 && s == s.ToUpperInvariant() && s != s.ToLowerInvariant(); }
 
     static Dictionary<string, string> parts(string sPath) {
@@ -749,6 +799,8 @@ public static class OfficeCheck {
                 continue;
             }
             if (sText == "") continue;
+            int iScore = fauxHeadingScore(sXml, sText, sStyle);
+            if (iScore >= iFauxHeadingThreshold) add("FauxHeading", "Heading issues", "(Document)", sText, "This paragraph looks like a heading -- " + iScore + " of 100 by GLOW's signals -- but has no heading style, so a screen reader cannot move to it.", "Apply the heading style for its level.");
             if (iLast == 0 && ++iBeforeFirst > iMaxParasBetweenHeadings && !bLongFired) {
                 bLongFired = true;
                 add("LongSectionWithoutHeading", "Heading issues", "(Document)", sText, "More than " + iMaxParasBetweenHeadings + " paragraphs come before the first heading.", "Add headings so a screen reader can move by them.");

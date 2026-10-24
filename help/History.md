@@ -7,6 +7,22 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.92.3 -- 24 October 2026
+
+Learnings from QUILL for All, Community Access's family of accessible apps, which turns each of its accessibility rules into a check the build runs.
+
+- **What is spoken is also brailled.** Say flashes every message it speaks through NVDA on the braille display too, through NVDA's brailleMessage; through JAWS it calls JAWS's BrailleMessage function by the API's RunFunction, which is unconfirmed on every JAWS version, so a failure there is ignored and never stops the speech.
+- **A build is asked to do its job.** QUILL's lesson: a library missing from its runtime left every installed copy opening Word files as plain text, while every build exited 0. BatCon's acceptance checks now convert its own guide to Word, EPUB and PDF with the built program.
+
+## 1.92.2 -- 24 October 2026
+
+Learnings from GLOW, the American Council of the Blind's Guided Layout & Output Workflow, whose 97 rules for Word, Excel, PowerPoint, Markdown, PDF and EPUB share their roots with extCheck's.
+
+- **EPUB Accessibility 1.1 metadata** is added to every EPUB the kit makes that has none: access modes, sufficient access mode, features, hazards and a summary, each true of a book made from a document.
+- **Faux headings in Word** are reported, FauxHeading, by GLOW's ten-signal score, less the three signals that need neighbouring paragraphs, with its threshold adjusted to match.
+- **More than one H1 in Markdown** is reported, MultipleTopHeadings, in MarkdownCheck and the Python fallback.
+- **PDF title and bookmarks** are checked with tags and language, in both languages.
+
 ## 1.92.1 -- 24 October 2026
 
 - **extCheck's Word, Excel and PowerPoint rules are in the kit,** as OfficeCheck in Quality.cs, reading each file's XML rather than driving Office, with extCheck's rule names, wording and thresholds. Every Word, Excel and PowerPoint file the kit makes is now judged by them, as Markdown already was, through one door, QualityCheck. ColorUsedAlone and Word's own help text for a form field need Office and stay in extCheck for now. extCheck itself still uses Office for those files; moving it onto OfficeCheck waits until the two have been compared on the same files.

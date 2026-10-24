@@ -425,6 +425,10 @@ public static class Say
             // SayString(text, flush). flush=false queues politely
             // rather than interrupting whatever JAWS is reading.
             object result = oJaws.SayString(sText, false);
+            // WHAT IS SPOKEN IS ALSO BRAILLED (kit 1.92.3): JAWS's own BrailleMessage function, through the API's
+            // RunFunction, flashes the message on the display for three seconds. Unconfirmed on every JAWS
+            // version, so a failure here is ignored and never stops the speech.
+            try { oJaws.RunFunction("BrailleMessage(\"" + sText.Replace("\"", "'").Replace("\r", " ").Replace("\n", " ") + "\", 0, 3000)"); } catch { }
             return result != null && (bool)result;
         }
         catch
@@ -482,6 +486,11 @@ public static class Say
     private static extern int nvdaController_testIfRunning();
     [DllImport("nvdaControllerClient.dll", CharSet = CharSet.Unicode, EntryPoint = "nvdaController_speakText")]
     private static extern int nvdaController_speakText([MarshalAs(UnmanagedType.LPWStr)] string sText);
+    // WHAT IS SPOKEN IS ALSO BRAILLED (kit 1.92.3, from QUILL's GATE-BRAILLE): a message spoken through NVDA
+    // is flashed on the braille display too, so a deaf-blind user, or anyone reading by braille, is not left
+    // out of what the program says. nvdaController_brailleMessage is in NVDA's controller client API.
+    [DllImport("nvdaControllerClient.dll", CharSet = CharSet.Unicode, EntryPoint = "nvdaController_brailleMessage")]
+    private static extern int nvdaController_brailleMessage([MarshalAs(UnmanagedType.LPWStr)] string sText);
     [DllImport("nvdaControllerClient.dll", CharSet = CharSet.Unicode, EntryPoint = "nvdaController_cancelSpeech")]
     private static extern int nvdaController_cancelSpeech();
 
@@ -517,7 +526,12 @@ public static class Say
     {
         if (string.IsNullOrEmpty(sText)) return false;
         if (!bNvdaDllPresent) return false;
-        try { return nvdaController_speakText(sText) == 0; }
+        try
+        {
+            bool bSpoken = nvdaController_speakText(sText) == 0;
+            try { nvdaController_brailleMessage(sText); } catch { }
+            return bSpoken;
+        }
         catch { return false; }
     }
 

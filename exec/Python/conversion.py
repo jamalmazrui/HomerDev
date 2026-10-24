@@ -1473,6 +1473,18 @@ def finishEpub(sPath, lsFindings):
         if not re.search(r"<dc:language\b[^>]*>\s*\S", sOpf):
             sOpf = re.sub(r"<dc:language\b[^>]*>\s*</dc:language>|<dc:language\s*/>", "", sOpf).replace("</metadata>", "<dc:language>%s</dc:language></metadata>" % documentLanguage())
             lsFindings.append("MissingLanguage: fixed, the book's language set to " + documentLanguage())
+        # EPUB Accessibility 1.1 metadata (1.92.2, from GLOW), as Conversion.cs: added only where there is none.
+        if "schema:accessMode" not in sOpf:
+            bPictures = any(re.search(r"<img\b", partText(dParts, s), re.I) for s in lsOrder if re.search(r"\.x?html?$", s, re.I))
+            lsMeta = ['<meta property="schema:accessMode">textual</meta>']
+            if bPictures: lsMeta.append('<meta property="schema:accessMode">visual</meta>')
+            lsMeta += ['<meta property="schema:accessModeSufficient">textual</meta>', '<meta property="schema:accessibilityFeature">structuralNavigation</meta>']
+            if re.search(r'properties="[^"]*\bnav\b', sOpf): lsMeta.append('<meta property="schema:accessibilityFeature">tableOfContents</meta>')
+            if bPictures: lsMeta.append('<meta property="schema:accessibilityFeature">alternativeText</meta>')
+            lsMeta += ['<meta property="schema:accessibilityHazard">none</meta>',
+                       '<meta property="schema:accessibilitySummary">Made by a Homer program from a document: its text can be read throughout, and its headings and table of contents can be moved by.</meta>']
+            sOpf = sOpf.replace("</metadata>", "".join(lsMeta) + "</metadata>")
+            lsFindings.append("EpubAccessibilityMetadata: fixed, access modes, features, hazards and a summary added")
         if sOpf != sWas: setPart(dParts, lsOrder, sName, sOpf)
     writePackage(sPath, lsOrder, dParts)
 
@@ -1485,6 +1497,8 @@ def finishMarkdown(sPath, lsFindings):
         if iLast and iLevel > iLast + 1: lsFindings.append("SkippedHeadingLevel: a level %d heading follows a level %d" % (iLevel, iLast))
         iLast = iLevel; bHeading = True
     if not bHeading: lsFindings.append("NoHeadings: the document has no headings, so a screen reader cannot move by them")
+    iTop = len(re.findall(r"^#[ \t]+\S", re.sub(r"(?ms)^(```|~~~).*?^\1", "", sText), re.M))
+    if iTop > 1: lsFindings.append("MultipleTopHeadings: the document has %d top-level headings; a document has one, its title" % iTop)
     if re.search(r"!\[\s*\]\(", sText): lsFindings.append("MissingAltText: a picture has no alternative text")
     if not sText.startswith("---\n"):
         oFirst = re.search(r"^#[ \t]+(.+)$", sText, re.M)
@@ -1501,6 +1515,10 @@ def checkPdfTags(sPath, lsFindings):
     if not bTree or not bMarked:
         lsFindings.append("UntaggedPdf: no %s was found, so a screen reader may read it as plain text; listen to it to be sure" % ("structure tree" if not bTree else "marked-content flag"))
     if not re.search(r"/Lang\s*\(", sBytes): lsFindings.append("MissingDocumentLanguage: the PDF names no language")
+    # A title and bookmarks (1.92.2, from GLOW), as Conversion.cs.
+    if not re.search(r"/Title\s*(?:\(\s*[^)\s]|<\s*[0-9A-Fa-f]{4})", sBytes) and not re.search(r"<dc:title>\s*<rdf:Alt>\s*<rdf:li[^>]*>\s*[^<\s]", sBytes):
+        lsFindings.append("MissingDocumentTitle: the PDF has no title, so a reader announces its file name")
+    if "/Outlines" not in sBytes: lsFindings.append("NoBookmarks: the PDF has no bookmarks to move by its headings")
 
 
 def checkPage(sPath, lsFindings):

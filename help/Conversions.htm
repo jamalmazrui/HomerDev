@@ -322,6 +322,23 @@ fast or automatic advancing, repeating or rapid animation, a title not
 read first, and missing speaker notes in PowerPoint. Two need Office’s
 rendering and stay in extCheck for now: color used alone, and a form
 field’s help text beyond what the file holds.</p></li>
+<li><p><strong>Every EPUB gets EPUB Accessibility 1.1 metadata</strong>
+where it has none (kit 1.92.2, from GLOW): how it can be read (textual,
+and visual when it has pictures), that text alone suffices, its features
+(structural navigation, a table of contents when it has one, alternative
+text when it has pictures), no hazards, and a short summary. Each is a
+claim the kit can stand behind for a book it made from a document; it
+claims no conformance it has not tested.</p></li>
+<li><p><strong>A Word paragraph that looks like a heading but is not
+styled as one</strong> is reported as FauxHeading, scored by GLOW’s
+signals: bold, large type, short, no closing punctuation, capitals or
+title case, one line, a numbering pattern, less for a name or a “Note:”.
+Only bold or large text is reported.</p></li>
+<li><p><strong>A Markdown file with more than one top heading</strong>
+is reported, MultipleTopHeadings: one H1, its title.</p></li>
+<li><p><strong>Every PDF is checked for a title and bookmarks</strong>
+as well (kit 1.92.2, from GLOW), since the title is what a reader
+announces and bookmarks let it move by headings.</p></li>
 <li><p><strong>Every PDF is checked for tags and a language,</strong>
 from IsTagged in KeyLine: a structure tree, the marked-content flag and
 /Lang. A PDF whose catalog is packed in a compressed stream could hide

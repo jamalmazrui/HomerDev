@@ -1766,6 +1766,26 @@ sOpf = Regex.Replace(sOpf, "<dc:language\\b[^>]*>\\s*</dc:language>|<dc:language
 sOpf = sOpf.Replace("</metadata>", "<dc:language>" + documentLanguage() + "</dc:language></metadata>");
 lsFindings.Add("MissingLanguage: fixed, the book's language set to " + documentLanguage());
 }
+// EPUB ACCESSIBILITY 1.1 METADATA (kit 1.92.2, from GLOW's EPUB rules): how the book can be read, what
+// helps, and what could harm, in schema.org terms, which reading systems and stores show a reader. Added
+// only where the package has none; each value is one the kit can stand behind for a book it made from a
+// document: text throughout, headings and a table of contents to move by, pictures with alternative text
+// where the source had it, and no flashing, motion or sound.
+if (sOpf.IndexOf("schema:accessMode", StringComparison.Ordinal) < 0) {
+bool bPictures = false;
+foreach (string sPage in lsOrder) if (Regex.IsMatch(partText(dParts, sPage), "<img\\b", RegexOptions.IgnoreCase)) { bPictures = true; break; }
+StringBuilder sbMeta = new StringBuilder();
+sbMeta.Append("<meta property=\"schema:accessMode\">textual</meta>");
+if (bPictures) sbMeta.Append("<meta property=\"schema:accessMode\">visual</meta>");
+sbMeta.Append("<meta property=\"schema:accessModeSufficient\">textual</meta>");
+sbMeta.Append("<meta property=\"schema:accessibilityFeature\">structuralNavigation</meta>");
+if (Regex.IsMatch(sOpf, "properties=\"[^\"]*\\bnav\\b")) sbMeta.Append("<meta property=\"schema:accessibilityFeature\">tableOfContents</meta>");
+if (bPictures) sbMeta.Append("<meta property=\"schema:accessibilityFeature\">alternativeText</meta>");
+sbMeta.Append("<meta property=\"schema:accessibilityHazard\">none</meta>");
+sbMeta.Append("<meta property=\"schema:accessibilitySummary\">Made by a Homer program from a document: its text can be read throughout, and its headings and table of contents can be moved by.</meta>");
+sOpf = sOpf.Replace("</metadata>", sbMeta.ToString() + "</metadata>");
+lsFindings.Add("EpubAccessibilityMetadata: fixed, access modes, features, hazards and a summary added");
+}
 if (sOpf != sWas) setPart(dParts, lsOrder, sName, sOpf);
 }
 writePackage(sPath, lsOrder, dParts);
@@ -1809,6 +1829,11 @@ bool bMarked = Regex.IsMatch(sBytes, "/Marked\\s*true");
 if (!bTree || !bMarked) lsFindings.Add("UntaggedPdf: no " + (!bTree ? "structure tree" : "marked-content flag") + " was found, so a screen reader may read it as plain text; listen to it to be sure");
 bool bLanguage = Regex.IsMatch(sBytes, "/Lang\\s*\\(");
 if (!bLanguage) lsFindings.Add("MissingDocumentLanguage: the PDF names no language");
+// A title and bookmarks (kit 1.92.2, from GLOW's PDF rules): the title is what a reader announces in place
+// of the file's name, and bookmarks let a reader move by the document's headings.
+if (!Regex.IsMatch(sBytes, "/Title\\s*(?:\\(\\s*[^)\\s]|<\\s*[0-9A-Fa-f]{4})") && !Regex.IsMatch(sBytes, "<dc:title>\\s*<rdf:Alt>\\s*<rdf:li[^>]*>\\s*[^<\\s]"))
+lsFindings.Add("MissingDocumentTitle: the PDF has no title, so a reader announces its file name");
+if (sBytes.IndexOf("/Outlines", StringComparison.Ordinal) < 0) lsFindings.Add("NoBookmarks: the PDF has no bookmarks to move by its headings");
 return true;
 } // checkPdfTags method
 
