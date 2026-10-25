@@ -301,19 +301,29 @@ def locateKit():
     """The HomerDev kit's folder, found as the kit's kind.findKit finds it: the HomerDev environment variable, then
     from the project upward, then a HomerDev folder at the top of any drive. Only Windows and the folder name HomerDev
     are assumed, never a drive or a depth."""
-    # The development kit first (13 October 2026), as kind.findKit: the variable names the installed kit, which lags.
+    # THE NEWEST KIT FOUND (1.93.1), as kind.findKit now chooses: every kit above the project, at a drive's top HomerDev
+    # and named by the variable is a candidate, and the highest version.txt wins -- a whole kit at the top of C:\\ was
+    # met first by the climb, ahead of the C:\\HomerDev being developed. Of equals, the first found.
+    lsFound = []
+    def consider(sFolder):
+        if sFolder and isKit(sFolder) and os.path.abspath(sFolder).lower() not in [s.lower() for s in lsFound]: lsFound.append(os.path.abspath(sFolder))
     sDir = sProject
     while True:
-        if isKit(sDir): return sDir
-        if isKit(os.path.join(sDir, "HomerDev")): return os.path.join(sDir, "HomerDev")
+        consider(sDir)
+        consider(os.path.join(sDir, "HomerDev"))
         sUp = os.path.dirname(sDir)
         if sUp == sDir: break
         sDir = sUp
-    for sLetter in "CDEFGHIJKLMNOPQRSTUVWXYZ":
-        if isKit(sLetter + ":\\HomerDev"): return sLetter + ":\\HomerDev"
-    sEnv = os.environ.get("HomerDev", "")
-    if isKit(sEnv): return os.path.abspath(sEnv)
-    return ""
+    for sLetter in "CDEFGHIJKLMNOPQRSTUVWXYZ": consider(sLetter + ":\\HomerDev")
+    consider(os.environ.get("HomerDev", ""))
+    def version(sFolder):
+        try: return tuple(int(s) for s in re.findall(r"\d+", open(os.path.join(sFolder, "version.txt"), encoding="utf-8-sig").read())[:3])
+        except (OSError, ValueError): return ()
+    if not lsFound: return ""
+    sBest = lsFound[0]
+    for sFolder in lsFound[1:]:
+        if version(sFolder) > version(sBest): sBest = sFolder
+    return sBest
 
 
 def bookTemplate(sName):
@@ -2533,9 +2543,57 @@ def writeSummary(lAudits):
 
 # ---------------------------------------------------------------- main
 
+# A BLANK IN THE CATALOG IS FILLED FROM KDP'S RECORD (25 October 2026, the author's request that missing metadata be
+# replaced when it is found). kdpReport reads each book's KDP pages into data\\books\\<root>.inix; a catalog field
+# left blank there -- Blind Vibe Coding's ASIN was -- is taken from that record and written back into books.inix, with
+# a log line, so it is corrected once and the catalog stays the one place a book's metadata is read from.
+lsCatalogFromKdp = ["asin", "author", "subtitle"]
+
+def bookshelfAsin(sTitle):
+    """The ASIN results\\KDP_Report.md's Bookshelf row gives a title, or ""."""
+    sReport = os.path.join(sProject, "results", "KDP_Report.md")
+    if not sTitle or not os.path.exists(sReport): return ""
+    for sLine in open(sReport, encoding="utf-8-sig", errors="replace"):
+        if "Bookshelf:" in sLine and sTitle.lower() in sLine.lower():
+            oAsin = re.search(r"\bASIN:\s*([A-Z0-9]{10})\b", sLine)
+            if oAsin: return oAsin.group(1)
+    return ""
+
+
+def fillCatalog(dRaw):
+    sCatalog = os.path.join(sProject, "configs", "books.inix")
+    sText = open(sCatalog, encoding="utf-8-sig").read()
+    sWas = sText
+    for sRoot, d in dRaw.items():
+        if not isinstance(d, dict) or not d.get("title"): continue
+        sRecord = os.path.join(sProject, "data", "books", sRoot + ".inix")
+        if not os.path.exists(sRecord): continue
+        try: dKdp = readInix(sRecord).get("kdp", {})
+        except Exception: continue
+        for sKey in lsCatalogFromKdp:
+            sFound = str(dKdp.get(sKey, "")).strip().strip('"')
+            # The Bookshelf row in kdpReport's report names the ASIN when the book's record does not, as for Blind
+            # Vibe Coding: "<title>: <subtitle> by <author> ... ASIN: B0HLVK4H3W".
+            if sKey == "asin" and not sFound: sFound = bookshelfAsin(d.get("title", ""))
+            if str(d.get(sKey, "")).strip() or not sFound: continue
+            # The blank line inside this book's section, and only there.
+            oSection = re.search(r"(?ms)^\[" + re.escape(sRoot) + r"\][^\n]*\n(.*?)(?=^\[|\Z)", sText)
+            if not oSection: continue
+            sBody = oSection.group(1)
+            sNewBody, iCount = re.subn(r"(?m)^(" + sKey + r"[ \t]*=)[ \t]*\r?$", lambda m: m.group(1) + " " + sFound, sBody, count=1)
+            if not iCount: continue
+            sText = sText[:oSection.start(1)] + sNewBody + sText[oSection.end(1):]
+            d[sKey] = sFound
+            log(sRoot + ": the catalog's blank " + sKey + " filled from KDP's record: " + sFound)
+    if sText != sWas:
+        writeText(sCatalog, sText)
+        say("Blank fields in configs\\books.inix were filled from KDP's records of the books; the log names each.")
+
+
 def loadCatalog():
     """configs\\books.inix as {root: book}, every field present."""
     dRaw = readInix(os.path.join(sProject, "configs", "books.inix"))
+    fillCatalog(dRaw)
     dCatalog = {}
     for sRoot, d in dRaw.items():
         if sRoot in ("excluded", inix.globalSectionName) or not d.get("title"): continue

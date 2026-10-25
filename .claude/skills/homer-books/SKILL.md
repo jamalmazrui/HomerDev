@@ -6,7 +6,9 @@ description: >-
   book's sources in its own folder under books, EPUBs and audits in results,
   and KDP's records in data. Covers the catalog's keys, the build settings, KDP's
   tables of contents, EPUBCheck, Ace and Kindle Previewer checks, AI and
-  accessibility answers, and sending updates with kdpUpdate. Use this skill
+  accessibility answers, sending updates with kdpUpdate, and kdpSubmit, which
+  fills missing metadata from KDP's own records before it decides what to
+  submit. Use this skill
   whenever the user wants to build, check, convert, publish, update or submit a
   book, ebook, EPUB or Kindle title; asks about KDP, a book's catalog entry,
   its audit, its AI disclosure or its cover; or starts a new book project,
@@ -18,6 +20,14 @@ description: >-
 A Homer project publishes books when `configs\books.inix` exists. The kit's
 `kind` script reports it. The full pattern is the kit's `help\BookPattern.md`;
 read it before changing a book project's layout or settings.
+
+**Missing metadata is filled in when found (kit 1.93.0).** A book KDP holds with no
+configs\<Book>_KDP.inix gets one made from KDP's record of it in data\books, keeping
+everything as KDP holds it but the manuscript; kdpUpdate's receipts in data\receipts are
+adopted where kdpSubmit has none; and buildBooks fills a blank ASIN, author or subtitle in
+books.inix from KDP's record or the KDP report's Bookshelf row. No MyBooks script asks a
+question or needs an argument: run bare, kdpSubmit builds what changed and submits every
+changed book, listing each and why first (kit 1.93.0).
 
 ## Where things are
 

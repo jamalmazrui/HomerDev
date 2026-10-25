@@ -75,6 +75,9 @@ HomerDev.md, under "Claude skills".
   operation and command bands, OK and Cancel alone, the Results box, automatic
   logs and matching switches -- with a checkLaunch script the kit's check runs
   on every app.
+- **homer-quality**: check any document -- Word, Excel, PowerPoint, Markdown,
+  web page, EPUB or PDF -- by extCheck's rules and the kit's finishing checks;
+  scripts\checkQuality.cmd lists what the kit would fix and what needs a person.
 - **homer-migrate**: bring an existing app onto the kit, or audit one that
   has drifted, one app at a time, with a checklist of every area and what each
   looked like when it was wrong.

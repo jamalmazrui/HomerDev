@@ -81,6 +81,22 @@ From docxIt's FormatTables in KeyLine (kit 1.91.1). A table whose first row is a
 
 A database the kit makes is one DbDo opens with nothing to set up, as the homer-db skill describes. Its table is named for the file, plural and in lower case, with the English singular for its id: people.db holds people, with person_id. Its fields come in DbDo's order: the id, added and edited, the data fields with DbDo's types (TEXTLINE, TEXTMEMO, INTEGER or REAL, from what the column holds), url, notes and tags, look (the first three fields, joined with " | "), prime (every data field) and marked. It has the edited and maps triggers, a unique index on prime, and DbDo's own lookups, maps and views tables, seeded with DbDo's field types and link kinds. A row that repeats another exactly is left out and counted. checkDb passes such a database with no warnings. Turning a database back into Markdown leaves out DbDo's own tables and the fields DbDo keeps for itself.
 
+## Records: Contacts, Calendars, Playlists, Feeds and Subtitles
+
+The plain-text formats people pass records in convert like any other type (kit 1.93.0). Each becomes a table, one record to a row, and a table becomes each of them, so they reach every other type through the table: contact cards to Excel, a calendar to a web page, a spreadsheet of names back to contact cards.
+
+- **Contact cards (.vcf):** name, given and family names, organization, title, email, phone, mobile, address, web, birthday and note. Several emails or phones share one field, separated by semicolons.
+- **Calendars (.ics, and vCalendar's .vcs):** summary, start, end, location, description, web, organizer, the repeat rule and the event's id. Times keep their time zone, and an all-day event stays a date.
+- **Playlists (.m3u, .m3u8, .pls, .xspf, .wpl, .asx):** title, location and length in seconds. A .m3u8 that is a streaming manifest rather than a playlist is refused, as QUILL's playlist reader taught; the two share a first line.
+- **Feed lists (.opml):** title, feed, site and the group it sits in.
+- **Subtitles (.srt, .vtt):** start, end and text, so one turns into the other.
+
+Writing one, a table's field names are matched loosely: Email, E-mail and Email Address all fill the email. It is one short Python script that both languages run, as the SQLite engine is, and the kit's build fails if the two copies differ. The table is the third hub, after Markdown and a web page.
+
+## Audio and Video
+
+Audio (mp3, wav, flac, m4a, aac, ogg, opus, wma, aiff) and video (mp4, mkv, avi, mov, wmv, webm, flv, m4v, mpg, mpeg, ts, m2ts, 3gp, ogv) convert among themselves through ffmpeg; video to audio keeps the sound. Either becomes a transcript -- text, Markdown, a web page, Word, PDF, EPUB -- through Whisper, and a document becomes spoken audio or video through the kit's voices.
+
 ## .htm, Never .html
 
 A web page a Homer app makes is .htm. Every Homer app reads .html as .htm, in C# and in Python alike, so the table has no html2 sections; four were removed in 1.90.0, since they could never be reached. A picker offers "htm" and never "html".

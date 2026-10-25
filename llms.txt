@@ -33,6 +33,7 @@ Start with AGENTS.md. Each skill below is a folder under .claude/skills holding 
 - [homer-elevate](.claude/skills/homer-elevate/SKILL.md): add or fix F11, Elevate Version, the update check
 - [homer-installer](.claude/skills/homer-installer/SKILL.md): write or fix an Inno Setup installer and its finish page
 - [homer-launch-dialog](.claude/skills/homer-launch-dialog/SKILL.md): build or check the one dialog, command line and Results box of a launch app such as 2htm or BatCon
+- [homer-quality](.claude/skills/homer-quality/SKILL.md): check any document for accessibility and quality by extCheck's rules and the kit's finishing checks, and say what to fix.
 - [homer-migrate](.claude/skills/homer-migrate/SKILL.md): bring an existing app onto the kit, or audit one that has drifted
 - [homer-new-app](.claude/skills/homer-new-app/SKILL.md): start a new app from the kit's templates
 - [homer-page](.claude/skills/homer-page/SKILL.md): publish a document as an accessible GitHub Page

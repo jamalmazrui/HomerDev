@@ -1,6 +1,6 @@
 # AGENTS.md -- the Homer Development Kit, for AI agents
 
-HomerDev is a development kit for building Windows programs, documents, books, databases, installers and spoken tutorials for people who use screen readers. It holds shared code in C# and Python, templates, build and release scripts, checks, and twenty-two skills that state its conventions. Its programs are used with a keyboard and a screen reader -- JAWS, NVDA or Narrator -- so every rule serves one aim: the person hears each thing once, in the order they meet it, and can reach any command by a key they can guess.
+HomerDev is a development kit for building Windows programs, documents, books, databases, installers and spoken tutorials for people who use screen readers. It holds shared code in C# and Python, templates, build and release scripts, checks, and twenty-three skills that state its conventions. Its programs are used with a keyboard and a screen reader -- JAWS, NVDA or Narrator -- so every rule serves one aim: the person hears each thing once, in the order they meet it, and can reach any command by a key they can guess.
 
 This file is for any AI agent asked to use the kit. Read it first; then read the skill that matches the task before writing anything.
 
@@ -47,13 +47,14 @@ Each skill holds the rules for one kind of work. Claude loads a skill by its des
 - **homer-books** -- build, audit and publish Kindle books with the kit's book tools. `.claude/skills/homer-books/SKILL.md`
 - **homer-build-release** -- run or troubleshoot build, tidy, push and release, with the checks inside them, and read their logs. `.claude/skills/homer-build-release/SKILL.md`
 - **homer-code** -- write or review code in Camel Type with the kit's shared classes. `.claude/skills/homer-code/SKILL.md`
-- **homer-convert** -- convert documents and data between formats, writing the Homer encoding. `.claude/skills/homer-convert/SKILL.md`
+- **homer-convert** -- convert between any two types through the kit's one Conversion: documents, tables, media and records such as contact cards and calendars. `.claude/skills/homer-convert/SKILL.md`
 - **homer-db** -- design or check a SQLite database the way DbDo opens it. `.claude/skills/homer-db/SKILL.md`
 - **homer-library-source** -- add a book library, such as Apple Books, to bookFido, or a source to any harvester. `.claude/skills/homer-library-source/SKILL.md`
 - **homer-docs** -- write or review an app's documents at a ninth-grade reading level. `.claude/skills/homer-docs/SKILL.md`
 - **homer-elevate** -- add or fix F11, Elevate Version, the update check. `.claude/skills/homer-elevate/SKILL.md`
 - **homer-installer** -- write or fix an Inno Setup installer and its finish page. `.claude/skills/homer-installer/SKILL.md`
 - **homer-launch-dialog** -- build or check the one dialog, command line and Results box of a launch app such as 2htm or BatCon. `.claude/skills/homer-launch-dialog/SKILL.md`
+- **homer-quality** -- check any document for accessibility and quality by extCheck's rules and the kit's finishing checks, and say what to fix. `.claude/skills/homer-quality/SKILL.md`
 - **homer-migrate** -- bring an existing app onto the kit, or audit one that has drifted. `.claude/skills/homer-migrate/SKILL.md`
 - **homer-new-app** -- start a new app from the kit's templates. `.claude/skills/homer-new-app/SKILL.md`
 - **homer-page** -- publish a document as an accessible GitHub Page. `.claude/skills/homer-page/SKILL.md`

@@ -4,8 +4,11 @@ description: >-
   Builds and reviews the dialog and command line of a Homer launch app: an app
   that takes source paths and settings, runs a process, and writes results to
   an output directory (2htm, BatCon, extCheck, HomerScribe, urlCheck,
-  urlFido). Use when making a new launch app, changing one's dialog, switches,
-  Results box or logging, or checking that one still follows the pattern.
+  urlFido): its bands, keys, Force replacements, progress window -- spoken
+  percentage and time left, only while the app is in front, and in braille
+  -- and Results box. Use when making a new launch app, changing one's dialog,
+  switches, progress, Results box or logging, or checking that one still
+  follows the pattern.
 ---
 
 # Homer launch dialog

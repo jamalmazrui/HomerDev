@@ -72,6 +72,7 @@ lsExpected = [
     ".claude/skills/convention-walking-guide/SKILL.md",
     ".claude/skills/homer-launch-dialog/SKILL.md", "exec/CSharp/Quality.cs", ".claude/skills/homer-launch-dialog/scripts/checkLaunch.cmd",
     ".claude/skills/homer-launch-dialog/scripts/checkLaunch.py", "help/LaunchDialog.md",
+    ".claude/skills/homer-quality/SKILL.md", ".claude/skills/homer-quality/scripts/checkQuality.cmd", ".claude/skills/homer-quality/scripts/checkQuality.py",
     "Templates/makeHotkeys.py",
     "Templates/LocalFiles.txt",
     "Templates/_APP_.cmd",
@@ -887,13 +888,15 @@ def checkSqliteSame():
     import re as reLocal
     sCs = open(os.path.join(sScriptDir, "exec", "CSharp", "Conversion.cs"), encoding="utf-8-sig").read()
     sPy = open(os.path.join(sScriptDir, "exec", "Python", "conversion.py"), encoding="utf-8-sig").read()
-    oCs = reLocal.search(r'sSqliteScript =\s*@"((?:[^"]|"")*)";', sCs)
-    oPy = reLocal.search(r"sSqliteScript = r'''(.*?)'''", sPy, reLocal.S)
-    if not oCs or not oPy: return "the SQLite script was not found in " + ("Conversion.cs" if not oCs else "conversion.py")
-    sOne = oCs.group(1).replace('""', '"').replace("\r\n", "\n")
-    sTwo = oPy.group(1).replace("\r\n", "\n")
-    if sOne != sTwo: return "the SQLite script differs between Conversion.cs and conversion.py; make them the same"
-    sayLine("The SQLite script is the same in Conversion.cs and conversion.py.")
+    # THE RECORDS SCRIPT TOO (1.93.0): every script both languages run is checked the same way.
+    for sName, sLabel in (("sSqliteScript", "SQLite"), ("sRecordsScript", "records")):
+        oCs = reLocal.search(sName + r'\s*=\s*@"((?:[^"]|"")*)";', sCs)
+        oPy = reLocal.search(sName + r" = r'''(.*?)'''", sPy, reLocal.S)
+        if not oCs or not oPy: return "the %s script was not found in %s" % (sLabel, "Conversion.cs" if not oCs else "conversion.py")
+        sOne = oCs.group(1).replace('""', '"').replace("\r\n", "\n")
+        sTwo = oPy.group(1).replace("\r\n", "\n")
+        if sOne != sTwo: return "the %s script differs between Conversion.cs and conversion.py; make them the same" % sLabel
+        sayLine("The %s script is the same in Conversion.cs and conversion.py." % sLabel)
     return ""
 
 

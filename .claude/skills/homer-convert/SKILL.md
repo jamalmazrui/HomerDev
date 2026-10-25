@@ -1,29 +1,46 @@
 ---
 name: homer-convert
 description: >-
-  Converts documents and data between file formats the Homer way: Markdown to
-  .htm with Pandoc, Word, Excel, PowerPoint, PDF, CSV, JSON and HTML to clean
-  .htm or .txt with 2htm, tables among .inix, .csv, .tsv, Markdown and .xlsx
-  with inixVert, and the rest with Pandoc, always writing the Homer encoding.
-  Use when asked to convert, export or import a file, make the .htm copy of a
-  .md, turn a document into accessible HTML or plain text, or move a table
-  from one format to another, for Homer documentation or for a user's own
-  files.
+  Converts files between any two types the Homer way, through the HomerDev
+  kit's one shared Conversion (Conversion.cs and conversion.py): documents
+  (Word, PDF, EPUB, Markdown, .htm, text, RTF, OpenDocument), tables (Excel,
+  CSV, TSV, .inix, SQLite .db in DbDo's form), audio and video (mp3, mp4, mkv,
+  wav and more, transcripts and spoken documents), and records (contact cards
+  .vcf, calendars .ics, playlists .m3u .pls .xspf, feed lists .opml, subtitles
+  .srt .vtt). Every file made is finished for a screen reader. Use when asked
+  to convert, export or import a file, change a file's format, make the .htm of
+  a .md, add a conversion to an app or to the route table, or work out why a
+  conversion took the way it did.
 ---
 
 # Converting files
 
-Pick the tool by what is converted, write the output in the Homer encoding,
-and check the result. Any two of the kit's types convert, PDF and SQLite
-included: a pair the route table does not name goes through Markdown (else a web
-page) in two of its own steps, and a PDF is printed by Edge, so no Office is
-needed (kit 1.90.0; help\Conversions.md). Every file made is then finished for a
-screen reader and checked, with extCheck's rule names in the log: workbook header
-names (from xlHeaders.vbs, without Office), titles, authors, languages, front
-matter and tagged PDFs; a .db is in DbDo's form (kit 1.91.0). extCheck's Markdown rules live in
-Quality.cs (Homer.MarkdownCheck); an app that converts compiles it, by adding
-Quality to homerModules, and every PDF is checked for tags (kit 1.92.0). Web pages are `.htm`, never `.html`; settings and data
-in INI form are `.inix`.
+Every Homer app converts with the same code: the kit's Conversion, which reads
+its ways from exec\conversions.inix (help\Conversions.md has the whole story).
+
+- **Any two types.** The table names the best direct ways. A pair it does not
+  name, or whose every way fails, goes in two of its own steps through a hub:
+  Markdown, else a web page, else a table of comma-separated values. So a contact
+  card reaches Excel (vcf2csv, then csv2xlsx) and a PDF reaches PowerPoint.
+- **Each way best first.** Each step of a way is judged by the type it is handed,
+  and the log names every way tried and why one was passed over. A route table
+  found away from the program is logged as a warning: an older installed kit's
+  table once quietly took BatCon's PDFs away from Edge.
+- **PDF without Office:** Edge prints a web page to a tagged PDF; Word's export,
+  with structure tags, is the last resort.
+- **Two scripts both languages run, word for word:** SQLite (a .db in DbDo's
+  form, and back to Markdown) and records (contact cards, calendars, playlists,
+  feed lists and subtitles, to and from a table). The kit's build fails if the
+  C# and Python copies differ.
+- **Media** -- audio and video among themselves, a transcript from either, a
+  document spoken as audio or video -- goes through ffmpeg, Whisper and the
+  kit's voices (ConversionMedia.cs).
+- **Every file is finished, then checked:** title, author and language, workbook
+  header names and layout, table header rows, front matter, EPUB accessibility
+  metadata, tagged PDF; what a person must fix is logged under extCheck's rule
+  names. The homer-quality skill runs the same checks on any file.
+- **.htm, never .html,** for a page a Homer program makes; settings and data in
+  INI form are .inix. Text results are UTF-8 with a byte order mark and CRLF.
 
 ## Which tool
 

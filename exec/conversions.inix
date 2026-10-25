@@ -35,6 +35,8 @@
 ;                 the kit's PdfReader (HomerScribe's reader) where an app compiles
 ;                 it, else pymupdf4llm; Python uses pdfminer
 ;   pdftext       a PDF's text layer as it is, the quickest
+;   records       contact cards, calendars, playlists, feed lists and subtitles to and
+;                 from a table: one Python script, run by both languages (1.93.0)
 ;   sqlite        a table to an SQLite database, or a database to Markdown: one
 ;                 Python script, run by both languages (1.90.0)
 ;   table         rows and columns, through the kit's Table class (C#)
@@ -386,3 +388,87 @@ note = As inix2db.
 [xlsx2db]
 ways = table:csv > sqlite
 note = The first sheet, as inix2db.
+
+[asx2csv]
+ways = records
+note = Each record a row, under its own field names (1.93.0).
+
+[ics2csv]
+ways = records
+note = Each record a row, under its own field names (1.93.0).
+
+[m3u2csv]
+ways = records
+note = Each record a row, under its own field names (1.93.0).
+
+[m3u82csv]
+ways = records
+note = Each record a row, under its own field names (1.93.0).
+
+[opml2csv]
+ways = records
+note = Each record a row, under its own field names (1.93.0).
+
+[pls2csv]
+ways = records
+note = Each record a row, under its own field names (1.93.0).
+
+[srt2csv]
+ways = records
+note = Each record a row, under its own field names (1.93.0).
+
+[vcf2csv]
+ways = records
+note = Each record a row, under its own field names (1.93.0).
+
+[vcs2csv]
+ways = records
+note = Each record a row, under its own field names (1.93.0).
+
+[vtt2csv]
+ways = records
+note = Each record a row, under its own field names (1.93.0).
+
+[wpl2csv]
+ways = records
+note = Each record a row, under its own field names (1.93.0).
+
+[xspf2csv]
+ways = records
+note = Each record a row, under its own field names (1.93.0).
+
+[csv2ics]
+ways = records
+note = A row for each record; field names are matched loosely, so Email, E-mail and Email Address all work (1.93.0).
+
+[csv2m3u]
+ways = records
+note = A row for each record; field names are matched loosely, so Email, E-mail and Email Address all work (1.93.0).
+
+[csv2m3u8]
+ways = records
+note = A row for each record; field names are matched loosely, so Email, E-mail and Email Address all work (1.93.0).
+
+[csv2opml]
+ways = records
+note = A row for each record; field names are matched loosely, so Email, E-mail and Email Address all work (1.93.0).
+
+[csv2pls]
+ways = records
+note = A row for each record; field names are matched loosely, so Email, E-mail and Email Address all work (1.93.0).
+
+[csv2srt]
+ways = records
+note = A row for each record; field names are matched loosely, so Email, E-mail and Email Address all work (1.93.0).
+
+[csv2vcf]
+ways = records
+note = A row for each record; field names are matched loosely, so Email, E-mail and Email Address all work (1.93.0).
+
+[csv2vtt]
+ways = records
+note = A row for each record; field names are matched loosely, so Email, E-mail and Email Address all work (1.93.0).
+
+[csv2xspf]
+ways = records
+note = A row for each record; field names are matched loosely, so Email, E-mail and Email Address all work (1.93.0).

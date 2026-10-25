@@ -7,6 +7,23 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.93.1 -- 25 October 2026
+
+From DbDo's release of 24 October evening, stopped by three failures that came from two kit copies in the wrong places.
+
+- **The newest kit found is the one the checks use.** kind.findKit, which every check uses to find the kit, took the first it met, and the top of C:\ holds a whole kit, HomerDev.cs and all, which the climb from an app's folder reaches before C:\HomerDev. Every check compared its app with that copy, and DbDo's could not find checkDb in it. Now every kit found -- above or beside the project, a HomerDev at a drive's top, the HomerDev variable -- is a candidate, and the highest version wins, as tidy and the build scripts already chose. buildBooks finds its kit the same way.
+- **tidy restores a project's own file that a kit overwrote.** A kit unarchived into DbDo's folder left fifteen of its files there, which tidy rightly removed, and overwrote DbDo's ReadMe.md with the kit's, which tidy then removed too, as byte for byte the kit's; DbDo's installer could not be built without it. When the project's git history holds its own version of such a file, and that version is not the kit's, tidy now writes the project's version back instead of deleting it.
+
+## 1.93.0 -- 25 October 2026
+
+- **Records convert like any other type:** contact cards (.vcf), calendars (.ics, .vcs), playlists (.m3u, .m3u8, .pls, .xspf, .wpl, .asx), feed lists (.opml) and subtitles (.srt, .vtt), each to and from a table. A new engine, records, is one Python script both languages run, checked word for word by the build as the SQLite script is. The table is now the third hub, so each reaches every other type. From QUILL's playlist reader: a .m3u8 that is a streaming manifest is refused, not read as a playlist.
+- **Audio and video were checked:** mp3, mp4, mkv, wav and the rest convert among themselves, to transcripts and from documents, as before; help\Conversions.md now lists them.
+- **A new skill, homer-quality,** checks any document by extCheck's rules and the kit's finishing checks, with scripts\checkQuality.cmd, which lists what the kit would fix and what needs a person, through a copy so no file changes. The kit has twenty-three skills.
+- **The skills were reviewed.** homer-convert described separate tools -- Pandoc, 2htm, inixVert -- and now describes the one Conversion every app shares, its hubs, PDF by Edge, SQLite, records and media, and the finishing step. homer-launch-dialog names its progress window and braille; homer-books names kdpSubmit's filling of missing metadata.
+- **kdpSubmit fills missing metadata when it finds it** (version 42). A book KDP holds with no answers file gets one made from KDP's own record, keeping everything as KDP holds it but the manuscript; fourteen of 22 MyBooks books had none, so kdpSubmit had not followed them. kdpUpdate's receipts are adopted where kdpSubmit had none.
+- **No MyBooks script asks anything or needs an argument** (kdpSubmit version 43, the author's ruling). kdpSubmit's question before submitting is gone: run bare, it builds what changed and submits every changed book, listing each with its reasons first. The pause after each book, which held an unattended run at its first book until Enter, now comes only with --inspect or --ask, and a browser holding the sign-in cookies is waited for, up to two minutes, rather than for a key. The other book scripts -- buildBooks, kdpBooks, kdpUpdate, kdpFetch, kdpReport -- never asked.
+- **buildBooks fills a blank catalog field** -- ASIN, author or subtitle -- from KDP's record of the book, or from the KDP report's Bookshelf row, and writes it back into books.inix; Blind Vibe Coding's ASIN was blank.
+
 ## 1.92.6 -- 25 October 2026
 
 From the builds of 24 October evening, whose checks each said they were built against the kit at C:\.

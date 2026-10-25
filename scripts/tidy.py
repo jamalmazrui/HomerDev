@@ -987,6 +987,17 @@ def removeStrayKitFiles(bRepo):
             if hashOf(sMine) != hashOf(os.path.join(sKit, sRel.replace("/", os.sep))): continue
         except OSError:
             continue
+        # THE PROJECT'S OWN FILE COMES BACK (1.93.1). A kit unarchived into an app's folder overwrites the app's files
+        # of the same name with the kit's: on 24 October DbDo's ReadMe.md became the kit's, this pass then deleted it as
+        # a stray, and DbDo's installer could not be built. When the project's git history holds its own version of the
+        # file, and that version is not the kit's, the project's version is written back instead.
+        if bRepo:
+            oHead = subprocess.run(["git", "show", "HEAD:" + sRel], capture_output=True, cwd=sRoot)
+            if oHead.returncode == 0 and oHead.stdout and hashlib.sha256(oHead.stdout).hexdigest() != hashOf(os.path.join(sKit, sRel.replace("/", os.sep))):
+                open(sMine, "wb").write(oHead.stdout)
+                logLine("project file restored from git, overwritten by the kit's: " + sRel)
+                sayLine("Restored " + sRel + " from the project's own history; a kit unarchived here had overwritten it with the kit's.")
+                continue
         os.remove(sMine)
         iRemoved += 1
         lsDirs.add(os.path.dirname(sMine))

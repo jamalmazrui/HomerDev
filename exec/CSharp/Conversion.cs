@@ -191,7 +191,8 @@ finally { try { File.Delete(sMd); } catch (Exception) { } }
 // nearly every type reads into and writes out of, else a web page (json2pdf: json2htm, htm2pdf).
 // Each step is an ordinary route, so each keeps its best-first ways, its logging, and its own
 // finishing; nothing here is a second way of converting.
-private static readonly string[] aHubs = { "md", "htm" };
+// A table, comma-separated values, is the third hub (1.93.0): the records formats reach every other type through it.
+private static readonly string[] aHubs = { "md", "htm", "csv" };
 
 // hubFor: the hub a pair would go through, or "" when the pair cannot be made that way.
 public static string hubFor(string sSource, string sTarget) {
@@ -319,6 +320,7 @@ case "copy": File.Copy(sSource, sTarget, true); return true;
 case "officecom": return officeCom(sSource, sTarget, out sError);
 case "edge": return edgePdf(sSource, sTarget, out sError);
 case "sqlite": return runPython(sSqliteScript, sSource, sTarget, out sError);
+case "records": return runPython(sRecordsScript, sSource, sTarget, out sError);
 case "markdown": return markdownToHtml(sSource, sTarget, out sError);
 case "pandoc": return pandoc(sSource, sTarget, out sError);
 case "pdfstructure": return pdfStructure(sSource, sTarget, out sError);
@@ -354,6 +356,7 @@ case "ocr": return !haveReader() ? "this program does not include the PDF reader
 case "officecom": return officeApp(sSource) == "" ? "Office cannot open this type" : "";
 case "edge": return edgePath() != "" ? "" : "Microsoft Edge is not installed";
 case "sqlite": return pythonProgram() != "" ? "" : "Python is not installed, and an SQLite database is read and written by it";
+case "records": return pythonProgram() != "" ? "" : "Python is not installed, and contact cards, calendars, playlists, feed lists and subtitles are read and written by it";
 case "json": case "page": { bool bPage = false; pageState(ref bPage); return bPage ? "" : "this program does not include the Homer page writer (ConversionPage.cs)"; }
 }
 return "the engine " + sEngine + " is unknown";
@@ -410,7 +413,8 @@ public string sType = "";
 private static readonly string[,] aTypeNames = {
 {"bat", "Windows batch script"}, {"cmd", "Windows command script"}, {"cs", "C# source"}, {"css", "style sheet"},
 {"csv", "comma separated table"}, {"cue", "CD cue sheet"}, {"doc", "Word 97 document"}, {"docx", "Word document"},
-{"db", "SQLite database"}, {"epub", "EPUB book"}, {"exe", "program"}, {"htm", "web page"}, {"ini", "settings file"}, {"inix", "Homer settings file"},
+{"asx", "ASX play list"}, {"db", "SQLite database"}, {"epub", "EPUB book"}, {"ics", "calendar"}, {"m3u", "M3U play list"}, {"m3u8", "M3U play list"},
+{"opml", "feed list"}, {"vcf", "contact cards"}, {"vcs", "vCalendar calendar"}, {"vtt", "WebVTT subtitles"}, {"wpl", "Windows Media play list"}, {"xspf", "XSPF play list"}, {"exe", "program"}, {"htm", "web page"}, {"ini", "settings file"}, {"inix", "Homer settings file"},
 {"iss", "Inno Setup script"}, {"jkm", "JAWS key map"}, {"jpg", "JPEG picture"}, {"js", "JavaScript source"},
 {"jsd", "JAWS script documentation"}, {"jsh", "JAWS script header"}, {"json", "JSON data"}, {"jss", "JAWS script source"},
 {"log", "log"}, {"m3u", "M3U play list"}, {"m3u8", "M3U play list"}, {"md", "Markdown document"}, {"mp3", "MP3 audio"},
@@ -1097,6 +1101,270 @@ else:
         lsOut.append('')
     oDb.close()
     open(sOut, 'w', encoding='utf-8-sig', newline='\r\n').write('\n'.join(lsOut))
+";
+
+// THE RECORDS ENGINE (kit 1.93.0, the author's request of 25 October 2026): the plain-text formats people pass records
+// in -- contact cards (.vcf), calendars (.ics, and vCalendar's .vcs), playlists (.m3u, .m3u8, .pls, .xspf, .wpl, .asx),
+// feed lists (.opml) and subtitles (.srt, .vtt) -- to and from a table of comma-separated values, which the kit turns into
+// anything else (vcf to xlsx is vcf2csv, then csv2xlsx). Like the SQLite engine, both languages run THIS SAME SCRIPT,
+// held word for word in exec\Python\conversion.py as sRecordsScript; the kit's build fails if the two ever differ.
+// From QUILL's playlist_formats.py: a .m3u8 that is a streaming manifest, not a playlist, is refused rather than read.
+private const string sRecordsScript =
+@"import csv, datetime, io, os, re, sys, uuid
+import xml.etree.ElementTree as ET
+sIn, sOut = sys.argv[1], sys.argv[2]
+sOutType = os.path.splitext(sOut[:-5] if sOut.lower().endswith('.part') else sOut)[1].lstrip('.').lower()
+sInType = os.path.splitext(sIn)[1].lstrip('.').lower()
+dColumns = {'vcf': ['Name', 'Given', 'Family', 'Organization', 'Title', 'Email', 'Phone', 'Mobile', 'Address', 'Web', 'Birthday', 'Note'],
+            'ics': ['Summary', 'Start', 'End', 'Location', 'Description', 'Web', 'Organizer', 'Repeats', 'Id'],
+            'playlist': ['Title', 'Location', 'Seconds'],
+            'opml': ['Title', 'Feed', 'Site', 'Group'],
+            'subtitles': ['Start', 'End', 'Text']}
+dKind = {'vcf': 'vcf', 'ics': 'ics', 'vcs': 'ics', 'm3u': 'playlist', 'm3u8': 'playlist', 'pls': 'playlist', 'xspf': 'playlist',
+         'wpl': 'playlist', 'asx': 'playlist', 'opml': 'opml', 'srt': 'subtitles', 'vtt': 'subtitles'}
+dAliases = {'name': 'Name', 'full name': 'Name', 'fn': 'Name', 'display name': 'Name', 'first name': 'Given', 'given name': 'Given',
+            'last name': 'Family', 'surname': 'Family', 'family name': 'Family', 'company': 'Organization', 'org': 'Organization',
+            'job title': 'Title', 'e-mail': 'Email', 'email address': 'Email', 'telephone': 'Phone', 'phone number': 'Phone',
+            'cell': 'Mobile', 'mobile phone': 'Mobile', 'url': 'Web', 'website': 'Web', 'link': 'Web', 'notes': 'Note',
+            'subject': 'Summary', 'event': 'Summary', 'starts': 'Start', 'begin': 'Start', 'ends': 'End', 'finish': 'End',
+            'where': 'Location', 'details': 'Description', 'rrule': 'Repeats', 'uid': 'Id', 'file': 'Location', 'path': 'Location',
+            'duration': 'Seconds', 'length': 'Seconds', 'xmlurl': 'Feed', 'feed url': 'Feed', 'htmlurl': 'Site', 'category': 'Group',
+            'from': 'Start', 'to': 'End', 'caption': 'Text', 'line': 'Text'}
+def base(s):
+    return re.split(r'[\\/]', s.rstrip('/\\'))[-1] or s
+def seconds(n):
+    return str(int(n)) if float(n) == int(float(n)) else str(n)
+def decode(ab):
+    for sCodec in ('utf-8-sig', 'cp1252'):
+        try: return ab.decode(sCodec)
+        except UnicodeDecodeError: pass
+    return ab.decode('utf-8', 'replace')
+def unfold(sText):
+    # vCard and iCalendar fold long lines: a line starting with a space or tab continues the one before.
+    return re.sub(r'\r?\n[ \t]', '', sText.replace('\r\n', '\n'))
+def unescape(s):
+    return re.sub(r'\\([nN,;\\])', lambda m: '\n' if m.group(1) in 'nN' else m.group(1), s)
+def escape(s):
+    return s.replace('\\', '\\\\').replace(';', '\\;').replace(',', '\\,').replace('\r\n', '\n').replace('\n', '\\n')
+def fold(sLine):
+    lParts = []
+    while len(sLine.encode('utf-8')) > 75:
+        i = 75
+        while len(sLine[:i].encode('utf-8')) > 75: i -= 1
+        lParts.append(sLine[:i]); sLine = ' ' + sLine[i:]
+    lParts.append(sLine)
+    return '\r\n'.join(lParts)
+def properties(sBlock):
+    """"""[(name, params, value)] for each line of one BEGIN/END block.""""""
+    lOut = []
+    for sLine in sBlock.split('\n'):
+        oLine = re.match(r'^([A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)?)((?:;[^:]*)?):(.*)$', sLine)
+        if not oLine: continue
+        sName = oLine.group(1).split('.')[-1].upper()
+        lOut.append((sName, oLine.group(2), oLine.group(3)))
+    return lOut
+def icsTime(sValue, sParams):
+    """"""2026-10-24 19:00, with Z kept as UTC and a TZID named; a date alone stays a date.""""""
+    o = re.match(r'^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})(\d{2})?(Z)?)?$', sValue.strip())
+    if not o: return sValue.strip()
+    s = '%s-%s-%s' % o.group(1, 2, 3)
+    if o.group(4): s += ' %s:%s' % (o.group(4), o.group(5)) + (' UTC' if o.group(7) else '')
+    oZone = re.search(r'(?i)TZID=([^;:]+)', sParams)
+    if oZone and o.group(4) and not o.group(7): s += ' ' + oZone.group(1)
+    return s
+def icsValue(sText, bEnd=False):
+    """"""An iCalendar date or time from 2026-10-24 or 2026-10-24 19:00 [UTC]; the property's parameters with it.""""""
+    o = re.match(r'^\s*(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2}):(\d{2})(?::\d{2})?\s*(UTC|Z|[A-Za-z_]+(?:/[A-Za-z_+-]+)+)?)?\s*$', sText or '')
+    if not o: return '', ''
+    sDate = '%s%s%s' % o.group(1, 2, 3)
+    if not o.group(4): return ';VALUE=DATE', sDate
+    sTime = sDate + 'T%02d%s00' % (int(o.group(4)), o.group(5))
+    if o.group(6) in ('UTC', 'Z'): return '', sTime + 'Z'
+    return (';TZID=' + o.group(6) if o.group(6) else ''), sTime
+def readRecords():
+    sText = decode(open(sIn, 'rb').read())
+    sKind = dKind[sInType]
+    lRows = []
+    if sKind == 'vcf':
+        for sCard in re.findall(r'(?ims)^BEGIN:VCARD\s*$(.*?)^END:VCARD\s*$', unfold(sText)):
+            d = {c: '' for c in dColumns['vcf']}
+            lEmails, lPhones = [], []
+            for sName, sParams, sValue in properties(sCard):
+                sValue = unescape(sValue)
+                if sName == 'FN': d['Name'] = sValue
+                elif sName == 'N':
+                    lN = (sValue.split(';') + [''] * 5)[:5]
+                    d['Family'], d['Given'] = lN[0], lN[1]
+                elif sName == 'ORG': d['Organization'] = sValue.replace(';', ', ').strip(', ')
+                elif sName == 'TITLE': d['Title'] = sValue
+                elif sName == 'EMAIL': lEmails.append(sValue)
+                elif sName == 'TEL':
+                    if re.search(r'(?i)CELL|MOBILE', sParams) and not d['Mobile']: d['Mobile'] = sValue
+                    else: lPhones.append(sValue)
+                elif sName == 'ADR': d['Address'] = ', '.join(p for p in sValue.split(';') if p.strip())
+                elif sName == 'URL': d['Web'] = sValue
+                elif sName == 'BDAY': d['Birthday'] = icsTime(sValue.replace('-', ''), '') if re.match(r'^\d{4}-?\d{2}-?\d{2}$', sValue) else sValue
+                elif sName == 'NOTE': d['Note'] = sValue
+            d['Email'], d['Phone'] = '; '.join(lEmails), '; '.join(lPhones)
+            if not d['Name']: d['Name'] = (d['Given'] + ' ' + d['Family']).strip() or d['Organization']
+            lRows.append(d)
+    elif sKind == 'ics':
+        for sEvent in re.findall(r'(?ims)^BEGIN:VEVENT\s*$(.*?)^END:VEVENT\s*$', unfold(sText)):
+            d = {c: '' for c in dColumns['ics']}
+            for sName, sParams, sValue in properties(sEvent):
+                if sName == 'SUMMARY': d['Summary'] = unescape(sValue)
+                elif sName == 'DTSTART': d['Start'] = icsTime(sValue, sParams)
+                elif sName == 'DTEND': d['End'] = icsTime(sValue, sParams)
+                elif sName == 'LOCATION': d['Location'] = unescape(sValue)
+                elif sName == 'DESCRIPTION': d['Description'] = unescape(sValue)
+                elif sName == 'URL': d['Web'] = sValue
+                elif sName == 'ORGANIZER': d['Organizer'] = re.sub(r'(?i)^mailto:', '', sValue)
+                elif sName == 'RRULE': d['Repeats'] = sValue
+                elif sName == 'UID': d['Id'] = sValue
+            lRows.append(d)
+    elif sKind == 'playlist':
+        if sInType in ('m3u', 'm3u8'):
+            # A .m3u8 is either a playlist or an HLS stream manifest, which share a first line (from QUILL's
+            # playlist_formats.py): segment and stream tags mean a manifest, whose entries are seconds of one stream.
+            if re.search(r'(?m)^#EXT-X-(?:TARGETDURATION|MEDIA-SEQUENCE|STREAM-INF|ENDLIST)', sText): raise SystemExit('this .m3u8 is a streaming manifest, not a playlist')
+            sTitle, sSeconds = '', ''
+            for sLine in sText.replace('\r\n', '\n').split('\n'):
+                sLine = sLine.strip()
+                oInf = re.match(r'^#EXTINF:\s*(-?[\d.]+)[^,]*,(.*)$', sLine)
+                if oInf: sSeconds, sTitle = oInf.group(1), oInf.group(2).strip(); continue
+                if not sLine or sLine.startswith('#'): continue
+                lRows.append({'Title': sTitle or base(sLine), 'Location': sLine, 'Seconds': '' if sSeconds in ('', '-1') else sSeconds})
+                sTitle, sSeconds = '', ''
+        elif sInType == 'pls':
+            dEntries = {}
+            for oLine in re.finditer(r'(?im)^(File|Title|Length)(\d+)\s*=\s*(.*)$', sText):
+                dEntries.setdefault(int(oLine.group(2)), {})[oLine.group(1).lower()] = oLine.group(3).strip()
+            for i in sorted(dEntries):
+                d = dEntries[i]
+                if d.get('file'): lRows.append({'Title': d.get('title', '') or base(d['file']), 'Location': d['file'], 'Seconds': '' if d.get('length', '') in ('', '-1') else d['length']})
+        else:
+            oRoot = ET.fromstring(re.sub(r'(?is)<!DOCTYPE[^>]*>', '', sText).encode('utf-8'))
+            def local(e): return e.tag.split('}')[-1].lower()
+            for oItem in oRoot.iter():
+                sTag = local(oItem)
+                if sTag == 'track':
+                    d = {local(c): (c.text or '').strip() for c in oItem}
+                    if d.get('location'): lRows.append({'Title': d.get('title', '') or base(d['location']), 'Location': d['location'], 'Seconds': seconds(int(d['duration']) / 1000) if d.get('duration', '').isdigit() else ''})
+                elif sTag == 'media' and oItem.get('src'): lRows.append({'Title': base(oItem.get('src')), 'Location': oItem.get('src'), 'Seconds': ''})
+                elif sTag == 'entry':
+                    sRef = next((c.get('href') or c.get('HREF') for c in oItem if local(c) == 'ref'), '')
+                    sName = next(((c.text or '').strip() for c in oItem if local(c) == 'title'), '')
+                    if sRef: lRows.append({'Title': sName or base(sRef), 'Location': sRef, 'Seconds': ''})
+    elif sKind == 'opml':
+        oRoot = ET.fromstring(re.sub(r'(?is)<!DOCTYPE[^>]*>', '', sText).encode('utf-8'))
+        def walk(oNode, sGroup):
+            for oChild in oNode:
+                if oChild.tag.split('}')[-1].lower() != 'outline': continue
+                sName = oChild.get('title') or oChild.get('text') or ''
+                if oChild.get('xmlUrl'): lRows.append({'Title': sName, 'Feed': oChild.get('xmlUrl', ''), 'Site': oChild.get('htmlUrl', ''), 'Group': sGroup})
+                walk(oChild, sName if not oChild.get('xmlUrl') else sGroup)
+        oBody = next((e for e in oRoot if e.tag.split('}')[-1].lower() == 'body'), oRoot)
+        walk(oBody, '')
+    elif sKind == 'subtitles':
+        sBody = re.sub(r'(?s)^\ufeff?WEBVTT[^\n]*\n', '', sText.replace('\r\n', '\n'))
+        for sCue in re.split(r'\n\s*\n', sBody):
+            oTimes = re.search(r'(\d{1,2}:)?(\d{2}):(\d{2})[,.](\d{3})\s*-->\s*(\d{1,2}:)?(\d{2}):(\d{2})[,.](\d{3})', sCue)
+            if not oTimes: continue
+            def stamp(lGroups): return '%02d:%s:%s.%s' % (int((lGroups[0] or '0:')[:-1]), lGroups[1], lGroups[2], lGroups[3])
+            lText = [s for s in sCue.split('\n')[sCue.split('\n').index(next(l for l in sCue.split('\n') if '-->' in l)) + 1:] if s.strip()]
+            lRows.append({'Start': stamp(oTimes.groups()[:4]), 'End': stamp(oTimes.groups()[4:]), 'Text': re.sub(r'<[^>]+>', '', ' '.join(lText)).strip()})
+    return dColumns[sKind], lRows
+def readTable():
+    lAll = [r for r in csv.reader(io.StringIO(decode(open(sIn, 'rb').read()))) if any(c.strip() for c in r)]
+    if not lAll: raise SystemExit('the table is empty')
+    lHeads = [dAliases.get(h.strip().lower(), h.strip()) for h in lAll[0]]
+    lKnown = {c.lower(): c for l in dColumns.values() for c in l}
+    lHeads = [lKnown.get(h.lower(), h) for h in lHeads]
+    return [dict(zip(lHeads, (r + [''] * len(lHeads))[:len(lHeads)])) for r in lAll[1:]]
+def writeRecords(lRows):
+    sKind = dKind[sOutType]
+    lOut = []
+    sStamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ')
+    if sKind == 'vcf':
+        for d in lRows:
+            sName = d.get('Name', '') or (d.get('Given', '') + ' ' + d.get('Family', '')).strip() or d.get('Organization', '')
+            if not sName: continue
+            lCard = ['BEGIN:VCARD', 'VERSION:3.0', 'FN:' + escape(sName), 'N:' + escape(d.get('Family', '')) + ';' + escape(d.get('Given', '')) + ';;;']
+            if d.get('Organization'): lCard.append('ORG:' + escape(d['Organization']))
+            if d.get('Title'): lCard.append('TITLE:' + escape(d['Title']))
+            lCard += ['EMAIL;TYPE=INTERNET:' + s.strip() for s in d.get('Email', '').split(';') if s.strip()]
+            lCard += ['TEL;TYPE=VOICE:' + s.strip() for s in d.get('Phone', '').split(';') if s.strip()]
+            if d.get('Mobile'): lCard.append('TEL;TYPE=CELL:' + d['Mobile'].strip())
+            if d.get('Address'): lCard.append('ADR;TYPE=HOME:;;' + escape(d['Address']) + ';;;;')
+            if d.get('Web'): lCard.append('URL:' + d['Web'].strip())
+            if d.get('Birthday'): lCard.append('BDAY:' + d['Birthday'].strip())
+            if d.get('Note'): lCard.append('NOTE:' + escape(d['Note']))
+            lOut += [fold(s) for s in lCard + ['END:VCARD']]
+    elif sKind == 'ics':
+        lOut = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Homer Tools//HomerDev conversion//EN', 'CALSCALE:GREGORIAN']
+        for d in lRows:
+            sStartParams, sStart = icsValue(d.get('Start', ''))
+            if not sStart: continue
+            lEvent = ['BEGIN:VEVENT', 'UID:' + (d.get('Id', '').strip() or str(uuid.uuid4()) + '@homer'), 'DTSTAMP:' + sStamp, 'DTSTART' + sStartParams + ':' + sStart]
+            sEndParams, sEnd = icsValue(d.get('End', ''))
+            if sEnd: lEvent.append('DTEND' + sEndParams + ':' + sEnd)
+            lEvent.append('SUMMARY:' + escape(d.get('Summary', '') or '(no title)'))
+            if d.get('Location'): lEvent.append('LOCATION:' + escape(d['Location']))
+            if d.get('Description'): lEvent.append('DESCRIPTION:' + escape(d['Description']))
+            if d.get('Web'): lEvent.append('URL:' + d['Web'].strip())
+            if d.get('Organizer'): lEvent.append('ORGANIZER:mailto:' + d['Organizer'].strip())
+            if d.get('Repeats'): lEvent.append('RRULE:' + d['Repeats'].strip())
+            lOut += [fold(s) for s in lEvent + ['END:VEVENT']]
+        lOut.append('END:VCALENDAR')
+    elif sKind == 'playlist':
+        lEntries = [d for d in lRows if d.get('Location', '').strip()]
+        if sOutType in ('m3u', 'm3u8'):
+            lOut = ['#EXTM3U']
+            for d in lEntries: lOut += ['#EXTINF:%s,%s' % (int(float(d['Seconds'])) if re.match(r'^[\d.]+$', d.get('Seconds', '')) else -1, d.get('Title', '')), d['Location']]
+        elif sOutType == 'pls':
+            lOut = ['[playlist]']
+            for i, d in enumerate(lEntries, 1):
+                lOut += ['File%d=%s' % (i, d['Location']), 'Title%d=%s' % (i, d.get('Title', '')), 'Length%d=%s' % (i, int(float(d['Seconds'])) if re.match(r'^[\d.]+$', d.get('Seconds', '')) else -1)]
+            lOut += ['NumberOfEntries=%d' % len(lEntries), 'Version=2']
+        else:
+            oList = ET.Element('playlist', {'version': '1', 'xmlns': 'http://xspf.org/ns/0/'}); oTracks = ET.SubElement(oList, 'trackList')
+            for d in lEntries:
+                oTrack = ET.SubElement(oTracks, 'track'); ET.SubElement(oTrack, 'location').text = d['Location']
+                if d.get('Title'): ET.SubElement(oTrack, 'title').text = d['Title']
+                if re.match(r'^[\d.]+$', d.get('Seconds', '')): ET.SubElement(oTrack, 'duration').text = str(int(float(d['Seconds']) * 1000))
+            lOut = ['<?xml version=""1.0"" encoding=""UTF-8""?>', ET.tostring(oList, encoding='unicode')]
+    elif sKind == 'opml':
+        oOpml = ET.Element('opml', {'version': '2.0'}); ET.SubElement(ET.SubElement(oOpml, 'head'), 'title').text = os.path.splitext(os.path.basename(sOut[:-5] if sOut.lower().endswith('.part') else sOut))[0]
+        oBody = ET.SubElement(oOpml, 'body'); dGroups = {}
+        for d in lRows:
+            if not d.get('Feed', '').strip(): continue
+            oParent = oBody
+            if d.get('Group'):
+                if d['Group'] not in dGroups: dGroups[d['Group']] = ET.SubElement(oBody, 'outline', {'text': d['Group'], 'title': d['Group']})
+                oParent = dGroups[d['Group']]
+            ET.SubElement(oParent, 'outline', {'type': 'rss', 'text': d.get('Title', ''), 'title': d.get('Title', ''), 'xmlUrl': d['Feed'], 'htmlUrl': d.get('Site', '')})
+        lOut = ['<?xml version=""1.0"" encoding=""UTF-8""?>', ET.tostring(oOpml, encoding='unicode')]
+    elif sKind == 'subtitles':
+        def stamp(s, sMark):
+            o = re.match(r'^(?:(\d{1,2}):)?(\d{2}):(\d{2})(?:[.,](\d{1,3}))?$', s.strip())
+            return '%02d:%s:%s%s%s' % (int(o.group(1) or 0), o.group(2), o.group(3), sMark, (o.group(4) or '0').ljust(3, '0')) if o else ''
+        lCues = [d for d in lRows if stamp(d.get('Start', ''), ',') and stamp(d.get('End', ''), ',')]
+        lOut = ['WEBVTT', ''] if sOutType == 'vtt' else []
+        sMark = '.' if sOutType == 'vtt' else ','
+        for i, d in enumerate(lCues, 1):
+            lOut += ([str(i)] if sOutType == 'srt' else []) + [stamp(d['Start'], sMark) + ' --> ' + stamp(d['End'], sMark), d.get('Text', ''), '']
+    return lOut
+if sOutType == 'csv':
+    if sInType not in dKind: raise SystemExit('records cannot read .' + sInType)
+    lHeads, lRows = readRecords()
+    oBuffer = io.StringIO(); oWriter = csv.writer(oBuffer, lineterminator='\r\n'); oWriter.writerow(lHeads)
+    for d in lRows: oWriter.writerow([d.get(h, '') for h in lHeads])
+    open(sOut, 'w', encoding='utf-8-sig', newline='').write(oBuffer.getvalue())
+    print('%d %s' % (len(lRows), 'record' if len(lRows) == 1 else 'records'))
+else:
+    if sOutType not in dKind: raise SystemExit('records cannot write .' + sOutType)
+    lOut = writeRecords(readTable())
+    open(sOut, 'w', encoding='utf-8', newline='').write('\r\n'.join(lOut) + '\r\n')
 ";
 
 private const string sPyMuPdfText =
