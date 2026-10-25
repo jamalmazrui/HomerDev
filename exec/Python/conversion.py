@@ -1475,14 +1475,17 @@ def finishEpub(sPath, lsFindings):
             lsFindings.append("MissingLanguage: fixed, the book's language set to " + documentLanguage())
         # EPUB Accessibility 1.1 metadata (1.92.2, from GLOW), as Conversion.cs: added only where there is none.
         if "schema:accessMode" not in sOpf:
-            bPictures = any(re.search(r"<img\b", partText(dParts, s), re.I) for s in lsOrder if re.search(r"\.x?html?$", s, re.I))
+            # Pictures are claimed to have text alternatives only when every one has (1.92.4, from MyBooks' buildBooks).
+            lsImages = [m for s in lsOrder if re.search(r"\.x?html?$", s, re.I) for m in re.findall(r"<img\b[^>]*>", partText(dParts, s), re.I)]
+            bPictures = bool(lsImages)
+            bDescribed = bPictures and all(re.search(r'\balt="[^"]*\S[^"]*"', m, re.I) for m in lsImages)
             lsMeta = ['<meta property="schema:accessMode">textual</meta>']
             if bPictures: lsMeta.append('<meta property="schema:accessMode">visual</meta>')
-            lsMeta += ['<meta property="schema:accessModeSufficient">textual</meta>', '<meta property="schema:accessibilityFeature">structuralNavigation</meta>']
+            lsMeta += ['<meta property="schema:accessModeSufficient">%s</meta>' % ("textual,visual" if bPictures and not bDescribed else "textual"), '<meta property="schema:accessibilityFeature">structuralNavigation</meta>']
             if re.search(r'properties="[^"]*\bnav\b', sOpf): lsMeta.append('<meta property="schema:accessibilityFeature">tableOfContents</meta>')
-            if bPictures: lsMeta.append('<meta property="schema:accessibilityFeature">alternativeText</meta>')
+            if bDescribed: lsMeta.append('<meta property="schema:accessibilityFeature">alternativeText</meta>')
             lsMeta += ['<meta property="schema:accessibilityHazard">none</meta>',
-                       '<meta property="schema:accessibilitySummary">Made by a Homer program from a document: its text can be read throughout, and its headings and table of contents can be moved by.</meta>']
+                       '<meta property="schema:accessibilitySummary">Made by a Homer program from a document: its text can be read throughout, and its headings and table of contents can be moved by.%s</meta>' % ((" Every picture has a text alternative." if bDescribed else " Some pictures are not yet described in text.") if bPictures else "")]
             sOpf = sOpf.replace("</metadata>", "".join(lsMeta) + "</metadata>")
             lsFindings.append("EpubAccessibilityMetadata: fixed, access modes, features, hazards and a summary added")
         if sOpf != sWas: setPart(dParts, lsOrder, sName, sOpf)

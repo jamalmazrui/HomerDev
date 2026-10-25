@@ -48,10 +48,11 @@ sBuildFormat = "2026-10-09"
 # covers kept their earlier "ready", since their fingerprints had not changed. The fingerprint must not change for a
 # rule (kdpUpdate compares it, and a change resends the book to KDP), so the rules are recorded in the audit instead.
 # Raise this whenever what makes a book ready changes; each book is then judged again, its EPUB unchanged.
-sAuditRules = "2026-10-13 a book needs its cover and real pictures"
+sAuditRules = "2026-10-24 link text, picture descriptions, typed bullets and bold headings"
 dDefaults = {"author": "", "ownTemplates": "", "imageMaxBytes": "150000", "imageMaxEdge": "1000", "jpegQuality": "75", "pandocMinimum": "3.1", "searchDepth": "6", "toolRefreshDays": "7", "userAgent": "HomerBooksBuild/1"}
 dSeriesSections = {"Strange Truths": ["Copyright", "Table of Contents", "Introduction", "Conclusion", "Key Terms", "Further Reading", "Also in the Strange Truths Series", "About the Author"]}
 iLongSentence = 30
+lVagueLinkText = ["click here", "continue", "details", "go", "here", "info", "information", "learn more", "link", "more", "read more", "this", "url"]
 iWordDiffPercent = 5
 lCoverExtensions = [".jpg", ".jpeg", ".png"]
 lSourceExtensions = [".docx", ".epub", ".htm", ".html", ".pdf"]
@@ -847,6 +848,34 @@ def pageColumns(lWords, oPage):
         if lMerged and lSpan[0] - lMerged[-1][1] < 8: lMerged[-1][1] = lSpan[1]
         else: lMerged.append(lSpan)
     lMerged = [l for l in lMerged if l[1] - l[0] > oPage.width * 0.12]
+    # A GUTTER UNDER A CENTERED HEADING (24 October 2026, from an audit with the HomerDev kit's newer rules). The
+    # appendix of Individuals with Cognitive Disabilities, the Coleman Institute Declaration, is set in two columns
+    # under a centered title and headings whose words cross the gutter; they lifted its count to a quarter of the
+    # busiest strip, above the tenth that counts as empty, so the page read as one column and the two were woven
+    # together line by line. When one span is all that was found, a valley in the middle of the page -- under a
+    # third of the busiest strip and at least 12 points wide -- is the gutter. A one-column page has none, since its
+    # lines cross the middle.
+    # A contents page's dot leaders are wide words left out of the count above, which leaves the middle of the page
+    # empty though every line crosses it; such a page is never split. Nor is a page with a table, whose columns of
+    # figures leave valleys of their own: six pages of the Section 508 rule's cost tables would have been cut apart.
+    iLeaders = sum(1 for d in lWords if d["x1"] - d["x0"] > oPage.width * 0.4)
+    try: bTable = bool(oPage.find_tables())
+    except Exception: bTable = False
+    if len(lMerged) == 1 and iLeaders < 3 and not bTable:
+        iPeak = max(lCovered)
+        iLow, iHigh = int(oPage.width * 0.3), int(oPage.width * 0.7)
+        iRun, iBestStart, iBestLength = None, None, 0
+        for x in range(iLow, iHigh + 1):
+            if lCovered[x] < iPeak / 3.0:
+                if iRun is None: iRun = x
+                if x - iRun + 1 > iBestLength: iBestStart, iBestLength = iRun, x - iRun + 1
+            else: iRun = None
+        # Two columns leave their gutter at the middle; a valley well off the middle is a table's gap, such as page
+        # 35 of the Section 508 rule, a continued table without ruled lines.
+        nMiddle = (iBestStart + iBestLength / 2.0) / oPage.width if iBestStart is not None else 0
+        if iBestLength >= 12 and 0.45 <= nMiddle <= 0.55:
+            iLeft, iRight = lMerged[0]
+            lMerged = [[iLeft, iBestStart], [iBestStart + iBestLength, iRight]]
     return [tuple(l) for l in lMerged] or [(0, oPage.width)]
 
 
@@ -2228,6 +2257,41 @@ def auditManuscript(dBook, dAudit, dCatalog):
     if iMojibake: lErrors.append(plural(iMojibake, "place") + " with garbled characters from a wrong text encoding, such as \u00e2\u20ac.")
     iViewImage = len(re.findall(r"\[View image\]", sBody))
     if iViewImage: lErrors.append(plural(iViewImage, "\u201cView image\u201d link") + " left where an earlier build could not find a picture.")
+    # THE KIT'S NEWER RULES FOR A MANUSCRIPT (24 October 2026), from extCheck's Markdown rules, GLOW (the American
+    # Council of the Blind's Guided Layout & Output Workflow) and QUILL for All, as the HomerDev kit's Quality.cs holds
+    # them. Their first run over all 22 books found an appendix whose two columns had been woven together, three typed
+    # bullets, one picture described as "Photo of", and no vague links; each is checked from now on.
+    sLinkable = outsideCode(sBody)
+    lVague = [m.group(1) for m in re.finditer(r"(?<!!)\[([^\]]+)\]\(", sLinkable) if m.group(1).strip().lower() in lVagueLinkText]
+    if lVague: lWarnings.append(plural(len(lVague), "link") + " whose text does not say where it goes, such as \u201c" + lVague[0] + "\u201d; a screen reader user moving by links hears only the text.")
+    lFileNames, lPrefixed, lShort = [], [], []
+    for m in re.finditer(r"!\[([^\]]*)\]\(([^)\s]+)", sLinkable):
+        sAlt, sSource = m.group(1).strip(), m.group(2)
+        if not sAlt: continue
+        if re.search(r"\.(?:jpe?g|png|gif|webp|svg|bmp)$", sAlt, re.I) or sAlt.lower() == os.path.splitext(os.path.basename(sSource))[0].lower(): lFileNames.append(sAlt)
+        elif re.match(r"(?:image|picture|photo|photograph|graphic) of\b", sAlt, re.I): lPrefixed.append(sAlt)
+        elif len(sAlt) < 5: lShort.append(sAlt)
+    if lFileNames: lWarnings.append(plural(len(lFileNames), "picture") + " described by a file name, such as \u201c" + lFileNames[0] + "\u201d; say what the picture shows.")
+    if lPrefixed: lWarnings.append(plural(len(lPrefixed), "picture description") + " beginning \u201c" + lPrefixed[0].split(" of")[0] + " of\u201d, which a screen reader already says by calling it a graphic, such as \u201c" + lPrefixed[0] + "\u201d.")
+    if lShort: lWarnings.append(plural(len(lShort), "picture description") + " too short to say what it shows, such as \u201c" + lShort[0] + "\u201d.")
+    lProse = sLinkable.split("\n")
+    iBullets = sum(1 for s in lProse if re.match(r"^\s*[\u2022\u25CF\u25AA\u2023]\s", s))
+    if iBullets: lWarnings.append(plural(iBullets, "line") + " starting with a typed bullet, which is read as text rather than as a list; usually two columns of a PDF read across.")
+    # A paragraph that is all bold, standing alone, reads as a heading to the eye but is not one, so a screen reader
+    # cannot move to it. A label -- one with a colon, or one introducing a list -- and a term in a definition list
+    # (its next line opens with ": ") are left alone: the Strange Truths books' Articles: and Videos: are labels.
+    lBold = []
+    for iIndex, sLine in enumerate(lProse):
+        m = re.match(r"^\*\*([^*]{3,120})\*\*$", sLine.strip())
+        if not m or ":" in m.group(1): continue
+        if iIndex and lProse[iIndex - 1].strip(): continue
+        # Display text right under a real heading -- a title page's title -- belongs to that heading's section.
+        sBefore = next((s.strip() for s in reversed(lProse[:iIndex]) if s.strip()), "")
+        if sBefore.startswith("#"): continue
+        sNext = next((s.strip() for s in lProse[iIndex + 1:] if s.strip()), "")
+        if sNext.startswith((":", "-", "*", "+")) or re.match(r"^\d+[.)]\s", sNext): continue
+        lBold.append(m.group(1))
+    if lBold: lWarnings.append(plural(len(lBold), "paragraph") + " in bold standing alone like a heading, which a screen reader cannot move to, such as \u201c" + lBold[0] + "\u201d; make each a heading, or part of the paragraph it introduces.")
     dAudit["readingLevel"] = readingLevel(sBody)
     dLevel = dAudit["readingLevel"]
     if dLevel and dBook["readingGrade"] and dLevel["grade"] > dBook["readingGrade"]:

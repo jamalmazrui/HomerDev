@@ -7,6 +7,19 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.92.5 -- 25 October 2026
+
+From BatCon's runtime log of 24 October, which showed its acceptance PDF made by Word although Edge comes first for a PDF.
+
+- **tidy no longer deletes what a build puts in exec.** Its pass for stray kit files -- a file byte for byte the kit's at the same path, left by a kit unarchived into an app's folder -- deleted exec\conversions.inix, which every converting app's build copies from the kit, and would delete PdfPig's libraries the same way. BatCon then read the installed kit's 1.77.6 route table from Program Files, which has no Edge way to a PDF. A file directly in exec is never a stray now; exec\CSharp and other kit folders still are.
+- **A way is judged by what each step is handed.** Whether a way could run was decided by asking each engine about the source file, so Word, in "pandoc:docx > officecom", was asked whether it opens Markdown, said no, and the way was skipped. Each step is now asked about the type the step before hands it.
+- **A route table found away from the program is logged as a warning,** naming the folder and that it may be older than the program, so a stale table cannot again pass silently.
+
+## 1.92.4 -- 24 October 2026
+
+- **buildBooks checks more in a manuscript and reads one more kind of page.** From a run of the kit's newer rules over the 22 MyBooks manuscripts: vague link text, picture descriptions that are file names, begin "Photo of" or are too short, typed bullets, and bold paragraphs standing alone like headings, with labels, glossary terms and a title page's title left alone. Its column finder now finds a gutter under a centered heading, only at the middle of a page without a table or dot leaders; across both government documents that changes one page, the one it misread. The rules stamp is raised, so each book is judged again with its EPUB unchanged.
+- **An EPUB's accessibility metadata claims alternative text only when every picture has some,** and otherwise says text alone is not enough, as buildBooks already did; 1.92.2 claimed it for any book with pictures.
+
 ## 1.92.3 -- 24 October 2026
 
 Learnings from QUILL for All, Community Access's family of accessible apps, which turns each of its accessibility rules into a check the build runs.

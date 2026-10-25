@@ -73,9 +73,14 @@ lsFolders.Add(Path.Combine(sExeDir, "exec"));
 try { lsFolders.Add(Path.Combine(Path.GetDirectoryName(sExeDir.TrimEnd('\\')), "exec")); } catch (Exception) { }
 string sKit = Environment.GetEnvironmentVariable("HomerDev");
 if (!String.IsNullOrEmpty(sKit)) lsFolders.Add(Path.Combine(sKit, "exec"));
-foreach (string sFolder in lsFolders) {
-string sPath = Path.Combine(sFolder, sTableName);
-if (File.Exists(sPath)) return sPath;
+for (int i = 0; i < lsFolders.Count; i++) {
+string sPath = Path.Combine(lsFolders[i], sTableName);
+if (!File.Exists(sPath)) continue;
+// A TABLE FROM ELSEWHERE IS SAID SO (1.92.5). Beside the program is where an app's build puts it; one found only in
+// the kit named by the HomerDev variable may be an older installed kit's, which is how BatCon read a 1.77.6 table
+// on 24 October and quietly made a PDF without Edge.
+if (i >= 2) Log.warn("Conversion: " + sTableName + " is not beside the program, so the one in " + lsFolders[i] + " is used; it may be older than the program. Building the app again puts the kit's own beside it.");
+return sPath;
 }
 return "";
 } // tablePath method
@@ -232,11 +237,17 @@ List<string> lsWhy = new List<string>();
 foreach (string sWay in lsWays) {
 string[] aSteps = sWay.Split('>');
 string sMissing = "";
+// EACH STEP IS ASKED ABOUT WHAT IT IS HANDED (1.92.5): the first step reads the source; a later one reads the type
+// the step before hands on ("pandoc:docx > officecom" gives Word a .docx). Asked about the source instead, Word was
+// judged unable to open Markdown, and the way was skipped as impossible.
+string sStepInput = sSource;
 foreach (string sStep in aSteps) {
-string sEngine = sStep.Split(':')[0].Trim();
+string[] aParts = sStep.Split(':');
+string sEngine = aParts[0].Trim();
 if (bQuick && sEngine == "ocr") { sMissing = "ocr is too slow for a quick read"; break; }
-string sWhy = engineMissing(sEngine, sSource);
+string sWhy = engineMissing(sEngine, sStepInput);
 if (sWhy != "") { sMissing = sWhy; break; }
+if (aParts.Length > 1 && aParts[1].Trim() != "") sStepInput = Path.ChangeExtension(sSource, "." + aParts[1].Trim());
 }
 if (sMissing != "") { lsWhy.Add(sWay + ": " + sMissing); continue; }
 Stopwatch oClock = Stopwatch.StartNew();
@@ -1772,17 +1783,24 @@ lsFindings.Add("MissingLanguage: fixed, the book's language set to " + documentL
 // document: text throughout, headings and a table of contents to move by, pictures with alternative text
 // where the source had it, and no flashing, motion or sound.
 if (sOpf.IndexOf("schema:accessMode", StringComparison.Ordinal) < 0) {
-bool bPictures = false;
-foreach (string sPage in lsOrder) if (Regex.IsMatch(partText(dParts, sPage), "<img\\b", RegexOptions.IgnoreCase)) { bPictures = true; break; }
+// Pictures are claimed to have text alternatives only when every one has (kit 1.92.4, from MyBooks' buildBooks,
+// which judged this before the kit did): otherwise text alone is not enough to read the book.
+bool bPictures = false, bAllDescribed = true;
+foreach (string sPage in lsOrder)
+foreach (Match oImage in Regex.Matches(partText(dParts, sPage), "<img\\b[^>]*>", RegexOptions.IgnoreCase)) {
+bPictures = true;
+if (!Regex.IsMatch(oImage.Value, "\\balt=\"[^\"]*\\S[^\"]*\"", RegexOptions.IgnoreCase)) bAllDescribed = false;
+}
+bool bDescribed = bPictures && bAllDescribed;
 StringBuilder sbMeta = new StringBuilder();
 sbMeta.Append("<meta property=\"schema:accessMode\">textual</meta>");
 if (bPictures) sbMeta.Append("<meta property=\"schema:accessMode\">visual</meta>");
-sbMeta.Append("<meta property=\"schema:accessModeSufficient\">textual</meta>");
+sbMeta.Append("<meta property=\"schema:accessModeSufficient\">" + (bPictures && !bDescribed ? "textual,visual" : "textual") + "</meta>");
 sbMeta.Append("<meta property=\"schema:accessibilityFeature\">structuralNavigation</meta>");
 if (Regex.IsMatch(sOpf, "properties=\"[^\"]*\\bnav\\b")) sbMeta.Append("<meta property=\"schema:accessibilityFeature\">tableOfContents</meta>");
-if (bPictures) sbMeta.Append("<meta property=\"schema:accessibilityFeature\">alternativeText</meta>");
+if (bDescribed) sbMeta.Append("<meta property=\"schema:accessibilityFeature\">alternativeText</meta>");
 sbMeta.Append("<meta property=\"schema:accessibilityHazard\">none</meta>");
-sbMeta.Append("<meta property=\"schema:accessibilitySummary\">Made by a Homer program from a document: its text can be read throughout, and its headings and table of contents can be moved by.</meta>");
+sbMeta.Append("<meta property=\"schema:accessibilitySummary\">Made by a Homer program from a document: its text can be read throughout, and its headings and table of contents can be moved by." + (bPictures ? (bDescribed ? " Every picture has a text alternative." : " Some pictures are not yet described in text.") : "") + "</meta>");
 sOpf = sOpf.Replace("</metadata>", sbMeta.ToString() + "</metadata>");
 lsFindings.Add("EpubAccessibilityMetadata: fixed, access modes, features, hazards and a summary added");
 }
