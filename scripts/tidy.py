@@ -949,19 +949,98 @@ def selfTest():
         shutil.rmtree(sTemp, ignore_errors=True)
 
 
-def cleanDriveRootKitCopy(lsRootsForTest=None):
-    """A KIT UNARCHIVED AT THE TOP OF A DRIVE IS REMOVED (1.93.2, the author's request of 25 October 2026: "I
-    accidentally unarchived into the root directory. Please clean it up for me using commands in a tidy script").
+def provenCopies(lsFiles, sDrive, sKit):
+    """Which files are copies a git project can vouch for: {file: who}. A file is proven when its git hash, as it is or
+    with its line endings as git stores text (a line feed alone -- the kit's repository normalizes them, and a copy
+    unarchived on Windows has CR LF), is held by the kit's repository or by any git project at the top of its drive."""
+    import hashlib as hashlibLocal
+    def blobHash(binData): return hashlibLocal.sha1(b"blob %d\0" % len(binData) + binData).hexdigest()
+    dHashes = {}
+    for sFile in lsFiles:
+        try: binData = open(sFile, "rb").read()
+        except OSError: continue
+        dHashes[sFile] = {blobHash(binData), blobHash(binData.replace(b"\r\n", b"\n"))}
+    lsWitnesses = [sKit]
+    try:
+        lsWitnesses += [os.path.join(sDrive, s) for s in sorted(os.listdir(sDrive))
+                        if os.path.isdir(os.path.join(sDrive, s, ".git")) and os.path.abspath(os.path.join(sDrive, s)).lower() != sKit.lower()]
+    except OSError: pass
+    lsAll = sorted(set(h for setHashes in dHashes.values() for h in setHashes))
+    dWitness = {}
+    for sWitness in lsWitnesses:
+        try:
+            oCheck = subprocess.run(["git", "cat-file", "--batch-check"], input="\n".join(lsAll), capture_output=True, text=True, cwd=sWitness)
+            for sHash, sLine in zip(lsAll, oCheck.stdout.splitlines()):
+                if not sLine.endswith(" missing") and sHash not in dWitness: dWitness[sHash] = os.path.basename(sWitness)
+        except Exception as oError:
+            logLine("kit copies: git could not ask " + sWitness + ": " + str(oError))
+    dProven = {}
+    for sFile, setHashes in dHashes.items():
+        lsWho = [dWitness[h] for h in setHashes if h in dWitness]
+        if lsWho: dProven[sFile] = lsWho[0]
+    # Python's cache of a proven script is the script's too.
+    for sFile in lsFiles:
+        oCache = re.match(r"^(.*)[\\/]__pycache__[\\/]([^\\/.]+)\.cpython-\d+\.pyc$", sFile)
+        if oCache and sFile not in dProven:
+            sSource = os.path.join(oCache.group(1), oCache.group(2) + ".py")
+            if sSource in dProven or os.path.isfile(sSource): dProven[sFile] = "the cache of " + oCache.group(2) + ".py"
+    return dProven
 
-    Run only from the kit itself, on the top of each fixed drive that holds a kit's marks (HomerDev.cs, or
-    exec\\CSharp\\Lbc.cs). It is the top of a drive, so the rule is strict and checkable. A file is removed only when
-    BOTH hold: its path is under one of the names the kit's RepoFiles.txt gives (.claude, data, exec\\CSharp, help,
-    scripts, Templates, HomerDev.cs, version.txt and the rest), and its content is provably the kit's -- byte for byte
-    the kit's file at that path, or a version once committed to the kit's own git repository, which git confirms by the
-    content's hash. Anything else is kept and named in the log: a file of the author's that merely shares a name, such
-    as a ReadMe of his own, stays. Nothing outside those names is looked at, links and junctions are not followed, and
-    folders under those names are removed only once empty. Every file removed or kept is logged with why. Returns the
-    number removed."""
+
+def settleKitCopy(lsFiles, sBase, sDrive, sKit, sNotesName, sWhere):
+    """Deletes each file that is the kit's or a proven copy, and moves every other into the kit's notes folder under
+    sNotesName, keeping its path below sBase, as tidy treats strays everywhere: a duplicate goes, anything else is kept
+    where a person can look at it. Returns (deleted, moved)."""
+    dProven = provenCopies(lsFiles, sDrive, sKit)
+    iDeleted = iMoved = 0
+    for sFile in lsFiles:
+        sRel = os.path.relpath(sFile, sBase)
+        sMine = os.path.join(sKit, sRel)
+        try: bSame = os.path.isfile(sMine) and hashOf(sMine) == hashOf(sFile)
+        except OSError: bSame = False
+        try:
+            if bSame or sFile in dProven:
+                os.remove(sFile)
+                iDeleted += 1
+                logLine("kit copies: deleted %s -- %s" % (sFile, "the same as the kit's" if bSame else "a copy " + dProven[sFile] + " vouches for"))
+                continue
+            sTarget = os.path.join(sKit, "notes", sNotesName, sRel)
+            if os.path.exists(sTarget):
+                sStem, sExt = os.path.splitext(sTarget)
+                iNumber = 2
+                while os.path.exists("%s (%d)%s" % (sStem, iNumber, sExt)): iNumber += 1
+                sTarget = "%s (%d)%s" % (sStem, iNumber, sExt)
+            os.makedirs(os.path.dirname(sTarget), exist_ok=True)
+            shutil.move(sFile, sTarget)
+            iMoved += 1
+            logLine("kit copies: moved %s to %s -- no git project vouches for it" % (sFile, sTarget))
+        except OSError as oError:
+            logLine("kit copies: could not settle %s: %s" % (sFile, oError))
+    return iDeleted, iMoved
+
+
+def removeEmptyFolders(sTop):
+    for sDir, lsSub, lsHere in os.walk(sTop, topdown=False):
+        try:
+            if not os.listdir(sDir): os.rmdir(sDir); logLine("kit copies: empty folder removed " + sDir)
+        except OSError: pass
+
+
+def cleanDriveRootKitCopy(lsRootsForTest=None):
+    """EXTRANEOUS KIT FILES AND FOLDERS ARE CLEARED (1.93.2, the author's request after unarchiving a kit into C:\\;
+    extended 1.93.5: "delete duplicates and move anything else to the notes subdirectory as usual").
+
+    Run only from the kit itself, as its build_release runs tidy. Two places on each fixed drive:
+      * THE TOP OF THE DRIVE, when it holds the kit's marks (HomerDev.cs, or exec\\CSharp\\Lbc.cs): everything under the
+        names the kit's RepoFiles.txt gives -- .claude, data, exec\\CSharp, help, scripts, Templates, HomerDev.cs and the
+        rest. Nothing outside those names is looked at, so Users, Windows and Program Files are never touched.
+      * EXTRA COPIES OF THE KIT at the top of the drive: a folder whose name begins HomerDev (HomerDev-main, HomerDev (2))
+        that holds the kit's marks and is not the kit. One that is a git repository of its own is left alone and named
+        in the log, since it may be a working clone.
+    In each, a file that is byte for byte the kit's, or that a git project on the drive vouches for (provenCopies), is
+    deleted; every other file is moved to the kit's notes folder, under a folder named for where it came from, keeping
+    its path, so nothing is lost and the drive is left clear. Emptied folders go. Links and junctions are not followed.
+    Every file is logged with what was done and why. Returns the number of files deleted or moved."""
     sKit = os.path.abspath(sRoot)
     if not isKitAt(sKit) or (os.name != "nt" and lsRootsForTest is None): return 0
     lsNames = []
@@ -972,64 +1051,57 @@ def cleanDriveRootKitCopy(lsRootsForTest=None):
     else:
         import ctypes
         lsRoots = [s + ":\\" for s in "CDEFGHIJKLMNOPQRSTUVWXYZ" if ctypes.windll.kernel32.GetDriveTypeW(s + ":\\") == 3]
-    iRemoved = 0
+    def hasMarks(sFolder):
+        return os.path.isfile(os.path.join(sFolder, "HomerDev.cs")) or os.path.isfile(os.path.join(sFolder, "exec", "CSharp", "Lbc.cs"))
+    def walkFiles(sFolder):
+        lsOut = []
+        for sDir, lsSub, lsHere in os.walk(sFolder):
+            lsSub[:] = [s for s in lsSub if not os.path.islink(os.path.join(sDir, s))]
+            lsOut += [os.path.join(sDir, s) for s in lsHere]
+        return lsOut
+    iTotal = 0
     for sDrive in lsRoots:
-        if os.path.abspath(sDrive).lower() == sKit.lower(): continue
-        if not (os.path.isfile(os.path.join(sDrive, "HomerDev.cs")) or os.path.isfile(os.path.join(sDrive, "exec", "CSharp", "Lbc.cs"))): continue
-        logLine("drive-top kit copy: found the kit's marks at " + sDrive)
-        lsFiles, lsFolders = [], []
-        for sName in lsNames:
-            sPath = os.path.join(sDrive, sName.rstrip("/").replace("/", os.sep))
-            if sName.endswith("/"):
-                if os.path.isdir(sPath) and not os.path.islink(sPath):
-                    lsFolders.append(sPath)
-                    for sDir, lsSub, lsHere in os.walk(sPath):
-                        lsSub[:] = [s for s in lsSub if not os.path.islink(os.path.join(sDir, s))]
-                        lsFiles += [os.path.join(sDir, s) for s in lsHere]
-            elif os.path.isfile(sPath): lsFiles.append(sPath)
-        if not lsFiles and not lsFolders: continue
-        # Which contents git has seen in the kit: hashed and looked up in two batches, not a process per file.
-        setKnown = set()
-        try:
-            oHash = subprocess.run(["git", "hash-object", "--stdin-paths"], input="\n".join(lsFiles), capture_output=True, text=True, cwd=sKit)
-            lsHashes = oHash.stdout.split()
-            if oHash.returncode == 0 and len(lsHashes) == len(lsFiles):
-                oCheck = subprocess.run(["git", "cat-file", "--batch-check"], input="\n".join(lsHashes), capture_output=True, text=True, cwd=sKit)
-                for sFile, sLine in zip(lsFiles, oCheck.stdout.splitlines()):
-                    if not sLine.endswith(" missing"): setKnown.add(sFile)
-            else: logLine("drive-top kit copy: git could not hash the files (%d of %d); only exact copies of the kit's are removed" % (len(lsHashes), len(lsFiles)))
-        except Exception as oError:
-            logLine("drive-top kit copy: git was not available (%s); only exact copies of the kit's are removed" % oError)
-        iKept = 0
-        for sFile in lsFiles:
-            sRel = os.path.relpath(sFile, sDrive)
-            sMine = os.path.join(sKit, sRel)
-            try: bSame = os.path.isfile(sMine) and hashOf(sMine) == hashOf(sFile)
-            except OSError: bSame = False
-            if not (bSame or sFile in setKnown):
-                iKept += 1
-                logLine("drive-top kit copy: kept " + sFile + " -- not a file the kit holds or ever committed")
-                continue
-            try:
-                os.remove(sFile)
-                iRemoved += 1
-                logLine("drive-top kit copy: removed " + sFile + (" -- the same as the kit's" if bSame else " -- a version the kit once committed"))
-            except OSError as oError:
-                iKept += 1
-                logLine("drive-top kit copy: could not remove " + sFile + ": " + str(oError))
-        for sTop in lsFolders:
-            for sDir, lsSub, lsHere in os.walk(sTop, topdown=False):
+        sLetter = re.sub(r"[^A-Za-z0-9]", "", os.path.splitdrive(os.path.abspath(sDrive))[0]) or "drive"
+        # The top of the drive.
+        if os.path.abspath(sDrive).lower() != sKit.lower() and hasMarks(sDrive):
+            logLine("kit copies: found the kit's marks at " + sDrive)
+            lsFiles, lsFolders = [], []
+            for sName in lsNames:
+                sPath = os.path.join(sDrive, sName.rstrip("/").replace("/", os.sep))
+                if sName.endswith("/"):
+                    if os.path.isdir(sPath) and not os.path.islink(sPath):
+                        lsFolders.append(sPath)
+                        lsFiles += walkFiles(sPath)
+                elif os.path.isfile(sPath): lsFiles.append(sPath)
+            if lsFiles:
+                iDeleted, iMoved = settleKitCopy(lsFiles, sDrive, sDrive, sKit, "from the top of " + sLetter, sDrive)
+                iTotal += iDeleted + iMoved
+                sayLine("At the top of %s: deleted %s (copies of the kit or an app); moved %s to notes\\from the top of %s." %
+                        (sDrive, countNoun(iDeleted, "file"), countNoun(iMoved, "other file"), sLetter))
+            for sTop in lsFolders: removeEmptyFolders(sTop)
+            for sName in ("exec", "notes"):
+                sTop = os.path.join(sDrive, sName)
                 try:
-                    if not os.listdir(sDir): os.rmdir(sDir); logLine("drive-top kit copy: empty folder removed " + sDir)
+                    if os.path.isdir(sTop) and not os.listdir(sTop): os.rmdir(sTop); logLine("kit copies: empty folder removed " + sTop)
                 except OSError: pass
-        # exec itself, emptied of exec\\CSharp and exec\\Python, goes too when nothing else is in it.
-        sExec = os.path.join(sDrive, "exec")
-        try:
-            if os.path.isdir(sExec) and not os.listdir(sExec): os.rmdir(sExec); logLine("drive-top kit copy: empty folder removed " + sExec)
-        except OSError: pass
-        sayLine("Removed %s of a kit copy unarchived at %s%s." % (countNoun(iRemoved, "file"), sDrive,
-                "; kept %s that the kit never held, named in the log" % countNoun(iKept, "file") if iKept else ""))
-    return iRemoved
+        # Extra copies of the kit.
+        try: lsTops = sorted(os.listdir(sDrive))
+        except OSError: lsTops = []
+        for sName in lsTops:
+            sCopy = os.path.join(sDrive, sName)
+            if not re.match(r"(?i)^homerdev\b|^homerdev[\W_]", sName) or not os.path.isdir(sCopy) or os.path.islink(sCopy): continue
+            if os.path.abspath(sCopy).lower() == sKit.lower() or not hasMarks(sCopy): continue
+            if os.path.isdir(os.path.join(sCopy, ".git")):
+                logLine("kit copies: %s is a git repository of its own, so it is left alone" % sCopy)
+                sayLine("%s looks like another copy of the kit, but it is a git repository of its own, so it was left alone." % sCopy)
+                continue
+            lsFiles = walkFiles(sCopy)
+            iDeleted, iMoved = settleKitCopy(lsFiles, sCopy, sDrive, sKit, sName, sCopy)
+            removeEmptyFolders(sCopy)
+            iTotal += iDeleted + iMoved
+            sayLine("%s, a copy of the kit: deleted %s (the kit's); moved %s to notes\\%s%s." %
+                    (sCopy, countNoun(iDeleted, "file"), countNoun(iMoved, "other file"), sName, "" if os.path.isdir(sCopy) else "; the folder is gone"))
+    return iTotal
 
 
 def removeStrayKitFiles(bRepo):

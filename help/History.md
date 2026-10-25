@@ -7,6 +7,15 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.93.5 -- 25 October 2026
+
+- **tidy clears extraneous kit files and folders, as it treats strays everywhere** (the author's request: "delete duplicates and move anything else to the notes subdirectory as usual"). Run in the kit, it now settles two places on each fixed drive. At the top of a drive holding the kit's marks, everything under the kit's own names; and any extra copy of the kit at a drive's top, a folder whose name begins HomerDev, such as HomerDev-main. In each, a file that is byte for byte the kit's, or that a git project on the drive vouches for, is deleted, and every other file is moved to the kit's notes folder, under a folder named for where it came from and keeping its path, so the drive is left clear and nothing is lost; emptied folders go. 1.93.4 left such files where they were. A copy that is a git repository of its own is left alone and named, since it may be a working clone. Tested: a proven file at a drive's top deleted and another moved to notes; an extra copy's two duplicates deleted, its own draft moved, and the folder gone; a cloned copy untouched.
+
+## 1.93.4 -- 25 October 2026
+
+- **check.py imports the newest kit's kind.py.** Its loadKind put the HomerDev variable's folder first, and that names the installed kit in Program Files, 1.77.6, whose kind.findKit took any folder with exec\CSharp\Lbc.cs for the kit. So every check of 25 October morning ran the old lookup, settled on the top of C:\, and could not find the skills' scripts there -- DbDo's checkDb and BatCon's checkLaunch "could not run", and both releases stopped -- although 1.93.3's lookup was right. Folders are now ranked as the build scripts, tidy and kind.findKit rank kits: a real kit before any copy, then the highest version, then a folder named HomerDev, then a git repository. The other scripts' loaders try their own refreshed copy first and were not affected.
+- **tidy's drive-top cleanup knows more copies.** Its first run removed 42 files from C:\ and kept 41. Line endings hid some: the kit's repository stores text with a line feed alone, and a copy unarchived on Windows has CR LF, so each file's hash is now worked out both ways. And app zips had been unarchived there too, so every git project at the top of the drive -- 2htm, urlCheck and the rest -- now vouches for its own files, still only under the kit's names. Python's cache of a removed script goes with it. Tested: a CR LF copy of a kit file, an app's guide and a cache file were removed, and a file of the author's own was kept.
+
 ## 1.93.3 -- 25 October 2026
 
 - **A tie goes to the real kit.** DbDo's check of 25 October still compared it with the kit copy at the top of C:\, because that copy came from a recent kit zip and its version equalled C:\HomerDev's, so the first found won. Of kits with equal versions, kind.findKit and buildBooks now take a folder named HomerDev, then one that is a git repository. 1.93.2's tidy removes the copy itself the first time the kit's build_release runs.
