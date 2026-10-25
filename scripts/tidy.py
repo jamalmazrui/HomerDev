@@ -949,6 +949,89 @@ def selfTest():
         shutil.rmtree(sTemp, ignore_errors=True)
 
 
+def cleanDriveRootKitCopy(lsRootsForTest=None):
+    """A KIT UNARCHIVED AT THE TOP OF A DRIVE IS REMOVED (1.93.2, the author's request of 25 October 2026: "I
+    accidentally unarchived into the root directory. Please clean it up for me using commands in a tidy script").
+
+    Run only from the kit itself, on the top of each fixed drive that holds a kit's marks (HomerDev.cs, or
+    exec\\CSharp\\Lbc.cs). It is the top of a drive, so the rule is strict and checkable. A file is removed only when
+    BOTH hold: its path is under one of the names the kit's RepoFiles.txt gives (.claude, data, exec\\CSharp, help,
+    scripts, Templates, HomerDev.cs, version.txt and the rest), and its content is provably the kit's -- byte for byte
+    the kit's file at that path, or a version once committed to the kit's own git repository, which git confirms by the
+    content's hash. Anything else is kept and named in the log: a file of the author's that merely shares a name, such
+    as a ReadMe of his own, stays. Nothing outside those names is looked at, links and junctions are not followed, and
+    folders under those names are removed only once empty. Every file removed or kept is logged with why. Returns the
+    number removed."""
+    sKit = os.path.abspath(sRoot)
+    if not isKitAt(sKit) or (os.name != "nt" and lsRootsForTest is None): return 0
+    lsNames = []
+    for sLine in open(os.path.join(sKit, "RepoFiles.txt"), "r", encoding="utf-8-sig"):
+        sName = sLine.strip()
+        if sName and sName[0] not in "#;": lsNames.append(sName.replace("\\", "/"))
+    if lsRootsForTest is not None: lsRoots = lsRootsForTest
+    else:
+        import ctypes
+        lsRoots = [s + ":\\" for s in "CDEFGHIJKLMNOPQRSTUVWXYZ" if ctypes.windll.kernel32.GetDriveTypeW(s + ":\\") == 3]
+    iRemoved = 0
+    for sDrive in lsRoots:
+        if os.path.abspath(sDrive).lower() == sKit.lower(): continue
+        if not (os.path.isfile(os.path.join(sDrive, "HomerDev.cs")) or os.path.isfile(os.path.join(sDrive, "exec", "CSharp", "Lbc.cs"))): continue
+        logLine("drive-top kit copy: found the kit's marks at " + sDrive)
+        lsFiles, lsFolders = [], []
+        for sName in lsNames:
+            sPath = os.path.join(sDrive, sName.rstrip("/").replace("/", os.sep))
+            if sName.endswith("/"):
+                if os.path.isdir(sPath) and not os.path.islink(sPath):
+                    lsFolders.append(sPath)
+                    for sDir, lsSub, lsHere in os.walk(sPath):
+                        lsSub[:] = [s for s in lsSub if not os.path.islink(os.path.join(sDir, s))]
+                        lsFiles += [os.path.join(sDir, s) for s in lsHere]
+            elif os.path.isfile(sPath): lsFiles.append(sPath)
+        if not lsFiles and not lsFolders: continue
+        # Which contents git has seen in the kit: hashed and looked up in two batches, not a process per file.
+        setKnown = set()
+        try:
+            oHash = subprocess.run(["git", "hash-object", "--stdin-paths"], input="\n".join(lsFiles), capture_output=True, text=True, cwd=sKit)
+            lsHashes = oHash.stdout.split()
+            if oHash.returncode == 0 and len(lsHashes) == len(lsFiles):
+                oCheck = subprocess.run(["git", "cat-file", "--batch-check"], input="\n".join(lsHashes), capture_output=True, text=True, cwd=sKit)
+                for sFile, sLine in zip(lsFiles, oCheck.stdout.splitlines()):
+                    if not sLine.endswith(" missing"): setKnown.add(sFile)
+            else: logLine("drive-top kit copy: git could not hash the files (%d of %d); only exact copies of the kit's are removed" % (len(lsHashes), len(lsFiles)))
+        except Exception as oError:
+            logLine("drive-top kit copy: git was not available (%s); only exact copies of the kit's are removed" % oError)
+        iKept = 0
+        for sFile in lsFiles:
+            sRel = os.path.relpath(sFile, sDrive)
+            sMine = os.path.join(sKit, sRel)
+            try: bSame = os.path.isfile(sMine) and hashOf(sMine) == hashOf(sFile)
+            except OSError: bSame = False
+            if not (bSame or sFile in setKnown):
+                iKept += 1
+                logLine("drive-top kit copy: kept " + sFile + " -- not a file the kit holds or ever committed")
+                continue
+            try:
+                os.remove(sFile)
+                iRemoved += 1
+                logLine("drive-top kit copy: removed " + sFile + (" -- the same as the kit's" if bSame else " -- a version the kit once committed"))
+            except OSError as oError:
+                iKept += 1
+                logLine("drive-top kit copy: could not remove " + sFile + ": " + str(oError))
+        for sTop in lsFolders:
+            for sDir, lsSub, lsHere in os.walk(sTop, topdown=False):
+                try:
+                    if not os.listdir(sDir): os.rmdir(sDir); logLine("drive-top kit copy: empty folder removed " + sDir)
+                except OSError: pass
+        # exec itself, emptied of exec\\CSharp and exec\\Python, goes too when nothing else is in it.
+        sExec = os.path.join(sDrive, "exec")
+        try:
+            if os.path.isdir(sExec) and not os.listdir(sExec): os.rmdir(sExec); logLine("drive-top kit copy: empty folder removed " + sExec)
+        except OSError: pass
+        sayLine("Removed %s of a kit copy unarchived at %s%s." % (countNoun(iRemoved, "file"), sDrive,
+                "; kept %s that the kit never held, named in the log" % countNoun(iKept, "file") if iKept else ""))
+    return iRemoved
+
+
 def removeStrayKitFiles(bRepo):
     """A HomerDev.zip unarchived into an app's folder leaves the kit's files
     beside the app's (6 October 2026: twice, into C:\\DbDo). A stray is a file
@@ -1230,6 +1313,8 @@ def main():
         # is not trusted here, since the strays are what mislead it.
         try: removeStrayKitFiles(isGitRepo() and not dArguments.folder_only)
         except Exception as oError: logLine("stray kit files: skipped, " + str(oError))
+        try: cleanDriveRootKitCopy()
+        except Exception as oError: logLine("drive-top kit copy: skipped, " + str(oError))
         try: removeKitSampleLeftovers(isGitRepo() and not dArguments.folder_only)
         except Exception as oError: logLine("kit sample leftovers: skipped, " + str(oError))
         try: givePagesOneHeading()

@@ -320,9 +320,14 @@ def locateKit():
         try: return tuple(int(s) for s in re.findall(r"\d+", open(os.path.join(sFolder, "version.txt"), encoding="utf-8-sig").read())[:3])
         except (OSError, ValueError): return ()
     if not lsFound: return ""
+    # A TIE GOES TO THE REAL KIT (1.93.3). The copy unarchived at the top of C:\\ came from a recent kit zip, so its
+    # version.txt equalled C:\\HomerDev's, and the first found -- the drive's top, met first by the climb -- won the tie.
+    # Of equal versions, a folder named HomerDev wins, then one that is a git repository, as the kit being developed is.
+    def rank(sFolder):
+        return (version(sFolder), os.path.basename(os.path.normpath(sFolder)).lower() == "homerdev", os.path.isdir(os.path.join(sFolder, ".git")))
     sBest = lsFound[0]
     for sFolder in lsFound[1:]:
-        if version(sFolder) > version(sBest): sBest = sFolder
+        if rank(sFolder) > rank(sBest): sBest = sFolder
     return sBest
 
 

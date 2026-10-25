@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.93.3 -- 25 October 2026
+
+- **A tie goes to the real kit.** DbDo's check of 25 October still compared it with the kit copy at the top of C:\, because that copy came from a recent kit zip and its version equalled C:\HomerDev's, so the first found won. Of kits with equal versions, kind.findKit and buildBooks now take a folder named HomerDev, then one that is a git repository. 1.93.2's tidy removes the copy itself the first time the kit's build_release runs.
+
+## 1.93.2 -- 25 October 2026
+
+- **tidy removes a kit unarchived at the top of a drive** (the author's request, after unarchiving one into C:\ by accident). Run in the kit, as the kit's build_release runs it, tidy looks at the top of each fixed drive that holds the kit's marks, and removes a file only when its path is under a name the kit's RepoFiles.txt gives and its content is provably the kit's: byte for byte the kit's file, or a version once committed to the kit's git repository. Anything else is kept and named in the log, so a file of the author's that only shares a name stays; folders under those names go once empty; nothing outside them is looked at. Tested on a copy of the case: an exact copy, two old committed versions and an emptied folder were removed; a ReadMe of the author's own, a script of his in a kit folder and an unrelated folder were kept.
+
 ## 1.93.1 -- 25 October 2026
 
 From DbDo's release of 24 October evening, stopped by three failures that came from two kit copies in the wrong places.
