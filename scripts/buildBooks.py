@@ -292,7 +292,9 @@ def tidyEarlierLayout(dCatalog):
 
 def isKit(sFolder):
     """Does this folder hold the kit's shared Python modules this script uses?"""
-    return bool(sFolder) and all(os.path.isfile(os.path.join(sFolder, "exec", "Python", s)) for s in ("inix.py", "media.py"))
+    # HomerDev.cs at its top too (1.92.6), so a stray copy of the kit's exec folder, such as one at the top of a
+    # drive, is never taken for the kit, as kind.py's own check now asks.
+    return bool(sFolder) and os.path.isfile(os.path.join(sFolder, "HomerDev.cs")) and all(os.path.isfile(os.path.join(sFolder, "exec", "Python", s)) for s in ("inix.py", "media.py"))
 
 
 def locateKit():

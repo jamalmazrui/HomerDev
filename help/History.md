@@ -7,6 +7,13 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.92.6 -- 25 October 2026
+
+From the builds of 24 October evening, whose checks each said they were built against the kit at C:\.
+
+- **A kit is a folder with HomerDev.cs at its top,** in kind.py, which the checks use to find the kit, and in buildBooks. The kit's shared classes alone were taken for the kit, so the climb from an app's folder stopped at C:\, which holds kit files left by an unarchiving, before reaching C:\HomerDev. Every app's check then skipped four checks without failing, and DbDo's failed outright because checkDb could not be found there, which stopped its release. The build scripts already ask for HomerDev.cs (1.89.1); now the checks do too.
+- **Edge's PDFs are tagged:** BatCon's acceptance PDF of 24 October, the first made by Edge since 1.92.5 stopped tidy from deleting the route table, carries a structure tree, its language, its title and bookmarks. 1.90.0 left that unconfirmed.
+
 ## 1.92.5 -- 25 October 2026
 
 From BatCon's runtime log of 24 October, which showed its acceptance PDF made by Word although Edge comes first for a PDF.

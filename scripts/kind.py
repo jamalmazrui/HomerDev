@@ -189,9 +189,15 @@ def publishesPages(sFolder):
 
 
 def isKit(sFolder):
-    """Does this folder hold the kit's shared classes?"""
-    return bool(sFolder) and (os.path.isfile(os.path.join(sFolder, "exec", "CSharp", "Lbc.cs"))
-                              or os.path.isfile(os.path.join(sFolder, "exec", "Python", "lbc.py")))
+    """Does this folder hold the kit? Its shared classes, and HomerDev.cs at its top.
+
+    HOMERDEV.CS AT THE TOP (1.92.6). The shared classes alone were taken as the kit, so the climb from C:\\DbDo
+    stopped at C:\\, which holds kit files left by an unarchiving, before reaching C:\\HomerDev; DbDo's check of
+    24 October then found no HomerComponents.iss and no checkKeys.py there, and checkDb could not run, which stopped
+    its release. The build scripts already ask for HomerDev.cs (1.89.1); a stray copy of exec has no such file."""
+    return bool(sFolder) and os.path.isfile(os.path.join(sFolder, "HomerDev.cs")) and (
+        os.path.isfile(os.path.join(sFolder, "exec", "CSharp", "Lbc.cs"))
+        or os.path.isfile(os.path.join(sFolder, "exec", "Python", "lbc.py")))
 
 
 def fixedDrives():
