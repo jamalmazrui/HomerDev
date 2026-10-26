@@ -7,6 +7,15 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.93.9 -- 26 October 2026
+
+From MyBooks' kdpSubmit run of 26 October: 8 of 20 books submitted, 3 rightly left while KDP reviewed an earlier submission, and 9 stopped on the Content tab.
+
+- **Every accuracy box is ticked** (kdpSubmit version 45). After a new upload KDP shows two "I confirm that my answers are accurate" boxes, and only the first was ticked, so Save and Continue was refused with "Confirm your answers are accurate and check the box". confirmAnswers, written for this on 4 October, ticks every unticked one, and had never been called; it now runs in the Content tab and again before Save and Continue there.
+- **The keyboard focus stays in the page,** not Edge's address bar, where it sat through long waits; pressing F5 there reloaded KDP under the script.
+- **A long upload is never silent:** a line every 30 seconds says the manuscript is still processing.
+- **A window touched by hand is explained.** Pressing Save and Continue or F5 while the script works pulls the page out from under it; the run now says so plainly, notes the draft is saved, and asks the author, when Edge opens, to leave the window alone while a book runs.
+
 ## 1.93.8 -- 26 October 2026
 
 From MyBooks' unattended kdpSubmit runs of 24 and 25 October: 0 of 21 books submitted.
