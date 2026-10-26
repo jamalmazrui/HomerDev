@@ -56,7 +56,8 @@ if defined bReinstall set "sForce=--force"
 echo Installing Node.js. Nothing is asked of you while it runs.
 
 :installRun
-winget install --id !sInstallId! !sForce! --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%log%" 2>&1
+set "sHomerRunLong=winget install --id !sInstallId! !sForce! --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity"
+call "%~dp0installCommon.cmd" runLong "Node.js"
 set "iCode=!ERRORLEVEL!"
 call "%~dp0installCommon.cmd" log "winget install !sInstallId! !sForce! exit code !iCode!"
 if not "!iCode!"=="0" goto :failed

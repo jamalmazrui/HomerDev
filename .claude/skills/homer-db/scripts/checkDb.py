@@ -116,6 +116,12 @@ def checkDatabase(sPath):
                 note("pass", sSub, "%s is a stored generated column" % sName)
             else:
                 note("fail", sSub, "%s should be TEXT GENERATED ALWAYS AS (...) STORED" % sName)
+        # EVERY STANDARD FIELD, NOT ONLY ITS ORDER (kit 1.93.6). The rule below checked the order of whichever of these a
+        # table had, so a table with no url passed, and twenty-two DbDo template tables had none: Shift+U said "no url
+        # field" in RadioTrail. A missing one now fails.
+        # DbDo's own maps table links two records and has no url of its own, by DbDo's conventions.
+        lsMissing = [s for s in ("url", "notes", "tags", "look", "prime", "marked") if s not in lsNames and not (s == "url" and sTable == "maps")]
+        if lsMissing: note("fail", sSub, "has no " + ", ".join(lsMissing) + "; every table ends with url, notes, tags, look, prime and marked")
         lsTail = [s for s in lsNames if s in ("url", "notes", "tags", "look", "prime", "marked")]
         lsWanted = [s for s in ("url", "notes", "tags", "look", "prime", "marked") if s in lsNames]
         if lsNames[-len(lsWanted):] == lsWanted: note("pass", sSub, "ends with " + ", ".join(lsWanted))

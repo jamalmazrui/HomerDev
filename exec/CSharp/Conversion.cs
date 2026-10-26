@@ -688,6 +688,20 @@ return aAll;
 // readable name for each, sorted alphabetically by that name (kit 1.83.0). For a picker that
 // offers every target at once, before any source is known -- BatCon's Target format -- with
 // hasRoute(source, target) asked per file at run time.
+// targetLabel: how every Homer app shows a target format -- "txt (plain text)" -- extension first (kit 1.93.7, the
+// author's ruling of 25 October 2026), so a list sorted by label runs in extension order and its first letters are the
+// extensions: pressing t in BatCon's Target format list reaches txt. Was "Plain text (txt)". Names keep their
+// capitals -- "docx (Word document)", "odt (OpenDocument text)", "pdf (PDF document)" -- and only a generic first word,
+// as in the curated lists' "Plain text", is lowered, so it reads "txt (plain text)".
+private static readonly string[] aGenericFirstWords = { "Audio", "Calendar", "Comma", "Contact", "Feed", "Plain", "Rich", "Spoken", "Subtitles", "Tab", "Text", "Video", "Web" };
+
+public static string targetLabel(string sExt, string sName) {
+if (string.IsNullOrEmpty(sName) || sName == sExt) sName = sExt.ToUpperInvariant() + " file";
+string sFirst = sName.Split(' ')[0];
+if (Array.IndexOf(aGenericFirstWords, sFirst) >= 0) sName = char.ToLowerInvariant(sName[0]) + sName.Substring(1);
+return sExt + " (" + sName + ")";
+} // targetLabel method
+
 public static string[] allTargets(out string[] aLabels) {
 List<string[]> lsAll = new List<string[]>();
 HashSet<string> hsSeen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -705,9 +719,7 @@ if (typeName(sLeft) != "") { iJoint = iTry; break; }
 if (iJoint <= 0 || iJoint >= sRoute.Length - 1) continue;
 string sTo = typeOf(sRoute.Substring(iJoint + 1));
 if (sTo == "" || !hsSeen.Add(sTo)) continue;
-string sName = typeName(sTo);
-if (string.IsNullOrEmpty(sName) || sName == sTo) sName = sTo.ToUpperInvariant() + " file";
-lsAll.Add(new string[] { char.ToUpperInvariant(sName[0]) + sName.Substring(1) + " (" + sTo + ")", sTo });
+lsAll.Add(new string[] { targetLabel(sTo, typeName(sTo)), sTo });
 }
 } catch (Exception oError) { Log.warn("allTargets: the route table could not be read: " + oError.Message); }
 // The media half's targets too (1.84.0), when the app compiles ConversionMedia.
@@ -717,7 +729,7 @@ foreach (string[] aOne in lsMedia) {
 if (!hsSeen.Add(aOne[1])) continue;
 string sName = typeName(aOne[1]);
 if (string.IsNullOrEmpty(sName)) sName = aOne[0];
-lsAll.Add(new string[] { char.ToUpperInvariant(sName[0]) + sName.Substring(1) + " (" + aOne[1] + ")", aOne[1] });
+lsAll.Add(new string[] { targetLabel(aOne[1], sName), aOne[1] });
 }
 lsAll.Sort(delegate(string[] a, string[] b) { return string.Compare(a[0], b[0], StringComparison.OrdinalIgnoreCase); });
 aLabels = new string[lsAll.Count];
@@ -753,7 +765,7 @@ string sExt = aTargets[i, 1];
 if (String.Compare(sExt, sOwn, true) == 0) continue;
 if (sOwn == "jpeg" && sExt == "jpg") continue;
 if ((sOwn == "html" && sExt == "htm") || (sOwn == "htm" && sExt == "html")) continue;
-lsLabels.Add(aTargets[i, 0] + " (" + sExt + ")");
+lsLabels.Add(targetLabel(sExt, aTargets[i, 0]));
 lsExts.Add(sExt);
 }
 aExtensions = lsExts.ToArray();

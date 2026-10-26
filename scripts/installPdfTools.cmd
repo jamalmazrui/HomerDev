@@ -35,12 +35,14 @@ goto :update
 
 :install
 echo Installing PDF tools. Nothing is asked of you while it runs.
-winget install --id Python.Python.3.13 --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%log%" 2>&1
+set "sHomerRunLong=winget install --id Python.Python.3.13 --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity"
+call "%~dp0installCommon.cmd" runLong "the PDF tools"
 set "iCode=%ERRORLEVEL%"
 call "%~dp0installCommon.cmd" log "winget install Python.Python.3.13 exit code %iCode%"
 if not "%iCode%"=="0" goto :failed
 where python >nul 2>&1 || (echo Python is installed but not on this window's path yet; open a new window and run this again.& goto :done)
-python -m pip install --upgrade pymupdf4llm >> "%log%" 2>&1
+set "sHomerRunLong=python -m pip install --upgrade pymupdf4llm"
+call "%~dp0installCommon.cmd" runLong "the PDF tools"
 set "iCode=%ERRORLEVEL%"
 call "%~dp0installCommon.cmd" log "pip install pymupdf4llm exit code %iCode%"
 if not "%iCode%"=="0" goto :failed
@@ -49,7 +51,8 @@ goto :done
 
 :update
 echo Python is installed. Making sure the PDF reader is current.
-python -m pip install --upgrade pymupdf4llm >> "%log%" 2>&1
+set "sHomerRunLong=python -m pip install --upgrade pymupdf4llm"
+call "%~dp0installCommon.cmd" runLong "the PDF tools"
 set "iCode=%ERRORLEVEL%"
 call "%~dp0installCommon.cmd" log "pip install pymupdf4llm exit code %iCode%"
 if "%iCode%"=="0" echo The PDF reader is current.
@@ -61,7 +64,8 @@ goto :done
 
 :reinstall
 echo Reinstalling the PDF reader.
-python -m pip install --force-reinstall pymupdf4llm >> "%log%" 2>&1
+set "sHomerRunLong=python -m pip install --force-reinstall pymupdf4llm"
+call "%~dp0installCommon.cmd" runLong "the PDF tools"
 set "iCode=%ERRORLEVEL%"
 call "%~dp0installCommon.cmd" log "pip install --force-reinstall pymupdf4llm exit code %iCode%"
 if not "%iCode%"=="0" goto :failed

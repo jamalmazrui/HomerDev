@@ -37,7 +37,8 @@ if not defined sOllama (
 set "iFailed=0"
 for %%M in (!sModels!) do (
   echo Fetching or updating %%M. A new model is several gigabytes; an up-to-date one takes a moment.
-  "!sOllama!" pull %%M >> "%log%" 2>&1
+  set "sHomerRunLong="!sOllama!" pull %%M"
+  call "%~dp0installCommon.cmd" runLong "Fetching %%M"
   set "iCode=!ERRORLEVEL!"
   call "%~dp0installCommon.cmd" log "ollama pull %%M exit code !iCode!"
   if not "!iCode!"=="0" set "iFailed=1"

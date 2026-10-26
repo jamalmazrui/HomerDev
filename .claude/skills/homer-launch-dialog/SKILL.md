@@ -62,7 +62,7 @@ standard parts by hand; `help\LaunchDialog.md` explains each rule.
 - **First three messages and every phase change at once; steps at most every
   five seconds; newest wins.**
 - **Say the percentage, and time left when honest:** `step` gives "Budget.pdf,
-  2 of 5 done, 40%, about 3 min left"; `fraction(where, done, total)` gives
+  2 of 5 done, 40%, 3 min left"; `fraction(where, done, total)` gives
   "Film.mp4, 11 min, 23%". The window also has a real progress bar; the
   spoken percentage is how a screen reader user receives it (the author's
   ruling, 24 October 2026). Say time with `LaunchProgress.spokenTime`.

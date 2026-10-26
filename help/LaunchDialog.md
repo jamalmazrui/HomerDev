@@ -145,7 +145,7 @@ the Results box. It follows these rules.
   still going on. Work measured another way, such as minutes of a recording,
   says where it is and the percentage: "Film.mp4, 11 min, 23%".
 - **Time left, when it can be estimated honestly.** Once a job has run 20
-  seconds and finished something, the status adds "about 3 min left", or
+  seconds and finished something, the status adds "3 min left", or
   "under a minute left" near the end. Times are said the way HomerScribe says
   them: "11 min", "1 hour 5 min".
 - **A progress bar, and the percentage spoken anyway.** The window has a real
@@ -162,6 +162,11 @@ the Results box. It follows these rules.
   ten times a second, and a long silent step should call `pump()` now and
   then. The window's only command sets a flag, so pumping cannot start the
   work a second time.
+- **The window keeps the focus.** It runs on a thread of its own, with its own
+  message loop, so it answers Windows even while a long step runs, and the
+  focus stays in its Status box for as long as you want to read it. Running on
+  the working thread, it once stopped answering during a long step, and Windows
+  moved the focus away (kit 1.93.6).
 - **Every status is logged,** with a note when it was not spoken because the
   app was not in front, so the log shows exactly what you heard.
 

@@ -28,7 +28,8 @@ where yt-dlp >nul 2>&1
 if not errorlevel 1 if not defined bReinstall goto :update
 
 echo Installing yt-dlp. Nothing is asked of you while it runs.
-winget install --id yt-dlp.yt-dlp --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%log%" 2>&1
+set "sHomerRunLong=winget install --id yt-dlp.yt-dlp --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity"
+call "%~dp0installCommon.cmd" runLong "yt-dlp"
 set "iCode=%ERRORLEVEL%"
 call "%~dp0installCommon.cmd" log "winget install yt-dlp.yt-dlp exit code %iCode%"
 if not "%iCode%"=="0" goto :failed

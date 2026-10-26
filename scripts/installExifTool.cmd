@@ -52,8 +52,8 @@ if errorlevel 1 (
   exit /b 1
 )
 
-winget install --id OliverBetz.ExifTool --exact --scope machine ^
-  --accept-package-agreements --accept-source-agreements >> "%log%" 2>&1
+set "sHomerRunLong=winget install --id OliverBetz.ExifTool --exact --scope machine --accept-package-agreements --accept-source-agreements"
+call "%~dp0installCommon.cmd" runLong "ExifTool"
 
 rem THE FILE, NOT THE EXIT CODE.
 set "found="

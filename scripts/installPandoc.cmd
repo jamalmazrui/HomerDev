@@ -68,7 +68,8 @@ if errorlevel 1 (
 
 echo Downloading Pandoc. This is about 30 MB and happens once.
 echo Fetching with winget>> "%log%"
-winget install --id JohnMacFarlane.Pandoc --accept-source-agreements --accept-package-agreements --silent >> "%log%" 2>&1
+set "sHomerRunLong=winget install --id JohnMacFarlane.Pandoc --accept-source-agreements --accept-package-agreements --silent"
+call "%~dp0installCommon.cmd" runLong "Pandoc"
 
 where pandoc >nul 2>&1
 if errorlevel 1 (

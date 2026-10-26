@@ -75,7 +75,8 @@ if errorlevel 1 (
 
 echo Downloading Tesseract. This is about 60 MB and happens once.
 echo Fetching with winget>> "%log%"
-winget install --id UB-Mannheim.TesseractOCR --accept-source-agreements --accept-package-agreements --silent >> "%log%" 2>&1
+set "sHomerRunLong=winget install --id UB-Mannheim.TesseractOCR --accept-source-agreements --accept-package-agreements --silent"
+call "%~dp0installCommon.cmd" runLong "Tesseract"
 
 where tesseract >nul 2>&1
 if not errorlevel 1 goto :ok

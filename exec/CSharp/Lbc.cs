@@ -5020,7 +5020,15 @@ public class LaunchProgress : IDisposable
 
     private string appName = "";
     private Button btnCancel;
-    private bool bCancelled = false;
+    private volatile bool bCancelled = false;
+    // ITS OWN THREAD (25 October 2026, the author's report: the status line could not be kept in focus; focus left as
+    // soon as it was read, leaving activation ambiguous between windows). The window ran on the thread doing the work,
+    // pumped only between steps, so during a long step it stopped answering Windows, which treated it as not responding
+    // and moved the focus on. It now runs on a thread of its own with its own message loop, so it always answers; every
+    // change the work makes to it is passed across with BeginInvoke, and oLock keeps the speech pacing consistent
+    // between the two threads.
+    private System.Threading.Thread thUi;
+    private readonly object oLock = new object();
     private DateTime dtLastPump = DateTime.MinValue;
     private DateTime dtLastSpoken = DateTime.MinValue;
     private DateTime dtCountedSince = DateTime.MinValue;
@@ -5055,6 +5063,25 @@ public class LaunchProgress : IDisposable
     {
         appName = sAppName ?? "";
         logLine = logTo;
+        System.Threading.ManualResetEvent oReady = new System.Threading.ManualResetEvent(false);
+        thUi = new System.Threading.Thread(delegate()
+        {
+            buildWindow();
+            frm.Shown += delegate(object o, EventArgs e) { frm.Activate(); tbStatus.Focus(); oReady.Set(); };
+            try { Application.Run(frm); } catch (Exception) { }
+            oReady.Set();
+        });
+        thUi.SetApartmentState(System.Threading.ApartmentState.STA);
+        thUi.IsBackground = true;
+        thUi.Name = appName + " progress";
+        thUi.Start();
+        oReady.WaitOne(10000);
+        status(string.IsNullOrEmpty(sFirstStatus) ? "Starting" : sFirstStatus);
+    }
+
+    // buildWindow: the window and its controls, made on the window's own thread.
+    private void buildWindow()
+    {
         frm = new Form();
         frm.FormBorderStyle = FormBorderStyle.FixedDialog;
         frm.StartPosition = FormStartPosition.CenterScreen;
@@ -5119,10 +5146,17 @@ public class LaunchProgress : IDisposable
         tmrFlush.Start();
 
         frm.Text = appName;
-        frm.Show();
-        frm.Activate();
-        tbStatus.Focus();
-        status(string.IsNullOrEmpty(sFirstStatus) ? "Starting" : sFirstStatus);
+    }
+
+    // onUi: a change to the window, made on the window's thread.
+    private void onUi(MethodInvoker oChange)
+    {
+        try
+        {
+            if (frm == null || frm.IsDisposed || !frm.IsHandleCreated) return;
+            if (frm.InvokeRequired) frm.BeginInvoke(oChange); else oChange();
+        }
+        catch (Exception) { }
     }
 
     private bool bClosing = false;
@@ -5161,7 +5195,7 @@ public class LaunchProgress : IDisposable
     {
         show(sText);
         if (iSpokenSoFar < iEarlyMessages) { speakNow(sText, "early"); return true; }
-        sPending = sText;
+        lock (oLock) { sPending = sText; }
         flushIfDue();
         return true;
     }
@@ -5174,22 +5208,21 @@ public class LaunchProgress : IDisposable
         if (nDone < 0) nDone = 0;
         if (nDone > nTotal) nDone = nTotal;
         int iPercent = (int)(nDone * 100.0 / nTotal);
-        try
+        onUi(delegate()
         {
-            if (pbDone != null)
-            {
-                if (pbDone.Style != ProgressBarStyle.Continuous) pbDone.Style = ProgressBarStyle.Continuous;
-                pbDone.Value = iPercent;
-            }
-        }
-        catch (Exception) { }
+            if (pbDone == null) return;
+            if (pbDone.Style != ProgressBarStyle.Continuous) pbDone.Style = ProgressBarStyle.Continuous;
+            pbDone.Value = iPercent;
+        });
         if (dtCountedSince == DateTime.MinValue) dtCountedSince = DateTime.Now;
         string sText = ", " + iPercent + "%";
         double nSeconds = DateTime.Now.Subtract(dtCountedSince).TotalSeconds;
         if (nDone > 0 && nDone < nTotal && nSeconds >= iEstimateAfterSeconds)
         {
             double nLeft = nSeconds * (nTotal - nDone) / nDone;
-            sText += nLeft < 60.0 ? ", under a minute left" : ", about " + spokenTime(nLeft) + " left";
+            // No "about" (25 October 2026, the author's ruling): every estimate is understood to be rounded, and the
+            // word cost two syllables in every update.
+            sText += nLeft < 60.0 ? ", under a minute left" : ", " + spokenTime(nLeft) + " left";
         }
         return sText;
     }
@@ -5222,7 +5255,7 @@ public class LaunchProgress : IDisposable
     {
         if (bCancelled) return false;
         bCancelled = true;
-        try { btnCancel.Enabled = false; } catch (Exception) { }
+        onUi(delegate() { btnCancel.Enabled = false; });
         status("Cancelling after the current item");
         return true;
     }
@@ -5230,8 +5263,13 @@ public class LaunchProgress : IDisposable
     public void Dispose()
     {
         bClosing = true;
-        try { if (tmrFlush != null) { tmrFlush.Stop(); tmrFlush.Dispose(); } } catch (Exception) { }
-        try { if (frm != null) { frm.Close(); frm.Dispose(); } } catch (Exception) { }
+        // The window closes on its own thread, which then ends its message loop; this waits briefly for it.
+        onUi(delegate()
+        {
+            try { if (tmrFlush != null) { tmrFlush.Stop(); tmrFlush.Dispose(); } } catch (Exception) { }
+            try { frm.Close(); } catch (Exception) { }
+        });
+        try { if (thUi != null) thUi.Join(3000); } catch (Exception) { }
         frm = null;
         try { Application.DoEvents(); } catch (Exception) { }
     }
@@ -5255,25 +5293,26 @@ public class LaunchProgress : IDisposable
         if (sText == sLatest) { pump(); return; }
         sLatest = sText;
         try { if (logLine != null) logLine("Status: " + sText); } catch (Exception) { }
-        try
+        onUi(delegate()
         {
-            if (frm != null)
-            {
-                tbStatus.Text = sText;
-                frm.Text = appName + ", " + sText;
-            }
-        }
-        catch (Exception) { }
+            tbStatus.Text = sText;
+            frm.Text = appName + ", " + sText;
+        });
         dtLastPump = DateTime.MinValue;
         pump();
     }
 
+    // flushIfDue runs on either thread -- the work's, at each step, and the window's timer between steps.
     private void flushIfDue()
     {
-        if (sPending == "") return;
-        if (DateTime.Now.Subtract(dtLastSpoken).TotalSeconds < speakGapSeconds) return;
-        string sText = sPending;
-        sPending = "";
+        string sText;
+        lock (oLock)
+        {
+            if (sPending == "") return;
+            if (DateTime.Now.Subtract(dtLastSpoken).TotalSeconds < speakGapSeconds) return;
+            sText = sPending;
+            sPending = "";
+        }
         speakNow(sText, "step");
     }
 
@@ -5285,9 +5324,12 @@ public class LaunchProgress : IDisposable
             try { if (logLine != null) logLine("  not spoken (" + sWhy + "): " + appName + " is not the window in front"); } catch (Exception) { }
             return;
         }
-        sPending = "";
-        dtLastSpoken = DateTime.Now;
-        iSpokenSoFar++;
+        lock (oLock)
+        {
+            sPending = "";
+            dtLastSpoken = DateTime.Now;
+            iSpokenSoFar++;
+        }
         try { Say.say(sSaid); } catch (Exception) { }
     }
 }

@@ -28,7 +28,8 @@ where magick >nul 2>&1
 if not errorlevel 1 if not defined bReinstall goto :update
 
 echo Installing ImageMagick. Nothing is asked of you while it runs.
-winget install --id ImageMagick.ImageMagick --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%log%" 2>&1
+set "sHomerRunLong=winget install --id ImageMagick.ImageMagick --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity"
+call "%~dp0installCommon.cmd" runLong "ImageMagick"
 set "iCode=%ERRORLEVEL%"
 call "%~dp0installCommon.cmd" log "winget install ImageMagick.ImageMagick exit code %iCode%"
 if not "%iCode%"=="0" goto :failed

@@ -214,3 +214,17 @@ time: "Downloading Ollama. This is about 1 GB and takes a few minutes." An
 update path says so too: "Checking for a newer version" followed by a silent
 two-minute download reads as a hang.
 
+## Never silent during a long step
+
+While a long step runs, the console keeps saying so, briefly: "Pandoc: still
+working, 2 min, 45%" -- the percentage when the tool reports one -- first after
+20 seconds, then every 30. The log gets the step's full output and a progress
+line each time. An install script runs such a step through installCommon's
+runLong: it sets sHomerRunLong to the command, then calls
+`installCommon.cmd runLong "<name>"`, whose exit code is the command's.
+
+This rule was missing. The earlier rule asked only for the line before a long
+step, and the console-versus-log rule sent each tool's whole output -- winget's
+and ollama's own progress included -- to the log, so for the length of every
+long step the console said nothing (kit 1.93.7).
+

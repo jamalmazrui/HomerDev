@@ -28,7 +28,8 @@ where mpv >nul 2>&1
 if not errorlevel 1 if not defined bReinstall goto :update
 
 echo Installing mpv. Nothing is asked of you while it runs.
-winget install --id shinchiro.mpv --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%log%" 2>&1
+set "sHomerRunLong=winget install --id shinchiro.mpv --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity"
+call "%~dp0installCommon.cmd" runLong "mpv"
 set "iCode=%ERRORLEVEL%"
 call "%~dp0installCommon.cmd" log "winget install shinchiro.mpv exit code %iCode%"
 if not "%iCode%"=="0" goto :failed

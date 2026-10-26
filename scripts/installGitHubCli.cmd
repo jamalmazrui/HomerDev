@@ -37,7 +37,8 @@ if defined sFound set "sInstallId=!sFound!"
 if defined bReinstall set "sForce=--force"
 
 echo Installing GitHub CLI. Nothing is asked of you while it runs.
-winget install --id !sInstallId! !sForce! --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%log%" 2>&1
+set "sHomerRunLong=winget install --id !sInstallId! !sForce! --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity"
+call "%~dp0installCommon.cmd" runLong "GitHub CLI"
 set "iCode=!ERRORLEVEL!"
 call "%~dp0installCommon.cmd" log "winget install !sInstallId! !sForce! exit code !iCode!"
 if not "!iCode!"=="0" goto :failed

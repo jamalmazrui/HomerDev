@@ -27,7 +27,8 @@ call "%~dp0installCommon.cmd" wingetHas Microsoft.OpenJDK.21
 if not errorlevel 1 if not defined bReinstall goto :update
 
 echo Installing Java. Nothing is asked of you while it runs.
-winget install --id Microsoft.OpenJDK.21 --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%log%" 2>&1
+set "sHomerRunLong=winget install --id Microsoft.OpenJDK.21 --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity"
+call "%~dp0installCommon.cmd" runLong "Java"
 set "iCode=%ERRORLEVEL%"
 call "%~dp0installCommon.cmd" log "winget install Microsoft.OpenJDK.21 exit code %iCode%"
 if not "%iCode%"=="0" goto :failed

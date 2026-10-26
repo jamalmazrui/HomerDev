@@ -411,9 +411,9 @@ never shows while work is still going on. Work measured another way,
 such as minutes of a recording, says where it is and the percentage:
 “Film.mp4, 11 min, 23%”.</li>
 <li><strong>Time left, when it can be estimated honestly.</strong> Once
-a job has run 20 seconds and finished something, the status adds “about
-3 min left”, or “under a minute left” near the end. Times are said the
-way HomerScribe says them: “11 min”, “1 hour 5 min”.</li>
+a job has run 20 seconds and finished something, the status adds “3 min
+left”, or “under a minute left” near the end. Times are said the way
+HomerScribe says them: “11 min”, “1 hour 5 min”.</li>
 <li><strong>A progress bar, and the percentage spoken anyway.</strong>
 The window has a real progress bar, as Microsoft asks. Microsoft keeps
 the percentage out of status text because the bar beside it already
@@ -430,6 +430,12 @@ told the screen reader the title changed. Every status update pumps
 long silent step should call <code>pump()</code> now and then. The
 window’s only command sets a flag, so pumping cannot start the work a
 second time.</li>
+<li><strong>The window keeps the focus.</strong> It runs on a thread of
+its own, with its own message loop, so it answers Windows even while a
+long step runs, and the focus stays in its Status box for as long as you
+want to read it. Running on the working thread, it once stopped
+answering during a long step, and Windows moved the focus away (kit
+1.93.6).</li>
 <li><strong>Every status is logged,</strong> with a note when it was not
 spoken because the app was not in front, so the log shows exactly what
 you heard.</li>

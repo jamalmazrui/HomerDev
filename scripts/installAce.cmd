@@ -43,7 +43,8 @@ call "%~dp0installCommon.cmd" log "Ace installed !sHave!, latest on npm !sLatest
 if defined sHave if not defined bReinstall if "!sHave!"=="!sLatest!" (echo Ace by DAISY !sHave! is the latest.& goto :done)
 if defined sHave if not defined bReinstall if not defined sLatest (echo Ace by DAISY !sHave! is installed; npm could not be asked for a newer one.& goto :done)
 echo Installing Ace by DAISY !sLatest! with npm. This fetches its own copy of Chromium and takes a few minutes.
-call "!sNpm!" install --global @daisy/ace@latest >> "%log%" 2>&1
+set "sHomerRunLong=call "!sNpm!" install --global @daisy/ace@latest"
+call "%~dp0installCommon.cmd" runLong "Ace by DAISY"
 set "iCode=!ERRORLEVEL!"
 call "%~dp0installCommon.cmd" log "npm install --global @daisy/ace exit code !iCode!"
 if not "!iCode!"=="0" goto :failed
