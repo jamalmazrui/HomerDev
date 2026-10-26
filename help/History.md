@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.93.8 -- 26 October 2026
+
+From MyBooks' unattended kdpSubmit runs of 24 and 25 October: 0 of 21 books submitted.
+
+- **Kept AI answers no longer stop the Content tab** (kdpSubmit version 44). Every answers file that keeps KDP's AI disclosure as it is -- used = Keep, the fourteen kdpSubmit made among them -- names no tools, and the Content tab's message, built even when nobody is asked, read the tools answer anyway: every book's run stopped there with KeyError 'tools', the draft untouched. Blind Vibe Coding, the only book submitted before, had full AI answers, so the keep path had never run.
+- **A book that is not ready is neither listed nor submitted.** The run said so but did not check: it listed Legacy of Mazrui, whose pictures are still missing, and that book's own run went on to KDP's Content tab, since its EPUB was current and only a rebuild was checked. kdpSubmit now reads each book's audit (results\<book>-audit.md, "Ready to submit") when choosing books and again before opening KDP.
+- **A silent Publish is checked on the Bookshelf.** When KDP's page shows neither acknowledgement nor error within two minutes, kdpSubmit reads the book's status on the Bookshelf: In Review or Publishing counts as submitted, anything else stays unknown. Blind Vibe Coding's run of 24 October uploaded its manuscript, pressed Publish and ended "outcome unknown" this way.
+
 ## 1.93.7 -- 25 October 2026
 
 - **Target formats read "txt (plain text)",** extension first (the author's ruling): a list sorted by label then runs in extension order, so pressing t in BatCon's Target format list reaches txt. Conversion.targetLabel words every one -- in allTargets, which BatCon lists, and targetLabelsFor, which FileDir's conversion list uses -- keeping names' capitals ("docx (Word document)") and lowering only a generic first word ("txt (plain text)"). DbDo and EdSharp show no list of target formats.
