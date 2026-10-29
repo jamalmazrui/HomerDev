@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.94.0 -- 29 October 2026
+
+- **Stored parts, in Util.cs and util.py.** A value built of parts -- DbDo's look and prime, made from a record's fields -- is stored with the parts joined by ASCII 31, the unit separator, which never occurs in real text, so the value always splits back into exact parts. Util.aPartsOf splits it, Util.sJoinParts joins it, Util.sScreenText shows it with a space and Util.sExportText writes it to a text export with a semicolon and a space. Speech says each part in its own call, Say.sayParts(Util.aPartsOf(sValue)), so the pause between calls marks each boundary with no punctuation word. A value with no separator passes through unchanged. Came from DbDo, which had its own copies; it now uses these.
+- **Schema.cs and schema.py: upgrades without loss.** When a newer app installs a newer template that has gained a field, the person's own copy should gain the field too -- empty, at the end of the table -- without a record being added, changed or removed. Schema lists a table's fields (sColumnsSql, lParseColumns), finds the template's ordinary fields the copy lacks (lMissingColumns), writes the statement that adds each (sAddColumnSql), and writes the table's edited trigger again to watch the new fields (aEditedTriggerSql). The kit has no SQLite connection of its own, so it decides and writes the SQL and the app runs it on its connection -- DbDo through its driver, a Python app through sqlite3. Taking a template's records stays the person's choice, through the app's own merge. Came from DbDo's Update from Template, which now runs on it, and also runs by itself whenever DbDo opens a database it can edit.
+
 ## 1.93.9 -- 26 October 2026
 
 From MyBooks' kdpSubmit run of 26 October: 8 of 20 books submitted, 3 rightly left while KDP reviewed an earlier submission, and 9 stopped on the Content tab.

@@ -24,6 +24,43 @@ namespace Homer {
 
 public static class Util {
 
+// STORED PARTS (kit 1.94.0, from DbDo's look and prime, 29 Oct 2026). A value
+// built of parts -- a record's name from its title and author, a key from
+// several fields -- is stored with the parts joined by ASCII 31, the unit
+// separator, which never occurs in real text, so it always splits back into
+// exact parts. Nobody meets the character raw: the screen joins parts with a
+// space, text exports with a semicolon and a space, and speech says each part
+// in its own call (Say.sayParts(Util.aPartsOf(sValue))), so the pause between
+// calls marks each boundary with no punctuation word.
+public const char PartSeparator = (char)31;
+public const string ExportSeparator = "; ";
+public const string ScreenSeparator = " ";
+
+// aPartsOf: split a stored value into its parts; empty input gives none.
+public static string[] aPartsOf(string sValue) {
+    if (string.IsNullOrEmpty(sValue)) return new string[0];
+    return sValue.Split(PartSeparator);
+}
+
+// sJoinParts: store parts as one value, joined by the unit separator.
+public static string sJoinParts(IEnumerable<string> parts) {
+    return string.Join(PartSeparator.ToString(), parts);
+}
+
+// sScreenText: a stored value as shown on screen -- parts joined by a space.
+// A value with no separator comes back unchanged.
+public static string sScreenText(string sValue) {
+    if (string.IsNullOrEmpty(sValue) || sValue.IndexOf(PartSeparator) < 0) return sValue ?? "";
+    return string.Join(ScreenSeparator, aPartsOf(sValue));
+}
+
+// sExportText: a stored value as written to a text export (CSV, TSV, HTML,
+// Markdown, inix, spreadsheet) -- parts joined by a semicolon and a space.
+public static string sExportText(string sValue) {
+    if (string.IsNullOrEmpty(sValue) || sValue.IndexOf(PartSeparator) < 0) return sValue ?? "";
+    return string.Join(ExportSeparator, aPartsOf(sValue));
+}
+
 // Section break (with form feed) and end-of-document marker, used when
 // concatenating documents; formerly Lbc.SB and Lbc.EOD.
 public static string sSectionBreak = "\r\n----------\r\n\f\r\n";
