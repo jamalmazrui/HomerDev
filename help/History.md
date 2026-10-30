@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.94.2 -- 30 October 2026
+
+- **kdpSubmit keeps what it saw apart from why.** A setup page sent back to the Bookshelf was said to mean a review in progress, even when the Bookshelf did not show the title; then the cause is now said to be unknown (from ChatGPT's audit of the logs).
+- **The plugin files carry the kit's version.** The 1.94.1 delivery carried 1.94.0 in plugin.json and marketplace.json; the build syncs them, but an unzip during a running build put the old numbers back, and the build rightly failed. The files now match the kit.
+
 ## 1.94.1 -- 30 October 2026
 
 From an audit by another AI of twelve Homer repositories; each fix keeps the integrated design.

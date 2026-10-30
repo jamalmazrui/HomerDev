@@ -1163,8 +1163,15 @@ def findDraft(page):
             log("Opening the setup page was interrupted: " + str(oError).splitlines()[0][:160])
         time.sleep(3)
         if sKnown not in page.url:
-            say("KDP sent the title's setup page back to the Bookshelf, which it does while a submission is in review or publishing. Nothing was changed; run this again once the Bookshelf shows Live.")
-            log("Stopped: title-setup for " + sKnown + " redirected to " + page.url)
+            # WHAT WAS SEEN, APART FROM WHY (30 October 2026, from ChatGPT's audit of the logs). The redirect was said to
+            # mean a review was under way, but when the Bookshelf did not find the title at all, that was never shown:
+            # the title ID may be stale, the Bookshelf filtered, or the session odd. When the Bookshelf showed the
+            # title, the review reason stands; when it did not, the cause is said to be unknown.
+            if sStatus in ("not shown", ""):
+                say("KDP sent the title's setup page back to the Bookshelf, and the Bookshelf did not show this title, so why is not known: a review in progress, a title ID that has changed, or a Bookshelf filter could each do it. Nothing was changed. Check the title on the Bookshelf, then run this again.")
+            else:
+                say("KDP sent the title's setup page back to the Bookshelf, which it does while a submission is in review or publishing. Nothing was changed; run this again once the Bookshelf shows Live.")
+            log("Stopped: title-setup for " + sKnown + " redirected to " + page.url + "; Bookshelf status " + repr(sStatus))
             return "STOP"
         if sKnown in page.url and page.locator("#data-title").count():
             sHeld = page.locator("#data-title").first.input_value()

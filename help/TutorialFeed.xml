@@ -5,7 +5,7 @@
     <link>Tutorials.htm</link>
     <description>Spoken walks through the Homer Development Kit: what it is, how it builds and releases an app, and what its shared code makes a person hear. Ten walks in the pattern of ten, each three to five minutes.</description>
     <language>en-us</language>
-    <lastBuildDate>Fri, 30 Oct 2026 21:05:57 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 30 Oct 2026 22:50:26 +0000</lastBuildDate>
     <itunes:author>Jamal Mazrui</itunes:author>
     <itunes:explicit>false</itunes:explicit>
     <itunes:category text="Technology"/>
@@ -42,7 +42,7 @@
       <description>The kit is at C colon backslash HomerDev, and a command prompt is open there. Full transcript: Tutorials.htm#0c-3-start-an-app-from-the-kit</description>
       <link>Tutorials.htm#0c-3-start-an-app-from-the-kit</link>
       <guid isPermaLink="false">homer-tutorial_3_start_an_app_from_the_kit</guid>
-      <enclosure url="tutorials/3_Start_an_App_from_the_Kit.mp3" length="1692123" type="audio/mpeg"/>
+      <enclosure url="tutorials/3_Start_an_App_from_the_Kit.mp3" length="1683038" type="audio/mpeg"/>
       <itunes:duration>00:03:50</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
     </item>
@@ -51,7 +51,7 @@
       <description>An app built on the kit is open in a command prompt, with a change made and GitHub signed in. Full transcript: Tutorials.htm#0d-4-build-check-and-release</description>
       <link>Tutorials.htm#0d-4-build-check-and-release</link>
       <guid isPermaLink="false">homer-tutorial_4_build_check_and_release</guid>
-      <enclosure url="tutorials/4_Build_Check_and_Release.mp3" length="1383271" type="audio/mpeg"/>
+      <enclosure url="tutorials/4_Build_Check_and_Release.mp3" length="1382614" type="audio/mpeg"/>
       <itunes:duration>00:03:10</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
     </item>
@@ -60,7 +60,7 @@
       <description>A Homer program's installer is downloaded, and your reader is running. Full transcript: Tutorials.htm#0e-5-the-installer-and-its-finish-page</description>
       <link>Tutorials.htm#0e-5-the-installer-and-its-finish-page</link>
       <guid isPermaLink="false">homer-tutorial_5_the_installer_and_its_finish_page</guid>
-      <enclosure url="tutorials/5_The_Installer_and_Its_Finish_Page.mp3" length="1613276" type="audio/mpeg"/>
+      <enclosure url="tutorials/5_The_Installer_and_Its_Finish_Page.mp3" length="1612514" type="audio/mpeg"/>
       <itunes:duration>00:03:40</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
     </item>
@@ -69,7 +69,7 @@
       <description>An app built on the kit, with its help folder open. Full transcript: Tutorials.htm#0f-6-spoken-tutorials</description>
       <link>Tutorials.htm#0f-6-spoken-tutorials</link>
       <guid isPermaLink="false">homer-tutorial_6_spoken_tutorials</guid>
-      <enclosure url="tutorials/6_Spoken_Tutorials.mp3" length="1637864" type="audio/mpeg"/>
+      <enclosure url="tutorials/6_Spoken_Tutorials.mp3" length="1638146" type="audio/mpeg"/>
       <itunes:duration>00:03:40</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
     </item>
@@ -78,7 +78,7 @@
       <description>FileDir and DbDo are installed, with mpv. Full transcript: Tutorials.htm#0g-7-shared-code-and-the-homer-player</description>
       <link>Tutorials.htm#0g-7-shared-code-and-the-homer-player</link>
       <guid isPermaLink="false">homer-tutorial_7_shared_code_and_the_homer_player</guid>
-      <enclosure url="tutorials/7_Shared_Code_and_the_Homer_Player.mp3" length="1647480" type="audio/mpeg"/>
+      <enclosure url="tutorials/7_Shared_Code_and_the_Homer_Player.mp3" length="1649720" type="audio/mpeg"/>
       <itunes:duration>00:03:43</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
     </item>
