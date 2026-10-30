@@ -107,17 +107,9 @@ def fileSha(sPath):
 
 
 def auditProblem(sRoot, sEpub):
-    """Why the book's audit does not approve the EPUB in results, or "" when it does: the audit must say ready to submit
-    and name this exact EPUB's fingerprint. WHY (8 October 2026, from an audit by another AI): readiness was read from
-    the audit's first line alone, so an old audit could approve a newer or damaged EPUB."""
-    sAudit = os.path.join(sProject, "results", sRoot + "-audit.md")
-    if not os.path.exists(sAudit): return "it has no audit; run scripts\\buildBooks.cmd"
-    with open(sAudit, encoding="utf-8-sig") as f: sText = f.read()
-    if not re.search(r"(?m)^Ready to submit", sText): return "its audit does not say ready to submit; read results\\" + sRoot + "-audit.htm"
-    oSha = re.search(r"(?m)^- EPUB SHA-256: ([0-9a-f]{64})", sText)
-    if not oSha: return "its audit names no EPUB fingerprint, as audits from before 8 October do not; run scripts\\buildBooks.cmd"
-    if oSha.group(1) != fileSha(sEpub): return "the EPUB in results is not the one its audit approved; run scripts\\buildBooks.cmd"
-    return ""
+    """Why the book's audit does not approve the EPUB in results, or "" when it does. One rule for both submitters
+    (30 October 2026): it lives in kdpSubmit.auditProblem, where kdpSubmit uses it too."""
+    return k.auditProblem(sRoot, sEpub, sProject)
 
 
 def auditReady(sRoot):

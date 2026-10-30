@@ -27,6 +27,10 @@ Hear=Setup, Finish page
 Say=The finish page lists the optional pieces as boxes. Arrow through them; each says its name, its state, and its size.
 Key=DownArrow
 Hear=Update screen reader scripts checked, 1 of 6
+
+
+[step]
+
 Say=Update, not Install: the scripts are there, and a newer set is available. The word is the state.
 
 [step]
@@ -40,6 +44,10 @@ Hear=
 Say=Down Arrow to the player.
 Key=DownArrow
 Hear=Install mpv checked, 2 of 6
+
+
+[step]
+
 Say=mpv is the Homer Player's engine; FileDir and DbDo share it, so one installation serves both.
 
 [step]

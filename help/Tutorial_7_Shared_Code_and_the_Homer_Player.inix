@@ -9,6 +9,10 @@ Homework=Play something in FileDir and in DbDo, and notice the keys that are the
 Say=The want: a feature written once and heard in every program. The kit's shared code is where that happens, and the Homer Player is the plainest case. Here it is in FileDir, on a saved podcast page.
 Key=Control+Shift+L
 Hear=4 tracks from Access On
+
+
+[step]
+
 Say=Every media link the page holds, counted and queued.
 
 [step]
@@ -23,6 +27,10 @@ Say=Now the same player in DbDo, on a radio station.
 Key=Alt+Shift+P
 Hear=1 track from stations
 Hear=RadioTrail, Track list: list box, KIRO 710 ESPN Seattle, 1 of 1
+
+
+[step]
+
 Say=The same window, the same list, the same keys, from a different program on different data.
 
 [step]

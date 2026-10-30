@@ -1744,6 +1744,14 @@ def uploadFile(page, sWhat, sPath, sButtonId, sDonePattern):
     sSentName = os.path.basename(sPath).lower()
     setBefore = set(lBefore)
     bSeenChange = False
+    # ONLY A NEW SUCCESS COUNTS (30 October 2026, from an audit by another AI). A success message already on the page,
+    # about the file KDP held before, still matched, and when no success message quoted a file name any one was taken
+    # as naming this file; with one unrelated new notice, the upload was taken as done and a receipt written for bytes
+    # KDP had not acknowledged. Now a success message counts only if it appeared after this upload began, or came back
+    # after the old one went away while KDP processed; and one that quotes a file name must quote this one. Without
+    # such a message the upload stays unconfirmed, and the run says so.
+    setDoneBefore = set(t for t in lBefore if oDone.search(t))
+    bDoneCleared = False
     dtEnd = datetime.datetime.now() + datetime.timedelta(minutes=iProcessingMinutes)
     # NEVER SILENT WHILE KDP PROCESSES (26 October 2026): a manuscript can take minutes, and the author heard nothing but
     # the address bar. A short line every 30 seconds says the run is alive and what it waits for.
@@ -1762,14 +1770,16 @@ def uploadFile(page, sWhat, sPath, sButtonId, sDonePattern):
             logMessages(page, sWhat + " problem")
             say("KDP reported a problem with the " + sWhat.lower() + ". The exact message is in the log.")
             return unresolved(sWhat, " | ".join(lMine)[:300])
-        lQuoted = [t for t in lTexts if oDone.search(t) and re.search(r'"[^"]+\.[a-z0-9]{2,5}"', t)]
+        if setDoneBefore and not any(t in setDoneBefore for t in lTexts): bDoneCleared = True
+        lFresh = [t for t in lTexts if oDone.search(t) and (bDoneCleared or t not in setDoneBefore)]
+        lQuoted = [t for t in lFresh if re.search(r'"[^"]+\.[a-z0-9]{2,5}"', t)]
         bNamed = any(sSentName in t.lower() for t in lQuoted) if lQuoted else True
-        if bSeenChange and bNamed and any(oDone.search(t) for t in lTexts) and not any("processing your file" in t.lower() for t in lMine):
+        if bSeenChange and lFresh and bNamed and not any("processing your file" in t.lower() for t in lMine):
             for t in [t for t in lTexts if t not in setBefore and re.match(r"(?i)we recommend|missing ", t)]: log("KDP RECOMMENDS (not a problem): " + t[:300])
             logMessages(page, sWhat + " done")
             say(sWhat + " uploaded and processed.")
             dReceipt = readReceipt()
-            dReceipt[currentBook() + "." + sWhat.lower()] = {"file": os.path.basename(sPath), "sha256": sSha, "bytes": os.path.getsize(sPath), "uploaded": now(), "kdpMessage": next((t for t in lTexts if oDone.search(t)), "")[:200]}
+            dReceipt[currentBook() + "." + sWhat.lower()] = {"file": os.path.basename(sPath), "sha256": sSha, "bytes": os.path.getsize(sPath), "uploaded": now(), "kdpMessage": lFresh[0][:200]}
             writeReceipt(dReceipt)
             log("Receipt written for " + sWhat.lower() + " (a local record of what was sent, not a server-side check)")
             return True
@@ -2343,9 +2353,26 @@ def bookReady(sStem):
     READY IS CHECKED, NOT ASSUMED (26 October 2026). The run said "A book that is not ready is not submitted" but did
     not check: it listed Legacy of Mazrui, whose twelve pictures are still missing, and that book's own run went
     straight to KDP's Content tab, since its EPUB was current and only a rebuild was ever checked."""
-    sAudit = os.path.join(sProject, "results", sStem + "-audit.md")
-    try: return re.search(r"(?m)^Ready to submit", open(sAudit, encoding="utf-8-sig", errors="replace").read()) is not None
-    except OSError: return False
+    return not auditProblem(sStem, os.path.join(sProject, "results", sStem + ".epub"))
+
+
+def auditProblem(sStem, sEpub, sInProject=None):
+    """Why the book's audit does not approve sEpub, or "" when it does: the audit must say ready to submit and name
+    this exact EPUB's fingerprint.
+
+    ONE RULE FOR BOTH SUBMITTERS (30 October 2026, from an audit by another AI). kdpUpdate required the audited EPUB's
+    exact fingerprint; kdpSubmit asked only for a line saying Ready to submit, so an EPUB replaced after its audit --
+    damaged, or built from other sources -- passed. This is now the one check, here, and kdpUpdate calls it."""
+    sAudit = os.path.join(sInProject or sProject, "results", sStem + "-audit.md")
+    if not os.path.exists(sAudit): return "it has no audit; run scripts\\buildBooks.cmd"
+    try: sText = open(sAudit, encoding="utf-8-sig", errors="replace").read()
+    except OSError as oError: return "its audit could not be read: " + str(oError)
+    if not re.search(r"(?m)^Ready to submit", sText): return "its audit does not say ready to submit; read results\\" + sStem + "-audit.htm"
+    oSha = re.search(r"(?m)^- EPUB SHA-256: ([0-9a-f]{64})", sText)
+    if not oSha: return "its audit names no EPUB fingerprint, as audits from before 8 October do not; run scripts\\buildBooks.cmd"
+    if not os.path.exists(sEpub): return "it has no EPUB in results; run scripts\\buildBooks.cmd"
+    if oSha.group(1) != fileSha256(sEpub): return "the EPUB in results is not the one its audit approved; run scripts\\buildBooks.cmd"
+    return ""
 
 
 def ensureEpub(sEpub):
@@ -2355,10 +2382,14 @@ def ensureEpub(sEpub):
     # book builds with its own build.py beside the manuscript.
     sBookDir = os.path.join(sProject, "books", sStem)
     if os.path.isfile(os.path.join(sProject, "configs", "books.inix")) and os.path.isdir(sBookDir):
-        lSources = [os.path.join(sBookDir, sStem + sExt) for sExt in (".md", ".bib", ".csl", ".jpg", ".css")]
-        lSources = [sPath for sPath in lSources if os.path.exists(sPath)]
+        # EVERY FILE IN THE BOOK'S FOLDER (30 October 2026, from an audit by another AI): the list named the manuscript
+        # and a few companions, so a changed picture or a .png cover did not make the EPUB stale. And readiness is the
+        # audit's exact EPUB fingerprint, not its first line, so an EPUB replaced after its audit is not taken.
+        lSources = [os.path.join(sRoot, sName) for sRoot, _, lNames in os.walk(sBookDir) for sName in lNames]
         bStale = not os.path.exists(sEpub) or any(os.path.getmtime(sPath) > os.path.getmtime(sEpub) for sPath in lSources)
-        if not bStale: return "" if bookReady(sStem) else "the book is not ready; results\\" + sStem + "-audit.htm says why"
+        if not bStale:
+            sProblem = auditProblem(sStem, sEpub)
+            return "" if not sProblem else "the book is not ready: " + sProblem
         sBuild = os.path.join(sFolder, "buildBooks.py")
         if not os.path.exists(sBuild): return "the EPUB is out of date and scripts\\buildBooks.py is missing"
         say("Rebuilding " + sStem + " with buildBooks, since its sources are newer than its EPUB.")
@@ -2366,7 +2397,8 @@ def ensureEpub(sEpub):
         log("buildBooks exit " + str(oResult.returncode))
         for sLine in ((oResult.stdout or "") + (oResult.stderr or "")).strip().splitlines()[-40:]: log("  | " + sLine)
         if oResult.returncode != 0 or not os.path.exists(sEpub): return "buildBooks did not produce a ready EPUB; read its audit in results\\"
-        if not bookReady(sStem): return "the book is not ready; results\\" + sStem + "-audit.htm says why"
+        sProblem = auditProblem(sStem, sEpub)
+        if sProblem: return "the book is not ready: " + sProblem
         return ""
     lSources = [os.path.join(sProject, sStem + sExt) for sExt in (".md", ".yaml", ".bib", ".csl", ".jpg")] + [os.path.join(sProject, sName) for sName in ("book.css", "tocMarker.lua")]
     lSources = [sPath for sPath in lSources if os.path.exists(sPath)]

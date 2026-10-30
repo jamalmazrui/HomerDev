@@ -1091,13 +1091,17 @@ Screen reader:
 
 ### Step 2
 
-What is in it. The program file, Recipes dot cs, with the Homer classes referenced from the kit; build dot cmd, the stages every Homer build runs; the installer script with the shared finish page; accept dot inix, the acceptance checks; the tutorial skeletons in help, in the pattern of ten; the ReadMe, guide and history, each with its HTML pair; and the policy files that say which files travel to the repository.
+A folder beside the kit, with everything the kit's checks expect.
 
 ### Step 3
 
+What is in it. The program file, Recipes dot cs, with the Homer classes referenced from the kit; build dot cmd, the stages every Homer build runs; the installer script with the shared finish page; accept dot inix, the acceptance checks; the tutorial skeletons in help, in the pattern of ten; the ReadMe, guide and history, each with its HTML pair; and the policy files that say which files travel to the repository.
+
+### Step 4
+
 The template program is the fruit basket's shape with the new name: a dialog with a field and a list, a report, F1 help on the fields, a session log. It runs before you have written a line, so every change is made against a working program.
 
-### Step 4: build
+### Step 5: build
 
 Change into the folder and build.
 
@@ -1107,7 +1111,11 @@ Screen reader:
 - Version, 1.0.0
 - Built Recipes dot exe version 1.0.0
 
-### Step 5: Recipes
+### Step 6
+
+The build read the kit's version first and would have refused an older one; then it fixed the encoding of every file, generated the hotkey list, spoke the tutorials that had no audio, compiled, and built the installer.
+
+### Step 7: Recipes
 
 Run it.
 
@@ -1116,7 +1124,7 @@ Screen reader:
 - Recipes, the list is empty
 - Name, edit
 
-### Step 6: pancakes
+### Step 8: pancakes
 
 Type a name and press Enter.
 
@@ -1124,7 +1132,7 @@ Screen reader:
 
 - pancakes added, 1 item in the list
 
-### Step 7: Alt+F4
+### Step 9: Alt+F4
 
 Alt plus F4, and run it again: kept.
 
@@ -1132,15 +1140,15 @@ Screen reader:
 
 - Recipes, 1 item in the list
 
-### Step 8
+### Step 10
 
 Now the first real change. Open Recipes dot cs in EdSharp; the Camel Type conventions the kit's skill teaches are already followed in it: a prefix on every name says its type, functions in lower camel case, constants with c underscore. An AI assistant that has read the kit's skills writes the same way, so what it adds reads like what was there.
 
-### Step 9
+### Step 11
 
 Where the Homer classes come in. Lbc builds every dialog; Say speaks; Log writes the session log; Inix reads settings; Web fetches; Util has the pluralizer that said one item and not one items. None of them is in your folder; they compile from the kit, so a kit update improves every app on the next build.
 
-### Step 10
+### Step 12
 
 The Python template, newHomerApp with dash py, makes the same program in Python, built with the kit's Python modules; buildFruitBasketPy showed the shape in walk two: a build environment made, what the build needs installed, and an executable at the end.
 
@@ -1150,7 +1158,7 @@ Screen reader:
 - Installing what the build needs
 - Built FruitBasketPy dot exe version 1.0.0
 
-### Step 11
+### Step 13
 
 A planned misstep. Name the app with a space, and newHomerApp refuses in one line, because the name becomes a folder, a file, a class and a shortcut key.
 
@@ -1158,27 +1166,27 @@ Screen reader:
 
 - A Homer app's name is one word in upper camel case, like FruitBasket.
 
-### Step 12
+### Step 14
 
 From here the work is yours: fields in the dialog, commands on the menus with their keys named for their words, a template database or two. Walk four is what happens each time you type build.
 
-### Step 13
+### Step 15
 
 The tutorial skeletons in help, one for each walk in the pattern of ten, are part of what newHomerApp made. Each is a walk in the pattern with placeholder steps, so the day a feature is finished its walk is a file to fill in, not to invent; walk six is about filling them.
 
-### Step 14
+### Step 16
 
 accept dot inix is the app's own acceptance list: a name and a command each -- the program was produced, the installer was produced, no kit class was copied into the folder. check runs them, and the release refuses on any that fails. Add one for each promise the app makes.
 
-### Step 15
+### Step 17
 
 The policy files. RepoFiles dot txt names what the repository carries; LocalFiles dot txt names what stays on your machine; a file in neither is one tidy asks about. Together they are why a stray file is noticed and a private one is never pushed.
 
-### Step 16
+### Step 18
 
 What this walk taught. I say the idea or the key; the reader says the command or the name.
 
-### Step 17
+### Step 19
 
 Make a new app from the template.
 
@@ -1186,7 +1194,7 @@ Screen reader:
 
 - newHomerApp
 
-### Step 18
+### Step 20
 
 Every stage, from encoding to installer.
 
@@ -1243,7 +1251,11 @@ Screen reader:
 
 - 12 checks passed, 1 check failed. failed: access letters -- Filter Records: F is used by Find and Filter
 
-### Step 7: scripts\release
+### Step 7
+
+Fix the caption, build, check again. Nothing was published, and nothing was going to be.
+
+### Step 8: scripts\release
 
 Third, release. It reads the version from the installer, refuses if the last build did not succeed, runs check, commits and pushes, tags the version, and publishes the installer on GitHub.
 
@@ -1252,27 +1264,27 @@ Screen reader:
 - GitHub has no published release tagged v1.0.228.
 - DbDo 1.0.228 published.
 
-### Step 8
+### Step 9
 
 Release refuses for honest reasons and says which. A build still running: the last build did not succeed, build again, then release. A check failing: nothing was published, its report names it. And it never publishes an installer older than the source beside it.
 
-### Step 9
+### Step 10
 
 What the release left behind. A tag, a release page with the installer, and in the logs folder a release log and an evidence report; the ReadMe's download link now points at the new installer. F11 in any installed copy finds it within the hour.
 
-### Step 10
+### Step 11
 
 The logs. Every stage wrote its own: build, encoding, hotkeys, tutorials, check, push, release. The console said one line each; the logs say every command and its exit code. When something is wrong, the log is the thing to send -- never a description of the console.
 
-### Step 11
+### Step 12
 
 A second planned misstep. Run release before the build has finished speaking its tutorials, and it refuses -- the build has not succeeded yet -- which is right, if blunt; wait for the Built line, then release.
 
-### Step 12
+### Step 13
 
 What this walk taught. I say the idea or the key; the reader says the command or the name.
 
-### Step 13
+### Step 14
 
 Every stage, encoding to installer.
 
@@ -1280,7 +1292,7 @@ Screen reader:
 
 - build
 
-### Step 14
+### Step 15
 
 What release would refuse, in seconds.
 
@@ -1288,7 +1300,7 @@ Screen reader:
 
 - check
 
-### Step 15
+### Step 16
 
 Tag, publish, and leave a log.
 
@@ -1334,9 +1346,13 @@ Screen reader:
 
 ### Step 5
 
+Update, not Install: the scripts are there, and a newer set is available. The word is the state.
+
+### Step 6
+
 The three words, from the kit. Install when the piece is not there. Update when it is there and a newer version is available -- the installer asked winget. Reinstall when it is there and current, unticked unless you want it. You never have to know what is on your machine; the box says.
 
-### Step 6: DownArrow
+### Step 7: DownArrow
 
 Down Arrow to the player.
 
@@ -1344,7 +1360,11 @@ Screen reader:
 
 - Install mpv checked, 2 of 6
 
-### Step 7: Space
+### Step 8
+
+mpv is the Homer Player's engine; FileDir and DbDo share it, so one installation serves both.
+
+### Step 9: Space
 
 Ollama runs AI on your own computer. Its models are large, so it is unticked unless you tick it; Spacebar changes a box, and the answer is one word.
 
@@ -1352,7 +1372,7 @@ Screen reader:
 
 - checked
 
-### Step 8: Enter
+### Step 10: Enter
 
 Launch is ticked already. Enter presses Finish, and whatever was ticked installs now; a results box then says what was done, one line per piece.
 
@@ -1360,43 +1380,43 @@ Screen reader:
 
 - DbDo Setup, screen reader scripts: updated. mpv: installed. Ollama: installed.
 
-### Step 9
+### Step 11
 
 The same summary is saved in the logs folder under your local application data, and summarizeSetup, in the program folder, shows it again on any later day.
 
-### Step 10
+### Step 12
 
 What the app's installer script writes, and what the kit writes. The app names its pieces in a table -- a name, a winget id, an executable to look for, what it is used for -- and the kit does the rest: the probing, the three states, the labels, the ordering, the results. Ten lines of the app's, for a page that behaves the same in every Homer program.
 
-### Step 11
+### Step 13
 
 Screen reader scripts are a piece of their own: the kit knows where each reader keeps its settings or its add-ons, and the box reads Install, Update or Reinstall for them as for the rest.
 
-### Step 12
+### Step 14
 
 A planned misstep. Run the installer a second time: every piece already present says so, and Install becomes Reinstall, unticked. Nothing is installed twice.
 
-### Step 13
+### Step 15
 
 Removing a Homer program is Windows Settings, Apps; the pieces it installed are programs in their own right and stay for the other Homer programs, and your data folder stays unless you delete it.
 
-### Step 14
+### Step 16
 
 What the table in the app's script looks like, in words: one line per piece -- the name the box shows, the winget id that installs it, the executable whose presence means it is there, and what it is for, which becomes the box's description. The kit reads the table and does everything else.
 
-### Step 15
+### Step 17
 
 Why winget. It knows what is installed and what the newest version is, so the three states are read rather than guessed; it fetches from the maker's own feed; and it comes with current Windows 10 and 11 as part of App Installer, though an older machine or a brand-new account may need App Installer updated first. The kit asks it once per piece as the finish page is built, so the boxes are right before you reach them.
 
-### Step 16
+### Step 18
 
 The installer's own log is written beside the results -- every piece, every command, every exit code -- so a piece that failed to install names why, and the summary points at the log.
 
-### Step 17
+### Step 19
 
 What this walk taught. I say the idea or the key; the reader says the command or the name.
 
-### Step 18
+### Step 20
 
 The one word that is the box's state.
 
@@ -1404,7 +1424,7 @@ Screen reader:
 
 - Install, Update, or Reinstall
 
-### Step 19
+### Step 21
 
 The shared installer parts.
 
@@ -1456,7 +1476,11 @@ Screen reader:
 
 - Tutorial underscore 17, step 6: Hear writes an access key with a plus sign; the reader says the words
 
-### Step 8: scripts\buildTutorials -build
+### Step 8
+
+Fix the line, run it again.
+
+### Step 9: scripts\buildTutorials -build
 
 buildTutorials speaks them. Two voices: Kokoro, with a narrator and a reader, both licensed to redistribute; Piper when Kokoro is not there. The reader's voice shifts by context -- a cursor line, a message, a menu -- so a message is heard as a message.
 
@@ -1464,11 +1488,11 @@ Screen reader:
 
 - Creating 4 underscore Open underscore and underscore Move dot mp3, 23 steps. A few minutes.
 
-### Step 9
+### Step 10
 
 The audio is named like a chapter -- 4 underscore Open underscore and underscore Move dot mp3 -- so a folder or a player shows the number and the title. A walk is spoken again only when its text has changed since it was last spoken; the rest are kept.
 
-### Step 10
+### Step 11
 
 At the end, the lengths, and the two lines that matter.
 
@@ -1477,23 +1501,23 @@ Screen reader:
 - 4 underscore Open underscore and underscore Move dot mp3 runs 2 33
 - Wrote Tutorials dot m3u naming 12 tutorials, 27 minutes in all.
 
-### Step 11
+### Step 12
 
 Under three minutes or over five, the tool says so by name, with the guideline in one line. Tutorials dot m3u is the playlist Play Tutorials uses; Tutorials dot md is the transcript, made from the same scripts; TutorialFeed dot xml is a podcast feed of the same audio.
 
-### Step 12
+### Step 13
 
 Two kinds of listener. A walk is written for the person who will press the keys tomorrow; it is also what an AI assistant reads to learn the program, which is why the skills folder points at it.
 
-### Step 13
+### Step 14
 
 The learning behind the rules came from ninety-eight recorded screen reader training sessions and from Quill Radio's tutorials: spell a lone letter with its alphabet word; one planned misstep per walk; close by naming the two or three keys taught; a concrete want before a feature. TutorialLearnings dot md in the kit's help has the rest.
 
-### Step 14
+### Step 15
 
 What this walk taught. I say the idea or the key; the reader says the command or the name.
 
-### Step 15
+### Step 16
 
 Reads every walk before anything is spoken.
 
@@ -1501,7 +1525,7 @@ Screen reader:
 
 - checkTutorial
 
-### Step 16
+### Step 17
 
 Speaks what is missing or stale and measures it.
 
@@ -1509,7 +1533,7 @@ Screen reader:
 
 - buildTutorials
 
-### Step 17
+### Step 18
 
 The playlist Play Tutorials uses.
 
@@ -1535,13 +1559,17 @@ Screen reader:
 
 ### Step 2
 
+Every media link the page holds, counted and queued.
+
+### Step 3
+
 The player opens on its track list, and the first track plays.
 
 Screen reader:
 
 - Access On, Track list: list box, Episode 212, 1 of 4
 
-### Step 3: Alt+Shift+P
+### Step 4: Alt+Shift+P
 
 Now the same player in DbDo, on a radio station.
 
@@ -1550,39 +1578,43 @@ Screen reader:
 - 1 track from stations
 - RadioTrail, Track list: list box, KIRO 710 ESPN Seattle, 1 of 1
 
-### Step 4
-
-Scroll Lock pauses and resumes; the Volume and Rate sliders are ordinary sliders; Alt plus Shift plus R records a copy of the stream; Escape closes it. Learned once in FileDir, known in DbDo, because MediaPlayer dot cs lives in the kit and both programs compile it from there.
-
 ### Step 5
 
-The other classes work the same way, less visibly. Lbc builds every dialog you heard in walk one. Say speaks every message, choosing the channel of whichever screen reader is running, or the Windows voice when none is, and never speaking over a keystroke. Log writes the session log in one format for every program.
+The same window, the same list, the same keys, from a different program on different data.
 
 ### Step 6
 
-Inix reads the settings files -- the dot inix format, sections and lines, with the comments the kit's rules ask for, so a settings file is documentation too. Web fetches with the same user agent and the same patience. Util holds the small things: the pluralizer, the short path, the version string.
+Scroll Lock pauses and resumes; the Volume and Rate sliders are ordinary sliders; Alt plus Shift plus R records a copy of the stream; Escape closes it. Learned once in FileDir, known in DbDo, because MediaPlayer dot cs lives in the kit and both programs compile it from there.
 
 ### Step 7
 
-Mpv dot cs finds the player engine, machine-wide, and drives it: play, pause, record, the sliders. Media dot cs knows what a track is -- a file, a stream, an episode -- and what to say about one.
+The other classes work the same way, less visibly. Lbc builds every dialog you heard in walk one. Say speaks every message, choosing the channel of whichever screen reader is running, or the Windows voice when none is, and never speaking over a keystroke. Log writes the session log in one format for every program.
 
 ### Step 8
 
-What sharing buys. A fix to the player on Monday is in every program's next build; a new Say channel for a new reader reaches all of them; and a person who learned the dialog in one program has learned it in the next.
+Inix reads the settings files -- the dot inix format, sections and lines, with the comments the kit's rules ask for, so a settings file is documentation too. Web fetches with the same user agent and the same patience. Util holds the small things: the pluralizer, the short path, the version string.
 
 ### Step 9
 
-The cost is one rule: an app never copies a kit class into its own folder; it compiles against the kit.
+Mpv dot cs finds the player engine, machine-wide, and drives it: play, pause, record, the sliders. Media dot cs knows what a track is -- a file, a stream, an episode -- and what to say about one.
 
 ### Step 10
 
-A planned misstep, from this very week. A kit class had a line that depended on one app, and compiled in that app alone; the kit's check now compiles every shared class on its own, so the mistake is caught in the kit and not in the fifth app to try it.
+What sharing buys. A fix to the player on Monday is in every program's next build; a new Say channel for a new reader reaches all of them; and a person who learned the dialog in one program has learned it in the next.
 
 ### Step 11
 
-The Python side has the same shape: a Say, a Log, an Inix, a dialog builder, so a Python app -- HomerScribe is one -- speaks and logs and asks exactly as the C sharp ones do. Walk one's two fruit baskets were the proof.
+The cost is one rule: an app never copies a kit class into its own folder; it compiles against the kit.
 
 ### Step 12
+
+A planned misstep, from this very week. A kit class had a line that depended on one app, and compiled in that app alone; the kit's check now compiles every shared class on its own, so the mistake is caught in the kit and not in the fifth app to try it.
+
+### Step 13
+
+The Python side has the same shape: a Say, a Log, an Inix, a dialog builder, so a Python app -- HomerScribe is one -- speaks and logs and asks exactly as the C sharp ones do. Walk one's two fruit baskets were the proof.
+
+### Step 14
 
 Updating the kit is unarchiving HomerDev dot zip over the folder and building; every app's build checks the kit's version against the one it needs, and says so in one line when the kit is too old.
 
@@ -1590,23 +1622,23 @@ Screen reader:
 
 - ERROR: FileDir needs HomerDev 1.52.8 or later, and C colon backslash HomerDev is 1.52.6.
 
-### Step 13
+### Step 15
 
 How an app reaches the kit. Its build passes the kit's CSharp folder to the compiler, so Lbc dot cs, Say dot cs and the rest are compiled into the app from where they live; nothing is copied. The acceptance check named missing Lbc dot cs is the proof that nothing was.
 
-### Step 14
+### Step 16
 
 A worked case of the gain. The Homer Player's recording -- Alt plus Shift plus R, a Record button and a Stop recording button -- was written once, in the kit, on 5 October. FileDir had it on its next build, and DbDo on its next, with no change to either program.
 
-### Step 15
+### Step 17
 
 What belongs in the kit and what does not. A behaviour every app wants -- a dialog, speech, a log, a player -- belongs in the kit. A behaviour one app wants -- DbDo's grid, EdSharp's compiler table, FileDir's tags -- belongs in that app. The test: would a second app want it exactly as it is?
 
-### Step 16
+### Step 18
 
 What this walk taught. I say the idea or the key; the reader says the command or the name.
 
-### Step 17
+### Step 19
 
 The player every Homer program shares.
 
@@ -1614,7 +1646,7 @@ Screen reader:
 
 - MediaPlayer dot cs
 
-### Step 18
+### Step 20
 
 The dialog class.
 
@@ -1622,7 +1654,7 @@ Screen reader:
 
 - Lbc
 
-### Step 19
+### Step 21
 
 The speech class.
 

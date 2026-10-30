@@ -40,6 +40,10 @@ Hear=
 Say=A planned misstep, the one everybody meets. Change a dialog and reuse a letter, and check names the dialog and the two captions.
 Key=
 Hear=12 checks passed, 1 check failed. failed: access letters -- Filter Records: F is used by Find and Filter
+
+
+[step]
+
 Say=Fix the caption, build, check again. Nothing was published, and nothing was going to be.
 
 [step]

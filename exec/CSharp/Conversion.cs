@@ -253,32 +253,49 @@ if (aParts.Length > 1 && aParts[1].Trim() != "") sStepInput = Path.ChangeExtensi
 if (sMissing != "") { lsWhy.Add(sWay + ": " + sMissing); continue; }
 Stopwatch oClock = Stopwatch.StartNew();
 string sStepError;
-bool bMade = runWay(aSteps, sSource, sTarget, out sStepError);
+// FINISHED, THEN SWAPPED IN (1.94.1, from an audit by another AI). The last engine wrote the
+// target itself, which was then finished in place, so a failure part way -- a full disk, an
+// interrupted rewrite, a way that broke after writing -- left a changed or partial file under
+// the real name of a conversion that had failed. Each way now writes a staging file beside the
+// target, with the target's extension, and is finished there; Util.replaceFileSafely makes it the
+// target only when it is whole. The staging name is told to documentTitle through intendFor, so a
+// title still comes from the target's name.
+string sStage = stagingFor(sTarget);
+intendFor(sStage, sTarget);
+bool bMade = runWay(aSteps, sSource, sStage, out sStepError);
 oClock.Stop();
 Log.info("Conversion " + sRoute + " by " + sWay + ": " + (bMade ? "made" : "failed") + " in " + oClock.ElapsedMilliseconds + " ms, " + Path.GetFileName(sSource)
 + (sStepError != "" ? " -- " + sStepError : ""));
 if (bMade) {
+try {
 // EVERY WEB PAGE IN THE HOMER FORM (1.87.1): a page made by any way but the page and json
 // engines, which write it already, is finished as 2htm finishes its pages -- one H1, main
 // labelled by it, the base stylesheet -- when the app compiles ConversionPage.cs.
 if (typeOf(sTarget) == "htm" && !sWay.TrimEnd().EndsWith("page") && !sWay.TrimEnd().EndsWith("json")) {
 string sPageError = "";
-pageFinish(sTarget, ref sPageError);
+pageFinish(sStage, ref sPageError);
 if (sPageError != "") Log.info("Page form not applied to " + Path.GetFileName(sTarget) + ": " + sPageError);
 }
 // TEXT IN THE HOMER ENCODING (kit 1.80.0, from ChatGPT's BatCon work): whatever an engine wrote,
 // a text result ends as UTF-8 with a byte order mark and CRLF, as every Homer text file is.
 string sMadeType = typeOf(sTarget);
 if (Array.IndexOf(new string[] {"csv", "htm", "inix", "md", "tsv", "txt"}, sMadeType) >= 0) {
-string sMadeText = decodeText(File.ReadAllBytes(sTarget));
+string sMadeText = decodeText(File.ReadAllBytes(sStage));
 sMadeText = sMadeText.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "\r\n");
-File.WriteAllText(sTarget, sMadeText, new UTF8Encoding(true));
+File.WriteAllText(sStage, sMadeText, new UTF8Encoding(true));
 }
 // EVERY FILE FINISHED FOR A SCREEN READER, THEN CHECKED (kit 1.91.0): see finishOutput. The
 // middle file of a two-step conversion is not, since the next step reads it, not a person.
-if (!hsIntermediates.Contains(Path.GetFullPath(sTarget))) finishOutput(sTarget);
+if (!hsIntermediates.Contains(Path.GetFullPath(sTarget))) finishOutput(sStage);
+string sWarning = Util.replaceFileSafely(sStage, sTarget, "");
+if (sWarning != "") Log.warn(sWarning);
 return true;
 }
+catch (Exception oError) { bMade = false; sStepError = "finishing failed: " + oError.Message; Log.exception(oError); }
+finally { forgetIntended(sStage); }
+}
+else forgetIntended(sStage);
+try { if (File.Exists(sStage)) File.Delete(sStage); } catch (Exception) { }
 lsWhy.Add(sWay + ": " + sStepError);
 }
 sError = lsWhy.Count == 1 ? lsWhy[0] : "every way failed: " + String.Join("; ", lsWhy.ToArray());
@@ -1346,7 +1363,7 @@ def writeRecords(lRows):
                 if re.match(r'^[\d.]+$', d.get('Seconds', '')): ET.SubElement(oTrack, 'duration').text = str(int(float(d['Seconds']) * 1000))
             lOut = ['<?xml version=""1.0"" encoding=""UTF-8""?>', ET.tostring(oList, encoding='unicode')]
     elif sKind == 'opml':
-        oOpml = ET.Element('opml', {'version': '2.0'}); ET.SubElement(ET.SubElement(oOpml, 'head'), 'title').text = os.path.splitext(os.path.basename(sOut[:-5] if sOut.lower().endswith('.part') else sOut))[0]
+        oOpml = ET.Element('opml', {'version': '2.0'}); ET.SubElement(ET.SubElement(oOpml, 'head'), 'title').text = re.sub(r'\.homer-staging(-\d+)?$', '', os.path.splitext(os.path.basename(sOut[:-5] if sOut.lower().endswith('.part') else sOut))[0])
         oBody = ET.SubElement(oOpml, 'body'); dGroups = {}
         for d in lRows:
             if not d.get('Feed', '').strip(): continue
@@ -1453,8 +1470,35 @@ sb.Append(sText.Trim()).Append("\r\n\r\n");
 }
 }
 else if (sFrom == "xlsx") {
-foreach (Match oString in Regex.Matches(entryText(zip, "xl/sharedStrings.xml"), @"<si>(.*?)</si>", RegexOptions.Singleline))
-sb.Append(runText(oString.Groups[1].Value, @"<t(?:\s[^>]*)?>(.*?)</t>", "")).Append("\r\n");
+// EVERY SHEET, CELL BY CELL (1.94.1, from an audit by another AI). This read only the
+// shared-string pool: every text in the workbook in one heap, with numbers and inline
+// text left out and no rows or columns. Each sheet is now read as Table reads it, in
+// the workbook's order, a blank cell keeping its place, as exec\Python\conversion.py's
+// zipXlsx does: a Markdown table per sheet, or tab-separated lines in plain text.
+List<string> lsShared = Table.xlsxShared(zip);
+foreach (string[] aSheet in Table.xlsxSheets(zip)) {
+List<List<string>> lsRows = Table.xlsxRows(zip, aSheet[1], lsShared);
+if (bMarkdown) {
+sb.Append("## ").Append(aSheet[0]).Append("\r\n\r\n");
+int iWidth = 0;
+foreach (List<string> lsRow in lsRows) iWidth = Math.Max(iWidth, lsRow.Count);
+for (int iRow = 0; iRow < lsRows.Count && iWidth > 0; iRow++) {
+sb.Append("|");
+for (int iCell = 0; iCell < iWidth; iCell++) {
+string sCell = iCell < lsRows[iRow].Count ? lsRows[iRow][iCell] : "";
+sb.Append(" ").Append(sCell.Replace("|", "\\|").Replace("\r\n", " ").Replace('\n', ' ').Replace('\r', ' ')).Append(" |");
+}
+sb.Append("\r\n");
+if (iRow == 0) { sb.Append("|"); for (int iCell = 0; iCell < iWidth; iCell++) sb.Append("---|"); sb.Append("\r\n"); }
+}
+sb.Append("\r\n");
+}
+else {
+sb.Append(aSheet[0]).Append("\r\n");
+foreach (List<string> lsRow in lsRows) sb.Append(string.Join("\t", lsRow.ToArray())).Append("\r\n");
+sb.Append("\r\n");
+}
+}
 }
 else if (sFrom == "odt" || sFrom == "odp" || sFrom == "ods") {
 string sXml = entryText(zip, "content.xml");
@@ -1608,7 +1652,8 @@ return true;
 catch (Exception oError) { sError = "the Markdown could not be written as a web page: " + oError.Message; return false; }
 } // markdownToHtml method
 
-private static string[] markdownCells(string sRow) {
+// internal (1.94.1): Table.fromMarkdown splits its rows with it too.
+internal static string[] markdownCells(string sRow) {
 string s = sRow.Trim();
 if (s.StartsWith("|")) s = s.Substring(1);
 if (s.EndsWith("|") && !s.EndsWith("\\|")) s = s.Substring(0, s.Length - 1);
@@ -1887,8 +1932,35 @@ return true;
 catch (Exception oError) { Log.warn("Finishing " + Path.GetFileName(sPath) + " for a screen reader failed: " + oError.Message); return false; }
 } // finishOutput method
 
+// THE NAME A FILE IS MADE FOR (1.94.1, from an audit by another AI). A file finished under a
+// staging name -- the route's own, or a caller's such as BatCon's -- took its document title from
+// that name. A caller names the final path with intendFor, and documentTitle uses it; as
+// exec\Python\conversion.py does.
+private static Dictionary<string, string> dIntendedNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+public static void intendFor(string sStage, string sFinal) {
+lock (dIntendedNames) dIntendedNames[Path.GetFullPath(sStage)] = Path.GetFullPath(sFinal);
+} // intendFor method
+
+public static void forgetIntended(string sStage) {
+lock (dIntendedNames) dIntendedNames.Remove(Path.GetFullPath(sStage));
+} // forgetIntended method
+
+// stagingFor: a free name beside sTarget with sTarget's own extension, the same form Python uses.
+private static string stagingFor(string sTarget) {
+string sFull = Path.GetFullPath(sTarget);
+string sRoot = Path.Combine(Path.GetDirectoryName(sFull), Path.GetFileNameWithoutExtension(sFull));
+string sExt = Path.GetExtension(sFull);
+for (int iTry = 0; ; iTry++) {
+string sStage = sRoot + ".homer-staging" + (iTry == 0 ? "" : "-" + iTry) + sExt;
+if (!File.Exists(sStage)) return sStage;
+}
+} // stagingFor method
+
 // documentTitle: a title from a file's name, when it has none of its own.
 public static string documentTitle(string sPath) {
+// A chain is followed: BatCon stages its result, and the route stages BatCon's staging file.
+lock (dIntendedNames) { string sFinal; for (int iHop = 0; iHop < 5 && dIntendedNames.TryGetValue(Path.GetFullPath(sPath), out sFinal); iHop++) sPath = sFinal; }
 string sStem = Path.GetFileNameWithoutExtension(sPath).Replace('_', ' ').Trim();
 return sStem.Length == 0 ? "Untitled" : sStem;
 } // documentTitle method

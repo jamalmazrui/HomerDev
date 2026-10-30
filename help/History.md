@@ -7,6 +7,18 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.94.1 -- 30 October 2026
+
+From an audit by another AI of twelve Homer repositories; each fix keeps the integrated design.
+
+- **A converted file is finished, then swapped in.** Each way writes a staging file beside the target, with the target's extension, and is finished there; only a whole result replaces the target, through Util.replaceFileSafely in C# and one rename in Python. A failure while finishing used to leave a changed or partial file under the real name of a conversion that had failed.
+- **A title comes from the name a file is made for.** intendFor tells documentTitle the final name of a staging file, following a chain, so neither the kit's staging name nor a caller's, such as BatCon's, becomes a document's title.
+- **Workbooks are read in the workbook's own order.** Both languages follow xl/workbook.xml and its relationships to each sheet, where they took sheet1.xml or the first part name by sort. Every cell keeps its column, so a blank cell is not closed up; numbers and inline text are read. C# zipxml reads every sheet this way, where it read only the shared strings; and an empty cell written as `<c r="B1"/>` no longer swallows the next one.
+- **An escaped pipe stays in its Markdown table cell,** in Table.cs and conversion.py, which split on every pipe; a round trip through Markdown is now exact. Python's sheet tables escape pipes too.
+- **One Say a step.** A second Say after the reader's lines was neither spoken nor written into the transcript; the checker now refuses it, and eight steps of the kit's tutorials are split.
+- **The book tools, from an audit of MyBooks.** kdpSubmit and kdpUpdate share one readiness check, kdpSubmit.auditProblem, which needs the audit's exact EPUB fingerprint; any changed file in a book's folder makes its EPUB stale. An upload is confirmed only by a success message that appears after it, naming its file when it names one. buildBooks publishes an EPUB only after every check passes, keeping a failed one as `<book>.rejected.epub`. Picture settings that differ from their defaults join the build fingerprint.
+- **A field an upgrade added may follow marked.** The kit's Schema adds a field a newer template gained with ALTER TABLE, which can only put it at the end, after marked. The database check failed such a table, so a supported upgrade made a database the kit called broken. It is now a warning that names the field; anything else after marked still fails (from an audit by another AI).
+
 ## 1.94.0 -- 29 October 2026
 
 - **Stored parts, in Util.cs and util.py.** A value built of parts -- DbDo's look and prime, made from a record's fields -- is stored with the parts joined by ASCII 31, the unit separator, which never occurs in real text, so the value always splits back into exact parts. Util.aPartsOf splits it, Util.sJoinParts joins it, Util.sScreenText shows it with a space and Util.sExportText writes it to a text export with a semicolon and a space. Speech says each part in its own call, Say.sayParts(Util.aPartsOf(sValue)), so the pause between calls marks each boundary with no punctuation word. A value with no separator passes through unchanged. Came from DbDo, which had its own copies; it now uses these.

@@ -207,8 +207,11 @@ continue;
 }
 // The dashed line under the header is not data.
 if (Regex.IsMatch(sLine, @"^\|?[\s:\-|]+\|?$")) continue;
-string sTrim = sLine.Trim('|');
-lsCells.Add(sTrim.Split('|'));
+// AN ESCAPED PIPE STAYS IN ITS CELL (1.94.1, from an audit by another AI). The writer
+// escapes a pipe in a value as \|, but this reader split on every pipe, so one cell
+// became two and the row's later cells moved. Rows are split as the Markdown page
+// writer splits them, by Conversion.markdownCells.
+lsCells.Add(Conversion.markdownCells(sLine));
 }
 if (lsCells.Count == 0) {
 sError = "no table was found in this Markdown file";
@@ -234,54 +237,20 @@ public static Table fromXlsx(string sPath, out string sError) {
 // string table.
 sError = "";
 Table table = new Table();
-List<string> lsShared = new List<string>();
-string sSheetXml = "";
+List<List<string>> lsAll;
 try {
 using (System.IO.Compression.ZipArchive zip = System.IO.Compression.ZipFile.OpenRead(sPath)) {
-System.IO.Compression.ZipArchiveEntry entryShared = findEntry(zip, "xl/sharedStrings.xml");
-if (entryShared != null) {
-string sXml = readEntry(zip, entryShared);
-foreach (Match match in Regex.Matches(sXml, @"<si>(.*?)</si>", RegexOptions.Singleline)) {
-StringBuilder sb = new StringBuilder();
-foreach (Match run in Regex.Matches(match.Groups[1].Value, @"<t(?:\s[^>]*)?>(.*?)</t>", RegexOptions.Singleline))
-sb.Append(unescapeXml(run.Groups[1].Value));
-lsShared.Add(sb.ToString());
-}
-}
-// The first sheet by name, which is how a workbook numbers them.
-string sWanted = "";
-foreach (System.IO.Compression.ZipArchiveEntry entry in zip.Entries) {
-if (entry.FullName.EndsWith("/")) continue;
-string sName = entry.FullName.Replace('\\', '/').ToLower();
-if (!sName.StartsWith("xl/worksheets/sheet") || !sName.EndsWith(".xml")) continue;
-if (sWanted.Length == 0 || String.Compare(sName, sWanted, StringComparison.Ordinal) < 0)
-sWanted = entry.FullName;
-}
-if (sWanted.Length == 0) {
+List<string[]> lsSheets = xlsxSheets(zip);
+if (lsSheets.Count == 0) {
 sError = "no worksheet was found in this workbook";
 return table;
 }
-sSheetXml = readEntry(zip, findEntry(zip, sWanted));
+lsAll = xlsxRows(zip, lsSheets[0][1], xlsxShared(zip));
 }
 }
 catch (Exception ex) {
 sError = ex.Message;
 return table;
-}
-
-// Every row, and within it every cell placed by the letters of its reference,
-// so a gap in the middle of a row stays a gap.
-List<List<string>> lsAll = new List<List<string>>();
-foreach (Match rowMatch in Regex.Matches(sSheetXml, @"<row[^>]*>(.*?)</row>", RegexOptions.Singleline)) {
-List<string> lsRow = new List<string>();
-foreach (Match cellMatch in Regex.Matches(rowMatch.Groups[1].Value, @"<c([^>]*)>(.*?)</c>|<c([^>]*)/>", RegexOptions.Singleline)) {
-string sAttrs = cellMatch.Groups[1].Success ? cellMatch.Groups[1].Value : cellMatch.Groups[3].Value;
-string sBody = cellMatch.Groups[2].Success ? cellMatch.Groups[2].Value : "";
-int iColumn = columnOf(sAttrs);
-while (lsRow.Count < iColumn) lsRow.Add("");
-lsRow.Add(cellText(sAttrs, sBody, lsShared));
-}
-lsAll.Add(lsRow);
 }
 if (lsAll.Count == 0) {
 sError = "this worksheet has no rows in it";
@@ -291,6 +260,79 @@ foreach (string sField in lsAll[0]) table.lsFields.Add(sField);
 for (int i = 1; i < lsAll.Count; i++) table.lsRows.Add(lsAll[i]);
 return table;
 } // fromXlsx method
+
+// xlsxShared: the workbook's shared strings, in order, for cells that point into them.
+internal static List<string> xlsxShared(System.IO.Compression.ZipArchive zip) {
+List<string> lsShared = new List<string>();
+System.IO.Compression.ZipArchiveEntry entryShared = findEntry(zip, "xl/sharedStrings.xml");
+if (entryShared == null) return lsShared;
+string sXml = readEntry(zip, entryShared);
+foreach (Match match in Regex.Matches(sXml, @"<si>(.*?)</si>", RegexOptions.Singleline)) {
+StringBuilder sb = new StringBuilder();
+foreach (Match run in Regex.Matches(match.Groups[1].Value, @"<t(?:\s[^>]*)?>(.*?)</t>", RegexOptions.Singleline))
+sb.Append(unescapeXml(run.Groups[1].Value));
+lsShared.Add(sb.ToString());
+}
+return lsShared;
+} // xlsxShared method
+
+// xlsxSheets: each worksheet as { name, part path }, in the workbook's own order.
+// BY THE WORKBOOK, NOT THE FILE NAME (1.94.1, from an audit by another AI). The first
+// sheet was the part whose name sorted first, so sheet10.xml came before sheet2.xml,
+// and a sheet moved in Excel kept its old part name. xl/workbook.xml lists the sheets
+// in order, and xl/_rels/workbook.xml.rels names each one's part; both are followed.
+// A workbook without them falls back to its sheetN.xml parts in number order.
+internal static List<string[]> xlsxSheets(System.IO.Compression.ZipArchive zip) {
+List<string[]> lsSheets = new List<string[]>();
+Dictionary<string, string> dTargets = new Dictionary<string, string>();
+foreach (Match rel in Regex.Matches(readEntry(zip, findEntry(zip, "xl/_rels/workbook.xml.rels")), @"<Relationship\b([^>]*?)/?>", RegexOptions.Singleline)) {
+Match id = Regex.Match(rel.Groups[1].Value, @"\bId=""([^""]*)""");
+Match target = Regex.Match(rel.Groups[1].Value, @"\bTarget=""([^""]*)""");
+if (!id.Success || !target.Success) continue;
+string sTarget = target.Groups[1].Value.Replace('\\', '/');
+sTarget = sTarget.StartsWith("/") ? sTarget.Substring(1) : "xl/" + sTarget;
+dTargets[id.Groups[1].Value] = sTarget;
+}
+int iSheet = 0;
+foreach (Match sheet in Regex.Matches(readEntry(zip, findEntry(zip, "xl/workbook.xml")), @"<sheet\b([^>]*?)/?>", RegexOptions.Singleline)) {
+iSheet++;
+Match name = Regex.Match(sheet.Groups[1].Value, @"\bname=""([^""]*)""");
+Match rid = Regex.Match(sheet.Groups[1].Value, @"\br:id=""([^""]*)""");
+string sPart = rid.Success && dTargets.ContainsKey(rid.Groups[1].Value) ? dTargets[rid.Groups[1].Value] : "xl/worksheets/sheet" + iSheet + ".xml";
+if (findEntry(zip, sPart) == null) continue;
+lsSheets.Add(new string[] { name.Success ? unescapeXml(name.Groups[1].Value) : "Sheet" + iSheet, sPart });
+}
+if (lsSheets.Count > 0) return lsSheets;
+List<string> lsParts = new List<string>();
+foreach (System.IO.Compression.ZipArchiveEntry entry in zip.Entries) {
+string sName = entry.FullName.Replace('\\', '/');
+if (Regex.IsMatch(sName, @"^xl/worksheets/sheet\d+\.xml$", RegexOptions.IgnoreCase)) lsParts.Add(sName);
+}
+lsParts.Sort(delegate(string a, string b) { return int.Parse(Regex.Match(a, @"(\d+)\.xml$").Groups[1].Value).CompareTo(int.Parse(Regex.Match(b, @"(\d+)\.xml$").Groups[1].Value)); });
+foreach (string sPart in lsParts) lsSheets.Add(new string[] { Path.GetFileNameWithoutExtension(sPart), sPart });
+return lsSheets;
+} // xlsxSheets method
+
+// xlsxRows: a worksheet's rows, every cell placed by the letters of its reference,
+// so a gap in the middle of a row stays a gap.
+internal static List<List<string>> xlsxRows(System.IO.Compression.ZipArchive zip, string sPart, List<string> lsShared) {
+string sSheetXml = readEntry(zip, findEntry(zip, sPart));
+List<List<string>> lsAll = new List<List<string>>();
+foreach (Match rowMatch in Regex.Matches(sSheetXml, @"<row[^>]*>(.*?)</row>", RegexOptions.Singleline)) {
+List<string> lsRow = new List<string>();
+// An empty cell written as <c r="B1"/> is matched first (1.94.1): the other form once
+// read it as an open cell running to the next one's </c>, which swallowed that cell.
+foreach (Match cellMatch in Regex.Matches(rowMatch.Groups[1].Value, @"<c\b([^>]*?)/>|<c\b([^>]*)>(.*?)</c>", RegexOptions.Singleline)) {
+string sAttrs = cellMatch.Groups[1].Success ? cellMatch.Groups[1].Value : cellMatch.Groups[2].Value;
+string sBody = cellMatch.Groups[3].Success ? cellMatch.Groups[3].Value : "";
+int iColumn = columnOf(sAttrs);
+while (lsRow.Count < iColumn) lsRow.Add("");
+lsRow.Add(cellText(sAttrs, sBody, lsShared));
+}
+lsAll.Add(lsRow);
+}
+return lsAll;
+} // xlsxRows method
 
 // findEntry: a part by name, ignoring case, since Office and other writers
 // differ in how they capitalize them.

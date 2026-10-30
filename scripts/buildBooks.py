@@ -1783,8 +1783,11 @@ def buildEpub(dBook, dKdp, dAudit, dEdition=None):
     except Exception:
         if os.path.exists(sEpub): os.remove(sEpub)
         raise
-    os.replace(sEpub, sFinal)
-    sEpub = sFinal
+    # A CANDIDATE UNTIL IT PASSES (30 October 2026, from an audit by another AI): the new EPUB took results\<book>.epub
+    # here, before the audit, EPUBCheck, Ace and Kindle Previewer had judged it, so one that failed them replaced the
+    # last good one. It stays the .building.epub candidate; publishEpub makes it the book's EPUB only when no check
+    # found an error, and otherwise keeps the last good one and the candidate apart.
+    dAudit["epubFinal"] = sFinal
     if dEdition:
         log("%s: built the %s edition, %s, %s bytes; %s replaced, %s to %s made plain text" % (sRoot, dEdition["name"], sEpub, format(os.path.getsize(sEpub), ","), plural(len(dEdition["replacements"]), "passage"), plural(iUnlinked, "link"), ", ".join(dEdition["unlink"]) or "no host"))
         return sEpub
@@ -2362,6 +2365,25 @@ def mdEscape(sText):
     return re.sub(r"([\\`*_\[\]<>#|])", r"\\\1", sText)
 
 
+def publishEpub(dAudit):
+    """After every check: the candidate becomes the book's EPUB when no check found an error. Otherwise the last good
+    EPUB stays where it is, the candidate is kept beside it as <name>.rejected.epub, and the audit names that file as
+    the one it judged. Returns the path the audit judged."""
+    sCandidate, sFinal = dAudit.get("epub", ""), dAudit.get("epubFinal", "")
+    if not sCandidate or not sFinal or sCandidate == sFinal or not os.path.exists(sCandidate): return sCandidate
+    if not dAudit["errors"]:
+        os.replace(sCandidate, sFinal)
+        dAudit["epub"] = sFinal
+        return sFinal
+    sRejected = sFinal[:-5] + ".rejected.epub"
+    os.replace(sCandidate, sRejected)
+    dAudit["epub"] = sRejected
+    dAudit["warnings"].append("The checks found errors, so " + ("the last good EPUB, results\\" + os.path.basename(sFinal) + ", is kept" if os.path.exists(sFinal) else "no EPUB is published")
+                              + "; this audit judged the rejected one, results\\" + os.path.basename(sRejected) + ".")
+    log(dAudit["root"] + ": not published; the rejected EPUB is " + sRejected)
+    return sRejected
+
+
 def writeAudit(dBook, dAudit):
     """results\\<root>-audit.md and .htm: verdict first, then each check, problems as list items."""
     lErrors, lWarnings = dAudit["errors"], dAudit["warnings"]
@@ -2371,7 +2393,7 @@ def writeAudit(dBook, dAudit):
     l += ["## Verdict", "", ("Ready to submit" if bReady else "Not ready to submit") + ": " + plural(len(lErrors), "error") + " and " + plural(len(lWarnings), "warning") + ".", ""]
     l += ["## Book", "", "- Title: " + mdEscape(dBook["title"]) + (": " + mdEscape(dBook["subtitle"]) if dBook["subtitle"] else ""), "- Manuscript: " + (mdEscape(externalManuscript(dBook)) + ", built by its own project" if dBook.get("externalProject") else "books\\\\" + dBook["root"] + "\\\\" + dBook["root"] + ".md")]
     if dAudit.get("epub"):
-        l.append("- EPUB: results\\\\" + dBook["root"] + ".epub, " + "{:.2f}".format(dAudit["size"] / 1048576.0) + " MB" + (". At the 70 percent royalty KDP would deduct about $" + "{:.2f}".format(dAudit["deliveryFee"]) + " a sale in the US for delivery" + (", which this book pays now" if dAudit.get("royalty") == "70_PERCENT" else "; this book is at 35 percent, which has no delivery fee") + "." if dAudit.get("size") else ""))
+        l.append("- EPUB: results\\\\" + os.path.basename(dAudit["epub"]) + ", " + "{:.2f}".format(dAudit["size"] / 1048576.0) + " MB" + (". At the 70 percent royalty KDP would deduct about $" + "{:.2f}".format(dAudit["deliveryFee"]) + " a sale in the US for delivery" + (", which this book pays now" if dAudit.get("royalty") == "70_PERCENT" else "; this book is at 35 percent, which has no delivery fee") + "." if dAudit.get("size") else ""))
     l.append("- Cover inside the EPUB: " + (dAudit.get("cover") or "none"))
     # The fingerprint of the EPUB this audit judged (8 October 2026, from an audit by another AI): kdpUpdate sends a book
     # only when the EPUB in results is this exact file, so an old audit cannot approve a newer or damaged one.
@@ -2432,6 +2454,12 @@ def buildKey(dBook, sBookDir, dKdp):
                 if os.path.isfile(sPath): lsTemplates.append(sName.lower() + ":" + hashlib.sha256(open(sPath, "rb").read()).hexdigest())
     lsEditions = [os.path.basename(s) + ":" + hashlib.sha256(open(s, "rb").read()).hexdigest() for s in sorted(glob.glob(os.path.join(sProject, "configs", "editions", dBook["root"] + "-*.inix")), key=str.lower)]
     lParts = [sBuildFormat, kdpSubmit.bookSourcesSha(sBookDir), dBook, {s: dKdp.get(s, {}) for s in ("kdp", "proposed")}, lsTemplates, dTools.get("pandocVersion", ""), lsEditions]
+    # THE PICTURE SETTINGS TOO (30 October 2026, from an audit by another AI): imageMaxBytes, imageMaxEdge and
+    # jpegQuality change the EPUB, but a change to them alone left the last build in place. A setting that differs
+    # from its default is now part of the fingerprint; one at its default adds nothing, so a book whose settings never
+    # changed keeps the fingerprint it had and is not sent to KDP again for this change.
+    dOutput = {sKey: str(dSettings.get(sKey, "")) for sKey in ("imageMaxBytes", "imageMaxEdge", "jpegQuality") if str(dSettings.get(sKey, dDefaults[sKey])) != dDefaults[sKey]}
+    if dOutput: lParts.append(dOutput)
     return hashlib.sha256(json.dumps(lParts, sort_keys=True, default=str).encode("utf-8")).hexdigest()
 
 
@@ -2778,12 +2806,16 @@ def main():
                 runAce(sEpub, dAudit)
                 runKindlePreviewer(sEpub, dAudit)
                 keepEvidence(sEpub, dAudit)
+                sEpub = publishEpub(dAudit)
                 # EVERY EDITION, built from the same manuscript and checked by EPUBCheck; an edition that fails makes the
                 # book not ready, since what goes to another store must be as sound as what goes to KDP.
                 for dEdition in editionRules(dBook["root"]):
                     dEditionAudit = {"root": dBook["root"] + "-" + dEdition["name"], "errors": [], "warnings": []}
                     sEditionEpub = buildEpub(dBook, dKdp, dEditionAudit, dEdition)
-                    if sEditionEpub: runEpubcheck(sEditionEpub, dEditionAudit)
+                    if sEditionEpub:
+                        runEpubcheck(sEditionEpub, dEditionAudit)
+                        dEditionAudit["epub"] = sEditionEpub
+                        sEditionEpub = publishEpub(dEditionAudit)
                     for sProblem in dEditionAudit["errors"]: dAudit["errors"].append(dEdition["name"] + " edition: " + sProblem)
                     dAudit.setdefault("editions", []).append("%s: %s, %s" % (dEdition["name"], dEdition["file"], "built and checked" if sEditionEpub and not dEditionAudit["errors"] else plural(len(dEditionAudit["errors"]) or 1, "problem")))
         except Exception as oError:

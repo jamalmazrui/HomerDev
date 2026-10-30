@@ -9,6 +9,10 @@ Homework=Make an app of your own with newHomerApp, build it, run it, and add one
 Say=The want: a new program of your own, built on the kit, running by the end of the walk. In the kit folder, newHomerApp with a name makes the folder and its files.
 Key=newHomerApp Recipes
 Hear=Made C colon backslash Recipes with 14 files. Run build there.
+
+
+[step]
+
 Say=A folder beside the kit, with everything the kit's checks expect.
 
 [step]
@@ -30,6 +34,10 @@ Key=build
 Hear=Kit, C colon backslash HomerDev version 1.52.8
 Hear=Version, 1.0.0
 Hear=Built Recipes dot exe version 1.0.0
+
+
+[step]
+
 Say=The build read the kit's version first and would have refused an older one; then it fixed the encoding of every file, generated the hotkey list, spoke the tutorials that had no audio, compiled, and built the installer.
 
 [step]

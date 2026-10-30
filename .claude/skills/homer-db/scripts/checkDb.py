@@ -107,8 +107,15 @@ def checkDatabase(sPath):
                 note("pass", sSub, "%s is column %d, TEXTTIME defaulting to the current time" % (sName, iIndex + 1))
             else:
                 note("fail" if sName not in lsNames else "warn", sSub, "%s should be column %d, TEXTTIME NOT NULL DEFAULT CURRENT_TIMESTAMP" % (sName, iIndex + 1))
+        # A FIELD AN UPGRADE ADDED MAY FOLLOW MARKED (1.94.1, from an audit by another AI). The kit's Schema adds a field
+        # a newer template gained with ALTER TABLE, which can only append, so an upgraded table has it after marked.
+        # Nothing is wrong with the data, and rebuilding a person's table to move one field is a risk not worth taking,
+        # so that case is a warning; anything else out of place after marked still fails.
+        lsAfter = lsNames[lsNames.index("marked") + 1:] if "marked" in lsNames else []
         if lsNames and lsNames[-1] == "marked" and dCol["marked"][3] == 1:
             note("pass", sSub, "marked is the last column, never null")
+        elif "marked" in lsNames and dCol["marked"][3] == 1 and lsAfter and all(dCol[s][6] == 0 and s not in ("url", "notes", "tags", "look", "prime") for s in lsAfter):
+            note("warn", sSub, "marked is followed by %s, added by an upgrade; a table made from the template ends with marked" % ", ".join(lsAfter))
         else:
             note("fail", sSub, "marked should be the last column, INTEGER NOT NULL DEFAULT 0")
         for sName in ("look", "prime"):

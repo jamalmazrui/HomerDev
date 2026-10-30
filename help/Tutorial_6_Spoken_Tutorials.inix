@@ -45,6 +45,10 @@ Hear=12 scripts checked, 0 problems.
 Say=A planned misstep. Write a Hear line with a plus sign in it, or a file name as written, and the checker names the step.
 Key=
 Hear=Tutorial underscore 17, step 6: Hear writes an access key with a plus sign; the reader says the words
+
+
+[step]
+
 Say=Fix the line, run it again.
 
 [step]
