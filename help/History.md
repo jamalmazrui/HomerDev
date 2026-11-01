@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.95.1 -- 1 November 2026
+
+- **A prompt's ampersand is a character.** The list Filter prompt said "with & or | or *", and its label took the ampersand as an access-key marker, so JAWS read "with  or" and "Alt+". Prompts now show their text as written.
+
 ## 1.95.0 -- 31 October 2026
 
 - **One search syntax, Homer.Search, in Lbc.cs.** Every search that is not a regular expression reads a pattern the same way: a word anywhere, `*` and `?` as wildcards, `&` all, `|` any (with `&` read first), `!` not, and quotes for exact text. Searching a name, a wildcard term must match all of it (`*.md`); searching text, every term may match anywhere. HomerSearch.md describes it.

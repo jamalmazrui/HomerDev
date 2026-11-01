@@ -1524,6 +1524,10 @@ public class LbcDialog : IDisposable
             prompt.ClientSize = new Size(400, 110);
             prompt.KeyPreview = true;
             Label lbl = new Label();
+            // A PROMPT IS TEXT, NOT A CAPTION (1 November 2026): the Filter prompt said
+            // "with & or | or *", and the ampersand was taken as an access-key marker --
+            // JAWS read "with  or" and "Alt+". No prompt here gives its box an access key.
+            lbl.UseMnemonic = false;
             lbl.Text = sPrompt;
             lbl.AutoSize = true;
             lbl.Location = new Point(12, 12);
