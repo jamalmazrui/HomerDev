@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.95.2 -- 1 November 2026
+
+- **The key check reads navigation keys correctly.** It took the words "Alt+Control+Shift with an arrow" as a key named Shift, and Number Pad 5 as a letter key, so DbDo's push stopped on its own table keys. A modifier named in prose is skipped, and Number Pad 5 counts as a navigation key, as the arrows, Home, End, Page Up and Page Down already did. Every app's copy of check.py is the kit's.
+
 ## 1.95.1 -- 1 November 2026
 
 - **A prompt's ampersand is a character.** The list Filter prompt said "with & or | or *", and its label took the ampersand as an access-key marker, so JAWS read "with  or" and "Alt+". Prompts now show their text as written.
