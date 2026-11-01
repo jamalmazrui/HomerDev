@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.95.0 -- 31 October 2026
+
+- **One search syntax, Homer.Search, in Lbc.cs.** Every search that is not a regular expression reads a pattern the same way: a word anywhere, `*` and `?` as wildcards, `&` all, `|` any (with `&` read first), `!` not, and quotes for exact text. Searching a name, a wildcard term must match all of it (`*.md`); searching text, every term may match anywhere. HomerSearch.md describes it.
+- **The kit's list dialogs use it** for Filter, Jump and Keywords; a line is a name, and a list's fuller item data is text. `keywordsMatch` calls it.
+- **Why.** FileDir's folder filter took `|` but not `&`; the list filter matched anywhere where the folder filter matched whole names; `?` was promised and worked almost nowhere; any `|` silently overrode `&`; and an apostrophe could break a filter.
+
 ## 1.94.2 -- 30 October 2026
 
 - **kdpSubmit keeps what it saw apart from why.** A setup page sent back to the Bookshelf was said to mean a review in progress, even when the Bookshelf did not show the title; then the cause is now said to be unknown (from ChatGPT's audit of the logs).

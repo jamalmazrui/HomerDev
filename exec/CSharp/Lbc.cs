@@ -1363,7 +1363,10 @@ public class LbcDialog : IDisposable
         List<int> liRows = new List<int>();
         for (int i = 0; i < state.lsAll.Count; i++)
         {
-            if (sLower.Length == 0 || keywordsMatch(state.lsSearch[i].ToLowerInvariant(), sLower)) liRows.Add(i);
+            // A line is a name; where the list knows more about an item than its line
+            // shows, all of that is read as text (31 October 2026).
+            bool bRicher = i < state.lsSearch.Count && state.lsSearch[i] != state.lsAll[i];
+            if (sLower.Length == 0 || (bRicher ? Search.isMatch(state.lsSearch[i], sFilter, false) : Search.isMatch(state.lsAll[i], sFilter, true))) liRows.Add(i);
         }
         // A FILTER THAT MATCHES NOTHING IS NOT APPLIED. An empty list is a
         // dead end with no way back that is obvious from inside it, and the
@@ -1429,7 +1432,7 @@ public class LbcDialog : IDisposable
         {
             // The prompt says what it takes, because a syntax nobody is told
             // about is a syntax nobody uses.
-            string sWanted = promptWithHistory("Filter", "Filter text, with & or | or *:",
+            string sWanted = promptWithHistory("Filter", "Filter: " + Search.Syntax,
                 "listFilter", stateFor(lb).sFilter);
             if (sWanted != null) applyFilter(lb, sWanted);
             return true;
@@ -1624,38 +1627,11 @@ public class LbcDialog : IDisposable
     // the same one is used here on what is known about each item.
     public static bool keywordsMatch(string sHaystack, string sPattern)
     {
+        // THE HOMER SEARCH SYNTAX (31 October 2026): Search, below, is now the one
+        // matcher; this name stays for the apps that call it. Keywords reads text,
+        // so every term may match anywhere. An empty pattern still finds nothing.
         if (string.IsNullOrEmpty(sPattern)) return false;
-        if (sHaystack == null) sHaystack = "";
-        char chJoin = sPattern.Contains("|") ? '|' : '&';
-        bool bAny = (chJoin == '|');
-        bool bSawOne = false;
-        foreach (string sRaw in sPattern.Split(chJoin))
-        {
-            string sTerm = sRaw.Trim();
-            if (sTerm.Length == 0) continue;
-            bSawOne = true;
-            bool bMatch = wildcardWithin(sHaystack, sTerm);
-            if (bAny && bMatch) return true;
-            if (!bAny && !bMatch) return false;
-        }
-        return bSawOne && !bAny;
-    }
-
-    // wildcardWithin: one term, where * stands for anything. Without a star
-    // this is a plain substring test, which is what nearly every term is.
-    private static bool wildcardWithin(string sHaystack, string sTerm)
-    {
-        if (sTerm.IndexOf('*') < 0) return sHaystack.Contains(sTerm);
-        string[] asParts = sTerm.Split('*');
-        int iAt = 0;
-        for (int i = 0; i < asParts.Length; i++)
-        {
-            if (asParts[i].Length == 0) continue;
-            int iFound = sHaystack.IndexOf(asParts[i], iAt, StringComparison.Ordinal);
-            if (iFound < 0) return false;
-            iAt = iFound + asParts[i].Length;
-        }
-        return true;
+        return Search.isMatch(sHaystack, sPattern, false);
     }
 
     private void moveTo(ListBox lb, int iRow)
@@ -1687,9 +1663,12 @@ public class LbcDialog : IDisposable
             if (bOverEverything && j < state.liRows.Count && state.liRows[j] < state.lsSearch.Count)
                 sItem = state.lsSearch[state.liRows[j]];
             sItem = sItem.ToLowerInvariant();
+            // Jump reads the line as a name; Keywords reads all that is known as
+            // text. Both in the Homer search syntax (31 October 2026); a plain
+            // word is still the plain substring Jump always was.
             bool bHit = bOverEverything
-                ? keywordsMatch(sItem, sLowerNeedle)
-                : sItem.Contains(sLowerNeedle);
+                ? Search.isMatch(sItem, sNeedle, false)
+                : Search.isMatch(sItem, sNeedle, true);
             if (bHit) return j;
         }
         return -1;
@@ -5331,6 +5310,183 @@ public class LaunchProgress : IDisposable
             iSpokenSoFar++;
         }
         try { Say.say(sSaid); } catch (Exception) { }
+    }
+}
+
+// ============================================================================
+// Search: THE HOMER SEARCH SYNTAX (31 October 2026). One way to say what you
+// are looking for, in every Homer search that is not a regular expression:
+//
+//   red            red, anywhere, case aside
+//   re*d  ch?p     * any run of characters, ? any one character
+//   red & blue     both                     (& binds before |, so
+//   red | blue     either                    red & blue | green is
+//   !draft         not draft                 (red and blue) or green)
+//   "a & b"        exactly what is inside the quotes, symbols and all
+//
+// ONE RULE FOR WHERE A WILDCARD APPLIES. Searching a NAME -- a file name, a line
+// of a list, one field -- a term with a wildcard must match the whole name, as
+// file patterns always have: *.md is a name ending in .md, chap* one starting
+// with chap. Searching TEXT -- a file's contents, a whole record -- every term
+// may match anywhere. A term without a wildcard matches anywhere in both. So a
+// plain word behaves the same everywhere, and *.md means what a Windows user
+// expects it to.
+//
+// WHY NOT ONE OF THE OLD SYNTAXES. FileDir's folder filter matched whole names
+// and took | but not &; the list filter matched anywhere and took both; ? was
+// promised in help and worked nowhere but File Find; mixing & and | let any |
+// silently win; and a quote or a bracket in a name could break a filter. This
+// keeps every pattern that worked before working the same way, except that a
+// line mixing & and | now groups as written.
+// ============================================================================
+public static class Search
+{
+    // The syntax in one line, for prompts and help.
+    public const string Syntax = "& both, | either, ! not, * any characters, ? one character, \"quotes\" exact";
+
+    // A term: its text, with * and ? outside quotes held as the two marker
+    // characters below so a quoted * stays a star.
+    public class Term
+    {
+        public string sText = "";
+        public bool bNot = false;
+        public bool bWild = false;
+    }
+
+    private const char cAny = '\u0001';
+    private const char cOne = '\u0002';
+    private static Dictionary<string, Regex> dRegexCache = new Dictionary<string, Regex>();
+
+    // parse: the pattern as alternatives (|), each a list of terms that must all
+    // match (&). An empty pattern gives no alternatives.
+    public static List<List<Term>> parse(string sPattern)
+    {
+        List<List<Term>> llAlternatives = new List<List<Term>>();
+        List<Term> lTerms = new List<Term>();
+        StringBuilder sb = new StringBuilder();
+        bool bInQuotes = false, bNot = false, bStarted = false, bWild = false;
+        string s = sPattern ?? "";
+        for (int i = 0; i <= s.Length; i++)
+        {
+            char c = (i < s.Length) ? s[i] : '\0';
+            bool bEnd = (i == s.Length);
+            if (!bEnd && bInQuotes)
+            {
+                if (c == '"') bInQuotes = false; else sb.Append(c);
+                continue;
+            }
+            if (!bEnd && c == '"') { bInQuotes = true; bStarted = true; continue; }
+            if (bEnd || c == '&' || c == '|')
+            {
+                string sTerm = sb.ToString();
+                // Spaces at the edges of an unquoted term are only spacing; inside
+                // quotes they were appended as they are and survive the trim
+                // because a quoted term is never empty-checked by its edges alone.
+                string sTrim = sTerm.Trim(' ', '\t');
+                if (bStarted && sTerm.Length > 0 && sTrim.Length == 0) sTrim = sTerm;
+                if (sTrim.Length > 0)
+                {
+                    Term t = new Term();
+                    t.sText = sTrim; t.bNot = bNot; t.bWild = bWild;
+                    lTerms.Add(t);
+                }
+                sb.Length = 0; bNot = false; bStarted = false; bWild = false;
+                if (bEnd || c == '|')
+                {
+                    if (lTerms.Count > 0) llAlternatives.Add(lTerms);
+                    lTerms = new List<Term>();
+                }
+                continue;
+            }
+            if (c == '!' && !bStarted && sb.ToString().Trim().Length == 0) { bNot = true; sb.Length = 0; continue; }
+            if (c == '*') { sb.Append(cAny); bWild = true; bStarted = true; continue; }
+            if (c == '?') { sb.Append(cOne); bWild = true; bStarted = true; continue; }
+            if (c != ' ' && c != '\t') bStarted = true;
+            sb.Append(c);
+        }
+        return llAlternatives;
+    }
+
+    // isMatch: whether a target matches a pattern. bName: the target is a name
+    // (a wildcard term must match all of it); otherwise it is text. Case aside
+    // unless bCaseSensitive. An empty pattern matches everything.
+    public static bool isMatch(string sTarget, string sPattern, bool bName)
+    {
+        return isMatch(sTarget, sPattern, bName, false);
+    }
+
+    public static bool isMatch(string sTarget, string sPattern, bool bName, bool bCaseSensitive)
+    {
+        List<List<Term>> llAlternatives = parse(sPattern);
+        if (llAlternatives.Count == 0) return true;
+        return isMatch(sTarget, llAlternatives, bName, bCaseSensitive);
+    }
+
+    // isMatch with a pattern already parsed, for a search over many targets.
+    public static bool isMatch(string sTarget, List<List<Term>> llAlternatives, bool bName, bool bCaseSensitive)
+    {
+        if (llAlternatives == null || llAlternatives.Count == 0) return true;
+        if (sTarget == null) sTarget = "";
+        foreach (List<Term> lTerms in llAlternatives)
+        {
+            bool bAll = true;
+            foreach (Term t in lTerms)
+            {
+                bool bHit = termMatch(sTarget, t, bName, bCaseSensitive);
+                if (t.bNot) bHit = !bHit;
+                if (!bHit) { bAll = false; break; }
+            }
+            if (bAll) return true;
+        }
+        return false;
+    }
+
+    // termMatch: one term, before any ! is applied.
+    public static bool termMatch(string sTarget, Term t, bool bName, bool bCaseSensitive)
+    {
+        if (!t.bWild)
+            return sTarget.IndexOf(t.sText, bCaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase) >= 0;
+        string sKey = (bName ? "N" : "T") + (bCaseSensitive ? "C" : "I") + t.sText;
+        Regex rx;
+        if (!dRegexCache.TryGetValue(sKey, out rx))
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (char c in t.sText)
+            {
+                if (c == cAny) sb.Append(".*?");
+                else if (c == cOne) sb.Append(".");
+                else sb.Append(Regex.Escape(c.ToString()));
+            }
+            string sRx = bName ? "^" + sb.ToString() + "$" : sb.ToString();
+            RegexOptions opts = RegexOptions.Singleline | RegexOptions.CultureInvariant;
+            if (!bCaseSensitive) opts |= RegexOptions.IgnoreCase;
+            rx = new Regex(sRx, opts);
+            if (dRegexCache.Count > 500) dRegexCache.Clear();
+            dRegexCache[sKey] = rx;
+        }
+        return rx.IsMatch(sTarget);
+    }
+
+    // likePattern: one term as a SQL LIKE pattern with \ as its escape, for an
+    // app that searches a database: % and _ in the term are characters, * and ?
+    // become % and _, and only a wildcard term searched as a name is anchored.
+    public static string likePattern(Term t, bool bName)
+    {
+        StringBuilder sb = new StringBuilder();
+        foreach (char c in t.sText)
+        {
+            if (c == cAny) sb.Append('%');
+            else if (c == cOne) sb.Append('_');
+            else if (c == '\\' || c == '%' || c == '_') sb.Append('\\').Append(c);
+            else sb.Append(c);
+        }
+        return (bName && t.bWild) ? sb.ToString() : "%" + sb.ToString() + "%";
+    }
+
+    // plainText: a term as the person typed it, for messages and logs.
+    public static string plainText(Term t)
+    {
+        return (t.bNot ? "!" : "") + t.sText.Replace(cAny, '*').Replace(cOne, '?');
     }
 }
 
