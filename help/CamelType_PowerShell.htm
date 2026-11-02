@@ -2,13 +2,19 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="pandoc" />
+  <meta name="generator" content="pandoc 3.12.1" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>CamelType_PowerShell</title>
   <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
     html {
       color: #1a1a1a;
+      color: light-dark(#1a1a1a, #fdfdfd);
       background-color: #fdfdfd;
+      background-color: light-dark(#fdfdfd, #1a1a1a);
+      color-scheme: light dark;
     }
     body {
       margin: 0 auto;
@@ -33,12 +39,16 @@
     }
     @media print {
       html {
-        background-color: white;
+        color-scheme: light only;
       }
-      body {
+      html, body, pre, code {
         background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
         color: black;
-        font-size: 12pt;
+      }
+      pre, code {
+        padding: 0;
       }
       p, h2, h3 {
         orphans: 3;
@@ -51,13 +61,14 @@
     p {
       margin: 1em 0;
     }
-    a {
-      color: #1a1a1a;
-    }
-    a:visited {
-      color: #1a1a1a;
+    a, a:visited {
+      color: inherit;
     }
     img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
       max-width: 100%;
     }
     h1, h2, h3, h4, h5, h6 {
@@ -80,10 +91,14 @@
     blockquote {
       margin: 1em 0 1em 1.7em;
       padding-left: 1em;
-      border-left: 2px solid #e6e6e6;
+      border-left: 2px solid;
+      border-color: #e6e6e6;
+      border-color: light-dark(#e6e6e6, #4c4c4c);
       color: #606060;
+      color: light-dark(#606060, #b6b6b6);
     }
     code {
+      white-space: pre-wrap;
       font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
       font-size: 85%;
       margin: 0;
@@ -103,8 +118,8 @@
      overflow: visible;
     }
     hr {
-      background-color: #1a1a1a;
       border: none;
+      border-top: 1px solid currentColor;
       height: 1px;
       margin: 1em 0;
     }
@@ -121,11 +136,11 @@
     }
     tbody {
       margin-top: 0.5em;
-      border-top: 1px solid #1a1a1a;
-      border-bottom: 1px solid #1a1a1a;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
     }
     th {
-      border-top: 1px solid #1a1a1a;
+      border-top: 1px solid currentColor;
       padding: 0.25em 0.5em 0.25em 0.5em;
     }
     td {
@@ -147,10 +162,13 @@
     #TOC a:not(:hover) {
       text-decoration: none;
     }
-    code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     /* The extra [class] is a hack that increases specificity enough to
        override a similar rule in reveal.js */
@@ -161,10 +179,10 @@
       margin: 0 0.8em 0.2em -1.6em;
       vertical-align: middle;
     }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -291,7 +309,7 @@ should not change. Name them using the same lower camel case and
 Hungarian prefix convention as variables — no special prefix or
 capitalization to distinguish them from variables.</p>
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb2-1"><span class="fu">Set-Variable</span> <span class="op">-</span>Name iDefaultTimeoutMs <span class="op">-</span>Value 60000 <span class="op">-</span>Option Constant</span>
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb2-1"><span class="fu">Set-Variable</span> <span class="op">-</span>Name iDefaultTimeoutMs <span class="op">-</span>Value <span class="dv">60000</span> <span class="op">-</span>Option Constant</span>
 <span id="cb2-2"><span class="fu">Set-Variable</span> <span class="op">-</span>Name sResultsDir <span class="op">-</span>Value <span class="st">&quot;results&quot;</span> <span class="op">-</span>Option Constant</span>
 <span id="cb2-3"><span class="fu">Set-Variable</span> <span class="op">-</span>Name sFallbackTitle <span class="op">-</span>Value <span class="st">&quot;untitled&quot;</span> <span class="op">-</span>Option Constant</span></code></pre></div>
 <p>If the constant is only used locally and mutation is not a concern, a
@@ -319,13 +337,13 @@ type on the same line where practical.</p>
 <code>@()</code> for arrays, <code>@{}</code> for hashtables,
 <code>$null</code> for objects.</p>
 <div class="sourceCode" id="cb3"><pre
-class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb3-1"><span class="va">$iCount</span> <span class="op">=</span> 0<span class="op">;</span> <span class="va">$iMax</span> <span class="op">=</span> 100</span>
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb3-1"><span class="va">$iCount</span> <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> <span class="va">$iMax</span> <span class="op">=</span> <span class="dv">100</span></span>
 <span id="cb3-2"><span class="va">$sDir</span> <span class="op">=</span> <span class="st">&quot;&quot;</span><span class="op">;</span> <span class="va">$sTitle</span> <span class="op">=</span> <span class="st">&quot;&quot;</span><span class="op">;</span> <span class="va">$sUrl</span> <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
 <span id="cb3-3"><span class="va">$outlook</span> <span class="op">=</span> <span class="va">$null</span></span></code></pre></div>
 <p>For type safety and documentation clarity, you may optionally add a
 type accelerator before the variable name:</p>
 <div class="sourceCode" id="cb4"><pre
-class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb4-1"><span class="op">[</span><span class="dt">int</span><span class="op">]</span> <span class="va">$iCount</span> <span class="op">=</span> 0</span>
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb4-1"><span class="op">[</span><span class="dt">int</span><span class="op">]</span> <span class="va">$iCount</span> <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb4-2"><span class="op">[</span><span class="dt">string</span><span class="op">]</span> <span class="va">$sTitle</span> <span class="op">=</span> <span class="st">&quot;&quot;</span></span></code></pre></div>
 <hr />
 <h2 id="script-structure-and-entry-point">6. Script Structure and Entry
@@ -371,8 +389,8 @@ specific value.</li>
 one-consequence conditionals:</li>
 </ul>
 <div class="sourceCode" id="cb6"><pre
-class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb6-1"><span class="kw">if</span> <span class="op">(-</span>not <span class="va">$sUrl</span><span class="op">)</span> <span class="op">{</span> <span class="kw">throw</span> <span class="st">&quot;URL is required&quot;</span> <span class="op">}</span></span>
-<span id="cb6-2"><span class="kw">if</span> <span class="op">(</span><span class="va">$bReady</span><span class="op">)</span> <span class="op">{</span> <span class="kw">return</span> <span class="va">$true</span> <span class="op">}</span></span></code></pre></div>
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb6-1"><span class="cf">if</span> <span class="op">(-not</span> <span class="va">$sUrl</span><span class="op">)</span> <span class="op">{</span> <span class="cf">throw</span> <span class="st">&quot;URL is required&quot;</span> <span class="op">}</span></span>
+<span id="cb6-2"><span class="cf">if</span> <span class="op">(</span><span class="va">$bReady</span><span class="op">)</span> <span class="op">{</span> <span class="cf">return</span> <span class="va">$true</span> <span class="op">}</span></span></code></pre></div>
 <ul>
 <li>Prefer <code>throw</code> for error conditions over
 <code>Write-Error</code> when the error should be terminating.</li>
@@ -396,7 +414,7 @@ class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb7-
 <code>ForEach-Object</code> in pipelines) over index-based
 <code>for</code> loops whenever iterating a collection.</p>
 <div class="sourceCode" id="cb8"><pre
-class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb8-1"><span class="kw">foreach</span> <span class="op">(</span><span class="va">$sItem</span> <span class="kw">in</span> <span class="va">$aItems</span><span class="op">)</span> <span class="op">{</span> processItem <span class="va">$sItem</span> <span class="op">}</span></span>
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb8-1"><span class="cf">foreach</span> <span class="op">(</span><span class="va">$sItem</span> <span class="kw">in</span> <span class="va">$aItems</span><span class="op">)</span> <span class="op">{</span> processItem <span class="va">$sItem</span> <span class="op">}</span></span>
 <span id="cb8-2"><span class="va">$aItems</span> <span class="op">|</span> <span class="fu">ForEach-Object</span> <span class="op">{</span> processItem <span class="va">$_</span> <span class="op">}</span></span></code></pre></div>
 <p>Use index-based <code>for</code> loops only when the index itself is
 needed.</p>
@@ -409,8 +427,8 @@ abbreviation as prefix. Try to attach to a running instance first via
 creating a new instance.</p>
 <div class="sourceCode" id="cb9"><pre
 class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb9-1"><span class="va">$outlook</span> <span class="op">=</span> <span class="va">$null</span></span>
-<span id="cb9-2"><span class="kw">try</span> <span class="op">{</span> <span class="va">$outlook</span> <span class="op">=</span> <span class="op">[</span>Runtime<span class="op">.</span><span class="fu">InteropServices</span><span class="op">.</span><span class="fu">Marshal</span><span class="op">]::</span>GetActiveObject<span class="op">(</span><span class="st">&quot;Outlook.Application&quot;</span><span class="op">)</span> <span class="op">}</span></span>
-<span id="cb9-3"><span class="kw">catch</span> <span class="op">{</span> <span class="va">$outlook</span> <span class="op">=</span> <span class="fu">New-Object</span> <span class="op">-</span>ComObject Outlook<span class="op">.</span><span class="fu">Application</span> <span class="op">}</span></span></code></pre></div>
+<span id="cb9-2"><span class="cf">try</span> <span class="op">{</span> <span class="va">$outlook</span> <span class="op">=</span> <span class="op">[</span>Runtime<span class="op">.</span><span class="fu">InteropServices</span><span class="op">.</span><span class="fu">Marshal</span><span class="op">]::</span>GetActiveObject<span class="op">(</span><span class="st">&quot;Outlook.Application&quot;</span><span class="op">)</span> <span class="op">}</span></span>
+<span id="cb9-3"><span class="cf">catch</span> <span class="op">{</span> <span class="va">$outlook</span> <span class="op">=</span> <span class="fu">New-Object</span> <span class="op">-</span>ComObject Outlook<span class="op">.</span><span class="fu">Application</span> <span class="op">}</span></span></code></pre></div>
 <p>Release COM objects explicitly when done using
 <code>[Runtime.InteropServices.Marshal]::ReleaseComObject()</code>
 followed by setting the variable to <code>$null</code>:</p>
@@ -426,7 +444,7 @@ is the more commonly needed behavior. Use single-quoted strings
 literally and contains characters that would be incorrectly
 interpolated.</p>
 <div class="sourceCode" id="cb11"><pre
-class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb11-1"><span class="va">$sMessage</span> <span class="op">=</span> <span class="st">&quot;Processing $sTitle...&quot;</span></span>
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb11-1"><span class="va">$sMessage</span> <span class="op">=</span> <span class="st">&quot;Processing </span><span class="va">$sTitle</span><span class="st">...&quot;</span></span>
 <span id="cb11-2"><span class="va">$sLiteral</span> <span class="op">=</span> <span class="st">&#39;Use $dollar signs literally here&#39;</span></span></code></pre></div>
 <hr />
 <h2 id="magic-numbers">13. Magic Numbers</h2>
@@ -441,11 +459,11 @@ equivalents.</p>
 named exception variable. Catch specific exception types where
 possible.</p>
 <div class="sourceCode" id="cb12"><pre
-class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb12-1"><span class="kw">try</span> <span class="op">{</span></span>
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb12-1"><span class="cf">try</span> <span class="op">{</span></span>
 <span id="cb12-2">  <span class="va">$dt</span> <span class="op">=</span> <span class="op">[</span>datetime<span class="op">]::</span>Parse<span class="op">(</span><span class="va">$sStartDateTime</span><span class="op">)</span></span>
-<span id="cb12-3"><span class="op">}</span> <span class="kw">catch</span> <span class="op">[</span>System<span class="op">.</span><span class="fu">FormatException</span><span class="op">]</span> <span class="op">{</span></span>
-<span id="cb12-4">  <span class="fu">Write-Output</span> <span class="st">&quot;Error: Could not parse date: $sStartDateTime&quot;</span></span>
-<span id="cb12-5">  <span class="kw">return</span> <span class="va">$false</span></span>
+<span id="cb12-3"><span class="op">}</span> <span class="cf">catch</span> <span class="op">[</span>System<span class="op">.</span><span class="fu">FormatException</span><span class="op">]</span> <span class="op">{</span></span>
+<span id="cb12-4">  <span class="fu">Write-Output</span> <span class="st">&quot;Error: Could not parse date: </span><span class="va">$sStartDateTime</span><span class="st">&quot;</span></span>
+<span id="cb12-5">  <span class="cf">return</span> <span class="va">$false</span></span>
 <span id="cb12-6"><span class="op">}</span></span></code></pre></div>
 <p>For code that must always clean up (such as releasing COM objects),
 use a <code>finally</code> block.</p>
@@ -455,8 +473,8 @@ use a <code>finally</code> block.</p>
 line</strong> where practical, to maximize information density per line
 for screen reader review.</p>
 <div class="sourceCode" id="cb13"><pre
-class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb13-1"><span class="va">$dConfig</span> <span class="op">=</span> @<span class="op">{</span> Server <span class="op">=</span> <span class="st">&quot;localhost&quot;</span><span class="op">;</span> Port <span class="op">=</span> 8080<span class="op">;</span> Debug <span class="op">=</span> <span class="va">$true</span> <span class="op">}</span></span>
-<span id="cb13-2"><span class="va">$aEngines</span> <span class="op">=</span> @<span class="op">(</span><span class="st">&quot;axe&quot;</span><span class="op">,</span> <span class="st">&quot;ibm&quot;</span><span class="op">,</span> <span class="st">&quot;alfa&quot;</span><span class="op">)</span></span></code></pre></div>
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb13-1"><span class="va">$dConfig</span> <span class="op">=</span> @<span class="op">{</span> Server <span class="op">=</span> <span class="st">&quot;localhost&quot;</span><span class="op">;</span> Port <span class="op">=</span> <span class="dv">8080</span><span class="op">;</span> Debug <span class="op">=</span> <span class="va">$true</span> <span class="op">}</span></span>
+<span id="cb13-2"><span class="va">$aEngines</span> <span class="op">=</span> <span class="op">@(</span><span class="st">&quot;axe&quot;</span><span class="op">,</span> <span class="st">&quot;ibm&quot;</span><span class="op">,</span> <span class="st">&quot;alfa&quot;</span><span class="op">)</span></span></code></pre></div>
 <p>Use multi-line syntax only when the literal is too long to read
 comfortably on one line.</p>
 <hr />
