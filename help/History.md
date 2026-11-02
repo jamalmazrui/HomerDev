@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.95.3 -- 1 November 2026
+
+- **The tutorials' screen reader voice is a little slower,** to be easier to understand: its pace setting goes from 0.64 to 0.70, still faster than the narrator's 0.80 so the two stay apart. The Windows-voice and eSpeak fallbacks slow with it.
+- **A change of voice respeaks the tutorials.** Whether a tutorial needed speaking again was decided by its text alone, so a slower voice would never have reached the tutorials already made. The voice settings are now part of each tutorial's fingerprint. The next build of each app speaks all its tutorials once more, which takes a while.
+
 ## 1.95.2 -- 1 November 2026
 
 - **The key check reads navigation keys correctly.** It took the words "Alt+Control+Shift with an arrow" as a key named Shift, and Number Pad 5 as a letter key, so DbDo's push stopped on its own table keys. A modifier named in prose is skipped, and Number Pad 5 counts as a navigation key, as the arrows, Home, End, Page Up and Page Down already did. Every app's copy of check.py is the kit's.
