@@ -82,15 +82,22 @@ if errorlevel 1 (
   )
   set "sHolderLog="
   if exist "!sLock!\holder.txt" set /p sHolderLog=<"!sLock!\holder.txt"
+  rem AN OLD LOCK WITH A LIVING, BUSY HOLDER STAYS (2 November 2026). The four-hour rule cleared the 07:40 DbDo cycle's
+  rem lock at 11:40 while that cycle was still speaking tutorials, so two cycles spoke DbDo's walks at once and a third
+  rem was refused. A living holder alone proves nothing (Control+C leaves its Command Prompt running), but a holder
+  rem whose project is still writing logs is working. So an old lock is cleared only when no file in the project's logs
+  rem folder has changed for 30 minutes; a holder that is gone clears it at once, as before.
+  set "iQuiet=9999"
+  for /f %%a in ('powershell -NoProfile -Command "$o = Get-ChildItem -LiteralPath '%CD%\logs' -File -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1; if ($o) { [int]((Get-Date)-$o.LastWriteTime).TotalMinutes } else { 9999 }"') do set "iQuiet=%%a"
   set "bStale="
-  if !iAge! geq 240 set "bStale=1"
+  if !iAge! geq 240 if !iQuiet! geq 30 set "bStale=1"
   if "!sAlive!"=="no" set "bStale=1"
   rem A LOCK WITH NO HOLDER RECORD, 30 MINUTES OLD OR MORE, IS STALE (12 October 2026). The runner before 1.72.10
   rem recorded no process, and from 1.72.5 every one of its cycles ended in a syntax error at push, leaving its lock.
   rem No cycle that is still running takes that long, so such a lock no longer holds a project back for four hours.
   if not defined iHolder if !iAge! geq 30 set "bStale=1"
   if defined bStale (
-    >> "%sLog%" echo Lock !sLock! was !iAge! minutes old, from a cycle no longer running ^(holder process !iHolder!, alive: !sAlive!^); cleared
+    >> "%sLog%" echo Lock !sLock! was !iAge! minutes old, holder process !iHolder! alive: !sAlive!, project logs quiet for !iQuiet! minutes; cleared
     rmdir /s /q "!sLock!" 2>nul
     mkdir "!sLock!" 2>nul
   ) else (
@@ -98,10 +105,11 @@ if errorlevel 1 (
     echo Its log: !sHolderLog!
     echo If that cycle's Command Prompt window is still open, look there: it may be waiting for
     echo you, for instance at a sign-in window. Closing that window ends the cycle, and the
-    echo next build_release then starts at once. A lock older than four hours is cleared by itself.
+    echo next build_release then starts at once. A lock older than four hours is cleared by itself
+    echo once the project's logs have been quiet for 30 minutes; the logs changed !iQuiet! minutes ago.
     if defined sHolderLog for /f "tokens=3*" %%a in ("!sHolderLog!") do for /f "usebackq delims=" %%l in (`powershell -NoProfile -Command "Get-Content -LiteralPath '%%b' -Tail 1 -ErrorAction SilentlyContinue"`) do echo Its latest line: %%l
     echo If you are sure no %sName% cycle is running, type: build_release unlock
-    >> "%sLog%" echo Refused: another cycle holds !sLock!, made !iAge! minutes ago ^(holder process !iHolder!, alive: !sAlive!; !sHolderLog!^)
+    >> "%sLog%" echo Refused: another cycle holds !sLock!, made !iAge! minutes ago ^(holder process !iHolder!, alive: !sAlive!, logs quiet !iQuiet! minutes; !sHolderLog!^)
     exit /b 1
   )
 )

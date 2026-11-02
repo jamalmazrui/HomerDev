@@ -35,6 +35,10 @@ the rest in `help`. What each holds is in
   Where Filter", not "Sorting and Filtering").
 - **Key names** as JAWS writes them: Alt, Control, Shift, Windows in that
   order, "Control" spelled out, the reader key as "JAWS" or "NVDA".
+- **An article that teaches keys ends with them**: a short H4, "Keys in
+  this article", listing each key with its command's name, so a reader who
+  comes back for one key finds it without rereading. The Hotkeys document
+  stays the full list.
 - **Match the noun to the count** ("1 match"); zero is an answer.
 - **Lists rather than tables**, except in reports for sighted managers or
   developers. Lists in lowercase alphabetical order unless another order is

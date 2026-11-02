@@ -61,6 +61,11 @@ A script is proved in the reader itself: one that compiles or imports
 cleanly can still fail to load, or lose its key to another script. Press its
 key with JAWS or NVDA running before calling it done.
 
+## Handling a key: one framework for both readers
+
+Every Homer app's scripts handle a key by two choices, in JAWS and NVDA alike. The way: capture it, pass it quietly, pass it then speak, or speak then pass it. The scope: everywhere, or only here with a stated fallback elsewhere. The app does the work and speaks through the kit's `Say`; a script only decides who gets the key and whether the reader adds anything. NVDA add-ons share the kit's `exec\Python\keys.py`, which each app's build copies in; JAWS scripts share the shapes in `Templates\screenReader\jaws`. Read [references/key-handling.md](references/key-handling.md) for the patterns in both languages. DbDo and HomerView are the working examples.
+
+
 ## Where it lives and how it ships
 
 - JAWS sources in `scripts/jaws` (`<App>.jss`, `.jsh`, `.jsd`, `.jkm`, and a

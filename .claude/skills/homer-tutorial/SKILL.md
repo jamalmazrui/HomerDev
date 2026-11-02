@@ -105,12 +105,16 @@ Intro as the want in plain words, and say which earlier walks it assumes.
   contents as a clean two-voice list, one step per walk, host saying the
   number and title, reader saying what it covers; a closing line with the
   count, that nine is always last, and "under an hour". Prose and list never
-  mix.
+  mix. One line places the set (from Quill's tutorials, November 2026): the
+  walks teach what people come to the app wanting, and F1 opens the full guide,
+  the reference for everything they leave out.
 - **1**: the parts of the program as heard -- window, main view, a dialog that
   works one way, Say keys, messages, the pick list, menus that say their keys
   -- each named in a sentence or two and then shown (see Show, then tell);
   then the key rules, each shown with a key and the reader's answer; the keys
-  that explain the keys; help in its four places, host naming, reader giving
+  that explain the keys, presented as habits -- the few things that, done from
+  the first day, make everything else easy, as Quill's first tutorial teaches
+  its command palette and F1 -- ; help in its four places, host naming, reader giving
   the key; one planned misstep; the recap in two voices.
 - **2**, usually Install and Launch: download, the installer's pages, the
   finish page with each box's purpose and the three words Install, Update,
@@ -118,7 +122,12 @@ Intro as the want in plain words, and say which earlier walks it assumes.
   later, one misstep (run while open; a mistaken tick).
 - **3 to 8**: the other six wants. Each: the want stated, the keys taught in four
   beats, one planned misstep with its recovery, things taught earlier named
-  rather than retaught, the recap in two voices.
+  rather than retaught, the recap in two voices, then what you did not have to
+  do: one or two chores the want would cost without the app, the host naming
+  the chore and the reader what the app did instead -- "no list of streams to
+  find" / "the catalog came with it". Taken from Quill's tutorials, which close
+  their first hour this way, it is two or three steps, and it is where a
+  listener hears what the app is worth.
 - **9**: three parts, in this order. The conclusion and summary: the
   principles to carry away with their keys in two voices, and one thing kept
   from the seven task walks. The glossary: the app's words, alphabetical, one

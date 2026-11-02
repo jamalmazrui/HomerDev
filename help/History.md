@@ -7,6 +7,59 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.102.0 -- 2 November 2026
+
+- **Spoken walks are kept in a cache.** buildTutorials now keeps every recording under %LOCALAPPDATA%\HomerDev\tutorialCache, named by its walk's fingerprint, which covers the walk's text and the voices. A recording that is missing or stale is copied back from the cache in seconds when the same walk was spoken before, instead of being spoken again. On 2 November each unzip of a DbDo.zip carrying old recordings cost about three hours of speech. Recordings unused for 90 days are removed.
+- **A busy cycle keeps its lock.** build_release cleared any lock older than four hours, even when its holder was alive and still speaking tutorials, so two DbDo cycles ran at once and a third was refused. An old lock is now cleared only when the project's logs have been quiet for 30 minutes; a lock whose holder is gone is still cleared at once.
+- **kdpSubmit version 46.** A tab is acted on only once KDP's address has stopped changing, so a late second Save and Continue that carries KDP past a tab no longer stops the run. And a title the Bookshelf page in view does not show is looked for on every page, through kdpBooks' shared reader, before its status is called unknown: Mastery in Popular Song, live with an update publishing, was not on the first page.
+
+## 1.101.0 -- 2 November 2026
+
+- **NVDA's own keys are in the key ownership data.** KeyOwnership.inix, which checkKeys reads, named JAWS's keys but none that NVDA takes without its NVDA key. From NVDA's user guide it now has the keypad keys of NVDA's desktop layout, Alt+Up and Down Arrow for sentences, and Alt+Control+Home for the first column. checkKeys now asks for five tests it did not: DbDo's Keypad Star, a right mouse click under both readers, and Next and Previous Sentence in EdSharp and HomerView, which share NVDA's sentence keys.
+- **The Alternate Menu says how to find a command by any word.** Its tip now names Control+F, which shows only commands with that word in their name, keys or summary, as JAWS's Commands Search does.
+- **Two conventions grow.** A command key is a rarely typed key that announces itself and types its own character when pressed twice; and an article that teaches keys ends with a short list of them, in the homer-docs skill.
+
+## 1.100.0 -- 2 November 2026
+
+- **The ReadMe opens with what HomerDev gives you,** in nine plain points: conversions, .inix, direct speech, dialog keys, the folder layout, app shapes, the installer, matching C# and Python, and the spoken tutorials.
+- **Camel Type throughout the new screen reader code.** JAWS script and function names are lower camel case (passDbDoKey, nextDbDoRow), with one Var line per type; keys.py uses n, not f, for its real numbers; NVDA modules import in one line; Homer.Util's text statistics method is measureText, its result named textStatistics. The docs name the reader key JAWS, as Homer key names do, and their lists are alphabetical.
+
+- **Conventions every Homer app's screen reader scripts share.** The key-handling reference adds them: keys in Common Keys, names prefixed by the app, JAWS+Q naming the scripts with the program's version, JAWS+F1 twice opening the guide, an Input Gestures category in NVDA with NVDA+Shift+V saying both versions, passing a key on when a script has nothing to do, a command key when commands outnumber free keys, and a caution about GetTickCount arithmetic. The JAWS and NVDA templates carry the entry points, and keys.py gains sayVersions.
+- **A Credits section in the kit's guide** names, in one place, what Homer learned from QUILL and from Doug Lee's scripts and tools.
+
+## 1.99.0 -- 2 November 2026
+
+Lessons from the Quill family of accessible apps, whose guides, requirements and tutorials were studied for what fits Homer.
+
+- **Homer.Util.measureText counts what a writer asks about.** Words, sentences, paragraphs and reading time, as Quill's Document Statistics reports, and the two measures Homer documents are held to: the Flesch-Kincaid reading grade and the sentences past 30 words, by the same rules as the books' build. EdSharp's Say Yield is the first user.
+- **The tutorial skill takes three of Quill's tutorial patterns.** Task walks close with what you did not have to do, in two voices, after the recap; walk 0 says in one line that the walks teach the wants and F1 opens the full guide; walk 1 presents the keys that explain the keys as habits, the few things that make everything else easy.
+
+## 1.98.0 -- 2 November 2026
+
+- **JAWS scripts and NVDA add-ons are built, fingerprinted, installed and run the same way.** installScreenReaderSupport's PowerShell is one design for both readers, in four steps: discover every place the reader looks, fingerprint the shipped sources against each installed copy, install into every place found, and report how each reader picks the scripts up.
+- **Every place the reader looks, without the reader running.** JAWS scripts went only into Settings\enu, and only for versions with user settings already; they now go into every language folder of every installed version, Settings\enu made for a version never started. The NVDA add-on went only into %APPDATA%\nvda, and failed when NVDA had never run; that folder is now made when NVDA is installed, and a running portable NVDA's userConfig is covered too.
+- **One fingerprint for both.** JAWS compared the shipped sources with a record kept in %LOCALAPPDATA%\<App>\jawsScripts.inix, and NVDA compared versions. Both now compare the shipped sources with the installed copies themselves, file by file, so a copy that was changed or removed is seen as it is; the old record is removed at the next install.
+- **packScreenReaderSupport packs both packages for an app's build,** sources only for JAWS, and for NVDA the add-on with the kit's keys.py copied in. DbDo's build calls it instead of a block of its own.
+
+## 1.97.1 -- 2 November 2026
+
+- **The installer notices an NVDA add-on whose code changed at the same version.** The finish page judged the add-on by manifest version alone, so an add-on with new code at the same version -- DbDo's, whose build copies the kit's keys.py in every time -- was offered as Reinstall, unticked, and a stale add-on stayed installed. When the versions match, installScreenReaderSupport now compares the add-on's files with the installed ones, names and bytes, leaving out the Python caches NVDA writes, the same way it has always fingerprinted the JAWS sources. A difference is an Update, ticked. The JAWS side needed no change: its fingerprint was already of the sources inside the zip, so repacking it on every build changes nothing.
+
+## 1.97.0 -- 2 November 2026
+
+- **One key-handling framework for every Homer app's screen reader scripts.** Each key has a way -- capture, pass quietly, pass then speak, speak then pass -- and a scope: everywhere, or only here with a stated fallback elsewhere. DbDo passes its grid's arrows quietly, only in the grid; HomerView captures its commands, only in its own browser. The homer-screen-reader skill's key-handling reference shows every combination in JAWS and NVDA.
+- **The kit's exec\Python\keys.py is the NVDA half, shared code rather than copies.** passQuietly, passThenSpeak, speakThenPass, onlyHere, quietNextFocus and focusIsQuiet, and windowClassIs. Each app's build copies it into its add-on's homer package, as HomerView's already does with the kit's other modules, so DbDo's add-on and HomerView's run the same code. It sends a key by its six-pack name even when the number pad was pressed, the lesson DbDo's add-on learned. JAWS scripts, which use no Include, share the shapes in Templates\screenReader\jaws.
+
+## 1.96.1 -- 2 November 2026
+
+- **Five standard ways to handle a key, for JAWS and NVDA alike.** The homer-screen-reader skill's new references\key-handling.md shows each way in both languages: capture the key, pass it only in one control, pass it quietly, pass it then speak, or speak then pass it. The app speaks for itself through Say; a script only decides who gets the key. Templates\screenReader holds starting files for both readers, and the sources live in an app's scripts\jaws and scripts\nvda, packed by its build.
+- **The key check accepts the number pad's navigation keys.** With NumLock off, number pad 1 to 9 are Home, the arrows and the page keys; Alt+Control with them is a navigation chord, allowed like Alt+Control with the arrows. DbDo's NVDA add-on binds them, and the check had reported each as a reserved desktop shortcut.
+- **Say.sayNow is withdrawn.** It interrupted the screen reader from the app, a workaround for a missing script. The screen readers' own keyboard interrupt already cuts off speech when a key is pressed, and a quiet pass-through script keeps the reader from adding its own; DbDo's grid now works that way.
+
+## 1.96.0 -- 2 November 2026
+
+- **Say.sayNow speaks in place of what the reader was saying.** say() queues politely; sayNow flushes the screen reader's current speech first -- JAWS's SayString with flush, NVDA's cancelSpeech, the UIA notification for others -- so an app that moved the focus itself can say exactly what should be heard, with no JAWS or NVDA script. The Extra Speech gate still applies. DbDo's grid is the first user.
+
 ## 1.95.3 -- 1 November 2026
 
 - **The tutorials' screen reader voice is a little slower,** to be easier to understand: its pace setting goes from 0.64 to 0.70, still faster than the narrator's 0.80 so the two stay apart. The Windows-voice and eSpeak fallbacks slow with it.

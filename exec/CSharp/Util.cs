@@ -1075,6 +1075,47 @@ if (!sPath.ToLower().Contains(sDir.ToLower())) Environment.SetEnvironmentVariabl
 return true;
 } // initJfw method
 
+// TEXT STATISTICS (kit 1.99.0, 2 November 2026). The counts a writer asks for -- words, sentences, paragraphs,
+// reading time -- and the two the Homer documents are held to: the Flesch-Kincaid grade, and how many sentences
+// run past 30 words. Learned from Quill's Document Statistics, which reports words, paragraphs and reading time;
+// the grade and long sentences use the same formula and rules as the books' build (buildBooks.py's syllables and
+// readingLevel). That build first sets aside Markdown markup, so on a Markdown file the two may differ by a tenth.
+public class TextStatistics {
+public int iLongSentences, iParagraphs, iReadingMinutes, iSentences, iSyllables, iWords;
+public double nGrade;
+} // class TextStatistics
+
+public static int syllables(string sWord) {
+string s = sWord.ToLowerInvariant().Trim('\'');
+if (s.Length <= 3) return 1;
+s = Regex.Replace(s, "(?:[^laeiouy]es|ed|[^laeiouy]e)$", "");
+s = Regex.Replace(s, "^y", "");
+return Math.Max(1, Regex.Matches(s, "[aeiouy]{1,2}").Count);
+} // syllables method
+
+public static TextStatistics measureText(string sText) {
+const int iLongSentence = 30;
+const int iWordsPerMinute = 200;
+TextStatistics textStatistics = new TextStatistics();
+if (string.IsNullOrEmpty(sText)) return textStatistics;
+string sFlat = sText.Replace("\r\n", "\n");
+foreach (string sBlock in Regex.Split(sFlat, "\n\\s*\n")) if (sBlock.Trim().Length > 0) textStatistics.iParagraphs++;
+string sJoined = Regex.Replace(sFlat, "\\s+", " ");
+string sWordPattern = "[A-Za-z][A-Za-z'\u2019-]*";
+MatchCollection oWords = Regex.Matches(sJoined, sWordPattern);
+textStatistics.iWords = oWords.Count;
+foreach (Match oWord in oWords) textStatistics.iSyllables += syllables(oWord.Value);
+foreach (string sSentence in Regex.Split(sJoined, "(?<=[.!?])[\"\u201d\u2019)]*\\s+")) {
+if (!Regex.IsMatch(sSentence, "[A-Za-z]")) continue;
+textStatistics.iSentences++;
+if (Regex.Matches(sSentence, sWordPattern).Count > iLongSentence) textStatistics.iLongSentences++;
+}
+if (textStatistics.iWords > 0 && textStatistics.iSentences > 0)
+textStatistics.nGrade = Math.Round(0.39 * textStatistics.iWords / textStatistics.iSentences + 11.8 * textStatistics.iSyllables / textStatistics.iWords - 15.59, 1);
+textStatistics.iReadingMinutes = (textStatistics.iWords + iWordsPerMinute - 1) / iWordsPerMinute;
+return textStatistics;
+} // measureText method
+
 } // class Util
 
 } // namespace Homer

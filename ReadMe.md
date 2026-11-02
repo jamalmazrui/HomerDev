@@ -13,8 +13,21 @@ It is aimed at two readers. A developer who wants to build or change a Homer
 app, and an AI asked to write one, which can be told: "use the Homer namespace
 in `C:\HomerDev\exec\CSharp` and follow HomerDev.md."
 
+## What HomerDev gives you
+
+- **Conversion between almost any two file formats,** at high quality, chosen after long comparison of the free alternatives, through the .NET Framework or the Python Package Index.
+- **The .inix format:** plain, readable text that reads and writes both settings and tables, in place of .csv, .json and other configuration formats in most real uses.
+- **Direct speech:** messages sent straight to JAWS or NVDA through their programming interfaces, or through UI Automation, which reaches Narrator too.
+- **Dialogs with the same keys everywhere:** every control has its own Alt+letter, Control+Enter presses OK and Escape presses Cancel, wherever the focus is.
+- **One folder layout:** each subfolder of a project starts with a different letter -- configs, data, exec, help, logs and the rest -- so first-letter navigation lands where you mean.
+- **Ready shapes for accessible apps:** a launch dialog followed by a conversion or other job, and a multiple-document app with a traditional Windows menu bar and submenus, besides command-line tools.
+- **An Inno Setup installer** that installs the shared components and keeps track of which need updating later.
+- **The same capabilities in C# and Python,** with generally equivalent implementations, so an app can be built in either.
+- **Spoken tutorials for every app:** ten short audio walks, each under five minutes, in which a host works with a simulated screen reader voice to teach the app.
+
 ## Contents
 
+- [What HomerDev gives you](#what-homerdev-gives-you)
 - [Install](#install)
 - [Quick start](#quick-start)
 - [What is in the kit](#what-is-in-the-kit)

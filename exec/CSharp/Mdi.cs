@@ -896,7 +896,7 @@ public class MdiFrame : LbcForm {
         KeyMap.Command oChosen = null;
         using (LbcDialog dlg = new LbcDialog("Alternate Menu", this)) {
             ListBox lb = dlg.addPickBox("&Command:", lsLines, "",
-                "Type the start of a command, then press Enter to run it.");
+                "Type the start of a command, or press Control+F to show only commands with a word in their name, keys or summary; then press Enter to run it.");
             if (!dlg.runOkCancel()) return true;
             if (lb.SelectedIndex >= 0) oChosen = lsCommands[lb.SelectedIndex];
         }

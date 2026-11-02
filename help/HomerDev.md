@@ -2538,3 +2538,11 @@ text, as a reference when writing or improving a Homer skill.
 [Homer Skills](HomerSkills.htm) reads them for what they teach the kit: what
 fits the Homer guidelines, what needs a decision first, and which new and
 improved Homer skills are proposed.
+
+## Credits
+
+Homer has learned from two other bodies of accessible software, studied for their published guides and code.
+
+- **[Doug Lee's scripts and tools](https://dlee.org/)**, dozens of JAWS script sets and NVDA add-ons. From them: the script conventions in the homer-screen-reader skill's key-handling reference, among them JAWS+Q naming the scripts, JAWS+F1 twice for the guide, keys in Common Keys, names prefixed by the app, Input Gestures categories, passing a key on when a script has nothing to do, the command key for many commands, and the GetTickCount caution; and the installer's reach into every JAWS version and language folder.
+- **[QUILL](https://quillforall.org/)**, by Community Access, a family of free talking apps for screen reader users. From it: RadioTrail's catalog design, after Quill Radio's; the writer's counts in EdSharp's Say Yield, after Document Statistics; and three tutorial patterns: what you did not have to do, placing the set, and teaching habits.
+

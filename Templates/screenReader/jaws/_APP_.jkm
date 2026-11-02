@@ -1,0 +1,14 @@
+﻿; _APP_.jkm -- JAWS key map for _APP_.exe, from the HomerDev template.
+; Each line names a Script in _APP_.jss. The kit's tidy adds a marked block of
+; keys JAWS takes everywhere, from data\KeyOwnership.inix; leave it alone.
+[Common Keys]
+; Pass quietly: chords the app owns.
+Alt+Control+RightArrow=pass_APP_Key
+Alt+Control+LeftArrow=pass_APP_Key
+; Pass only here: arrows, quiet only in the app's list view.
+DownArrow=next_APP_Row
+UpArrow=prior_APP_Row
+
+[Keyboard Layouts]
+Desktop=Common
+Laptop=Common

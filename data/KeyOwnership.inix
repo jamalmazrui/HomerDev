@@ -8,7 +8,8 @@
 ; reader global, reader tables, reader laptop, browser, historical.
 ;
 ; Sources: Microsoft's Windows 11 shortcut list, Freedom Scientific's JAWS
-; keystroke list, the Window-Eyes reference. Also always reserved: every
+; keystroke list and JAWS Basic Training, NV Access's NVDA user guide (its
+; desktop-layout commands that need no NVDA key), the Window-Eyes reference. Also always reserved: every
 ; Windows-key and Insert-key combination, Alt+Control with letters, digits,
 ; function keys or punctuation, and Control+Alt+N, which starts NVDA.
 
@@ -424,3 +425,123 @@ what=read to end
 context=discontinued 2017
 interception=none today
 disposition=reference only, not enforced
+
+[Key NumPad1]
+owner=NVDA
+kind=conditional
+what=previous character in review
+context=everywhere, in NVDA's desktop layout with Num Lock off
+interception=taken by NVDA before the app; the main arrow, Home, End and page keys still reach it
+disposition=never bind as an app's only key; keypad navigation in a Homer grid is a convenience the main keys must duplicate
+
+[Key NumPad2]
+owner=NVDA
+kind=conditional
+what=current character in review
+context=everywhere, in NVDA's desktop layout with Num Lock off
+interception=taken by NVDA before the app; the main arrow, Home, End and page keys still reach it
+disposition=never bind as an app's only key; keypad navigation in a Homer grid is a convenience the main keys must duplicate
+
+[Key NumPad3]
+owner=NVDA
+kind=conditional
+what=next character in review
+context=everywhere, in NVDA's desktop layout with Num Lock off
+interception=taken by NVDA before the app; the main arrow, Home, End and page keys still reach it
+disposition=never bind as an app's only key; keypad navigation in a Homer grid is a convenience the main keys must duplicate
+
+[Key NumPad4]
+owner=NVDA
+kind=conditional
+what=previous word in review
+context=everywhere, in NVDA's desktop layout with Num Lock off
+interception=taken by NVDA before the app; the main arrow, Home, End and page keys still reach it
+disposition=never bind as an app's only key; keypad navigation in a Homer grid is a convenience the main keys must duplicate
+
+[Key NumPad5]
+owner=NVDA
+kind=conditional
+what=current word in review
+context=everywhere, in NVDA's desktop layout with Num Lock off
+interception=taken by NVDA before the app; the main arrow, Home, End and page keys still reach it
+disposition=never bind as an app's only key; keypad navigation in a Homer grid is a convenience the main keys must duplicate
+
+[Key NumPad6]
+owner=NVDA
+kind=conditional
+what=next word in review
+context=everywhere, in NVDA's desktop layout with Num Lock off
+interception=taken by NVDA before the app; the main arrow, Home, End and page keys still reach it
+disposition=never bind as an app's only key; keypad navigation in a Homer grid is a convenience the main keys must duplicate
+
+[Key NumPad7]
+owner=NVDA
+kind=conditional
+what=previous line in review
+context=everywhere, in NVDA's desktop layout with Num Lock off
+interception=taken by NVDA before the app; the main arrow, Home, End and page keys still reach it
+disposition=never bind as an app's only key; keypad navigation in a Homer grid is a convenience the main keys must duplicate
+
+[Key NumPad8]
+owner=NVDA
+kind=conditional
+what=current line in review
+context=everywhere, in NVDA's desktop layout with Num Lock off
+interception=taken by NVDA before the app; the main arrow, Home, End and page keys still reach it
+disposition=never bind as an app's only key; keypad navigation in a Homer grid is a convenience the main keys must duplicate
+
+[Key NumPad9]
+owner=NVDA
+kind=conditional
+what=next line in review
+context=everywhere, in NVDA's desktop layout with Num Lock off
+interception=taken by NVDA before the app; the main arrow, Home, End and page keys still reach it
+disposition=never bind as an app's only key; keypad navigation in a Homer grid is a convenience the main keys must duplicate
+
+[Key NumPadPlus]
+owner=NVDA
+kind=conditional
+what=say all with review
+context=everywhere, in NVDA's desktop layout with Num Lock off
+interception=taken by NVDA before the app
+disposition=never bind as an app's only key
+
+[Key NumPadSlash]
+owner=JAWS and NVDA
+kind=conditional
+what=left mouse click
+context=everywhere, with Num Lock off (JAWS turns it off; NVDA's desktop layout)
+interception=taken by the reader before the app
+disposition=never bind as an app's only key
+
+[Key NumPadStar]
+owner=JAWS and NVDA
+kind=conditional
+what=right mouse click
+context=everywhere, with Num Lock off (JAWS turns it off; NVDA's desktop layout)
+interception=taken by the reader before the app
+disposition=kept only as a second key beside one that always works, such as DbDo's Shift+8; test under both readers
+
+[Key Alt+UpArrow]
+owner=NVDA
+kind=conditional
+what=previous sentence
+context=in documents where NVDA supports sentence movement
+interception=NVDA moves by sentence itself where it can, and otherwise hands the key on
+disposition=kept for a Homer app's own Previous Sentence, which means the same thing; test under NVDA that the app's command runs
+
+[Key Alt+DownArrow]
+owner=NVDA
+kind=conditional
+what=next sentence
+context=in documents where NVDA supports sentence movement
+interception=NVDA moves by sentence itself where it can, and otherwise hands the key on
+disposition=kept for a Homer app's own Next Sentence, which means the same thing; test under NVDA that the app's command runs
+
+[Key Alt+Control+Home]
+owner=NVDA
+kind=reader tables
+what=first column
+context=in tables NVDA recognizes
+interception=NVDA moves to the first column itself
+disposition=allowed for cell movement inside the app's own grid only, tested
