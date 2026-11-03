@@ -631,8 +631,10 @@ begin
     '{localappdata}\Programs\Ollama\ollama.exe', 'runs the local AI model', 'Ollama');
   iPandoc := homerAdd('Pandoc', 'JohnMacFarlane.Pandoc', 'pandoc',
     '{pf}\Pandoc\pandoc.exe', 'converts documents between formats', 'Pandoc');
-  iPdfTools := homerAdd('PDF tools', 'Python.Python.3.13', 'python',
-    '', 'reads PDF files as text, through Python', 'Python 3.13');
+  // pip:pymupdf4llm, not winget's Python 3.13 (3 November 2026): the box compares the PDF package itself, which
+  // installPdfTools updates, so it says Update only when there is one.
+  iPdfTools := homerAdd('PDF tools', 'pip:pymupdf4llm', '',
+    '', 'reads PDF files as text, through Python', '');
   iPython := homerAdd('Python', 'Python.Python.3.14;Python.Python.3.13', 'python',
     '', 'runs the kit''s scripts', '');
   iTesseract := homerAdd('Tesseract', 'UB-Mannheim.TesseractOCR', 'tesseract',

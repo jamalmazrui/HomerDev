@@ -7,6 +7,15 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.115.0 -- 3 November 2026
+
+- **PDF tools stop asking to be updated after every install.** HomerDev's and BatCon's installers registered PDF tools under winget's Python 3.13, so Setup compared Python's versions -- "3.13.15 found, 3.13.17 available; offered as Update" in both of 3 November's setup logs -- while installPdfTools updates pymupdf4llm, never Python; the box could never be satisfied. A component id may now be pip:<package>, read with "python -m pip index versions", whose INSTALLED and LATEST lines are compared; PDF tools is pip:pymupdf4llm.
+- **recordWalk closes the app when it is done,** as Alt+F4 would, so its closing says the run is over; --keep leaves it open. Nothing is forced: an app still open after ten seconds is left so, and said.
+
+## 1.114.0 -- 3 November 2026
+
+- **recordWalk forgives the recognizer's near-misses.** At a fast JAWS rate it wrote "show now" for "shown now" and "rhymes" for "prime's", so exact matching scored 3 and 4 of 10 on runs where JAWS said every line. A word now counts when a heard word is at least 75% alike, in any order within the step; on the 14:09 run's own transcripts that credits Shown now, Shows look's columns and Prime columns button, and still refuses a line heard as "the false order".
+
 ## 1.113.0 -- 3 November 2026
 
 - **An inline field is named by its own label.** addInlineInputBox registered each box through nameFromLabel, which looks for the band's current label, and this row never sets one; so every such field was named "field", and in DbDo's Edit View Where Am I said "On field edit, Sonic Radio, 1 of 38" for the name field. It now registers under its own label, and Where Am I also falls back to the label just before a control.

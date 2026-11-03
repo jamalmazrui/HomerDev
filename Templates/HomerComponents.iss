@@ -138,6 +138,29 @@ begin
   DeleteFile(sTemp);
 end;
 
+(* A PYTHON PACKAGE AS A COMPONENT (3 November 2026). An id written pip:<package> is read with
+   "python -m pip index versions <package>", whose INSTALLED and LATEST lines give both versions; no
+   INSTALLED line means not installed. HomerDev's PDF tools were registered under winget's Python 3.13,
+   so Setup compared Python's own versions -- "3.13.15 found, 3.13.17 available" -- and offered an Update
+   after every install, though installPdfTools updates pymupdf4llm, never Python. *)
+function homerPipInfo(sPackage: String; var sInstalled, sAvailable: String): Boolean;
+var
+  lsLines: TArrayOfString;
+  i: Integer;
+  sLine: String;
+begin
+  Result := False; sInstalled := ''; sAvailable := '';
+  if not homerProbeLines('python -m pip index versions ' + sPackage + ' --disable-pip-version-check', lsLines) then exit;
+  for i := 0 to GetArrayLength(lsLines) - 1 do
+  begin
+    sLine := Trim(lsLines[i]);
+    if Pos('INSTALLED:', Uppercase(sLine)) = 1 then sInstalled := Trim(Copy(sLine, 11, 100));
+    if Pos('LATEST:', Uppercase(sLine)) = 1 then sAvailable := Trim(Copy(sLine, 8, 100));
+  end;
+  Log('pip ' + sPackage + ': installed ' + sInstalled + ', latest ' + sAvailable);
+  Result := sInstalled <> '';
+end;
+
 function homerWingetInfo(sId: String; var sInstalled, sAvailable: String): Boolean;
 (* True when winget lists the package. Columns are located from the header row,
    because package names contain spaces. *)
@@ -407,7 +430,16 @@ begin
   while (Result = 0) and (sRest <> '') do
   begin
     sId := homerNextId(sRest);
-    if homerWingetInfo(sId, sInstalled, sAvailable) then
+    if Pos('pip:', sId) = 1 then
+    begin
+      if homerPipInfo(Copy(sId, 5, Length(sId)), sInstalled, sAvailable) then
+      begin
+        gHomer[iAt].sLocal := sInstalled;
+        gHomer[iAt].sRemote := sAvailable;
+        if (sAvailable <> '') and (homerVersionOrder(sInstalled, sAvailable) < 0) then Result := 1 else Result := 2;
+      end;
+    end
+    else if homerWingetInfo(sId, sInstalled, sAvailable) then
     begin
       gHomer[iAt].sLocal := sInstalled;
       gHomer[iAt].sRemote := sAvailable;

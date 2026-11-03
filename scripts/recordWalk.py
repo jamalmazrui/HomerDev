@@ -30,6 +30,7 @@ USAGE
     recordWalk --wait 5                 listen five seconds after each key (default 4)
     recordWalk --model base.en          a smaller, faster, less accurate recognizer (default small.en)
     recordWalk --no-transcribe          record and report, and write nothing down
+    recordWalk --keep                   leave the app open at the end; by default it is closed, so its closing says the run is over
     recordWalk --speaker Headphones     record the sound output whose name holds Headphones (the log names them all)
     recordWalk --app DbDo               the app, when the folder does not say
 
@@ -279,6 +280,20 @@ def bringForward(sApp):
     return sExeNow.lower() == sExe.lower()
 
 
+def closeApp(sApp):
+    """Closes the app as Alt+F4 would, so its closing says the run is over (3 November 2026). Each window is asked
+    to close; nothing is forced, and an app still open after ten seconds is left so and logged."""
+    sExe = sApp + ".exe"
+    for hWnd, iPid, sTitle in windowsOf(sExe):
+        ctypes.windll.user32.PostMessageW(hWnd, 0x0010, 0, 0)  # WM_CLOSE
+        logLine("asked to close: " + repr(sTitle))
+    nUntil = time.time() + 10
+    while windowsOf(sExe) and time.time() < nUntil: time.sleep(0.5)
+    bClosed = not windowsOf(sExe)
+    logLine(sApp + (" closed" if bClosed else " still open after ten seconds; left so"))
+    return bClosed
+
+
 def focusNow():
     """What UI Automation says has keyboard focus: name, kind, help text and automation id."""
     try:
@@ -358,11 +373,17 @@ def wordsOf(sText):
 
 
 def hearMatch(sExpected, sHeard):
-    """How much of an expected line was heard: the share of its words found, in order, in what was heard."""
+    """How much of an expected line was heard: the share of its words that were heard, each matched to a heard word
+    spelled nearly alike. THE RECOGNIZER MISHEARS FAST SPEECH (3 November 2026): at Jamal's JAWS rate it wrote
+    "show now" for "shown now", "looks" for "look's" and "rhymes" for "prime's", so exact, in-order matching scored
+    3 and 4 lines of 10 on runs where JAWS said every line. A word now counts when a heard word is at least 75%
+    alike, and order no longer matters within a step."""
     lWant, lGot = wordsOf(sExpected), wordsOf(sHeard)
     if not lWant: return 1.0
-    oMatcher = difflib.SequenceMatcher(None, lWant, lGot)
-    return sum(oBlock.size for oBlock in oMatcher.get_matching_blocks()) / float(len(lWant))
+    iFound = 0
+    for sWant in lWant:
+        if sWant in lGot or any(difflib.SequenceMatcher(None, sWant, sGot).ratio() >= 0.75 for sGot in lGot): iFound += 1
+    return iFound / float(len(lWant))
 
 
 # ---- the run ----
@@ -377,6 +398,7 @@ def main():
     oParser.add_argument("--model", default=sDefaultModel)
     oParser.add_argument("--no-transcribe", action="store_true")
     oParser.add_argument("--speaker", default="")
+    oParser.add_argument("--keep", action="store_true")
     oArgs = oParser.parse_args([s.lower() if s.startswith("--") else s for s in sys.argv[1:]])
 
     sLogs = os.path.join(sProject, "logs"); os.makedirs(sLogs, exist_ok=True)
@@ -487,7 +509,10 @@ def main():
     lsReport.insert(3, "**" + str(iMatched) + " of " + str(iChecked) + " expected lines heard.**")
     lsReport.insert(4, "")
     with open(sReportPath, "w", encoding="utf-8") as fOut: fOut.write("\n".join(lsReport) + "\n")
-    sayLine(str(iMatched) + " of " + str(iChecked) + " expected lines heard. The report is " + sReportPath + ".")
+    if not oArgs.keep:
+        bClosed = closeApp(oArgs.app)
+        if not bClosed: sayLine(oArgs.app + " did not close by itself, so it is still open.")
+    sayLine("recordWalk is done. " + str(iMatched) + " of " + str(iChecked) + " expected lines heard. The report is " + sReportPath + ".")
     sayLine("Upload the report, the log and the results\\recordWalk-" + sStamp + " folder.")
     return 0 if iMatched == iChecked else 1
 
