@@ -948,9 +948,34 @@ public static class LbcHints
         return "Tab moves on.";
     }
 
+    // A HINT FOR EACH ITEM OF A LIST (3 November 2026): Shift+F1 on a list says the hint for the item selected,
+    // such as a table's description in a list of tables, before anything said about the list itself.
+    private static readonly Dictionary<Control, Dictionary<string, string>> dItemHints = new Dictionary<Control, Dictionary<string, string>>();
+    public static void setItemHints(Control ctl, Dictionary<string, string> dHints)
+    {
+        if (ctl == null) return;
+        lock (dItemHints) { if (dHints == null || dHints.Count == 0) dItemHints.Remove(ctl); else dItemHints[ctl] = dHints; }
+    }
+    private static string itemHint(Control ctl)
+    {
+        ListControl lc = ctl as ListControl;
+        if (lc == null) return "";
+        Dictionary<string, string> dHints;
+        lock (dItemHints) { if (!dItemHints.TryGetValue(ctl, out dHints)) return ""; }
+        string sItem = "";
+        ListBox lb = ctl as ListBox;
+        ComboBox combo = ctl as ComboBox;
+        if (lb != null && lb.SelectedItem != null) sItem = lb.GetItemText(lb.SelectedItem);
+        else if (combo != null) sItem = combo.Text;
+        string sHint;
+        return (sItem.Length > 0 && dHints.TryGetValue(sItem, out sHint)) ? sHint : "";
+    }
+
     // Shift+F1: once, one sentence; twice, the whole description; three times, the keys.
     public static string hintFor(Control ctl, string sTip, int iLevel)
     {
+        string sItem = itemHint(ctl);
+        if (sItem.Length > 0 && iLevel < 3) return iLevel == 2 && !string.IsNullOrEmpty(sTip) ? sItem + " " + sTip.Trim() : sItem;
         if (iLevel >= 3) return keysFor(ctl);
         if (iLevel == 2)
         {
@@ -2573,6 +2598,7 @@ public class LbcDialog : IDisposable
             else
             {
                 btn.Click += delegate(object o, EventArgs e) {
+                    if (string.Equals(sCaptured.Replace("&", ""), "OK", StringComparison.OrdinalIgnoreCase) && !checkPatterns()) return;
                     sResult = sCaptured;
                     frm.DialogResult = DialogResult.OK;
                     frm.Close();
@@ -3404,6 +3430,47 @@ public class LbcDialog : IDisposable
     //   three times  the keys the whole dialog answers.
     // What it is for comes from the dialog's first line of text, or else the first sentence of its help note.
     public string summaryScript = "";
+
+    // PATTERNS, CHECKED ONLY WHEN OK IS PRESSED (3 November 2026). addPattern gives a field a .NET regular
+    // expression and a sentence to say when its value does not match. Nothing is checked while typing or moving;
+    // pressing OK, or Control+Enter, checks every pattern in the order the fields were added, and the first
+    // failure is said, its field takes focus with its text selected, and the dialog stays open. AN EMPTY VALUE IS
+    // TESTED TOO (3 November 2026), so a pattern can make a field required -- ^\s*\S refuses a blank -- and a
+    // pattern that allows a blank says so with ^$| in front. A read-only field is not checked. A pattern that is not a valid
+    // expression fails with a sentence that says so, rather than letting a broken check pass everything.
+    private readonly List<object[]> lsPatterns = new List<object[]>();
+    public void addPattern(Control ctl, string sPattern, string sMessage)
+    {
+        if (ctl == null || string.IsNullOrEmpty(sPattern)) return;
+        lsPatterns.Add(new object[] { ctl, sPattern, sMessage ?? "" });
+    }
+
+    public bool checkPatterns()
+    {
+        foreach (object[] aOne in lsPatterns)
+        {
+            Control ctl = (Control) aOne[0];
+            string sPattern = (string) aOne[1], sMessage = (string) aOne[2];
+            TextBoxBase tb = ctl as TextBoxBase;
+            if (tb != null && tb.ReadOnly) continue;
+            if (!ctl.Enabled || !ctl.Visible) continue;
+            string sValue = ctl.Text ?? "";
+            bool bMatch;
+            string sSay;
+            try { bMatch = System.Text.RegularExpressions.Regex.IsMatch(sValue, sPattern); sSay = sMessage; }
+            catch (Exception exceptionPattern) { bMatch = false; sSay = "The pattern for this field is not a valid pattern: " + exceptionPattern.Message; }
+            if (bMatch) continue;
+            string sName = nameOf(ctl);
+            // The opening says what is wrong; the caller's sentence, such as what the field is for, follows it.
+            string sOpening = sValue.Length == 0 ? "This field cannot be left blank." : "This value does not fit.";
+            sSay = string.IsNullOrEmpty(sSay) ? sOpening : (sSay.StartsWith("The pattern for this field is not") ? sSay : sOpening + " " + sSay);
+            try { Homer.Log.info("Lbc: " + sName + " failed its pattern " + sPattern); } catch { }
+            Say.sayForced(sName + ": " + sSay);
+            try { ctl.Focus(); if (tb != null) tb.SelectAll(); } catch { }
+            return false;
+        }
+        return true;
+    }
 
     private string tipOf(Control ctl)
     {

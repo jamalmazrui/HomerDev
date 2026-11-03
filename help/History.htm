@@ -190,7 +190,32 @@
 <h1 id="history">History</h1>
 <p>Each version is a level-2 heading, newest first, so your screen
 reader’s heading keys move from one version to the next.</p>
-<h2 id="november-2026">1.115.0 – 3 November 2026</h2>
+<h2 id="november-2026">1.117.0 – 3 November 2026</h2>
+<ul>
+<li><strong>A pattern can make a field required.</strong> Lbc’s pattern
+check now tests an empty value too, so ^refuses a blank and ^$| in front
+of a pattern lets a field stay blank. What is said on a failure opens
+with what is wrong – “This field cannot be left blank” or “This value
+does not fit” – and then the caller’s sentence, such as what the field
+is for.</li>
+</ul>
+<h2 id="november-2026-1">1.116.0 – 3 November 2026</h2>
+<ul>
+<li><strong>Patterns, checked only when OK is pressed, in every Lbc
+dialog.</strong> addPattern(field, pattern, sentence) gives a field a
+.NET regular expression and what to say when a value does not fit.
+Nothing is checked while typing or moving; OK, or Control+Enter, checks
+each pattern in the order the fields were added, says the first failure,
+puts focus on that field with its text selected, and keeps the dialog
+open. An empty or read-only field passes; a pattern that is not a valid
+expression fails and says so. DbDo’s record form did this for itself;
+the kit now does it for every app.</li>
+<li><strong>A hint for each item of a list.</strong>
+LbcHints.setItemHints gives a list a sentence per item, which Shift+F1
+says for the item selected, before the list’s own tip; DbDo’s table
+lists use it for each table’s description.</li>
+</ul>
+<h2 id="november-2026-2">1.115.0 – 3 November 2026</h2>
 <ul>
 <li><strong>PDF tools stop asking to be updated after every
 install.</strong> HomerDev’s and BatCon’s installers registered PDF
@@ -205,7 +230,7 @@ Alt+F4 would, so its closing says the run is over; –keep leaves it open.
 Nothing is forced: an app still open after ten seconds is left so, and
 said.</li>
 </ul>
-<h2 id="november-2026-1">1.114.0 – 3 November 2026</h2>
+<h2 id="november-2026-3">1.114.0 – 3 November 2026</h2>
 <ul>
 <li><strong>recordWalk forgives the recognizer’s near-misses.</strong>
 At a fast JAWS rate it wrote “show now” for “shown now” and “rhymes” for
@@ -215,7 +240,7 @@ alike, in any order within the step; on the 14:09 run’s own transcripts
 that credits Shown now, Shows look’s columns and Prime columns button,
 and still refuses a line heard as “the false order”.</li>
 </ul>
-<h2 id="november-2026-2">1.113.0 – 3 November 2026</h2>
+<h2 id="november-2026-4">1.113.0 – 3 November 2026</h2>
 <ul>
 <li><strong>An inline field is named by its own label.</strong>
 addInlineInputBox registered each box through nameFromLabel, which looks
@@ -225,7 +250,7 @@ field edit, Sonic Radio, 1 of 38” for the name field. It now registers
 under its own label, and Where Am I also falls back to the label just
 before a control.</li>
 </ul>
-<h2 id="november-2026-3">1.112.0 – 3 November 2026</h2>
+<h2 id="november-2026-5">1.112.0 – 3 November 2026</h2>
 <ul>
 <li><strong>Where Am I and Shift+F1’s levels in the Python Lbc
 too,</strong> so the key is the same in every Homer app, whatever
@@ -236,7 +261,7 @@ sentence, twice the whole tip, three times the control’s keys. The rules
 match the C# Lbc’s LbcHints: one press counter, 1.2 seconds between
 presses, up to three.</li>
 </ul>
-<h2 id="november-2026-4">1.111.0 – 3 November 2026</h2>
+<h2 id="november-2026-6">1.111.0 – 3 November 2026</h2>
 <ul>
 <li><strong>Installers compile again.</strong> 1.108.0’s spoken status
 called GetTickCount, which Inno Setup does not have, so every installer
@@ -253,7 +278,7 @@ reported, and a silent one is flagged, since the default output – on
 Jamal’s machine a monitor’s speakers – may not be where JAWS speaks;
 –speaker chooses another, and the log names them all.</li>
 </ul>
-<h2 id="november-2026-5">1.110.0 – 3 November 2026</h2>
+<h2 id="november-2026-7">1.110.0 – 3 November 2026</h2>
 <ul>
 <li><strong>Where Am I on Alt+Shift+Slash, Alt and the question mark, in
 every Lbc dialog of every Homer app.</strong> Pressed once it says the
@@ -278,7 +303,7 @@ pywinauto starts COM as it loads, and soundcard took the “already
 started” answer for an error, stopping all three first runs with “Error
 0x100000001”.</li>
 </ul>
-<h2 id="november-2026-6">1.109.0 – 3 November 2026</h2>
+<h2 id="november-2026-8">1.109.0 – 3 November 2026</h2>
 <ul>
 <li><strong>recordWalk hears what uiCheck could not.</strong> uiCheck
 drives a program through UI Automation and says plainly it does not hear
@@ -292,7 +317,7 @@ moment another window comes to the front, so switching away is the way
 to stop it. Packages install for the user alone; no administrator
 rights.</li>
 </ul>
-<h2 id="november-2026-7">1.108.0 – 3 November 2026</h2>
+<h2 id="november-2026-9">1.108.0 – 3 November 2026</h2>
 <ul>
 <li><strong>Setup says what it is checking.</strong> Between the last
 file copied and the page with the Install button, every installer asks
@@ -306,7 +331,7 @@ controller library is 64-bit and Setup is a 32-bit program. Every status
 is in the setup log too. Every Homer installer gets this at its next
 build.</li>
 </ul>
-<h2 id="november-2026-8">1.107.0 – 3 November 2026</h2>
+<h2 id="november-2026-10">1.107.0 – 3 November 2026</h2>
 <ul>
 <li><strong>The JAWS template compiles again.</strong> Its
 ScreenSensitiveHelp script, added on 2 November for JAWS+F1 pressed
@@ -316,7 +341,7 @@ before every name, and scompile stopped there in JAWS 2024, 2025 and
 in all three. Every app built from the template since needs the fix,
 which is now <code>string sHelp, string sPath</code>.</li>
 </ul>
-<h2 id="november-2026-9">1.106.0 – 3 November 2026</h2>
+<h2 id="november-2026-11">1.106.0 – 3 November 2026</h2>
 <ul>
 <li><strong>Help guides for Shoutcast and Radio Browser.</strong> The
 app-help-guide skill’s generator has both: Shoutcast’s help centre by
@@ -325,7 +350,7 @@ questions page and how to add a station; its programming interface is
 left out, as the collection’s rule asks. The builder knows Shoutcast’s
 shape already; Radio Browser’s reader follows its first harvest.</li>
 </ul>
-<h2 id="november-2026-10">1.105.0 – 2 November 2026</h2>
+<h2 id="november-2026-12">1.105.0 – 2 November 2026</h2>
 <ul>
 <li><strong>Shift+F1 in any Lbc dialog says what the control with focus
 does, in one sentence.</strong> The new LbcHints looks for the sentence
@@ -342,7 +367,7 @@ to have a name of at least two words. Lbc logs each one-word name once
 per run, so an app’s log lists what is left to rename; nothing is
 refused.</li>
 </ul>
-<h2 id="november-2026-11">1.104.0 – 2 November 2026</h2>
+<h2 id="november-2026-13">1.104.0 – 2 November 2026</h2>
 <ul>
 <li><strong>The Homer Player’s Extra Info box is last of its fields
 again.</strong> It sat in the Tracks band, so Tab went from the list
@@ -365,7 +390,7 @@ minutes. The idea is from Leasey’s Media Player, chosen because people
 planning their listening ask it; its equalizer, audio notes and audio
 editing were not taken, being tunings few listeners use.</li>
 </ul>
-<h2 id="november-2026-12">1.103.0 – 2 November 2026</h2>
+<h2 id="november-2026-14">1.103.0 – 2 November 2026</h2>
 <ul>
 <li><strong>kdpSubmit version 47 waits out KDP’s reviews.</strong> KDP
 locks a book’s setup pages while it reviews or publishes an earlier
@@ -395,7 +420,7 @@ in the app-help-guide skill’s makeHarvester.py, replacing a one-off
 harvester written outside it. The skill now says so, and records what a
 browser road will need when one is built.</li>
 </ul>
-<h2 id="november-2026-13">1.102.0 – 2 November 2026</h2>
+<h2 id="november-2026-15">1.102.0 – 2 November 2026</h2>
 <ul>
 <li><strong>Spoken walks are kept in a cache.</strong> buildTutorials
 now keeps every recording under %LOCALAPPDATA%, named by its walk’s
@@ -418,7 +443,7 @@ through kdpBooks’ shared reader, before its status is called unknown:
 Mastery in Popular Song, live with an update publishing, was not on the
 first page.</li>
 </ul>
-<h2 id="november-2026-14">1.101.0 – 2 November 2026</h2>
+<h2 id="november-2026-16">1.101.0 – 2 November 2026</h2>
 <ul>
 <li><strong>NVDA’s own keys are in the key ownership data.</strong>
 KeyOwnership.inix, which checkKeys reads, named JAWS’s keys but none
@@ -437,7 +462,7 @@ typed key that announces itself and types its own character when pressed
 twice; and an article that teaches keys ends with a short list of them,
 in the homer-docs skill.</li>
 </ul>
-<h2 id="november-2026-15">1.100.0 – 2 November 2026</h2>
+<h2 id="november-2026-17">1.100.0 – 2 November 2026</h2>
 <ul>
 <li><p><strong>The ReadMe opens with what HomerDev gives you,</strong>
 in nine plain points: conversions, .inix, direct speech, dialog keys,
@@ -463,7 +488,7 @@ sayVersions.</p></li>
 one place, what Homer learned from QUILL and from Doug Lee’s scripts and
 tools.</p></li>
 </ul>
-<h2 id="november-2026-16">1.99.0 – 2 November 2026</h2>
+<h2 id="november-2026-18">1.99.0 – 2 November 2026</h2>
 <p>Lessons from the Quill family of accessible apps, whose guides,
 requirements and tutorials were studied for what fits Homer.</p>
 <ul>
@@ -480,7 +505,7 @@ teach the wants and F1 opens the full guide; walk 1 presents the keys
 that explain the keys as habits, the few things that make everything
 else easy.</li>
 </ul>
-<h2 id="november-2026-17">1.98.0 – 2 November 2026</h2>
+<h2 id="november-2026-19">1.98.0 – 2 November 2026</h2>
 <ul>
 <li><strong>JAWS scripts and NVDA add-ons are built, fingerprinted,
 installed and run the same way.</strong> installScreenReaderSupport’s
@@ -506,7 +531,7 @@ build,</strong> sources only for JAWS, and for NVDA the add-on with the
 kit’s keys.py copied in. DbDo’s build calls it instead of a block of its
 own.</li>
 </ul>
-<h2 id="november-2026-18">1.97.1 – 2 November 2026</h2>
+<h2 id="november-2026-20">1.97.1 – 2 November 2026</h2>
 <ul>
 <li><strong>The installer notices an NVDA add-on whose code changed at
 the same version.</strong> The finish page judged the add-on by manifest
@@ -520,7 +545,7 @@ sources. A difference is an Update, ticked. The JAWS side needed no
 change: its fingerprint was already of the sources inside the zip, so
 repacking it on every build changes nothing.</li>
 </ul>
-<h2 id="november-2026-19">1.97.0 – 2 November 2026</h2>
+<h2 id="november-2026-21">1.97.0 – 2 November 2026</h2>
 <ul>
 <li><strong>One key-handling framework for every Homer app’s screen
 reader scripts.</strong> Each key has a way – capture, pass quietly,
@@ -538,7 +563,7 @@ same code. It sends a key by its six-pack name even when the number pad
 was pressed, the lesson DbDo’s add-on learned. JAWS scripts, which use
 no Include, share the shapes in Templates.</li>
 </ul>
-<h2 id="november-2026-20">1.96.1 – 2 November 2026</h2>
+<h2 id="november-2026-22">1.96.1 – 2 November 2026</h2>
 <ul>
 <li><strong>Five standard ways to handle a key, for JAWS and NVDA
 alike.</strong> The homer-screen-reader skill’s new
@@ -559,7 +584,7 @@ readers’ own keyboard interrupt already cuts off speech when a key is
 pressed, and a quiet pass-through script keeps the reader from adding
 its own; DbDo’s grid now works that way.</li>
 </ul>
-<h2 id="november-2026-21">1.96.0 – 2 November 2026</h2>
+<h2 id="november-2026-23">1.96.0 – 2 November 2026</h2>
 <ul>
 <li><strong>Say.sayNow speaks in place of what the reader was
 saying.</strong> say() queues politely; sayNow flushes the screen
@@ -569,7 +594,7 @@ focus itself can say exactly what should be heard, with no JAWS or NVDA
 script. The Extra Speech gate still applies. DbDo’s grid is the first
 user.</li>
 </ul>
-<h2 id="november-2026-22">1.95.3 – 1 November 2026</h2>
+<h2 id="november-2026-24">1.95.3 – 1 November 2026</h2>
 <ul>
 <li><strong>The tutorials’ screen reader voice is a little
 slower,</strong> to be easier to understand: its pace setting goes from
@@ -582,7 +607,7 @@ voice settings are now part of each tutorial’s fingerprint. The next
 build of each app speaks all its tutorials once more, which takes a
 while.</li>
 </ul>
-<h2 id="november-2026-23">1.95.2 – 1 November 2026</h2>
+<h2 id="november-2026-25">1.95.2 – 1 November 2026</h2>
 <ul>
 <li><strong>The key check reads navigation keys correctly.</strong> It
 took the words “Alt+Control+Shift with an arrow” as a key named Shift,
@@ -591,7 +616,7 @@ table keys. A modifier named in prose is skipped, and Number Pad 5
 counts as a navigation key, as the arrows, Home, End, Page Up and Page
 Down already did. Every app’s copy of check.py is the kit’s.</li>
 </ul>
-<h2 id="november-2026-24">1.95.1 – 1 November 2026</h2>
+<h2 id="november-2026-26">1.95.1 – 1 November 2026</h2>
 <ul>
 <li><strong>A prompt’s ampersand is a character.</strong> The list
 Filter prompt said “with &amp; or | or *“, and its label took the

@@ -7,6 +7,15 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.117.0 -- 3 November 2026
+
+- **A pattern can make a field required.** Lbc's pattern check now tests an empty value too, so ^\s*\S refuses a blank and ^$| in front of a pattern lets a field stay blank. What is said on a failure opens with what is wrong -- "This field cannot be left blank" or "This value does not fit" -- and then the caller's sentence, such as what the field is for.
+
+## 1.116.0 -- 3 November 2026
+
+- **Patterns, checked only when OK is pressed, in every Lbc dialog.** addPattern(field, pattern, sentence) gives a field a .NET regular expression and what to say when a value does not fit. Nothing is checked while typing or moving; OK, or Control+Enter, checks each pattern in the order the fields were added, says the first failure, puts focus on that field with its text selected, and keeps the dialog open. An empty or read-only field passes; a pattern that is not a valid expression fails and says so. DbDo's record form did this for itself; the kit now does it for every app.
+- **A hint for each item of a list.** LbcHints.setItemHints gives a list a sentence per item, which Shift+F1 says for the item selected, before the list's own tip; DbDo's table lists use it for each table's description.
+
 ## 1.115.0 -- 3 November 2026
 
 - **PDF tools stop asking to be updated after every install.** HomerDev's and BatCon's installers registered PDF tools under winget's Python 3.13, so Setup compared Python's versions -- "3.13.15 found, 3.13.17 available; offered as Update" in both of 3 November's setup logs -- while installPdfTools updates pymupdf4llm, never Python; the box could never be satisfied. A component id may now be pip:<package>, read with "python -m pip index versions", whose INSTALLED and LATEST lines are compared; PDF tools is pip:pymupdf4llm.
