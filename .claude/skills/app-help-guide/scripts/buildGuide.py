@@ -2625,6 +2625,156 @@ def readVirtualAudioCable(sFolder):
     return lArticles
 
 
+def readThreeCx(sFolder):
+    """The 3CX user manual: one page per app or feature, the article in the page's googledoc block. 3CX gives no
+    groups above its pages, so they are grouped by subject, and the preamble says so."""
+    lArticles = []
+    for sName in sorted(os.listdir(sFolder)):
+        if not sName.endswith(".html"): continue
+        sMarkup = re.sub(r"(?is)<(script|style)\b.*?</\1>", "", readText(os.path.join(sFolder, sName)))
+        oTitle = re.search(r"(?is)<h1[^>]*>(.*?)</h1>", sMarkup)
+        sTitle = stripTags(oTitle.group(1)).strip() if oTitle else ""
+        sBody = findBalanced(sMarkup, r'<div[^>]*class="[^"]*\bgoogledoc\b', "div")
+        if not sTitle or not sBody: continue
+        if sTitle.isupper(): sTitle = sTitle.capitalize().replace("3cx", "3CX")
+        lBody = toMarkdown(sBody, 0)
+        if len(" ".join(lBody).split()) < 40: continue
+        sLower = sTitle.lower()
+        sCategory = ("Apps and phones" if re.search(r"app|client|deskphone", sLower)
+                     else "Meetings and conferencing" if re.search(r"conferenc|meet", sLower) else sMiscellaneous)
+        lArticles.append((sCategory, sTitle, lBody))
+    return lArticles
+
+
+def readMicroSip(sFolder):
+    """MicroSIP's two pages: the documentation, one article per section, and the questions page as one article."""
+    lArticles = []
+    for sName in sorted(os.listdir(sFolder)):
+        if not sName.endswith(".html"): continue
+        sMarkup = re.sub(r"(?is)<(script|style)\b.*?</\1>", "", readText(os.path.join(sFolder, sName)))
+        sMarkup = re.sub(r"(?is)<h1[^>]*>\s*Please allow ads.*?</h1>(\s*<p>.*?</p>)?", "", sMarkup)
+        sMain = findBalanced(sMarkup, r"<main[^>]*>", "main") or ""
+        if not sMain: continue
+        if "faq" in sName:
+            lBody = toMarkdown(afterFirstHeading(sMain), 0)
+            if len(" ".join(lBody).split()) >= 40: lArticles.append((sMiscellaneous, "Frequently asked questions", lBody))
+            continue
+        lParts = re.split(r"(?is)(<h2[^>]*>.*?</h2>)", afterFirstHeading(sMain))
+        for iIndex in range(1, len(lParts) - 1, 2):
+            sTitle = stripTags(lParts[iIndex]).strip()
+            lBody = toMarkdown(lParts[iIndex + 1], 0)
+            if sTitle and len(" ".join(lBody).split()) >= 10: lArticles.append(("Documentation", sTitle, lBody))
+    return lArticles
+
+
+def readMuseScore(sFolder):
+    """The MuseScore Studio 4 handbook: the article is the page's article element, and the category is the chapter
+    named in the page's own breadcrumb trail."""
+    lArticles = []
+    for sName in sorted(os.listdir(sFolder)):
+        if not sName.endswith(".html"): continue
+        sMarkup = re.sub(r"(?is)<(script|style)\b.*?</\1>", "", readText(os.path.join(sFolder, sName)))
+        oTitle = re.search(r"(?is)<h1[^>]*>(.*?)</h1>", sMarkup)
+        sTitle = stripTags(oTitle.group(1)).strip() if oTitle else ""
+        sBody = findBalanced(sMarkup, r"<article[^>]*>", "article")
+        if sBody:
+            sCrumbs = findBalanced(sMarkup, r'<div[^>]*block-system-breadcrumb-block', "div") or ""
+            lCrumbs = [stripTags(x).strip() for x in re.findall(r"(?is)<li[^>]*>(.*?)</li>", sCrumbs)]
+            lCrumbs = [x for x in lCrumbs if x and x.lower() != "home"]
+            sCategory = lCrumbs[1] if len(lCrumbs) > 1 else "About the handbook"
+        else:
+            # THE NEW HANDBOOK (2 November 2026). Most handbook addresses now redirect to MuseScore's new handbook,
+            # built with GitBook: the article is the contents block, and the chapter is the first name in the trail
+            # printed above the title, after the language picker.
+            sBody = findBalanced(sMarkup, r'<div[^>]*class="contents"[^>]*data-content-ref-root', "div")
+            iTitle = sMarkup.find("<h1")
+            sHeader = sMarkup[sMarkup.rfind("<header", 0, iTitle):iTitle] if iTitle > 0 else ""
+            lCrumbs = [x.strip() for x in stripTags(re.sub(r"<[^>]+>", "|", sHeader)).split("|") if x.strip()]
+            iAfter = lCrumbs.index("English (US)") + 1 if "English (US)" in lCrumbs else len(lCrumbs)
+            sCategory = lCrumbs[iAfter] if iAfter < len(lCrumbs) else "About the handbook"
+        if not sTitle or not sBody: continue
+        sBody = re.sub(r'(?is)<(nav|ul)[^>]*class="[^"]*(book-navigation|book-traversal|links inline)[^"]*".*?</\1>', "", sBody)
+        lBody = toMarkdown(afterFirstHeading(sBody), 0)
+        if len(" ".join(lBody).split()) < 40: continue
+        lArticles.append((sCategory, sTitle, lBody))
+    return lArticles
+
+
+def readTeamTalk(sFolder):
+    """The TeamTalk 5 client manual, a Doxygen-built help: the title follows "TeamTalk Help:" in the page title and
+    the article is the contents block. The index pages that only list other pages are left out."""
+    lArticles = []
+    for sName in sorted(os.listdir(sFolder)):
+        if not sName.endswith(".html") or re.search(r"(doxygen_crawl|_pages)\.html$", sName): continue
+        sMarkup = readText(os.path.join(sFolder, sName))
+        oTitle = re.search(r"(?is)<title[^>]*>(.*?)</title>", sMarkup)
+        sTitle = re.sub(r"^TeamTalk Help:\s*", "", stripTags(oTitle.group(1)).strip()) if oTitle else ""
+        sBody = findBalanced(sMarkup, r'<div[^>]*class="contents"', "div")
+        if not sTitle or not sBody: continue
+        lBody = toMarkdown(sBody, 0)
+        if len(" ".join(lBody).split()) < 40: continue
+        lArticles.append(("TeamTalk 5 client", sTitle, lBody))
+    return lArticles
+
+
+def readTeamViewer(sFolder):
+    """TeamViewer's knowledge base: the title is the heading marked data-kb-title and the article the block marked
+    data-kb-main-content. The category is the product and the first part of the article's address, which is how
+    TeamViewer files its articles; listing pages, which have no article block, are left out."""
+    lArticles = []
+    for sName in sorted(os.listdir(sFolder)):
+        if not sName.endswith(".html"): continue
+        oPath = re.search(r"knowledge-base_teamviewer-(classic|remote)_([a-z0-9-]+)_", sName)
+        if not oPath: continue
+        sMarkup = re.sub(r"(?is)<(script|style|svg)\b.*?</\1>", "", readText(os.path.join(sFolder, sName)))
+        oTitle = re.search(r"(?is)<h[1-3][^>]*data-kb-title[^>]*>(.*?)</h[1-3]>", sMarkup)
+        sBody = findBalanced(sMarkup, r"<div[^>]*data-kb-main-content", "div")
+        if not oTitle or not sBody: continue
+        lBody = toMarkdown(sBody, 0)
+        if len(" ".join(lBody).split()) < 25: continue
+        sProduct = "TeamViewer Classic" if oPath.group(1) == "classic" else "TeamViewer Remote"
+        sTopic = oPath.group(2).replace("-", " ")
+        sTopic = re.sub(r"\bteamviewer ai\b", "TeamViewer AI", sTopic)
+        lArticles.append((sProduct + ": " + sTopic[:1].upper() + sTopic[1:], stripTags(oTitle.group(1)).strip(), lBody))
+    return lArticles
+
+
+# Winlink's site mixes help with news, history and stories from the field. Only help is kept: these titles are the
+# news, history, stories and Spanish-language pages, set aside and counted in the log.
+sWinlinkNotHelp = (r"presentation|wildfires|healthcare|alachua|\bSK\b|shakeout|kuwait|\bMARS\b|muddle|carpe|jungle|"
+                   r"seven seas shack|early history|feature article|workshop update|articles and application stories|"
+                   r"sistema|tutorial para|communications at sea|staying connected|21st century")
+
+
+def readWinlink(sFolder):
+    """Winlink Express and the Winlink help pages on winlink.org, grouped by subject, since the site files its pages
+    by date rather than by topic; the preamble says so."""
+    lArticles = []
+    iSetAside = 0
+    for sName in sorted(os.listdir(sFolder)):
+        if not sName.endswith(".html"): continue
+        sMarkup = re.sub(r"(?is)<(script|style)\b.*?</\1>", "", readText(os.path.join(sFolder, sName)))
+        oTitle = re.search(r"(?is)<title[^>]*>(.*?)</title>", sMarkup)
+        sTitle = re.sub(r"\s*\|\s*Winlink Global Radio Email\s*$", "", stripTags(oTitle.group(1))).strip() if oTitle else ""
+        if not sTitle: continue
+        if re.search(sWinlinkNotHelp, sTitle, re.I):
+            iSetAside += 1
+            continue
+        sBody = (findBalanced(sMarkup, r'<div[^>]*class="[^"]*\bfield-name-body\b', "div")
+                 or findBalanced(sMarkup, r'<div[^>]*class="region region-content"', "div"))
+        if not sBody: continue
+        lBody = toMarkdown(afterFirstHeading(sBody), 0)
+        if len(" ".join(lBody).split()) < 30: continue
+        sLower = sTitle.lower()
+        if re.search(r"account|callsign|acceptlist|password|message|precedence|tactical|mail|e-mail", sLower): sCategory = "Accounts and messages"
+        elif re.search(r"ft-991|icom|ardop|signalink|sound|packet|vara|rms|brick|airmail|pactor|gateway|hybrid|mesh|radio", sLower): sCategory = "Radios, modems and networks"
+        elif re.search(r"express|form|template|propagation|picture|linux|scale|call sign folder", sLower): sCategory = "Winlink Express"
+        else: sCategory = "Getting started and reference"
+        lArticles.append((sCategory, sTitle, lBody))
+    logging.info("Winlink: %d pages of news, history, stories or Spanish-language material set aside", iSetAside)
+    return lArticles
+
+
 def main():
     """Builds the magazine guides and reports what passed."""
     sScriptDir = os.path.dirname(os.path.abspath(__file__))
@@ -2851,6 +3001,21 @@ def main():
          "This guide holds the Wireshark User's Guide, the Wireshark project's own manual, gathered on 2 November 2026 from its edition published one section per page. The categories are the guide's own chapters and appendices, and each article keeps its section number, so the order of the original can be followed. Doug Lee publishes JAWS scripts for Wireshark; his documentation is in Ttcom.htm."),
         ("Virtual Audio Cable", "VirtualAudioCableHelp", readVirtualAudioCable, "VirtualAudioCable.md", "Virtual Audio Cable user manual",
          "This guide holds the Virtual Audio Cable user manual, published by its author, Eugene Muzychenko, gathered on 2 November 2026. The manual lists its pages in one flat run with no groups, so they are grouped here by subject: getting started, using cables, problems and answers, and about the product. The page describing the driver's programming interface is left out, as written for programmers. Doug Lee publishes JAWS scripts and an NVDA add-on for Virtual Audio Cable's applications; his documentation is in Ttcom.htm."),
+        ("3CX", "ThreeCxHelp", readThreeCx, "ThreeCx.md", "3CX user manual",
+         "This guide holds the 3CX user manual, the publisher's own pages for the people who make and take calls with 3CX, gathered on 2 November 2026: the web client, the Windows, Android and iOS apps, desk phones, voicemail and video meetings. 3CX gives its user pages no groups, so they are grouped here by subject. The administrator's manual is a separate set and is not here. Doug Lee publishes JAWS scripts for the 3CX apps; his documentation is in Ttcom.htm."),
+        ("MicroSIP", "MicroSIPHelp", readMicroSip, "MicroSIP.md", "MicroSIP documentation",
+         "This guide holds MicroSIP's own documentation and its questions page, gathered on 2 November 2026. The documentation is one long page, so each of its sections is an article here, under the page's own section names. Doug Lee publishes JAWS scripts for MicroSIP; his documentation is in Ttcom.htm."),
+        ("MuseScore", "MuseScoreHelp", readMuseScore, "MuseScore.md", "MuseScore Studio 4 handbook",
+         "This guide holds the MuseScore Studio 4 handbook, written by the MuseScore community on musescore.org, gathered on 2 November 2026. The categories are the handbook's own chapters, taken from the trail above each page. Most of the handbook's addresses now lead to MuseScore's new handbook, so most pages here come from it, with the chapters it prints above each page. It holds the pages the gathering reached, not the whole handbook. The handbook's own Accessibility page is among them. Doug Lee worked on the MuseScore 3 JAWS scripts, now distributed by MuseScore."),
+        ("TeamTalk", "TeamTalkHelp", readTeamTalk, "TeamTalk.md", "TeamTalk 5 client manual",
+         "This guide holds the TeamTalk 5 client manual published by BearWare.dk, gathered on 2 November 2026: the user interface, preferences, the server, .tt files, how-to answers and advanced settings. The developer kit's documentation is a separate set and is not here. Doug Lee publishes JAWS scripts for the TeamTalk Qt client and his own text client, TTCom; his documentation for both is in Ttcom.htm."),
+        ("TeamViewer", "TeamViewerHelp", readTeamViewer, "TeamViewer.md", "TeamViewer knowledge base",
+         "This guide holds TeamViewer's own knowledge base for TeamViewer Remote and TeamViewer Classic, gathered on 2 November 2026. The categories are TeamViewer's own, named by product and by the topic in each article's address. The enterprise products, Tensor and Frontline, are not here. Doug Lee publishes JAWS scripts for TeamViewer; his documentation is in Ttcom.htm."),
+        ("Winlink Express", "WinlinkExpressHelp", readWinlink, "WinlinkExpress.md", "Winlink Express and Winlink help",
+         "This guide holds the help pages on winlink.org for Winlink Express and the Winlink system it connects to, gathered on 2 November 2026. The site files its pages by date rather than by topic, so they are grouped here by subject. The site also carries news, history, stories from the field and two Spanish-language pages; those are set aside, and the build's log counts them. Doug Lee publishes JAWS scripts for Winlink Express; his documentation is in Ttcom.htm."),
+        # INTERNET RADIO (3 November 2026)
+        ("Shoutcast", "ShoutcastHelp", readZendesk, "Shoutcast.md", "Shoutcast help",
+         "This guide holds Shoutcast's own help centre, gathered from the publisher's own listing: the Shoutcast directory, the Radio Manager where a station is listed and earns, and the Shoutcast server software. The categories are Shoutcast's own sections. RadioTrail, DbDo's radio template, draws its stations from Radio Browser and SomaFM; Shoutcast's directory needs a developer key to read."),
     ]
     lResults = []
     for sProduct, sFolder, functionRead, sFile, sTitle, sPreamble in lPlan:

@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.107.0 -- 3 November 2026
+
+- **The JAWS template compiles again.** Its ScreenSensitiveHelp script, added on 2 November for JAWS+F1 pressed twice, declared `string sHelp, sPath`; JAWS wants a type before every name, and scompile stopped there in JAWS 2024, 2025 and 2026. DbDo's 3 November install reported its JAWS scripts NOT installed in all three. Every app built from the template since needs the fix, which is now `string sHelp, string sPath`.
+
+## 1.106.0 -- 3 November 2026
+
+- **Help guides for Shoutcast and Radio Browser.** The app-help-guide skill's generator has both: Shoutcast's help centre by its Zendesk listing, and Radio Browser's own pages for listeners, its questions page and how to add a station; its programming interface is left out, as the collection's rule asks. The builder knows Shoutcast's shape already; Radio Browser's reader follows its first harvest.
+
 ## 1.105.0 -- 2 November 2026
 
 - **Shift+F1 in any Lbc dialog says what the control with focus does, in one sentence.** The new LbcHints looks for the sentence in the app's configs\Hints.inix, by the dialog's title and the control's name, with the kind in parentheses only where two names clash, and in an [All dialogs] section; the person's own copy in %LOCALAPPDATA%\<app>\configs wins. With no hint written, the first sentence of the control's description is said, and with no description, its name and kind. Text boxes, which already spoke their whole tip on Shift+F1, now give the same one sentence.

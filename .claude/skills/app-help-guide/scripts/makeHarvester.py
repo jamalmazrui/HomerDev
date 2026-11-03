@@ -2961,6 +2961,48 @@ lEstates = [
         "sOkStatuses": "200, 202",
         "sExtraLinks": "",
     },
+    # INTERNET RADIO DIRECTORIES (3 November 2026), the two sources behind RadioTrail and the Homer Player's stations.
+    {
+        "sProduct": "Shoutcast",
+        "sScriptName": "getShoutcastHelp.py",
+        "sSystem": "Zendesk, by the listing route: the directory, the Radio Manager and the server software",
+        "sFolder": "ShoutcastHelp",
+        "sLogName": "getShoutcastHelp.log",
+        "sZipName": "ShoutcastHelp.zip",
+        "iMaxPages": 800,
+        "nDelay": 1.0,
+        "sSeeds": ('"https://help.shoutcast.com/api/v2/help_center/en-us/articles.json?per_page=100",\n'
+                   '              "https://help.shoutcast.com/api/v2/help_center/en-us/categories.json?per_page=100",\n'
+                   '              "https://help.shoutcast.com/api/v2/help_center/en-us/sections.json?per_page=100",\n'
+                   '              "https://help.shoutcast.com/hc/en-us/articles/360003410493-Shoutcast-Server-Configuration-New-Features-"'),
+        "sFencePattern": r"^https://help\.shoutcast\.com/(hc/en-us(?!/community|/requests|/signin)|api/v2/help_center/en-us)",
+        "sSubjectPattern": "",
+        "sReadyPattern": r"(hc/en-us/articles/|shoutcast|articles.:)",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": ('    if sText.lstrip().startswith("{"):\n'
+                        '        try:\n'
+                        '            dPayload = json.loads(sText)\n'
+                        '            if dPayload.get("next_page"): lFound.append(dPayload["next_page"])\n'
+                        '        except Exception as oError:\n'
+                        '            logging.warning("a listing page was not readable as JSON: %s", oError)\n'),
+    },
+    {
+        "sProduct": "Radio Browser",
+        "sScriptName": "getRadioBrowserHelp.py",
+        "sSystem": "the community directory's own pages for listeners: its questions page and how to add a station; its programming interface is left out",
+        "sFolder": "RadioBrowserHelp",
+        "sLogName": "getRadioBrowserHelp.log",
+        "sZipName": "RadioBrowserHelp.zip",
+        "iMaxPages": 20,
+        "nDelay": 1.0,
+        "sSeeds": ('"https://www.radio-browser.info/faq",\n'
+                   '              "https://www.radio-browser.info/add"'),
+        "sFencePattern": r"^https://www\.radio-browser\.info/(?!.*(api|json|xml|m3u|pls))[a-z]*$",
+        "sSubjectPattern": "",
+        "sReadyPattern": r"(radio|station)",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": "",
+    },
 ]
 
 

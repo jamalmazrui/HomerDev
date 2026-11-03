@@ -43,7 +43,9 @@ EndScript
 
 Script ScreenSensitiveHelp ()
 Var
-    string sHelp, sPath
+    ; EACH NAME TAKES ITS TYPE (3 November 2026): "string sHelp, sPath" stopped scompile at the second
+    ; name, in every JAWS version, so no Homer app's JAWS scripts could install from this template.
+    string sHelp, string sPath
 If IsSameScript () Then
 Let sPath = GetAppFilePath ()
 Let sHelp = StringLeft (sPath, StringLength (sPath) - StringLength (GetAppFileName ())) + "help\\_APP_.htm"
