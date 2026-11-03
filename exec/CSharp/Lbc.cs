@@ -1298,7 +1298,9 @@ public class LbcDialog : IDisposable
         tb.TabIndex = iTabIndex++;
         tb.Margin = new Padding(0, 0, 0, 0);
         tb.GotFocus += handleGotFocus;
-        registerWidget(tb, "TextBox", nameFromLabel());
+        // ITS OWN LABEL NAMES IT (3 November 2026): nameFromLabel looks for the band's current label, which this
+        // row does not set, so every inline field was registered as "field" and Where Am I said "On field edit".
+        registerWidget(tb, "TextBox", string.IsNullOrEmpty(nameFromLabel()) ? (lbl.Text ?? "") : nameFromLabel());
         if (!string.IsNullOrEmpty(sTip)) { dFocusTips[tb] = sTip; tb.Tip = sTip; }
         pnlRow.Controls.Add(tb, 1, 0);
 
@@ -3418,10 +3420,25 @@ public class LbcDialog : IDisposable
         return lsOut;
     }
 
+    // The label just before a control in its own row or band, when the control has no name of its own.
+    private static string labelBefore(Control ctl)
+    {
+        if (ctl == null || ctl.Parent == null) return "";
+        string sLast = "";
+        foreach (Control ctlSibling in ctl.Parent.Controls)
+        {
+            if (ctlSibling == ctl) return sLast;
+            Label lbl = ctlSibling as Label;
+            if (lbl != null) sLast = LbcHints.plainName(lbl.Text);
+        }
+        return "";
+    }
+
     private string nameOf(Control ctl)
     {
         string sName = LbcHints.plainName(ctl.AccessibleName ?? "");
         if (sName.Length == 0) sName = LbcHints.plainName(ctl is Button || ctl is CheckBox || ctl is RadioButton ? ctl.Text : "");
+        if (sName.Length == 0) sName = labelBefore(ctl);
         if (sName.Length == 0)
         {
             string sKey = ctl.Name ?? "";

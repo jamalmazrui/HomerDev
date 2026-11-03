@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.113.0 -- 3 November 2026
+
+- **An inline field is named by its own label.** addInlineInputBox registered each box through nameFromLabel, which looks for the band's current label, and this row never sets one; so every such field was named "field", and in DbDo's Edit View Where Am I said "On field edit, Sonic Radio, 1 of 38" for the name field. It now registers under its own label, and Where Am I also falls back to the label just before a control.
+
+## 1.112.0 -- 3 November 2026
+
+- **Where Am I and Shift+F1's levels in the Python Lbc too,** so the key is the same in every Homer app, whatever language it is written in. Alt+Shift+Slash: once the dialog, what it is for and the control with focus, with its value and place; twice every control and what it holds; three times the keys. Shift+F1: once a sentence, twice the whole tip, three times the control's keys. The rules match the C# Lbc's LbcHints: one press counter, 1.2 seconds between presses, up to three.
+
 ## 1.111.0 -- 3 November 2026
 
 - **Installers compile again.** 1.108.0's spoken status called GetTickCount, which Inno Setup does not have, so every installer since stopped compiling with "Unknown identifier 'GetTickCount'": the kit's at 11:28 and 12:39, DbDo's at 11:50 and 12:41, and with them every change since, though the programs themselves compiled. It is now taken from Windows's kernel32.dll.
