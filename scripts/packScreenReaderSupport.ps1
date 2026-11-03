@@ -30,6 +30,48 @@ logLine "packScreenReaderSupport started; script=$PSCommandPath; PowerShell $($P
 logLine "Root=$Root App=$App OutDir=$OutDir Kit=$Kit"
 $bFailed = $false
 
+# ---- SOURCES THE INSTALLER NEEDS, MADE AGAIN WHEN MISSING (3 November 2026) ----
+# DbDo's installer installed JAWS scripts and an NVDA add-on, but its scripts\jaws and scripts\nvda were not named in
+# RepoFiles.txt, so tidy moved them to notes and every build after packed nothing; Setup then compiled an old package
+# left in Program Files, which failed in every JAWS version. BatCon was in the same state. So: when the app's
+# installer runs installScreenReaderSupport and a reader's sources are missing, they are made from the kit's own
+# templates (Templates\screenReader), _APP_ and _app_ replaced by the app's name, and named in RepoFiles.txt so tidy
+# keeps them. Sources that are there are never touched.
+$sIss = Join-Path $Root "${App}_setup.iss"
+$bWanted = (Test-Path -LiteralPath $sIss) -and ((Get-Content -LiteralPath $sIss -Raw) -match 'installScreenReaderSupport')
+$sTemplates = Join-Path $Kit "Templates\screenReader"
+if ($bWanted -and (Test-Path -LiteralPath $sTemplates)) {
+    $lsMade = @()
+    foreach ($sReader in @("jaws", "nvda")) {
+        $sTarget = Join-Path $Root ("scripts\" + $sReader)
+        $bHave = if ($sReader -eq "jaws") { Test-Path -LiteralPath (Join-Path $sTarget "$App.jss") } else { (Test-Path -LiteralPath (Join-Path $sTarget "manifest.ini")) -or (Test-Path -LiteralPath (Join-Path $Root "addon\manifest.ini")) }
+        if ($bHave) { logLine "scripts\$sReader is here; left as it is"; continue }
+        $sFrom = Join-Path $sTemplates $sReader
+        foreach ($oFile in @(Get-ChildItem -LiteralPath $sFrom -File -Recurse | Where-Object { $_.Extension -ne ".pyc" -and $_.FullName -notmatch '__pycache__' })) {
+            $sRelative = $oFile.FullName.Substring($sFrom.Length).TrimStart('\').Replace("_APP_", $App).Replace("_app_", $App.ToLowerInvariant())
+            $sDest = Join-Path $sTarget $sRelative
+            New-Item -ItemType Directory -Force -Path (Split-Path -Parent $sDest) | Out-Null
+            # Each file keeps the byte order mark its template has, or has not.
+            $aBytes = [IO.File]::ReadAllBytes($oFile.FullName)
+            $bMark = ($aBytes.Length -ge 3 -and $aBytes[0] -eq 0xEF -and $aBytes[1] -eq 0xBB -and $aBytes[2] -eq 0xBF)
+            $sText = [IO.File]::ReadAllText($oFile.FullName).Replace("_APP_", $App).Replace("_app_", $App.ToLowerInvariant())
+            [IO.File]::WriteAllText($sDest, $sText, (New-Object System.Text.UTF8Encoding $bMark))
+            $lsMade += ("scripts/" + $sReader + "/" + $sRelative.Replace('\', '/'))
+        }
+        logLine "Made scripts\$sReader from the kit's template, since ${App}_setup.iss installs it and it was missing"
+        Write-Host "Made $App's $(if ($sReader -eq 'jaws') { 'JAWS scripts' } else { 'NVDA add-on' }) from the kit's template; they were missing"
+    }
+    $sRepoFiles = Join-Path $Root "RepoFiles.txt"
+    if ($lsMade.Count -gt 0 -and (Test-Path -LiteralPath $sRepoFiles)) {
+        $lsHave = @(Get-Content -LiteralPath $sRepoFiles)
+        $lsAdd = @($lsMade | Where-Object { $lsHave -notcontains $_ })
+        if ($lsAdd.Count -gt 0) {
+            Add-Content -LiteralPath $sRepoFiles -Value (@("# Screen reader sources, made from the kit's template (packScreenReaderSupport, " + (Get-Date -Format "d MMMM yyyy") + ").") + $lsAdd) -Encoding UTF8
+            logLine "Named in RepoFiles.txt, so tidy keeps them: $($lsAdd -join ', ')"
+        }
+    }
+} elseif (-not $bWanted) { logLine "${App}_setup.iss does not install screen reader support, so nothing is made" }
+
 # ---- JAWS ----
 $sJaws = Join-Path $Root "scripts\jaws"
 if (Test-Path -LiteralPath (Join-Path $sJaws "$App.jss")) {

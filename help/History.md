@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.118.0 -- 3 November 2026
+
+- **A missing screen reader source is made again, not silently skipped.** DbDo's installer installed JAWS scripts and an NVDA add-on, but its scripts\jaws and scripts\nvda were not named in RepoFiles.txt, so tidy moved them to notes, every build after packed nothing, and Setup compiled an old package left in Program Files, which failed in every JAWS version. BatCon's repository was in the same state. packScreenReaderSupport now checks the app's own installer: when it runs installScreenReaderSupport and a reader's sources are missing, they are made from the kit's templates, _APP_ and _app_ replaced by the app's name, each file keeping its template's byte order mark, and named in RepoFiles.txt so tidy keeps them. Sources that are there are never touched, and an app whose installer installs no screen reader support is left alone. The log says what was made.
+
 ## 1.117.0 -- 3 November 2026
 
 - **A pattern can make a field required.** Lbc's pattern check now tests an empty value too, so ^\s*\S refuses a blank and ^$| in front of a pattern lets a field stay blank. What is said on a failure opens with what is wrong -- "This field cannot be left blank" or "This value does not fit" -- and then the caller's sentence, such as what the field is for.
