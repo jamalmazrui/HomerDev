@@ -93,7 +93,7 @@ def bookshelfRows(page, dSettings=None):
                 let sSetup = ""; if (e) for (const a of e.querySelectorAll("a[href]")) { const mm = (a.getAttribute("href") || "").match(/title-setup\\/kindle\\/([A-Z0-9]+)\\//); if (mm) { sSetup = mm[1]; break; } }
                 const oImg = e ? e.querySelector("img[src*='/images/I/']") : null;
                 const sCover = oImg ? ((oImg.getAttribute("src").match(/\\/images\\/I\\/([^._]+)/) || [, ""])[1]) : "";
-                lOut.push({id: sSetup, cover: sCover, spanId: (t.id || "").split("-").pop(), hrefs: e ? Array.from(e.querySelectorAll("a[href]")).map(a => a.getAttribute("href")).slice(0, 6) : [], title: sMine, asin: m ? m[1].toUpperCase() : "", status: /\\bLive\\b/i.test(sRow) ? "Live" : (/In Review|Publishing/i.test(sRow) ? "In Review" : (/Draft/i.test(sRow) ? "Draft" : "")), review: /updates in review/i.test(sRow)});
+                lOut.push({id: sSetup, cover: sCover, spanId: (t.id || "").split("-").pop(), hrefs: e ? Array.from(e.querySelectorAll("a[href]")).map(a => a.getAttribute("href")).slice(0, 6) : [], title: sMine, asin: m ? m[1].toUpperCase() : "", status: /\\bIn Review\\b|\\bPublishing\\b/i.test(sRow) ? "In Review" : (/\\bLive\\b/i.test(sRow) ? "Live" : (/Draft/i.test(sRow) ? "Draft" : "")), review: /\\bLive\\b/i.test(sRow) && /\\bIn Review\\b|\\bPublishing\\b/i.test(sRow), text: sRow.slice(0, 400)});  // IN REVIEW BEFORE LIVE (2 November 2026): a live book with an update pending shows both words, and Live alone was read
             }
             return lOut;
         }""", sAsinPattern)

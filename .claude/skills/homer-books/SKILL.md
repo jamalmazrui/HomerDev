@@ -51,6 +51,9 @@ changed book, listing each and why first (kit 1.93.0).
    `--book` limits it; `--no-publish` stops at a saved draft; `--republish`
    sends unchanged books too. A book KDP is reviewing is skipped, not failed.
 4. `scripts\kdpSubmit --book <root>` submits a new book from its answers file.
+   A bare `scripts\kdpSubmit` submits every changed book; one KDP is still
+   reviewing is tried again every hour for up to 72 hours and submitted once
+   KDP allows (exit code 7 if the wait ends first; `--no-wait` skips it).
 
 The code originates in the kit's `scripts` folder; each wrapper copies the
 kit's current tools in before running. Fix a tool in the kit, never in a

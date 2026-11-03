@@ -127,3 +127,30 @@ address with its status, and the reason for anything not kept.
 - **Count what you leave out, and say it.** Every guide that drops material —
   translations, a changelog, an administrator's half, badge pages — says how
   many and why, in its preamble or its log.
+- **Every estate goes through the generator, never a script of its own.** On 2
+  November 2026 a one-off harvester, getDougLeeTargetsHelp.py, was written for
+  fifteen of Doug Lee's scripted apps beside `makeHarvester.py` instead of in
+  it -- the Homer DRY rule broken, as with FreeWill in October. Its thirteen
+  plain estates are now blocks in `makeHarvester.py`. Before writing any code
+  for a new product, look here first: a listing, `llms.txt`, a sitemap or a
+  fenced crawl almost always fits one of the four scripts.
+
+## Estates that need a browser
+
+The generated harvesters fetch with Python alone, so an estate drawn by script
+in the page, or one that refuses Python, waits for a browser road the kit does
+not have yet: Coursera, Dell Command Update's user's guide and Twitch's help
+(Salesforce) so far, and Adobe Connect if its pages keep answering Python with
+HTTP 403. When that road is built, these lessons from the hang of 2 November
+2026 apply. Edge opened on its blank page and nothing followed, because only
+the launch had a time limit and the console never said what it was waiting
+for:
+
+- Launch with Playwright's persistent context, which hands back a usable tab,
+  rather than a separate context and page step.
+- Upgrade Playwright before the first launch of a run; an old Playwright can
+  stall against a newer Edge.
+- Give every browser step its own time limit, and say before each wait what it
+  waits for and for how long ("Waiting up to 60 seconds for ..."), as the
+  Homer rule for browser automation asks. Log every page change.
+- Run one visible-browser harvest at a time.

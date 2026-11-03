@@ -204,7 +204,7 @@ exit /b 0
 echo(
 echo Stopped: %sStep% failed, so the steps after it did not run. Its own log is in logs, and this cycle's is
 echo logs\%sName%-build_release-%sStamp%.log.
->> "%sLog%" echo Stopped %date% %time%: %sStep% failed; steps passed before it:!sSummary!
+if defined sSummary (>> "%sLog%" echo Stopped %date% %time%: %sStep% failed; steps passed before it:!sSummary!) else (>> "%sLog%" echo Stopped %date% %time%: %sStep% failed; it was the first step, so none passed before it. Its own log, logs\%sName%-%sStep%-*.log, says why.)
 rem THE RUNNER IS REPLACED ONLY BY THE CYCLE THAT HOLDS THE LOCK (kit 1.88.5): replacing it under another cycle of
 rem this project makes that cycle read the new file from the middle.
 set "bOwnLock="

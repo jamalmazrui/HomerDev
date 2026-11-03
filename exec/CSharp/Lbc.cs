@@ -210,7 +210,9 @@ public class LbcTextBox : TextBox
         }
         else if (key == (Keys.Shift | Keys.F1))
         {
-            Say.say(string.IsNullOrEmpty(Tip) ? "No tip for this field" : Tip);
+            // ONE SENTENCE, FROM ONE LOOKUP (2 November 2026): the same answer
+            // every Lbc control gives, from configs\Hints.inix or the tip.
+            Say.say(LbcHints.sentenceFor(this, Tip));
         }
         // Homer structured-text line operations, active only in
         // multiline fields (notes, tags). Each acts on the selected
@@ -728,6 +730,137 @@ public class LbcMenuItem : ToolStripMenuItem
                 return iState;
             }
         }
+    }
+}
+
+// LBCHINTS: WHAT THE CONTROL WITH FOCUS DOES, IN ONE SENTENCE (2 November 2026).
+//
+// Shift+F1 in any Lbc dialog says it. F1 lists every control with its full
+// description and F7 picks one by name; Shift+F1 answers the narrower question
+// a person asks halfway through a dialog -- "what does this button do?" -- in
+// one sentence, without leaving the control. It came from Select Columns in
+// DbDo, whose buttons Default, Main, Standard and All were forgotten between
+// one visit and the next.
+//
+// THE HINTS LIVE IN configs\Hints.inix, shipped with the app and copied to the
+// person's own configs on first use, so they can be read, edited and translated
+// without touching code:
+//
+//   [Select Columns]                  the dialog's title, as its window shows it
+//   Main fields = Shows the fields about the table's subject, hiding url, tags and the rest.
+//   Search (Button) = ...             the kind in parentheses, only when two
+//                                     controls of one dialog share a name
+//   [All dialogs]                     names that mean the same everywhere
+//
+// A control with no hint written falls back to the first sentence of the tip it
+// was given in code, and a control with neither says its name and kind, so
+// Shift+F1 never answers with silence.
+public static class LbcHints
+{
+    private static readonly Dictionary<Control, string[]> dNames = new Dictionary<Control, string[]>();
+    private static readonly HashSet<string> setReported = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+    // The plain name and the kind of each control, kept as Lbc registers it.
+    public static void register(Control ctl, string sKind, string sLabel)
+    {
+        if (ctl == null) return;
+        string sPlain = plainName(sLabel);
+        lock (dNames) { dNames[ctl] = new string[] { sPlain, sKind ?? "" }; }
+        checkWords(sKind, sPlain);
+    }
+
+    public static string plainName(string sLabel)
+    {
+        string sPlain = (sLabel ?? "").Replace("&", "").Trim();
+        while (sPlain.EndsWith(":") || sPlain.EndsWith("...") || sPlain.EndsWith(".")) sPlain = sPlain.TrimEnd(':', '.').Trim();
+        return sPlain;
+    }
+
+    // TWO WORDS OR MORE (2 November 2026, a guideline on trial in DbDo): a name
+    // of one word tells less than a name of two -- "Main" against "Main fields".
+    // OK, Cancel, Help and Close are exempt, being the same in every dialog. A
+    // name of one word is logged once per run, so a build's log lists what is
+    // left to rename; nothing refuses it.
+    private static void checkWords(string sKind, string sPlain)
+    {
+        if (sPlain.Length == 0) return;
+        if (sPlain.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Length >= 2) return;
+        foreach (string sExempt in new string[] { "OK", "Cancel", "Help", "Close" })
+            if (string.Equals(sPlain, sExempt, StringComparison.OrdinalIgnoreCase)) return;
+        string sKey = (sKind ?? "") + ":" + sPlain;
+        lock (setReported) { if (!setReported.Add(sKey)) return; }
+        try { Homer.Log.info("Two-word names: the " + (sKind ?? "control") + " named \"" + sPlain + "\" has one word"); } catch { }
+    }
+
+    private static string hintsFile()
+    {
+        // Found without Homer.Paths, which not every app that compiles Lbc has: the
+        // person's own copy first (%LOCALAPPDATA%\<app>\configs), where an edited
+        // hint wins, then the one shipped beside the program or one folder up.
+        try
+        {
+            string sApp = System.IO.Path.GetFileNameWithoutExtension(Application.ExecutablePath);
+            string sStart = Application.StartupPath;
+            string sParent = System.IO.Path.GetDirectoryName(sStart) ?? sStart;
+            foreach (string sFolder in new string[] {
+                System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), sApp),
+                sStart, sParent })
+            {
+                string sTry = System.IO.Path.Combine(System.IO.Path.Combine(sFolder, "configs"), "Hints.inix");
+                if (System.IO.File.Exists(sTry)) return sTry;
+            }
+        }
+        catch { }
+        return "";
+    }
+
+    // The one sentence: the dialog's own hint, then the shared one, then the
+    // first sentence of the tip, then the name and kind.
+    public static string sentenceFor(Control ctl, string sTip)
+    {
+        string sPlain = "", sKind = "";
+        string[] aName;
+        lock (dNames) { if (ctl != null && dNames.TryGetValue(ctl, out aName)) { sPlain = aName[0]; sKind = aName[1]; } }
+        if (sPlain.Length == 0 && ctl != null) sPlain = plainName(ctl.AccessibleName ?? ctl.Text ?? "");
+        string sDialog = "";
+        try { Form frm = ctl == null ? null : ctl.FindForm(); if (frm != null) sDialog = (frm.Text ?? "").Trim(); } catch { }
+        string sFile = hintsFile();
+        if (sFile.Length > 0 && System.IO.File.Exists(sFile) && sPlain.Length > 0)
+        {
+            foreach (string sSection in new string[] { sDialog, "All dialogs" })
+            {
+                if (sSection.Length == 0) continue;
+                foreach (string sKey in new string[] { sPlain + " (" + sKind + ")", sPlain })
+                {
+                    string sHint = "";
+                    try { sHint = InixCodec.readValue(sFile, sSection, sKey, ""); } catch { }
+                    if (!string.IsNullOrEmpty(sHint)) return sHint.Trim();
+                }
+            }
+        }
+        string sFirst = firstSentence(sTip);
+        if (sFirst.Length > 0) return sFirst;
+        if (sPlain.Length > 0) return sPlain + (sKind.Length > 0 ? ", " + sKind.ToLowerInvariant() : "") + ". No hint is written for it yet.";
+        return "No hint for this control.";
+    }
+
+    public static string firstSentence(string sText)
+    {
+        string sAll = (sText ?? "").Trim();
+        if (sAll.Length == 0) return "";
+        int iEnd = -1;
+        for (int i = 0; i < sAll.Length - 1; i++)
+            if ((sAll[i] == '.' || sAll[i] == '?' || sAll[i] == '!') && char.IsWhiteSpace(sAll[i + 1])) { iEnd = i; break; }
+        return iEnd < 0 ? sAll : sAll.Substring(0, iEnd + 1);
+    }
+
+    // For a window that is not an Lbc dialog, such as an app's main window.
+    public static string sentenceForFocused(Form frm)
+    {
+        Control ctl = frm == null ? null : frm.ActiveControl;
+        while (ctl is ContainerControl && ((ContainerControl) ctl).ActiveControl != null) ctl = ((ContainerControl) ctl).ActiveControl;
+        string sTip = ctl == null ? "" : (ctl.AccessibleDescription ?? "");
+        return sentenceFor(ctl, sTip);
     }
 }
 
@@ -2152,6 +2285,16 @@ public class LbcDialog : IDisposable
                 evArgs.SuppressKeyPress = true;
                 showHelp();
             }
+            else if (evArgs.KeyData == (Keys.Shift | Keys.F1) && !(ctlNow is LbcTextBox))
+            {
+                // WHAT THIS CONTROL DOES, in one sentence, from any control
+                // (2 November 2026). A text box answers for itself, the same way.
+                evArgs.Handled = true;
+                evArgs.SuppressKeyPress = true;
+                string sTip;
+                if (ctlNow == null || !dFocusTips.TryGetValue(ctlNow, out sTip)) sTip = ctlNow == null ? "" : (ctlNow.AccessibleDescription ?? "");
+                Say.say(LbcHints.sentenceFor(ctlNow, sTip));
+            }
             else if (evArgs.KeyData == (Keys.Control | Keys.Home) && !bInMemo && !bInList)
             {
                 evArgs.Handled = true;
@@ -3151,6 +3294,7 @@ public class LbcDialog : IDisposable
         dNameCounts[sBase] = (dNameCounts.ContainsKey(sBase) ? dNameCounts[sBase] : 0) + 1;
         ctl.Name = sName;
         dWidgets[sName] = ctl;
+        LbcHints.register(ctl, sKind, sLabel);
     }
 
     // makeIdentifier: turn a label into a programmer-friendly

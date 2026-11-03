@@ -42,7 +42,7 @@ import datetime, glob, json, os, platform, re, shutil, subprocess, sys, time, tr
 PlaywrightTimeout, sync_playwright = TimeoutError, None  # set by loadPlaywright() once the log is open, so an import failure is logged
 
 iProcessingMinutes, iSaveWaitSeconds, iSettleSeconds, iSignInMinutes = 20, 45, 20, 15
-sVersion = "2026-11-02 version 46: a tab is acted on only once its address has stopped changing, so a late second Save and Continue that carries KDP past a tab no longer stops the run, and a title the Bookshelf page in view does not show is looked for on every page before its status is called unknown; 2026-10-26 version 45: every accuracy box ticked, the focus kept in the page rather than the address bar, a line every 30 seconds during uploads, and a plain message when the window is touched by hand; version 44: a book that is not ready by its audit is neither listed nor submitted, and kept AI answers no longer stop the Content tab with KeyError 'tools'; version 43: no question before submitting and no pause after each book, so a bare run builds and submits every changed book unattended; version 42: missing metadata is filled in when found -- a book KDP holds with no answers file gets one made from KDP's own record, keeping everything but the manuscript, and kdpUpdate's receipts are adopted where kdpSubmit had none; was 2026-10-15 version 41: a save is confirmed before the next tab is opened directly; the fallback .inix reader reads fences; version 40: with no --book, it builds what changed and submits every book whose manuscript, cover or answers differ from its own receipt; version 39: a book is named with --book whenever more than one is on file; the answers may keep KDP's cover (coverFile = Keep KDP's cover) and its AI-generated content answers (aiContent used = Keep), so a live book's manuscript is replaced without touching what KDP already holds right; was version 38: DRM that cannot be confirmed off blocks Publish; version 37: an upload is judged only by what KDP says after it, praise and recommendations are not problems, and done means KDP names the file just sent; version 36, from the 11:39 run: KDP took 33 seconds to leave the Details tab after the second Save and Continue, the page was still changing when its messages were read, and the third press landed on the Content tab's own Save and Continue, which moved to Pricing and skipped the EPUB upload, then crashed the control dump; now Save and Continue is never pressed again once the page has left its tab, a run whose messages cannot be read waits for the page to settle before deciding, the Content and Pricing steps open their own tab address when the browser is elsewhere, and a control dump interrupted by a navigation is read again; was version 35: before touching KDP, the EPUB is rebuilt with build.py when it is missing or older than the manuscript or its build files (the 6 October edition added Blind Apps passages), so a run always submits the latest text and a failed build stops the run with exit code 2; was version 34, from the 13:42 run of kdpBooks on 5 October, from the 13:42 run of kdpBooks, which finished twelve books and left four at two categories: Add another category does add a chain, but KDP pre-fills the new chain's top menu with the last chain's first step, so the script saw no empty top menu, pressed Add again, found it disabled and gave up; a chain that appears after Add another category is now used for the next path whether or not it is pre-filled, and the save-and-reopen fallback presses Add another category once the picker is open again; the Remove existing categories? dialog was answered with Continue on the four older books and their categories verified; was version 33, from the 10:43 run of kdpBooks, which chose all three categories on nine books but lost them on three older ones and stopped at two on two more: after Save categories, KDP asks Remove existing categories? on a book whose categories predate the picker, and closeNotice pressed that dialog's Close, throwing the choices away, so the dialog is now answered with its continue button and the buttons seen are logged; and when Add another category is disabled after a finished chain (Self-Help > Memory Improvement), the chosen categories are saved and the picker reopened, which gives a fresh chain for the next path; was version 32, from the 09:15 run of kdpBooks, which chose none or one of three categories on seven books: KDP keeps the menus of saved and reset chains on the page, so a path's first step was looked for after the last filled menu and found a sub-menu instead, where a containing name (Art for Arts & Photography) was taken and the real top menu never used; now the top-level menus are found by content, a new path starts in the last empty one (Add another category is pressed again when there is none), a menu is checked to have taken its option, only an exact name is accepted anywhere, and the wait after a pick is for the menu below to show new options or new boxes to appear, up to 10 seconds, with 15 seconds for the placement box; was version 31: no category is ever replaced by General or by an unrelated name; a path KDP does not offer is dropped and reported with the placements KDP offers there, a path whose placement name is already chosen for the book is skipped as a duplicate (Tennis twice, 19:10 run), and General is ticked only when no proposed path can be chosen at all, since KDP needs one category to save; the console names each category by its whole path; was version 30, from the 17:38 run of kdpBooks: a picker menu is used whether or not it is visible, since KDP hides its native menus behind styled drop-downs (version 29 required visibility and found no first step on three books); a Content tab that KDP leaves by itself no longer waits 30 seconds for DRM radios; was version 29, from the 16:46 run of kdpBooks: the picker's placement boxes are read as they are (KDP reuses the same box elements with new labels when a menu changes, so marking them as seen hid every placement and three books were published with one category); a step is looked for only in menus after the one the last step used; a chain that ends without a placement is dropped and its menus reused after Reset, since Add another category is disabled until the chain is complete; the Content tab's accuracy confirmation boxes are ticked when KDP asks (Confirm your answers are accurate and check the box), and that message now stops Save and Continue instead of being pressed through; a navigation aborted by a hand on the browser no longer crashes the run; DRM is left alone when KDP has already moved past the Content tab; was version 28, from the 15:15 run of kdpBooks: the picker's Reset clears only the newest chain of menus, so the saved chains are removed one by one through their Remove links (they had counted toward the three and hidden Add another category on nine books); the DRM consent box is found by its words (version 27 looked for a literal backslash) after waiting for the Content tab to draw; KDP's Categories update notice is closed before Save as Draft, and a button the ordinary click cannot reach is clicked by script; a path ending above a placement takes General or a placement sharing a word with the path, never an unrelated first one (Gun & Firearm Policy was ticked for Communication Policy); was version 27: the category picker uses only its newest menu and waits for the next menu to draw (on 4 October a History step was matched in the top menu and saved History > General instead of Mathematics > History); a step KDP does not offer is replaced by the nearest offered name, then the General placement, then the first placement, so every path ends on a placement and the book keeps three categories, with the paths chosen reported; the DRM No choice also ticks KDP's new consent box (Consent is required when not applying Digital Rights Management); page messages read during a navigation no longer crash the run; was version 26: the Bookshelf row's labels are all read, so Live followed by Updates in review stops the run before the setup page, and an aborted navigation to that page is treated as the same lock rather than a crash (the 16:42 run); was version 25: a live book with updates in review is reported as such and left alone until the update is live; was version 24: publishes unless KDP refused a save or a file failed to upload; everything else unconfirmed is listed to check afterwards; was version 23: the royalty radio selector is quoted (the 15:05 run crashed on it one step before Publish); a submission acknowledged by KDP counts as submitted even when the Bookshelf label cannot be read; was version 22: the accessibility radio is chosen by its label, since KDP briefly gives all four the same value after an upload; the release option and a missing Bookshelf status no longer count as problems; a processed upload is recognized by file name; was version 21: the Draft2Digital section no longer leaks into KDP's ISBN and publisher; saved categories are kept without opening the picker; KDP's spelling notice is not treated as a refusal; was version 20: .inix answers, Homer layout"
+sVersion = "2026-11-02 version 47: a book whose setup page KDP locks during a review is reported as in review, not blocked, and a bare run waits for the review to end, trying again every hour for up to 72 hours, then submits it, so a revised manuscript reaches KDP without another run; the Bookshelf reads In Review or Publishing before Live, since a live book with an update pending shows both; was version 46: a tab is acted on only once its address has stopped changing, so a late second Save and Continue that carries KDP past a tab no longer stops the run, and a title the Bookshelf page in view does not show is looked for on every page before its status is called unknown; 2026-10-26 version 45: every accuracy box ticked, the focus kept in the page rather than the address bar, a line every 30 seconds during uploads, and a plain message when the window is touched by hand; version 44: a book that is not ready by its audit is neither listed nor submitted, and kept AI answers no longer stop the Content tab with KeyError 'tools'; version 43: no question before submitting and no pause after each book, so a bare run builds and submits every changed book unattended; version 42: missing metadata is filled in when found -- a book KDP holds with no answers file gets one made from KDP's own record, keeping everything but the manuscript, and kdpUpdate's receipts are adopted where kdpSubmit had none; was 2026-10-15 version 41: a save is confirmed before the next tab is opened directly; the fallback .inix reader reads fences; version 40: with no --book, it builds what changed and submits every book whose manuscript, cover or answers differ from its own receipt; version 39: a book is named with --book whenever more than one is on file; the answers may keep KDP's cover (coverFile = Keep KDP's cover) and its AI-generated content answers (aiContent used = Keep), so a live book's manuscript is replaced without touching what KDP already holds right; was version 38: DRM that cannot be confirmed off blocks Publish; version 37: an upload is judged only by what KDP says after it, praise and recommendations are not problems, and done means KDP names the file just sent; version 36, from the 11:39 run: KDP took 33 seconds to leave the Details tab after the second Save and Continue, the page was still changing when its messages were read, and the third press landed on the Content tab's own Save and Continue, which moved to Pricing and skipped the EPUB upload, then crashed the control dump; now Save and Continue is never pressed again once the page has left its tab, a run whose messages cannot be read waits for the page to settle before deciding, the Content and Pricing steps open their own tab address when the browser is elsewhere, and a control dump interrupted by a navigation is read again; was version 35: before touching KDP, the EPUB is rebuilt with build.py when it is missing or older than the manuscript or its build files (the 6 October edition added Blind Apps passages), so a run always submits the latest text and a failed build stops the run with exit code 2; was version 34, from the 13:42 run of kdpBooks on 5 October, from the 13:42 run of kdpBooks, which finished twelve books and left four at two categories: Add another category does add a chain, but KDP pre-fills the new chain's top menu with the last chain's first step, so the script saw no empty top menu, pressed Add again, found it disabled and gave up; a chain that appears after Add another category is now used for the next path whether or not it is pre-filled, and the save-and-reopen fallback presses Add another category once the picker is open again; the Remove existing categories? dialog was answered with Continue on the four older books and their categories verified; was version 33, from the 10:43 run of kdpBooks, which chose all three categories on nine books but lost them on three older ones and stopped at two on two more: after Save categories, KDP asks Remove existing categories? on a book whose categories predate the picker, and closeNotice pressed that dialog's Close, throwing the choices away, so the dialog is now answered with its continue button and the buttons seen are logged; and when Add another category is disabled after a finished chain (Self-Help > Memory Improvement), the chosen categories are saved and the picker reopened, which gives a fresh chain for the next path; was version 32, from the 09:15 run of kdpBooks, which chose none or one of three categories on seven books: KDP keeps the menus of saved and reset chains on the page, so a path's first step was looked for after the last filled menu and found a sub-menu instead, where a containing name (Art for Arts & Photography) was taken and the real top menu never used; now the top-level menus are found by content, a new path starts in the last empty one (Add another category is pressed again when there is none), a menu is checked to have taken its option, only an exact name is accepted anywhere, and the wait after a pick is for the menu below to show new options or new boxes to appear, up to 10 seconds, with 15 seconds for the placement box; was version 31: no category is ever replaced by General or by an unrelated name; a path KDP does not offer is dropped and reported with the placements KDP offers there, a path whose placement name is already chosen for the book is skipped as a duplicate (Tennis twice, 19:10 run), and General is ticked only when no proposed path can be chosen at all, since KDP needs one category to save; the console names each category by its whole path; was version 30, from the 17:38 run of kdpBooks: a picker menu is used whether or not it is visible, since KDP hides its native menus behind styled drop-downs (version 29 required visibility and found no first step on three books); a Content tab that KDP leaves by itself no longer waits 30 seconds for DRM radios; was version 29, from the 16:46 run of kdpBooks: the picker's placement boxes are read as they are (KDP reuses the same box elements with new labels when a menu changes, so marking them as seen hid every placement and three books were published with one category); a step is looked for only in menus after the one the last step used; a chain that ends without a placement is dropped and its menus reused after Reset, since Add another category is disabled until the chain is complete; the Content tab's accuracy confirmation boxes are ticked when KDP asks (Confirm your answers are accurate and check the box), and that message now stops Save and Continue instead of being pressed through; a navigation aborted by a hand on the browser no longer crashes the run; DRM is left alone when KDP has already moved past the Content tab; was version 28, from the 15:15 run of kdpBooks: the picker's Reset clears only the newest chain of menus, so the saved chains are removed one by one through their Remove links (they had counted toward the three and hidden Add another category on nine books); the DRM consent box is found by its words (version 27 looked for a literal backslash) after waiting for the Content tab to draw; KDP's Categories update notice is closed before Save as Draft, and a button the ordinary click cannot reach is clicked by script; a path ending above a placement takes General or a placement sharing a word with the path, never an unrelated first one (Gun & Firearm Policy was ticked for Communication Policy); was version 27: the category picker uses only its newest menu and waits for the next menu to draw (on 4 October a History step was matched in the top menu and saved History > General instead of Mathematics > History); a step KDP does not offer is replaced by the nearest offered name, then the General placement, then the first placement, so every path ends on a placement and the book keeps three categories, with the paths chosen reported; the DRM No choice also ticks KDP's new consent box (Consent is required when not applying Digital Rights Management); page messages read during a navigation no longer crash the run; was version 26: the Bookshelf row's labels are all read, so Live followed by Updates in review stops the run before the setup page, and an aborted navigation to that page is treated as the same lock rather than a crash (the 16:42 run); was version 25: a live book with updates in review is reported as such and left alone until the update is live; was version 24: publishes unless KDP refused a save or a file failed to upload; everything else unconfirmed is listed to check afterwards; was version 23: the royalty radio selector is quoted (the 15:05 run crashed on it one step before Publish); a submission acknowledged by KDP counts as submitted even when the Bookshelf label cannot be read; was version 22: the accessibility radio is chosen by its label, since KDP briefly gives all four the same value after an upload; the release option and a missing Bookshelf status no longer count as problems; a processed upload is recognized by file name; was version 21: the Draft2Digital section no longer leaks into KDP's ISBN and publisher; saved categories are kept without opening the picker; KDP's spelling notice is not treated as a refusal; was version 20: .inix answers, Homer layout"
 lProfileSkip = ["Cache", "Code Cache", "GPUCache", "Service Worker", "DawnCache", "GrShaderCache", "ShaderCache", "blob_storage", "File System", "IndexedDB", "Session Storage", "Storage", "Extensions", "Extension State", "Extension Rules", "optimization_guide_hint_cache_store", "Platform Notifications"]
 lListKeys = ["afterPublishing", "categories", "contributors", "keywords", "priceReasoning", "recommended"]  # .inix keys whose value is a list: one item per line, or comma-separated on one line
 lNestedSections = ["accessibility", "aiContent", "draft2digital", "notes"]  # .inix sections kept as dictionaries under their own name; every other section is flattened into the answers. draft2digital holds another store's answers (its isbn and publisher once overrode KDP's and KDP refused the save)
@@ -1152,7 +1152,7 @@ def fullShelfStatus(page, sTitleId):
     for dRow in lRows:
         if dRow.get("id") == sTitleId:
             sStatus = "In Review" if dRow.get("review") else (dRow.get("status") or "not shown")
-            log("The full Bookshelf shows title " + sTitleId + " (" + dRow.get("title", "") + ") as " + sStatus)
+            log("The full Bookshelf shows title " + sTitleId + " (" + dRow.get("title", "") + ") as " + sStatus + "; the row's words: " + repr(dRow.get("text", ""))[:400])
             return sStatus
     log("The full Bookshelf, " + str(len(lRows)) + " titles, does not hold title " + sTitleId)
     return "not shown"
@@ -1171,7 +1171,7 @@ def findDraft(page):
     if sStatus in ("In Review", "Publishing"):
         say("KDP is still reviewing the last submission" + (", the update of the live book" if "updates in review" in sStatusText else "") + ". It does not allow edits until that is done, usually within 72 hours. Nothing was changed; run this again once the Bookshelf shows Live alone.")
         log("Stopped: the book is " + sStatus + "; KDP locks the title setup pages during review")
-        return "STOP"
+        return "REVIEW"
     sKnown = str(dAnswers.get("kdpTitleId", "") or sKnownTitleId)
     if sKnown:
         try:
@@ -1193,10 +1193,15 @@ def findDraft(page):
                 sStatus = fullShelfStatus(page, sKnown)
             if sStatus in ("not shown", ""):
                 say("KDP sent the title's setup page back to the Bookshelf, and the Bookshelf did not show this title, so why is not known: a review in progress, a title ID that has changed, or a Bookshelf filter could each do it. Nothing was changed. Check the title on the Bookshelf, then run this again.")
-            else:
-                say("KDP sent the title's setup page back to the Bookshelf, which it does while a submission is in review or publishing. Nothing was changed; run this again once the Bookshelf shows Live.")
-            log("Stopped: title-setup for " + sKnown + " redirected to " + page.url + "; Bookshelf status " + repr(sStatus))
-            return "STOP"
+                log("Stopped: title-setup for " + sKnown + " redirected to " + page.url + "; Bookshelf status " + repr(sStatus))
+                return "STOP"
+            # A LIVE BOOK WHOSE SETUP PAGE IS LOCKED HAS AN UPDATE IN REVIEW (2 November 2026, version 47). The 12:44 and
+            # 12:45 runs read both books as Live and were still sent back to the Bookshelf: KDP keeps the earlier edition on
+            # sale while it reviews or publishes the update. The redirect is KDP's own answer, so it is reported as a
+            # review, which a bare run waits out, never as a plain block.
+            say("KDP is still reviewing or publishing the last submission of this book, so it locks the book's setup pages; the Bookshelf shows " + sStatus + (", the edition already on sale" if sStatus == "Live" else "") + ". Nothing was changed.")
+            log("Review lock: title-setup for " + sKnown + " redirected to " + page.url + "; Bookshelf status " + repr(sStatus))
+            return "REVIEW"
         if sKnown in page.url and page.locator("#data-title").count():
             sHeld = page.locator("#data-title").first.input_value()
             sAuthor = (page.locator("#data-primary-author-first-name").first.input_value() + " " + page.locator("#data-primary-author-last-name").first.input_value()).strip() if page.locator("#data-primary-author-first-name").count() else ""
@@ -2272,8 +2277,8 @@ def finalReview(page):
     return "unknown"
 
 
-lFlags = ["--ask", "--book", "--chrome", "--copy-profile", "--create-new", "--inspect", "--no-publish", "--reupload", "--start-at", "--stop-after", "--title-id", "--yes"]
-dExit = {"submitted": 0, "draft": 5, "blocked": 5, "unknown": 6}
+lFlags = ["--ask", "--book", "--chrome", "--copy-profile", "--create-new", "--inspect", "--no-publish", "--no-wait", "--reupload", "--start-at", "--stop-after", "--title-id", "--yes"]
+dExit = {"submitted": 0, "draft": 5, "blocked": 5, "unknown": 6, "review": 7}  # 7: KDP is reviewing or publishing an earlier submission and locks the setup pages; a bare run waits and tries again
 lBlockingNames = ["DRM", "Manuscript", "Cover", "Confirmation that the answers are accurate", "Save as Draft", "Save and Continue to content", "Save and Continue to pricing", "Pricing tab", "Publish"]  # only these stop Publish: a refused save, a failed upload, or the confirmation box; everything else is read out afterwards
 
 
@@ -2623,20 +2628,108 @@ def submitChanged(lBooks):
     # and changes nothing.
     say("Submitting " + str(len(lDue)) + (" book" if len(lDue) == 1 else " books") + ":")
     for sBook, lReasons in lDue: say("  " + sBook + ": " + ", ".join(lReasons))
-    lFailed = []
+    lFailed, lReview = [], []
     lPass = [s for s in sys.argv[1:] if s in ("--reupload", "--no-publish", "--ask", "--chrome", "--copy-profile")]
     for sBook, lReasons in lDue:
         say("Submitting " + sBook + ": " + ", ".join(lReasons) + ".")
-        oRun = subprocess.run([sys.executable, os.path.abspath(__file__), "--book", sBook] + lPass, cwd=os.getcwd())
-        log(sBook + ": kdpSubmit --book exit code " + str(oRun.returncode))
-        if oRun.returncode == 0:
-            dReceipt = readReceipt()
-            dReceipt[sBook + ".answers"] = {"file": sBook + "_KDP.inix", "sha256": answersSha(sBook), "submitted": now()}
-            writeReceipt(dReceipt)
-        else:
-            lFailed.append(sBook)
-    say(str(len(lDue) - len(lFailed)) + " of " + str(len(lDue)) + " submitted" + ("; not finished: " + ", ".join(lFailed) + ". Each book's log says why." if lFailed else "."))
-    return 0 if not lFailed else 1
+        iCode = submitOne(sBook, lPass)
+        if iCode == dExit["review"]: lReview.append(sBook)
+        elif iCode != 0: lFailed.append(sBook)
+    lReview = waitForReviews(lReview, lPass, lFailed)
+    noteReviews(lReview, [b for b, _ in lDue if b not in lReview and b not in lFailed])
+    iDone = len(lDue) - len(lFailed) - len(lReview)
+    say(str(iDone) + " of " + str(len(lDue)) + " submitted" + ("; still in KDP's review: " + ", ".join(lReview) + ", which the next run submits once KDP has finished" if lReview else "")
+        + ("; not finished: " + ", ".join(lFailed) + ". Each book's log says why." if lFailed else "."))
+    if lFailed: return 1
+    return dExit["review"] if lReview else 0
+
+
+def submitOne(sBook, lPass):
+    """Submits one book by running this script with --book, records its answers on success, and returns the exit code."""
+    oRun = subprocess.run([sys.executable, os.path.abspath(__file__), "--book", sBook] + lPass, cwd=os.getcwd())
+    log(sBook + ": kdpSubmit --book exit code " + str(oRun.returncode))
+    if oRun.returncode == 0:
+        dReceipt = readReceipt()
+        dReceipt[sBook + ".answers"] = {"file": sBook + "_KDP.inix", "sha256": answersSha(sBook), "submitted": now()}
+        writeReceipt(dReceipt)
+    return oRun.returncode
+
+
+def noteReviews(lLocked, lCleared):
+    """HOW LONG KDP HAS HELD EACH BOOK (2 November 2026, version 47). The receipt keeps, per book, when a review lock was
+    first met, so every run can say how long it has lasted; Mastery in Popular Song met one run after run for days. KDP
+    says reviews take up to 72 hours, so a lock older than that is reported as KDP waiting on something, most often an
+    email asking a question, rather than as a review still running. A submitted book's note is removed."""
+    dReceipt = readReceipt()
+    bChanged = False
+    for sBook in lCleared:
+        if dReceipt.pop(sBook + ".review", None) is not None: bChanged = True
+    for sBook in lLocked:
+        dNote = dReceipt.get(sBook + ".review", {}) or {}
+        if not dNote.get("since"):
+            dReceipt[sBook + ".review"] = {"since": now()}
+            bChanged = True
+            continue
+        try:
+            nHours = (datetime.datetime.now() - datetime.datetime.strptime(str(dNote["since"])[:19], "%Y-%m-%d %H:%M:%S")).total_seconds() / 3600
+        except ValueError:
+            log(sBook + ": the review note's time could not be read: " + repr(dNote.get("since")))
+            continue
+        log(sBook + ": locked by a KDP review since " + str(dNote["since"]) + ", " + str(int(nHours)) + " hours")
+        if nHours > 72:
+            say(sBook + ": KDP has held this book for " + str(int(nHours // 24)) + " days, longer than the 72 hours KDP gives for a review. KDP is most likely waiting on you: look for an email from KDP about this title, and read the title's line on the Bookshelf.")
+    if bChanged: writeReceipt(dReceipt)
+    return True
+
+
+def reviewSettings():
+    """How long a bare run waits for KDP's reviews and how often it tries: configs\\kdpSubmit.inix, section [review], keys
+    waitHours and checkMinutes, 72 and 60 unless that file says otherwise (checkMinutes at least 15). waitHours = 0 turns the
+    waiting off for good; --no-wait turns it off for one run."""
+    iHours, iMinutes = 72, 60
+    sPath = os.path.join(sProject, "configs", "kdpSubmit.inix")
+    if os.path.exists(sPath):
+        dReview = readInix(sPath).get("review", {})
+        try:
+            iHours = int(str(dReview.get("waitHours", iHours)).strip())
+            iMinutes = max(15, int(str(dReview.get("checkMinutes", iMinutes)).strip()))
+        except ValueError:
+            log("configs\\kdpSubmit.inix [review] holds a value that is not a whole number; using 72 hours and 60 minutes")
+            iHours, iMinutes = 72, 60
+    if "--no-wait" in sys.argv: iHours = 0
+    log("Review wait: up to " + str(iHours) + " hours, trying every " + str(iMinutes) + " minutes")
+    return iHours, iMinutes
+
+
+def waitForReviews(lReview, lPass, lFailed):
+    """WAIT OUT KDP'S REVIEW (2 November 2026, version 47). KDP locks a book's setup pages while it reviews or publishes an
+    earlier submission, usually for hours and at most 72. Blind Vibe Coding's revised EPUB sat unsent behind such a lock:
+    each run stopped, and nothing reached KDP unless someone ran it again at the right time. Now a bare run keeps going,
+    tries each locked book again every hour, says when the next try is, and submits the book as soon as KDP allows it.
+    Edge opens for about a minute at each try. Control+C stops the waiting; the next run picks up from there.
+    Returns the books still locked when the waiting ends; a book that fails for another reason joins lFailed."""
+    iHours, iMinutes = reviewSettings()
+    if not lReview or iHours <= 0: return lReview
+    dtEnd = datetime.datetime.now() + datetime.timedelta(hours=iHours)
+    say(", ".join(lReview) + ": KDP is still reviewing the last submission, so this run waits, trying again every " + str(iMinutes) + " minutes for up to " + str(iHours) + " hours, until " + dtEnd.strftime("%A %H:%M") + ". Edge opens for about a minute at each try. Control+C stops the waiting; the next run picks up from there.")
+    try:
+        while lReview and datetime.datetime.now() < dtEnd:
+            dtNext = min(dtEnd, datetime.datetime.now() + datetime.timedelta(minutes=iMinutes))
+            say("Waiting until " + dtNext.strftime("%H:%M") + ", " + str(iMinutes) + " minutes, before trying " + ", ".join(lReview) + " again.")
+            while datetime.datetime.now() < dtNext: time.sleep(min(30, max(1, (dtNext - datetime.datetime.now()).total_seconds())))
+            lStill = []
+            for sBook in lReview:
+                say("Trying " + sBook + " again.")
+                iCode = submitOne(sBook, lPass)
+                if iCode == dExit["review"]: lStill.append(sBook)
+                elif iCode == 0: say(sBook + ": submitted.")
+                else: lFailed.append(sBook)
+            lReview = lStill
+    except KeyboardInterrupt:
+        say("Waiting stopped. Still in KDP's review: " + ", ".join(lReview) + ". Run kdpSubmit again later and it submits them.")
+        log("Review wait stopped by Control+C")
+    if lReview: log("Review wait ended at " + now() + "; still locked: " + ", ".join(lReview))
+    return lReview
 
 
 def main():
@@ -2718,6 +2811,7 @@ def main():
             return 0
         if not sTitleId:
             sFound = findDraft(page)
+            if sFound == "REVIEW": return finish(page, browser, "review", "KDP must finish its review before this book can be changed.")
             if sFound == "STOP": return finish(page, browser, "blocked", "Nothing was changed.") if sBookStatus or "bookshelf" in page.url else 1
             if sFound == "AMBIGUOUS": return finish(page, browser, "blocked", "More than one draft matches the title, so nothing was changed.")
             sTitleId = sFound

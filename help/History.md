@@ -7,6 +7,26 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.105.0 -- 2 November 2026
+
+- **Shift+F1 in any Lbc dialog says what the control with focus does, in one sentence.** The new LbcHints looks for the sentence in the app's configs\Hints.inix, by the dialog's title and the control's name, with the kind in parentheses only where two names clash, and in an [All dialogs] section; the person's own copy in %LOCALAPPDATA%\<app>\configs wins. With no hint written, the first sentence of the control's description is said, and with no description, its name and kind. Text boxes, which already spoke their whole tip on Shift+F1, now give the same one sentence.
+- **Names of one word are logged.** On trial in DbDo, a proposed guideline asks every control besides OK, Cancel, Help and Close to have a name of at least two words. Lbc logs each one-word name once per run, so an app's log lists what is left to rename; nothing is refused.
+
+## 1.104.0 -- 2 November 2026
+
+- **The Homer Player's Extra Info box is last of its fields again.** It sat in the Tracks band, so Tab went from the list straight into a long box of track details on every pass; Lbc's tab order is the order controls are added. It now follows Rate and Volume, before only the command bands. Alt+X still reaches it from anywhere.
+- **The player's closing band follows Lbc.** Close and Help are now a band of their own, last, in Windows order: Close, this dialog's Cancel, then Help. Escape still closes and F1 still opens Help from any control.
+- **One Capture stream button, with a letter.** Record and Stop recording were two buttons with no trigger letter, against the Lbc rule that every button but OK and Cancel has its own. One button, Alt+C, now starts a capture and, named Stop capture while it runs, stops it, as Alt+Shift+R always did.
+- **The position says what is left.** Alt+Shift+A, and keypad 2, now add the time left in the track and, when the rate is not normal, how long that is to listen to: an hour left at 150 percent is 40 minutes. The idea is from Leasey's Media Player, chosen because people planning their listening ask it; its equalizer, audio notes and audio editing were not taken, being tunings few listeners use.
+
+## 1.103.0 -- 2 November 2026
+
+- **kdpSubmit version 47 waits out KDP's reviews.** KDP locks a book's setup pages while it reviews or publishes an earlier submission. The 12:44 runs met that lock on Blind Vibe Coding and Mastery in Popular Song, read both as Live, and stopped as blocked, so the revised Blind Vibe Coding EPUB was never sent. Now the lock is reported as a review, and a bare run tries each locked book again every hour for up to 72 hours, saying when the next try is, and submits it as soon as KDP allows. Control+C stops the waiting; configs\kdpSubmit.inix can change the hours, and --no-wait skips them once. The receipt notes when each lock was first met, and a lock older than 72 hours is reported as KDP most likely waiting on an email.
+- **The Bookshelf reads In Review before Live.** A live book with an update pending shows both words; kdpBooks' shared reader took Live, and now logs the row's own words too.
+- **A tutorial build stops waiting when nothing is left to speak.** DbDo's 11:41 cycle waited more than three hours for the voices, though by 12:57 every walk it needed was spoken. buildTutorials now tests the walks every five minutes while it waits, restoring from the tutorial cache, and leaves the line when all are current.
+- **A cycle that stops at its first step says so.** build_release logged "steps passed before it:" with nothing after it; it now says the first step failed and names its log.
+- **Doug Lee's scripted apps join the help guide generator.** Thirteen estates, from 3CX to Wireshark, are blocks in the app-help-guide skill's makeHarvester.py, replacing a one-off harvester written outside it. The skill now says so, and records what a browser road will need when one is built.
+
 ## 1.102.0 -- 2 November 2026
 
 - **Spoken walks are kept in a cache.** buildTutorials now keeps every recording under %LOCALAPPDATA%\HomerDev\tutorialCache, named by its walk's fingerprint, which covers the walk's text and the voices. A recording that is missing or stale is copied back from the cache in seconds when the same walk was spoken before, instead of being spoken again. On 2 November each unzip of a DbDo.zip carrying old recordings cost about three hours of speech. Recordings unused for 90 days are removed.

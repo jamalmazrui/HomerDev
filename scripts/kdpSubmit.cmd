@@ -62,7 +62,7 @@ set "sErrors=%sProject%\logs\%sName%-kdpSubmit-errors.txt"
 python "%sHere%kdpSubmit.py" %* 2> "%sErrors%"
 rem The exit code is read with "if errorlevel N", from the highest down, in one statement: a variable named ERRORLEVEL
 rem can hide the real code from %%ERRORLEVEL%%, and in a .cmd file a successful SET resets the error level to 0.
-if errorlevel 6 (set "iCode=6") else if errorlevel 5 (set "iCode=5") else if errorlevel 4 (set "iCode=4") else if errorlevel 3 (set "iCode=3") else if errorlevel 2 (set "iCode=2") else if errorlevel 1 (set "iCode=1") else (set "iCode=0")
+if errorlevel 7 (set "iCode=7") else if errorlevel 6 (set "iCode=6") else if errorlevel 5 (set "iCode=5") else if errorlevel 4 (set "iCode=4") else if errorlevel 3 (set "iCode=3") else if errorlevel 2 (set "iCode=2") else if errorlevel 1 (set "iCode=1") else (set "iCode=0")
 for %%F in ("%sErrors%") do if %%~zF equ 0 del "%sErrors%"
 if exist "%sErrors%" echo Python reported an error before or outside the script's own log; it is saved in logs\%sName%-kdpSubmit-errors.txt.
 echo %date% %time% kdpSubmit.py ended with exit code %iCode% >> "%sSetupLog%"

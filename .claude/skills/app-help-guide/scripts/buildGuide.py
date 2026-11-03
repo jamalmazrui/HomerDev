@@ -2554,6 +2554,77 @@ def runGates(sProduct, sPath, sText):
     return lFailures
 
 
+# DOUG LEE'S SCRIPTED APPS (2 November 2026). Two readers for the estates makeHarvester gathered that are not
+# Zendesk listings; Discord and TeamSpeak go through readZendesk.
+
+def afterFirstHeading(sMarkup):
+    """The markup after its first heading, so an article does not open with its own title a second time."""
+    oHeading = re.search(r"(?is)<h[1-3][^>]*>.*?</h[1-3]>", sMarkup)
+    return sMarkup[oHeading.end():] if oHeading else sMarkup
+
+
+def readWireshark(sFolder):
+    """The Wireshark User's Guide, chunked: one page per section. The category is the chapter or appendix, named
+    from the guide's own contents page; each page's title is its section number and name."""
+    dChapters = {"Preface": "Preface"}
+    for sName in os.listdir(sFolder):
+        if not sName.endswith("index.html"): continue
+        for sHref, sText in re.findall(r'(?is)<a[^>]*href="([^"#]+)"[^>]*>(.*?)</a>', readText(os.path.join(sFolder, sName))):
+            sText = stripTags(sText).replace("\xa0", " ").strip()
+            # A chapter or appendix is a contents entry with one number or letter; the preface's own numbered
+            # entries come first in the list and are not chapters. The category is the name alone, so the
+            # categories sort by name, as the collection's guides do, rather than 11 before 2.
+            oMatch = re.match(r"^([0-9]+|[A-Z])\.\s+(.+)$", sText)
+            if oMatch and not sHref.startswith("Pre"): dChapters[oMatch.group(1)] = oMatch.group(2)
+    lArticles = []
+    for sName in sorted(os.listdir(sFolder)):
+        if not sName.endswith(".html") or sName.endswith("index.html"): continue
+        sMarkup = readText(os.path.join(sFolder, sName))
+        oTitle = re.search(r"(?is)<title[^>]*>(.*?)</title>", sMarkup)
+        sTitle = stripTags(oTitle.group(1)).replace("\xa0", " ").strip() if oTitle else ""
+        if not sTitle: continue
+        sBody = (findBalanced(sMarkup, r'<div[^>]*class="(section|chapter|appendix|preface)"', "div") or "")
+        if not sBody: continue
+        sBody = re.sub(r'(?is)<div[^>]*class="nav(header|footer)".*?</div>', "", afterFirstHeading(sBody))
+        lBody = toMarkdown(sBody, 0)
+        if len(" ".join(lBody).split()) < 25: continue
+        oNumber = re.match(r"^(?:Chapter\s+|Appendix\s+)?([0-9]+|[A-Z])\.", sTitle)
+        sKey = oNumber.group(1) if oNumber and "_chunked_Pre" not in sName else "Preface"  # the preface numbers its sections 1 to 7 too
+        lArticles.append((dChapters.get(sKey, sMiscellaneous), sTitle, lBody))
+    return lArticles
+
+
+def readVirtualAudioCable(sFolder):
+    """The Virtual Audio Cable user manual: the article is the ContentFrame and its first h1 the title. The category
+    is the manual's own contents: each page sits under the top-level entry of the contents list that links to it.
+    The driver and filter API page is developer material and is left out, as the collection's rule asks."""
+    # The manual's contents list is flat, one entry per page, so it offers no categories; the pages are grouped by
+    # subject here, and the preamble says so.
+    dGroups = {"main": "Getting started", "principles": "Getting started", "features": "Getting started",
+               "sysreq": "Getting started", "install": "Getting started", "upgrade": "Getting started",
+               "uninstall": "Getting started", "simple": "Using cables", "advanced": "Using cables",
+               "examples": "Using cables", "howto": "Using cables", "ctlpan": "Using cables", "repeater": "Using cables",
+               "configure": "Using cables", "defdev": "Using cables", "troubles": "Problems and answers",
+               "faq": "Problems and answers", "dsound": "Problems and answers", "layers": "Problems and answers",
+               "winbugs": "Problems and answers", "compat": "Problems and answers", "glossary": "About the product",
+               "history": "About the product", "distrib": "About the product", "support": "About the product"}
+    lArticles = []
+    for sName in sorted(os.listdir(sFolder)):
+        if not sName.endswith(".html"): continue
+        sMarkup = readText(os.path.join(sFolder, sName))
+        sBody = findBalanced(sMarkup, r'<div[^>]*class="ContentFrame"', "div")
+        if not sBody: continue
+        oTitle = re.search(r"(?is)<h1[^>]*>(.*?)</h1>", sBody)
+        sTitle = stripTags(oTitle.group(1)).strip() if oTitle else ""
+        if not sTitle or re.search(r"\bAPI\b", sTitle): continue
+        sTitle = re.sub(r"^fdu(?=[A-Z])", "", sTitle)  # a stray "fdu" before "Advanced cable usage" in the publisher's heading
+        lBody = toMarkdown(afterFirstHeading(sBody), 0)
+        if len(" ".join(lBody).split()) < 25: continue
+        sPage = re.sub(r"^vac\.muzychenko\.net_en_manual_?", "", sName)[:-5].replace(".htm", "") or "main"
+        lArticles.append((dGroups.get(sPage, sMiscellaneous), sTitle, lBody))
+    return lArticles
+
+
 def main():
     """Builds the magazine guides and reports what passed."""
     sScriptDir = os.path.dirname(os.path.abspath(__file__))
@@ -2771,6 +2842,15 @@ def main():
          "Vogue does not publish reader help on vogue.com; its answers are published by the company that runs its subscription service, and this guide holds them, gathered on 18 August 2026. It covers the print magazine and Vogue Digital separately, because the two are sold and served separately. Anything behind a sign-in could not be gathered and is not here."),
         ("Smithsonian", "SmithsonianHelp", readSmithsonian, "Smithsonian.md", "Smithsonian magazine subscriber service",
          "Smithsonian's subscriber service is run for the magazine by an outside company, and its help pages live on that company's site. This guide holds them, gathered on 18 August 2026. Anything that needed a sign-in could not be gathered and is not here."),
+        # DOUG LEE'S SCRIPTED APPS (2 November 2026)
+        ("Discord", "DiscordHelp", readZendesk, "Discord.md", "Discord help",
+         "This guide holds Discord's own help centre, gathered on 2 November 2026 from the publisher's own listing, so every article arrived with its title, its section and its body. The categories are Discord's own sections. The developer help centre is a separate site and is not here. Doug Lee publishes JAWS scripts for the Discord desktop app; his documentation is in Ttcom.htm."),
+        ("TeamSpeak", "TeamSpeakHelp", readZendesk, "TeamSpeak.md", "TeamSpeak help",
+         "This guide holds TeamSpeak's own help centre, gathered on 2 November 2026 from the publisher's own listing. The categories are TeamSpeak's own sections, covering TeamSpeak 6 and the older TeamSpeak 3, whose articles TeamSpeak keeps for people still using it. Doug Lee publishes JAWS scripts and an NVDA add-on for TeamSpeak; his documentation is in Ttcom.htm."),
+        ("Wireshark", "WiresharkHelp", readWireshark, "Wireshark.md", "Wireshark user's guide",
+         "This guide holds the Wireshark User's Guide, the Wireshark project's own manual, gathered on 2 November 2026 from its edition published one section per page. The categories are the guide's own chapters and appendices, and each article keeps its section number, so the order of the original can be followed. Doug Lee publishes JAWS scripts for Wireshark; his documentation is in Ttcom.htm."),
+        ("Virtual Audio Cable", "VirtualAudioCableHelp", readVirtualAudioCable, "VirtualAudioCable.md", "Virtual Audio Cable user manual",
+         "This guide holds the Virtual Audio Cable user manual, published by its author, Eugene Muzychenko, gathered on 2 November 2026. The manual lists its pages in one flat run with no groups, so they are grouped here by subject: getting started, using cables, problems and answers, and about the product. The page describing the driver's programming interface is left out, as written for programmers. Doug Lee publishes JAWS scripts and an NVDA add-on for Virtual Audio Cable's applications; his documentation is in Ttcom.htm."),
     ]
     lResults = []
     for sProduct, sFolder, functionRead, sFile, sTitle, sPreamble in lPlan:

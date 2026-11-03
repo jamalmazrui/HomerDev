@@ -350,6 +350,7 @@ return;
 string sSettings = sectionFor(sSource, lsTracks);
 int iVolume = readNumber(sSettings, "volume", Homer.Mpv.iDefaultVolume, 0, 130);
 int iRate = readNumber(sSettings, "rate", iDefaultRate, 25, 400);
+iRatePercentNow = iRate;
 int iStep = readNumber(sSettings, "step", iDefaultStep, 0, aiSteps.Length - 1);
 int iOrder = readNumber(sSettings, "order", iDefaultOrder, 0, asOrders.Length - 1);
 
@@ -400,14 +401,6 @@ dlg.addBand();
 ListBox lstTracks = dlg.addPickBox("&Track list:", orderedNames(lsRef, aOrder), null,
 "The queue, with each track's name, presenter and length where they are known. Moving through it chooses nothing; Enter plays the one you are on. Control+J jumps to a track by name, F3 jumps to the next, Control+F filters the list to what matches and Control+Shift+F clears the filter. Filter and Keywords take & for both words, a bar for either, and a star for anything. Alt+Shift+M writes what is showing, in the order shown, to a Markdown file.");
 
-// EVERYTHING KNOWN ABOUT THE TRACK THE CURSOR IS ON, sorted by field.
-//
-// One Alt key away, read like any other text -- by character, word or line,
-// selected, copied -- and nothing to close to get back. Filled when the cursor
-// arrives, so it never speaks over anything and is current when it is read.
-TextBox txtExtra = dlg.addMemoBox("E&xtra Info:", "",
-"Everything known about the track the cursor is on, one field to a line, sorted by field. Read it by character, word or line; Control+C copies what is selected.");
-txtExtra.ReadOnly = true;
 dlg.endBand();
 
 // ---- Order, Next, Previous ----
@@ -454,7 +447,26 @@ TrackBar barVolume = dlg.addSlider("&Volume percent:", iVolume, 0, 130, 5,
 delegate(int iPercent) { return iPercent.ToString(CultureInfo.InvariantCulture) + " percent"; });
 dlg.endBand();
 
-// ---- Go, Stop, Help, Close ----
+// ---- Extra Info ----
+
+// EVERYTHING KNOWN ABOUT THE TRACK THE CURSOR IS ON, sorted by field.
+//
+// One Alt key away, read like any other text -- by character, word or line,
+// selected, copied -- and nothing to close to get back. Filled when the cursor
+// arrives, so it never speaks over anything and is current when it is read.
+//
+// LAST OF THE FIELDS (2 November 2026). It sat in the Tracks band, so Tab went
+// from the list straight into a long box of details on every pass through the
+// dialog; Lbc's tab order is the order controls are added. It is reference, not
+// control, so it comes after every control that plays or moves, and before only
+// the command bands, which Lbc keeps last.
+dlg.addBand();
+TextBox txtExtra = dlg.addMemoBox("E&xtra Info:", "",
+"Everything known about the track the cursor is on, one field to a line, sorted by field. Read it by character, word or line; Control+C copies what is selected.");
+txtExtra.ReadOnly = true;
+dlg.endBand();
+
+// ---- Execute, Stop, Capture, Default ----
 
 dlg.addBand();
 // EXECUTE PLAYBACK, not Go.
@@ -466,22 +478,28 @@ dlg.addBand();
 // Start collides with Stop, which has no better name than Stop playback.
 Button btnGo = dlg.addButton("&Execute playback", "Play the track the cursor is on, or resume what is paused, applying the order the cursor is on. Control+Enter does this from anywhere in the dialog, and so does Scroll Lock.");
 Button btnStop = dlg.addButton("&Stop playback", "Stop playing and stay exactly where you are, in the queue and in the track. Execute playback carries on from there. It is a pause; the name is Stop because Previous track already has the P.");
-// RECORDING HAS A START AND A STOP, as playing has Execute and Stop, and one
-// key that does whichever applies, as Scroll Lock does for playing. The two
-// buttons carry no trigger letter: R is the Rate slider's and S is Stop
-// playback's, and a letter from inside a word is worse than none. They are
-// reached by Tab or F7, and each is available only when it applies, so the
-// reader says "unavailable" on the one that does not -- which is the state
-// of the recording, told without a question asked.
-Button btnRecord = dlg.addButton("Record", "Start keeping a copy of the stream as it arrives, in your Music folder under Homer Player, named for the track and the time. Alt+Shift+R does this from anywhere in the dialog, and stops it again.");
-Button btnStopRecording = dlg.addButton("Stop recording", "Stop the recording and say how long it ran. Alt+Shift+R does this too while a recording is running.");
-btnStopRecording.Enabled = false;
-btnRecordNow = btnRecord; btnStopRecordingNow = btnStopRecording;
-btnRecord.Click += delegate(object o, EventArgs e) { if (sRecordingPath.Length == 0) toggleRecording(dlg, oPlayer, lsRef); };
-btnStopRecording.Click += delegate(object o, EventArgs e) { if (sRecordingPath.Length > 0) toggleRecording(dlg, oPlayer, lsRef); };
+// ONE CAPTURE BUTTON WITH ITS OWN LETTER (2 November 2026). Recording was two
+// buttons, Record and Stop recording, with no trigger letter, because R is the
+// Rate slider's and S is Stop playback's -- and every Lbc button but OK and
+// Cancel takes a unique initial. One button now does whichever applies, as
+// Alt+Shift+R always has, and says which in its name: Capture stream, then Stop
+// capture while a copy is being written. C is the first letter of a word in
+// both names, and no other control claims it.
+Button btnRecord = dlg.addButton("&Capture stream", "Start keeping a copy of the stream as it arrives, in your Music folder under Homer Player, named for the track and the time. Pressed again, as Stop capture, it stops and says how long it ran. Alt+Shift+R does the same from anywhere in the dialog.");
+btnRecordNow = btnRecord; btnStopRecordingNow = null;
+btnRecord.Click += delegate(object o, EventArgs e) { toggleRecording(dlg, oPlayer, lsRef); };
 Button btnDefaults = dlg.addButton("&Default settings", "Forget what this queue has been set to and go back to the built-in settings: one minute, normal speed, the play list's own order.");
-Button btnHelp = dlg.addButton("&Help", "What this dialog does and which keys do it, in one page.");
+dlg.endBand();
+
+// ---- Close, Help ----
+
+// THE LBC CLOSING BAND (2 November 2026): Windows order, Cancel then Help, on a
+// band of their own and last. Close is this dialog's Cancel -- Escape presses it
+// from anywhere -- so like Cancel it takes no letter; Help takes H, and F1
+// reaches it from any control.
+dlg.addBand();
 Button btnClose = dlg.addButton("Close", "Close the player. Where each track had reached is written down first, so playing it again starts there.");
+Button btnHelp = dlg.addButton("&Help", "What this dialog does and which keys do it, in one page.");
 dlg.endBand();
 
 // ---- what the controls do ----
@@ -587,6 +605,7 @@ say(dlg, "Defaults restored");
 // its arrow keys have always meant in Windows. So these take effect at once,
 // and are written down at once.
 barRate.ValueChanged += delegate(object o, EventArgs e) {
+iRatePercentNow = barRate.Value;
 oPlayer.setSpeed(((double) barRate.Value) / 100.0);
 writeValue(sSettings, "rate", barRate.Value.ToString(CultureInfo.InvariantCulture));
 };
@@ -1266,7 +1285,9 @@ private static Button btnStopRecordingNow = null;
 
 private static void showRecordingState() {
 try {
-if (btnRecordNow != null) btnRecordNow.Enabled = (sRecordingPath.Length == 0);
+// One button whose name is the state: Capture stream when idle, Stop capture
+// while a copy is being written.
+if (btnRecordNow != null) btnRecordNow.Text = (sRecordingPath.Length == 0) ? "&Capture stream" : "Stop &capture";
 if (btnStopRecordingNow != null) btnStopRecordingNow.Enabled = (sRecordingPath.Length > 0);
 } catch { }
 }
@@ -1339,7 +1360,7 @@ sb.Append("Control+Home, Control+End     first and last track in the list\r\n\r\
 sb.Append("Sideways is time inside a track, up and down is tracks in the queue,\r\n");
 sb.Append("the Page keys are chapters, and adding Shift means all the way.\r\n\r\n");
 sb.Append("TELLING YOU WHERE YOU ARE\r\n");
-sb.Append("Alt+Shift+A    say the position\r\n");
+sb.Append("Alt+Shift+A    say the position, the time left, and the listening time left at this rate\r\n");
 sb.Append("Alt+Shift+W    say the track, its number and the position\r\n");
 sb.Append("Alt+Shift+O    say how many tracks, then their names\r\n");
 sb.Append("Alt+X          extra info: everything known about this track\r\n\r\n");
@@ -1347,7 +1368,7 @@ sb.Append("THE REST\r\n");
 sb.Append("Alt+Shift+C    copy the address of the track\r\n");
 sb.Append("Alt+Shift+L    save the queue as a play list\r\n");
 sb.Append("Alt+Shift+M    write track notes to a Markdown file\r\n");
-sb.Append("Alt+Shift+R    record, or stop recording: the Record and Stop recording buttons do the same, one at a time\r\n");
+sb.Append("Alt+Shift+R    capture the stream, or stop capturing: the Capture stream button does the same\r\n");
 sb.Append("Alt+Shift+Z    undo the last jump within a track\r\n");
 sb.Append("Escape         close, remembering where each track had reached\r\n\r\n");
 sb.Append("F7 lists the controls; F1 lists them with their descriptions.\r\n");
@@ -1424,12 +1445,29 @@ return sb.ToString();
 // SPOKEN, NOT SHOWN. "12:03" read aloud is two numbers and a colon to
 // disentangle; "12 min 3 sec" is the answer. The list keeps the short written
 // form, which is for the eye.
+// THE RATE, AS POSITION SPEECH NEEDS IT (2 November 2026). Kept as the Rate
+// slider changes, so the position can say how long is left in listening time.
+private static int iRatePercentNow = 100;
+
 private static string positionText(Homer.Mpv player) {
 string sAt = Homer.Mpv.saySpan(player.position);
 string sOf = Homer.Mpv.saySpan(player.duration);
 if (sAt.Length == 0) return "Not playing";
 if (sOf.Length == 0) return sAt;
-return sAt + " of " + sOf;
+// TIME LEFT, AND HOW LONG THAT IS TO LISTEN TO (2 November 2026, after
+// Leasey's remaining and listening-time commands): at 150 percent, an hour
+// left is 40 minutes of listening, which is the number a person planning their
+// time wants. Said only when the rate is not normal, since otherwise the two
+// are the same.
+double dLeft = player.duration - player.position;
+string sLeft = (dLeft > 0) ? Homer.Mpv.saySpan(dLeft) : "";
+if (sLeft.Length == 0) return sAt + " of " + sOf;
+string sText = sAt + " of " + sOf + ", " + sLeft + " left";
+if (iRatePercentNow != 100 && iRatePercentNow > 0) {
+string sListen = Homer.Mpv.saySpan(dLeft * 100.0 / iRatePercentNow);
+if (sListen.Length > 0) sText += ", " + sListen + " at this rate";
+}
+return sText;
 }
 
 private static string whereText(Homer.Mpv player, List<MediaTrack> lsTracks) {
