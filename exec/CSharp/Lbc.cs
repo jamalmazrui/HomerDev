@@ -212,7 +212,7 @@ public class LbcTextBox : TextBox
         {
             // ONE SENTENCE, FROM ONE LOOKUP (2 November 2026): the same answer
             // every Lbc control gives, from configs\Hints.inix or the tip.
-            Say.say(LbcHints.sentenceFor(this, Tip));
+            Say.say(LbcHints.hintFor(this, Tip, LbcHints.pressCount("Shift+F1")));
         }
         // Homer structured-text line operations, active only in
         // multiline fields (notes, tags). Each acts on the selected
@@ -852,6 +852,112 @@ public static class LbcHints
         for (int i = 0; i < sAll.Length - 1; i++)
             if ((sAll[i] == '.' || sAll[i] == '?' || sAll[i] == '!') && char.IsWhiteSpace(sAll[i + 1])) { iEnd = i; break; }
         return iEnd < 0 ? sAll : sAll.Substring(0, iEnd + 1);
+    }
+
+    // PRESSED ONCE, TWICE, THREE TIMES (3 November 2026). Shift+F1 and Alt+Shift+Slash both answer more the
+    // more often they are pressed in a row, as JAWS's own keys do: a press within 1.2 seconds of the last press
+    // of the same key counts as the next, up to three.
+    private static string sLastKey = "";
+    private static DateTime dtLast = DateTime.MinValue;
+    private static int iCount;
+    public static int pressCount(string sKey)
+    {
+        DateTime dtNow = DateTime.Now;
+        if (sKey == sLastKey && (dtNow - dtLast).TotalMilliseconds <= 1200) iCount = Math.Min(iCount + 1, 3);
+        else iCount = 1;
+        sLastKey = sKey; dtLast = dtNow;
+        return iCount;
+    }
+
+    // A dialog's summaryScript is run by the app's own evaluator, when it registers one: DbDo registers its
+    // JScript .NET evaluator, so Lbc itself needs no reference to Microsoft.JScript. The script sees $title,
+    // $focus, $value and $count as strings and returns a sentence.
+    public static Func<string, Dictionary<string, string>, string> scriptEvaluator;
+
+    public static string roleOf(Control ctl)
+    {
+        if (ctl is Button) return "button";
+        if (ctl is CheckedListBox) return "check list";
+        if (ctl is CheckBox) return "check box";
+        if (ctl is RadioButton) return "radio button";
+        if (ctl is ListBox) return "list";
+        if (ctl is ComboBox) return "combo box";
+        if (ctl is TrackBar) return "slider";
+        TextBox tb = ctl as TextBox;
+        if (tb != null) return tb.Multiline ? "multi-line edit" : "edit";
+        if (ctl is Label) return "text";
+        return ctl == null ? "" : ctl.GetType().Name.ToLowerInvariant();
+    }
+
+    // What a control holds now, in a few words: a value, a choice, a state.
+    public static string valueOf(Control ctl)
+    {
+        if (ctl == null) return "";
+        string sState = ctl.Enabled ? "" : "unavailable";
+        CheckedListBox clb = ctl as CheckedListBox;
+        if (clb != null) return join(clb.CheckedItems.Count + " of " + clb.Items.Count + " checked", sState);
+        CheckBox cb = ctl as CheckBox;
+        if (cb != null) return join(cb.Checked ? "checked" : "not checked", sState);
+        RadioButton rb = ctl as RadioButton;
+        if (rb != null) return join(rb.Checked ? "selected" : "not selected", sState);
+        ListBox lb = ctl as ListBox;
+        if (lb != null)
+            return join(lb.SelectedIndex < 0 ? "nothing selected, " + lb.Items.Count + (lb.Items.Count == 1 ? " item" : " items")
+                : brief(Convert.ToString(lb.SelectedItem)) + ", " + (lb.SelectedIndex + 1) + " of " + lb.Items.Count, sState);
+        ComboBox combo = ctl as ComboBox;
+        if (combo != null) return join(combo.Text.Length == 0 ? "blank" : brief(combo.Text), sState);
+        TrackBar bar = ctl as TrackBar;
+        if (bar != null) return join(bar.Value.ToString(), sState);
+        TextBox tb = ctl as TextBox;
+        if (tb != null)
+        {
+            string sText = tb.Text.Length == 0 ? "blank" : brief(tb.Text);
+            if (tb.Multiline && tb.Lines.Length > 1) sText += ", " + tb.Lines.Length + " lines";
+            return join(sText, tb.ReadOnly ? join("read only", sState) : sState);
+        }
+        return sState;
+    }
+
+    private static string join(string sOne, string sTwo)
+    {
+        if (string.IsNullOrEmpty(sOne)) return sTwo ?? "";
+        if (string.IsNullOrEmpty(sTwo)) return sOne;
+        return sOne + ", " + sTwo;
+    }
+
+    private static string brief(string sText)
+    {
+        string sOne = System.Text.RegularExpressions.Regex.Replace(sText ?? "", @"\s+", " ").Trim();
+        return sOne.Length <= 80 ? sOne : sOne.Substring(0, 77) + "...";
+    }
+
+    // The keys that work in a control, by its kind: Shift+F1 pressed three times.
+    public static string keysFor(Control ctl)
+    {
+        if (ctl is Button) return "Space or Enter presses it.";
+        if (ctl is CheckedListBox) return "Arrows move, Space ticks or clears, and a letter jumps to an item that starts with it.";
+        if (ctl is CheckBox) return "Space ticks or clears it.";
+        if (ctl is RadioButton) return "Arrows choose among the group.";
+        if (ctl is ListBox) return "Arrows move, Home and End go to the first and last, a letter jumps, Control+J jumps by name, Control+F filters and F3 finds the next.";
+        if (ctl is ComboBox) return "Alt+Down Arrow opens the choices, arrows move among them, and typing chooses one.";
+        if (ctl is TrackBar) return "Arrows move by one step, Page Up and Page Down by more, Home and End to the ends.";
+        TextBox tb = ctl as TextBox;
+        if (tb != null) return tb.Multiline
+            ? "Type to edit; Enter starts a new line, Control+Home and Control+End go to the top and bottom, and Alt+F8 says it all."
+            : "Type to edit; Alt+F8 says it all, and Control+Enter presses the dialog's default button.";
+        return "Tab moves on.";
+    }
+
+    // Shift+F1: once, one sentence; twice, the whole description; three times, the keys.
+    public static string hintFor(Control ctl, string sTip, int iLevel)
+    {
+        if (iLevel >= 3) return keysFor(ctl);
+        if (iLevel == 2)
+        {
+            string sAll = (sTip ?? "").Trim();
+            return sAll.Length > 0 ? sAll : sentenceFor(ctl, sTip);
+        }
+        return sentenceFor(ctl, sTip);
     }
 
     // For a window that is not an Lbc dialog, such as an app's main window.
@@ -2291,9 +2397,14 @@ public class LbcDialog : IDisposable
                 // (2 November 2026). A text box answers for itself, the same way.
                 evArgs.Handled = true;
                 evArgs.SuppressKeyPress = true;
-                string sTip;
-                if (ctlNow == null || !dFocusTips.TryGetValue(ctlNow, out sTip)) sTip = ctlNow == null ? "" : (ctlNow.AccessibleDescription ?? "");
-                Say.say(LbcHints.sentenceFor(ctlNow, sTip));
+                Say.say(LbcHints.hintFor(ctlNow, tipOf(ctlNow), LbcHints.pressCount("Shift+F1")));
+            }
+            else if (evArgs.KeyData == (Keys.Alt | Keys.Shift | Keys.OemQuestion))
+            {
+                // WHERE AM I: Alt+Shift+Slash, the question key, in every Lbc dialog of every Homer app.
+                evArgs.Handled = true;
+                evArgs.SuppressKeyPress = true;
+                Say.say(whereAmI(ctlNow, LbcHints.pressCount("Alt+Shift+Slash")));
             }
             else if (evArgs.KeyData == (Keys.Control | Keys.Home) && !bInMemo && !bInList)
             {
@@ -3281,6 +3392,111 @@ public class LbcDialog : IDisposable
     {
         Label lbl = currentLabelOrNull();
         return (lbl != null && !string.IsNullOrEmpty(lbl.Text)) ? cleanLabel(lbl.Text) : "";
+    }
+
+    // WHERE AM I, IN ANY LBC DIALOG (3 November 2026). Alt+Shift+Slash -- Alt and the question mark -- the same
+    // key in every Homer app, free in JAWS, NVDA and Windows and in every app's own keys:
+    //   once         the dialog, what it is for, any context the app's summaryScript adds, and the control with
+    //                focus: its name, kind, value and place, such as "3 of 9";
+    //   twice        every control in Tab order, with its kind and what it holds now;
+    //   three times  the keys the whole dialog answers.
+    // What it is for comes from the dialog's first line of text, or else the first sentence of its help note.
+    public string summaryScript = "";
+
+    private string tipOf(Control ctl)
+    {
+        string sTip;
+        if (ctl != null && dFocusTips.TryGetValue(ctl, out sTip)) return sTip;
+        return ctl == null ? "" : (ctl.AccessibleDescription ?? "");
+    }
+
+    private List<Control> orderedControls()
+    {
+        List<Control> lsOut = new List<Control>();
+        foreach (Control ctl in dWidgets.Values)
+            if (!(ctl is Label) && ctl.Visible) lsOut.Add(ctl);
+        return lsOut;
+    }
+
+    private string nameOf(Control ctl)
+    {
+        string sName = LbcHints.plainName(ctl.AccessibleName ?? "");
+        if (sName.Length == 0) sName = LbcHints.plainName(ctl is Button || ctl is CheckBox || ctl is RadioButton ? ctl.Text : "");
+        if (sName.Length == 0)
+        {
+            string sKey = ctl.Name ?? "";
+            int iUnder = sKey.IndexOf('_');
+            sName = (iUnder >= 0 ? sKey.Substring(iUnder + 1) : sKey).Replace("_", " ");
+        }
+        return sName;
+    }
+
+    private string purposeOf()
+    {
+        foreach (Control ctl in dWidgets.Values)
+        {
+            Label lbl = ctl as Label;
+            if (lbl == null) continue;
+            string sText = (lbl.Text ?? "").Replace("&", "").Trim();
+            if (sText.Length > 0 && !sText.EndsWith(":")) return LbcHints.firstSentence(sText);
+        }
+        return LbcHints.firstSentence(helpNote ?? "");
+    }
+
+    public string whereAmI(Control ctlFocus, int iLevel)
+    {
+        List<Control> lsControls = orderedControls();
+        string sTitle = (frm.Text ?? "").Trim();
+        if (iLevel >= 3)
+        {
+            string sDefault = frm.AcceptButton is Button ? LbcHints.plainName(((Button) frm.AcceptButton).Text) : "the default button";
+            return sTitle + " keys: Control+Enter presses " + sDefault + "; Escape cancels; F1 opens help; F7 lists the controls to jump to; "
+                + "Tab and Shift+Tab move between them, and an underlined letter with Alt goes straight to one. "
+                + "Shift+F1 says what a control does, twice its whole description, three times its keys. "
+                + "Alt+Shift+Slash says where you are, twice every control, three times these keys.";
+        }
+        if (iLevel == 2)
+        {
+            System.Text.StringBuilder sbAll = new System.Text.StringBuilder();
+            sbAll.Append(sTitle).Append(", ").Append(lsControls.Count).Append(lsControls.Count == 1 ? " control: " : " controls: ");
+            for (int i = 0; i < lsControls.Count; i++)
+            {
+                Control ctl = lsControls[i];
+                string sValue = LbcHints.valueOf(ctl);
+                sbAll.Append(nameOf(ctl)).Append(" ").Append(LbcHints.roleOf(ctl));
+                if (sValue.Length > 0) sbAll.Append(", ").Append(sValue);
+                sbAll.Append(i < lsControls.Count - 1 ? "; " : ".");
+            }
+            return sbAll.ToString();
+        }
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+        sb.Append(sTitle.Length > 0 ? sTitle + " dialog. " : "Dialog. ");
+        string sPurpose = purposeOf();
+        if (sPurpose.Length > 0) sb.Append(sPurpose.EndsWith(".") || sPurpose.EndsWith("?") ? sPurpose + " " : sPurpose + ". ");
+        if (!string.IsNullOrEmpty(summaryScript) && LbcHints.scriptEvaluator != null)
+        {
+            try
+            {
+                Dictionary<string, string> dVars = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                dVars["title"] = sTitle;
+                dVars["focus"] = ctlFocus == null ? "" : nameOf(ctlFocus);
+                dVars["value"] = LbcHints.valueOf(ctlFocus);
+                dVars["count"] = lsControls.Count.ToString();
+                string sExtra = (LbcHints.scriptEvaluator(summaryScript, dVars) ?? "").Trim();
+                if (sExtra.Length > 0) sb.Append(sExtra.EndsWith(".") ? sExtra + " " : sExtra + ". ");
+            }
+            catch (Exception exceptionScript) { try { Homer.Log.info("Lbc: summaryScript failed: " + exceptionScript.Message); } catch { } }
+        }
+        if (ctlFocus != null)
+        {
+            int iAt = lsControls.IndexOf(ctlFocus);
+            string sValue = LbcHints.valueOf(ctlFocus);
+            sb.Append("On ").Append(nameOf(ctlFocus)).Append(" ").Append(LbcHints.roleOf(ctlFocus));
+            if (sValue.Length > 0) sb.Append(", ").Append(sValue);
+            if (iAt >= 0) sb.Append(", ").Append(iAt + 1).Append(" of ").Append(lsControls.Count);
+            sb.Append(".");
+        }
+        return sb.ToString().Trim();
     }
 
     private void registerWidget(Control ctl, string sKind, string sLabel)

@@ -7,6 +7,26 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.111.0 -- 3 November 2026
+
+- **Installers compile again.** 1.108.0's spoken status called GetTickCount, which Inno Setup does not have, so every installer since stopped compiling with "Unknown identifier 'GetTickCount'": the kit's at 11:28 and 12:39, DbDo's at 11:50 and 12:41, and with them every change since, though the programs themselves compiled. It is now taken from Windows's kernel32.dll.
+- **recordWalk writes speech down.** Its first full run drove DbDo through all eleven steps, with UI Automation reporting each focus correctly, but every transcription failed: faster-whisper opens a file through PyAV, and the PyAV pip installs is newer than it expects. It is now given the recorded sound itself. Each step's loudness is reported, and a silent one is flagged, since the default output -- on Jamal's machine a monitor's speakers -- may not be where JAWS speaks; --speaker chooses another, and the log names them all.
+
+## 1.110.0 -- 3 November 2026
+
+- **Where Am I on Alt+Shift+Slash, Alt and the question mark, in every Lbc dialog of every Homer app.** Pressed once it says the dialog, what it is for -- its first line of text, or the first sentence of its help -- and the control with focus: name, kind, value and place, such as "3 of 9". Twice, every control in Tab order with its kind and what it holds. Three times, the keys the whole dialog answers. The key was free everywhere: the F1 family is taken in main windows, Alt+Shift+Q is DbDo's Query History and Alt+Q HomerView's lookup, Alt+Slash is EdSharp's Say Styles, and the kit's key ownership data shows nothing in JAWS, NVDA or Windows on Alt+Shift+Slash.
+- **Shift+F1 answers more when pressed again:** once, one sentence; twice, the control's whole description; three times, the keys that work in it. A press within 1.2 seconds of the last counts as the next, as with JAWS's own keys.
+- **A dialog may add context of its own** through a summaryScript, which the app's evaluator runs at the moment of asking; Lbc itself takes no new reference. DbDo registers its JScript .NET evaluator, with $title, $focus, $value and $count bound.
+- **recordWalk loads soundcard before pywinauto.** pywinauto starts COM as it loads, and soundcard took the "already started" answer for an error, stopping all three first runs with "Error 0x100000001".
+
+## 1.109.0 -- 3 November 2026
+
+- **recordWalk hears what uiCheck could not.** uiCheck drives a program through UI Automation and says plainly it does not hear speech. recordWalk drives an app through a walk -- the tutorials' [step] format, with Type= and Wait= added -- while the screen reader runs, records the computer's own sound, writes it down with faster-whisper, or HomerScribe's whisper.cpp when faster-whisper cannot install, and reports per step the expected Hear lines, what was heard, UI Automation's focused control and the app's own speech log. It stops the moment another window comes to the front, so switching away is the way to stop it. Packages install for the user alone; no administrator rights.
+
+## 1.108.0 -- 3 November 2026
+
+- **Setup says what it is checking.** Between the last file copied and the page with the Install button, every installer asks each component, screen reader and AI model what is installed, which took about thirty silent seconds in DbDo's setup on 3 November. HomerComponents.iss now says each check as it starts -- "Checking Ollama", "Checking the JAWS scripts" -- through JAWS when it is running and otherwise the Windows voice, no more often than every four seconds, and never in a silent install. NVDA hears the Windows voice: its controller library is 64-bit and Setup is a 32-bit program. Every status is in the setup log too. Every Homer installer gets this at its next build.
+
 ## 1.107.0 -- 3 November 2026
 
 - **The JAWS template compiles again.** Its ScreenSensitiveHelp script, added on 2 November for JAWS+F1 pressed twice, declared `string sHelp, sPath`; JAWS wants a type before every name, and scompile stopped there in JAWS 2024, 2025 and 2026. DbDo's 3 November install reported its JAWS scripts NOT installed in all three. Every app built from the template since needs the fix, which is now `string sHelp, string sPath`.

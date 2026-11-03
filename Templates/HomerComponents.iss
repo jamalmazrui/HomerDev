@@ -60,6 +60,71 @@ var
      pressed, one per line -- see homerNoteTicked *)
   gHomerTicked: String;
 
+(* SPOKEN STATUS WHILE SETUP LOOKS AROUND (3 November 2026). The finish page
+   asks each component what is installed the first time it is shown, and each
+   question is a winget call, a version check or a screen reader probe -- about
+   thirty seconds on Jamal's machine on 3 November, with nothing said between
+   the last file copied and the page with the Install button. homerSay speaks a
+   short status through JAWS, by its own COM interface, and when JAWS is not
+   there through the Windows voice, which every machine has; NVDA's controller
+   library is 64-bit and cannot load into Setup, which is a 32-bit program. A
+   status is said at most every four seconds, so a quick run says little and a
+   slow one keeps saying where it is. The setup log has every status too. *)
+var
+  gHomerSaidAt: Cardinal;
+  gHomerVoice: Variant;
+  gHomerVoiceTried: Boolean;
+  gHomerJawsApi: Variant;
+  gHomerJawsTried: Boolean;
+
+(* Inno has no GetTickCount of its own -- 1.108.0 called one, and every installer stopped compiling with
+   "Unknown identifier 'GetTickCount'" -- so it is taken from Windows itself. *)
+function homerTickCount: Cardinal; external 'GetTickCount@kernel32.dll stdcall';
+
+procedure homerSay(sText: String; bAlways: Boolean);
+var
+  iNow: Cardinal;
+begin
+  Log('Status: ' + sText);
+  if WizardSilent() then exit;
+  iNow := homerTickCount();
+  if (not bAlways) and (gHomerSaidAt <> 0) and (iNow - gHomerSaidAt < 4000) then exit;
+  gHomerSaidAt := iNow;
+  if not gHomerJawsTried then
+  begin
+    gHomerJawsTried := True;
+    try
+      if FindWindowByClassName('JFWUI2') <> 0 then gHomerJawsApi := CreateOleObject('FreedomSci.JawsApi');
+    except
+      Log('Status: JAWS could not be reached for speech: ' + GetExceptionMessage());
+    end;
+  end;
+  try
+    if not VarIsEmpty(gHomerJawsApi) then
+    begin
+      gHomerJawsApi.SayString(sText, False);
+      exit;
+    end;
+  except
+    Log('Status: JAWS would not speak: ' + GetExceptionMessage());
+  end;
+  if not gHomerVoiceTried then
+  begin
+    gHomerVoiceTried := True;
+    try
+      gHomerVoice := CreateOleObject('SAPI.SpVoice');
+    except
+      Log('Status: the Windows voice could not be reached: ' + GetExceptionMessage());
+    end;
+  end;
+  try
+    (* 1 = speak without waiting, so Setup does not pause for the voice *)
+    if not VarIsEmpty(gHomerVoice) then gHomerVoice.Speak(sText, 1);
+  except
+    Log('Status: the Windows voice would not speak: ' + GetExceptionMessage());
+  end;
+end;
+
 function homerProbeLines(sCommand: String; var lsLines: TArrayOfString): Boolean;
 var
   sTemp: String;
@@ -337,6 +402,7 @@ begin
     exit;
   end;
 
+  homerSay('Checking ' + gHomer[iAt].sName, False);
   sRest := gHomer[iAt].sIdList;
   while (Result = 0) and (sRest <> '') do
   begin
@@ -717,6 +783,7 @@ var
 begin
   if (sReader = 'jaws') and gHomerJawsRead then begin Result := gHomerJawsState; exit; end;
   if (sReader = 'nvda') and gHomerNvdaRead then begin Result := gHomerNvdaState; exit; end;
+  if sReader = 'jaws' then homerSay('Checking the JAWS scripts', False) else homerSay('Checking the NVDA add-on', False);
   Result := -1;
   sScript := ExpandConstant('{app}\scripts\{#HomerReaderScript}');
   sFile := ExpandConstant('{tmp}\homerReader_') + sReader + '.txt';
@@ -868,6 +935,7 @@ var
 begin
   if not gOllamaListKnown then
   begin
+    homerSay('Checking the AI models', False);
     gOllamaList := '';
     if homerProbeLines('ollama list', lsLines) then
       for i := 0 to GetArrayLength(lsLines) - 1 do
