@@ -38,7 +38,7 @@ public class LbcTextBox : TextBox
 
     // lsLookupValues: opt-in F4 / Alt+DownArrow pick list. When an
     // editor assigns the valid values for this control's table+field
-    // pair (from the builtin lookups table, e.g. maps.kind or
+    // pair (from the builtin defs table, e.g. maps.kind or
     // projects.kind), F4 opens an alphabetical pick list and replaces
     // the text with the chosen value -- the same pattern the multi-
     // field edit dialog offers, now available in any single Lbc text

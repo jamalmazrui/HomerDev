@@ -47,7 +47,7 @@ skill): each table with the standard fields, look, prime and triggers.
   is in a location), **sponsors**, **features** (an event features a project),
   **offers** (a contact provides a project), **affiliated_with** and
   **part_of**.
-- **lookups** -- the link kinds and project kinds, each with its meaning, so
+- **defs** -- the link kinds and project kinds, each with its meaning, so
   Record Edit offers them as comboboxes. Add the venue's hotels or buildings as
   `locations.hotel` values.
 

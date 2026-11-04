@@ -58,7 +58,7 @@ HomerDev.md, under "Claude skills".
   toHomerEncoding script.
 - **homer-db**: design, create and review SQLite .db files the way DbDo opens
   them -- table and field names, the standard fields in their order, look and
-  prime, the lookups, maps and views tables, pick lists, and a database's own
+  prime, the defs, maps and views tables, pick lists, and a database's own
   folder -- with a checkDb script that reports where a database departs from
   the conventions.
 - **homer-docs**: the documentation set, reading level, headings, lists,

@@ -5,7 +5,7 @@ description: >-
   opens them: plural lower-case table names, an integer key named for the singular, such as book_id, the
   standard fields added, edited, url, notes, tags, look, prime and marked in
   their fixed order, DbDo's field types (TEXTLINE, TEXTMEMO, TEXTMARKDOWN,
-  TEXTTIME), the lookups, maps and views tables, pick lists, a database's own
+  TEXTTIME), the defs, maps and views tables, pick lists, a database's own
   folder with its .inix settings, reports and scripts, and a checkDb script
   that reports where a database departs from all of this. Use this skill
   whenever the user wants to design a database, add or change a table or
@@ -90,13 +90,13 @@ singular, person_id, in the engine and in checkDb alike (kit 1.91.0).
 Three tables belong to DbDo, not to the user, and are kept off every list that
 offers a table; SQL and the dot prompt still reach them.
 
-- **lookups** -- pick lists: `src`, `tbl`, `fld`, `val`, `ordinal`, `descrip`.
-  A field gets a pick list when lookups holds values for its exact table and
+- **defs** -- pick lists: `src`, `tbl`, `fld`, `val`, `ordinal`, `descrip`.
+  A field gets a pick list when defs holds values for its exact table and
   field. Order the values alphabetically and let `ordinal` follow, so typing a
   first letter lands on the value. `tbl` `*` holds DbDo's own vocabularies.
 - **maps** -- links from any record to any other record in the file:
   `tbl1`, `prime1`, `kind`, `tbl2`, `prime2`, read as "record 1 is `kind`
-  record 2" (`contact_for`, `sent_for`), with the kinds kept in lookups under
+  record 2" (`contact_for`, `sent_for`), with the kinds kept in defs under
   `maps`.`kind`. See "Two ways to relate records" below.
 - **views** -- how the database presents itself when shared: `tbl`, `fld`,
   `val`, keyed on `tbl` and `fld`.
@@ -123,7 +123,7 @@ follow every relationship, whichever way it is recorded.
   when a record is deleted, its links go with it.
 
 A database from elsewhere with only foreign keys works as it is; adding a maps
-table (and its lookups kinds) adds the second way without changing anything
+table (and its defs kinds) adds the second way without changing anything
 already there.
 
 ## A row is heard, not seen

@@ -40,7 +40,7 @@ SelectFields = last_name, first_name, enterprise
 OrderFields = last_name, first_name
 WhereFilter =
 
-[Table:lookups]
+[Table:defs]
 
 SelectFields = fld, val
 OrderFields = fld, ordinal

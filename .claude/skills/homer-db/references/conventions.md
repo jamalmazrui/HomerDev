@@ -3,7 +3,7 @@
 ## Contents
 
 - A user table, as DbDo makes it
-- lookups, maps and views
+- defs, maps and views
 - Seeded vocabularies
 - Where the shipped databases differ (2 October 2026)
 
@@ -62,9 +62,9 @@ A foreign key, by contrast, may be declared in the usual way:
 - Generated columns need SQLite 3.31 or later, and STORED keeps them
   queryable and indexable.
 
-## lookups, maps and views
+## defs, maps and views
 
-    lookups: lookup_id, added, edited, src TEXTLINE, tbl TEXTLINE,
+    defs: def_id, added, edited, src TEXTLINE, tbl TEXTLINE,
              fld TEXTLINE, val TEXTLINE, ordinal INTEGER, descrip TEXTMEMO,
              url TEXTLINE, notes, tags, look, prime, marked
              prime: src|tbl|fld|val
@@ -81,7 +81,7 @@ merge, an export and a renumbering.
 
 ## Seeded vocabularies
 
-A new database's lookups table holds DbDo's field types under `tbl` `*` and
+A new database's defs table holds DbDo's field types under `tbl` `*` and
 `fld` `type`, and these generic `maps.kind` values: `affiliated_with`,
 `located_at`, `member_of`, `part_of`, `related_to`. A template replaces them
 with its own, as JobTrail does with `contact_for`, `sent_for` and `works_at`.
@@ -94,7 +94,7 @@ when a template is next rebuilt.
 - **No `trg_<table>_edited` trigger** in most templates' tables, so `edited`
   changes only when DbDo itself saves. A script or another program that edits
   the file leaves it stale.
-- **lookups and maps have no index on prime** in most templates, and JobTrail's
+- **defs and maps have no index on prime** in most templates, and JobTrail's
   tables have a plain, not unique, prime index.
 - **url is not always just before notes** (CellarTrail's wines, SchoolTrail's
   students and teachers).
@@ -103,8 +103,17 @@ when a template is next rebuilt.
   So editing a field that is part of a record's prime, or deleting the record,
   leaves its links pointing at nothing until DbDo or the database adds them.
 - **DbDo recognizes its own tables by name alone**, so a user's own table named
-  maps, lookups or views would be hidden. Recognizing them by their columns too
+  maps or defs would be hidden. (DbDo's own tables are defs and maps; a table named views,
+  which kept saved columns, sort and filter, was retired on 4 November 2026.) Recognizing them by their columns too
   (maps has tbl1, prime1, kind, tbl2 and prime2) would prevent that.
 - **DbDo's generator makes the id by dropping one trailing s**, which would
   give `storie_id` for `stories`. The templates rightly use `story_id`; the
   generator should take the English singular, as checkDb does.
+
+## Naming DbDo's own tables (4 November 2026)
+
+A DbDo system table is named with a plain English plural ending in s, and its key is the
+singular plus _id: defs and def_id, maps and map_id. The name is not an SQL keyword, does not
+begin like a standard field name (added, edited, id, look, marked, notes, prime, tags, url),
+and where it can be, begins with a letter no common table uses, so a letter press in a list of
+tables lands on it at once.

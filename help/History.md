@@ -7,6 +7,19 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.126.0 -- 4 November 2026
+
+- **The SQLite script is the same in both copies again.** Retiring the views table changed it in Conversion.cs but not in conversion.py, and the build's own check stopped at 13:22 saying they differ; conversion.py now matches, all 126 lines.
+
+## 1.125.0 -- 4 November 2026
+
+- **lookups is now defs, with def_id,** in the kit's database conventions, checkDb and the conversion to DbDo's form: DbDo's own table of descriptions, patterns and choices, every row of which is a definition, renamed by Jamal's choice so it no longer echoes the standard field look.
+- **A DbDo system table is named with a plain English plural ending in s**, its key the singular plus _id (defs and def_id, maps and map_id); not an SQL keyword, not the start of a standard field name (added, edited, id, look, marked, notes, prime, tags, url), and where it can be, beginning with a letter no common table uses.
+
+## 1.124.0 -- 4 November 2026
+
+- **DbDo's own tables are lookups and maps; the views table is retired.** A table named views, which kept a table's shown columns, sort and filter inside the database, was never approved for DbDo's schema. checkDb no longer treats a table of that name as DbDo's, and the conversion to DbDo's form no longer creates one. A database may of course hold SQL views, which SQLite tells apart from tables.
+
 ## 1.123.0 -- 3 November 2026
 
 - **kdpSubmit uploads a manuscript only when its book's sources changed (version 48).** On 3 November a bare run uploaded 17 manuscripts when one or two had changed. It compared each EPUB's own bytes with its receipt, and a rebuilt EPUB differs in its stamps even when not a word did: ten of the seventeen were the same size as their last upload, give or take eight bytes, and six grew by about the size of their cover image, a change in how books are built rather than in what was written. A manuscript is now new only when the files in books\<Book> are, by the sources fingerprint buildBooks and kdpUpdate already use; the upload step uses the same test, so a book due only for changed answers no longer sends its manuscript again; each upload records its sources; a book with no such record is recorded as it stands and nothing is uploaded for it, so --book <Book> --reupload is how to send one on purpose.

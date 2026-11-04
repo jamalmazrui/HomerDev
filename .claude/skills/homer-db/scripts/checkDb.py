@@ -18,9 +18,10 @@ database outside any project still logs beside itself, in <folder>\logs.
 import datetime, glob, os, platform, re, sqlite3, sys
 
 lsFieldTypes = ["BLOB", "BOOLEAN", "INTEGER", "NUMERIC", "REAL", "TEXT", "TEXTLINE", "TEXTMARKDOWN", "TEXTMEMO", "TEXTTIME"]
-lsOwnTables = ["lookups", "maps", "views"]
-dOwnColumns = {"lookups": ["tbl", "fld", "val", "ordinal", "src"], "maps": ["tbl1", "prime1", "kind", "tbl2", "prime2"],
-                 "views": ["tbl", "fld", "val"]}
+# DbDo's own tables are defs and maps (4 November 2026): a table named views, which kept saved columns, sort and filter
+# inside the database, was never approved for the schema and is retired; a table of that name is now checked like any other.
+lsOwnTables = ["defs", "maps"]
+dOwnColumns = {"defs": ["tbl", "fld", "val", "ordinal", "src"], "maps": ["tbl1", "prime1", "kind", "tbl2", "prime2"]}
 lsProjectMarks = ["build.cmd", "build.py", "build_release.bat", "RepoFiles.txt"]
 sStamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
@@ -88,10 +89,6 @@ def checkDatabase(sPath):
         lsNames = [c[1] for c in lsCols]
         dCol = {c[1]: c for c in lsCols}
         sLower = sTable.lower()
-        if sLower == "views":
-            bOk = all(s in lsNames for s in dOwnColumns["views"])
-            note("pass" if bOk else "fail", "views", "holds tbl, fld and val" if bOk else "lacks tbl, fld or val")
-            continue
         sSub = sTable
         if not re.fullmatch(r"[a-z][a-z0-9_]*", sTable): note("warn", sSub, "name is not lower case with underscores")
         if not sTable.endswith("s") and sTable not in dIrregular: note("warn", sSub, "name is not plural, so the id is %s_id" % singular(sTable))
@@ -170,15 +167,15 @@ def checkDatabase(sPath):
     lsShared = [", ".join(v) for v in dLetters.values() if len(v) > 1]
     if lsShared: note("warn", "tables", "share a first letter, so typing it does not reach one table: " + "; ".join(lsShared))
     else: note("pass", "tables", "%d user tables, each with its own first letter" % len(lsUser))
-    if "lookups" in lsTables:
+    if "defs" in lsTables:
         # A ROW WITH A FIELD BUT NO VALUE DESCRIBES THE FIELD (3 November 2026), and one with no field describes its table,
         # or with tbl * the database; DbDo's data dictionary lives beside the choices. Only rows that name a field are
         # checked against the tables, so a table's or the database's own row is not taken for a choice of field None.
-        for sTbl, sFld, iCount in oCon.execute("SELECT tbl, fld, count(*) FROM lookups WHERE coalesce(fld, '') <> '' GROUP BY tbl, fld"):
+        for sTbl, sFld, iCount in oCon.execute("SELECT tbl, fld, count(*) FROM defs WHERE coalesce(fld, '') <> '' GROUP BY tbl, fld"):
             if sTbl == "*": continue
-            if sTbl not in lsTables: note("warn", "lookups", "%d values for %s.%s, but there is no table %s" % (iCount, sTbl, sFld, sTbl)); continue
+            if sTbl not in lsTables: note("warn", "defs", "%d values for %s.%s, but there is no table %s" % (iCount, sTbl, sFld, sTbl)); continue
             lsCols = [c[1] for c in oCon.execute('PRAGMA table_xinfo("%s")' % sTbl)]
-            if sFld not in lsCols: note("warn", "lookups", "%d values for %s.%s, but %s has no field %s" % (iCount, sTbl, sFld, sTbl, sFld))
+            if sFld not in lsCols: note("warn", "defs", "%d values for %s.%s, but %s has no field %s" % (iCount, sTbl, sFld, sTbl, sFld))
     if "maps" in lsTables and all(s in [c[1] for c in oCon.execute('PRAGMA table_xinfo("maps")')] for s in dOwnColumns["maps"]):
         iLinks, iDangling = 0, 0
         for sTbl1, sPrime1, sTbl2, sPrime2 in oCon.execute("SELECT tbl1, prime1, tbl2, prime2 FROM maps"):
