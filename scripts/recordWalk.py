@@ -42,6 +42,9 @@ step under results\recordWalk-<stamp>. Exit code 0 when every step was heard as 
 import argparse, ctypes, datetime, difflib, glob, json, os, platform, re, shutil, subprocess, sys, time, traceback, urllib.request, wave, zipfile
 
 iDefaultWait, iSampleRate, nMatchNeeded = 4, 16000, 0.6
+# Listening (3 November 2026): chunks of a quarter second; speech is a chunk louder than 0.01 (JAWS peaked 0.13 to 0.22);
+# half a second of quiet before a key, 0.8 after speech ends, at most ten seconds to settle and fifteen to listen.
+nChunkSeconds, nMaxListen, nMaxSettle, nQuietAfter, nQuietBefore, nSpeechLevel = 0.25, 15, 10, 0.8, 0.5, 0.01
 sDefaultModel = "small.en"
 
 sStamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -517,14 +520,41 @@ def main():
         dBefore = speechSizes(oArgs.app)
         sKeys = keysFor(dStep["sKey"]) if dStep["sKey"] else ""
         logLine("step " + str(iIndex) + ": type " + repr(dStep["sType"]) + ", key " + repr(dStep["sKey"]) + " as " + repr(sKeys) + ", listen " + str(iWait) + " s")
+        # LISTEN UNTIL JAWS STOPS, NOT FOR A FIXED TIME (3 November 2026). The recordings of nine walks showed JAWS
+        # still speaking when the four-second window closed -- Filter Records, every Escape back to the grid, Order
+        # Records -- and the rest spilling into the next step's recording, where it was taken for that step's words.
+        # So: before the key, wait for half a second of quiet (up to ten seconds); after it, record until JAWS has been
+        # quiet for 0.8 seconds, at most fifteen seconds, and stop at Wait= only if nothing was said at all.
+        import numpy
+        iChunk = int(iSampleRate * nChunkSeconds)
+        def levelOf(aChunk):
+            aOne = aChunk.mean(axis=1) if aChunk.ndim > 1 else aChunk
+            return float(numpy.sqrt(numpy.mean(numpy.square(aOne)))) if aOne.size else 0.0
         with oMicrophone.recorder(samplerate=iSampleRate) as oRecorder:
+            nQuiet, nWaited = 0.0, 0.0
+            while nQuiet < nQuietBefore and nWaited < nMaxSettle:
+                nLevel = levelOf(oRecorder.record(numframes=iChunk))
+                nQuiet = nQuiet + nChunkSeconds if nLevel < nSpeechLevel else 0.0
+                nWaited += nChunkSeconds
+            if nWaited >= nMaxSettle: logLine("  still sound after %d s of waiting for quiet; pressed anyway" % nMaxSettle)
             if dStep["sType"]: send_keys(escapeText(dStep["sType"]), with_spaces=True, pause=0.05)
             if sKeys: send_keys(sKeys, pause=0.05)
-            aFrames = oRecorder.record(numframes=iSampleRate * iWait)
+            lChunks, nQuiet, nSpoken, nElapsed, bSpoke = [], 0.0, 0.0, 0.0, False
+            while True:
+                aChunk = oRecorder.record(numframes=iChunk)
+                lChunks.append(aChunk)
+                nElapsed += nChunkSeconds
+                if levelOf(aChunk) >= nSpeechLevel: bSpoke, nQuiet, nSpoken = True, 0.0, nSpoken + nChunkSeconds
+                else: nQuiet += nChunkSeconds
+                if bSpoke and nQuiet >= nQuietAfter: break
+                if not bSpoke and nElapsed >= iWait: break
+                if nElapsed >= nMaxListen: break
+            aFrames = numpy.concatenate(lChunks)
+            bCutOff = bSpoke and nQuiet < nQuietAfter
+        logLine("  listened %.2f s; speech %.2f s%s" % (nElapsed, nSpoken, "; STILL SPEAKING at the limit" if bCutOff else ""))
         sWave = writeWave(os.path.join(sWaves, "step%02d.wav" % iIndex), aFrames)
         # HOW LOUD THE STEP WAS (3 November 2026): a recording of the wrong device is silence, which looks like
         # a reader that said nothing. The peak says which: below about 0.01 nothing was played there.
-        import numpy
         aMono = (aFrames.mean(axis=1) if aFrames.ndim > 1 else aFrames).astype(numpy.float32)
         nPeak = float(numpy.abs(aMono).max()) if aMono.size else 0.0
         logLine("  loudness peak %.3f" % nPeak)
@@ -572,7 +602,9 @@ def main():
         lsReport.append("- **Focus:** " + sFocus)
         lsReport.append("- **" + oArgs.app + " said:** " + (sApp or "(nothing in its speech log)"))
         if sAxeCli: lsReport.append("- **Axe.Windows:** " + (sAxe or "(no scan)"))
-        lsReport.append("- **Recording:** " + os.path.relpath(sWave, sProject) + ", loudness peak %.3f%s" % (nPeak, " -- SILENT: nothing played on the recorded output; try --speaker" if nPeak < 0.01 else ""))
+        lsReport.append("- **Recording:** " + os.path.relpath(sWave, sProject) + ", %.1f s of speech in %.1f s, loudness peak %.3f%s%s" % (nSpoken, nElapsed, nPeak,
+                        " -- SILENT: nothing played on the recorded output; try --speaker" if nPeak < 0.01 else "",
+                        " -- STILL SPEAKING at %d s, so the end is missing" % nMaxListen if bCutOff else ""))
         lsReport.append("")
         logLine("step " + str(iIndex) + " recorded")
     lsReport.insert(3, "**" + str(iMatched) + " of " + str(iChecked) + " expected lines heard.**")

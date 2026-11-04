@@ -7,6 +7,19 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.123.0 -- 3 November 2026
+
+- **kdpSubmit uploads a manuscript only when its book's sources changed (version 48).** On 3 November a bare run uploaded 17 manuscripts when one or two had changed. It compared each EPUB's own bytes with its receipt, and a rebuilt EPUB differs in its stamps even when not a word did: ten of the seventeen were the same size as their last upload, give or take eight bytes, and six grew by about the size of their cover image, a change in how books are built rather than in what was written. A manuscript is now new only when the files in books\<Book> are, by the sources fingerprint buildBooks and kdpUpdate already use; the upload step uses the same test, so a book due only for changed answers no longer sends its manuscript again; each upload records its sources; a book with no such record is recorded as it stands and nothing is uploaded for it, so --book <Book> --reupload is how to send one on purpose.
+- **kdpSubmit --list** says which books a bare run would submit, and why, and stops without sending or writing anything.
+
+## 1.122.0 -- 3 November 2026
+
+- **whoOpens names the program behind Windows's "Select an app to open this file" prompt.** The prompt came again and again on 3 November, with no build running, and JAWS never read which file. It is OpenWith.exe, started with the file's full path on its command line, and its parent is whoever asked; whoOpens watches for it (ten minutes, or -minutes N), says each file and the program that asked, and logs the parent chain four levels up with each one's command line. It changes nothing on the machine.
+
+## 1.121.0 -- 3 November 2026
+
+- **recordWalk listens until JAWS stops, not for a fixed time.** The recordings of nine walks on 3 November showed JAWS still speaking when the four-second window closed -- Filter Records, every Escape back to the grid, and the Order Records steps -- with the rest spilling into the next step's recording, where it was taken for that step's words. Before each key it now waits for half a second of quiet (up to ten seconds), and after it records until JAWS has been quiet for 0.8 seconds (at most fifteen); Wait= is only how long to wait for speech to begin. Each step reports its seconds of speech and says when speech ran past the limit.
+
 ## 1.120.0 -- 3 November 2026
 
 - **recordWalk --axe scans the app after each step with Axe.Windows,** the rules engine of Accessibility Insights for Windows: missing names, wrong roles, controls the keyboard cannot reach. AxeWindowsCLI is fetched once into %LOCALAPPDATA%\HomerDev\tools\AxeWindowsCLI from the newest microsoft/axe-windows release, by asking GitHub for the release's assets and taking the zip whose name holds CLI. Each step's scan is run with the switches its README documents -- --processId, --outputDirectory, --scanId, --verbosity, --alwaysSaveTestFile -- and the report gives the error count, the rules it names and the .a11ytest file, which opens in Accessibility Insights; the log keeps the tool's whole output. A scan that cannot run is said, and the walk goes on.
