@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.120.0 -- 3 November 2026
+
+- **recordWalk --axe scans the app after each step with Axe.Windows,** the rules engine of Accessibility Insights for Windows: missing names, wrong roles, controls the keyboard cannot reach. AxeWindowsCLI is fetched once into %LOCALAPPDATA%\HomerDev\tools\AxeWindowsCLI from the newest microsoft/axe-windows release, by asking GitHub for the release's assets and taking the zip whose name holds CLI. Each step's scan is run with the switches its README documents -- --processId, --outputDirectory, --scanId, --verbosity, --alwaysSaveTestFile -- and the report gives the error count, the rules it names and the .a11ytest file, which opens in Accessibility Insights; the log keeps the tool's whole output. A scan that cannot run is said, and the walk goes on.
+
 ## 1.119.0 -- 3 November 2026
 
 - **checkDb no longer takes a description for a choice.** DbDo's lookups now holds a data dictionary beside its choices: a row with a field but no value describes the field, one with no field describes its table, and one with tbl * and no field describes the database. checkDb counted those as choices for a field named None -- ten warnings in BlindCreations alone -- and now checks only rows that name a field.

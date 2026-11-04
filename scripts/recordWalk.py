@@ -30,6 +30,7 @@ USAGE
     recordWalk --wait 5                 listen five seconds after each key (default 4)
     recordWalk --model base.en          a smaller, faster, less accurate recognizer (default small.en)
     recordWalk --no-transcribe          record and report, and write nothing down
+    recordWalk --axe                    also scan the app after each step with Axe.Windows, the engine of Accessibility Insights
     recordWalk --keep                   leave the app open at the end; by default it is closed, so its closing says the run is over
     recordWalk --speaker Headphones     record the sound output whose name holds Headphones (the log names them all)
     recordWalk --app DbDo               the app, when the folder does not say
@@ -38,7 +39,7 @@ Writes logs\<App>-recordWalk-<stamp>.log, logs\<App>-recordWalk-<stamp>.md (the 
 step under results\recordWalk-<stamp>. Exit code 0 when every step was heard as expected, 1 otherwise.
 """
 
-import argparse, ctypes, datetime, difflib, glob, os, platform, re, subprocess, sys, time, traceback, wave
+import argparse, ctypes, datetime, difflib, glob, json, os, platform, re, shutil, subprocess, sys, time, traceback, urllib.request, wave, zipfile
 
 iDefaultWait, iSampleRate, nMatchNeeded = 4, 16000, 0.6
 sDefaultModel = "small.en"
@@ -294,6 +295,55 @@ def closeApp(sApp):
     return bClosed
 
 
+# ---- AXE.WINDOWS, THE ENGINE OF ACCESSIBILITY INSIGHTS FOR WINDOWS (3 November 2026) --------------------------------
+# --axe scans the app after each step with Microsoft's AxeWindowsCLI, the same rules Accessibility Insights runs:
+# missing names, wrong roles, controls the keyboard cannot reach. Its switches are from its own README: --processId,
+# --outputDirectory, --scanId, --verbosity and --alwaysSaveTestFile, whose .a11ytest file opens in Accessibility
+# Insights for Windows. It is fetched once into %LOCALAPPDATA%\HomerDev\tools\AxeWindowsCLI from the newest release of
+# microsoft/axe-windows on GitHub, choosing the release asset whose name holds "CLI" and ends .zip rather than guessing
+# its exact name. A scan that cannot run is said in the report and the log; the walk goes on.
+sAxeReleases = "https://api.github.com/repos/microsoft/axe-windows/releases/latest"
+
+
+def getAxeCli():
+    sHome = os.path.join(os.environ.get("LOCALAPPDATA", os.path.expanduser("~")), "HomerDev", "tools", "AxeWindowsCLI")
+    lFound = glob.glob(os.path.join(sHome, "**", "AxeWindowsCLI.exe"), recursive=True)
+    if lFound:
+        logLine("AxeWindowsCLI: " + lFound[0])
+        return lFound[0]
+    sayLine("Getting AxeWindowsCLI, once; it is about the size of a small program.")
+    oRequest = urllib.request.Request(sAxeReleases, headers={"User-Agent": "recordWalk", "Accept": "application/vnd.github+json"})
+    with urllib.request.urlopen(oRequest, timeout=60) as oResponse: dRelease = json.loads(oResponse.read().decode("utf-8"))
+    lAssets = [d for d in dRelease.get("assets", []) if "cli" in d.get("name", "").lower() and d.get("name", "").lower().endswith(".zip")]
+    logLine("axe-windows release " + str(dRelease.get("tag_name")) + "; assets " + ", ".join(d.get("name", "") for d in dRelease.get("assets", [])))
+    if not lAssets: raise RuntimeError("the newest axe-windows release has no CLI zip among its assets")
+    os.makedirs(sHome, exist_ok=True)
+    sZip = os.path.join(sHome, lAssets[0]["name"])
+    oRequest = urllib.request.Request(lAssets[0]["browser_download_url"], headers={"User-Agent": "recordWalk"})
+    with urllib.request.urlopen(oRequest, timeout=300) as oResponse, open(sZip, "wb") as fOut: shutil.copyfileobj(oResponse, fOut)
+    with zipfile.ZipFile(sZip) as oZip: oZip.extractall(sHome)
+    logLine("AxeWindowsCLI fetched: " + lAssets[0]["name"] + " into " + sHome)
+    lFound = glob.glob(os.path.join(sHome, "**", "AxeWindowsCLI.exe"), recursive=True)
+    if not lFound: raise RuntimeError("the CLI zip held no AxeWindowsCLI.exe")
+    return lFound[0]
+
+
+def axeScan(sCli, iPid, sFolder, sScanId):
+    """One scan of the app's process; answers (error count or None, a one-line summary, the .a11ytest file or '')."""
+    lCommand = [sCli, "--processId", str(iPid), "--outputDirectory", sFolder, "--scanId", sScanId, "--verbosity", "verbose", "--alwaysSaveTestFile"]
+    logLine("axe: " + " ".join(lCommand))
+    oRun = subprocess.run(lCommand, capture_output=True, text=True, timeout=180)
+    sOut = (oRun.stdout or "") + (oRun.stderr or "")
+    logLine("axe exit code " + str(oRun.returncode) + "; output:\n" + sOut)
+    oCount = re.search(r"(\d+)\s+errors?\b", sOut, re.I)
+    lFiles = glob.glob(os.path.join(sFolder, "**", sScanId + "*.a11ytest"), recursive=True) or glob.glob(os.path.join(sFolder, "**", "*.a11ytest"), recursive=True)
+    sFile = max(lFiles, key=os.path.getmtime) if lFiles else ""
+    iErrors = int(oCount.group(1)) if oCount else None
+    lLines = [s.strip() for s in sOut.splitlines() if s.strip()]
+    lRules = [s for s in lLines if re.search(r"rule|error", s, re.I)][:6]
+    return iErrors, ("; ".join(lRules) if lRules else (lLines[-1] if lLines else "no output")), sFile
+
+
 def focusNow():
     """What UI Automation says has keyboard focus: name, kind, help text and automation id."""
     try:
@@ -399,6 +449,7 @@ def main():
     oParser.add_argument("--no-transcribe", action="store_true")
     oParser.add_argument("--speaker", default="")
     oParser.add_argument("--keep", action="store_true")
+    oParser.add_argument("--axe", action="store_true")
     oArgs = oParser.parse_args([s.lower() if s.startswith("--") else s for s in sys.argv[1:]])
 
     sLogs = os.path.join(sProject, "logs"); os.makedirs(sLogs, exist_ok=True)
@@ -450,6 +501,12 @@ def main():
     lsReport.extend(["# recordWalk: " + oArgs.app + ", " + os.path.basename(oArgs.walk), "",
                      "Recorded " + datetime.datetime.now().strftime("%d %B %Y at %H:%M") + ". Each step: the key pressed, what the walk expected, "
                      "what was heard, what UI Automation says has focus, and what " + oArgs.app + " itself said.", ""])
+    sAxeCli, iAxeErrors = "", 0
+    if oArgs.axe:
+        try: sAxeCli = getAxeCli()
+        except Exception:
+            logLine("AxeWindowsCLI not available: " + traceback.format_exc())
+            sayLine("AxeWindowsCLI could not be got, so no scans; the log says why.")
     for iIndex, dStep in enumerate(lSteps, 1):
         sExeNow, sTitleNow = foregroundExe()
         if sExeNow.lower() != (oArgs.app + ".exe").lower():
@@ -473,6 +530,17 @@ def main():
         logLine("  loudness peak %.3f" % nPeak)
         sFocus = focusNow()
         sApp = speechSince(oArgs.app, dBefore)
+        sAxe = ""
+        if sAxeCli:
+            try:
+                lWindows = windowsOf(oArgs.app + ".exe")
+                if lWindows:
+                    iErrors, sSummary, sFile = axeScan(sAxeCli, lWindows[0][1], os.path.join(sWaves, "axe"), "step%02d" % iIndex)
+                    if iErrors is not None: iAxeErrors += iErrors
+                    sAxe = ((str(iErrors) + (" error" if iErrors == 1 else " errors")) if iErrors is not None else "count not read") + "; " + sSummary + ((" -- " + os.path.relpath(sFile, sProject)) if sFile else "")
+            except Exception:
+                logLine("axe scan failed for step " + str(iIndex) + ": " + traceback.format_exc())
+                sAxe = "the scan could not run; the log says why"
         sHeard = ""
         if oModel is not None:
             try:
@@ -503,11 +571,13 @@ def main():
         lsReport.append("- **Heard:** " + (sHeard or "(nothing written down)"))
         lsReport.append("- **Focus:** " + sFocus)
         lsReport.append("- **" + oArgs.app + " said:** " + (sApp or "(nothing in its speech log)"))
+        if sAxeCli: lsReport.append("- **Axe.Windows:** " + (sAxe or "(no scan)"))
         lsReport.append("- **Recording:** " + os.path.relpath(sWave, sProject) + ", loudness peak %.3f%s" % (nPeak, " -- SILENT: nothing played on the recorded output; try --speaker" if nPeak < 0.01 else ""))
         lsReport.append("")
         logLine("step " + str(iIndex) + " recorded")
     lsReport.insert(3, "**" + str(iMatched) + " of " + str(iChecked) + " expected lines heard.**")
     lsReport.insert(4, "")
+    if sAxeCli: lsReport.insert(5, "**Axe.Windows: " + str(iAxeErrors) + (" error" if iAxeErrors == 1 else " errors") + " across the steps; each .a11ytest file opens in Accessibility Insights for Windows.**\n")
     with open(sReportPath, "w", encoding="utf-8") as fOut: fOut.write("\n".join(lsReport) + "\n")
     if not oArgs.keep:
         bClosed = closeApp(oArgs.app)
