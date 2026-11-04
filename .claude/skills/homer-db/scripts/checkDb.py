@@ -171,7 +171,10 @@ def checkDatabase(sPath):
     if lsShared: note("warn", "tables", "share a first letter, so typing it does not reach one table: " + "; ".join(lsShared))
     else: note("pass", "tables", "%d user tables, each with its own first letter" % len(lsUser))
     if "lookups" in lsTables:
-        for sTbl, sFld, iCount in oCon.execute("SELECT tbl, fld, count(*) FROM lookups GROUP BY tbl, fld"):
+        # A ROW WITH A FIELD BUT NO VALUE DESCRIBES THE FIELD (3 November 2026), and one with no field describes its table,
+        # or with tbl * the database; DbDo's data dictionary lives beside the choices. Only rows that name a field are
+        # checked against the tables, so a table's or the database's own row is not taken for a choice of field None.
+        for sTbl, sFld, iCount in oCon.execute("SELECT tbl, fld, count(*) FROM lookups WHERE coalesce(fld, '') <> '' GROUP BY tbl, fld"):
             if sTbl == "*": continue
             if sTbl not in lsTables: note("warn", "lookups", "%d values for %s.%s, but there is no table %s" % (iCount, sTbl, sFld, sTbl)); continue
             lsCols = [c[1] for c in oCon.execute('PRAGMA table_xinfo("%s")' % sTbl)]

@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.119.0 -- 3 November 2026
+
+- **checkDb no longer takes a description for a choice.** DbDo's lookups now holds a data dictionary beside its choices: a row with a field but no value describes the field, one with no field describes its table, and one with tbl * and no field describes the database. checkDb counted those as choices for a field named None -- ten warnings in BlindCreations alone -- and now checks only rows that name a field.
+
 ## 1.118.0 -- 3 November 2026
 
 - **A missing screen reader source is made again, not silently skipped.** DbDo's installer installed JAWS scripts and an NVDA add-on, but its scripts\jaws and scripts\nvda were not named in RepoFiles.txt, so tidy moved them to notes, every build after packed nothing, and Setup compiled an old package left in Program Files, which failed in every JAWS version. BatCon's repository was in the same state. packScreenReaderSupport now checks the app's own installer: when it runs installScreenReaderSupport and a reader's sources are missing, they are made from the kit's templates, _APP_ and _app_ replaced by the app's name, each file keeping its template's byte order mark, and named in RepoFiles.txt so tidy keeps them. Sources that are there are never touched, and an app whose installer installs no screen reader support is left alone. The log says what was made.
