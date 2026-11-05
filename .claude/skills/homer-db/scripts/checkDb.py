@@ -20,8 +20,8 @@ import datetime, glob, os, platform, re, sqlite3, sys
 lsFieldTypes = ["BLOB", "BOOLEAN", "INTEGER", "NUMERIC", "REAL", "TEXT", "TEXTLINE", "TEXTMARKDOWN", "TEXTMEMO", "TEXTTIME"]
 # DbDo's own tables are defs and maps (4 November 2026): a table named views, which kept saved columns, sort and filter
 # inside the database, was never approved for the schema and is retired; a table of that name is now checked like any other.
-lsOwnTables = ["defs", "maps"]
-dOwnColumns = {"defs": ["tbl", "fld", "val", "ordinal", "src"], "maps": ["tbl1", "prime1", "kind", "tbl2", "prime2"]}
+lsOwnTables = ["defs", "files", "maps"]  # files, the files a database carries (5 November 2026)
+dOwnColumns = {"defs": ["tbl", "fld", "val", "ordinal", "src"], "files": ["name", "kind", "content"], "maps": ["tbl1", "prime1", "kind", "tbl2", "prime2"]}
 lsProjectMarks = ["build.cmd", "build.py", "build_release.bat", "RepoFiles.txt"]
 sStamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 

@@ -32,6 +32,130 @@ using System.Text.RegularExpressions;
 
 namespace Homer {
 
+// COLUMN TYPES (5 November 2026). A Homer database says what a column holds through its declared type, in names that
+// follow SQLite's affinity rules and the web's de facto conventions together. The prefix states storage, which SQLite
+// decides from the name: TEXT for UTF-8 text, BLOB for bytes. The rest names the format by its usual file extension,
+// the download convention Windows also uses to choose a program -- TEXTJSON, TEXTINIX, BLOBPNG, BLOBZIP -- and each type
+// records its MIME type, for export and web headers. Formats that are text are TEXT whatever MIME's first word says
+// (application/json is TEXTJSON, image/svg+xml is TEXTSVG); binary ones are BLOB (application/zip is BLOBZIP). Value
+// types name a single value with a natural action, after HTML's input types: TEXTURL is browsed, TEXTEMAIL mailed,
+// TEXTPHONE called, TEXTPATH opened. Tested on 5 November 2026: SQLite gives INTEGER affinity to any name containing
+// INT, so no name may contain it (TEXTPOINT stores '123' as a number); after that, TEXT affinity to any name containing
+// CHAR, CLOB or TEXT, so no BLOB name may contain those (BLOBTEXT is text); then BLOB affinity to any name containing
+// BLOB, before REAL, FLOA and DOUB. STRICT tables refuse every name here, so a Homer table is never STRICT. Twin:
+// scripts\columnTypes.py; change both together; the kit's build checks that they agree and that SQLite gives each
+// name the affinity it says. Each row: type, file extension, MIME type, lines (multi, single, binary), action
+// (browse, call, edit, mail, open, show, or none), meaning.
+public static class ColumnTypes {
+    public static readonly string[][] aTypes = new string[][] {
+        new string[] { "BLOBDOCX", ".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "binary", "show", "a Word document" },
+        new string[] { "BLOBEPUB", ".epub", "application/epub+zip", "binary", "show", "an EPUB book" },
+        new string[] { "BLOBGIF", ".gif", "image/gif", "binary", "show", "a GIF picture" },
+        new string[] { "BLOBJPG", ".jpg", "image/jpeg", "binary", "show", "a JPEG photo" },
+        new string[] { "BLOBM4A", ".m4a", "audio/mp4", "binary", "show", "AAC audio" },
+        new string[] { "BLOBMP3", ".mp3", "audio/mpeg", "binary", "show", "MP3 audio" },
+        new string[] { "BLOBMP4", ".mp4", "video/mp4", "binary", "show", "MP4 video" },
+        new string[] { "BLOBOGG", ".ogg", "audio/ogg", "binary", "show", "Ogg audio" },
+        new string[] { "BLOBPDF", ".pdf", "application/pdf", "binary", "show", "a PDF document" },
+        new string[] { "BLOBPNG", ".png", "image/png", "binary", "show", "a PNG picture" },
+        new string[] { "BLOBPPTX", ".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "binary", "show", "a PowerPoint deck" },
+        new string[] { "BLOBWAV", ".wav", "audio/wav", "binary", "show", "WAV audio" },
+        new string[] { "BLOBWEBM", ".webm", "video/webm", "binary", "show", "WebM video" },
+        new string[] { "BLOBWEBP", ".webp", "image/webp", "binary", "show", "a WebP picture" },
+        new string[] { "BLOBXLSX", ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "binary", "show", "an Excel workbook" },
+        new string[] { "BLOBZIP", ".zip", "application/zip", "binary", "show", "a zip archive" },
+        new string[] { "TEXTCSV", ".csv", "text/csv", "multi", "edit", "comma-separated values" },
+        new string[] { "TEXTDBDO", ".dbdo", "text/x-dbdo", "multi", "edit", "a DbDo routine of dot-prompt commands" },
+        new string[] { "TEXTEMAIL", "", "", "single", "mail", "an email address, written to with mailto" },
+        new string[] { "TEXTHTML", ".htm", "text/html", "multi", "edit", "a web page" },
+        new string[] { "TEXTICS", ".ics", "text/calendar", "multi", "edit", "iCalendar events" },
+        new string[] { "TEXTINIX", ".inix", "text/x-inix", "multi", "edit", "Homer settings, in sections of key = value lines" },
+        new string[] { "TEXTJSCRIPT", ".js", "text/javascript", "multi", "edit", "a JScript .NET program" },
+        new string[] { "TEXTJSON", ".json", "application/json", "multi", "edit", "JSON data" },
+        new string[] { "TEXTLINE", "", "text/plain", "single", "", "one line of plain text" },
+        new string[] { "TEXTM3U", ".m3u", "audio/x-mpegurl", "multi", "edit", "a playlist" },
+        new string[] { "TEXTMARKDOWN", ".md", "text/markdown", "multi", "edit", "Markdown" },
+        new string[] { "TEXTMEMO", ".txt", "text/plain", "multi", "edit", "lines of plain text" },
+        new string[] { "TEXTPATH", "", "", "single", "open", "the path of a file or folder, opened by Windows" },
+        new string[] { "TEXTPHONE", "", "", "single", "call", "a phone number, called with tel" },
+        new string[] { "TEXTSQL", ".sql", "application/sql", "multi", "edit", "SQL statements" },
+        new string[] { "TEXTSRT", ".srt", "application/x-subrip", "multi", "edit", "SubRip captions" },
+        new string[] { "TEXTSVG", ".svg", "image/svg+xml", "multi", "edit", "an SVG drawing, which is text" },
+        new string[] { "TEXTTIME", "", "", "single", "", "a date and time, as YYYY-MM-DD HH:MM:SS" },
+        new string[] { "TEXTTSV", ".tsv", "text/tab-separated-values", "multi", "edit", "tab-separated values" },
+        new string[] { "TEXTURL", "", "", "single", "browse", "a web address, opened in the default browser" },
+        new string[] { "TEXTVCAL", ".vcs", "text/x-vcalendar", "multi", "edit", "vCalendar events" },
+        new string[] { "TEXTVCARD", ".vcf", "text/vcard", "multi", "edit", "vCard contacts" },
+        new string[] { "TEXTVTT", ".vtt", "text/vtt", "multi", "edit", "WebVTT captions" },
+        new string[] { "TEXTXML", ".xml", "application/xml", "multi", "edit", "XML" },
+    };
+    private static readonly Dictionary<string, string> dExtAlias = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) {
+        { ".html", "TEXTHTML" },
+        { ".ini", "TEXTINIX" },
+        { ".jpeg", "BLOBJPG" },
+        { ".m3u8", "TEXTM3U" },
+        { ".markdown", "TEXTMARKDOWN" },
+        { ".text", "TEXTMEMO" },
+    };
+    private static readonly Dictionary<string, string> dTypeAlias = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) {
+        { "BLOBJPEG", "BLOBJPG" },
+        { "TEXTJAVASCRIPT", "TEXTJSCRIPT" },
+        { "TEXTJS", "TEXTJSCRIPT" },
+        { "TEXTMD", "TEXTMARKDOWN" },
+        { "TEXTPLAIN", "TEXTMEMO" },
+        { "TEXTTEL", "TEXTPHONE" },
+        { "TEXTTXT", "TEXTMEMO" },
+    };
+    private static string[] rowOf(string sType) {
+        string s = canonical(sType);
+        foreach (string[] a in aTypes) if (string.Equals(a[0], s, StringComparison.OrdinalIgnoreCase)) return a;
+        return null;
+    }
+    // names: every type, alphabetical.
+    public static string[] names() { List<string> l = new List<string>(); foreach (string[] a in aTypes) l.Add(a[0]); return l.ToArray(); }
+    // canonical: a type's own name, from an alias such as BLOBJPEG, TEXTJS, TEXTMD or TEXTTEL; any other name upper-cased.
+    public static string canonical(string sType) {
+        string s = (sType ?? "").Trim().ToUpperInvariant(), sTo;
+        return dTypeAlias.TryGetValue(s, out sTo) ? sTo : s;
+    }
+    // typeForName: the type for a file, by its extension; TEXTMEMO when the extension names no format.
+    public static string typeForName(string sFileName) {
+        string sExt = System.IO.Path.GetExtension(sFileName ?? "");
+        if (string.IsNullOrEmpty(sExt)) return "TEXTMEMO";
+        foreach (string[] a in aTypes) if (a[1].Length > 0 && string.Equals(a[1], sExt, StringComparison.OrdinalIgnoreCase)) return a[0];
+        string sType; return dExtAlias.TryGetValue(sExt, out sType) ? sType : "TEXTMEMO";
+    }
+    // typeForMime: the type for a MIME type, such as image/png or application/json; "" when none matches.
+    public static string typeForMime(string sMime) {
+        string s = (sMime ?? "").Split(';')[0].Trim();
+        foreach (string[] a in aTypes) if (a[2].Length > 0 && string.Equals(a[2], s, StringComparison.OrdinalIgnoreCase)) return a[0];
+        return "";
+    }
+    public static string extensionFor(string sType) { string[] a = rowOf(sType); return a != null && a[1].Length > 0 ? a[1] : (isBinary(sType) ? ".bin" : ".txt"); }
+    public static string mimeOf(string sType) { string[] a = rowOf(sType); return a != null && a[2].Length > 0 ? a[2] : (isBinary(sType) ? "application/octet-stream" : "text/plain"); }
+    public static string actionOf(string sType) { string[] a = rowOf(sType); return a != null ? a[4] : ""; }
+    public static string meaningOf(string sType) { string[] a = rowOf(sType); return a != null ? a[5] : ""; }
+    // isBinary: whether the type stores bytes -- its name gives BLOB affinity.
+    public static bool isBinary(string sType) { return affinityOf(canonical(sType)) == "BLOB" && (sType ?? "").Trim().Length > 0; }
+    // isMultiline: whether the type holds lines of text: a format that is text, or an unknown TEXT name other than
+    // TEXT, TEXTLINE and TEXTTIME; never a value type or a binary one.
+    public static bool isMultiline(string sType) {
+        string[] a = rowOf(sType);
+        if (a != null) return a[3] == "multi";
+        string s = canonical(sType);
+        return affinityOf(s) == "TEXT" && s.StartsWith("TEXT") && s != "TEXT";
+    }
+    // affinityOf: the affinity SQLite gives a declared type, by its rules in their order (sqlite.org/datatype3.html).
+    public static string affinityOf(string sDeclared) {
+        string s = (sDeclared ?? "").ToUpperInvariant();
+        if (s.Contains("INT")) return "INTEGER";
+        if (s.Contains("CHAR") || s.Contains("CLOB") || s.Contains("TEXT")) return "TEXT";
+        if (s.Contains("BLOB") || s.Trim().Length == 0) return "BLOB";
+        if (s.Contains("REAL") || s.Contains("FLOA") || s.Contains("DOUB")) return "REAL";
+        return "NUMERIC";
+    }
+}
+
 public static class Schema {
 
 // Column: one field as SQLite reports it. bComputed is true for a generated

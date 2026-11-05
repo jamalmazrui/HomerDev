@@ -1008,7 +1008,7 @@ sIn, sOut = sys.argv[1], sys.argv[2]
 # A DATABASE IN DBDO'S FORM (kit 1.91.0, the homer-db skill): a plural lower-case table named for the
 # file, <singular>_id, added and edited, the data fields, url, notes, tags, look, prime and marked in
 # that order, the edited and maps triggers, a unique prime index, and DbDo's defs and maps (no views table, retired 4 November 2026).
-lsTypes = ['BLOB', 'BOOLEAN', 'INTEGER', 'NUMERIC', 'REAL', 'TEXT', 'TEXTLINE', 'TEXTMARKDOWN', 'TEXTMEMO', 'TEXTTIME']
+lsTypes = ['BLOB', 'BOOLEAN', 'INTEGER', 'NUMERIC', 'REAL', 'TEXT', 'BLOBDOCX', 'BLOBEPUB', 'BLOBGIF', 'BLOBJPG', 'BLOBM4A', 'BLOBMP3', 'BLOBMP4', 'BLOBOGG', 'BLOBPDF', 'BLOBPNG', 'BLOBPPTX', 'BLOBWAV', 'BLOBWEBM', 'BLOBWEBP', 'BLOBXLSX', 'BLOBZIP', 'TEXTCSV', 'TEXTDBDO', 'TEXTEMAIL', 'TEXTHTML', 'TEXTICS', 'TEXTINIX', 'TEXTJSCRIPT', 'TEXTJSON', 'TEXTLINE', 'TEXTM3U', 'TEXTMARKDOWN', 'TEXTMEMO', 'TEXTPATH', 'TEXTPHONE', 'TEXTSQL', 'TEXTSRT', 'TEXTSVG', 'TEXTTIME', 'TEXTTSV', 'TEXTURL', 'TEXTVCAL', 'TEXTVCARD', 'TEXTVTT', 'TEXTXML']  # Homer.ColumnTypes, 5 November 2026
 lsKinds = ['affiliated_with', 'located_at', 'member_of', 'part_of', 'related_to']
 lsHousekeeping = ['added', 'edited', 'look', 'prime', 'marked']
 dIrregular = {'people': 'person', 'children': 'child', 'men': 'man', 'women': 'woman', 'data': 'data'}

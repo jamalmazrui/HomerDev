@@ -1,0 +1,339 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.13" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>ColumnTypes</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      color: light-dark(#1a1a1a, #fdfdfd);
+      background-color: #fdfdfd;
+      background-color: light-dark(#fdfdfd, #1a1a1a);
+      color-scheme: light dark;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a, a:visited {
+      color: inherit;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid;
+      border-color: #e6e6e6;
+      border-color: light-dark(#e6e6e6, #4c4c4c);
+      color: #606060;
+      color: light-dark(#606060, #b6b6b6);
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid currentColor;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+    }
+    th {
+      border-top: 1px solid currentColor;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+<main>
+<h1 id="column-types">Column Types</h1>
+<p>A Homer database says what a column holds through its declared type.
+The names follow two sets of rules at once: SQLite’s rules for storing
+data, and the web’s de facto conventions for naming formats.</p>
+<h2 id="how-a-name-is-built">How a name is built</h2>
+<ul>
+<li><strong>The prefix states storage.</strong> SQLite decides how to
+store a value from words inside its column’s declared type. A name
+beginning TEXT stores UTF-8 text; a name beginning BLOB keeps bytes
+exactly as given.</li>
+<li><strong>The rest names the format,</strong> by its usual file
+extension: the convention of downloads, and the one Windows uses to
+choose a program. So it is BLOBJPG, not BLOBJPEG, though BLOBJPEG is
+accepted and read as BLOBJPG.</li>
+<li><strong>Each type records its MIME type,</strong> such as image/png
+or application/json, for exporting and for web headers.</li>
+<li><strong>Text formats are TEXT, whatever MIME’s first word
+says.</strong> JSON is application/json, yet it is text, so TEXTJSON; an
+SVG drawing is image/svg+xml, yet text, so TEXTSVG. A zip file is
+binary, so BLOBZIP.</li>
+<li><strong>Value types name one value with a natural action,</strong>
+after HTML’s input types: TEXTURL opens in the browser, TEXTEMAIL writes
+with mailto, TEXTPHONE calls with tel, and TEXTPATH opens a file or
+folder.</li>
+</ul>
+<h2 id="three-traps-proven-on-5-november-2026">Three traps, proven on 5
+November 2026</h2>
+<p>SQLite reads a declared type by looking for words in it, in this
+order, and the first match wins:</p>
+<ul>
+<li><strong>INT anywhere means a number.</strong> TEXTPOINT, TEXTPRINT
+and BLOBPOINT all turned the text 123 into the number 123. No Homer type
+contains INT.</li>
+<li><strong>CHAR, CLOB or TEXT anywhere means text,</strong> even after
+BLOB: BLOBTEXT and BLOBCHART store text. No BLOB type contains
+them.</li>
+<li><strong>BLOB comes before REAL,</strong> so BLOBFLOAT would still
+keep bytes; Homer has no such type, but the order is safe.</li>
+</ul>
+<p>A STRICT table refuses all of these names, so a Homer table is never
+STRICT.</p>
+<h2 id="the-types">The types</h2>
+<p>Each type below gives its extension, its MIME type where it has one,
+and what it holds.</p>
+<h3 id="binary-formats">Binary formats</h3>
+<ul>
+<li><strong>BLOBDOCX</strong> (.docx,
+application/vnd.openxmlformats-officedocument.wordprocessingml.document):
+A Word document. Shown with the default program for its format.</li>
+<li><strong>BLOBEPUB</strong> (.epub, application/epub+zip): An EPUB
+book. Shown with the default program for its format.</li>
+<li><strong>BLOBGIF</strong> (.gif, image/gif): A GIF picture. Shown
+with the default program for its format.</li>
+<li><strong>BLOBJPG</strong> (.jpg, image/jpeg): A JPEG photo. Shown
+with the default program for its format.</li>
+<li><strong>BLOBM4A</strong> (.m4a, audio/mp4): AAC audio. Shown with
+the default program for its format.</li>
+<li><strong>BLOBMP3</strong> (.mp3, audio/mpeg): MP3 audio. Shown with
+the default program for its format.</li>
+<li><strong>BLOBMP4</strong> (.mp4, video/mp4): MP4 video. Shown with
+the default program for its format.</li>
+<li><strong>BLOBOGG</strong> (.ogg, audio/ogg): Ogg audio. Shown with
+the default program for its format.</li>
+<li><strong>BLOBPDF</strong> (.pdf, application/pdf): A PDF document.
+Shown with the default program for its format.</li>
+<li><strong>BLOBPNG</strong> (.png, image/png): A PNG picture. Shown
+with the default program for its format.</li>
+<li><strong>BLOBPPTX</strong> (.pptx,
+application/vnd.openxmlformats-officedocument.presentationml.presentation):
+A PowerPoint deck. Shown with the default program for its format.</li>
+<li><strong>BLOBWAV</strong> (.wav, audio/wav): WAV audio. Shown with
+the default program for its format.</li>
+<li><strong>BLOBWEBM</strong> (.webm, video/webm): WebM video. Shown
+with the default program for its format.</li>
+<li><strong>BLOBWEBP</strong> (.webp, image/webp): A WebP picture. Shown
+with the default program for its format.</li>
+<li><strong>BLOBXLSX</strong> (.xlsx,
+application/vnd.openxmlformats-officedocument.spreadsheetml.sheet): An
+Excel workbook. Shown with the default program for its format.</li>
+<li><strong>BLOBZIP</strong> (.zip, application/zip): A zip archive.
+Shown with the default program for its format.</li>
+</ul>
+<h3 id="text-formats">Text formats</h3>
+<ul>
+<li><strong>TEXTCSV</strong> (.csv, text/csv): Comma-separated
+values.</li>
+<li><strong>TEXTDBDO</strong> (.dbdo, text/x-dbdo): A DbDo routine of
+dot-prompt commands.</li>
+<li><strong>TEXTHTML</strong> (.htm, text/html): A web page.</li>
+<li><strong>TEXTICS</strong> (.ics, text/calendar): ICalendar
+events.</li>
+<li><strong>TEXTINIX</strong> (.inix, text/x-inix): Homer settings, in
+sections of key = value lines.</li>
+<li><strong>TEXTJSCRIPT</strong> (.js, text/javascript): A JScript .NET
+program.</li>
+<li><strong>TEXTJSON</strong> (.json, application/json): JSON data.</li>
+<li><strong>TEXTM3U</strong> (.m3u, audio/x-mpegurl): A playlist.</li>
+<li><strong>TEXTMARKDOWN</strong> (.md, text/markdown): Markdown.</li>
+<li><strong>TEXTMEMO</strong> (.txt, text/plain): Lines of plain
+text.</li>
+<li><strong>TEXTSQL</strong> (.sql, application/sql): SQL
+statements.</li>
+<li><strong>TEXTSRT</strong> (.srt, application/x-subrip): SubRip
+captions.</li>
+<li><strong>TEXTSVG</strong> (.svg, image/svg+xml): An SVG drawing,
+which is text.</li>
+<li><strong>TEXTTSV</strong> (.tsv, text/tab-separated-values):
+Tab-separated values.</li>
+<li><strong>TEXTVCAL</strong> (.vcs, text/x-vcalendar): VCalendar
+events.</li>
+<li><strong>TEXTVCARD</strong> (.vcf, text/vcard): VCard contacts.</li>
+<li><strong>TEXTVTT</strong> (.vtt, text/vtt): WebVTT captions.</li>
+<li><strong>TEXTXML</strong> (.xml, application/xml): XML.</li>
+</ul>
+<h3 id="single-values">Single values</h3>
+<ul>
+<li><strong>TEXTEMAIL</strong>: An email address, written to with
+mailto. Written to with the default mail program.</li>
+<li><strong>TEXTLINE</strong> (text/plain): One line of plain text.</li>
+<li><strong>TEXTPATH</strong>: The path of a file or folder, opened by
+Windows. Opened by Windows.</li>
+<li><strong>TEXTPHONE</strong>: A phone number, called with tel. Called
+with the default phone program.</li>
+<li><strong>TEXTTIME</strong>: A date and time, as YYYY-MM-DD
+HH:MM:SS.</li>
+<li><strong>TEXTURL</strong>: A web address, opened in the default
+browser. Opened in the default browser.</li>
+</ul>
+<h3 id="aliases">Aliases</h3>
+<p>These names are read as the type after them: BLOBJPEG as BLOBJPG,
+TEXTJAVASCRIPT as TEXTJSCRIPT, TEXTJS as TEXTJSCRIPT, TEXTMD as
+TEXTMARKDOWN, TEXTPLAIN as TEXTMEMO, TEXTTEL as TEXTPHONE, TEXTTXT as
+TEXTMEMO. These extensions are read as the type after them: .html as
+TEXTHTML, .ini as TEXTINIX, .jpeg as BLOBJPG, .m3u8 as TEXTM3U,
+.markdown as TEXTMARKDOWN, .text as TEXTMEMO. A file whose extension is
+not listed is TEXTMEMO.</p>
+<h2 id="where-the-vocabulary-lives">Where the vocabulary lives</h2>
+<p>The kit keeps it in two twins: Homer.ColumnTypes in exec.cs, for
+programs, and scripts.py, for scripts. The kit’s build runs scripts.py,
+which proves that the twins agree and that a real SQLite gives every
+name the storage it says. On Windows it also logs how the SQLite ODBC
+driver reports each type to ADO, which is how DbDo reads a database. The
+conversion to DbDo format seeds every type into each database’s defs, as
+rows with src DbDo and fld type, so a database describes its own
+types.</p>
+<h2 id="one-column-many-formats">One column, many formats</h2>
+<p>When one column holds rows of different formats, as DbDo’s files
+table does, the column is declared for what they share, and a kind
+column names each row’s format in this same vocabulary. Both ways speak
+one language: the declared type when a column has one format, kind when
+each row has its own.</p>
+</main>
+</body>
+</html>

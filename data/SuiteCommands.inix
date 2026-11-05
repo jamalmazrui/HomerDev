@@ -234,8 +234,10 @@ status=current
 
 [DbDo editSnippet]
 name=Edit Snippet
-keys=Control+Shift+E
-status=current
+keys=Alt+Shift+S
+change=was Control+Shift+E, 5 November 2026
+reason=S for Snippet; Control+Shift+E went to Extract with Regex, the suite's key for it
+status=implemented
 
 [DbDo editTags]
 name=Edit Tags
@@ -304,8 +306,10 @@ status=current
 
 [DbDo extractWithRegex]
 name=Extract with Regex
-keys=Control+Shift+X
-status=current
+keys=Control+Shift+E
+change=was Control+Shift+X, 5 November 2026
+reason=the suite's key, as EdSharp and FileDir; X began no word of its name, and its menu letter came from inside "Extract"
+status=implemented
 
 [DbDo facetColumn]
 name=Facet Column
@@ -638,9 +642,11 @@ keys=F5
 status=current
 
 [DbDo regexReplace]
-name=Regex Replace
+name=Replace with Regex
 keys=Control+Shift+R
-status=current
+change=renamed from Regex Replace, 5 November 2026
+reason=one Replace dialog now, alike for both keys; this key opens it with Use regex pattern checked
+status=implemented
 
 [DbDo relatedRecords]
 name=Related Records
@@ -653,9 +659,11 @@ keys=Alt+G
 status=current
 
 [DbDo replaceColumn]
-name=Replace Column
+name=Replace
 keys=Control+R
-status=current
+change=renamed from Replace Column, 5 November 2026
+reason=its dialog now chooses the columns (current, shown or all) and the records (all in view, marked or current); since v1.0.111 it had changed only the current record unless records were marked, against its name
+status=implemented
 
 [DbDo reverseJump]
 name=Reverse Jump
@@ -853,8 +861,10 @@ status=current
 
 [DbDo sayRegexReplace]
 name=Say Regex Replace
-keys=Shift+X
-status=current
+keys=
+status=retired
+change=retired 5 November 2026
+reason=one Replace dialog now, so Shift+V says its pattern and setting too; and its menu letter, X, came from inside "Regex"
 
 [DbDo sayRelated]
 name=Say Related
@@ -862,9 +872,11 @@ keys=Shift+R
 status=current
 
 [DbDo sayReplacementValue]
-name=Say Replacement Value
+name=Say Replace Values
 keys=Shift+V
-status=current
+change=renamed from Say Replacement Value, 5 November 2026
+reason=it says two values, what Replace would find and what it would put there, now with the last setting; hearing first, as Shift+B and Shift+J
+status=implemented
 
 [DbDo saySelectColumns]
 name=Say Select Columns
@@ -1040,12 +1052,26 @@ keys=
 status=current
 note=Shift+W was tried and withdrawn 5 November 2026: Control+Tab and Control+Shift+Tab already move between two windows
 
-[DbDo alphaOrder]
-name=Alpha Order
+[DbDo addColumnToOrder]
+name=Add Column to Order
 keys=Alt+A
 status=implemented
+change=5 November 2026, replacing Alpha Order of the same day
+reason=the suite's Alt+A sorts ascending by what is under focus, as FileDir's Alpha Order does a file list; in a grid it puts the column under the cursor first and keeps the order in force after it, so successive presses build a sort by several columns, the last added counting most
+
+[DbDo addColumnToOrderDescending]
+name=Add Column to Order Descending
+keys=Alt+Shift+A
+status=implemented
 change=new 5 November 2026
-reason=the suite's Alt+A, as FileDir's Alpha Order: sort by the column under the cursor, which Look and Prime columns cannot; Reverse Order (Alt+Shift+O) then gives descending
+reason=Shift reverses direction, as FileDir's Reverse Alpha Order on Alt+Shift+A
+
+[DbDo sayWholeRecord]
+name=Say Whole Record
+keys=Shift+W
+status=implemented
+change=new 5 November 2026
+reason=W for Whole; every field with a value, hidden columns too, which the reader's read-line command cannot reach; the old Say Record spoke only shown columns and was dropped as read-line's duplicate
 
 [EdSharp about]
 name=About
@@ -3597,6 +3623,7 @@ status=current
 name=Window Toggle
 keys=Shift+W
 status=current
+note=to retire when FileDir is next updated (5 November 2026): Jamal never uses it, Control+Tab and Control+Shift+Tab do the same, and DbDo's Shift+W is now Say Whole Record; DbDo withdrew its own Window Toggle on Shift+W the same day
 
 [FileDir windowsControlPanel]
 name=Windows Control Panel

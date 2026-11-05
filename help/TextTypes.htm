@@ -1,0 +1,232 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.13" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>TextTypes</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      color: light-dark(#1a1a1a, #fdfdfd);
+      background-color: #fdfdfd;
+      background-color: light-dark(#fdfdfd, #1a1a1a);
+      color-scheme: light dark;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a, a:visited {
+      color: inherit;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid;
+      border-color: #e6e6e6;
+      border-color: light-dark(#e6e6e6, #4c4c4c);
+      color: #606060;
+      color: light-dark(#606060, #b6b6b6);
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid currentColor;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+    }
+    th {
+      border-top: 1px solid currentColor;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+<h1 id="text-types">Text Types</h1>
+<p>A Homer database says what kind of text a column holds through the
+column’s declared type. SQLite gives any declared type that contains
+TEXT the text affinity, so a column declared TEXTJSON or TEXTINIX stores
+ordinary UTF-8 text, exactly as TEXT would, while its name tells a
+program the text’s format – so the program can read, check, edit and
+convert it as that format.</p>
+<p>This is the vocabulary, in alphabetical order. TEXTLINE and TEXTTIME
+hold one value; every other type holds lines. The kit keeps it in two
+twins, Homer.TextTypes in exec.cs and scripts.py, which must be changed
+together; the conversion to DbDo format seeds it into each database’s
+defs, as rows with src DbDo and fld type, so a database describes its
+own types.</p>
+<ul>
+<li><strong>TEXTCSV</strong> (.csv): Comma-separated values.</li>
+<li><strong>TEXTDBDO</strong> (.dbdo): A DbDo routine of dot-prompt
+commands.</li>
+<li><strong>TEXTHTML</strong> (.htm): A web page.</li>
+<li><strong>TEXTICS</strong> (.ics): ICalendar events.</li>
+<li><strong>TEXTINIX</strong> (.inix): Homer settings, in sections of
+key = value lines.</li>
+<li><strong>TEXTJSCRIPT</strong> (.js): A JScript .NET program.</li>
+<li><strong>TEXTJSON</strong> (.json): JSON data.</li>
+<li><strong>TEXTLINE</strong>: One line of plain text.</li>
+<li><strong>TEXTM3U</strong> (.m3u): A playlist.</li>
+<li><strong>TEXTMARKDOWN</strong> (.md): Markdown.</li>
+<li><strong>TEXTMEMO</strong> (.txt): Lines of plain text.</li>
+<li><strong>TEXTSQL</strong> (.sql): SQL statements.</li>
+<li><strong>TEXTTIME</strong>: A date and time, as YYYY-MM-DD
+HH:MM:SS.</li>
+<li><strong>TEXTTSV</strong> (.tsv): Tab-separated values.</li>
+<li><strong>TEXTVCAL</strong> (.vcs): VCalendar events.</li>
+<li><strong>TEXTVCARD</strong> (.vcf): VCard contacts.</li>
+<li><strong>TEXTXML</strong> (.xml): XML.</li>
+</ul>
+<p>A file whose extension is not listed is TEXTMEMO. A few other
+extensions are read as their format: .html as TEXTHTML, .ini as
+TEXTINIX, .m3u8 as TEXTM3U, .markdown as TEXTMARKDOWN, .text as
+TEXTMEMO.</p>
+<h2 id="one-column-many-formats">One column, many formats</h2>
+<p>When one column holds rows of different formats, as DbDo’s files
+table does – a SQL question in one row, a report definition in the next
+– the column is declared TEXTMEMO and a kind column names each row’s
+format in this same vocabulary. Both ways speak one language: the
+declared type when a column has one format, kind when each row has its
+own.</p>
+</body>
+</html>

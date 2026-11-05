@@ -2223,6 +2223,26 @@ def main():
             sayLine("The conversion routes could not be tested: %s" % oError)
             iSamplesFailed += 1
             lsFailedParts.append("the conversion test, which could not run")
+        # COLUMN TYPES (1.138.0): the kit's two twins agree, and SQLite gives each declared type the affinity its name
+        # says; on Windows, how the SQLite ODBC driver reports each type to ADO, as DbDo reads it, is logged. The brief
+        # TextTypes files of 1.137.0, which ColumnTypes replaced, are removed here, where repairs belong.
+        for sRetired in (os.path.join("scripts", "textTypes.py"), os.path.join("help", "TextTypes.md")):
+            sPath = os.path.join(sScriptDir, sRetired)
+            if os.path.isfile(sPath):
+                try: os.remove(sPath); logLine("Retired %s, replaced by ColumnTypes" % sRetired)
+                except Exception as oError: logLine("Could not retire %s: %s" % (sRetired, oError))
+        try:
+            oDone = subprocess.run([sys.executable, os.path.join(sScriptDir, "scripts", "checkTypes.py")], capture_output=True, text=True, timeout=300)
+            for sLine in (oDone.stdout or "").strip().splitlines(): sayLine(sLine)
+            for sLine in (oDone.stderr or "").strip().splitlines(): logLine("checkTypes stderr: " + sLine)
+            logLine("checkTypes exit %d" % oDone.returncode)
+            if oDone.returncode != 0:
+                iSamplesFailed += 1
+                lsFailedParts.append("the column-type check")
+        except Exception as oError:
+            sayLine("The column types could not be checked: %s" % oError)
+            iSamplesFailed += 1
+            lsFailedParts.append("the column-type check, which could not run")
         # TIDY KEEPS WHAT THE KIT PLACES (1.65.30): proved here in a scratch folder before any project's tidy relies
         # on it, since tidy once moved the running build_release.bat into notes and ended DbDo's cycle in silence.
         try:

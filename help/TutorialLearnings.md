@@ -155,6 +155,41 @@ app teaches" -- the rule makeTutorials already follows.
 arcs, each opening by recapping the last episode's takeaway. An audio course
 beside the walks, for the car rather than the keyboard.
 
+## What Brian Hartgen's database lessons add (5 November 2026)
+
+Eleven transcribed lessons from Catching Up with Leasey, Series 2, made by Whisper: a database manager much like DbDo, a file manager and a text store, taught by one of the best-known trainers of screen reader users. The transcripts mix two voices without marking them, so they were told apart by their shape. The screen reader speaks in fragments of name, role and state -- "Field type list box. Edit field one of nine.", "Checkbox not checked.", "Field added. Items of information list box." The host speaks in whole sentences of intent and reason -- "I'm going to check this because every book should have a title." Whisper also misheard names: Lisi, LISI and Leasey are one product, and "Hole number" is a whole number.
+
+Most of what he does is already among the eleven habits above: he says what he expects, interprets what was heard, and slows down to teach. These are new:
+
+**Promise a route, not the manual.** "The intention is not to read the user guide to you and it's not to cover every single command... give you a practical route into each feature... leave you feeling confident enough to experiment for yourself."
+
+**Give a picture before the keys.** "The simplest way to think of a database is a collection of cards or forms. Every card is about one item. And every card asks for the same kinds of information."
+
+**Say when another tool fits better.** "A database is not always the right tool. If you only want to write a paragraph about something, Notes may be better suited."
+
+**Teach the ways out first.** Context help, the command center and Where Am I come before any task: "I won't demonstrate all three in detail today, but do remember that they are there."
+
+**Plan before building.** "We need to do a certain amount of forward planning" -- the fields of a database are decided before the first is made.
+
+**Give the reason, and the cost of the other choice.** A fixed list of genres, because "one person might type science fiction, another sci-fi, and someone else SF"; a decimal field, because "if we later type the word excellent, it will not save."
+
+**Slowly once, then faster.** The first field is made with every key spoken; then "I'm going to move through these far more quickly because the process is now familiar to you."
+
+**Sum up the process the moment one cycle is done.** "We give the field a name. We choose its type. We decide whether it's required or not... That is all there is to it, really."
+
+**Show the whole list once.** "Of course we could have typed C. But I wanted to let you know what was here."
+
+**Open by recalling the last lesson, and name the shared aim.** Lesson two begins with what lesson one covered, then says the two new tools "share the same central aim... to remove unnecessary effort from everyday tasks."
+
+**Explain speech the listener will not hear.** "That is actually C colon backslash, but you're not hearing that because I have my JAWS punctuation set to Some, which is the default setting."
+
+**Give practice material, and permission.** A downloadable demonstration folder to follow along, with "you don't have to use my folder structure or my files"; and of a choice, "It's completely up to you of course. It's your database."
+
+### Applied
+
+- DbDo's Tutorial_0_Overview.inix gained the index-card picture, when a document serves better, DbDo's own three keys for getting unstuck (Shift+F1, Alt+Shift+Slash, Alt+Shift+H), the promise of a practical route, and a closing step that names where to start and gives permission to make the database one's own.
+- For every Homer app's walks: open a walk after the first by recalling the one before; give the reason for each choice and what the other choice costs; after the first full cycle of a task, sum it up in a sentence, then say the next ones will go faster; and wherever a Hear line depends on a screen reader setting, such as punctuation level, say so.
+
 ## Changes to make
 
 - **Tutorials.md and checkTutorial**: verify-after-focus is Insert+Tab in a

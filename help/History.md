@@ -7,6 +7,31 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.140.0 -- 5 November 2026
+
+- **TutorialLearnings.md learns from Brian Hartgen's database lessons** (Catching Up with Leasey, Series 2): how a transcript's two voices are told apart, twelve habits not yet recorded -- promise a route, not the manual; a picture before the keys; when another tool fits better; the ways out first; planning before building; the reason and the cost of the other choice; slowly once, then faster; a one-sentence summary after the first cycle; the whole list once; recalling the last lesson; speech the listener will not hear; practice material and permission -- and what was applied.
+- **SuiteCommands.inix records DbDo's Replace as one dialog** (Replace, Replace with Regex), Extract with Regex on the suite's Control+Shift+E, Edit Snippet on Alt+Shift+S, Say Replace Values on Shift+V, and Say Regex Replace retired.
+
+## 1.139.0 -- 5 November 2026
+
+- **SuiteCommands.inix records DbDo's new keys:** Add Column to Order (Alt+A) and its descending twin (Alt+Shift+A), the suite's Alt+A family of ascending and descending sorts by what is under focus, as FileDir's Alpha Order and Reverse Alpha Order; and Say Whole Record (Shift+W). FileDir's Window Toggle on Shift+W is marked to retire when FileDir is next updated, since Control+Tab does the same and DbDo's Shift+W now says the whole record.
+
+## 1.138.0 -- 5 November 2026
+
+- **Homer.ColumnTypes replaces TextTypes,** in Schema.cs, with its twin scripts\columnTypes.py: forty declared column types that follow SQLite's storage rules and the web's de facto naming together. The first word states storage, TEXT or BLOB; the rest names the format by its usual file extension, as downloads do (TEXTJSON, TEXTSQL, BLOBPNG, BLOBPDF, BLOBZIP), with its MIME type for export and web headers; and value types name one value with its natural action, after HTML's input types (TEXTURL browsed, TEXTEMAIL mailed, TEXTPHONE called, TEXTPATH opened). Aliases take MIME-style names: BLOBJPEG as BLOBJPG, TEXTJS as TEXTJSCRIPT.
+- **Proven, not assumed:** SQLite gives INTEGER affinity to any name containing INT, so TEXTPOINT stores the text 123 as a number; and TEXT affinity to any name containing CHAR, CLOB or TEXT, even after BLOB. No Homer type contains them. The build's new scripts\checkTypes.py proves on every build that the twins agree and that a real SQLite stores each name as it says; on Windows it logs how the SQLite ODBC driver reports each type to ADO, as DbDo reads it.
+- **help\ColumnTypes.md** explains the vocabulary; the build retires the brief TextTypes files of 1.137.0.
+- **The conversion's SQLite script is the same in both languages again.** Its type list was widened in Conversion.cs but not in conversion.py, and the build's twin check stopped the 21:35 build, as it should; both now list all forty types.
+
+## 1.137.0 -- 5 November 2026
+
+- **Homer.TextTypes, in Schema.cs, and its twin scripts\textTypes.py:** the vocabulary of declared text types, seventeen from TEXTCSV to TEXTXML, each with its file extension and meaning -- the SQLite convention that a type containing TEXT stores plain UTF-8 while its name says the format. The conversion to DbDo format seeds all of them into defs, and help\TextTypes.md explains them.
+- **checkDb knows the files table's kind column.**
+
+## 1.136.0 -- 5 November 2026
+
+- **checkDb knows DbDo's third table, files,** the files a database carries -- scripts, report definitions, settings -- beside defs and maps.
+
 ## 1.135.0 -- 5 November 2026
 
 - **A PDF read into Markdown gains a Contents list and citation links,** from "Improving the accessibility of scientific documents" (Allen Institute for AI), whose blind and low-vision readers valued headings, a table of contents and links between citations and references above all. A document with five or more second- and third-level headings gets a Contents list after its title, each entry linking to its heading. Where a References, Bibliography, Works Cited or Literature Cited section lists three or more numbered entries, each numbered citation in the text -- [12], [3, 4] -- links to its entry; a number with no entry, and every ordinary link, is left alone. Plain text keeps the words and drops the links.
