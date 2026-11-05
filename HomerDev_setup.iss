@@ -179,6 +179,13 @@ FileName: "{app}\scripts\installAce.cmd"; \
   Check: homerFinishRuns and isInstallAce; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
+FileName: "{app}\scripts\installAxeWindows.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelAxeWindows}"; \
+  Check: homerFinishRuns and isInstallAxeWindows; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
+
 FileName: "{app}\scripts\installEpubCheck.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
@@ -191,6 +198,13 @@ FileName: "{app}\scripts\installExifTool.cmd"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelExifTool}"; \
   Check: homerFinishRuns and isInstallExifTool; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
+
+FileName: "{app}\scripts\installFasterWhisper.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelFasterWhisper}"; \
+  Check: homerFinishRuns and isInstallFasterWhisper; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installFfmpeg.cmd"; \
@@ -270,6 +284,13 @@ FileName: "{app}\scripts\installPython.cmd"; \
   Check: homerFinishRuns and isInstallPython; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
+FileName: "{app}\scripts\installPywinauto.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelPywinauto}"; \
+  Check: homerFinishRuns and isInstallPywinauto; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
+
 FileName: "{app}\scripts\installTesseract.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
@@ -306,6 +327,13 @@ FileName: "{app}\scripts\installAce.cmd"; \
   Check: homerFinishRuns and isUpdateAce; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
+FileName: "{app}\scripts\installAxeWindows.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelAxeWindows}"; \
+  Check: homerFinishRuns and isUpdateAxeWindows; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
+
 FileName: "{app}\scripts\installEpubCheck.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
@@ -318,6 +346,13 @@ FileName: "{app}\scripts\installExifTool.cmd"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelExifTool}"; \
   Check: homerFinishRuns and isUpdateExifTool; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
+
+FileName: "{app}\scripts\installFasterWhisper.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelFasterWhisper}"; \
+  Check: homerFinishRuns and isUpdateFasterWhisper; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
 FileName: "{app}\scripts\installFfmpeg.cmd"; \
@@ -397,6 +432,13 @@ FileName: "{app}\scripts\installPython.cmd"; \
   Check: homerFinishRuns and isUpdatePython; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
+FileName: "{app}\scripts\installPywinauto.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelPywinauto}"; \
+  Check: homerFinishRuns and isUpdatePywinauto; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
+
 FileName: "{app}\scripts\installTesseract.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
@@ -426,6 +468,13 @@ FileName: "{app}\scripts\installAce.cmd"; \
   Check: homerFinishRuns and isReinstallAce; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
+FileName: "{app}\scripts\installAxeWindows.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelAxeWindows}"; \
+  Check: homerFinishRuns and isReinstallAxeWindows; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
+
 FileName: "{app}\scripts\installEpubCheck.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
@@ -438,6 +487,13 @@ FileName: "{app}\scripts\installExifTool.cmd"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelExifTool}"; \
   Check: homerFinishRuns and isReinstallExifTool; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
+
+FileName: "{app}\scripts\installFasterWhisper.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelFasterWhisper}"; \
+  Check: homerFinishRuns and isReinstallFasterWhisper; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installFfmpeg.cmd"; \
@@ -517,6 +573,13 @@ FileName: "{app}\scripts\installPython.cmd"; \
   Check: homerFinishRuns and isReinstallPython; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
+FileName: "{app}\scripts\installPywinauto.cmd"; \
+  Parameters: "noPause"; \
+  WorkingDir: "{app}\scripts"; \
+  Description: "{code:labelPywinauto}"; \
+  Check: homerFinishRuns and isReinstallPywinauto; \
+  Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
+
 FileName: "{app}\scripts\installTesseract.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
@@ -593,7 +656,7 @@ Type: filesandordirs; Name: "{localappdata}\{#AppName}\logs"
 #include HomerDev + "\Templates\HomerComponents.iss"
 
 var
-  iAce, iEpubCheck, iExifTool, iFfmpeg, iGit, iGitHubCli, iImageMagick, iJava, iMpv, iNode, iOllama, iPandoc, iPdfTools, iPython, iTesseract, iWhisper, iYtDlp: Integer;
+  iAce, iAxeWindows, iEpubCheck, iExifTool, iFasterWhisper, iFfmpeg, iGit, iGitHubCli, iImageMagick, iJava, iMpv, iNode, iOllama, iPandoc, iPdfTools, iPython, iPywinauto, iTesseract, iWhisper, iYtDlp: Integer;
   sActions: String;
   sPriorVersion: String;
 
@@ -609,10 +672,17 @@ begin
   //  never remove them, so none is under {app}.
   iAce := homerAdd('Ace by DAISY', '', 'ace',
     '{userappdata}\npm\ace.cmd', 'checks the accessibility of EPUB books', '');
+  // THE TESTING TOOLS (5 November 2026): Axe.Windows, faster-whisper and pywinauto, used by recordWalk and the
+  // accessibility check every push runs. Axe.Windows is not in winget; its fetch writes version.txt beside it, which
+  // homerFileVersion reads first, so a copy here is offered as Reinstall, which gets the newest release.
+  iAxeWindows := homerAdd('Axe.Windows', '', '',
+    '{localappdata}\HomerDev\tools\AxeWindowsCLI\AxeWindowsCLI.exe', 'checks a window''s accessibility, as Accessibility Insights does', '');
   iEpubCheck := homerAdd('EPUBCheck', '', '',
     '{pf}\EPUBCheck\epubcheck.jar', 'validates EPUB books', '');
   iExifTool := homerAdd('ExifTool', 'OliverBetz.ExifTool;PhilHarvey.ExifTool', 'exiftool',
     '', 'reads what a recording or photo knows about itself', 'ExifTool');
+  iFasterWhisper := homerAdd('faster-whisper', 'pip:faster-whisper', '',
+    '', 'writes down what the screen reader says in a walk', '');
   iFfmpeg := homerAdd('ffmpeg', 'Gyan.FFmpeg', 'ffmpeg',
     '', 'converts audio and video, with ffprobe', '');
   iGit := homerAdd('Git', 'Git.Git', 'git',
@@ -637,6 +707,8 @@ begin
     '', 'reads PDF files as text, through Python', '');
   iPython := homerAdd('Python', 'Python.Python.3.14;Python.Python.3.13', 'python',
     '', 'runs the kit''s scripts', '');
+  iPywinauto := homerAdd('pywinauto', 'pip:pywinauto', '',
+    '', 'drives an app and reads its focus in a walk', '');
   iTesseract := homerAdd('Tesseract', 'UB-Mannheim.TesseractOCR', 'tesseract',
     '{pf}\Tesseract-OCR\tesseract.exe', 'reads scanned pages', 'Tesseract-OCR');
   iWhisper := homerAdd('Whisper', '', '"{pf}\Whisper\whisper-cli.exe"',
@@ -722,6 +794,10 @@ function labelAce(sParam: String): String;  begin Result := homerLabel(iAce); en
 function isInstallAce(): Boolean;           begin Result := homerIs(iAce, 0); end;
 function isUpdateAce(): Boolean;            begin Result := homerIs(iAce, 1); end;
 function isReinstallAce(): Boolean;         begin Result := homerIs(iAce, 2); end;
+function labelAxeWindows(sParam: String): String;  begin Result := homerLabel(iAxeWindows); end;
+function isInstallAxeWindows(): Boolean;           begin Result := homerIs(iAxeWindows, 0); end;
+function isUpdateAxeWindows(): Boolean;            begin Result := homerIs(iAxeWindows, 1); end;
+function isReinstallAxeWindows(): Boolean;         begin Result := homerIs(iAxeWindows, 2); end;
 function labelEpubCheck(sParam: String): String;  begin Result := homerLabel(iEpubCheck); end;
 function isInstallEpubCheck(): Boolean;           begin Result := homerIs(iEpubCheck, 0); end;
 function isUpdateEpubCheck(): Boolean;            begin Result := homerIs(iEpubCheck, 1); end;
@@ -730,6 +806,10 @@ function labelExifTool(sParam: String): String;  begin Result := homerLabel(iExi
 function isInstallExifTool(): Boolean;           begin Result := homerIs(iExifTool, 0); end;
 function isUpdateExifTool(): Boolean;            begin Result := homerIs(iExifTool, 1); end;
 function isReinstallExifTool(): Boolean;         begin Result := homerIs(iExifTool, 2); end;
+function labelFasterWhisper(sParam: String): String;  begin Result := homerLabel(iFasterWhisper); end;
+function isInstallFasterWhisper(): Boolean;           begin Result := homerIs(iFasterWhisper, 0); end;
+function isUpdateFasterWhisper(): Boolean;            begin Result := homerIs(iFasterWhisper, 1); end;
+function isReinstallFasterWhisper(): Boolean;         begin Result := homerIs(iFasterWhisper, 2); end;
 function labelFfmpeg(sParam: String): String;  begin Result := homerLabel(iFfmpeg); end;
 function isInstallFfmpeg(): Boolean;           begin Result := homerIs(iFfmpeg, 0); end;
 function isUpdateFfmpeg(): Boolean;            begin Result := homerIs(iFfmpeg, 1); end;
@@ -774,6 +854,10 @@ function labelPython(sParam: String): String;  begin Result := homerLabel(iPytho
 function isInstallPython(): Boolean;           begin Result := homerIs(iPython, 0); end;
 function isUpdatePython(): Boolean;            begin Result := homerIs(iPython, 1); end;
 function isReinstallPython(): Boolean;         begin Result := homerIs(iPython, 2); end;
+function labelPywinauto(sParam: String): String;  begin Result := homerLabel(iPywinauto); end;
+function isInstallPywinauto(): Boolean;           begin Result := homerIs(iPywinauto, 0); end;
+function isUpdatePywinauto(): Boolean;            begin Result := homerIs(iPywinauto, 1); end;
+function isReinstallPywinauto(): Boolean;         begin Result := homerIs(iPywinauto, 2); end;
 function labelTesseract(sParam: String): String;  begin Result := homerLabel(iTesseract); end;
 function isInstallTesseract(): Boolean;           begin Result := homerIs(iTesseract, 0); end;
 function isUpdateTesseract(): Boolean;            begin Result := homerIs(iTesseract, 1); end;
@@ -841,8 +925,10 @@ begin
   //  the same alphabetical order as the [Run] section.
   addAction(homerScreenReaderOutcome());
   addAction(homerOutcomeLine(iAce));
+  addAction(homerOutcomeLine(iAxeWindows));
   addAction(homerOutcomeLine(iEpubCheck));
   addAction(homerOutcomeLine(iExifTool));
+  addAction(homerOutcomeLine(iFasterWhisper));
   addAction(homerOutcomeLine(iFfmpeg));
   addAction(homerOutcomeLine(iGit));
   addAction(homerOutcomeLine(iGitHubCli));
@@ -854,6 +940,7 @@ begin
   addAction(homerOutcomeLine(iPandoc));
   addAction(homerOutcomeLine(iPdfTools));
   addAction(homerOutcomeLine(iPython));
+  addAction(homerOutcomeLine(iPywinauto));
   addAction(homerOutcomeLine(iTesseract));
   addAction(homerOutcomeLine(iWhisper));
   addAction(homerOutcomeLine(iYtDlp));

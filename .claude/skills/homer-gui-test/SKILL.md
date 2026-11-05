@@ -85,6 +85,17 @@ help\Tutorial_NN_*.inix, which recordWalk also runs.
   %LOCALAPPDATA%\HomerDev\tools; --axe writes its findings per step and counts
   errors in the report.
 
+## Accessibility scans
+
+The kit's scripts\axeScan.py runs Axe.Windows, the rule engine of Accessibility Insights for Windows, and fetches its command-line tool once into %LOCALAPPDATA%\HomerDev\tools. It is used in three places:
+
+- **Every push:** the shared check starts a windowed app's program, scans its window, closes it by WM_CLOSE (nothing pressed), and writes logs\<App>-a11yScan-<time>.md. The verdict is a warning at most, never a failure; `check --noscan` leaves it out. If another copy of the app is running and takes the start over, the check says so and skips.
+- **Walks:** recordWalk scans after every step by default, so each dialog is scanned while it is open, and says so at the start and the total at the end; `--no-axe` leaves it out.
+- **Tutorials performed live:** `recordWalk --tutorial --walk 1` drives the app through Tutorial 1 for real -- menus and all -- with the host's lines in one Windows voice (made into a file, never played, so they cannot spill into the reader's recording), the real screen reader recorded at each key, and the tutorial's simulated reading in a second voice; everything joins into results\recordWalk-<time>\<tutorial>-live.mp3, the step-by-step report beside it as always.
+- **By hand:** `axeScan --exe <program>` or `axeScan --pid <id>`.
+
+**A finding is a question, not an order.** Before changing anything, check what a screen reader user would meet. Never add an accessible name where the label just before a control in the focus order, its own caption (a check box, a button), or the window's title already names it: JAWS and NVDA say that name, and an accessible name with the same words is said twice -- an Lbc violation. Fix without asking only what is plainly a bug under Homer's rules, such as a name that repeats its control's kind, or a control the keyboard cannot reach; bring anything else to the person first. A finding reviewed and accepted goes in the app's a11yAccepted.txt, one per line, as the report prints it, and is no longer counted as new.
+
 ## What it has taught
 
 - **Start every walk from the same state.** A grid left on other columns from an

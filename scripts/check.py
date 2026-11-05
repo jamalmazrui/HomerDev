@@ -1683,6 +1683,49 @@ def checkSmoke(bBuild):
     return finding("smoke", "fail", "%s --help returned %d" % (sExe, iCode))
 
 
+def checkAccessibility(bScan):
+    """ACCESSIBILITY SCAN (5 November 2026): a windowed program is started, its window scanned with Axe.Windows --
+    the rule engine of Accessibility Insights for Windows -- and closed by WM_CLOSE, nothing pressed. The verdict is a
+    warning at most, never a failure: a finding is a question to review, and the report says what to check first --
+    above all, never an accessible name where a label before the control, its own caption, or the window title
+    already names it, which the reader would then say twice. Findings reviewed and accepted go in a11yAccepted.txt."""
+    # IT RUNS AT EVERY PUSH (5 November 2026): push runs this check without --build, so the scan is on unless
+    # --noscan is given; the program opens for some seconds, and the screen reader says so.
+    if not bScan:
+        return finding("accessibility", "skip", "--noscan was given")
+    if os.name != "nt":
+        return finding("accessibility", "skip", "scans need Windows")
+    lsExe = [s for s in glob.glob(os.path.join(sRoot, "exec", "*.exe")) + glob.glob(os.path.join(sRoot, "*.exe"))
+             if not s.lower().endswith("_setup.exe")]
+    sApp = appName()
+    lsOwn = [s for s in lsExe if os.path.splitext(os.path.basename(s))[0].lower() == sApp.lower()]
+    lsExe = lsOwn or lsExe
+    if not lsExe or not isWindowed(lsExe[0]):
+        return finding("accessibility", "skip", "no windowed program here to scan")
+    oAxe = None
+    sKit = ""
+    try:
+        import kind
+        sKit = kind.findKit([sRoot]) or ""
+    except Exception:
+        sKit = ""
+    for sFolder in (os.path.dirname(os.path.abspath(__file__)), os.path.join(sKit, "scripts") if sKit else ""):
+        if sFolder and os.path.isfile(os.path.join(sFolder, "axeScan.py")):
+            import importlib.util
+            oSpec = importlib.util.spec_from_file_location("axeScan", os.path.join(sFolder, "axeScan.py"))
+            oAxe = importlib.util.module_from_spec(oSpec); oSpec.loader.exec_module(oAxe)
+            break
+    if oAxe is None:
+        return finding("accessibility", "skip", "the kit's axeScan.py was not found")
+    oAxe.useLog(logLine)
+    try:
+        sVerdict, sEvidence, sReport = oAxe.scanProgram(lsExe[0], sRoot, sApp, os.path.join(sRoot, "logs"))
+    except Exception as oError:
+        logLine("accessibility scan: " + traceback.format_exc())
+        return finding("accessibility", "skip", "the scan could not run: %s" % oError)
+    return finding("accessibility", sVerdict, sEvidence)
+
+
 def checkAccept():
     """The app's own acceptance criteria, which only the app can state."""
     sPath = os.path.join(sRoot, "accept.inix")
@@ -1798,6 +1841,7 @@ def main():
     oParser.add_argument("--build", action="store_true",
                          help="build the app first, and count the build as evidence")
     oParser.add_argument("--path", default="", help="the app folder; this one by default")
+    oParser.add_argument("--noscan", action="store_true", help="leave out the accessibility scan, which opens the program for some seconds")
     oParser.add_argument("--quiet", action="store_true", help="write the report, say little")
     oParser.add_argument("--fresh", action="store_true",
                          help="run every check even when a pass with exactly these files is on record")
@@ -1914,6 +1958,7 @@ def main():
         checkConversions()
         checkBuild(dArguments.build)
         checkSmoke(dArguments.build)
+        checkAccessibility(not dArguments.noscan)
         checkAccept()
 
     sReport = writeReport()
