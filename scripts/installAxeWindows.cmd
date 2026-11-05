@@ -36,6 +36,9 @@ call "%~dp0installCommon.cmd" runLong "Axe.Windows"
 set "iCode=%ERRORLEVEL%"
 call "%~dp0installCommon.cmd" log "python '%~dp0axeScan.py' --fetch exit code %iCode%"
 if not "%iCode%"=="0" goto :failed
+set "sHomerRunLong=python "%~dp0axeWindow.py" --fetch"
+call "%~dp0installCommon.cmd" runLong "the Axe.Windows library"
+call "%~dp0installCommon.cmd" log "axeWindow --fetch exit code %ERRORLEVEL%"
 echo Axe.Windows is installed.
 goto :done
 
@@ -47,6 +50,9 @@ call "%~dp0installCommon.cmd" runLong "Axe.Windows"
 set "iCode=%ERRORLEVEL%"
 call "%~dp0installCommon.cmd" log "python '%~dp0axeScan.py' --fetch --fresh exit code %iCode%"
 if not "%iCode%"=="0" goto :failed
+set "sHomerRunLong=python "%~dp0axeWindow.py" --fetch --fresh"
+call "%~dp0installCommon.cmd" runLong "the Axe.Windows library"
+call "%~dp0installCommon.cmd" log "axeWindow --fetch --fresh exit code %ERRORLEVEL%"
 echo Axe.Windows is the newest release.
 goto :done
 

@@ -202,6 +202,22 @@ def speechFrames(sText, iVoice):
         return numpy.frombuffer(oWave.readframes(oWave.getnframes()), dtype=numpy.int16)
 
 
+def launchKey(sProject, sApp):
+    """The app's own launch hotkey, from #define HotKey in its installer script, as a set of lower-case key names."""
+    sIss = os.path.join(sProject, sApp + "_setup.iss")
+    try:
+        with open(sIss, encoding="utf-8-sig", errors="replace") as fIn:
+            oMatch = re.search(r'^#define\s+HotKey\s+"([^"]+)"', fIn.read(), re.M)
+        return keySet(oMatch.group(1)) if oMatch else set()
+    except Exception:
+        return set()
+
+
+def keySet(sKey):
+    dSame = {"ctrl": "control", "ctl": "control"}
+    return set(dSame.get(s.strip().lower(), s.strip().lower()) for s in (sKey or "").split("+") if s.strip())
+
+
 def framesToInt16(aFrames):
     import numpy
     aMono = aFrames.mean(axis=1) if aFrames.ndim > 1 else aFrames
@@ -597,12 +613,25 @@ def main():
     lLive = []
     bAxeStopped = False
     setScanned, lAxeFindings = set(), []
+    setLaunch = launchKey(sProject, oArgs.app)
+    logLine("launch key: " + ("+".join(sorted(setLaunch)) if setLaunch else "none found"))
     for iIndex, dStep in enumerate(lSteps, 1):
         sExeNow, sTitleNow = foregroundExe()
         if sExeNow.lower() != (oArgs.app + ".exe").lower():
             sayLine("Stopped before step " + str(iIndex) + ": " + (sTitleNow or sExeNow or "another window") + " is in front.")
             logLine("stopped: foreground " + sExeNow + " " + repr(sTitleNow))
             break
+        # THE APP'S OWN LAUNCH KEY IS NOT PRESSED (5 November 2026, night). Tutorial 1 opens DbDo with Alt+Control+D, its
+        # desktop hotkey; recordWalk has already started DbDo, so the key went to Windows Explorer, which took the front,
+        # and the walk stopped at step 3. The narration is kept; the key, already done, is not pressed.
+        if oArgs.tutorial and dStep["sKey"] and setLaunch and keySet(dStep["sKey"]) == setLaunch:
+            logLine("step " + str(iIndex) + ": " + dStep["sKey"] + " is " + oArgs.app + "'s launch key, and it is open already; not pressed")
+            try:
+                if dStep["sSay"]: lLive.append(speechFrames(dStep["sSay"], 0))
+                if dStep["lHear"]: lLive.append(speechFrames(" ".join(dStep["lHear"]), 1))
+            except Exception:
+                logLine("tutorial voice failed at step " + str(iIndex) + ": " + traceback.format_exc())
+            continue
         if oArgs.tutorial:
             try:
                 if dStep["sSay"]: lLive.append(speechFrames(dStep["sSay"], 0))

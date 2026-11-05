@@ -2250,6 +2250,11 @@ def main():
             oDone = subprocess.run([sys.executable, os.path.join(sScriptDir, "scripts", "axeScan.py"), "--fetch"], capture_output=True, text=True, timeout=600, cwd=sScriptDir)
             for sLine in (oDone.stdout or "").strip().splitlines(): sayLine(sLine)
             logLine("axeScan --fetch exit %d; stderr %s" % (oDone.returncode, (oDone.stderr or "").strip()[:2000]))
+            # THE LIBRARY TOO (1.146.0): axeWindow scans one window through the Axe.Windows library, fetched from NuGet
+            # with its dependencies into the same tools folder.
+            oDone = subprocess.run([sys.executable, os.path.join(sScriptDir, "scripts", "axeWindow.py"), "--fetch"], capture_output=True, text=True, timeout=600, cwd=sScriptDir)
+            for sLine in (oDone.stdout or "").strip().splitlines(): sayLine(sLine)
+            logLine("axeWindow --fetch exit %d; stderr %s" % (oDone.returncode, (oDone.stderr or "").strip()[:2000]))
         except Exception as oError:
             sayLine("AxeWindowsCLI could not be fetched: %s" % oError)
         # TIDY KEEPS WHAT THE KIT PLACES (1.65.30): proved here in a scratch folder before any project's tidy relies

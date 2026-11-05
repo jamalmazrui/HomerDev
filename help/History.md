@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.146.0 -- 5 November 2026
+
+- **axeWindow loads the Axe.Windows library in 64-bit .NET Framework.** It had borrowed AxeWindowsCLI's runtime, which is 32-bit: its hostfxr.dll would not load into 64-bit Python (error 0xC1), so no scan ran in the 12:51 push or either walk. It now fetches the Axe.Windows package and each package it depends on from NuGet, once, into %LOCALAPPDATA%\HomerDev\tools\AxeWindowsLib, and loads them with pythonnet into .NET Framework 4.8. The kit's build fetches it, and so does the Axe.Windows component.
+- **A scan speaks before the library loads,** so a failure is heard, not silent.
+- **A tutorial performed live does not press the app's own launch key.** Tutorial 1's Alt+Control+D, DbDo's desktop hotkey, went to Windows Explorer since DbDo was already open, and the walk stopped at step 3. recordWalk reads the key from #define HotKey in the app's installer script and keeps that step's narration only.
+
 ## 1.145.0 -- 5 November 2026
 
 - **No arguments to remember.** recordWalk alone walks the pilot, scans each window once (spoken progress every 10 seconds), and then performs Tutorial 1 live, menus and all, when its recording is missing or older than the tutorial or the program. axeWindow alone scans the app of the folder it is run from, opening it when it is closed.

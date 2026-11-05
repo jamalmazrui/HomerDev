@@ -12,9 +12,10 @@ rows -- took it minutes and then failed. The Axe.Windows library can scan one wi
 ScanOptions(scanId, scanRootWindowHandle), added in Axe.Windows 2.4.1 (docs\\AutomationReference.md in
 microsoft/axe-windows). So a dialog is scanned without the record list behind it.
 
-WHERE THE LIBRARY COMES FROM. AxeWindowsCLI, which the kit already fetches (axeScan --fetch), ships the library and
-everything it needs in its own folder. pythonnet loads it from there into .NET, using the CLI's own runtime
-configuration, so nothing else is downloaded but pythonnet itself (pip, installed when missing).
+WHERE THE LIBRARY COMES FROM (5 November 2026, night). The Axe.Windows package and every package it depends on are
+fetched from NuGet once, into %LOCALAPPDATA%\\HomerDev\\tools\\AxeWindowsLib, following each package's own list of
+dependencies, and loaded into 64-bit .NET Framework 4.8 with pythonnet. The first try borrowed AxeWindowsCLI's
+runtime, which is 32-bit: its hostfxr.dll would not load into 64-bit Python (error 0xC1), and no scan ran.
 
 SPEECH WHILE IT WORKS. A scan can take a while, and silence sounds like a hang. JAWS is told directly, through its COM
 interface, when the scan starts, every 10 seconds while it runs, and when it ends; with JAWS not running, a Windows
@@ -70,37 +71,90 @@ def speak(sText):
 oAxe = None
 
 
-def cliFolder():
-    lFound = glob.glob(os.path.join(os.environ.get("LOCALAPPDATA", ""), "HomerDev", "tools", "AxeWindowsCLI", "**", "Axe.Windows.Automation.dll"), recursive=True)
-    return os.path.dirname(lFound[0]) if lFound else ""
+sNuget = "https://api.nuget.org/v3-flatcontainer/"
+# The frameworks .NET Framework 4.8 can load, best first; ".NETFramework4.6.2" and "net462" name the same one.
+lsFrameworks = ["net48", "net472", "net471", "net47", "net462", "net461", "net46", "net452", "net451", "net45",
+                  "netstandard2.0", "netstandard1.6", "netstandard1.3", "netstandard1.1", "netstandard1.0"]
+
+
+def libFolder():
+    return os.path.join(os.environ.get("LOCALAPPDATA", os.path.expanduser("~")), "HomerDev", "tools", "AxeWindowsLib")
+
+
+def shortFramework(sName):
+    """".NETFramework4.6.2" or "net462" as net462; ".NETStandard2.0" as netstandard2.0."""
+    s = (sName or "").strip().lower()
+    if s.startswith(".netframework"): return "net" + s[len(".netframework"):].replace(".", "")
+    if s.startswith(".netstandard"): return "netstandard" + s[len(".netstandard"):]
+    return s
+
+
+def urlGet(sUrl):
+    import urllib.request
+    oRequest = urllib.request.Request(sUrl, headers={"User-Agent": "HomerDev axeWindow"})
+    with urllib.request.urlopen(oRequest, timeout=120) as oResponse: return oResponse.read()
+
+
+def fetchLibrary(bFresh=False):
+    """The Axe.Windows package and its dependencies, from NuGet, into libFolder(): each package's newest stable version
+    for Axe.Windows itself, and the lowest version a dependency names, as NuGet chooses; from each, the lib folder of
+    the best framework .NET Framework 4.8 can load. A package whose best folder holds only _._ is part of the framework
+    and adds nothing. Answers the folder."""
+    import io, re, shutil, zipfile
+    sFolder = libFolder()
+    if bFresh and os.path.isdir(sFolder): shutil.rmtree(sFolder, ignore_errors=True)
+    if os.path.isfile(os.path.join(sFolder, "Axe.Windows.Automation.dll")): return sFolder
+    os.makedirs(sFolder, exist_ok=True)
+    dIndex = json.loads(urlGet(sNuget + "axe.windows/index.json").decode("utf-8"))
+    sVersion = [v for v in dIndex["versions"] if "-" not in v][-1]
+    lQueue, setDone = [("Axe.Windows", sVersion)], set()
+    while lQueue:
+        sId, sVer = lQueue.pop(0)
+        if sId.lower() in setDone: continue
+        setDone.add(sId.lower())
+        sUrl = "%s%s/%s/%s.%s.nupkg" % (sNuget, sId.lower(), sVer.lower(), sId.lower(), sVer.lower())
+        logLine("NuGet: " + sId + " " + sVer + " from " + sUrl)
+        with zipfile.ZipFile(io.BytesIO(urlGet(sUrl))) as oZip:
+            lNames = oZip.namelist()
+            sSpec = next((n for n in lNames if n.lower().endswith(".nuspec")), "")
+            sXml = oZip.read(sSpec).decode("utf-8-sig") if sSpec else ""
+            # Its libraries, from the best framework folder it has.
+            dLib = {}
+            for n in lNames:
+                m = re.match(r"^lib/([^/]+)/([^/]+)$", n, re.I)
+                if m: dLib.setdefault(shortFramework(m.group(1)), []).append(n)
+            sBest = next((f for f in lsFrameworks if f in dLib), "")
+            for n in dLib.get(sBest, []):
+                if n.lower().endswith((".dll",)):
+                    with open(os.path.join(sFolder, os.path.basename(n)), "wb") as fOut: fOut.write(oZip.read(n))
+            logLine("  libraries from lib/" + (sBest or "(none)") + ": " + ", ".join(os.path.basename(n) for n in dLib.get(sBest, [])))
+            # Its dependencies, from the group for the best framework it names.
+            dGroups = {}
+            for m in re.finditer(r"<group([^>]*)>(.*?)</group>", sXml, re.S):
+                oTf = re.search(r'targetFramework="([^"]*)"', m.group(1))
+                dGroups[shortFramework(oTf.group(1) if oTf else "")] = m.group(2)
+            sGroup = next((f for f in lsFrameworks if f in dGroups), "")
+            for m in re.finditer(r'<dependency\s+id="([^"]+)"\s+version="([^"]+)"', dGroups.get(sGroup, "")):
+                sDepVer = re.sub(r"[\[\]\(\)\s]", "", m.group(2)).split(",")[0]
+                lQueue.append((m.group(1), sDepVer))
+    with open(os.path.join(sFolder, "version.txt"), "w", encoding="utf-8") as fOut: fOut.write(sVersion + "\n")
+    logLine("Axe.Windows " + sVersion + " and its dependencies are in " + sFolder)
+    return sFolder
 
 
 def loadAxe():
-    """The Axe.Windows.Automation namespace, loaded from AxeWindowsCLI's folder; raises with the reason when it cannot."""
+    """The Axe.Windows.Automation namespace, loaded into 64-bit .NET Framework; raises with the reason when it cannot."""
     global oAxe
     if oAxe is not None: return oAxe
-    sFolder = cliFolder()
-    if not sFolder:
-        import axeScan
-        axeScan.useLog(logLine)
-        axeScan.getAxeCli()
-        sFolder = cliFolder()
-    if not sFolder: raise RuntimeError("Axe.Windows.Automation.dll is not in AxeWindowsCLI's folder")
+    sFolder = fetchLibrary()
     try:
         import pythonnet
     except ImportError:
         logLine("installing pythonnet")
         subprocess.call([sys.executable, "-m", "pip", "install", "--user", "--quiet", "pythonnet"])
         import pythonnet
-    lConfigs = glob.glob(os.path.join(sFolder, "*.runtimeconfig.json"))
-    if not lConfigs: raise RuntimeError("AxeWindowsCLI's folder has no runtimeconfig.json to start .NET with")
-    with open(lConfigs[0], encoding="utf-8-sig") as fIn: dConfig = json.load(fIn)
-    logLine("runtime config " + lConfigs[0] + ": " + json.dumps(dConfig.get("runtimeOptions", {}))[:400])
-    # A FRAMEWORK-DEPENDENT CLI names a framework that is installed; a self-contained one carries the runtime in its folder.
-    if "includedFrameworks" in dConfig.get("runtimeOptions", {}):
-        pythonnet.load("coreclr", runtime_config=lConfigs[0], dotnet_root=sFolder)
-    else:
-        pythonnet.load("coreclr", runtime_config=lConfigs[0])
+    try: pythonnet.load("netfx")
+    except Exception as oError: logLine("pythonnet.load(netfx): " + str(oError))   # already loaded is fine
     import clr
     import System
     def resolve(oSender, oArgs):
@@ -110,7 +164,7 @@ def loadAxe():
     clr.AddReference(os.path.join(sFolder, "Axe.Windows.Automation.dll"))
     import Axe.Windows.Automation as oNamespace
     oAxe = oNamespace
-    logLine("Axe.Windows.Automation loaded from " + sFolder)
+    logLine("Axe.Windows.Automation loaded from " + sFolder + " into .NET Framework, " + ("64" if sys.maxsize > 2**32 else "32") + "-bit")
     return oAxe
 
 
@@ -126,11 +180,15 @@ def scanWindow(iPid, hWnd, sFolder, sScanId, sSpoken="", iLimit=0):
     sProblem. Speaks at the start, every iProgressSeconds while it runs, and at the end."""
     dResult = {"iErrors": None, "lFindings": [], "sFile": "", "sProblem": ""}
     sName = sSpoken or windowTitle(hWnd) or "the window"
+    # SPOKEN FIRST, EVEN BEFORE THE LIBRARY LOADS (5 November 2026, night): a first load fetches packages from NuGet,
+    # and a failure there had been silent.
+    speak("Scanning " + sName + " for accessibility.")
     try:
         oNs = loadAxe()
     except Exception as oError:
         logLine("Axe.Windows library not loaded: " + traceback.format_exc())
         dResult["sProblem"] = "the Axe.Windows library could not be loaded: %s" % oError
+        speak("The accessibility scan could not start; the log says why.")
         return dResult
     os.makedirs(sFolder, exist_ok=True)
     dShared = {}
@@ -142,7 +200,6 @@ def scanWindow(iPid, hWnd, sFolder, sScanId, sSpoken="", iLimit=0):
             dShared["oOutput"] = oScanner.Scan(oNs.ScanOptions(sScanId, System.IntPtr(int(hWnd))))
         except Exception:
             dShared["sError"] = traceback.format_exc()
-    speak("Scanning " + sName + " for accessibility.")
     logLine("scan of %s: process %d, window 0x%X, into %s" % (sName, iPid, int(hWnd), sFolder))
     oThread = threading.Thread(target=work, daemon=True)
     oThread.start()
@@ -251,6 +308,8 @@ def main():
     oParser.add_argument("app", nargs="?", default="", help="a running program's name, such as DbDo")
     oParser.add_argument("--pid", type=int, default=0)
     oParser.add_argument("--hwnd", default="")
+    oParser.add_argument("--fetch", action="store_true", help="get the Axe.Windows library once and stop (the build does this)")
+    oParser.add_argument("--fresh", action="store_true", help="with --fetch, get the newest again")
     oArgs = oParser.parse_args()
     sRoot = os.getcwd()
     if os.path.basename(sRoot).lower() == "scripts": sRoot = os.path.dirname(sRoot)
@@ -259,6 +318,10 @@ def main():
     sStamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     sLog = os.path.join(sLogDir, "%s-axeWindow-%s.log" % (sApp, sStamp))
     logLine("axeWindow %s; Python %s at %s; %s; working folder %s; arguments %s" % (os.path.abspath(__file__), platform.python_version(), sys.executable, platform.platform(), os.getcwd(), sys.argv[1:]))
+    if oArgs.fetch:
+        try: print("The Axe.Windows library is ready: " + fetchLibrary(oArgs.fresh)); return 0
+        except Exception as oError:
+            logLine(traceback.format_exc()); print("The Axe.Windows library could not be had: %s; the log says why." % oError); return 1
     iPid = oArgs.pid or pidOf(sApp)
     if not iPid:
         # NOT RUNNING: OPEN IT, SCAN ITS MAIN WINDOW, CLOSE IT (5 November 2026): no argument to remember.
