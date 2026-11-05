@@ -2,6 +2,14 @@
 
 *What building the Homer apps has taught, kept so it is not learned twice. Newest first. Started 5 November 2026 from the transition brief of 26 October and the work since.*
 
+## 5 November 2026, night
+
+- **Run the gate before delivering, not after.** The kit's tutorial check found five problems in a new walk -- Hear lines written with underscores, not as a screen reader says them, and a silent Escape -- after delivery; run first, it would have found them before.
+- **A walk must say which build it walked.** Twice a walk's misses could only be explained by guessing an older DbDo had run, from the wording heard. recordWalk's report now names the program's path, version and build time.
+- **One run's miss is not yet a regression.** A step heard as "Get one" passed on the next run: speech recognition slips. Judge a step over two runs before chasing it.
+- **From "Improving the accessibility of scientific documents" (Allen Institute for AI):** no field had more than 6.5% of its paper PDFs meeting basic accessibility criteria, and alt text appears in only 5 to 10%; blind and low-vision readers valued headings, a table of contents, and links between citations and references above all, and wrong headings did most harm, since they break navigation and trust. The kit's PDF reader, already careful with headings, now adds the other two.
+- **From the AI and accessibility literature (CSUN 2024 and 2025, CAST, the Zero Project, a 2024 systematic review):** overlays do not make inaccessible content accessible; AI-made captions and descriptions need a person's review; and people want agency -- tools that do what they ask, under their control. Homer already holds to these: homer-quality's "Needs a person", models that run on the user's own computer, and keys that do one thing.
+
 ## 5 November 2026, evening
 
 - **A version number can claim files that never arrived.** C:\HomerDev said 1.132.0, yet its Lbc.cs predated LbcMessage: the zip that carried it was never unzipped, while later zips brought newer version files. DbDo's build now checks the kit's code for what it calls, not only the number. Every Homer app's build should do the same for the kit members it depends on.

@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.135.0 -- 5 November 2026
+
+- **A PDF read into Markdown gains a Contents list and citation links,** from "Improving the accessibility of scientific documents" (Allen Institute for AI), whose blind and low-vision readers valued headings, a table of contents and links between citations and references above all. A document with five or more second- and third-level headings gets a Contents list after its title, each entry linking to its heading. Where a References, Bibliography, Works Cited or Literature Cited section lists three or more numbered entries, each numbered citation in the text -- [12], [3, 4] -- links to its entry; a number with no entry, and every ordinary link, is left alone. Plain text keeps the words and drops the links.
+- **recordWalk's report names what it walked:** the program's path, file version and build time, under its title.
+- **help\Learnings.md** gains the night's lessons.
+
 ## 1.134.0 -- 5 November 2026
 
 - **The kit's C# is all C# 5 again.** Two lambdas with parenthesized parameters, added to Lbc.cs on 5 November, matched the C# 5 check's pattern for an expression-bodied member and stopped the 18:51 build; both are anonymous delegates now, as elsewhere in the kit.

@@ -837,7 +837,7 @@ namespace Homer
 
             // Levels closed across the whole document, so what is returned is
             // what will be written, and the review reads that.
-            oResult.sMarkdown = closedHeadingGaps(oWhole.ToString());
+            oResult.sMarkdown = withNavigation(closedHeadingGaps(oWhole.ToString()));
             oResult.sMarkdown = withLinksAndFields(oResult.sMarkdown, lPages, o);
             oResult.bRead = true;
             oResult.bBuiltFromTags = bBuiltFromTags;
@@ -1252,6 +1252,8 @@ namespace Homer
                 if (Regex.IsMatch(sTrim, @"^<!-- page \d+ -->$")) continue;
                 if (sTrim == "\\pagebreak") { oOut.Append("\f"); continue; }
                 string sPlain = Regex.Replace(sLine, @"^\s{0,3}#{1,6}\s+", "");
+                sPlain = Regex.Replace(sPlain, @"\[\]\{#[^}]*\}", "");                 // a reference's anchor (withNavigation)
+                sPlain = Regex.Replace(sPlain, @"\[([^\]]+)\]\(#[^)]*\)", "$1");       // a link within the document: its words
                 sPlain = Regex.Replace(sPlain, @"\*\*([^*]+)\*\*", "$1");
                 sPlain = Regex.Replace(sPlain, @"(?<![*\w])\*([^*\s][^*]*)\*(?![*\w])", "$1");
                 sPlain = Regex.Replace(sPlain, @"\\([\\`*_{}\[\]()#+\-.!|>])", "$1");
@@ -2510,6 +2512,97 @@ namespace Homer
         // their own levels and a model-written page has its own, and a document
         // made of both can still skip where the two meet. A reader meets the
         // document, not the pages it was made from.
+        // withNavigation: WHAT READERS OF SCIENTIFIC PAPERS VALUED MOST (5 November 2026, from Wang and others, "Improving
+        // the accessibility of scientific documents", Allen Institute for AI): headings, a table of contents, and links
+        // between inline citations and the references they name. Headings this reader already finds; this adds the other
+        // two. A document with five or more second- and third-level headings gets a Contents list after its title,
+        // each entry a link by the identifiers Pandoc gives headings. Where a References, Bibliography, Works Cited or
+        // Literature Cited section lists three or more numbered entries ([12] or 12.), each gets an anchor, and each
+        // numbered citation before it -- [12], [3, 4] -- links to its entry; a number with no entry is left alone, and so
+        // is an ordinary link. plainFrom drops the anchors and keeps a link's words.
+        public static string withNavigation(string sMarkdown)
+        {
+            if (string.IsNullOrEmpty(sMarkdown)) return sMarkdown;
+            List<string> lLines = new List<string>(sMarkdown.Replace("\r\n", "\n").Split('\n'));
+            List<int> lHeadAt = new List<int>(), lHeadLevel = new List<int>();
+            List<string> lHeadText = new List<string>(), lHeadSlug = new List<string>();
+            HashSet<string> hsSlugs = new HashSet<string>();
+            for (int i = 0; i < lLines.Count; i++)
+            {
+                Match oHead = Regex.Match(lLines[i], @"^(#{1,6})\s+(.+?)\s*#*\s*$");
+                if (!oHead.Success) continue;
+                lHeadAt.Add(i); lHeadLevel.Add(oHead.Groups[1].Value.Length); lHeadText.Add(oHead.Groups[2].Value);
+                lHeadSlug.Add(pandocSlug(oHead.Groups[2].Value, hsSlugs));
+            }
+            // Citations, when a numbered reference list is found.
+            int iRefHead = -1;
+            for (int h = 0; h < lHeadAt.Count; h++)
+                if (Regex.IsMatch(lHeadText[h].Trim(), @"^(references|bibliography|works cited|literature cited)$", RegexOptions.IgnoreCase)) { iRefHead = h; break; }
+            if (iRefHead >= 0)
+            {
+                int iStart = lHeadAt[iRefHead] + 1, iEnd = lLines.Count;
+                for (int h = iRefHead + 1; h < lHeadAt.Count; h++) if (lHeadLevel[h] <= lHeadLevel[iRefHead]) { iEnd = lHeadAt[h]; break; }
+                Dictionary<string, int> dEntry = new Dictionary<string, int>();
+                for (int k = iStart; k < iEnd; k++)
+                {
+                    Match oEntry = Regex.Match(lLines[k], @"^\s*(?:[-*]\s+)?\[(\d{1,4})\]|^\s*(\d{1,4})\.\s");
+                    if (!oEntry.Success) continue;
+                    string sNumber = oEntry.Groups[1].Success ? oEntry.Groups[1].Value : oEntry.Groups[2].Value;
+                    if (!dEntry.ContainsKey(sNumber)) dEntry[sNumber] = k;
+                }
+                if (dEntry.Count >= 3)
+                {
+                    foreach (KeyValuePair<string, int> oPair in dEntry) lLines[oPair.Value] = "[]{#ref-" + oPair.Key + "}" + lLines[oPair.Value];
+                    for (int k = 0; k < lHeadAt[iRefHead]; k++)
+                    {
+                        if (Regex.IsMatch(lLines[k], @"^#{1,6}\s")) continue;
+                        lLines[k] = Regex.Replace(lLines[k], @"\[(\d{1,4}(?:\s*,\s*\d{1,4})*)\](?![(\[{])", delegate(Match oCite)
+                        {
+                            string[] aNumbers = oCite.Groups[1].Value.Split(',');
+                            List<string> lLinked = new List<string>();
+                            foreach (string sRaw in aNumbers)
+                            {
+                                string sNumber = sRaw.Trim();
+                                if (!dEntry.ContainsKey(sNumber)) return oCite.Value;
+                                lLinked.Add("[" + sNumber + "](#ref-" + sNumber + ")");
+                            }
+                            return "[" + string.Join(", ", lLinked.ToArray()) + "]";
+                        });
+                    }
+                }
+            }
+            // Contents, when there are enough headings to need one.
+            List<string> lContents = new List<string>();
+            for (int h = 0; h < lHeadAt.Count; h++)
+                if (lHeadLevel[h] == 2 || lHeadLevel[h] == 3)
+                    lContents.Add((lHeadLevel[h] == 3 ? "  " : "") + "- [" + lHeadText[h] + "](#" + lHeadSlug[h] + ")");
+            if (lContents.Count >= 5)
+            {
+                int iAt = 0;
+                for (int h = 0; h < lHeadAt.Count; h++) if (lHeadLevel[h] == 1) { iAt = lHeadAt[h] + 1; break; }
+                while (iAt < lLines.Count && lLines[iAt].Trim().Length == 0) iAt++;
+                List<string> lInsert = new List<string> { "## Contents", "" };
+                lInsert.AddRange(lContents);
+                lInsert.Add("");
+                lLines.InsertRange(iAt, lInsert);
+            }
+            return string.Join("\n", lLines.ToArray());
+        }
+
+        // pandocSlug: the identifier Pandoc gives a heading -- lowercase, punctuation but _ - . removed, spaces as hyphens,
+        // nothing before the first letter -- with -1, -2 for repeats.
+        private static string pandocSlug(string sText, HashSet<string> hsSeen)
+        {
+            string sSlug = Regex.Replace(sText.ToLowerInvariant(), @"[^\w\s.\-]", "");
+            sSlug = Regex.Replace(sSlug.Trim(), @"\s+", "-");
+            sSlug = Regex.Replace(sSlug, "^[^a-z]+", "");
+            if (sSlug.Length == 0) sSlug = "section";
+            string sBase = sSlug; int iRepeat = 1;
+            while (hsSeen.Contains(sSlug)) { sSlug = sBase + "-" + iRepeat; iRepeat++; }
+            hsSeen.Add(sSlug);
+            return sSlug;
+        }
+
         public static string closedHeadingGaps(string sMarkdown)
         {
             if (sMarkdown == null || sMarkdown == "") return sMarkdown;

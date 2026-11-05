@@ -226,6 +226,42 @@ def exeNameOf(iPid):
         ctypes.windll.kernel32.CloseHandle(hProcess)
 
 
+def exePathOf(iPid):
+    """The full path of the program a process runs, or "" when it cannot be read."""
+    from ctypes import wintypes
+    hProcess = ctypes.windll.kernel32.OpenProcess(0x1000, False, iPid)
+    if not hProcess: return ""
+    try:
+        oBuffer = ctypes.create_unicode_buffer(1024)
+        iSize = wintypes.DWORD(1024)
+        if ctypes.windll.kernel32.QueryFullProcessImageNameW(hProcess, 0, oBuffer, ctypes.byref(iSize)):
+            return oBuffer.value
+        return ""
+    finally:
+        ctypes.windll.kernel32.CloseHandle(hProcess)
+
+
+def appIdentity(sExe):
+    """WHICH BUILD WAS WALKED (5 November 2026): twice a walk's misses could only be explained by guessing that an older
+    build had run, from the wording heard. The report now says, under its title, the program's path, its file version
+    and when that file was built, so a run is matched to its build without guessing."""
+    try:
+        lWindows = windowsOf(sExe)
+        if not lWindows: return "The app's program could not be identified: no window of " + sExe + " was found."
+        sPath = exePathOf(lWindows[0][1])
+        if not sPath: return "The app's program could not be identified: its path could not be read."
+        sVersion = ""
+        try:
+            oRun = subprocess.run(["powershell", "-NoProfile", "-Command", "(Get-Item -LiteralPath '" + sPath.replace("'", "''") + "').VersionInfo.FileVersion"],
+                                  capture_output=True, text=True, timeout=30)
+            sVersion = (oRun.stdout or "").strip()
+        except Exception: pass
+        sBuilt = datetime.datetime.fromtimestamp(os.path.getmtime(sPath)).strftime("%d %B %Y at %H:%M")
+        return "The app: " + sPath + (", version " + sVersion if sVersion else "") + ", built " + sBuilt + "."
+    except Exception as oError:
+        return "The app's program could not be identified: " + str(oError)
+
+
 def foregroundExe():
     """The program whose window is in front, and that window's title."""
     from ctypes import wintypes
@@ -509,6 +545,9 @@ def main():
     lsReport.extend(["# recordWalk: " + oArgs.app + ", " + os.path.basename(oArgs.walk), "",
                      "Recorded " + datetime.datetime.now().strftime("%d %B %Y at %H:%M") + ". Each step: the key pressed, what the walk expected, "
                      "what was heard, what UI Automation says has focus, and what " + oArgs.app + " itself said.", ""])
+    sIdentity = appIdentity(oArgs.app + ".exe")
+    lsReport.extend([sIdentity, ""])
+    logLine(sIdentity)
     sAxeCli, iAxeErrors = "", 0
     if oArgs.axe:
         try: sAxeCli = getAxeCli()
