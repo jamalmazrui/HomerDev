@@ -345,7 +345,9 @@ status=current
 [DbDo generateFromGrid]
 name=Generate from Grid
 keys=Alt+Shift+G
-status=current
+status=implemented
+change=the one analysis key, 5 November 2026: Statistics report, Frequency report, Cross-tab report, Markdown table, Excel chart
+reason=Statistics from Column, Graphics Column and Frequency by Columns were slices of it on keys of their own
 
 [DbDo goToRecord]
 name=Go to Record
@@ -354,8 +356,10 @@ status=current
 
 [DbDo graphicsColumn]
 name=Graphics Column
-keys=Control+Shift+G
-status=current
+keys=
+status=implemented
+change=key retired 5 November 2026, was Control+Shift+G
+reason=in Generate from Grid, Excel chart, with the current column first
 
 [DbDo historyOfChanges]
 name=History of Changes
@@ -474,8 +478,10 @@ status=current
 
 [DbDo nextVisitedTable]
 name=Next Visited Table
-keys=Alt+F6
-status=current
+keys=
+status=implemented
+change=key retired 5 November 2026, was Alt+F6
+reason=Control+F6 steps through every table and view of the window, these only the visited ones
 
 [DbDo nextWindow]
 name=Next Window
@@ -527,8 +533,10 @@ status=current
 
 [DbDo openTableInNewWindow]
 name=Open Table in New Window
-keys=Control+Shift+T
-status=current
+keys=
+status=implemented
+change=retired 5 November 2026, was Control+Shift+T
+reason=it opened a SELECT in a new window exactly as Query (Control+Q) does, under a name Open Table (Control+Shift+O) also means
 
 [DbDo openTemplateDatabase]
 name=Open Template Database
@@ -580,8 +588,10 @@ status=current
 
 [DbDo previousVisitedTable]
 name=Previous Visited Table
-keys=Alt+Shift+F6
-status=current
+keys=
+status=implemented
+change=key retired 5 November 2026, was Alt+Shift+F6
+reason=as Next Visited Table; Control+Shift+F6 steps back through every table and view
 
 [DbDo previousWindow]
 name=Previous Window
@@ -962,14 +972,17 @@ status=current
 
 [DbDo statisticsFromColumn]
 name=Statistics from Column
-keys=Alt+Shift+S
-status=current
+keys=
+status=implemented
+change=key retired 5 November 2026, was Alt+Shift+S
+reason=in Generate from Grid, Statistics report, the current column first
 
 [DbDo countByColumns]
 name=Count by Columns
-keys=Alt+Shift+B
-status=current
-change=new 22 October 2026, DbDialog's Count, accepted 19 October
+keys=
+status=implemented
+change=key retired 5 November 2026, was Alt+Shift+B
+reason=in Generate from Grid, Frequency report, Shown columns
 
 [DbDo tableProperties]
 name=Table Properties
@@ -1025,6 +1038,14 @@ status=current
 name=Window Toggle
 keys=
 status=current
+note=Shift+W was tried and withdrawn 5 November 2026: Control+Tab and Control+Shift+Tab already move between two windows
+
+[DbDo alphaOrder]
+name=Alpha Order
+keys=Alt+A
+status=implemented
+change=new 5 November 2026
+reason=the suite's Alt+A, as FileDir's Alpha Order: sort by the column under the cursor, which Look and Prime columns cannot; Reverse Order (Alt+Shift+O) then gives descending
 
 [EdSharp about]
 name=About

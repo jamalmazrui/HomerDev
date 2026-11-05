@@ -49,7 +49,12 @@ sDefaultModel = "small.en"
 
 sStamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 sScriptDir = os.path.dirname(os.path.abspath(__file__))
-sProject = os.path.dirname(sScriptDir)
+# THE APP'S FOLDER (5 November 2026): recordWalk lives in the kit's scripts, and is run from the app's folder; that
+# folder, when it has a scripts folder of its own, is the app's. Run from the app's own scripts, the folder above it.
+sProject = os.getcwd() if (os.path.isdir(os.path.join(os.getcwd(), "scripts"))
+                           and os.path.normcase(os.path.abspath(os.getcwd())) != os.path.normcase(os.path.dirname(sScriptDir))) \
+    else os.path.dirname(sScriptDir)
+
 sLogPath = ""
 lsReport = []
 
@@ -444,7 +449,7 @@ def hearMatch(sExpected, sHeard):
 def main():
     global sLogPath
     oParser = argparse.ArgumentParser(description="Drive a Homer app through a walk and record what is said.")
-    oParser.add_argument("--walk", default=os.path.join(sScriptDir, "walks", "pilot.inix"))
+    oParser.add_argument("--walk", default=os.path.join(sProject, "scripts", "walks", "pilot.inix"))  # the app's own walks
     oParser.add_argument("--app", default=os.path.basename(sProject))
     oParser.add_argument("--steps", type=int, default=0)
     oParser.add_argument("--wait", type=int, default=iDefaultWait)

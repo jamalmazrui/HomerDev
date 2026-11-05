@@ -425,8 +425,68 @@ public class LbcForm : Form
     // the same place, and for the same reason.
     public Func<Keys, bool> dialogKey;
 
+    // WHERE AM I IN EVERY LBC WINDOW (5 November 2026). Alt+Shift+Slash was LbcDialog's alone, so a window built on
+    // LbcForm directly -- DbDo's list pickers, its filter and command pickers, its error window -- could not answer it.
+    // Now LbcForm answers it: through whereAmIText when the window belongs to an LbcDialog, which sets it to its own,
+    // fuller Where Am I; otherwise by itself -- once the window, the control with focus, its value and place; twice
+    // every control; three times the keys.
+    public Func<Control, int, string> whereAmIText;
+
+    public string whereAmIHere(Control ctlFocus, int iLevel)
+    {
+        List<Control> lControls = new List<Control>();
+        collectTabStops(this, lControls);
+        lControls.Sort(delegate(Control a, Control b) { return a.TabIndex.CompareTo(b.TabIndex); });
+        string sTitle = (Text ?? "").Trim();
+        if (iLevel >= 3)
+            return sTitle + " keys: Tab and Shift+Tab move between the controls, and an underlined letter with Alt goes straight to one; "
+                + "Enter presses the button with focus; Escape closes; Shift+F1 says what a control does; Alt+Shift+Slash says where you are, twice every control, three times these keys.";
+        if (iLevel == 2)
+        {
+            List<string> lParts = new List<string>();
+            foreach (Control ctl in lControls) lParts.Add(controlSaid(ctl));
+            return sTitle + ", " + lControls.Count + (lControls.Count == 1 ? " control: " : " controls: ") + string.Join("; ", lParts.ToArray()) + ".";
+        }
+        string sSaid = (sTitle.Length > 0 ? sTitle : "This") + " window.";
+        if (ctlFocus != null)
+        {
+            sSaid += " On " + controlSaid(ctlFocus);
+            int iAt = lControls.IndexOf(ctlFocus);
+            if (iAt >= 0) sSaid += ", " + (iAt + 1) + " of " + lControls.Count;
+            sSaid += ".";
+        }
+        return sSaid;
+    }
+
+    private static void collectTabStops(Control ctlParent, List<Control> lOut)
+    {
+        foreach (Control ctl in ctlParent.Controls)
+        {
+            if (ctl.Visible && ctl.TabStop && ctl.CanSelect && !(ctl is Label)) lOut.Add(ctl);
+            collectTabStops(ctl, lOut);
+        }
+    }
+
+    private static string controlSaid(Control ctl)
+    {
+        string sName = LbcHints.plainName(!string.IsNullOrEmpty(ctl.AccessibleName) ? ctl.AccessibleName : (ctl is Button || ctl is CheckBox || ctl is RadioButton ? ctl.Text : ""));
+        string sRole = LbcHints.roleOf(ctl), sValue = LbcHints.valueOf(ctl);
+        return ((sName.Length > 0 ? sName + " " : "") + sRole + (sValue.Length > 0 ? ", " + sValue : "")).Trim();
+    }
+
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
     {
+        if (keyData == (Keys.Alt | Keys.Shift | Keys.OemQuestion))
+        {
+            int iLevel = LbcHints.pressCount("Alt+Shift+Slash");
+            Control ctlNow = ActiveControl;
+            while (ctlNow is ContainerControl && ((ContainerControl) ctlNow).ActiveControl != null) ctlNow = ((ContainerControl) ctlNow).ActiveControl;
+            string sSay = "";
+            try { sSay = whereAmIText != null ? whereAmIText(ctlNow, iLevel) : whereAmIHere(ctlNow, iLevel); }
+            catch (Exception) { sSay = whereAmIHere(ctlNow, iLevel); }
+            Say.say(sSay);
+            return true;
+        }
         if (commandKey != null)
         {
             try { if (commandKey(keyData)) return true; }
@@ -1092,6 +1152,8 @@ public class LbcDialog : IDisposable
         owner = ownerWindow;
         bAdopted = (frmAdopt != null);
         frm = frmAdopt ?? new LbcForm();
+        LbcForm frmLbc = frm as LbcForm;
+        if (frmLbc != null) frmLbc.whereAmIText = delegate(Control ctlFocus, int iLevel) { return whereAmI(ctlFocus, iLevel); };
         // The caption IS the accessible name of a Form.  Setting AccessibleName to
         // the same string made the reader speak the dialog title twice when the
         // dialog opened (once for the window caption, once for the name).  A screen
@@ -3443,6 +3505,22 @@ public class LbcDialog : IDisposable
     {
         if (ctl == null || string.IsNullOrEmpty(sPattern)) return;
         lsPatterns.Add(new object[] { ctl, sPattern, sMessage ?? "" });
+    }
+
+    // setPattern: a field's pattern replaced while the dialog is open (4 November 2026) -- DbDo's Alt+Shift+P edits the
+    // focused field's pattern, and the new one must be the one OK checks. An empty pattern removes it.
+    public void setPattern(Control ctl, string sPattern, string sMessage)
+    {
+        if (ctl == null) return;
+        lsPatterns.RemoveAll(a => a[0] == ctl);
+        if (!string.IsNullOrEmpty(sPattern)) lsPatterns.Add(new object[] { ctl, sPattern, sMessage ?? "" });
+    }
+
+    // patternOf: the pattern OK will check for a field, or "" when it has none.
+    public string patternOf(Control ctl)
+    {
+        foreach (object[] a in lsPatterns) if (a[0] == ctl) return (string) a[1];
+        return "";
     }
 
     public bool checkPatterns()
@@ -5935,6 +6013,72 @@ public static class Search
     public static string plainText(Term t)
     {
         return (t.bNot ? "!" : "") + t.sText.Replace(cAny, '*').Replace(cOne, '?');
+    }
+}
+
+// LbcMessage: MessageBox.Show's own arguments and answers, shown as an Lbc dialog (5 November 2026), so a message
+// answers Alt+Shift+Slash, Shift+F1, Control+Enter and Escape like every other Homer dialog. A short message is a line
+// of text, said as the dialog opens; a long one, or one of several lines, is a read-only box the screen reader reads
+// when it takes focus. Should the dialog fail, Windows's own message box shows it, so no message is ever lost.
+public static class LbcMessage
+{
+    // Without an owner, as MessageBox.Show allows (5 November 2026): DbDo's startup notice of recovered copies has none.
+    public static DialogResult show(string sText) { return show((IWin32Window) null, sText, "", MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1); }
+    public static DialogResult show(string sText, string sTitle) { return show((IWin32Window) null, sText, sTitle, MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1); }
+    public static DialogResult show(string sText, string sTitle, MessageBoxButtons buttons) { return show((IWin32Window) null, sText, sTitle, buttons, MessageBoxIcon.None, MessageBoxDefaultButton.Button1); }
+    public static DialogResult show(string sText, string sTitle, MessageBoxButtons buttons, MessageBoxIcon icon) { return show((IWin32Window) null, sText, sTitle, buttons, icon, MessageBoxDefaultButton.Button1); }
+    public static DialogResult show(string sText, string sTitle, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defaultButton) { return show((IWin32Window) null, sText, sTitle, buttons, icon, defaultButton); }
+
+    public static DialogResult show(IWin32Window owner, string sText) { return show(owner, sText, "", MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1); }
+    public static DialogResult show(IWin32Window owner, string sText, string sTitle) { return show(owner, sText, sTitle, MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1); }
+    public static DialogResult show(IWin32Window owner, string sText, string sTitle, MessageBoxButtons buttons) { return show(owner, sText, sTitle, buttons, MessageBoxIcon.None, MessageBoxDefaultButton.Button1); }
+    public static DialogResult show(IWin32Window owner, string sText, string sTitle, MessageBoxButtons buttons, MessageBoxIcon icon) { return show(owner, sText, sTitle, buttons, icon, MessageBoxDefaultButton.Button1); }
+
+    public static DialogResult show(IWin32Window owner, string sText, string sTitle, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defaultButton)
+    {
+        string[] aLabels;
+        DialogResult[] aResults;
+        switch (buttons)
+        {
+            case MessageBoxButtons.OKCancel: aLabels = new string[] { "OK", "Cancel" }; aResults = new DialogResult[] { DialogResult.OK, DialogResult.Cancel }; break;
+            case MessageBoxButtons.YesNo: aLabels = new string[] { "&Yes", "&No" }; aResults = new DialogResult[] { DialogResult.Yes, DialogResult.No }; break;
+            case MessageBoxButtons.YesNoCancel: aLabels = new string[] { "&Yes", "&No", "Cancel" }; aResults = new DialogResult[] { DialogResult.Yes, DialogResult.No, DialogResult.Cancel }; break;
+            case MessageBoxButtons.RetryCancel: aLabels = new string[] { "&Retry", "Cancel" }; aResults = new DialogResult[] { DialogResult.Retry, DialogResult.Cancel }; break;
+            case MessageBoxButtons.AbortRetryIgnore: aLabels = new string[] { "&Abort", "&Retry", "&Ignore" }; aResults = new DialogResult[] { DialogResult.Abort, DialogResult.Retry, DialogResult.Ignore }; break;
+            default: aLabels = new string[] { "OK" }; aResults = new DialogResult[] { DialogResult.OK }; break;
+        }
+        int iDefault = defaultButton == MessageBoxDefaultButton.Button3 ? 2 : defaultButton == MessageBoxDefaultButton.Button2 ? 1 : 0;
+        if (iDefault >= aLabels.Length) iDefault = 0;
+        string sBody = sText ?? "";
+        try
+        {
+            string sKind = (icon == MessageBoxIcon.Error) ? "Error. " : (icon == MessageBoxIcon.Warning) ? "Warning. " : "";
+            using (LbcDialog dlg = new LbcDialog(string.IsNullOrEmpty(sTitle) ? "Message" : sTitle, owner))
+            {
+                bool bLong = sBody.Length > 160 || sBody.IndexOf('\n') >= 0;
+                if (bLong)
+                {
+                    TextBox tb = dlg.addMemoBox("&Message:", (sKind + sBody).Replace("\r\n", "\n").Replace("\n", "\r\n"), null);
+                    tb.ReadOnly = true;
+                }
+                else
+                {
+                    dlg.addLabel(sKind + sBody);
+                    dlg.form.Shown += delegate(object o, EventArgs e) { Say.say(sKind + sBody); };
+                }
+                string sChosen = (dlg.runWithButtons(aLabels, false, aLabels[iDefault].Replace("&", "")) ?? "").Replace("&", "");
+                for (int i = 0; i < aLabels.Length; i++)
+                    if (string.Equals(aLabels[i].Replace("&", ""), sChosen, StringComparison.OrdinalIgnoreCase)) return aResults[i];
+                // Escape: Cancel where there is one, else No, else the one button there is.
+                foreach (DialogResult r in aResults) if (r == DialogResult.Cancel) return r;
+                foreach (DialogResult r in aResults) if (r == DialogResult.No) return r;
+                return aResults[0];
+            }
+        }
+        catch (Exception)
+        {
+            return MessageBox.Show(owner, sBody, sTitle ?? "", buttons, icon, defaultButton);
+        }
     }
 }
 

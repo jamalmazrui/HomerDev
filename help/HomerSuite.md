@@ -266,6 +266,8 @@ The HomerView commands added to the manifest are:
    - **Stage 2 is complete.** The menu repaint change is EdSharp's and FileDir's own code, so it moves to stage 4.
    - **Verified in the cycle, 18 October 2026:** the Python fruit basket loaded the C# frame through pythonnet and exported the same 38 commands as the C# one; FileDir's tidy wrote its JAWS pass-through for Alt+Delete and named its bracket keys.
    - **One frame for both languages.** Homer.dll now carries KeyMap, KeyName and Mdi, so a Python app builds the C# frame through pythonnet (exec\\Python\\mdi.py), not a wxPython copy. The fruit basket samples in C# and Python are twins, and the kit's build exports both and fails if their commands, keys or contexts differ. newHomerApp makes a Python MDI app with `--mdi --python`. Implemented in kit 1.73.6.
+**Where the work stands, 5 November 2026:** the stage list below was not updated after the October work. The code shows DbDo on the kit's router since 19 October (phase B, all 153 keys equivalent) and FileDir routing through it too, both with the shared commands. SharedCore.md lists, from the code, what is shared and what is left.
+
 4. **Stage 3, DbDo.** Its private KeyMap is replaced through an adapter and retired once equivalence is shown, then its key changes, JAWS scripts and laptop-layout tests follow.
 5. **Stage 4, EdSharp, then FileDir,** each on its own, with new commands implemented before their keys are checked.
 6. **Stage 5, HomerView.** The catalog, eligibility, verified session routing, per-browser JAWS script sets and the key alignment.
@@ -306,3 +308,14 @@ These results come from a Linux container with Python 3. No Windows build, insta
   - 13 keys to test in their real control: the laptop-layout table keys and Control+Space;
   - 9 first-letter misses, such as FileDir's Play Media on Alt+Shift+L.
 - **testIdentity:** 18 of 18 cases pass. Its first run found a real fault, Windows paths split wrongly on another system, which was fixed before delivery.
+
+## The Key Describer, in every Homer app
+
+Control+F1 turns the Key Describer on and off. While it is on, a key says what it would do instead of doing it. Every Homer app follows these rules, which the kit's KeyMap carries out:
+
+- **Every key is described,** whether or not its command can run now. The description comes first: the command's name, the key, and one sentence of what it does. If the command cannot run now, the reason follows: "Unavailable now: no filter is in force." The describer never answers with only "unavailable."
+- **The reason is true or absent.** An app says why a command is unavailable only when it knows; it never guesses a reason such as "open a database first."
+- **A key with no command is named,** with "No command is bound to this key here," so the person knows the describer heard it. A key a screen reader sends of its own, which has no name, is ignored rather than announced as "NoName".
+- **Alt+F4 turns the describer off** and says so, with "Alt+F4 again closes" the app. Someone who turned it on by accident, and does not know Control+F1, reaches for Alt+F4 to escape; a second Alt+F4 closes the app as usual. Control+F1 also turns it off.
+- **The describer's words are the app's own command descriptions,** from its command table, the same sentences its menus and Hotkey Summary use. A command without a description is a gap to fill, not something to describe by its bare name.
+- **Nothing runs while the describer is on,** except the two ways out: Control+F1 and Alt+F4.

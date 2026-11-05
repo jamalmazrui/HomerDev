@@ -1,0 +1,263 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.13" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>SharedCore</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      color: light-dark(#1a1a1a, #fdfdfd);
+      background-color: #fdfdfd;
+      background-color: light-dark(#fdfdfd, #1a1a1a);
+      color-scheme: light dark;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a, a:visited {
+      color: inherit;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid;
+      border-color: #e6e6e6;
+      border-color: light-dark(#e6e6e6, #4c4c4c);
+      color: #606060;
+      color: light-dark(#606060, #b6b6b6);
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid currentColor;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+    }
+    th {
+      border-top: 1px solid currentColor;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+<main>
+<h1 id="the-shared-core-what-is-shared-and-what-is-left">The Shared
+Core: What Is Shared, and What Is Left</h1>
+<p><em>5 November 2026, corrected the same day. Every statement here was
+checked in the code of DbDo, FileDir and HomerView; EdSharp’s source was
+not at hand.</em></p>
+<p>The rule is Homer DRY: a capability any Homer app could use lives in
+the kit, and every app takes it from there.</p>
+<h2 id="a-correction">A correction</h2>
+<p>An earlier version of this page said that stages 3 to 5 of the
+integration plan had not been done. That was wrong. It was taken from
+the stage list in HomerSuite.md, which had not been updated after the
+October work, instead of from the code. The code shows that <strong>DbDo
+has routed every key through the kit’s router since 19 October
+2026</strong> (phase B, after an equivalence check found all 153 of its
+keys resolving to the same command), and that <strong>FileDir routes
+every key through it too.</strong> Both use the kit’s shared
+commands.</p>
+<h2 id="shared-and-used">Shared and used</h2>
+<ul>
+<li><strong>The router:</strong> DbDo and FileDir route every key
+through Homer.KeyMap.route.</li>
+<li><strong>The shared commands:</strong> both use SuiteCommands – the
+clipboard family, Say Clipboard, Say Time and the help openers.</li>
+<li><strong>Dialogs:</strong> Lbc, including Where Am I, Shift+F1 hints,
+patterns and LbcMessage.</li>
+<li><strong>Conversions:</strong> every converting app uses the kit’s,
+and the gate fails on private conversion code.</li>
+<li><strong>Speech:</strong> both use the kit’s Say, extra speech
+included.</li>
+<li><strong>Building, installing and releasing:</strong> the scripts,
+the installer components and screen-reader script packaging.</li>
+<li><strong>HomerView,</strong> an NVDA add-on driving a browser, hands
+Lbc to the kit and uses NVDA’s input help in place of the Key Describer,
+as the plan agreed.</li>
+</ul>
+<h2 id="refinements-left-on-what-is-shared">Refinements left on what is
+shared</h2>
+<ul>
+<li><strong>The Key Describer.</strong> DbDo’s older describer still
+answered before the router in describe mode, so the kit’s never heard
+the key. Fixed in DbDo on 5 November 2026: one flag, the kit’s; every
+command carries its menu item and DbDo’s own reason when it cannot run;
+DbDo answers first only for grid keys such as Home and the arrows, which
+are not commands. <em>FileDir</em> still keeps a describer flag of its
+own beside the kit’s, the same refinement to make there.</li>
+<li><strong>The window family.</strong> The kit’s MdiWindows exists, but
+neither DbDo nor FileDir uses it; each keeps its own frame for windows,
+F4 and Control+Tab.</li>
+<li><strong>Updating.</strong> DbDo configures the kit’s Elevate, but an
+older ElevateVersion class of its own is still in DbDo.cs, to be checked
+and retired.</li>
+<li><strong>Settings files.</strong> DbDo reads some settings through
+its own readIniFromFile beside the kit’s InixCodec.</li>
+</ul>
+<h2 id="not-in-the-kit-yet">Not in the kit yet</h2>
+<p>Each of these is built separately by DbDo and FileDir, and EdSharp
+where it applies; each should be written once in the kit.</p>
+<ul>
+<li><strong>Marking a list:</strong> one item, a range with F8, all,
+invert, next and previous marked.</li>
+<li><strong>The search family for an app’s main list:</strong> Lbc’s
+dialog lists have Control+J, Control+K, F3 and Shift+F3, but DbDo’s grid
+and FileDir’s list each keep their own memory of the last search.</li>
+<li><strong>Recent files.</strong></li>
+<li><strong>The error window</strong> with its copyable details, beside
+LbcMessage.</li>
+<li><strong>Where Am I in the main window:</strong> every Lbc dialog and
+form answers it from the kit; main windows each answer in their own
+way.</li>
+</ul>
+<h2 id="the-order-of-work">The order of work</h2>
+<p>DbDo’s release comes first. After it: FileDir’s describer flag; then
+the window family; then the new components – marking, the main-list
+search family, recent files, the error window and main-window Where Am I
+– each built once and taken by every app that has its own.</p>
+</main>
+</body>
+</html>

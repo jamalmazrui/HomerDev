@@ -430,6 +430,16 @@ public static class KeyMap {
         if (bLbcKey) return false;
         if (bKeyDescriber) {
             if (oCommand != null && oCommand.sId == "keyDescriberToggle") return runCommand(oCommand);
+            // ALT+F4 LEAVES THE MODE (5 November 2026, a Homer rule): someone who turned the describer on by accident, and
+            // does not know Control+F1, reaches for Alt+F4; it turns the mode off and says so, and a second Alt+F4 closes
+            // the app as usual.
+            if (keyData == (Keys.Alt | Keys.F4)) {
+                bKeyDescriber = false;
+                Say.sayForced("Key Describer off. Alt+F4 again closes " + Application.ProductName + ".");
+                return true;
+            }
+            // A key with no name -- one a screen reader sends of its own -- is neither described nor swallowed.
+            if ((keyData & Keys.KeyCode) == Keys.NoName) return false;
             if (bTypingInText && !bEditor && oCommand == null) return false;
             Say.sayForced(describe(keyData, oCommand));
             return true;

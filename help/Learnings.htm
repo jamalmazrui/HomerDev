@@ -1,0 +1,307 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.13" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Learnings</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      color: light-dark(#1a1a1a, #fdfdfd);
+      background-color: #fdfdfd;
+      background-color: light-dark(#fdfdfd, #1a1a1a);
+      color-scheme: light dark;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a, a:visited {
+      color: inherit;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid;
+      border-color: #e6e6e6;
+      border-color: light-dark(#e6e6e6, #4c4c4c);
+      color: #606060;
+      color: light-dark(#606060, #b6b6b6);
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid currentColor;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+    }
+    th {
+      border-top: 1px solid currentColor;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+<main>
+<h1 id="learnings">Learnings</h1>
+<p><em>What building the Homer apps has taught, kept so it is not
+learned twice. Newest first. Started 5 November 2026 from the transition
+brief of 26 October and the work since.</em></p>
+<h2 id="november-2026-evening">5 November 2026, evening</h2>
+<ul>
+<li><strong>A version number can claim files that never
+arrived.</strong> C:said 1.132.0, yet its Lbc.cs predated LbcMessage:
+the zip that carried it was never unzipped, while later zips brought
+newer version files. DbDo’s build now checks the kit’s code for what it
+calls, not only the number. Every Homer app’s build should do the same
+for the kit members it depends on.</li>
+<li><strong>Redeliver what changed, not just what is new.</strong> When
+a delivery may have been missed, the next one should carry every file
+changed since the last build known to be good.</li>
+<li><strong>The kit’s gates catch the writer’s slips.</strong> Adding a
+skill means listing it in AGENTS.md, llms.txt and the skills ReadMe, and
+updating the count; a new help page needs its byte order mark. The build
+said all three; trust the gates, and run them before delivering when
+possible.</li>
+<li><strong>From the Urban Institute’s Do No Harm Guide, on data
+visualization:</strong> give the meaning first and the numbers on
+demand, since a screen reader user hearing a table must hold each number
+in working memory; keep spoken text free of symbols that screen readers
+voice, such as pipes, slashes and semicolons; and give every chart a
+description – its title and kind, then its takeaway – with the numbers
+beside it.</li>
+<li><strong>From the Accessibility Metadata Display Guide 2.0:</strong>
+reading systems show “ways of reading” and “conformance” first. A
+conformance claim belongs where it is verified – a book that passed Ace
+and EPUBCheck – not on every converted file.</li>
+</ul>
+<h2 id="to-5-november-2026">3 to 5 November 2026</h2>
+<ul>
+<li><strong>Read the code before stating status.</strong> A plan’s stage
+list had not been updated after the October work, and was reported as
+current: it said DbDo was not on the kit’s router, when the code showed
+it had been since 19 October. The 26 October transition brief had it
+right: integration complete. Documents describe intentions; code
+describes facts.</li>
+<li><strong>An app’s own copy of a shared capability drifts
+quietly.</strong> DbDo routed every key through the kit, yet its older
+describer still answered first in describe mode, so the kit’s never
+heard the key. When an app moves onto a shared component, retire the old
+path, not only add the new one.</li>
+<li><strong>A check run before the mode defeats the mode.</strong> DbDo
+checked whether a command could run before checking whether the
+describer was on, so unavailable commands refused to describe
+themselves.</li>
+<li><strong>The repository’s layout is not the installed
+layout.</strong> DbDo looked for DbDo.inix beside DbDo.exe, where it is
+during development but not after installing, so its descriptions never
+loaded.</li>
+<li><strong>A rename reaches further than the code.</strong> Renaming
+lookups to defs also meant: a file on disk (data.db) that the installer
+names; quoted table names inside triggers, which SQLite’s rename leaves
+alone; index and trigger names; rows that name the table; an installer
+line deleting an old file; and English words that happen to match
+(“repeated lookups”), which must be guarded.</li>
+<li><strong>A migration must run before anything that opens what it
+migrates.</strong> RadioTrail’s conventions step expected defs and ran
+before the rename; old view rows still named the old table when retired.
+Order build steps by what each consumes.</li>
+<li><strong>Twins still drift; the gate is what catches it.</strong>
+Retiring the views table changed the SQLite script in Conversion.cs but
+not conversion.py, and the kit’s own twin check stopped the build.</li>
+<li><strong>Files mix line endings.</strong> An edit that splits by one
+style misses lines in the other; edit by patterns that accept
+either.</li>
+<li><strong>Defaults belong in the data model, not in shipped settings
+that override it.</strong> A views table DbDo created by itself, and
+template .inix files with saved columns and orders, hid look and prime,
+which are the real defaults.</li>
+<li><strong>Unauthorized additions surface late.</strong> The views
+table was never approved; ask before adding a table, a key or a
+concept.</li>
+<li><strong>Check the suite manifest before calling a key a
+violation.</strong> Alt+P, Alt+Y, Alt+Z and the X keys looked wrong in
+DbDo but are shared on purpose across the apps.</li>
+<li><strong>Symmetry with another app is not a reason on its
+own.</strong> Keys tried to match FileDir (Alt+Shift+A, Shift+W,
+Shift+H) were withdrawn the same day: each must earn its key in this
+app.</li>
+<li><strong>Overlapping commands belong in one place.</strong> Four
+analysis commands on four keys became one, Generate from Grid, with
+nothing lost.</li>
+<li><strong>Rehearse on copies, in the build’s own order, with the
+user’s machine state planted.</strong> A rehearsal that planted the bad
+sections the real build had written caught what single edits did
+not.</li>
+<li><strong>Evidence from the running app beats inference.</strong>
+recordWalk’s 13 of 13 settled what reading code could not. Start every
+walk from the same state, listen until silence rather than for a fixed
+time, and match the essential words rather than exact sentences.</li>
+<li><strong>A pattern earns its place only if all the data fits
+it.</strong> 111 field patterns were kept because every existing record
+matched; “required” goes only on the field that names a record.</li>
+<li><strong>A message box is a dialog too.</strong> 109 Windows message
+boxes could not answer Alt+Shift+Slash until they became Lbc
+dialogs.</li>
+</ul>
+<h2 id="until-26-october-2026-from-the-transition-brief">Until 26
+October 2026 (from the transition brief)</h2>
+<ul>
+<li><strong>A kit in the wrong place misleads everything that climbs to
+find one.</strong> Every lookup now follows one rule, and tidy clears
+stray copies.</li>
+<li><strong>A fix can be written and never wired in.</strong> When a
+failure repeats, search for code that already handles it.</li>
+<li><strong>A check that tests order but not presence lets absence
+pass.</strong></li>
+<li><strong>Run the path you rarely run.</strong></li>
+<li><strong>The console must never go quiet for minutes:</strong> say
+what is being waited on, every 30 seconds.</li>
+<li><strong>A window must stay responsive during long work:</strong>
+give it its own thread.</li>
+<li><strong>Twins drift unless a build checks them.</strong></li>
+<li><strong>Readiness must be checked, not promised.</strong></li>
+</ul>
+</main>
+</body>
+</html>

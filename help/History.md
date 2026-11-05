@@ -7,6 +7,44 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.134.0 -- 5 November 2026
+
+- **The kit's C# is all C# 5 again.** Two lambdas with parenthesized parameters, added to Lbc.cs on 5 November, matched the C# 5 check's pattern for an expression-bodied member and stopped the 18:51 build; both are anonymous delegates now, as elsewhere in the kit.
+- **LbcMessage.show takes MessageBox.Show's forms without an owner too,** from text alone to text, title, buttons, icon and default button. DbDo's notice of recovered working copies, shown at startup, has no owner window, and failed to compile at 18:52.
+
+## 1.133.0 -- 5 November 2026
+
+- **The 18:38 build's three problems are fixed:** AGENTS.md and llms.txt list homer-gui-test, AGENTS.md says twenty-four skills, and help\SharedCore.md has its byte order mark.
+- **help\Learnings.md** gains the evening's lessons: a version number can claim files that never arrived; redeliver every file changed since the last good build; trust the kit's gates; and what the Do No Harm Guide and the Accessibility Metadata Display Guide teach.
+
+## 1.132.0 -- 5 November 2026
+
+- **A new skill, homer-gui-test:** testing a running app the way a screen reader user meets it, with uiCheck (the accessibility tree), recordWalk (what JAWS or NVDA said, step by step, with an optional Axe.Windows scan) and whoOpens (the program behind a stray open-with prompt), and confirming tutorials' Hear lines with live runs.
+- **recordWalk is the kit's,** in scripts beside uiCheck and whoOpens. Run from an app's folder, it takes that folder as the app's and its walks from the app's scripts\walks.
+- **help\Learnings.md** keeps what building the apps has taught, newest first, from the 26 October transition brief and the work since.
+
+## 1.131.0 -- 5 November 2026
+
+- **help\\SharedCore.md lists, from the code, what the Homer apps share and what is left.** A first version, the same day, wrongly said stages 3 to 5 had not been done, from HomerSuite.md's stage list rather than the code; DbDo has been on the kit's router since 19 October and FileDir routes through it too. Left: the Key Describer in FileDir (DbDo's done), the window family, DbDo's older update class and settings reader, and five components the kit does not have yet.
+
+## 1.130.0 -- 5 November 2026
+
+- **The Key Describer's rules, for every Homer app** (HomerSuite.md, KeyDecisions.md): every key described even when its command cannot run, with the true reason after; no guessed reasons; the nameless key a screen reader sends ignored; descriptions from the app's own command table; and **Alt+F4 turns the describer off**, saying so, with a second Alt+F4 closing the app. KeyMap carries out Alt+F4 and the nameless key.
+- **SuiteCommands.inix records DbDo's second key review:** Generate from Grid the one analysis key; Graphics Column, Statistics from Column, Count by Columns and the visited-table keys retired; Reverse Alpha Order, Say Header and Shift+W for Window Toggle withdrawn; Alpha Order kept on Alt+A.
+
+## 1.129.0 -- 5 November 2026
+
+- **SuiteCommands.inix records DbDo's key review of 5 November:** Frequency by Columns on Alt+Shift+F (was Count by Columns on Alt+Shift+B), Alpha Order on Alt+A and Reverse Alpha Order on Alt+Shift+A as in FileDir, Say Header on Shift+H, Window Toggle on Shift+W as in FileDir, and Open Table in New Window retired, freeing Control+Shift+T, since Query does the same.
+
+## 1.128.0 -- 5 November 2026
+
+- **Alt+Shift+Slash in every Lbc window.** LbcForm answers it before any control sees the key: through an LbcDialog's own, fuller Where Am I when the window belongs to one, and otherwise by itself -- once the window, the control with focus, its value and place; twice every control; three times the keys. Windows built on LbcForm directly, such as DbDo's list pickers, filter and command pickers and error window, could not answer it before.
+- **LbcMessage.show** takes MessageBox.Show's arguments and gives its answers -- OK, OK and Cancel, Yes and No, Yes, No and Cancel, Retry, Abort and Ignore, with the default button -- as an Lbc dialog, so a message answers Alt+Shift+Slash, Shift+F1, Control+Enter and Escape like any Homer dialog. A short message is a line said as the dialog opens; a long one is a read-only box. Should the dialog fail, Windows's message box shows it.
+
+## 1.127.0 -- 4 November 2026
+
+- **Lbc can change a field's pattern while its dialog is open:** setPattern replaces it (an empty pattern removes it), and patternOf tells which one OK will check. DbDo's Alt+Shift+P uses it to edit the focused field's pattern in a record form.
+
 ## 1.126.0 -- 4 November 2026
 
 - **The SQLite script is the same in both copies again.** Retiring the views table changed it in Conversion.cs but not in conversion.py, and the build's own check stopped at 13:22 saying they differ; conversion.py now matches, all 126 lines.

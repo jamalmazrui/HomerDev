@@ -88,3 +88,7 @@ Each decision is one or two lines in the app's source, named in the comment besi
 - **Considered.** The F1 family: Alt+F1 About, Control+F1 Key Describer, Control+Shift+F1 Hotkeys and Alt+Shift+F1 ReadMe hold every variation in main windows. Q: Alt+Shift+Q is DbDo's Query History and Alt+Q HomerView's lookup. Slash: Alt+Slash is EdSharp's Say Styles.
 - **Chosen.** Alt+Shift+Slash, Alt and the question mark: free in every app, in JAWS, NVDA and Windows by the kit's key ownership data, and never typed by accident in a text box. Pressed once, twice and three times, as Shift+F1 now is.
 - **Rollback.** Remove the Alt+Shift+Slash branch from Lbc's wireUniversalKeys and set DbDo's Where Am I back to no key.
+
+## Key Describer rules (5 November 2026)
+
+Jamal asked that Alt+F4 also turn the Key Describer off, for someone who turned it on by accident and does not know Control+F1, with a second Alt+F4 closing the app, and that this be the rule in every app. With it came what DbDo's describer had taught: describe every key even when its command cannot run, giving the true reason after the description; never guess a reason; ignore the nameless key a screen reader sends; and describe from the app's own command table. HomerSuite.md states the rules; the kit's KeyMap carries them out.

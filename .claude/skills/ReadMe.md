@@ -78,6 +78,10 @@ HomerDev.md, under "Claude skills".
 - **homer-quality**: check any document -- Word, Excel, PowerPoint, Markdown,
   web page, EPUB or PDF -- by extCheck's rules and the kit's finishing checks;
   scripts\checkQuality.cmd lists what the kit would fix and what needs a person.
+- **homer-gui-test**: test a running app the way a screen reader user meets it --
+  uiCheck reads the accessibility tree back, recordWalk records and transcribes
+  what JAWS or NVDA said for each step of a walk or tutorial, with an optional
+  Axe.Windows scan, and whoOpens finds the program behind a stray open-with prompt.
 - **homer-migrate**: bring an existing app onto the kit, or audit one that
   has drifted, one app at a time, with a checklist of every area and what each
   looked like when it was wrong.
