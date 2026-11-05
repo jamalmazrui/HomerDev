@@ -2,6 +2,11 @@
 
 *What building the Homer apps has taught, kept so it is not learned twice. Newest first. Started 5 November 2026 from the transition brief of 26 October and the work since.*
 
+## 5 November 2026, late
+
+- **No new top-level folder without the author's approval, asked in advance.** A samples folder was made in DbDo for one data file; its S clashed with scripts, DbDo's acceptance check already said no samples folder remains, and the build broke when the author deleted it. Review the existing tree first and use the folder that fits -- data for shipped data, templates for templates -- or a subfolder of an existing one; ask before adding anything at the top.
+- **Never declare a folder to quiet the layout check.** The check fails a folder outside the Homer tree, and only warns when RepoFiles.txt declares it; declaring samples there turned the guard into a warning. A declaration is the author's to make.
+
 ## 5 November 2026, night
 
 - **Anchor an insertion on a whole line, never on text that may sit inside another line.** Inserting before the first "[Database]" in nine .inix files split a comment that mentioned [Database]; DbDo's pattern audit, written after the same accident in JobTrail.inix, caught it.

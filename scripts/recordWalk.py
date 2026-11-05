@@ -30,7 +30,8 @@ USAGE
     recordWalk --wait 5                 listen five seconds after each key (default 4)
     recordWalk --model base.en          a smaller, faster, less accurate recognizer (default small.en)
     recordWalk --no-transcribe          record and report, and write nothing down
-    recordWalk --no-axe                 leave out the Axe.Windows scan after each step (on by default since 5 November 2026)
+    recordWalk --axe                    also scan after each step with Axe.Windows (off by default: it scans the whole
+                                        program, and a long record list is beyond it)
     recordWalk --tutorial --walk 1       (or the tutorial's path; a number finds help\Tutorial_1_*.inix)
                                         perform a tutorial live: the host's lines in one Windows voice, the real screen
                                         reader recorded at each key, joined into one recording, <walk>-live.wav and .mp3
@@ -576,9 +577,10 @@ def main():
     lsReport.extend([sIdentity, ""])
     logLine(sIdentity)
     sAxeCli, iAxeErrors = "", 0
-    # SCANS ON BY DEFAULT, AND SAID (5 November 2026): a walk scans each step unless --no-axe is given, and says so at
-    # the start and the total at the end, so a person listening knows the scans ran.
-    if not oArgs.no_axe:
+    # SCANS ONLY WHEN ASKED (5 November 2026, evening): on by default, the first scan of DbDo with RadioTrail open took a
+    # minute and failed, and the walk seemed to hang. With --axe a walk scans each step, saying so at the start and the
+    # total at the end.
+    if oArgs.axe and not oArgs.no_axe:
         try:
             sAxeCli = getAxeCli()
             sayLine("Each step is also scanned with Axe.Windows, the engine of Accessibility Insights.")

@@ -1689,10 +1689,12 @@ def checkAccessibility(bScan):
     warning at most, never a failure: a finding is a question to review, and the report says what to check first --
     above all, never an accessible name where a label before the control, its own caption, or the window title
     already names it, which the reader would then say twice. Findings reviewed and accepted go in a11yAccepted.txt."""
-    # IT RUNS AT EVERY PUSH (5 November 2026): push runs this check without --build, so the scan is on unless
-    # --noscan is given; the program opens for some seconds, and the screen reader says so.
+    # ONLY WHEN ASKED (5 November 2026, evening). At every push it opened DbDo for a minute and found nothing:
+    # AxeWindowsCLI scans the whole program, and DbDo's record list of 49,186 rows is beyond it. The library can scan
+    # one window by its handle (ScanOptions' scanRootWindowHandle, Axe.Windows 2.4.1), which a kit helper is to use;
+    # until then the scan runs only with check --scan.
     if not bScan:
-        return finding("accessibility", "skip", "--noscan was given")
+        return finding("accessibility", "skip", "not asked for; check --scan starts the program and scans its window")
     if os.name != "nt":
         return finding("accessibility", "skip", "scans need Windows")
     lsExe = [s for s in glob.glob(os.path.join(sRoot, "exec", "*.exe")) + glob.glob(os.path.join(sRoot, "*.exe"))
@@ -1841,7 +1843,8 @@ def main():
     oParser.add_argument("--build", action="store_true",
                          help="build the app first, and count the build as evidence")
     oParser.add_argument("--path", default="", help="the app folder; this one by default")
-    oParser.add_argument("--noscan", action="store_true", help="leave out the accessibility scan, which opens the program for some seconds")
+    oParser.add_argument("--scan", action="store_true", help="also start the program and scan its window with Axe.Windows")
+    oParser.add_argument("--noscan", action="store_true", help=argparse.SUPPRESS)   # kept for old command lines
     oParser.add_argument("--quiet", action="store_true", help="write the report, say little")
     oParser.add_argument("--fresh", action="store_true",
                          help="run every check even when a pass with exactly these files is on record")
@@ -1958,7 +1961,7 @@ def main():
         checkConversions()
         checkBuild(dArguments.build)
         checkSmoke(dArguments.build)
-        checkAccessibility(not dArguments.noscan)
+        checkAccessibility(dArguments.scan and not dArguments.noscan)
         checkAccept()
 
     sReport = writeReport()

@@ -89,8 +89,8 @@ help\Tutorial_NN_*.inix, which recordWalk also runs.
 
 The kit's scripts\axeScan.py runs Axe.Windows, the rule engine of Accessibility Insights for Windows, and fetches its command-line tool once into %LOCALAPPDATA%\HomerDev\tools. It is used in three places:
 
-- **Every push:** the shared check starts a windowed app's program, scans its window, closes it by WM_CLOSE (nothing pressed), and writes logs\<App>-a11yScan-<time>.md. The verdict is a warning at most, never a failure; `check --noscan` leaves it out. If another copy of the app is running and takes the start over, the check says so and skips.
-- **Walks:** recordWalk scans after every step by default, so each dialog is scanned while it is open, and says so at the start and the total at the end; `--no-axe` leaves it out.
+- **The shared check, when asked:** `check --scan` starts a windowed app's program, scans its window, closes it by WM_CLOSE (nothing pressed), and writes logs\<App>-a11yScan-<time>.md. The verdict is a warning at most, never a failure. It is not run at every push: AxeWindowsCLI scans the whole program, and a window holding a long list (DbDo's 49,186 records) is beyond it. The Axe.Windows library can scan one window by its handle -- ScanOptions(scanId, scanRootWindowHandle), version 2.4.1 -- which a kit helper is to use for dialogs.
+- **Walks:** `recordWalk --axe` scans after every step, saying so at the start and the total at the end; a scan that cannot finish stops the scans for the rest of the walk.
 - **Tutorials performed live:** `recordWalk --tutorial --walk 1` drives the app through Tutorial 1 for real -- menus and all -- with the host's lines in one Windows voice (made into a file, never played, so they cannot spill into the reader's recording), the real screen reader recorded at each key, and the tutorial's simulated reading in a second voice; everything joins into results\recordWalk-<time>\<tutorial>-live.mp3, the step-by-step report beside it as always.
 - **By hand:** `axeScan --exe <program>` or `axeScan --pid <id>`.
 

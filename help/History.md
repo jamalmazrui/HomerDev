@@ -7,6 +7,15 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.143.0 -- 5 November 2026
+
+- **Scans only when asked.** The accessibility check opened DbDo at every push for a minute and found nothing, and recordWalk's scans made its first step seem to hang: AxeWindowsCLI scans the whole program, and DbDo's record list of 49,186 rows is beyond it. The check scans now only with check --scan, and recordWalk only with --axe.
+- **The way forward, from Axe.Windows' own documentation:** its library can scan one window's subtree by its handle -- ScanOptions(scanId, scanRootWindowHandle), added in 2.4.1 -- so a dialog can be scanned without the record list behind it; the command-line tool cannot. A kit helper using it is the next step.
+
+## 1.142.0 -- 5 November 2026
+
+- **help\Learnings.md:** no new top-level folder without approval asked in advance, and never a declaration in RepoFiles.txt to quiet the layout check, from a samples folder made in DbDo unasked.
+
 ## 1.141.0 -- 5 November 2026
 
 - **Accessibility scans at every push.** The new scripts\axeScan.py runs Axe.Windows, the rule engine of Accessibility Insights for Windows, fetching its command-line tool once; the kit's build fetches it, so a push never waits on a download. The shared check's new accessibility check starts a windowed app's program, scans its window, closes it by WM_CLOSE with nothing pressed, and writes logs\<App>-a11yScan-<time>.md, grouping findings with Homer's advice for each. Its verdict is a warning at most, never a failure; check --noscan leaves it out. recordWalk --axe now uses the same module rather than its own copy.
