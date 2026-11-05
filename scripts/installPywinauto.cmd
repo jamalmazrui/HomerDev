@@ -1,5 +1,5 @@
 @echo off
-rem installPywinauto.cmd -- install, update or reinstall pywinauto, which drives an app by its keys and reads what has focus, with soundcard and numpy to record the screen reader, for recordWalk.
+rem installPywinauto.cmd -- install, update or reinstall pywinauto, which drives an app by its keys and reads what has focus, with soundcard and numpy to record the screen reader and pythonnet to run the Axe.Windows library, for recordWalk.
 rem
 rem Run from the installer's final page, or on its own at any time. The common half -- the log under
 rem %LOCALAPPDATA%\<App>\logs, the quiet flag when the installer is driving -- is the kit's installCommon.cmd, so a
@@ -29,23 +29,23 @@ if errorlevel 1 (
   goto :failed
 )
 if defined bReinstall goto :reinstall
-echo Installing or updating pywinauto, soundcard and numpy. Nothing is asked of you while it runs.
-set "sHomerRunLong=python -m pip install --user --upgrade pywinauto soundcard numpy"
+echo Installing or updating pywinauto, soundcard, numpy and pythonnet. Nothing is asked of you while it runs.
+set "sHomerRunLong=python -m pip install --user --upgrade pywinauto soundcard numpy pythonnet"
 call "%~dp0installCommon.cmd" runLong "pywinauto"
 set "iCode=%ERRORLEVEL%"
-call "%~dp0installCommon.cmd" log "python -m pip install --user --upgrade pywinauto soundcard numpy exit code %iCode%"
+call "%~dp0installCommon.cmd" log "python -m pip install --user --upgrade pywinauto soundcard numpy pythonnet exit code %iCode%"
 if not "%iCode%"=="0" goto :failed
-echo pywinauto, soundcard and numpy are ready.
+echo pywinauto, soundcard, numpy and pythonnet are ready.
 goto :done
 
 :reinstall
-echo Reinstalling pywinauto, soundcard and numpy.
-set "sHomerRunLong=python -m pip install --user --force-reinstall pywinauto soundcard numpy"
+echo Reinstalling pywinauto, soundcard, numpy and pythonnet.
+set "sHomerRunLong=python -m pip install --user --force-reinstall pywinauto soundcard numpy pythonnet"
 call "%~dp0installCommon.cmd" runLong "pywinauto"
 set "iCode=%ERRORLEVEL%"
-call "%~dp0installCommon.cmd" log "python -m pip install --user --force-reinstall pywinauto soundcard numpy exit code %iCode%"
+call "%~dp0installCommon.cmd" log "python -m pip install --user --force-reinstall pywinauto soundcard numpy pythonnet exit code %iCode%"
 if not "%iCode%"=="0" goto :failed
-echo pywinauto, soundcard and numpy are reinstalled.
+echo pywinauto, soundcard, numpy and pythonnet are reinstalled.
 goto :done
 
 :failed

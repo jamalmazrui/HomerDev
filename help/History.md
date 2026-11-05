@@ -7,6 +7,19 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.145.0 -- 5 November 2026
+
+- **No arguments to remember.** recordWalk alone walks the pilot, scans each window once (spoken progress every 10 seconds), and then performs Tutorial 1 live, menus and all, when its recording is missing or older than the tutorial or the program. axeWindow alone scans the app of the folder it is run from, opening it when it is closed.
+- **The gate does the routine checking.** The accessibility check runs at every push again, through axeWindow: it says why the program opens, speaks progress every 10 seconds, scans the main window by its handle, and gives up after two minutes, saying so; --noscan leaves it out. A new walk check reads the newest walk report and warns when it missed lines or is over two weeks old, so the gate says when to walk.
+- **help\Learnings.md** records both guidelines: a script does the sensible whole with no arguments, and routine checking belongs in build, tidy, push and release.
+
+## 1.144.0 -- 5 November 2026
+
+- **axeWindow scans one window, saying how it goes.** The new scripts\axeWindow.py scans the window in front by its handle through the Axe.Windows library -- ScanOptions' scanRootWindowHandle, from Axe.Windows 2.4.1 -- so a dialog is scanned without the record list behind it. It loads the library from AxeWindowsCLI's own folder with pythonnet, so nothing else is fetched. JAWS is told directly when a scan starts, every 10 seconds while it runs, and when it ends, with a Windows voice when JAWS is not running, so a long scan never sounds like a hang. `axeWindow DbDo` scans DbDo's window in front by hand.
+- **recordWalk --axe scans each window once,** the first time it is in front, through axeWindow, between recordings.
+- **recordWalk 1 performs Tutorial 1 live,** menus and all; a number given first is a tutorial. Plain recordWalk still walks the pilot.
+- **The pywinauto component installs pythonnet too,** which axeWindow needs.
+
 ## 1.143.0 -- 5 November 2026
 
 - **Scans only when asked.** The accessibility check opened DbDo at every push for a minute and found nothing, and recordWalk's scans made its first step seem to hang: AxeWindowsCLI scans the whole program, and DbDo's record list of 49,186 rows is beyond it. The check scans now only with check --scan, and recordWalk only with --axe.

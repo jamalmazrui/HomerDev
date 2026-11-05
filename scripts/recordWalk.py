@@ -24,14 +24,16 @@ its own, both optional:
 
 USAGE
 
-    recordWalk                          the walk scripts\walks\pilot.inix, for the app this folder belongs to
+    recordWalk                          WITH NO ARGUMENTS, THE SENSIBLE WHOLE: the pilot walk, each window scanned once with
+                                        Axe.Windows, and then Tutorial 1 performed live -- the menus through the real screen
+                                        reader -- when its recording is missing or older than the tutorial or the program
     recordWalk --walk C:\path\walk.inix another walk
     recordWalk --steps 3                only the first three steps
     recordWalk --wait 5                 listen five seconds after each key (default 4)
     recordWalk --model base.en          a smaller, faster, less accurate recognizer (default small.en)
     recordWalk --no-transcribe          record and report, and write nothing down
-    recordWalk --axe                    also scan after each step with Axe.Windows (off by default: it scans the whole
-                                        program, and a long record list is beyond it)
+    recordWalk --no-axe                 leave out the scans
+    recordWalk 1                        the same as recordWalk --tutorial --walk 1: Tutorial 1 performed live
     recordWalk --tutorial --walk 1       (or the tutorial's path; a number finds help\Tutorial_1_*.inix)
                                         perform a tutorial live: the host's lines in one Windows voice, the real screen
                                         reader recorded at each key, joined into one recording, <walk>-live.wav and .mp3
@@ -504,6 +506,7 @@ def hearMatch(sExpected, sHeard):
 def main():
     global sLogPath
     oParser = argparse.ArgumentParser(description="Drive a Homer app through a walk and record what is said.")
+    oParser.add_argument("which", nargs="?", default="", help="a tutorial's number, performed live, or a walk's path")
     oParser.add_argument("--walk", default=os.path.join(sProject, "scripts", "walks", "pilot.inix"))  # the app's own walks
     oParser.add_argument("--app", default=os.path.basename(sProject))
     oParser.add_argument("--steps", type=int, default=0)
@@ -527,6 +530,11 @@ def main():
     logLine("settings: app " + oArgs.app + ", walk " + oArgs.walk + ", steps " + str(oArgs.steps) + ", wait " + str(oArgs.wait)
             + ", model " + oArgs.model + ", transcribe " + str(not oArgs.no_transcribe))
 
+    # recordWalk 1 PERFORMS TUTORIAL 1 LIVE (5 November 2026, evening): "recordWalk" alone walks the pilot, and the
+    # menu tour needed --tutorial --walk 1, which no one remembers. A number given first is a tutorial, performed live.
+    if oArgs.which:
+        oArgs.walk = oArgs.which
+        if oArgs.which.strip().isdigit(): oArgs.tutorial = True
     # A NUMBER NAMES A TUTORIAL, AND A RELATIVE PATH IS THE PROJECT'S (5 November 2026): recordWalk is usually
     # started from the scripts folder, so help\... and 1 are looked for from the project folder.
     if re.match(r"^\d+$", oArgs.walk.strip()):
@@ -577,10 +585,9 @@ def main():
     lsReport.extend([sIdentity, ""])
     logLine(sIdentity)
     sAxeCli, iAxeErrors = "", 0
-    # SCANS ONLY WHEN ASKED (5 November 2026, evening): on by default, the first scan of DbDo with RadioTrail open took a
-    # minute and failed, and the walk seemed to hang. With --axe a walk scans each step, saying so at the start and the
-    # total at the end.
-    if oArgs.axe and not oArgs.no_axe:
+    # EACH WINDOW SCANNED ONCE, BY DEFAULT, AND SAID (5 November 2026, night): the kit's axeWindow scans one window by
+    # its handle and speaks every 10 seconds, so a scan never sounds like a hang; --no-axe leaves the scans out.
+    if not oArgs.no_axe:
         try:
             sAxeCli = getAxeCli()
             sayLine("Each step is also scanned with Axe.Windows, the engine of Accessibility Insights.")
@@ -589,6 +596,7 @@ def main():
             sayLine("AxeWindowsCLI could not be got, so no scans; the log says why.")
     lLive = []
     bAxeStopped = False
+    setScanned, lAxeFindings = set(), []
     for iIndex, dStep in enumerate(lSteps, 1):
         sExeNow, sTitleNow = foregroundExe()
         if sExeNow.lower() != (oArgs.app + ".exe").lower():
@@ -651,19 +659,35 @@ def main():
         sFocus = focusNow()
         sApp = speechSince(oArgs.app, dBefore)
         sAxe = ""
+        # ONE WINDOW AT A TIME, EACH ONCE (5 November 2026, evening). The kit's axeWindow scans the window in front by its
+        # handle, through the Axe.Windows library -- a dialog without the record list behind it -- and speaks as it
+        # goes: at the start, every 10 seconds, and at the end, between this step's recording and the next. Each window
+        # is scanned the first time it is in front; the main window, which may hold a long list, takes longest, and
+        # says so. When the library cannot be loaded, the walk says so once and goes on unscanned.
         if sAxeCli and not bAxeStopped:
             try:
                 lWindows = windowsOf(oArgs.app + ".exe")
                 if lWindows:
-                    iErrors, sSummary, sFile = axeScan(sAxeCli, lWindows[0][1], os.path.join(sWaves, "axe"), "step%02d" % iIndex)
-                    if iErrors is not None: iAxeErrors += iErrors
-                    # ONE FAILED SCAN STOPS THE SCANS (5 November 2026): a window Axe.Windows cannot finish -- DbDo's
-                    # 49,186-row record list took it 2 minutes 44 seconds and then failed -- will not be finished at the
-                    # next step either, and the walk seemed to hang. So the walk says so once and goes on unscanned.
-                    if iErrors is None and not sFile:
-                        bAxeStopped = True
-                        sayLine("Axe.Windows could not finish a scan, so the rest of the walk is not scanned: " + sSummary + ".")
-                    sAxe = ((str(iErrors) + (" error" if iErrors == 1 else " errors")) if iErrors is not None else "count not read") + "; " + sSummary + ((" -- " + os.path.relpath(sFile, sProject)) if sFile else "")
+                    import axeWindow
+                    axeWindow.useLog(logLine)
+                    iPid = lWindows[0][1]
+                    hWnd = axeWindow.frontWindowOf(iPid)
+                    sTitle = axeWindow.windowTitle(hWnd) if hWnd else ""
+                    if hWnd and sTitle in setScanned:
+                        sAxe = sTitle + " was scanned at an earlier step"
+                    elif hWnd:
+                        setScanned.add(sTitle)
+                        dScan = axeWindow.scanWindow(iPid, hWnd, os.path.join(sWaves, "axe"), "step%02d" % iIndex)
+                        if dScan["sProblem"]:
+                            sAxe = "no scan of " + (sTitle or "the window") + ": " + dScan["sProblem"]
+                            if "could not be loaded" in dScan["sProblem"]:
+                                bAxeStopped = True
+                                sayLine("Axe.Windows could not be loaded, so the rest of the walk is not scanned; the log says why.")
+                        else:
+                            iAxeErrors += dScan["iErrors"]
+                            lAxeFindings.extend(dScan["lFindings"])
+                            sAxe = (str(dScan["iErrors"]) + (" error" if dScan["iErrors"] == 1 else " errors") + " in " + (sTitle or "the window")
+                                    + (": " + "; ".join(dScan["lFindings"][:3]) + (" and more" if len(dScan["lFindings"]) > 3 else "") if dScan["lFindings"] else ""))
             except Exception:
                 logLine("axe scan failed for step " + str(iIndex) + ": " + traceback.format_exc())
                 sAxe = "the scan could not run; the log says why"
@@ -720,7 +744,25 @@ def main():
         if not bClosed: sayLine(oArgs.app + " did not close by itself, so it is still open.")
     sayLine("recordWalk is done. " + str(iMatched) + " of " + str(iChecked) + " expected lines heard. The report is " + sReportPath + ".")
     sayLine("Upload the report, the log and the results\\recordWalk-" + sStamp + " folder.")
-    return 0 if iMatched == iChecked else 1
+    iCode = 0 if iMatched == iChecked else 1
+    # TUTORIAL 1 LIVE WHEN IT IS DUE (5 November 2026, night): a plain recordWalk also performs Tutorial 1 -- the menus
+    # through the real screen reader -- when its live recording is missing, or older than the tutorial or the program,
+    # so no argument has to be remembered; it runs as a second pass, with the app started afresh.
+    if not oArgs.which and not oArgs.tutorial and os.path.basename(oArgs.walk).lower() == "pilot.inix":
+        lTutorial = glob.glob(os.path.join(sProject, "help", "Tutorial_1_*.inix"))
+        if lTutorial:
+            lLive = glob.glob(os.path.join(sProject, "results", "recordWalk-*", os.path.splitext(os.path.basename(lTutorial[0]))[0] + "-live.*"))
+            nLive = max([os.path.getmtime(s) for s in lLive] or [0])
+            sExe = os.path.join(sProject, "exec", oArgs.app + ".exe")
+            nNewest = max(os.path.getmtime(lTutorial[0]), os.path.getmtime(sExe) if os.path.isfile(sExe) else 0)
+            if nLive < nNewest:
+                sayLine("Now Tutorial 1, performed live: the menus through the screen reader. Keep your hands off the keyboard.")
+                lCommand = [sys.executable, os.path.abspath(__file__), "1"] + (["--no-axe"] if oArgs.no_axe else [])
+                logLine("tutorial pass: " + " ".join(lCommand))
+                iCode = max(iCode, subprocess.call(lCommand, cwd=os.getcwd()))
+            else:
+                logLine("Tutorial 1's live recording is current: " + max(lLive, key=os.path.getmtime))
+    return iCode
 
 
 if __name__ == "__main__":

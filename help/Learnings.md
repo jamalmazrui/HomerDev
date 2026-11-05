@@ -4,6 +4,8 @@
 
 ## 5 November 2026, late
 
+- **A script does the sensible whole with no arguments.** No parameter is to be recalled: recordWalk alone walks the pilot, scans each window and performs Tutorial 1 when its recording is due; axeWindow alone scans the app of the folder it is run from. Arguments are for the rare exception.
+- **Routine checking belongs in build, tidy, push and release, as audit gates.** A manual command is for an occasional test or fix, and the gate says when one is due -- the walk check warns when the newest walk missed lines or is two weeks old -- so nothing has to be remembered.
 - **No new top-level folder without the author's approval, asked in advance.** A samples folder was made in DbDo for one data file; its S clashed with scripts, DbDo's acceptance check already said no samples folder remains, and the build broke when the author deleted it. Review the existing tree first and use the folder that fits -- data for shipped data, templates for templates -- or a subfolder of an existing one; ask before adding anything at the top.
 - **Never declare a folder to quiet the layout check.** The check fails a folder outside the Homer tree, and only warns when RepoFiles.txt declares it; declaring samples there turned the guard into a warning. A declaration is the author's to make.
 
