@@ -4,6 +4,10 @@
 
 ## 5 November 2026, night
 
+- **Anchor an insertion on a whole line, never on text that may sit inside another line.** Inserting before the first "[Database]" in nine .inix files split a comment that mentioned [Database]; DbDo's pattern audit, written after the same accident in JobTrail.inix, caught it.
+- **A walk tests the installed program.** Until a build is released and installed, a walk drives the previous version; three walks in a row tested an older DbDo for that reason.
+- **A new command's letter is checked against its whole menu.** "Update All from Templates" took A, already Alternate Menu's, and every word of its name began with a taken letter, so it was renamed.
+
 - **Run the gate before delivering, not after.** The kit's tutorial check found five problems in a new walk -- Hear lines written with underscores, not as a screen reader says them, and a silent Escape -- after delivery; run first, it would have found them before.
 - **A walk must say which build it walked.** Twice a walk's misses could only be explained by guessing an older DbDo had run, from the wording heard. recordWalk's report now names the program's path, version and build time.
 - **One run's miss is not yet a regression.** A step heard as "Get one" passed on the next run: speech recognition slips. Judge a step over two runs before chasing it.
