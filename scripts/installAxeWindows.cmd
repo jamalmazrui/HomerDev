@@ -29,13 +29,14 @@ if errorlevel 1 (
   goto :failed
 )
 if defined bReinstall goto :fresh
-if exist "%LOCALAPPDATA%\HomerDev\tools\AxeWindowsCLI\AxeWindowsCLI.exe" goto :fresh
+rem THE LIBRARY ONLY (6 November 2026): axeWindow scans one window through the Axe.Windows library; the 107 MB
+rem AxeWindowsCLI it used to fetch as well had no use, and a copy left from before is removed here.
+if exist "%LOCALAPPDATA%\HomerDev\tools\AxeWindowsCLI" (
+  rd /s /q "%LOCALAPPDATA%\HomerDev\tools\AxeWindowsCLI" >nul 2>&1
+  call "%~dp0installCommon.cmd" log "removed the unused AxeWindowsCLI folder"
+)
+if exist "%LOCALAPPDATA%\HomerDev\tools\AxeWindowsLib\Axe.Windows.Automation.dll" goto :fresh
 echo Installing Axe.Windows. Nothing is asked of you while it runs.
-set "sHomerRunLong=python "%~dp0axeScan.py" --fetch"
-call "%~dp0installCommon.cmd" runLong "Axe.Windows"
-set "iCode=%ERRORLEVEL%"
-call "%~dp0installCommon.cmd" log "python '%~dp0axeScan.py' --fetch exit code %iCode%"
-if not "%iCode%"=="0" goto :failed
 set "sHomerRunLong=python "%~dp0axeWindow.py" --fetch"
 call "%~dp0installCommon.cmd" runLong "the Axe.Windows library"
 call "%~dp0installCommon.cmd" log "axeWindow --fetch exit code %ERRORLEVEL%"
@@ -45,11 +46,6 @@ goto :done
 :fresh
 rem Its newest version is on GitHub, not in winget, so a copy already here is replaced by the newest release.
 echo Getting the newest Axe.Windows.
-set "sHomerRunLong=python "%~dp0axeScan.py" --fetch --fresh"
-call "%~dp0installCommon.cmd" runLong "Axe.Windows"
-set "iCode=%ERRORLEVEL%"
-call "%~dp0installCommon.cmd" log "python '%~dp0axeScan.py' --fetch --fresh exit code %iCode%"
-if not "%iCode%"=="0" goto :failed
 set "sHomerRunLong=python "%~dp0axeWindow.py" --fetch --fresh"
 call "%~dp0installCommon.cmd" runLong "the Axe.Windows library"
 call "%~dp0installCommon.cmd" log "axeWindow --fetch --fresh exit code %ERRORLEVEL%"

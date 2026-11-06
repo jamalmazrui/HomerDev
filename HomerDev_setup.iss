@@ -676,7 +676,7 @@ begin
   // accessibility check every push runs. Axe.Windows is not in winget; its fetch writes version.txt beside it, which
   // homerFileVersion reads first, so a copy here is offered as Reinstall, which gets the newest release.
   iAxeWindows := homerAdd('Axe.Windows', 'github:microsoft/axe-windows', '',
-    '{localappdata}\HomerDev\tools\AxeWindowsCLI\AxeWindowsCLI.exe', 'checks a window''s accessibility, as Accessibility Insights does', '');
+    '{localappdata}\HomerDev\tools\AxeWindowsLib\Axe.Windows.Automation.dll', 'checks a window''s accessibility, as Accessibility Insights does', '');
   iEpubCheck := homerAdd('EPUBCheck', 'github:w3c/epubcheck', '',
     '{pf}\EPUBCheck\epubcheck.jar', 'validates EPUB books', '');
   iExifTool := homerAdd('ExifTool', 'OliverBetz.ExifTool;PhilHarvey.ExifTool', 'exiftool',

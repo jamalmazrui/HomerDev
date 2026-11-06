@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.162.0 -- 6 November 2026
+
+- **%LOCALAPPDATA%\\HomerDev shrinks from 114 MB to about 7.** 107 MB of it was AxeWindowsCLI, fetched by every build and by the Axe.Windows component since 1.141.0 and unused since scans moved to the 3.3 MB Axe.Windows library. The build and the component now fetch only the library and remove the old tool's folder; the installer checks the library. Nothing a Homer app runs depends on this folder: no app's code refers to it, and it holds development tools and logs only.
+
 ## 1.161.0 -- 6 November 2026
 
 - **HomerDev's own window, scanned at last.** The 12:26 push opened HomerDev, scanned its main window in 6.6 seconds -- 376 list items without the ScrollItem pattern, Windows Forms' list box, nothing to change -- and filed its fingerprint. It was filed under its title, HomerDev 1.159.0, since the window has a hidden owner; numbers like 1.159.0 are now left out of a window's key, so a new release is not a new window.

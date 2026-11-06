@@ -2243,20 +2243,24 @@ def main():
             sayLine("The column types could not be checked: %s" % oError)
             iSamplesFailed += 1
             lsFailedParts.append("the column-type check, which could not run")
-        # AXE.WINDOWS, FETCHED ONCE (1.141.0): every push's accessibility check and recordWalk --axe use
-        # AxeWindowsCLI from %LOCALAPPDATA%\HomerDev\tools; getting it here means a push never waits on a download.
-        # A fetch that fails is said, not a failure: the scans then say they could not run.
+        # THE AXE.WINDOWS LIBRARY ONLY (6 November 2026). axeWindow scans one window through the 3.3 MB library; the
+        # 107 MB AxeWindowsCLI, fetched here since 1.141.0, has had no use since, and filled %LOCALAPPDATA%\\HomerDev.
+        # It is no longer fetched, and a copy left there is removed. Nothing a Homer app runs depends on this folder:
+        # it holds development tools and logs only.
         try:
-            oDone = subprocess.run([sys.executable, os.path.join(sScriptDir, "scripts", "axeScan.py"), "--fetch"], capture_output=True, text=True, timeout=600, cwd=sScriptDir)
-            for sLine in (oDone.stdout or "").strip().splitlines(): sayLine(sLine)
-            logLine("axeScan --fetch exit %d; stderr %s" % (oDone.returncode, (oDone.stderr or "").strip()[:2000]))
-            # THE LIBRARY TOO (1.146.0): axeWindow scans one window through the Axe.Windows library, fetched from NuGet
-            # with its dependencies into the same tools folder.
             oDone = subprocess.run([sys.executable, os.path.join(sScriptDir, "scripts", "axeWindow.py"), "--fetch"], capture_output=True, text=True, timeout=600, cwd=sScriptDir)
             for sLine in (oDone.stdout or "").strip().splitlines(): sayLine(sLine)
             logLine("axeWindow --fetch exit %d; stderr %s" % (oDone.returncode, (oDone.stderr or "").strip()[:2000]))
         except Exception as oError:
-            sayLine("AxeWindowsCLI could not be fetched: %s" % oError)
+            sayLine("The Axe.Windows library could not be fetched: %s" % oError)
+        try:
+            sOldCli = os.path.join(os.environ.get("LOCALAPPDATA", ""), "HomerDev", "tools", "AxeWindowsCLI")
+            if os.environ.get("LOCALAPPDATA") and os.path.isdir(sOldCli):
+                shutil.rmtree(sOldCli, ignore_errors=True)
+                logLine("removed " + sOldCli + (" (some of it is still there)" if os.path.isdir(sOldCli) else ""))
+                sayLine("Removed the unused AxeWindowsCLI, about 107 MB, from %LOCALAPPDATA%\\HomerDev\\tools.")
+        except Exception as oError:
+            logLine("AxeWindowsCLI not removed: %s" % oError)
         # TIDY KEEPS WHAT THE KIT PLACES (1.65.30): proved here in a scratch folder before any project's tidy relies
         # on it, since tidy once moved the running build_release.bat into notes and ended DbDo's cycle in silence.
         try:
