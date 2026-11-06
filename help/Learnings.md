@@ -4,6 +4,7 @@
 
 ## 6 November 2026
 
+- **What a dialog shows beats what an app binds.** An app-wide Alt+letter (FileDir's Alt+Y, Yield Files) silently stole that letter from every dialog's buttons, because app commands were checked first. The access key a person can see in front of them must always win.
 - **Read a page the way the script that already works reads it.** kdpFix's first run found neither Blind Vibe Coding row: it searched element ids KDP's Bookshelf does not have, and read one page of three. kdpReport had read both rows the day before; its reader, reused, was the fix.
 - **Never say "the log has it" unless the log has it.** A message promised the page in the log; nothing had been written there.
 - **Scan what a person meets, where it is cheap to scan.** A walk spent seven minutes on DbDo's main window, record list and all, which every push already scans; walks now scan the dialogs they open, and every scan stops at five minutes.

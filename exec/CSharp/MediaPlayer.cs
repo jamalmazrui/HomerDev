@@ -1377,7 +1377,7 @@ Homer.LbcDialog dlgHelp = new Homer.LbcDialog("Player Help", owner);
 TextBox txtHelp = dlgHelp.addMemo(sb.ToString(),
 "The keys this dialog answers to. Read it by line, or Control+C to copy.");
 txtHelp.ReadOnly = true;
-Button btnOk = dlgHelp.addButton("&OK", "Go back to the player.");
+Button btnOk = dlgHelp.addButton("OK", "Go back to the player.");
 btnOk.Click += delegate(object o, EventArgs e) { dlgHelp.close(); };
 dlgHelp.setInitialFocus(txtHelp);
 try { dlgHelp.runPlain(btnOk, btnOk); }

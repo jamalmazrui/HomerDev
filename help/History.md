@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.154.0 -- 6 November 2026
+
+- **A dialog's own access keys come first, in every Homer app.** FileDir binds Alt+Y to Yield Files, and LbcForm tried an app's command keys before the dialog's controls, so Alt+Y in Unarchive's "Create it?" ran Yield Files instead of pressing Yes. Now an Alt+letter or Alt+digit that a visible, enabled control of the dialog shows as its access key goes to that control first.
+- **Yes is Y and No is N; OK, Cancel and Close have no letter.** Yes and No already took Y and N; Close now joins OK and Cancel without an access key, since Escape is its key. Four OK and Cancel buttons in Lbc and one in the media player's help, built directly with &OK or &Cancel, lose their letters.
+
 ## 1.153.0 -- 6 November 2026
 
 - **Every component's verb, checked against its versions.** In the 10:01 install, every component whose newest version was known was current and rightly offered as Reinstall; DbDo's and EdSharp's screen reader scripts were right too, including EdSharp's NVDA add-on, offered as Update since 5.0.123 replaced 5.0.122. Ace by DAISY, Axe.Windows, EPUBCheck and Whisper were offered as Reinstall only because no newer version could be looked up: none is in winget.

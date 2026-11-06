@@ -474,6 +474,19 @@ public class LbcForm : Form
         return ((sName.Length > 0 ? sName + " " : "") + sRole + (sValue.Length > 0 ? ", " + sValue : "")).Trim();
     }
 
+    // ownsMnemonic: whether a visible, enabled control under ctlRoot shows chKey as its access key.
+    private static bool ownsMnemonic(Control ctlRoot, char chKey)
+    {
+        if (!char.IsLetterOrDigit(chKey)) return false;
+        foreach (Control ctl in ctlRoot.Controls)
+        {
+            if (!ctl.Visible || !ctl.Enabled) continue;
+            if (!string.IsNullOrEmpty(ctl.Text) && Control.IsMnemonic(chKey, ctl.Text)) return true;
+            if (ctl.HasChildren && ownsMnemonic(ctl, chKey)) return true;
+        }
+        return false;
+    }
+
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
     {
         if (keyData == (Keys.Alt | Keys.Shift | Keys.OemQuestion))
@@ -487,6 +500,12 @@ public class LbcForm : Form
             Say.say(sSay);
             return true;
         }
+        // A DIALOG'S OWN ACCESS KEY COMES FIRST (6 November 2026, a regression Jamal found in FileDir). FileDir binds
+        // Alt+Y to Yield Files, and app commands were tried before the dialog's controls, so Alt+Y in "Create it?"
+        // ran Yield Files instead of pressing Yes. Now an Alt+letter or Alt+digit that a visible, enabled control of
+        // this dialog shows as its access key goes to that control, in every Homer app; any other key goes on as before.
+        if ((keyData & Keys.Modifiers) == Keys.Alt && ownsMnemonic(this, (char) (keyData & Keys.KeyCode)))
+            return base.ProcessCmdKey(ref msg, keyData);
         if (commandKey != null)
         {
             try { if (commandKey(keyData)) return true; }
@@ -562,7 +581,7 @@ public static class HelpDialog
             tb.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
 
             Button btnClose = new Button();
-            btnClose.Text = "&OK";
+            btnClose.Text = "OK";
                         btnClose.DialogResult = DialogResult.OK;
             btnClose.Size = new Size(90, 28);
             btnClose.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
@@ -616,7 +635,7 @@ public static class HelpDialog
             tb.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
 
             Button btnClose = new Button();
-            btnClose.Text = "&OK";             btnClose.DialogResult = DialogResult.OK;
+            btnClose.Text = "OK";             btnClose.DialogResult = DialogResult.OK;
             btnClose.Size = new Size(90, 28);
             btnClose.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnClose.Location = new Point(dlg.ClientSize.Width - 100, dlg.ClientSize.Height - 38);
@@ -1880,11 +1899,11 @@ public class LbcDialog : IDisposable
             cbo.Text = sInitial ?? "";
             cbo.SelectAll();
             Button btnOk = new Button();
-            btnOk.Text = "&OK";
+            btnOk.Text = "OK";
             btnOk.DialogResult = DialogResult.OK;
             btnOk.Location = new Point(232, 70);
             Button btnCancel = new Button();
-            btnCancel.Text = "&Cancel";
+            btnCancel.Text = "Cancel";
             btnCancel.DialogResult = DialogResult.Cancel;
             btnCancel.Location = new Point(313, 70);
             prompt.Controls.Add(lbl);
@@ -2634,8 +2653,10 @@ public class LbcDialog : IDisposable
             // all, because Control+Enter and Escape are their keys, and
             // an unnecessary Alt+O or Alt+C would only take a letter
             // another button may need.
+            // Close too (6 November 2026): Escape is its key, as it is Cancel's.
             bool bNoAccessKey = string.Equals(sPlain, "OK", StringComparison.OrdinalIgnoreCase)
-                             || string.Equals(sPlain, "Cancel", StringComparison.OrdinalIgnoreCase);
+                             || string.Equals(sPlain, "Cancel", StringComparison.OrdinalIgnoreCase)
+                             || string.Equals(sPlain, "Close", StringComparison.OrdinalIgnoreCase);
             if (bNoAccessKey) btn.Text = sPlain;
             else if (sLabel.IndexOf('&') >= 0) btn.Text = sLabel;
             else btn.Text = "&" + sPlain;
