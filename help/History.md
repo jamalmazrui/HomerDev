@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.159.0 -- 6 November 2026
+
+- **The kit's gate scans HomerDev's own window.** check.py in the kit handed everything to checkHomerDev and stopped, so HomerDev.exe, the program that opens after installing the kit, was never scanned. It now gets the scan every app's program gets, with its five-minute limit, spoken progress and fingerprint; a warning never fails the kit's push.
+- **Fingerprints at work:** DbDo's gate at 11:28 took the main window's first fingerprint (8 controls, none before), scanned, and saved it; FileDir's and EdSharp's gates reused their whole earlier result, so neither scanned.
+
 ## 1.158.0 -- 6 November 2026
 
 - **Whisper's refresh reads each program's own version.** The 11:25 install fetched the newest Windows build, b5454, but whisper-cli.exe carries no version in its file properties, so neither copy could be compared and 1.9.4 was kept. It now asks each copy, as the installer does, with --version, and falls back to the file properties only when that fails.

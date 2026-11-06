@@ -1926,6 +1926,17 @@ def main():
         sayLine("This is the kit; running checkHomerDev, which builds the samples ...")
         iCode = subprocess.call([sys.executable, sChecker], cwd=sRoot)
         logLine("checkHomerDev exit code %d" % iCode)
+        # THE KIT'S OWN WINDOW IS SCANNED TOO (6 November 2026). The kit's gate stopped after checkHomerDev, so
+        # HomerDev.exe -- the program that opens after installing the kit -- was never scanned, though every app's is.
+        # It gets the same scan, with the same five-minute limit, spoken progress and fingerprint; a warning never
+        # fails the kit's push, which checkHomerDev's result decides.
+        try:
+            checkAccessibility("--noscan" not in [sArg.lower() for sArg in sys.argv[1:]])
+            sName, sVerdict, sEvidence = lsFindings[-1]
+            if sVerdict in ("warn", "fail"): sayLine("  warning: %s -- %s" % (sName, sEvidence))
+            else: logLine("the kit's own program: %s %s" % (sVerdict, sEvidence))
+        except Exception:
+            logLine("the kit's own program could not be scanned: " + traceback.format_exc())
         logLine("check end")
         return iCode
 
