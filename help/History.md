@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.147.0 -- 5 November 2026
+
+- **axeWindow finds Axe.Windows' own library.** The 13:07 fetch brought every dependency from NuGet but read the Axe.Windows package as having no lib folder, so Axe.Windows.Automation.dll never arrived and no scan ran; a package's entries are now read whether written with / or \, a fetch that ends without the library fails saying so, and the package's contents are logged when its library is not found.
+
 ## 1.146.0 -- 5 November 2026
 
 - **axeWindow loads the Axe.Windows library in 64-bit .NET Framework.** It had borrowed AxeWindowsCLI's runtime, which is 32-bit: its hostfxr.dll would not load into 64-bit Python (error 0xC1), so no scan ran in the 12:51 push or either walk. It now fetches the Axe.Windows package and each package it depends on from NuGet, once, into %LOCALAPPDATA%\HomerDev\tools\AxeWindowsLib, and loads them with pythonnet into .NET Framework 4.8. The kit's build fetches it, and so does the Axe.Windows component.

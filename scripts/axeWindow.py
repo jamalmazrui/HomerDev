@@ -116,18 +116,24 @@ def fetchLibrary(bFresh=False):
         logLine("NuGet: " + sId + " " + sVer + " from " + sUrl)
         with zipfile.ZipFile(io.BytesIO(urlGet(sUrl))) as oZip:
             lNames = oZip.namelist()
+            # EITHER SEPARATOR (5 November 2026, night): the Axe.Windows package itself was read as having no lib folder,
+            # while its dependencies' were found; a package whose zip entries are written lib\\netstandard2.0\\... is
+            # read the same as lib/netstandard2.0/... now.
+            dByName = dict((n.replace("\\", "/"), n) for n in lNames)
             sSpec = next((n for n in lNames if n.lower().endswith(".nuspec")), "")
             sXml = oZip.read(sSpec).decode("utf-8-sig") if sSpec else ""
             # Its libraries, from the best framework folder it has.
             dLib = {}
-            for n in lNames:
+            for n in dByName:
                 m = re.match(r"^lib/([^/]+)/([^/]+)$", n, re.I)
-                if m: dLib.setdefault(shortFramework(m.group(1)), []).append(n)
+                if m: dLib.setdefault(shortFramework(m.group(1)), []).append(dByName[n])
             sBest = next((f for f in lsFrameworks if f in dLib), "")
+            if not sBest and sId.lower() == "axe.windows":
+                logLine("  no lib folder found; the package holds: " + ", ".join(lNames[:80]))
             for n in dLib.get(sBest, []):
                 if n.lower().endswith((".dll",)):
-                    with open(os.path.join(sFolder, os.path.basename(n)), "wb") as fOut: fOut.write(oZip.read(n))
-            logLine("  libraries from lib/" + (sBest or "(none)") + ": " + ", ".join(os.path.basename(n) for n in dLib.get(sBest, [])))
+                    with open(os.path.join(sFolder, os.path.basename(n.replace("\\", "/"))), "wb") as fOut: fOut.write(oZip.read(n))
+            logLine("  libraries from lib/" + (sBest or "(none)") + ": " + ", ".join(os.path.basename(n.replace("\\", "/")) for n in dLib.get(sBest, [])))
             # Its dependencies, from the group for the best framework it names.
             dGroups = {}
             for m in re.finditer(r"<group([^>]*)>(.*?)</group>", sXml, re.S):
@@ -137,6 +143,8 @@ def fetchLibrary(bFresh=False):
             for m in re.finditer(r'<dependency\s+id="([^"]+)"\s+version="([^"]+)"', dGroups.get(sGroup, "")):
                 sDepVer = re.sub(r"[\[\]\(\)\s]", "", m.group(2)).split(",")[0]
                 lQueue.append((m.group(1), sDepVer))
+    if not os.path.isfile(os.path.join(sFolder, "Axe.Windows.Automation.dll")):
+        raise RuntimeError("the Axe.Windows package gave no Axe.Windows.Automation.dll; the log lists what it holds")
     with open(os.path.join(sFolder, "version.txt"), "w", encoding="utf-8") as fOut: fOut.write(sVersion + "\n")
     logLine("Axe.Windows " + sVersion + " and its dependencies are in " + sFolder)
     return sFolder
