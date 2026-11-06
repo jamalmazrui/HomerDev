@@ -38,3 +38,26 @@ Each of these is built separately by DbDo and FileDir, and EdSharp where it appl
 ## The order of work
 
 DbDo's release comes first. After it: FileDir's describer flag; then the window family; then the new components -- marking, the main-list search family, recent files, the error window and main-window Where Am I -- each built once and taken by every app that has its own.
+
+## Measured on 5 November 2026, evening: what each app still keeps of its own
+
+EdSharp's source has now been checked too. Every app compiles the kit's classes from C:\HomerDev\exec\CSharp, not copies -- DbDo and FileDir 23 of the kit's files, EdSharp 12 -- but some still define a class the kit already provides, and use their own instead of the kit's:
+
+- **DbDo:** KeyMap and KeyBinding (its KeyMap delegates its describer to the kit's), and a small Result class whose name the kit also uses.
+- **EdSharp:** MdiFrame, MdiChild and Util. Its dialogs are mostly plain Windows Forms: one LbcDialog, so Shift+F1 hints and Alt+Shift+Slash, which come with LbcForm, do not reach most of them.
+- **FileDir:** MdiChild. Its dialogs are the kit's Lbc throughout.
+
+Neither EdSharp nor FileDir has a Hints.inix yet, so Shift+F1 has little specific to say in either.
+
+The shared check's **kit classes** finding lists these at every push, until none is left.
+
+## The order of the rest, one step to a build
+
+Each step is built and released before the next, so a fault is found where it was made:
+
+1. **The window family:** FileDir's MdiChild, then EdSharp's MdiFrame and MdiChild, replaced by the kit's MdiWindows -- one frame for windows, F4 and Control+Tab in every app.
+2. **EdSharp's Util:** any helper the kit's Util lacks is moved into the kit first; then EdSharp uses the kit's.
+3. **EdSharp's dialogs on Lbc,** so Shift+F1 and Alt+Shift+Slash reach them as in DbDo and FileDir.
+4. **DbDo's KeyMap and KeyBinding:** the kit's, with DbDo's commands registered as FileDir's are.
+5. **Hints.inix for EdSharp and FileDir,** written against their own dialogs, as complete as DbDo's.
+6. **The components still built in each app** -- marking, the main-list search family, recent files, the error window and main-window Where Am I -- each written once in the kit and taken by every app.

@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.150.0 -- 5 November 2026
+
+- **The gate measures integration.** The shared check's new kit classes finding lists every class an app defines under a name the kit provides, so the integration still to do is named at every push: today EdSharp's MdiFrame, MdiChild and Util; FileDir's MdiChild; DbDo's KeyMap, KeyBinding and Result.
+- **help\SharedCore.md** now records EdSharp as measured, and the order of the remaining steps, one to a build.
+
 ## 1.149.0 -- 5 November 2026
 
 - **SuiteCommands.inix:** FileDir's Window Toggle is retired from Shift+W, as planned, so Shift+W means Say Whole Record across the suite.
