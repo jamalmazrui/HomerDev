@@ -191,9 +191,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "Expand-Archive -Path $zip -DestinationPath $tmp -Force;" ^
   "$newCli = Get-ChildItem -Path $tmp -Recurse -Filter 'whisper-cli.exe' | Select-Object -First 1;" ^
   "$oldCli = Join-Path $dir 'whisper-cli.exe';" ^
+  "function verOf($p) { try { $o = (& $p --version 2>&1 | Out-String); if ($o -match '(\d+\.\d+\.\d+)') { return [version]$Matches[1] } } catch {}; try { return [version]((Get-Item $p).VersionInfo.FileVersion -replace '[^0-9.].*$','') } catch {}; return $null };" ^
   "$vNew = $null; $vOld = $null;" ^
-  "try { $vNew = [version]((Get-Item $newCli.FullName).VersionInfo.FileVersion -replace '[^0-9.].*$','') } catch {};" ^
-  "try { $vOld = [version]((Get-Item $oldCli).VersionInfo.FileVersion -replace '[^0-9.].*$','') } catch {};" ^
+  "if ($newCli) { $vNew = verOf $newCli.FullName }; $vOld = verOf $oldCli;" ^
   "Write-Output ('refresh: installed ' + $vOld + ', newest Windows build ' + $vNew);" ^
   "if ($newCli -and $vNew -and $vOld -and ($vNew -gt $vOld)) {" ^
   "  foreach ($f in (Get-ChildItem -Path $tmp -Recurse -Include '*.exe','*.dll')) { Copy-Item -Path $f.FullName -Destination $dir -Force };" ^

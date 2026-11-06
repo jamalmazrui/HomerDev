@@ -6068,6 +6068,16 @@ public static class LbcMessage
     public static DialogResult show(IWin32Window owner, string sText, string sTitle, MessageBoxButtons buttons) { return show(owner, sText, sTitle, buttons, MessageBoxIcon.None, MessageBoxDefaultButton.Button1); }
     public static DialogResult show(IWin32Window owner, string sText, string sTitle, MessageBoxButtons buttons, MessageBoxIcon icon) { return show(owner, sText, sTitle, buttons, icon, MessageBoxDefaultButton.Button1); }
 
+    // native: THE STANDARD WINDOWS MESSAGE BOX (6 November 2026, at Jamal's request). Its Yes and No answer Y and N, with or
+    // without Alt, by Windows itself, with no Homer key routing in the way: FileDir's "Create it?" still lost Alt+Y to
+    // the app's Yield Files after kit 1.154.0. Owned by the window in front, so a screen reader reads it as part of the app.
+    public static DialogResult native(IWin32Window owner, string sText, string sTitle, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defaultButton)
+    {
+        if (owner == null && Form.ActiveForm != null) owner = Form.ActiveForm;
+        return owner == null ? MessageBox.Show(sText ?? "", sTitle ?? "", buttons, icon, defaultButton)
+                             : MessageBox.Show(owner, sText ?? "", sTitle ?? "", buttons, icon, defaultButton);
+    }
+
     public static DialogResult show(IWin32Window owner, string sText, string sTitle, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defaultButton)
     {
         string[] aLabels;

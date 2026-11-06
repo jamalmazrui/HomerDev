@@ -7,6 +7,15 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.158.0 -- 6 November 2026
+
+- **Whisper's refresh reads each program's own version.** The 11:25 install fetched the newest Windows build, b5454, but whisper-cli.exe carries no version in its file properties, so neither copy could be compared and 1.9.4 was kept. It now asks each copy, as the installer does, with --version, and falls back to the file properties only when that fails.
+- **The scan report explains BoundingRectangleNotNull:** rows of a virtual list off screen have no on-screen rectangle, Windows' own list control; DbDo's record list gave it 4,161 times, and there is nothing to change.
+
+## 1.157.0 -- 6 November 2026
+
+- **LbcMessage.native wraps the standard Windows message box,** owned by the window in front, for a question whose Yes and No must answer Y and N by Windows itself, Alt or not. FileDir's "Create it?" still lost Alt+Y to its Yield Files after 1.154.0; FileDir's confirmations use this now.
+
 ## 1.156.0 -- 6 November 2026
 
 - **axeWindow keeps its fingerprints in axeScans.inix,** not axeScans.json: a file a Homer tool creates is .inix unless .inix cannot hold its data, and this data is a section a window with one line a value. A JSON copy left by 1.155.0 is removed the first time the .inix is written.

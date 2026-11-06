@@ -160,6 +160,9 @@ def walkJson(oNode, lFindings, sElement=""):
 def adviceFor(sFinding):
     """Homer's guidance for a finding, by the kind of rule it names."""
     s = sFinding.lower()
+    if "boundingrectangle" in s:
+        return ("How a virtual list reports rows that are not on screen: Windows' own list control gives them no on-screen "
+                "rectangle. DbDo's record list showed it 4,161 times. A screen reader reads the rows it is on; nothing to change.")
     if "scrollitem" in s:
         return ("How Windows Forms' standard list box reports its items: each lacks the ScrollItem pattern its scrolling list "
                 "implies. Screen readers do not depend on it, and a user does not meet it; nothing to change in the app.")
