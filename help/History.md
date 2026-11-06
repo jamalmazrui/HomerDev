@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.149.0 -- 5 November 2026
+
+- **SuiteCommands.inix:** FileDir's Window Toggle is retired from Shift+W, as planned, so Shift+W means Say Whole Record across the suite.
+
+## 1.148.0 -- 5 November 2026
+
+- **axeWindow reads the Axe.Windows package's own folder name.** The listing logged at 17:51 showed it: lib/netstandard20, an older spelling of netstandard2.0, which was missed while framework names kept their dots, so Axe.Windows.Automation.dll was never taken. Names are compared without dots now. No command-line tool scans one window: AxeWindowsCLI takes only a process id or name, and Accessibility Insights for Windows has no command-line scanner; the library's scanRootWindowHandle is the way.
+
 ## 1.147.0 -- 5 November 2026
 
 - **axeWindow finds Axe.Windows' own library.** The 13:07 fetch brought every dependency from NuGet but read the Axe.Windows package as having no lib folder, so Axe.Windows.Automation.dll never arrived and no scan ran; a package's entries are now read whether written with / or \, a fetch that ends without the library fails saying so, and the package's contents are logged when its library is not found.

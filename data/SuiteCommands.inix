@@ -3621,8 +3621,9 @@ status=current
 
 [FileDir windowToggle]
 name=Window Toggle
-keys=Shift+W
-status=current
+keys=
+status=retired
+change=retired 5 November 2026, from Shift+W
 note=to retire when FileDir is next updated (5 November 2026): Jamal never uses it, Control+Tab and Control+Shift+Tab do the same, and DbDo's Shift+W is now Say Whole Record; DbDo withdrew its own Window Toggle on Shift+W the same day
 
 [FileDir windowsControlPanel]
