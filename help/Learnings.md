@@ -2,6 +2,16 @@
 
 *What building the Homer apps has taught, kept so it is not learned twice. Newest first. Started 5 November 2026 from the transition brief of 26 October and the work since.*
 
+## 6 November 2026
+
+- **Read a page the way the script that already works reads it.** kdpFix's first run found neither Blind Vibe Coding row: it searched element ids KDP's Bookshelf does not have, and read one page of three. kdpReport had read both rows the day before; its reader, reused, was the fix.
+- **Never say "the log has it" unless the log has it.** A message promised the page in the log; nothing had been written there.
+- **Scan what a person meets, where it is cheap to scan.** A walk spent seven minutes on DbDo's main window, record list and all, which every push already scans; walks now scan the dialogs they open, and every scan stops at five minutes.
+- **A repeated finding is one finding.** FileDir's list gave 60 of one Axe.Windows rule, and 1,086 with a longer list; reports now give each rule once, with its count and three examples.
+- **The scans so far found no real fault.** FileDir's main window: list items without the ScrollItem pattern (Windows Forms' list box, not met by a screen reader user), and an unnamed list and menu bar, which the window title and the role already name.
+- **A finish step should start the program, not a shell.** Two installers started their app through cmd.exe with its window shown and left a console open; the kit's template carried it to every new app.
+
+
 ## 5 November 2026, late
 
 - **A script does the sensible whole with no arguments.** No parameter is to be recalled: recordWalk alone walks the pilot, scans each window and performs Tutorial 1 when its recording is due; axeWindow alone scans the app of the folder it is run from. Arguments are for the rare exception.

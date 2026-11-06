@@ -29,7 +29,7 @@ The console says little; logs\\<App>-axeWindow-<time>.log holds every step."""
 import argparse, ctypes, datetime, glob, json, os, platform, subprocess, sys, threading, time, traceback
 
 iProgressSeconds = 10
-iScanLimit = 600
+iScanLimit = 300   # five minutes at most, for any window (6 November 2026)
 
 sLog = ""
 
@@ -298,7 +298,7 @@ def frontWindowOf(iPid):
     return lWindows[0][0] if lWindows else 0
 
 
-def scanProgramWindow(sExe, sRoot, sApp, sLogDir, iLimit=120):
+def scanProgramWindow(sExe, sRoot, sApp, sLogDir, iLimit=300):
     """Open the program, scan its main window, close it, and write the report -- for every push's check. Answers
     (verdict, evidence, report): "pass" with no errors, "warn" with errors to review, "skip" when no scan was made.
     It says aloud why the program opens, and how the scan goes, so nothing seems to hang."""

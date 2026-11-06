@@ -911,8 +911,10 @@ begin
   sFlag := ExpandConstant('{localappdata}\{#AppName}\logs\{#AppName}_launch.flag');
   if not FileExists(sFlag) then exit;
   DeleteFile(sFlag);
-  ExecAsOriginalUser(ExpandConstant('{cmd}'),
-       '/s /c ""' + ExpandConstant('{app}\exec\{#AppExeName}') + '""',
+  // THE PROGRAM ITSELF, NOT CMD.EXE (6 November 2026). Starting it through cmd.exe with its window shown left a
+  // console open after installing; it is started directly now, still as the person and in Documents, as DbDo's and
+  // EdSharp's installers start theirs.
+  ExecAsOriginalUser(ExpandConstant('{app}\exec\{#AppExeName}'), '',
        ExpandConstant('{userdocs}'), SW_SHOW, ewNoWait, iResult);
 end;
 

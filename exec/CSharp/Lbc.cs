@@ -1835,6 +1835,19 @@ public class LbcDialog : IDisposable
         }
     }
 
+    // THE LAST CHOICE IN A PICK LIST (6 November 2026). A list that offers the same things each time starts on the
+    // one chosen last -- Go to Special Folder on AppData Local, say -- even in a later session when the app files
+    // its history, as FileDir does. The same short history as the prompts, under its own key.
+    public static string lastChoice(string sKey)
+    {
+        List<string> lsPast = historyFor("Pick" + sKey);
+        return lsPast.Count > 0 ? lsPast[0] : "";
+    }
+    public static void noteChoice(string sKey, string sValue)
+    {
+        historyAdd("Pick" + sKey, sValue);
+    }
+
     // promptWithHistory: ask for one line, with the last ten answers on hand.
     // Returns null when the person changes their mind.
     public string promptWithHistory(string sTitle, string sPrompt, string sHistoryKey, string sInitial)

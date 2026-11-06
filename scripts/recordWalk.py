@@ -702,6 +702,12 @@ def main():
                     iPid = lWindows[0][1]
                     hWnd = axeWindow.frontWindowOf(iPid)
                     sTitle = axeWindow.windowTitle(hWnd) if hWnd else ""
+                    # DIALOGS ONLY (6 November 2026). The 8:56 walk spent seven minutes on DbDo's main window, record
+                    # list and all; every push already scans an app's main window, so a walk scans the windows it
+                    # opens -- the ones another window owns -- and passes the main window by.
+                    if hWnd and not ctypes.windll.user32.GetWindow(hWnd, 4):
+                        sAxe = (sTitle or "the main window") + ": the main window, scanned by every push, so not here"
+                        hWnd = 0
                     if hWnd and sTitle in setScanned:
                         sAxe = sTitle + " was scanned at an earlier step"
                     elif hWnd:

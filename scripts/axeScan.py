@@ -160,6 +160,9 @@ def walkJson(oNode, lFindings, sElement=""):
 def adviceFor(sFinding):
     """Homer's guidance for a finding, by the kind of rule it names."""
     s = sFinding.lower()
+    if "scrollitem" in s:
+        return ("How Windows Forms' standard list box reports its items: each lacks the ScrollItem pattern its scrolling list "
+                "implies. Screen readers do not depend on it, and a user does not meet it; nothing to change in the app.")
     if "name" in s and re.search(r"null|empty|not null|missing|no name|whitespace", s):
         return ("Check first what already names it for the reader: the label just before it in the focus order, its own "
                 "caption (a check box, a button), or the window's title. If any does, change nothing -- an accessible "
@@ -194,8 +197,25 @@ def writeReport(sPath, sApp, sWhat, iErrors, sSummary, lFindings, setAccepted, s
               "never add an accessible name where a label before the control, its own caption, or the window's title already "
               "names it, since the reader would then say it twice. A finding reviewed and accepted goes in " + sAccepted + ", one per line, as written here.", ""]
     if sFile: lLines += ["The full results, " + os.path.basename(sFile) + ", open in Accessibility Insights for Windows.", ""]
+    # A REPEATING FINDING IS ONE ENTRY (6 November 2026). FileDir's list gave 60 of one rule, one per file, and 1,086
+    # with a longer list: the same question each time. Findings are grouped by rule and kind of element, each group
+    # with its count and up to three examples; a pattern seen once is read once.
+    dGroups, lOrder = {}, []
     for sFinding in lFindings:
-        lLines += ["## " + ("Accepted: " if sFinding in setAccepted else "") + sFinding, "", adviceFor(sFinding), ""]
+        sRule, _, sOn = sFinding.partition(" -- on ")
+        sKind = re.sub(r"\s*'.*$", "", sOn).replace(" with no name", "").strip()
+        sKey = sRule + " | " + sKind
+        if sKey not in dGroups: dGroups[sKey] = []; lOrder.append(sKey)
+        dGroups[sKey].append(sFinding)
+    for sKey in sorted(lOrder, key=lambda k: -len(dGroups[k])):
+        lSame = dGroups[sKey]
+        sRule, _, sKind = sKey.partition(" | ")
+        sNew = "" if all(s in setAccepted for s in lSame) else ""
+        lLines += ["## " + sRule + (" -- on " + sKind if sKind else "") + " (%d time%s)" % (len(lSame), "" if len(lSame) == 1 else "s"), "",
+                   adviceFor(lSame[0]), ""]
+        for sOne in lSame[:3]: lLines.append("- " + ("Accepted: " if sOne in setAccepted else "") + sOne)
+        if len(lSame) > 3: lLines.append("- and %d more like these" % (len(lSame) - 3))
+        lLines.append("")
     if not lFindings: lLines += ["No finding could be listed. " + (sSummary or ""), ""]
     with open(sPath, "w", encoding="utf-8-sig", newline="\r\n") as fOut: fOut.write("\n".join(lLines))
     return len(lNew)

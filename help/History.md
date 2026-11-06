@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.152.0 -- 6 November 2026
+
+- **Pick lists remember the last choice:** LbcDialog.lastChoice and noteChoice, on the same history that prompts keep, so a list starts on the item chosen last, across sessions in an app that files its history.
+- **No console after installing.** HomerDev's installer, and the template every new Homer app's installer is made from, started the program through cmd.exe with its window shown; they start it directly now, as the person and in Documents.
+- **Axe.Windows scans stop at five minutes; reports give each rule once,** with its count and up to three examples, and say plainly that the ScrollItem finding on Windows Forms list items is nothing to change; **walks scan only the dialogs they open,** since every push scans an app's main window.
+
 ## 1.151.0 -- 5 November 2026
 
 - **axeWindow finds ScanOptions wherever the library keeps it.** The library loaded at last at 20:01, in 64-bit .NET Framework, but each scan stopped at once: ScanOptions is not in the Axe.Windows.Automation namespace, where Config and ScannerFactory are. The library is now asked for the type by name, and if its constructor does not take scanId and the window's handle in that order, it is built by reflection, its constructors logged.
