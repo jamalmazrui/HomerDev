@@ -206,6 +206,103 @@ def scanOptions(sScanId, hWnd):
         return System.Activator.CreateInstance(oType, aArgs)
 
 
+# ---- a window's fingerprint: scan only what has changed (6 November 2026) ------------------------------------------
+# A window whose controls are the same kinds, in the same order, with the same captions, is the same window to a scan;
+# a list's rows or an edit box's text are its data, not its make-up, and are left out. The Axe.Windows version is part
+# of the fingerprint, so a new rule set scans again. Windows Forms class names carry a per-build suffix
+# (".app.0.141b42a_r6_ad1"), dropped so a rebuild alone is not a change. Kept in %LOCALAPPDATA%\\HomerDev\\axeScans.inix --
+# a Homer file is .inix, not JSON (6 November 2026) -- one section a window, by program and window: a dialog by its title,
+# the main window, whose title follows its folder or table, as "main"; each finding on its own numbered line.
+lsDataClasses = ("edit", "richedit", "combobox", "listbox", "syslistview32", "systreeview32", "datagridview")
+
+
+def scansFile():
+    return os.path.join(os.environ.get("LOCALAPPDATA", os.path.expanduser("~")), "HomerDev", "axeScans.inix")
+
+
+def exeNameOf(iPid):
+    from ctypes import wintypes
+    hProcess = ctypes.windll.kernel32.OpenProcess(0x1000, False, iPid)
+    if not hProcess: return ""
+    try:
+        oBuffer = ctypes.create_unicode_buffer(1024); iSize = wintypes.DWORD(1024)
+        if ctypes.windll.kernel32.QueryFullProcessImageNameW(hProcess, 0, oBuffer, ctypes.byref(iSize)): return os.path.basename(oBuffer.value)
+        return ""
+    finally:
+        ctypes.windll.kernel32.CloseHandle(hProcess)
+
+
+def windowFingerprint(hWnd):
+    """A hash of the window's controls in order: kind, and the caption of each that is not a data control."""
+    import hashlib, re as reLocal
+    oUser = ctypes.windll.user32
+    lParts = []
+    fEnum = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
+    def visit(hChild, lParam):
+        oClass = ctypes.create_unicode_buffer(256); oUser.GetClassNameW(hChild, oClass, 256)
+        sClass = reLocal.sub(r"\.app\..*$", "", oClass.value)
+        sText = ""
+        if not any(s in sClass.lower() for s in lsDataClasses):
+            oText = ctypes.create_unicode_buffer(512); oUser.GetWindowTextW(hChild, oText, 512); sText = oText.value
+        lParts.append("%s|%s|%d" % (sClass, sText, 1 if oUser.IsWindowVisible(hChild) else 0))
+        return True
+    oUser.EnumChildWindows(int(hWnd), fEnum(visit), 0)
+    sVersion = ""
+    try:
+        with open(os.path.join(libFolder(), "version.txt"), encoding="utf-8") as fIn: sVersion = fIn.read().strip()
+    except Exception: pass
+    return hashlib.sha256(("axe " + sVersion + "\n" + "\n".join(lParts)).encode("utf-8")).hexdigest(), len(lParts)
+
+
+def windowKey(iPid, hWnd):
+    bMain = not ctypes.windll.user32.GetWindow(int(hWnd), 4)   # GW_OWNER: an owned window is a dialog
+    return exeNameOf(iPid).lower() + " | " + ("main" if bMain else windowTitle(hWnd))
+
+
+def loadScans():
+    """axeScans.inix as {section: {key: value}}: [section] lines, then key = value lines."""
+    dScans, sSection = {}, ""
+    try:
+        with open(scansFile(), encoding="utf-8-sig") as fIn:
+            for sLine in fIn:
+                sLine = sLine.strip()
+                if not sLine or sLine.startswith(";"): continue
+                if sLine.startswith("[") and sLine.endswith("]"):
+                    sSection = sLine[1:-1]; dScans[sSection] = {}
+                elif "=" in sLine and sSection:
+                    sName, _, sValue = sLine.partition("=")
+                    dScans[sSection][sName.strip()] = sValue.strip()
+    except Exception: pass
+    for d in dScans.values():
+        d["lFindings"] = [d[k] for k in sorted((k for k in d if k.startswith("finding")), key=lambda k: int(k[7:] or 0))]
+        try: d["iErrors"] = int(d.get("errors", ""))
+        except ValueError: d["iErrors"] = None
+    return dScans
+
+
+def saveScan(sKey, sFingerprint, dResult):
+    """This window's fingerprint and result into axeScans.inix, UTF-8 with a byte order mark and CRLF line endings, the
+    other windows' sections kept. A JSON copy left by 1.155.0 is removed, so only the .inix remains."""
+    dScans = loadScans()
+    dScans[sKey.replace("[", "(").replace("]", ")")] = {"fingerprint": sFingerprint, "date": datetime.datetime.now().strftime("%d %B %Y"),
+        "errors": str(dResult["iErrors"]), "file": dResult["sFile"] or "", "lFindings": dResult["lFindings"][:300]}
+    lLines = ["; axeScans.inix -- the last Axe.Windows scan of each window, kept by axeWindow so an unchanged window is not scanned again", ""]
+    for sSection in sorted(dScans, key=str.lower):
+        d = dScans[sSection]
+        lLines.append("[" + sSection + "]")
+        for sName in ("fingerprint", "date", "errors", "file"):
+            lLines.append(sName + " = " + str(d.get(sName, "")))
+        for iAt, sFinding in enumerate(d.get("lFindings", []), 1):
+            lLines.append("finding%d = %s" % (iAt, sFinding.replace("\r", " ").replace("\n", " ")))
+        lLines.append("")
+    try:
+        os.makedirs(os.path.dirname(scansFile()), exist_ok=True)
+        with open(scansFile(), "w", encoding="utf-8-sig", newline="\r\n") as fOut: fOut.write("\n".join(lLines))
+        sOld = os.path.join(os.path.dirname(scansFile()), "axeScans.json")
+        if os.path.isfile(sOld): os.remove(sOld); logLine("removed " + sOld + "; axeScans.inix replaces it")
+    except Exception as oError: logLine("scan record not saved: " + str(oError))
+
+
 # ---- one window --------------------------------------------------------------------------------------------------
 def windowTitle(hWnd):
     oBuffer = ctypes.create_unicode_buffer(512)
@@ -218,6 +315,20 @@ def scanWindow(iPid, hWnd, sFolder, sScanId, sSpoken="", iLimit=0):
     sProblem. Speaks at the start, every iProgressSeconds while it runs, and at the end."""
     dResult = {"iErrors": None, "lFindings": [], "sFile": "", "sProblem": ""}
     sName = sSpoken or windowTitle(hWnd) or "the window"
+    # UNCHANGED SINCE ITS LAST SCAN: the earlier result stands, and nothing is scanned.
+    sKey, sFingerprint = "", ""
+    try:
+        sKey = windowKey(iPid, hWnd)
+        sFingerprint, iControls = windowFingerprint(hWnd)
+        dLast = loadScans().get(sKey.replace("[", "(").replace("]", ")"))
+        logLine("fingerprint of %s: %s, %d controls; last %s" % (sKey, sFingerprint[:16], iControls, (dLast or {}).get("fingerprint", "none")[:16]))
+        if dLast and dLast.get("fingerprint") == sFingerprint and dLast.get("iErrors") is not None:
+            iLast = int(dLast["iErrors"])
+            speak("%s is unchanged since its scan on %s: %d error%s then." % (sName, dLast.get("date", "an earlier day"), iLast, "" if iLast == 1 else "s"))
+            dResult.update({"iErrors": iLast, "lFindings": list(dLast.get("lFindings", [])), "sFile": dLast.get("sFile", ""), "bUnchanged": True})
+            return dResult
+    except Exception:
+        logLine("fingerprint not taken: " + traceback.format_exc())
     # SPOKEN FIRST, EVEN BEFORE THE LIBRARY LOADS (5 November 2026, night): a first load fetches packages from NuGet,
     # and a failure there had been silent.
     speak("Scanning " + sName + " for accessibility.")
@@ -265,6 +376,7 @@ def scanWindow(iPid, hWnd, sFolder, sScanId, sSpoken="", iLimit=0):
         for oError in list(getattr(oWindow, "Errors", []) or []):
             lFindings.append(describe(oError))
     dResult.update({"iErrors": iErrors, "lFindings": lFindings, "sFile": sFile})
+    if sKey and sFingerprint: saveScan(sKey, sFingerprint, dResult)
     logLine("scan of %s: %d error%s in %.1f s" % (sName, iErrors, "" if iErrors == 1 else "s", time.time() - nStart))
     speak("Scan done: %d error%s in %s." % (iErrors, "" if iErrors == 1 else "s", sName))
     return dResult

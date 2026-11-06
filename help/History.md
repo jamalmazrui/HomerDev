@@ -7,6 +7,15 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.156.0 -- 6 November 2026
+
+- **axeWindow keeps its fingerprints in axeScans.inix,** not axeScans.json: a file a Homer tool creates is .inix unless .inix cannot hold its data, and this data is a section a window with one line a value. A JSON copy left by 1.155.0 is removed the first time the .inix is written.
+
+## 1.155.0 -- 6 November 2026
+
+- **Every verb checked again, and one false Update found.** In the 10:43 and 10:58 installs, the new lookups confirmed Ace by DAISY 1.4.6, Axe.Windows 2.4.2 and EPUBCheck 5.4.0 current, every other component was rightly Reinstall, and Whisper was rightly offered as Update, 1.9.5 over 1.9.4 -- twice, since installWhisper with the program in place only checked the model. It now fetches the newest Windows CPU build, compares its whisper-cli.exe's own file version with the installed one, and replaces the program only when newer. whisper.cpp tags a version with its source alone and publishes Windows programs under nightly build tags, so when 1.9.5 has no Windows build yet the installed program is kept and the log says so.
+- **A window unchanged since its last scan is not scanned again.** axeWindow fingerprints a window by its controls in order -- each one's kind, and the caption of each that is not a data control -- with the Axe.Windows version, and keeps the fingerprints in %LOCALAPPDATA%\HomerDev\axeScans.json, a dialog by its title and the main window as main. When nothing has changed, JAWS says so with the error count of the last scan, and that scan's findings stand.
+
 ## 1.154.0 -- 6 November 2026
 
 - **A dialog's own access keys come first, in every Homer app.** FileDir binds Alt+Y to Yield Files, and LbcForm tried an app's command keys before the dialog's controls, so Alt+Y in Unarchive's "Create it?" ran Yield Files instead of pressing Yes. Now an Alt+letter or Alt+digit that a visible, enabled control of the dialog shows as its access key goes to that control first.

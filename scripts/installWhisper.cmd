@@ -88,10 +88,13 @@ rem PowerShell below reads this, so the download lands where this script
 rem decided -- not where it assumed.
 set "HOMER_WHISPER_DIR=%whisperDir%"
 if not exist "%whisperDir%\whisper-cli.exe" goto :fetchAll
-rem BOTH THERE IS NOT BOTH SOUND (13 October 2026): an incomplete model or a program that cannot start was "ready" here.
-rem The program is already in place, so its download is skipped, and the model check and the start test still run.
-if exist "%whisperDir%\ggml-%model%.bin" goto :checkModel
-goto :fetchAll
+rem AN UPDATE THAT UPDATES (6 November 2026). With the program in place, its download was skipped and only the model
+rem was checked, so the installer's Update -- offered at 10:43 and 10:58 for 1.9.5 over 1.9.4 -- ran and changed nothing.
+rem Now the newest Windows CPU build is fetched, its whisper-cli.exe's own file version compared with the installed one,
+rem and the program replaced only when the new one is newer. whisper.cpp tags a version (v1.9.5) with its source alone
+rem and publishes Windows programs under nightly build tags, so a newer version can be out before a Windows build of it;
+rem then the installed program is kept, and the log says so.
+goto :refreshProgram
 
 :fetchAll
 
@@ -158,6 +161,48 @@ if errorlevel 1 goto :programFailed
 
 :haveProgram
 if exist "%whisperDir%\whisper-cli.exe" echo whisper.cpp is in place.
+goto :checkModel
+
+:refreshProgram
+echo Checking for a newer whisper.cpp program. This is a small download.
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+  "$ErrorActionPreference='Stop';" ^
+  "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12;" ^
+  "$dir = $env:HOMER_WHISPER_DIR;" ^
+  "$hdr = @{ 'User-Agent' = 'HomerScribe-installWhisper'; 'Accept' = 'application/vnd.github+json' };" ^
+  "$url = $null; $picked = '';" ^
+  "try {" ^
+  "  $rels = Invoke-RestMethod -Uri 'https://api.github.com/repos/ggml-org/whisper.cpp/releases?per_page=30' -Headers $hdr;" ^
+  "  foreach ($r in $rels) {" ^
+  "    foreach ($a in $r.assets) {" ^
+  "      $n = $a.name.ToLower();" ^
+  "      $isWin = ($n -match 'win' -and $n -match 'x64') -or ($n -match '^whisper-bin-x64\.zip$');" ^
+  "      $isGpu = $n -match 'cuda|cublas|vulkan|arm|openvino|sycl';" ^
+  "      if ($isWin -and -not $isGpu -and $n -match '\.zip$') { $url = $a.browser_download_url; $picked = $r.tag_name + ' / ' + $a.name; break }" ^
+  "    }" ^
+  "    if ($url) { break }" ^
+  "  }" ^
+  "} catch { Write-Output ('GitHub API could not be read: ' + $_.Exception.Message) }" ^
+  "if (-not $url) { Write-Output 'refresh: no Windows build could be listed; the installed program is kept'; exit 0 };" ^
+  "Write-Output ('refresh asset: ' + $picked);" ^
+  "$zip = Join-Path $env:TEMP 'homerWhisperNew.zip'; $tmp = Join-Path $env:TEMP 'homerWhisperNew';" ^
+  "if (Test-Path $zip) { Remove-Item -Force $zip }; if (Test-Path $tmp) { Remove-Item -Recurse -Force $tmp };" ^
+  "Invoke-WebRequest -Uri $url -OutFile $zip -UseBasicParsing -Headers $hdr;" ^
+  "Expand-Archive -Path $zip -DestinationPath $tmp -Force;" ^
+  "$newCli = Get-ChildItem -Path $tmp -Recurse -Filter 'whisper-cli.exe' | Select-Object -First 1;" ^
+  "$oldCli = Join-Path $dir 'whisper-cli.exe';" ^
+  "$vNew = $null; $vOld = $null;" ^
+  "try { $vNew = [version]((Get-Item $newCli.FullName).VersionInfo.FileVersion -replace '[^0-9.].*$','') } catch {};" ^
+  "try { $vOld = [version]((Get-Item $oldCli).VersionInfo.FileVersion -replace '[^0-9.].*$','') } catch {};" ^
+  "Write-Output ('refresh: installed ' + $vOld + ', newest Windows build ' + $vNew);" ^
+  "if ($newCli -and $vNew -and $vOld -and ($vNew -gt $vOld)) {" ^
+  "  foreach ($f in (Get-ChildItem -Path $tmp -Recurse -Include '*.exe','*.dll')) { Copy-Item -Path $f.FullName -Destination $dir -Force };" ^
+  "  Write-Output ('refresh: updated to ' + $vNew)" ^
+  "} else { Write-Output 'refresh: the installed program is the newest Windows build, or the two cannot be compared; kept' };" ^
+  "Remove-Item -Force $zip; Remove-Item -Recurse -Force $tmp" >> "%log%" 2>&1
+if errorlevel 1 call "%~dp0installCommon.cmd" log "refresh failed; the installed program is kept"
+findstr /c:"refresh: updated to" "%log%" >nul 2>&1 && echo whisper.cpp is updated.
+findstr /c:"refresh: updated to" "%log%" >nul 2>&1 || echo whisper.cpp is the newest Windows build there is.
 
 :checkModel
 rem ---- the model ------------------------------------------------------
