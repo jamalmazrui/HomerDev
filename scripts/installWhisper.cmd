@@ -93,7 +93,11 @@ rem was checked, so the installer's Update -- offered at 10:43 and 10:58 for 1.9
 rem Now the newest Windows CPU build is fetched, its whisper-cli.exe's own file version compared with the installed one,
 rem and the program replaced only when the new one is newer. whisper.cpp tags a version (v1.9.5) with its source alone
 rem and publishes Windows programs under nightly build tags, so a newer version can be out before a Windows build of it;
-rem then the installed program is kept, and the log says so.
+rem then the installed program is kept, and the log says so. EACH VERSION ASKED THROUGH CMD.EXE (6 November 2026, 12:02):
+rem asked through PowerShell with errors stopping, the installed 1.9.4 answered nothing -- it writes its version where
+rem errors go -- while the new build answered 1.9.5. Each program is now started directly through .NET, its output and
+rem error output both read and its raw answer logged, so no quoting of a path with a space in it ("Program Files") can
+rem lose the answer -- the installed copy failed and the downloaded one, in a folder without spaces, did not.
 goto :refreshProgram
 
 :fetchAll
@@ -191,7 +195,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "Expand-Archive -Path $zip -DestinationPath $tmp -Force;" ^
   "$newCli = Get-ChildItem -Path $tmp -Recurse -Filter 'whisper-cli.exe' | Select-Object -First 1;" ^
   "$oldCli = Join-Path $dir 'whisper-cli.exe';" ^
-  "function verOf($p) { try { $o = (& $p --version 2>&1 | Out-String); if ($o -match '(\d+\.\d+\.\d+)') { return [version]$Matches[1] } } catch {}; try { return [version]((Get-Item $p).VersionInfo.FileVersion -replace '[^0-9.].*$','') } catch {}; return $null };" ^
+  "function verOf($p) { $o = ''; try { $psi = New-Object System.Diagnostics.ProcessStartInfo; $psi.FileName = $p; $psi.Arguments = '--version'; $psi.UseShellExecute = $false; $psi.RedirectStandardOutput = $true; $psi.RedirectStandardError = $true; $psi.CreateNoWindow = $true; $pr = [System.Diagnostics.Process]::Start($psi); $o = $pr.StandardOutput.ReadToEnd() + $pr.StandardError.ReadToEnd(); [void]$pr.WaitForExit(15000) } catch { $o = 'could not start: ' + $_.Exception.Message }; [Console]::Out.WriteLine('refresh: ' + $p + ' answers: ' + (($o -replace '\s+', ' ').Trim() + '').Substring(0, [Math]::Min(160, (($o -replace '\s+', ' ').Trim() + '').Length))); if ($o -match '(\d+\.\d+\.\d+)') { return [version]$Matches[1] }; try { return [version]((Get-Item $p).VersionInfo.FileVersion -replace '[^0-9.].*$','') } catch {}; return $null };" ^
   "$vNew = $null; $vOld = $null;" ^
   "if ($newCli) { $vNew = verOf $newCli.FullName }; $vOld = verOf $oldCli;" ^
   "Write-Output ('refresh: installed ' + $vOld + ', newest Windows build ' + $vNew);" ^

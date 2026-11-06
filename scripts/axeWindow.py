@@ -256,7 +256,12 @@ def windowFingerprint(hWnd):
 
 def windowKey(iPid, hWnd):
     bMain = not ctypes.windll.user32.GetWindow(int(hWnd), 4)   # GW_OWNER: an owned window is a dialog
-    return exeNameOf(iPid).lower() + " | " + ("main" if bMain else windowTitle(hWnd))
+    # A VERSION IN A TITLE IS NOT A NEW WINDOW (6 November 2026): HomerDev's main window has a hidden owner and is titled
+    # "HomerDev 1.159.0", so each release would have keyed a new window and scanned it again; numbers like 1.159.0 are
+    # left out of the key.
+    import re as reLocal
+    sTitle = reLocal.sub(r"\s*v?\d+(\.\d+)+", "", windowTitle(hWnd)).strip()
+    return exeNameOf(iPid).lower() + " | " + ("main" if bMain else sTitle)
 
 
 def loadScans():

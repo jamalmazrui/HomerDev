@@ -7,6 +7,16 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.161.0 -- 6 November 2026
+
+- **HomerDev's own window, scanned at last.** The 12:26 push opened HomerDev, scanned its main window in 6.6 seconds -- 376 list items without the ScrollItem pattern, Windows Forms' list box, nothing to change -- and filed its fingerprint. It was filed under its title, HomerDev 1.159.0, since the window has a hidden owner; numbers like 1.159.0 are now left out of a window's key, so a new release is not a new window.
+- **Whisper's refresh starts each program directly.** The 12:29 install ran 1.159.0's refresh, and the installed copy under Program Files again answered nothing while the downloaded one, in a folder without spaces, answered 1.9.5. Each is now started through .NET, its output and error output both read, its raw answer logged, so no quoting of a path with a space can lose it.
+
+## 1.160.0 -- 6 November 2026
+
+- **Whisper's Update is right, and now it updates.** At 12:02 the refresh asked the newest Windows build, b5454, its version and heard 1.9.5, so a Windows build of 1.9.5 exists; but the installed copy, asked through PowerShell with errors stopping, answered nothing -- 1.9.4 writes its version where errors go -- so the two could not be compared and 1.9.4 was kept. Each copy is now asked through cmd.exe, which joins the two, as the installer's own question does.
+- **Fingerprints at work:** the 12:11 walk said Select Columns, Filter Records, Order Records and the Alternate Menu were unchanged since their scans, and scanned none of them; Current Windows, reached for the first time, was scanned: 0 errors.
+
 ## 1.159.0 -- 6 November 2026
 
 - **The kit's gate scans HomerDev's own window.** check.py in the kit handed everything to checkHomerDev and stopped, so HomerDev.exe, the program that opens after installing the kit, was never scanned. It now gets the scan every app's program gets, with its five-minute limit, spoken progress and fingerprint; a warning never fails the kit's push.
