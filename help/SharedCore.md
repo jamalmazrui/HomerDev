@@ -55,7 +55,7 @@ The shared check's **kit classes** finding lists these at every push, until none
 
 Each step is built and released before the next, so a fault is found where it was made:
 
-1. **The window family:** FileDir's MdiChild, then EdSharp's MdiFrame and MdiChild, replaced by the kit's MdiWindows -- one frame for windows, F4 and Control+Tab in every app.
+1. **The window family:** FileDir's MdiChild, then EdSharp's MdiFrame and MdiChild, replaced by the kit's MdiWindows -- one frame for windows, F4 and Control+Tab in every app. *Begun 5 November 2026:* FileDir's Next and Previous Window, Close, Close All but Current and Windows Open now run the kit's MdiWindows. Still FileDir's own: its window list, F4, which shows folders by short name, sorted -- to move into MdiWindows for every app -- and its frame and window classes, which the kit's MdiChild cannot yet replace, since that needs the kit's MdiFrame as parent.
 2. **EdSharp's Util:** any helper the kit's Util lacks is moved into the kit first; then EdSharp uses the kit's.
 3. **EdSharp's dialogs on Lbc,** so Shift+F1 and Alt+Shift+Slash reach them as in DbDo and FileDir.
 4. **DbDo's KeyMap and KeyBinding:** the kit's, with DbDo's commands registered as FileDir's are.

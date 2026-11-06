@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.151.0 -- 5 November 2026
+
+- **axeWindow finds ScanOptions wherever the library keeps it.** The library loaded at last at 20:01, in 64-bit .NET Framework, but each scan stopped at once: ScanOptions is not in the Axe.Windows.Automation namespace, where Config and ScannerFactory are. The library is now asked for the type by name, and if its constructor does not take scanId and the window's handle in that order, it is built by reflection, its constructors logged.
+- **Integration, step 1 begun:** FileDir's window commands run on the kit's MdiWindows (help\SharedCore.md says what remains).
+
 ## 1.150.0 -- 5 November 2026
 
 - **The gate measures integration.** The shared check's new kit classes finding lists every class an app defines under a name the kit provides, so the integration still to do is named at every push: today EdSharp's MdiFrame, MdiChild and Util; FileDir's MdiChild; DbDo's KeyMap, KeyBinding and Result.

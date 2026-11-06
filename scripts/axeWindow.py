@@ -69,12 +69,15 @@ def speak(sText):
 
 # ---- the library -------------------------------------------------------------------------------------------------
 oAxe = None
+oAssembly = None
 
 
 sNuget = "https://api.nuget.org/v3-flatcontainer/"
 # The frameworks .NET Framework 4.8 can load, best first; ".NETFramework4.6.2" and "net462" name the same one.
+# Written without dots, as shortFramework gives them: the Axe.Windows package's own folder is lib/netstandard20, an
+# older spelling of netstandard2.0, and was missed while names kept their dots (5 November 2026, evening).
 lsFrameworks = ["net48", "net472", "net471", "net47", "net462", "net461", "net46", "net452", "net451", "net45",
-                  "netstandard2.0", "netstandard1.6", "netstandard1.3", "netstandard1.1", "netstandard1.0"]
+                  "netstandard20", "netstandard16", "netstandard13", "netstandard11", "netstandard10"]
 
 
 def libFolder():
@@ -82,11 +85,12 @@ def libFolder():
 
 
 def shortFramework(sName):
-    """".NETFramework4.6.2" or "net462" as net462; ".NETStandard2.0" as netstandard2.0."""
+    """A framework's name without dots: ".NETFramework4.6.2" and "net462" as net462; ".NETStandard2.0",
+    "netstandard2.0" and "netstandard20" as netstandard20."""
     s = (sName or "").strip().lower()
-    if s.startswith(".netframework"): return "net" + s[len(".netframework"):].replace(".", "")
-    if s.startswith(".netstandard"): return "netstandard" + s[len(".netstandard"):]
-    return s
+    if s.startswith(".netframework"): s = "net" + s[len(".netframework"):]
+    elif s.startswith(".netstandard"): s = "netstandard" + s[len(".netstandard"):]
+    return s.replace(".", "")
 
 
 def urlGet(sUrl):
@@ -152,7 +156,7 @@ def fetchLibrary(bFresh=False):
 
 def loadAxe():
     """The Axe.Windows.Automation namespace, loaded into 64-bit .NET Framework; raises with the reason when it cannot."""
-    global oAxe
+    global oAxe, oAssembly
     if oAxe is not None: return oAxe
     sFolder = fetchLibrary()
     try:
@@ -169,11 +173,37 @@ def loadAxe():
         sPath = os.path.join(sFolder, oArgs.Name.split(",")[0] + ".dll")
         return System.Reflection.Assembly.LoadFrom(sPath) if os.path.isfile(sPath) else None
     System.AppDomain.CurrentDomain.AssemblyResolve += System.ResolveEventHandler(resolve)
-    clr.AddReference(os.path.join(sFolder, "Axe.Windows.Automation.dll"))
+    oAssembly = clr.AddReference(os.path.join(sFolder, "Axe.Windows.Automation.dll"))
     import Axe.Windows.Automation as oNamespace
     oAxe = oNamespace
     logLine("Axe.Windows.Automation loaded from " + sFolder + " into .NET Framework, " + ("64" if sys.maxsize > 2**32 else "32") + "-bit")
     return oAxe
+
+
+def axeType(sName):
+    """A type of the Axe.Windows.Automation library by its short name, whatever namespace holds it: the 20:01 walk found
+    Config and ScannerFactory in Axe.Windows.Automation, but not ScanOptions, so the library is asked rather than guessed."""
+    import importlib
+    for oType in oAssembly.GetExportedTypes():
+        if oType.Name == sName:
+            logLine(sName + " is in " + str(oType.Namespace))
+            return getattr(importlib.import_module(str(oType.Namespace)), sName)
+    raise RuntimeError("the Axe.Windows library has no type named " + sName)
+
+
+def scanOptions(sScanId, hWnd):
+    """ScanOptions for one window: scanId and scanRootWindowHandle, positionally; if that constructor does not fit,
+    by reflection with the same two values, so a signature change is answered rather than fatal."""
+    import System
+    oClass = axeType("ScanOptions")
+    try:
+        return oClass(sScanId, System.IntPtr(int(hWnd)))
+    except Exception as oError:
+        logLine("ScanOptions(scanId, handle) did not fit: " + str(oError) + "; its constructors: "
+                + "; ".join(str(c) for c in oClass.__dict__.get("__overloads__", []) or []))
+        oType = System.Type.GetType(oClass.__module__ + "." + "ScanOptions") or [t for t in oAssembly.GetExportedTypes() if t.Name == "ScanOptions"][0]
+        aArgs = System.Array[System.Object]([sScanId, System.IntPtr(int(hWnd))])
+        return System.Activator.CreateInstance(oType, aArgs)
 
 
 # ---- one window --------------------------------------------------------------------------------------------------
@@ -205,7 +235,7 @@ def scanWindow(iPid, hWnd, sFolder, sScanId, sSpoken="", iLimit=0):
             import System
             oConfig = oNs.Config.Builder.ForProcessId(iPid).WithOutputFileFormat(oNs.OutputFileFormat.A11yTest).WithOutputDirectory(sFolder).Build()
             oScanner = oNs.ScannerFactory.CreateScanner(oConfig)
-            dShared["oOutput"] = oScanner.Scan(oNs.ScanOptions(sScanId, System.IntPtr(int(hWnd))))
+            dShared["oOutput"] = oScanner.Scan(scanOptions(sScanId, hWnd))
         except Exception:
             dShared["sError"] = traceback.format_exc()
     logLine("scan of %s: process %d, window 0x%X, into %s" % (sName, iPid, int(hWnd), sFolder))
