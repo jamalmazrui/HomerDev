@@ -670,14 +670,14 @@ begin
   //  proves it, what it is for in a few words, and the uninstall key name.
   //  Machine-wide tools go to their own default folders; an app upgrade must
   //  never remove them, so none is under {app}.
-  iAce := homerAdd('Ace by DAISY', '', 'ace',
+  iAce := homerAdd('Ace by DAISY', 'npm:@daisy/ace', 'ace',
     '{userappdata}\npm\ace.cmd', 'checks the accessibility of EPUB books', '');
   // THE TESTING TOOLS (5 November 2026): Axe.Windows, faster-whisper and pywinauto, used by recordWalk and the
   // accessibility check every push runs. Axe.Windows is not in winget; its fetch writes version.txt beside it, which
   // homerFileVersion reads first, so a copy here is offered as Reinstall, which gets the newest release.
-  iAxeWindows := homerAdd('Axe.Windows', '', '',
+  iAxeWindows := homerAdd('Axe.Windows', 'github:microsoft/axe-windows', '',
     '{localappdata}\HomerDev\tools\AxeWindowsCLI\AxeWindowsCLI.exe', 'checks a window''s accessibility, as Accessibility Insights does', '');
-  iEpubCheck := homerAdd('EPUBCheck', '', '',
+  iEpubCheck := homerAdd('EPUBCheck', 'github:w3c/epubcheck', '',
     '{pf}\EPUBCheck\epubcheck.jar', 'validates EPUB books', '');
   iExifTool := homerAdd('ExifTool', 'OliverBetz.ExifTool;PhilHarvey.ExifTool', 'exiftool',
     '', 'reads what a recording or photo knows about itself', 'ExifTool');
@@ -711,7 +711,7 @@ begin
     '', 'drives an app and reads its focus in a walk', '');
   iTesseract := homerAdd('Tesseract', 'UB-Mannheim.TesseractOCR', 'tesseract',
     '{pf}\Tesseract-OCR\tesseract.exe', 'reads scanned pages', 'Tesseract-OCR');
-  iWhisper := homerAdd('Whisper', '', '"{pf}\Whisper\whisper-cli.exe"',
+  iWhisper := homerAdd('Whisper', 'github:ggml-org/whisper.cpp', '"{pf}\Whisper\whisper-cli.exe"',
     '{pf}\Whisper\whisper-cli.exe', 'transcribes speech', '');
   iYtDlp := homerAdd('yt-dlp', 'yt-dlp.yt-dlp', 'yt-dlp',
     '', 'fetches audio and video from web pages', '');

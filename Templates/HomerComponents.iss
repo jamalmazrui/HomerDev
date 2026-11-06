@@ -223,6 +223,45 @@ begin
   end;
 end;
 
+(* THE NEWEST VERSION, WHEREVER IT IS PUBLISHED (6 November 2026). Ace by DAISY, Axe.Windows, EPUBCheck and Whisper
+   were offered as Reinstall only because "no newer version could be looked up": none is in winget. An id written
+   github:owner/repository is read from that project's latest release tag, through GitHub's public API, and one
+   written npm:package from npm; any other id is winget's, as before. A lookup that fails -- offline, say -- answers
+   nothing, and the component is offered as Reinstall, as it was. *)
+function homerFirstLine(var lsLines: TArrayOfString): String;
+var
+  i: Integer;
+begin
+  Result := '';
+  for i := 0 to GetArrayLength(lsLines) - 1 do
+    if Trim(lsLines[i]) <> '' then
+    begin
+      Result := Trim(lsLines[i]);
+      exit;
+    end;
+end;
+
+function homerLatestOf(sId: String): String;
+var
+  lsLines: TArrayOfString;
+begin
+  Result := '';
+  if Pos('github:', sId) = 1 then
+  begin
+    if homerProbeLines('powershell -NoProfile -Command "try { (Invoke-RestMethod -Uri https://api.github.com/repos/'
+        + Copy(sId, 8, Length(sId)) + '/releases/latest -TimeoutSec 20 -Headers @{''User-Agent''=''HomerDev''}).tag_name } catch { }"', lsLines) then
+      Result := homerFirstLine(lsLines);
+  end
+  else if Pos('npm:', sId) = 1 then
+  begin
+    if homerProbeLines('npm view ' + Copy(sId, 5, Length(sId)) + ' version', lsLines) then
+      Result := homerFirstLine(lsLines);
+  end
+  else
+    Result := homerWingetLatest(sId);
+  Log('Newest of ' + sId + ': ' + Result);
+end;
+
 function homerExeVersion(sExe: String): String;
 (* What the tool says about itself. This is what catches an install winget has
    never heard of -- and it is the check HomerScribe was missing when it kept
@@ -439,7 +478,7 @@ begin
         if (sAvailable <> '') and (homerVersionOrder(sInstalled, sAvailable) < 0) then Result := 1 else Result := 2;
       end;
     end
-    else if homerWingetInfo(sId, sInstalled, sAvailable) then
+    else if (Pos('github:', sId) <> 1) and (Pos('npm:', sId) <> 1) and homerWingetInfo(sId, sInstalled, sAvailable) then
     begin
       gHomer[iAt].sLocal := sInstalled;
       gHomer[iAt].sRemote := sAvailable;
@@ -503,7 +542,7 @@ begin
     if gHomer[iAt].sLocal <> '' then
     begin
       sRest := gHomer[iAt].sIdList;
-      if sRest <> '' then gHomer[iAt].sRemote := homerVersionIn(homerWingetLatest(homerNextId(sRest)));
+      if sRest <> '' then gHomer[iAt].sRemote := homerVersionIn(homerLatestOf(homerNextId(sRest)));
       iOrder := homerVersionOrder(gHomer[iAt].sLocal, gHomer[iAt].sRemote);
       if iOrder = -1 then Result := 1;
       if (iOrder = 2) and (gHomer[iAt].sRemote <> '') then
@@ -520,7 +559,7 @@ begin
   if Result = 0 then
   begin
     sRest := gHomer[iAt].sIdList;
-    if sRest <> '' then gHomer[iAt].sRemote := homerWingetLatest(homerNextId(sRest));
+    if sRest <> '' then gHomer[iAt].sRemote := homerLatestOf(homerNextId(sRest));
   end;
 
   gHomer[iAt].iState := Result;

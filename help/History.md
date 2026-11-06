@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.153.0 -- 6 November 2026
+
+- **Every component's verb, checked against its versions.** In the 10:01 install, every component whose newest version was known was current and rightly offered as Reinstall; DbDo's and EdSharp's screen reader scripts were right too, including EdSharp's NVDA add-on, offered as Update since 5.0.123 replaced 5.0.122. Ace by DAISY, Axe.Windows, EPUBCheck and Whisper were offered as Reinstall only because no newer version could be looked up: none is in winget.
+- **Newest versions from where they are published.** A component's id may now be github:owner/repository, read from the project's latest release tag, or npm:package, read from npm, beside winget ids and pip:package. Ace by DAISY reads npm:@daisy/ace; Axe.Windows, github:microsoft/axe-windows; EPUBCheck, github:w3c/epubcheck; Whisper, github:ggml-org/whisper.cpp. A lookup that fails leaves Reinstall, as before.
+- **recordWalk says it is downloading the recognizer only when it is.** Every run said the model is downloaded "the first time"; it is fetched once, by the faster-whisper component at install or the first walk, and loaded from its cache after.
+
 ## 1.152.0 -- 6 November 2026
 
 - **Pick lists remember the last choice:** LbcDialog.lastChoice and noteChoice, on the same history that prompts keep, so a list starts on the item chosen last, across sessions in an app that files its history.

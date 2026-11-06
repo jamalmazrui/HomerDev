@@ -568,7 +568,11 @@ def main():
     WhisperModel = None if oArgs.no_transcribe else ensureWhisper()
     oModel = None
     if WhisperModel is not None:
-        sayLine("Loading the recognizer, " + oArgs.model + "; the first time it is downloaded, which takes a few minutes.")
+        # SAID ONLY WHEN TRUE (6 November 2026): every run said the model is downloaded "the first time", though after
+        # the first it loads from its cache in seconds -- and the faster-whisper component fetches it at install.
+        sCache = os.path.join(os.path.expanduser("~"), ".cache", "huggingface", "hub", "models--Systran--faster-whisper-" + oArgs.model)
+        if os.path.isdir(sCache): sayLine("Loading the recognizer, " + oArgs.model + ".")
+        else: sayLine("Getting the recognizer, " + oArgs.model + ", once; this takes a few minutes, and later walks load it in seconds.")
         try:
             oModel = WhisperModel(oArgs.model, device="cpu", compute_type="int8")
         except Exception as exceptionError:
