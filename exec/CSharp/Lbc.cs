@@ -411,6 +411,10 @@ public class LbcTrackBar : TrackBar
 
 public class LbcForm : Form
 {
+    // bHintsHandled: set by LbcDialog, which answers Shift+F1 itself with each control's own tip; a plain form built
+    // on LbcForm -- an app's own dialog class -- leaves it false and LbcForm answers Shift+F1 (6 November 2026).
+    public bool bHintsHandled = false;
+
     // commandKey: a key the dialog claims before any control sees it. Set it to
     // a function that returns true when it has dealt with the key.
     //
@@ -498,6 +502,19 @@ public class LbcForm : Form
             try { sSay = whereAmIText != null ? whereAmIText(ctlNow, iLevel) : whereAmIHere(ctlNow, iLevel); }
             catch (Exception) { sSay = whereAmIHere(ctlNow, iLevel); }
             Say.say(sSay);
+            return true;
+        }
+        // SHIFT+F1 ON ANY LBCFORM (6 November 2026): Alt+Shift+Slash worked on every form built on LbcForm, but Shift+F1
+        // only in LbcDialog's own dialogs and text boxes, so an app's own dialog classes said nothing. The focused
+        // control's hint comes from Hints.inix, or its own description, as in every Lbc dialog.
+        if (keyData == (Keys.Shift | Keys.F1) && !bHintsHandled)
+        {
+            Control ctlHint = ActiveControl;
+            while (ctlHint is ContainerControl && ((ContainerControl) ctlHint).ActiveControl != null) ctlHint = ((ContainerControl) ctlHint).ActiveControl;
+            string sHint = "";
+            try { sHint = LbcHints.hintFor(ctlHint ?? (Control) this, "", LbcHints.pressCount("Shift+F1")); }
+            catch (Exception) { sHint = ""; }
+            if (!string.IsNullOrEmpty(sHint)) Say.say(sHint);
             return true;
         }
         // A DIALOG'S OWN ACCESS KEY COMES FIRST (6 November 2026, a regression Jamal found in FileDir). FileDir binds
@@ -1173,6 +1190,7 @@ public class LbcDialog : IDisposable
         frm = frmAdopt ?? new LbcForm();
         LbcForm frmLbc = frm as LbcForm;
         if (frmLbc != null) frmLbc.whereAmIText = delegate(Control ctlFocus, int iLevel) { return whereAmI(ctlFocus, iLevel); };
+        if (frmLbc != null) frmLbc.bHintsHandled = true;
         // The caption IS the accessible name of a Form.  Setting AccessibleName to
         // the same string made the reader speak the dialog title twice when the
         // dialog opened (once for the window caption, once for the name).  A screen

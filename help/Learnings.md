@@ -4,6 +4,9 @@
 
 ## 6 November 2026
 
+- **A results folder holds outputs only.** Jamal moves a project's results away whenever he likes, so no script may rely on a file there; one that needs such data runs the script that makes it, at the time.
+- **Look at every match, not the first.** A web page keeps hidden copies of its dialogs; the first match for a dialog's words was a hidden one while the real dialog showed, and kdpFix waited on it for two rounds.
+- **Keep what a called script says.** kdpFix ran kdpSubmit and kept only its exit code; when it failed, nothing said why.
 - **A file a Homer tool creates is .inix,** unless .inix cannot hold the data. The scan fingerprints went to JSON out of habit, though they are plainly sections of one-line values.
 - **What a dialog shows beats what an app binds.** An app-wide Alt+letter (FileDir's Alt+Y, Yield Files) silently stole that letter from every dialog's buttons, because app commands were checked first. The access key a person can see in front of them must always win.
 - **Read a page the way the script that already works reads it.** kdpFix's first run found neither Blind Vibe Coding row: it searched element ids KDP's Bookshelf does not have, and read one page of three. kdpReport had read both rows the day before; its reader, reused, was the fix.

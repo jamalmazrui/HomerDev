@@ -62,6 +62,10 @@ sStatusText = ""  # the Bookshelf's words around the status, for precise message
 sBookStatus = ""  # Bookshelf status read before the run: Draft, In Review, Publishing, Live, Blocked or not shown
 sFolder = os.path.dirname(os.path.abspath(__file__))
 sProject = os.path.dirname(sFolder) if os.path.basename(sFolder).lower() in ("scripts", "tools") else sFolder  # Homer layout: the script lives in scripts\, the project is its parent
+# THE PROJECT A CALLER NAMES (6 November 2026): the kit's copy of this script, run from C:\\HomerDev\\scripts, took the
+# kit as its project. A caller working for another project -- kdpFix for C:\\MyBooks -- sets HOMER_PROJECT to that
+# project's folder, and the scripts it starts inherit it; run any other way, the project is the parent of scripts\\.
+if os.path.isdir(os.environ.get("HOMER_PROJECT", "")): sProject = os.path.abspath(os.environ["HOMER_PROJECT"])
 sLogPath = ""
 
 

@@ -7,6 +7,18 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.165.0 -- 6 November 2026
+
+- **Shift+F1 on any LbcForm.** Alt+Shift+Slash already worked on every form built on LbcForm, but Shift+F1 only in LbcDialog's own dialogs and text boxes, so an app's own dialog classes said nothing. LbcForm now answers Shift+F1 with the focused control's hint, from Hints.inix or its own description; LbcDialog keeps its own answer, with each control's tip.
+
+## 1.164.0 -- 6 November 2026
+
+- **The kit-classes check counts top-level classes only.** DbDo's KeyBinding and Result are helpers nested inside its own classes and only share a name with the kit's. Five classes remain to integrate: DbDo's KeyMap; EdSharp's MdiChild, MdiFrame and Util; FileDir's MdiChild. Each is a large working part of its app, to be moved into the kit and generalized one per build, as help\\SharedCore.md and the transition brief of this date describe.
+
+## 1.163.0 -- 6 November 2026
+
+- **kdpSubmit and buildBooks work for the project a caller names.** Run from C:\\HomerDev\\scripts, they took the kit as their project. A caller working for another project sets HOMER_PROJECT to its folder, and the scripts it starts inherit it; kdpFix does, for C:\\MyBooks. Run any other way, the project is the parent of scripts\\, as before.
+
 ## 1.162.0 -- 6 November 2026
 
 - **%LOCALAPPDATA%\\HomerDev shrinks from 114 MB to about 7.** 107 MB of it was AxeWindowsCLI, fetched by every build and by the Axe.Windows component since 1.141.0 and unused since scans moved to the 3.3 MB Axe.Windows library. The build and the component now fetch only the library and remove the old tool's folder; the installer checks the library. Nothing a Homer app runs depends on this folder: no app's code refers to it, and it holds development tools and logs only.
