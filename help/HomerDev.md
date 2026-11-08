@@ -1784,8 +1784,9 @@ Each function key is a family of related commands, drawn from Windows and Office
 habits and extended. A command that belongs to a family takes a key from it; a
 key that belongs to one family is not spent on another.
 
-- **F1, help.** F1 the guide, Shift+F1 the history of changes, Alt+F1 About,
-  Control+F1 the key describer. The rest of the family opens other documents.
+- **F1, help.** F1 the guide, Shift+F1 what the focused control does, Alt+F1
+  About, Control+F1 the key describer, Control+Shift+F1 the history of changes,
+  Alt+Shift+F1 the quick start.
 - **F2, editing or renaming,** as F2 renames a file in Windows.
 - **F3, searching** and repeating a search.
 - **F4, picking, saying or closing open windows.** F4 picks one, Shift+F4 says

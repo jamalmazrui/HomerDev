@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.167.0 -- 7 November 2026
+
+- **The help keys of every main window.** Shift+F1 says what the focused control does, and Alt+Shift+Slash says where you are, in the kit's frame as in every dialog. History of Changes moves from Shift+F1 to Control+Shift+F1. The Hotkeys document keeps its place in the Help menu without a key, since Alt+Shift+H lists every key, live. KeyDecisions.md gives the reasons and the rollback.
+
 ## 1.166.0 -- 7 November 2026
 
 - **The Key Describer speaks in parts.** Name, key and one-sentence summary are separate utterances, through the new Say.sayForcedParts, so they are heard even with extra speech off. KeyMap.describeParts gives the parts; describe still gives one line for logs and exports.

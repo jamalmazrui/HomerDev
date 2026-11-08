@@ -46,11 +46,12 @@ sLogPath = os.path.join(sLogDir, os.path.basename(os.path.dirname(sScriptDir)) +
 dNamed = {
     # Each function key is a family, from Windows and Office habits, extended.
     "F1": "F1 is help: this guide.",
-    "Shift+F1": "F1 is help; Shift+F1 is the history of changes.",
+    "Shift+F1": "F1 is help; Shift+F1 says what the control with focus does.",
+    "Alt+Shift+Slash": "Slash is the question mark: Alt+Shift+Slash asks where am I.",
     "Alt+F1": "F1 is help; Alt+F1 is About.",
     "Control+F1": "F1 is help; Control+F1 describes whatever key you press next.",
     "Alt+Shift+F1": "F1 is help; Alt+Shift+F1 is the ReadMe, the short start.",
-    "Control+Shift+F1": "F1 is help; Control+F1 describes one key, and adding Shift describes them all.",
+    "Control+Shift+F1": "F1 is help; Control+Shift+F1 is the history of changes.",
     "F2": "F2 is editing, as it renames a file in Windows.",
     "Control+F2": "F2 is editing; Control+F2 edits by picking a value.",
     "F3": "F3 is searching and searching again.",

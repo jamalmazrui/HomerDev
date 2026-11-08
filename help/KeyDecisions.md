@@ -89,6 +89,18 @@ Each decision is one or two lines in the app's source, named in the comment besi
 - **Chosen.** Alt+Shift+Slash, Alt and the question mark: free in every app, in JAWS, NVDA and Windows by the kit's key ownership data, and never typed by accident in a text box. Pressed once, twice and three times, as Shift+F1 now is.
 - **Rollback.** Remove the Alt+Shift+Slash branch from Lbc's wireUniversalKeys and set DbDo's Where Am I back to no key.
 
+### The help keys of every main window (7 November 2026)
+
+- **Problem.** Shift+F1 meant two things. In a dialog, and in DbDo's main window, it says what the focused control does; in EdSharp's and FileDir's main windows and the kit's frame, it opened History of Changes. Alt+Shift+Slash, Where Am I, was not in fact free in every app: EdSharp's Style dialog had it, and FileDir's main window had no Where Am I. DbDo's History of Changes had no key at all. Both Claude's and ChatGPT's audits of 7 November found this.
+- **Considered.** Keeping Shift+F1 for History in main windows only, which would teach one key two meanings. Giving History a letter key: Alt+Shift+H is Hotkey Summary, and every other F1 variation was taken. Merging Hotkey Summary into the Hotkeys document by a second press: the first press opens a window, so a second press never reaches the frame.
+- **Chosen.**
+  - Shift+F1 is What This Does in every main window, as in every dialog.
+  - Alt+Shift+Slash is Where Am I in every main window.
+  - History of Changes takes Control+Shift+F1, in every app.
+  - The Hotkeys document gives that key up and stays in the Help menu. Alt+Shift+H, Hotkey Summary, lists the same commands and keys, live from the program, so the document was the duplicate (the 5 November rule: duplicative bindings are merged, keeping the best key). FileDir's Alt+Shift+H had been opening that same document, so it now shows the window, as DbDo's and EdSharp's do.
+  - EdSharp's Style dialog moves to Alt+Slash pressed twice: Alt+Slash, Say Styles, says the styles, and a second press opens the dialog to change them, so the dialog keeps a key and joins the command it belongs with.
+- **Rollback.** Kit: the What This Does, Where Am I, History and Hotkeys lines in Mdi.cs's Help menu. Apps: the Help-menu lines marked 7 November 2026 in DbDo.cs, EdSharp.cs and FileDir.cs, and their Hotkeys files. Rollback.zip of that date holds every file before the change.
+
 ## Key Describer rules (5 November 2026)
 
 Jamal asked that Alt+F4 also turn the Key Describer off, for someone who turned it on by accident and does not know Control+F1, with a second Alt+F4 closing the app, and that this be the rule in every app. With it came what DbDo's describer had taught: describe every key even when its command cannot run, giving the true reason after the description; never guess a reason; ignore the nameless key a screen reader sends; and describe from the app's own command table. HomerSuite.md states the rules; the kit's KeyMap carries them out.

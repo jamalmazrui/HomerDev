@@ -145,11 +145,13 @@ Jamal asked Claude to settle the pending decisions by best judgment, as optimiza
 - **Key spellings** are KeyName.cs's, taken from JAWS's own default.jkm: modifiers in the order Alt, Control, Shift, Windows; Control spelled out; GraveAccent, Backslash and SemiColon for those keys. The checker accepts other spellings when comparing, but every file Homer writes uses these.
 - **Help family:**
   - **F1:** Documentation.
-  - **Shift+F1:** History of Changes.
+  - **Shift+F1:** What This Does, the focused control's one-sentence hint, in every main window and dialog.
+  - **Alt+Shift+Slash:** Where Am I, in every main window and dialog.
   - **Alt+F1:** About.
   - **Control+F1:** Key Describer Toggle.
-  - **Control+Shift+F1:** Hotkeys.
+  - **Control+Shift+F1:** History of Changes.
   - **Alt+Shift+F1:** ReadMe.
+  - **Hotkeys:** the document of every key, from the Help menu; Alt+Shift+H lists the same keys, live.
   - **Alt+F10:** Alternate Menu.
   - **Alt+Shift+H:** Hotkey Summary.
   - **F11:** Elevate Version.

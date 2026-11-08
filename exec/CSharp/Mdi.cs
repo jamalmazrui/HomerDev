@@ -19,9 +19,10 @@
 //            Append Clipboard, Alt+Shift+Apostrophe Clear Clipboard
 //   Query    Alt+Apostrophe Say Clipboard, Alt+SemiColon Say Time
 //   Misc     Alt+Shift+E Edit Settings, Control+Shift+I Invoke Script
-//   Help     F1 Documentation, Shift+F1 History of Changes, Alt+F1 About,
-//            Control+F1 Key Describer Toggle, Control+Shift+F1 Hotkeys,
-//            Alt+Shift+F1 ReadMe, Alt+F10 Alternate Menu, Alt+Shift+H Hotkey
+//   Help     F1 Documentation, Shift+F1 What This Does, Alt+Shift+Slash
+//            Where Am I, Alt+F1 About, Control+F1 Key Describer Toggle,
+//            Control+Shift+F1 History of Changes, Hotkeys (menu only; Alt+Shift+H
+//            lists every key), Alt+Shift+F1 ReadMe, Alt+F10 Alternate Menu, Alt+Shift+H Hotkey
 //            Summary, F11 Elevate Version, Control+F12 Copy Log, and Play
 //            Tutorials in the Homer Player
 //
@@ -466,7 +467,7 @@ public static class SuiteCommands {
         return openHelp(sAppName + ".htm");
     }
 
-    // openHistory: Shift+F1, History of Changes.
+    // openHistory: Control+Shift+F1, History of Changes (kit 1.167.0; it was Shift+F1).
     public static bool openHistory() {
         return openHelp("History.htm");
     }
@@ -476,7 +477,7 @@ public static class SuiteCommands {
         return openHelp("ReadMe.htm");
     }
 
-    // openHotkeys: Control+Shift+F1, the document of every command and key.
+    // openHotkeys: the document of every command and key, from the Help menu.
     // When it is not installed, the Hotkey Summary window is shown instead.
     public static bool openHotkeys(IWin32Window oOwner) {
         string sPath = helpPath("Hotkeys.htm");
@@ -650,11 +651,25 @@ public class MdiFrame : LbcForm {
 
         addMenu("&Help");
         addCommand("&Documentation", "F1", "Open the guide.", delegate() { return openHelp(sAppName + ".htm"); }).bNoEcho = true;
-        addCommand("&History of Changes", "Shift+F1", "Open the list of changes, newest first.", SuiteCommands.openHistory).bNoEcho = true;
+        // THE HELP KEYS OF EVERY HOMER WINDOW (kit 1.167.0, 7 November 2026): Shift+F1 says what the focused control
+        // does and Alt+Shift+Slash says where you are, in a main window as in every Lbc dialog. History of Changes
+        // moves from Shift+F1 to Control+Shift+F1, which the Hotkeys document gives up: Alt+Shift+H already lists every
+        // command and key, live, so the document stays in this menu without a key of its own.
+        addCommand("What &This Does", "Shift+F1", "Say what the focused control does.", delegate() {
+            Say.sayForced(LbcHints.sentenceForFocused(this));
+            return true;
+        }).bNoEcho = true;
+        addCommand("&Where Am I", "Alt+Shift+Slash", "Say where you are and what has focus.", delegate() {
+            Control ctlNow = ActiveControl;
+            while (ctlNow is ContainerControl && ((ContainerControl) ctlNow).ActiveControl != null) ctlNow = ((ContainerControl) ctlNow).ActiveControl;
+            Say.sayForced(whereAmIHere(ctlNow, LbcHints.pressCount("Alt+Shift+Slash")));
+            return true;
+        }).bNoEcho = true;
+        addCommand("&History of Changes", "Control+Shift+F1", "Open the list of changes, newest first.", SuiteCommands.openHistory).bNoEcho = true;
         addCommand("&About", "Alt+F1", "The name, the version, and where this copy keeps its files.", showAbout).bNoEcho = true;
         KeyMap.Command oDescriber = addCommand("&Key Describer Toggle", "Control+F1", "A key says what it would do instead of doing it.", toggleKeyDescriber);
         oDescriber.fChecked = delegate() { return KeyMap.bKeyDescriber; };
-        addCommand("Hotkeys", "Control+Shift+F1", "Open the document of every command and key.", showHotkeys).bNoEcho = true;
+        addCommand("Hotkeys", "", "Open the document of every command and key.", showHotkeys).bNoEcho = true;
         addCommand("&ReadMe", "Alt+Shift+F1", "Open the quick start.", SuiteCommands.openReadMe).bNoEcho = true;
         addCommand("Alternate &Menu...", "Alt+F10", "Every command in one list you can search.", showAlternateMenu);
         addCommand("Hotkey &Summary", "Alt+Shift+H", "Every command, key and summary in a window.", showHotkeySummary).bNoEcho = true;
