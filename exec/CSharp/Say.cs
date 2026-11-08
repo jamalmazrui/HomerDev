@@ -304,6 +304,16 @@ public static class Say
         sayParts((IEnumerable<string>)aParts);
     }
 
+    // sayForcedParts: sayParts, past the Extra Speech gate (kit 1.166.0). For
+    // speech a person asked for, such as the Key Describer's answer, which must
+    // be heard even with extra speech off. One utterance per non-empty string.
+    public static void sayForcedParts(params string[] aParts)
+    {
+        if (aParts == null) return;
+        foreach (string sPart in aParts)
+            if (!string.IsNullOrEmpty(sPart)) sayForced(sPart);
+    }
+
     // Extra-Speech enabled flag. Public mutable so the toggle
     // command can flip it. Loaded from DbDo.inix at startup;
     // default true. Persisted on change.

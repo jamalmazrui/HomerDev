@@ -816,10 +816,19 @@ never answers with only “unavailable.”</li>
 <li><strong>The reason is true or absent.</strong> An app says why a
 command is unavailable only when it knows; it never guesses a reason
 such as “open a database first.”</li>
-<li><strong>A key with no command is named,</strong> with “No command is
-bound to this key here,” so the person knows the describer heard it. A
-key a screen reader sends of its own, which has no name, is ignored
-rather than announced as “NoName”.</li>
+<li><strong>A key with no command is named,</strong> then “No DbDo
+command” (the app’s own name), so the person knows the describer heard
+it without being told the key does nothing anywhere; an Alt+letter that
+opens a menu names the menu, as in “Edit menu”.</li>
+<li><strong>Every answer is separate utterances,</strong> the name, the
+key and the one-sentence summary, then where it works and “Unavailable
+now” when either applies (kit 1.166.0). The describer speaks them
+forced, so they are heard with extra speech off.</li>
+<li><strong>Nothing acts in the describer.</strong> An app’s own key
+handling asks the router first while the describer is on, so a key
+handled outside the command table is described too; an Lbc text box’s
+own keys are named, not done. A key a screen reader sends of its own,
+which has no name, is ignored rather than announced as “NoName”.</li>
 <li><strong>Alt+F4 turns the describer off</strong> and says so, with
 “Alt+F4 again closes” the app. Someone who turned it on by accident, and
 does not know Control+F1, reaches for Alt+F4 to escape; a second Alt+F4

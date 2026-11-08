@@ -706,7 +706,8 @@ public class MdiFrame : LbcForm {
         Log.info("Command: " + sCommand);
         if (KeyMap.bKeyDescriber) {
             KeyMap.Command c = KeyMap.commandById(KeyMap.toId(sCommand));
-            Say.sayForced(c == null ? sCommand : KeyMap.describe(c.primaryKey, c));
+            if (c == null) Say.sayForced(sCommand);
+            else Say.sayForcedParts(KeyMap.describeParts(c.primaryKey, c, this));
             return true;
         }
         try {
@@ -876,7 +877,8 @@ public class MdiFrame : LbcForm {
 
     public bool toggleKeyDescriber() {
         KeyMap.bKeyDescriber = !KeyMap.bKeyDescriber;
-        Say.sayForced(KeyMap.bKeyDescriber ? "Key Describer on" : "Key Describer off");
+        // The suite's toggle words (7 November 2026), as DbDo, EdSharp and FileDir say them and the tutorials teach.
+        Say.sayForced(KeyMap.bKeyDescriber ? "Key Describer On" : "No Key Describer");
         return true;
     }
 

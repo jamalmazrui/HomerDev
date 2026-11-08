@@ -7,6 +7,13 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.166.0 -- 7 November 2026
+
+- **The Key Describer speaks in parts.** Name, key and one-sentence summary are separate utterances, through the new Say.sayForcedParts, so they are heard even with extra speech off. KeyMap.describeParts gives the parts; describe still gives one line for logs and exports.
+- **Shorter answers.** A key with no command says the key, then "No DbDo command" with the app's own name. An Alt+letter that opens a menu names it, as in "Edit menu". A command that cannot run says "Unavailable now", with a reason only when the app knows one: an app returns KeyMap.sUnknownReason when it does not.
+- **Nothing acts in the describer.** An Lbc text box's own keys, such as cut and delete line, are named instead of done.
+- **The suite's toggle words.** The kit's frame and Alt+F4's way out now say "Key Describer On" and "No Key Describer", as DbDo, EdSharp and FileDir do and the tutorials teach.
+
 ## 1.165.0 -- 6 November 2026
 
 - **Shift+F1 on any LbcForm.** Alt+Shift+Slash already worked on every form built on LbcForm, but Shift+F1 only in LbcDialog's own dialogs and text boxes, so an app's own dialog classes said nothing. LbcForm now answers Shift+F1 with the focused control's hint, from Hints.inix or its own description; LbcDialog keeps its own answer, with each control's tip.

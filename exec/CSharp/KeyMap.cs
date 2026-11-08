@@ -70,6 +70,10 @@ public static class KeyMap {
     // list. "list" means only while a managed list has focus. "text" means
     // only while a marked editor has focus.
     public const string sAnywhere = "anywhere";
+    // sUnknownReason: what an app's fUnavailable returns when a command cannot
+    // run and the app knows no reason (kit 1.166.0). The describer then says only
+    // "Unavailable now", rather than inventing a reason or saying "it cannot run now".
+    public const string sUnknownReason = "(unknown)";
     public const string sListContext = "list";
     public const string sTextContext = "text";
 
@@ -240,7 +244,7 @@ public static class KeyMap {
         if (oCommand == null) return false;
         string sWhy = oCommand.unavailableReason();
         if (sWhy.Length > 0) {
-            Say.sayForced(oCommand.sName + " is unavailable: " + sWhy);
+            Say.sayForced(sWhy == sUnknownReason ? oCommand.sName + " is unavailable now." : oCommand.sName + " is unavailable: " + sWhy);
             Log.info("command refused: " + oCommand.sId + ": " + sWhy);
             return true;
         }
@@ -266,16 +270,67 @@ public static class KeyMap {
         return runCommand(commandById(sId));
     }
 
-    // describe: what the Key Describer says for a key.
-    public static string describe(Keys k, Command oCommand) {
-        if (oCommand == null) return friendlyKey(k) + ". No command is bound to this key here.";
-        StringBuilder sb = new StringBuilder();
-        sb.Append(oCommand.sName).Append(". ").Append(friendlyKey(k)).Append(". ");
-        if (oCommand.sSummary.Length > 0) sb.Append(oCommand.sSummary.TrimEnd('.')).Append(".");
-        if (oCommand.sContext != sAnywhere) sb.Append(" In the ").Append(oCommand.sContext).Append(" only.");
+    // describeParts: what the Key Describer says for a key, one utterance per
+    // part (kit 1.166.0): the command's name, its key, its one-sentence summary,
+    // where it works when that is not everywhere, and whether it is unavailable.
+    // A key with no command says so in two parts: the key, then "No <App>
+    // command", which is true of the app without claiming the key does nothing
+    // anywhere. An Alt+letter that opens a menu names that menu.
+    public static string[] describeParts(Keys k, Command oCommand, Form oWindow) {
+        List<string> lsParts = new List<string>();
+        if (oCommand == null) {
+            string sMenu = menuForKey(oWindow, k);
+            lsParts.Add(friendlyKey(k));
+            lsParts.Add(sMenu.Length > 0 ? sMenu + " menu." : "No " + Application.ProductName + " command.");
+            return lsParts.ToArray();
+        }
+        lsParts.Add(oCommand.sName);
+        lsParts.Add(friendlyKey(k));
+        if (oCommand.sSummary.Length > 0) lsParts.Add(oCommand.sSummary.TrimEnd('.') + ".");
+        if (oCommand.sContext != sAnywhere) lsParts.Add("In the " + oCommand.sContext + " only.");
         string sWhy = oCommand.unavailableReason();
-        if (sWhy.Length > 0) sb.Append(" Unavailable now: ").Append(sWhy);
+        if (sWhy == sUnknownReason) lsParts.Add("Unavailable now.");
+        else if (sWhy.Length > 0) lsParts.Add("Unavailable now: " + sWhy.TrimEnd('.') + ".");
+        return lsParts.ToArray();
+    }
+
+    public static string[] describeParts(Keys k, Command oCommand) {
+        return describeParts(k, oCommand, null);
+    }
+
+    // describe: the same answer as one line, for exports, logs and tests.
+    public static string describe(Keys k, Command oCommand) {
+        string[] aParts = describeParts(k, oCommand, null);
+        StringBuilder sb = new StringBuilder();
+        foreach (string sPart in aParts) {
+            if (sb.Length > 0) sb.Append(" ");
+            sb.Append(sPart.EndsWith(".") ? sPart : sPart + ".");
+        }
         return sb.ToString();
+    }
+
+    // menuForKey: the top-level menu an Alt+letter opens in this window or its
+    // MDI parent, without its ampersand; "" when the key opens none.
+    public static string menuForKey(Form oWindow, Keys k) {
+        try {
+            if (oWindow == null || (k & Keys.Modifiers) != Keys.Alt) return "";
+            Keys kCode = k & Keys.KeyCode;
+            if (kCode < Keys.A || kCode > Keys.Z) return "";
+            string sLetter = ((char)('a' + (kCode - Keys.A))).ToString();
+            Form oFrame = oWindow.MdiParent != null ? oWindow.MdiParent : oWindow;
+            MenuStrip oStrip = oFrame.MainMenuStrip;
+            if (oStrip == null) return "";
+            foreach (ToolStripItem oItem in oStrip.Items) {
+                if (!oItem.Visible || string.IsNullOrEmpty(oItem.Text)) continue;
+                int iAmp = oItem.Text.IndexOf('&');
+                if (iAmp < 0 || iAmp + 1 >= oItem.Text.Length) continue;
+                if (oItem.Text.Substring(iAmp + 1, 1).ToLowerInvariant() == sLetter) return oItem.Text.Replace("&", "");
+            }
+        }
+        catch (Exception oError) {
+            Log.exception(oError);
+        }
+        return "";
     }
 
     // ------------------------------------------------------------- routing
@@ -427,6 +482,12 @@ public static class KeyMap {
 
         notePress(keyData, oWindow, bAutoRepeat);
 
+        // DESCRIBE BEFORE ANYTHING ACTS (kit 1.166.0): in the describer an Lbc
+        // text-box key -- cut, delete the line and the rest -- is named, not done.
+        if (bLbcKey && bKeyDescriber) {
+            Say.sayForcedParts(friendlyKey(keyData), "A text box key, not a command.");
+            return true;
+        }
         if (bLbcKey) return false;
         if (bKeyDescriber) {
             if (oCommand != null && oCommand.sId == "keyDescriberToggle") return runCommand(oCommand);
@@ -435,13 +496,13 @@ public static class KeyMap {
             // the app as usual.
             if (keyData == (Keys.Alt | Keys.F4)) {
                 bKeyDescriber = false;
-                Say.sayForced("Key Describer off. Alt+F4 again closes " + Application.ProductName + ".");
+                Say.sayForcedParts("No Key Describer", "Alt+F4 again closes " + Application.ProductName + ".");
                 return true;
             }
             // A key with no name -- one a screen reader sends of its own -- is neither described nor swallowed.
             if ((keyData & Keys.KeyCode) == Keys.NoName) return false;
             if (bTypingInText && !bEditor && oCommand == null) return false;
-            Say.sayForced(describe(keyData, oCommand));
+            Say.sayForcedParts(describeParts(keyData, oCommand, oWindow));
             return true;
         }
 
