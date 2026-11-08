@@ -101,6 +101,15 @@ Each decision is one or two lines in the app's source, named in the comment besi
   - EdSharp's Style dialog moves to Alt+Slash pressed twice: Alt+Slash, Say Styles, says the styles, and a second press opens the dialog to change them, so the dialog keeps a key and joins the command it belongs with.
 - **Rollback.** Kit: the What This Does, Where Am I, History and Hotkeys lines in Mdi.cs's Help menu. Apps: the Help-menu lines marked 7 November 2026 in DbDo.cs, EdSharp.cs and FileDir.cs, and their Hotkeys files. Rollback.zip of that date holds every file before the change.
 
+### Control+Slash lists the keys (8 November 2026)
+
+- **Problem.** Jamal asked whether Homer should follow the key that web apps use to list their shortcuts.
+- **Found.** The slash and question-mark key is the de facto convention. Control+Slash lists the shortcuts in Google Docs and Drive, Slack, ChatGPT, Claude Docs, Discord and on Chromebooks; the question mark alone does so in Gmail, Outlook and GitHub, apps whose shortcuts are single keys; Teams uses Control+Period and Figma Control+Shift+Slash.
+- **Chosen.** Control+Slash becomes a second key for Hotkey Summary in the kit's frame, DbDo, EdSharp and FileDir. Alt+Shift+H stays, matching JAWS+H. The bare question mark is not used: FileDir's question mark is Say What Content, and in lists and text boxes it must type.
+- **Moved to make room.** Open Command Prompt keeps Control+Backslash only, in DbDo and FileDir, as in EdSharp. EdSharp's Next Style and Previous Style move from Control+Slash and Control+Shift+Slash to Alt+Period and Alt+Comma, a next-and-previous pair free in EdSharp.
+- **Not in HomerView.** HomerView runs inside Edge, where a web app's own Control+Slash -- Google Docs's, Slack's, ChatGPT's -- must reach the page, by the rule never to break the host program's keys. HomerView keeps Alt+Shift+H.
+- **Rollback.** The Hotkey Summary line in Mdi.cs; the lines marked 8 November 2026 in DbDo.cs, EdSharp.cs and FileDir.cs; their key files. Rollback.zip of that date holds every file before the change.
+
 ## Key Describer rules (5 November 2026)
 
 Jamal asked that Alt+F4 also turn the Key Describer off, for someone who turned it on by accident and does not know Control+F1, with a second Alt+F4 closing the app, and that this be the rule in every app. With it came what DbDo's describer had taught: describe every key even when its command cannot run, giving the true reason after the description; never guess a reason; ignore the nameless key a screen reader sends; and describe from the app's own command table. HomerSuite.md states the rules; the kit's KeyMap carries them out.

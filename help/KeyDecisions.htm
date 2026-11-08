@@ -410,6 +410,36 @@ lines marked 7 November 2026 in DbDo.cs, EdSharp.cs and FileDir.cs, and
 their Hotkeys files. Rollback.zip of that date holds every file before
 the change.</li>
 </ul>
+<h3 id="controlslash-lists-the-keys-8-november-2026">Control+Slash lists
+the keys (8 November 2026)</h3>
+<ul>
+<li><strong>Problem.</strong> Jamal asked whether Homer should follow
+the key that web apps use to list their shortcuts.</li>
+<li><strong>Found.</strong> The slash and question-mark key is the de
+facto convention. Control+Slash lists the shortcuts in Google Docs and
+Drive, Slack, ChatGPT, Claude Docs, Discord and on Chromebooks; the
+question mark alone does so in Gmail, Outlook and GitHub, apps whose
+shortcuts are single keys; Teams uses Control+Period and Figma
+Control+Shift+Slash.</li>
+<li><strong>Chosen.</strong> Control+Slash becomes a second key for
+Hotkey Summary in the kit’s frame, DbDo, EdSharp and FileDir.
+Alt+Shift+H stays, matching JAWS+H. The bare question mark is not used:
+FileDir’s question mark is Say What Content, and in lists and text boxes
+it must type.</li>
+<li><strong>Moved to make room.</strong> Open Command Prompt keeps
+Control+Backslash only, in DbDo and FileDir, as in EdSharp. EdSharp’s
+Next Style and Previous Style move from Control+Slash and
+Control+Shift+Slash to Alt+Period and Alt+Comma, a next-and-previous
+pair free in EdSharp.</li>
+<li><strong>Not in HomerView.</strong> HomerView runs inside Edge, where
+a web app’s own Control+Slash – Google Docs’s, Slack’s, ChatGPT’s – must
+reach the page, by the rule never to break the host program’s keys.
+HomerView keeps Alt+Shift+H.</li>
+<li><strong>Rollback.</strong> The Hotkey Summary line in Mdi.cs; the
+lines marked 8 November 2026 in DbDo.cs, EdSharp.cs and FileDir.cs;
+their key files. Rollback.zip of that date holds every file before the
+change.</li>
+</ul>
 <h2 id="key-describer-rules-5-november-2026">Key Describer rules (5
 November 2026)</h2>
 <p>Jamal asked that Alt+F4 also turn the Key Describer off, for someone

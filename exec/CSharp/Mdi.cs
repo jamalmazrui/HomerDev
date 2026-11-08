@@ -672,7 +672,9 @@ public class MdiFrame : LbcForm {
         addCommand("Hotkeys", "", "Open the document of every command and key.", showHotkeys).bNoEcho = true;
         addCommand("&ReadMe", "Alt+Shift+F1", "Open the quick start.", SuiteCommands.openReadMe).bNoEcho = true;
         addCommand("Alternate &Menu...", "Alt+F10", "Every command in one list you can search.", showAlternateMenu);
-        addCommand("Hotkey &Summary", "Alt+Shift+H", "Every command, key and summary in a window.", showHotkeySummary).bNoEcho = true;
+        // CONTROL+SLASH TOO (kit 1.169.0, 8 November 2026): the key Google Docs and Drive, Slack, ChatGPT and Claude Docs
+        // use to list their shortcuts, beside Alt+Shift+H, which matches JAWS+H, Hot Key Help.
+        addCommand("Hotkey &Summary", "Alt+Shift+H or Control+Slash", "Every command, key and summary in a window.", showHotkeySummary).bNoEcho = true;
         addCommand("&Play Tutorials...", "", "Play the spoken tutorials in the Homer Player.", playTutorials);
         addCommand("&Elevate Version...", "F11", "Check for a newer release and offer to install it.", elevateVersion);
         addCommand("Copy &Log", "Control+F12", "Put this session's log on the clipboard as a file, ready to attach.", copyLog).bNoEcho = true;

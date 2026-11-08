@@ -48,6 +48,7 @@ dNamed = {
     "F1": "F1 is help: this guide.",
     "Shift+F1": "F1 is help; Shift+F1 says what the control with focus does.",
     "Alt+Shift+Slash": "Slash is the question mark: Alt+Shift+Slash asks where am I.",
+    "Control+Slash": "Control+Slash lists the keys, as in Google Docs, Slack and ChatGPT.",
     "Alt+F1": "F1 is help; Alt+F1 is About.",
     "Control+F1": "F1 is help; Control+F1 describes whatever key you press next.",
     "Alt+Shift+F1": "F1 is help; Alt+Shift+F1 is the ReadMe, the short start.",

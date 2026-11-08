@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.169.0 -- 8 November 2026
+
+- **Control+Slash shows Hotkey Summary,** as well as Alt+Shift+H: the key Google Docs and Drive, Slack, ChatGPT and Claude Docs use to list their shortcuts. KeyDecisions.md gives the research and the rollback.
+
+## 1.168.0 -- 8 November 2026
+
+- **Menu keys are described.** In the Key Describer, Alt+F says "File menu", "Alt+F", then how many commands the menu holds, and the menu does not open. It had said nothing about the menu: the lookup checked one menu bar and skipped items Windows had not yet drawn. A key that opens no menu is noted in the log.
+
 ## 1.167.0 -- 7 November 2026
 
 - **The help keys of every main window.** Shift+F1 says what the focused control does, and Alt+Shift+Slash says where you are, in the kit's frame as in every dialog. History of Changes moves from Shift+F1 to Control+Shift+F1. The Hotkeys document keeps its place in the Help menu without a key, since Alt+Shift+H lists every key, live. KeyDecisions.md gives the reasons and the rollback.

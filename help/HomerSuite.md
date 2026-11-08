@@ -153,7 +153,7 @@ Jamal asked Claude to settle the pending decisions by best judgment, as optimiza
   - **Alt+Shift+F1:** ReadMe.
   - **Hotkeys:** the document of every key, from the Help menu; Alt+Shift+H lists the same keys, live.
   - **Alt+F10:** Alternate Menu.
-  - **Alt+Shift+H:** Hotkey Summary.
+  - **Alt+Shift+H or Control+Slash:** Hotkey Summary. Alt+Shift+H matches JAWS+H, Hot Key Help; Control+Slash is the key Google Docs, Slack, ChatGPT and Claude Docs use to list their shortcuts.
   - **F11:** Elevate Version.
   - **Control+F12:** Copy Log.
   - **Play Tutorials,** with no key, plays the walks in the Homer Player.
