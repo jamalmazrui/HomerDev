@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.174.0 -- 9 November 2026
+
+- **An unchanged window is not scanned again.** axeWindow's fingerprint now counts the captions of buttons and labels only; a folder window's title or a status bar's text, which change with what the program shows, had made FileDir's main window look new on every check. A scan that does not finish in its time is now kept too, so DbDo's main window, whose scan has never finished within 5 minutes, is not scanned again while it is unchanged; removing its section from axeScans.inix forces a scan.
+- **recordWalk presses a key twice.** A walk step with Press=2 double-presses its key, as a person does for a Homer key's second meaning.
+
 ## 1.173.0 -- 9 November 2026
 
 - **One Alternate Menu for every Homer app.** SuiteCommands.showAlternateMenu is the dialog, and SuiteCommands.alternateEntries gathers its commands from an app's menus. The list stands alone, with no filter box before it, and answers the suite's search keys: Control+F and Control+Shift+F filter and clear, Control+J and Control+Shift+J jump, F3 and Shift+F3 go to the next and previous match, all without regard to case. Menu order (the default), Name order and Key order buttons sort it, keeping any filter. LbcDialog.setListItemsKeepingFilter re-sorts a list that way.

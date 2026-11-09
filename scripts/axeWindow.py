@@ -242,7 +242,11 @@ def windowFingerprint(hWnd):
         oClass = ctypes.create_unicode_buffer(256); oUser.GetClassNameW(hChild, oClass, 256)
         sClass = reLocal.sub(r"\.app\..*$", "", oClass.value)
         sText = ""
-        if not any(s in sClass.lower() for s in lsDataClasses):
+        # ONLY BUTTONS AND LABELS SAY WHAT A WINDOW IS (9 November 2026). Every other control's text is its state: an
+        # MDI child is titled with its folder or table, a status bar with what was last done. FileDir's main window
+        # read as changed on every run, and was scanned every run, because its folder window's title was counted.
+        sLower = sClass.lower()
+        if ("button" in sLower or "static" in sLower) and not any(s in sLower for s in lsDataClasses):
             oText = ctypes.create_unicode_buffer(512); oUser.GetWindowTextW(hChild, oText, 512); sText = oText.value
         lParts.append("%s|%s|%d" % (sClass, sText, 1 if oUser.IsWindowVisible(hChild) else 0))
         return True
@@ -251,7 +255,7 @@ def windowFingerprint(hWnd):
     try:
         with open(os.path.join(libFolder(), "version.txt"), encoding="utf-8") as fIn: sVersion = fIn.read().strip()
     except Exception: pass
-    return hashlib.sha256(("axe " + sVersion + "\n" + "\n".join(lParts)).encode("utf-8")).hexdigest(), len(lParts)
+    return hashlib.sha256(("axe " + sVersion + " fingerprint 2\n" + "\n".join(lParts)).encode("utf-8")).hexdigest(), len(lParts)
 
 
 def windowKey(iPid, hWnd):
@@ -290,12 +294,13 @@ def saveScan(sKey, sFingerprint, dResult):
     other windows' sections kept. A JSON copy left by 1.155.0 is removed, so only the .inix remains."""
     dScans = loadScans()
     dScans[sKey.replace("[", "(").replace("]", ")")] = {"fingerprint": sFingerprint, "date": datetime.datetime.now().strftime("%d %B %Y"),
-        "errors": str(dResult["iErrors"]), "file": dResult["sFile"] or "", "lFindings": dResult["lFindings"][:300]}
+        "errors": "" if dResult["iErrors"] is None else str(dResult["iErrors"]), "file": dResult["sFile"] or "",
+        "problem": dResult.get("sProblem", "") or "", "lFindings": dResult["lFindings"][:300]}
     lLines = ["; axeScans.inix -- the last Axe.Windows scan of each window, kept by axeWindow so an unchanged window is not scanned again", ""]
     for sSection in sorted(dScans, key=str.lower):
         d = dScans[sSection]
         lLines.append("[" + sSection + "]")
-        for sName in ("fingerprint", "date", "errors", "file"):
+        for sName in ("fingerprint", "date", "errors", "file", "problem"):
             lLines.append(sName + " = " + str(d.get(sName, "")))
         for iAt, sFinding in enumerate(d.get("lFindings", []), 1):
             lLines.append("finding%d = %s" % (iAt, sFinding.replace("\r", " ").replace("\n", " ")))
@@ -332,6 +337,14 @@ def scanWindow(iPid, hWnd, sFolder, sScanId, sSpoken="", iLimit=0):
             speak("%s is unchanged since its scan on %s: %d error%s then." % (sName, dLast.get("date", "an earlier day"), iLast, "" if iLast == 1 else "s"))
             dResult.update({"iErrors": iLast, "lFindings": list(dLast.get("lFindings", [])), "sFile": dLast.get("sFile", ""), "bUnchanged": True})
             return dResult
+        # A SCAN THAT COULD NOT FINISH IS NOT TRIED AGAIN ON THE SAME WINDOW (9 November 2026). DbDo's main window has
+        # never finished within the time allowed, so nothing was kept and every check scanned it for 5 minutes more.
+        # Its outcome is kept now, like a finished scan's, and repeated while the window is unchanged; any change to
+        # the window scans it again, and removing its section from %LOCALAPPDATA%\\HomerDev\\axeScans.inix forces one.
+        if dLast and dLast.get("fingerprint") == sFingerprint and dLast.get("problem"):
+            speak("%s is unchanged since %s, when its scan did not finish; not scanned again." % (sName, dLast.get("date", "an earlier day")))
+            dResult.update({"sProblem": "unchanged since %s, when %s" % (dLast.get("date", "an earlier day"), dLast["problem"]), "bUnchanged": True})
+            return dResult
     except Exception:
         logLine("fingerprint not taken: " + traceback.format_exc())
     # SPOKEN FIRST, EVEN BEFORE THE LIBRARY LOADS (5 November 2026, night): a first load fetches packages from NuGet,
@@ -365,6 +378,7 @@ def scanWindow(iPid, hWnd, sFolder, sScanId, sSpoken="", iLimit=0):
             if nGone >= (iLimit or iScanLimit):
                 dResult["sProblem"] = "the scan did not finish in %d seconds" % (iLimit or iScanLimit)
                 speak("The scan of " + sName + " is taking too long; going on without it.")
+                if sKey and sFingerprint: saveScan(sKey, sFingerprint, dResult)
                 return dResult
             speak("Still scanning, %d seconds." % int(nGone))
     if "sError" in dShared:

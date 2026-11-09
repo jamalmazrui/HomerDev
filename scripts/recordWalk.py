@@ -21,6 +21,7 @@ its own, both optional:
 
     Type=seahawks       text typed before the Key, letter by letter
     Wait=6              seconds to listen after the key, instead of the default
+    Press=2             the key pressed twice in quick succession, a double press
 
 USAGE
 
@@ -162,7 +163,7 @@ def readWalk(sPath, bAll=False):
             sLine = sRaw.strip()
             if sLine.startswith(";") or not sLine: continue
             if sLine.lower() == "[step]":
-                dStep = {"sKey": "", "sType": "", "iWait": 0, "sSay": "", "lHear": []}
+                dStep = {"sKey": "", "sType": "", "iWait": 0, "iPress": 1, "sSay": "", "lHear": []}
                 lSteps.append(dStep)
                 continue
             if sLine.startswith("["):
@@ -175,6 +176,11 @@ def readWalk(sPath, bAll=False):
             elif sName == "type": dStep["sType"] = sValue
             elif sName == "say": dStep["sSay"] = sValue
             elif sName == "hear" and sValue: dStep["lHear"].append(sValue)
+            elif sName == "press":
+                # PRESS=2 (9 November 2026): the key pressed twice in quick succession, as a person double-presses a
+                # Homer key to have its second meaning -- spell a value, or show a summary in a window.
+                try: dStep["iPress"] = max(1, min(2, int(sValue)))
+                except ValueError: logLine("Press is not 1 or 2: " + sValue)
             elif sName == "wait":
                 try: dStep["iWait"] = int(sValue)
                 except ValueError: logLine("Wait is not a whole number: " + sValue)
@@ -669,6 +675,9 @@ def main():
             if nWaited >= nMaxSettle: logLine("  still sound after %d s of waiting for quiet; pressed anyway" % nMaxSettle)
             if dStep["sType"]: send_keys(escapeText(dStep["sType"]), with_spaces=True, pause=0.05)
             if sKeys: send_keys(sKeys, pause=0.05)
+            if sKeys and dStep.get("iPress", 1) >= 2:
+                time.sleep(0.25)   # well inside the 1.2 seconds Homer counts as one double press
+                send_keys(sKeys, pause=0.05)
             lChunks, nQuiet, nSpoken, nElapsed, bSpoke = [], 0.0, 0.0, 0.0, False
             while True:
                 aChunk = oRecorder.record(numframes=iChunk)
