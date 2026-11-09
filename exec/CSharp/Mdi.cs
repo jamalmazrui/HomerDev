@@ -260,9 +260,120 @@ public static class ClipFile {
 // BEST OF THE APPS (kit 1.74.0): Say Clipboard reads a list of copied files
 // as FileDir did; Copy Log puts the log on the clipboard as a file AND as its
 // path, as EdSharp and FileDir did; everything else is the frame's.
+// AlternateEntry: one command the Alternate Menu offers (kit 1.173.0). An app fills these from its menus with
+// SuiteCommands.alternateEntries, or from the kit's command table; oItem is whatever the app runs when it is chosen.
+public class AlternateEntry {
+    public string sName = "";
+    public string sKeys = "";
+    public string sSummary = "";
+    public bool bAvailable = true;
+    public object oItem;
+}
+
 public static class SuiteCommands {
 
     public const string sNoText = "The clipboard holds no text";
+
+    // ------- the Alternate Menu, the same in every Homer app (kit 1.173.0, 9 November 2026) -------
+    //
+    // THE DESIGN JAMAL ASKED FOR. One list of every command, with no filter box before it: drift had added one in
+    // DbDo. The list answers the suite's search keys, as every Lbc pick list does -- Control+F filters by a
+    // substring, Control+Shift+F clears the filter, Control+J and Control+Shift+J jump forward and back to a line
+    // holding a substring, F3 and Shift+F3 go to the next and previous match, all without regard to case -- and
+    // three buttons order it: Menu order, as the menus show the commands (the default), Name order, alphabetical by
+    // name, and Key order, alphabetical by key, commands without one last. A re-ordered list keeps its filter.
+
+    // alternateEntries: every command on a menu bar, in menu order, from each menu and its submenus; separators,
+    // hidden items, the open-window list and miSkip (the Alternate Menu itself) are left out. fSummary gives an
+    // item's one-sentence description; it may be null.
+    public static List<AlternateEntry> alternateEntries(MenuStrip oStrip, Func<ToolStripMenuItem, string> fSummary, ToolStripMenuItem miSkip) {
+        List<AlternateEntry> lEntries = new List<AlternateEntry>();
+        if (oStrip == null) return lEntries;
+        foreach (ToolStripItem oTop in oStrip.Items) {
+            ToolStripMenuItem miTop = oTop as ToolStripMenuItem;
+            if (miTop != null && miTop.Available) addAlternateEntries(miTop, fSummary, miSkip, lEntries);
+        }
+        return lEntries;
+    }
+
+    private static void addAlternateEntries(ToolStripMenuItem miMenu, Func<ToolStripMenuItem, string> fSummary, ToolStripMenuItem miSkip, List<AlternateEntry> lEntries) {
+        foreach (ToolStripItem oItem in miMenu.DropDownItems) {
+            ToolStripMenuItem mi = oItem as ToolStripMenuItem;
+            if (mi == null || !mi.Available || mi == miSkip || mi.IsMdiWindowListEntry) continue;
+            if (mi.HasDropDownItems) { addAlternateEntries(mi, fSummary, miSkip, lEntries); continue; }
+            string sName = (mi.Text ?? "").Replace("&", "").Trim();
+            if (sName.EndsWith("...")) sName = sName.Substring(0, sName.Length - 3).Trim();
+            if (sName.Length == 0) continue;
+            AlternateEntry oEntry = new AlternateEntry();
+            oEntry.sName = sName;
+            oEntry.sKeys = (mi.ShortcutKeyDisplayString ?? "").Trim();
+            if (oEntry.sKeys.Length == 0 && mi.ShortcutKeys != Keys.None) oEntry.sKeys = KeyMap.friendlyKey(mi.ShortcutKeys);
+            try { oEntry.sSummary = fSummary == null ? "" : (fSummary(mi) ?? "").Trim(); }
+            catch (Exception oError) { Log.exception(oError); }
+            oEntry.bAvailable = mi.Enabled;
+            oEntry.oItem = mi;
+            lEntries.Add(oEntry);
+        }
+    }
+
+    private static string alternateLine(AlternateEntry o) {
+        string sLine = o.sName + ", " + (o.sKeys.Length > 0 ? o.sKeys : "no key");
+        if (o.sSummary.Length > 0) sLine += ": " + o.sSummary.TrimEnd('.') + ".";
+        if (!o.bAvailable) sLine += " Unavailable now.";
+        return sLine;
+    }
+
+    // showAlternateMenu: the dialog. Returns the entry chosen, or null; the caller runs it after the dialog has
+    // closed, so the command acts on the window the person was in.
+    public static AlternateEntry showAlternateMenu(IWin32Window owner, List<AlternateEntry> lMenuOrder) {
+        if (lMenuOrder == null || lMenuOrder.Count == 0) { Say.sayForced("0 commands"); return null; }
+        List<AlternateEntry> lShown = new List<AlternateEntry>(lMenuOrder);
+        Func<List<string>> fLines = delegate() {
+            List<string> lsLines = new List<string>();
+            foreach (AlternateEntry o in lShown) lsLines.Add(alternateLine(o));
+            return lsLines;
+        };
+        using (LbcDialog dlg = new LbcDialog("Alternate Menu", owner)) {
+            ListBox lb = dlg.addPickBox("&Commands:", fLines(), "",
+                "Every command, in menu order; Enter runs the one you are on. Control+F filters, Control+J jumps, F3 goes to the next match.");
+            dlg.primaryList = lb;
+            dlg.addBand();
+            Button btnMenu = dlg.addButton("&Menu order", "Order the commands as the menus show them.");
+            Button btnName = dlg.addButton("&Name order", "Order the commands alphabetically by name.");
+            Button btnKey = dlg.addButton("&Key order", "Order the commands alphabetically by key, those without one last.");
+            dlg.endBand();
+            Action<string> aOrder = delegate(string sOrder) {
+                lShown = new List<AlternateEntry>(lMenuOrder);
+                if (sOrder == "Name order")
+                    lShown.Sort(delegate(AlternateEntry a, AlternateEntry b) { return string.Compare(a.sName, b.sName, StringComparison.OrdinalIgnoreCase); });
+                else if (sOrder == "Key order")
+                    lShown.Sort(delegate(AlternateEntry a, AlternateEntry b) {
+                        if ((a.sKeys.Length == 0) != (b.sKeys.Length == 0)) return a.sKeys.Length == 0 ? 1 : -1;
+                        int iKeys = string.Compare(a.sKeys, b.sKeys, StringComparison.OrdinalIgnoreCase);
+                        return iKeys != 0 ? iKeys : string.Compare(a.sName, b.sName, StringComparison.OrdinalIgnoreCase);
+                    });
+                dlg.setListItemsKeepingFilter(lb, fLines());
+                lb.Focus();
+                Say.say(sOrder);
+            };
+            btnMenu.Click += delegate(object o, EventArgs e) { aOrder("Menu order"); };
+            btnName.Click += delegate(object o, EventArgs e) { aOrder("Name order"); };
+            btnKey.Click += delegate(object o, EventArgs e) { aOrder("Key order"); };
+            if (!dlg.runOkCancel()) return null;
+            int iSource = dlg.listSourceIndex(lb, lb.SelectedIndex);
+            return iSource >= 0 && iSource < lShown.Count ? lShown[iSource] : null;
+        }
+    }
+
+    // runAlternateEntry: the usual way to run a chosen menu item, saying so when it cannot run now.
+    public static bool runAlternateEntry(AlternateEntry oChosen) {
+        if (oChosen == null) return true;
+        ToolStripMenuItem mi = oChosen.oItem as ToolStripMenuItem;
+        if (mi == null) return true;
+        if (!mi.Enabled) { Say.sayForced(oChosen.sName + " is unavailable now."); return true; }
+        mi.PerformClick();
+        return true;
+    }
 
     // ------- the Say family -------
 
@@ -922,26 +1033,18 @@ public class MdiFrame : LbcForm {
     // showAlternateMenu: every command in one searchable list. Its key and
     // summary follow its name, so the list answers "how do I" as well.
     public bool showAlternateMenu() {
-        List<KeyMap.Command> lsCommands = new List<KeyMap.Command>();
-        foreach (string sId in KeyMap.lsCommandOrder) lsCommands.Add(KeyMap.dCommands[sId]);
-        lsCommands.Sort(delegate(KeyMap.Command a, KeyMap.Command b) { return string.Compare(a.sName, b.sName, StringComparison.OrdinalIgnoreCase); });
-        if (lsCommands.Count == 0) { Say.sayForced("0 commands"); return true; }
-        List<string> lsLines = new List<string>();
-        foreach (KeyMap.Command c in lsCommands) {
-            string sLine = c.sName + ", " + (c.lsKeys.Count > 0 ? c.keysText() : "no key");
-            if (c.sSummary.Length > 0) sLine += ": " + c.sSummary;
-            lsLines.Add(sLine);
+        // The kit's command table, in the order the commands were added, which is their menu order.
+        List<AlternateEntry> lEntries = new List<AlternateEntry>();
+        foreach (string sId in KeyMap.lsCommandOrder) {
+            KeyMap.Command c = KeyMap.dCommands[sId];
+            if (c.sName.StartsWith("Alternate Menu")) continue;
+            AlternateEntry o = new AlternateEntry();
+            o.sName = c.sName; o.sKeys = c.lsKeys.Count > 0 ? c.keysText() : ""; o.sSummary = c.sSummary; o.oItem = c;
+            lEntries.Add(o);
         }
-        KeyMap.Command oChosen = null;
-        using (LbcDialog dlg = new LbcDialog("Alternate Menu", this)) {
-            ListBox lb = dlg.addPickBox("&Command:", lsLines, "",
-                "Type the start of a command, or press Control+F to show only commands with a word in their name, keys or summary; then press Enter to run it.");
-            if (!dlg.runOkCancel()) return true;
-            if (lb.SelectedIndex >= 0) oChosen = lsCommands[lb.SelectedIndex];
-        }
-        // Run after the list has closed, so the command acts on the window
-        // the person was in, not on the list.
-        if (oChosen != null) KeyMap.runCommand(oChosen);
+        AlternateEntry oChosen = SuiteCommands.showAlternateMenu(this, lEntries);
+        // Run after the list has closed, so the command acts on the window the person was in, not on the list.
+        if (oChosen != null) KeyMap.runCommand((KeyMap.Command) oChosen.oItem);
         return true;
     }
 

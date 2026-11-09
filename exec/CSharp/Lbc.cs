@@ -1730,6 +1730,17 @@ public class LbcDialog : IDisposable
         finally { lb.EndUpdate(); }
     }
 
+    // setListItemsKeepingFilter: replace what a list holds, as setListItems does, then apply again the filter it
+    // had, so a list re-sorted by a button -- the Alternate Menu's order buttons -- stays narrowed to what the
+    // person asked for (kit 1.173.0).
+    public void setListItemsKeepingFilter(ListBox lb, IList<string> lsItems)
+    {
+        if (lb == null) return;
+        string sFilter = dListStates.ContainsKey(lb) ? dListStates[lb].sFilter : "";
+        setListItems(lb, lsItems);
+        if (sFilter.Length > 0) applyFilter(lb, sFilter);
+    }
+
     // listSourceIndex: which item a visible row really is. With no filter the
     // answer is the row itself; with one it is not.
     public int listSourceIndex(ListBox lb, int iRow)
