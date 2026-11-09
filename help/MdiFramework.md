@@ -9,7 +9,7 @@ DbDo, EdSharp and FileDir are this kind of program. So is the fruit basket sampl
 A new app on the frame already has all of this:
 
 - **A window for each thing you work on,** inside one frame. F4 lists the windows, Shift+F4 says them, Control+Tab moves between them, and Control+F4 closes one.
-- **A Help menu.** F1 opens the guide, Shift+F1 says what the focused control does, Alt+Shift+Slash says where you are, Control+Shift+F1 opens the history, and Alt+F1 About. Control+F1 makes every key describe itself instead of running. Alt+F10 lists every command in one searchable list.
+- **A Help menu.** F1 opens the guide, Shift+F1 says what the focused control does, Control+Slash says where you are, Control+Shift+F1 opens the history, and Alt+F1 About. Control+F1 makes every key describe itself instead of running. Alt+F10 lists every command in one searchable list.
 - **Settings.** Alt+Shift+E changes a setting at once, with nothing to restart.
 - **The clipboard and files.**
   - Alt+Apostrophe says the clipboard: its text, or how many files are copied and their names.

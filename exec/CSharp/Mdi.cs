@@ -467,6 +467,24 @@ public static class SuiteCommands {
         return openHelp(sAppName + ".htm");
     }
 
+    // whereAmI: an app's main-window Where Am I (kit 1.171.0). Pressed once, the parts are spoken as separate
+    // utterances; pressed twice, they are shown in a window followed by every command and key.
+    public static bool whereAmI(IWin32Window owner, string[] aParts)
+    {
+        int iCount = LbcHints.pressCount("Control+Slash");
+        if (iCount >= 2)
+        {
+            List<string> lsLines = new List<string>();
+            foreach (string sPart in aParts) if (!string.IsNullOrEmpty(sPart)) lsLines.Add(sPart);
+            lsLines.Add("");
+            lsLines.Add("Commands and keys:");
+            lsLines.Add(KeyMap.hotkeySummary());
+            HelpDialog.show(owner, "Where Am I", string.Join("\r\n", lsLines.ToArray()));
+        }
+        else Say.sayForcedParts(aParts);
+        return true;
+    }
+
     // openHistory: Control+Shift+F1, History of Changes (kit 1.167.0; it was Shift+F1).
     public static bool openHistory() {
         return openHelp("History.htm");
@@ -659,11 +677,13 @@ public class MdiFrame : LbcForm {
             Say.sayForced(LbcHints.sentenceForFocused(this));
             return true;
         }).bNoEcho = true;
-        addCommand("&Where Am I", "Alt+Shift+Slash", "Say where you are and what has focus.", delegate() {
+        // CONTROL+SLASH, WHERE AM I (kit 1.171.0): everything at once, then on a second press a window with the same
+        // summary followed by every command and key -- what Hotkey Summary showed, which now has no key of its own.
+        addCommand("&Where Am I", "Control+Slash", "Say where you are, what has focus and the keys.", delegate() {
             Control ctlNow = ActiveControl;
             while (ctlNow is ContainerControl && ((ContainerControl) ctlNow).ActiveControl != null) ctlNow = ((ContainerControl) ctlNow).ActiveControl;
-            Say.sayForced(whereAmIHere(ctlNow, LbcHints.pressCount("Alt+Shift+Slash")));
-            return true;
+            Control ctlFocus = ctlNow;
+            return SuiteCommands.whereAmI(this, new string[] { LbcHints.allLevels(delegate(int iLevel) { return iLevel >= 3 ? "" : whereAmIHere(ctlFocus, iLevel); }) });
         }).bNoEcho = true;
         addCommand("&History of Changes", "Control+Shift+F1", "Open the list of changes, newest first.", SuiteCommands.openHistory).bNoEcho = true;
         addCommand("&About", "Alt+F1", "The name, the version, and where this copy keeps its files.", showAbout).bNoEcho = true;
@@ -672,9 +692,9 @@ public class MdiFrame : LbcForm {
         addCommand("Hotkeys", "", "Open the document of every command and key.", showHotkeys).bNoEcho = true;
         addCommand("&ReadMe", "Alt+Shift+F1", "Open the quick start.", SuiteCommands.openReadMe).bNoEcho = true;
         addCommand("Alternate &Menu...", "Alt+F10", "Every command in one list you can search.", showAlternateMenu);
-        // CONTROL+SLASH TOO (kit 1.169.0, 8 November 2026): the key Google Docs and Drive, Slack, ChatGPT and Claude Docs
-        // use to list their shortcuts, beside Alt+Shift+H, which matches JAWS+H, Hot Key Help.
-        addCommand("Hotkey &Summary", "Alt+Shift+H or Control+Slash", "Every command, key and summary in a window.", showHotkeySummary).bNoEcho = true;
+        // NO KEY OF ITS OWN (kit 1.171.0, 9 November 2026): Control+Slash pressed twice shows every command and key after
+        // the Where Am I summary, and Alt+Shift+H would press a dialog's Help button, so this stays on the menu only.
+        addCommand("Hotkey &Summary", "", "Every command, key and summary in a window.", showHotkeySummary).bNoEcho = true;
         addCommand("&Play Tutorials...", "", "Play the spoken tutorials in the Homer Player.", playTutorials);
         addCommand("&Elevate Version...", "F11", "Check for a newer release and offer to install it.", elevateVersion);
         addCommand("Copy &Log", "Control+F12", "Put this session's log on the clipboard as a file, ready to attach.", copyLog).bNoEcho = true;

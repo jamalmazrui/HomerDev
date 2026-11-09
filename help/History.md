@@ -7,6 +7,15 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.171.0 -- 9 November 2026
+
+- **Three help keys, two presses at most.** Control+Slash is Where Am I in every window and dialog, in place of Alt+Shift+Slash. Its first press, like Shift+F1's, reads everything, and Control stops it; a second press shows the same in a read-only window, ending in a main window with every command and key. There is no third press. Hotkey Summary keeps its menu item without a key. LbcHints.allLevels and LbcHints.answer, and SuiteCommands.whereAmI for main windows, do it for every app.
+- **JAWS+H in Homer apps.** The JAWS script template answers Hot Key Help by pressing Control+Slash twice.
+
+## 1.170.0 -- 8 November 2026
+
+- **Binding redirects cover every version.** getPdfPig.ps1 sent each library only versions up to the one shipped, so a library asking for a newer one, such as System.Memory asking for System.Runtime.CompilerServices.Unsafe 6.0.3.0, failed to load. Each redirect now sends every version to the copy on disk.
+
 ## 1.169.0 -- 8 November 2026
 
 - **Control+Slash shows Hotkey Summary,** as well as Alt+Shift+H: the key Google Docs and Drive, Slack, ChatGPT and Claude Docs use to list their shortcuts. KeyDecisions.md gives the research and the rollback.

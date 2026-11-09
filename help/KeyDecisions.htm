@@ -410,8 +410,52 @@ lines marked 7 November 2026 in DbDo.cs, EdSharp.cs and FileDir.cs, and
 their Hotkeys files. Rollback.zip of that date holds every file before
 the change.</li>
 </ul>
-<h3 id="controlslash-lists-the-keys-8-november-2026">Control+Slash lists
-the keys (8 November 2026)</h3>
+<h3 id="three-help-keys-and-two-presses-at-most-9-november-2026">Three
+help keys, and two presses at most (9 November 2026)</h3>
+<ul>
+<li><strong>Problem.</strong> Jamal found the help keys overlapping:
+Alt+Shift+H and Control+Slash both opened Hotkey Summary,
+Alt+Shift+Slash’s third press also spoke the keys, and a second press
+meant “more”, “something else” or “spell” depending on the window. He
+saw Control+Slash as a friendlier Alt+Shift+Slash. In a dialog,
+Alt+Shift+H would also press the Help button, because Windows matches an
+access letter whether or not Shift is down.</li>
+<li><strong>Chosen.</strong> Three keys, one question each: Shift+F1,
+what is this; Control+Slash, where am I and what can I do; Control+F1,
+what does this key do. The first press of Shift+F1 or Control+Slash
+reads everything – Control stops speech – and a second press shows the
+same in a read-only window; there is no third press. A command that says
+one short value keeps the screen readers’ habit: a second press spells
+it. Control+Slash replaces Alt+Shift+Slash in every main window and Lbc
+dialog; its window in a main window ends with every command and key, so
+Hotkey Summary keeps only its menu item, and Alt+Shift+H is free.</li>
+<li><strong>JAWS and NVDA.</strong> JAWS’s Insert+H, Hot Key Help, has
+nothing to say about an app Freedom Scientific does not script, so each
+Homer app’s JAWS scripts answer it by pressing Control+Slash twice.
+Insert+W, Windows Keys Help, and Insert+F1 stay JAWS’s own. NVDA has no
+hot key help; Control+Slash serves its users.</li>
+<li><strong>HomerView.</strong> Web pages own Control+Slash in Edge, so
+HomerView keeps Alt+Shift+Slash for Where Am I, its one exception.</li>
+<li><strong>Rollback.</strong> Lbc.cs (allLevels, answer, pressCount and
+the three key handlers), Mdi.cs’s Where Am I and Hotkey Summary lines,
+and the lines marked 9 November 2026 in DbDo.cs, EdSharp.cs, FileDir.cs
+and their JAWS scripts; Rollback.zip of that date holds every file
+before the change.</li>
+</ul>
+<h3 id="controlp-plays-media-9-november-2026">Control+P plays media (9
+November 2026)</h3>
+<ul>
+<li><strong>Chosen.</strong> Play Stream in DbDo and Play Media in
+FileDir take Control+P, as in Windows Media Player, the Windows 11 Media
+Player and Movies and TV; VLC and Spotify use it for preferences and
+browsers to print, and few people print now. Print keeps no key: on
+EdSharp’s and FileDir’s Misc menus, and hidden in DbDo until it prints.
+DbDo’s Alt+Shift+P and FileDir’s Alt+Shift+L are free. HomerView is
+unchanged: Control+P prints the page in Edge.</li>
+</ul>
+<h3
+id="controlslash-lists-the-keys-8-november-2026-superseded-9-november-2026">Control+Slash
+lists the keys (8 November 2026; superseded 9 November 2026)</h3>
 <ul>
 <li><strong>Problem.</strong> Jamal asked whether Homer should follow
 the key that web apps use to list their shortcuts.</li>

@@ -212,7 +212,8 @@ public class LbcTextBox : TextBox
         {
             // ONE SENTENCE, FROM ONE LOOKUP (2 November 2026): the same answer
             // every Lbc control gives, from configs\Hints.inix or the tip.
-            Say.say(LbcHints.hintFor(this, Tip, LbcHints.pressCount("Shift+F1")));
+            string sTipNow = Tip;
+            LbcHints.answer(FindForm(), "Shift+F1", "What This Does", LbcHints.allLevels(delegate(int iLevel) { return LbcHints.hintFor(this, sTipNow, iLevel); }));
         }
         // Homer structured-text line operations, active only in
         // multiline fields (notes, tags). Each acts on the selected
@@ -444,7 +445,7 @@ public class LbcForm : Form
         string sTitle = (Text ?? "").Trim();
         if (iLevel >= 3)
             return sTitle + " keys: Tab and Shift+Tab move between the controls, and an underlined letter with Alt goes straight to one; "
-                + "Enter presses the button with focus; Escape closes; Shift+F1 says what a control does; Alt+Shift+Slash says where you are, twice every control, three times these keys.";
+                + "Enter presses the button with focus; Escape closes; Shift+F1 says what a control does; Control+Slash says where you are; pressed twice, either shows what it said in a window.";
         if (iLevel == 2)
         {
             List<string> lParts = new List<string>();
@@ -493,16 +494,19 @@ public class LbcForm : Form
 
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
     {
-        if (keyData == (Keys.Alt | Keys.Shift | Keys.OemQuestion))
+        // WHERE AM I IS CONTROL+SLASH (kit 1.171.0, 9 November 2026), fewer keys than Alt+Shift+Slash: the first press
+        // says everything -- the window, the control with focus, every control, the keys -- and a second press shows
+        // it in a window to review.
+        if (keyData == (Keys.Control | Keys.OemQuestion))
         {
-            int iLevel = LbcHints.pressCount("Alt+Shift+Slash");
             Control ctlNow = ActiveControl;
             while (ctlNow is ContainerControl && ((ContainerControl) ctlNow).ActiveControl != null) ctlNow = ((ContainerControl) ctlNow).ActiveControl;
-            string sSay = "";
-            try { sSay = whereAmIText != null ? whereAmIText(ctlNow, iLevel) : whereAmIHere(ctlNow, iLevel); }
-            catch (Exception) { sSay = whereAmIHere(ctlNow, iLevel); }
-            Say.say(sSay);
-            return true;
+            Control ctlFocus = ctlNow;
+            string sAll = LbcHints.allLevels(delegate(int iLevel) {
+                try { return whereAmIText != null ? whereAmIText(ctlFocus, iLevel) : whereAmIHere(ctlFocus, iLevel); }
+                catch (Exception) { return whereAmIHere(ctlFocus, iLevel); }
+            });
+            return LbcHints.answer(this, "Control+Slash", "Where Am I", sAll);
         }
         // SHIFT+F1 ON ANY LBCFORM (6 November 2026): Alt+Shift+Slash worked on every form built on LbcForm, but Shift+F1
         // only in LbcDialog's own dialogs and text boxes, so an app's own dialog classes said nothing. The focused
@@ -511,11 +515,9 @@ public class LbcForm : Form
         {
             Control ctlHint = ActiveControl;
             while (ctlHint is ContainerControl && ((ContainerControl) ctlHint).ActiveControl != null) ctlHint = ((ContainerControl) ctlHint).ActiveControl;
-            string sHint = "";
-            try { sHint = LbcHints.hintFor(ctlHint ?? (Control) this, "", LbcHints.pressCount("Shift+F1")); }
-            catch (Exception) { sHint = ""; }
-            if (!string.IsNullOrEmpty(sHint)) Say.say(sHint);
-            return true;
+            Control ctlFor = ctlHint ?? (Control) this;
+            string sHint = LbcHints.allLevels(delegate(int iLevel) { return LbcHints.hintFor(ctlFor, "", iLevel); });
+            return LbcHints.answer(this, "Shift+F1", "What This Does", sHint);
         }
         // A DIALOG'S OWN ACCESS KEY COMES FIRST (6 November 2026, a regression Jamal found in FileDir). FileDir binds
         // Alt+Y to Yield Files, and app commands were tried before the dialog's controls, so Alt+Y in "Create it?"
@@ -959,7 +961,7 @@ public static class LbcHints
     public static int pressCount(string sKey)
     {
         DateTime dtNow = DateTime.Now;
-        if (sKey == sLastKey && (dtNow - dtLast).TotalMilliseconds <= 1200) iCount = Math.Min(iCount + 1, 3);
+        if (sKey == sLastKey && (dtNow - dtLast).TotalMilliseconds <= 1200) iCount = Math.Min(iCount + 1, 2);
         else iCount = 1;
         sLastKey = sKey; dtLast = dtNow;
         return iCount;
@@ -1079,6 +1081,41 @@ public static class LbcHints
             return sAll.Length > 0 ? sAll : sentenceFor(ctl, sTip);
         }
         return sentenceFor(ctl, sTip);
+    }
+
+    // ALL OF IT AT ONCE, THEN A WINDOW (kit 1.171.0, 9 November 2026). Jamal's rule for Shift+F1 and Control+Slash:
+    // the first press reads everything -- he stops speech with Control when he has heard enough -- and a second
+    // press shows the same text in a read-only window to review; there is no third press. allLevels gathers what
+    // the three presses used to say, dropping a level already contained in what was gathered.
+    public static string allLevels(Func<int, string> fText)
+    {
+        List<string> lsParts = new List<string>();
+        for (int iLevel = 1; iLevel <= 3; iLevel++)
+        {
+            string sPart = "";
+            try { sPart = (fText(iLevel) ?? "").Trim(); }
+            catch (Exception) { sPart = ""; }
+            if (sPart.Length == 0) continue;
+            bool bKnown = false;
+            for (int i = 0; i < lsParts.Count; i++)
+            {
+                if (lsParts[i].Contains(sPart)) { bKnown = true; break; }
+                if (sPart.Contains(lsParts[i])) { lsParts[i] = sPart; bKnown = true; break; }
+            }
+            if (!bKnown) lsParts.Add(sPart);
+        }
+        return string.Join(" ", lsParts.ToArray());
+    }
+
+    // answer: speak sText on the first press of sKey; on a second press within the repeat time, show it in a
+    // read-only window titled sTitle, where it can be reviewed line by line.
+    public static bool answer(IWin32Window owner, string sKey, string sTitle, string sText)
+    {
+        int iCount = pressCount(sKey);
+        if (string.IsNullOrEmpty(sText)) return true;
+        if (iCount >= 2) HelpDialog.show(owner, sTitle, sText);
+        else Say.sayForced(sText);
+        return true;
     }
 
     // For a window that is not an Lbc dialog, such as an app's main window.
@@ -2536,14 +2573,18 @@ public class LbcDialog : IDisposable
                 // (2 November 2026). A text box answers for itself, the same way.
                 evArgs.Handled = true;
                 evArgs.SuppressKeyPress = true;
-                Say.say(LbcHints.hintFor(ctlNow, tipOf(ctlNow), LbcHints.pressCount("Shift+F1")));
+                Control ctlHintNow = ctlNow;
+                string sTipNow = tipOf(ctlNow);
+                LbcHints.answer(frm, "Shift+F1", "What This Does", LbcHints.allLevels(delegate(int iLevel) { return LbcHints.hintFor(ctlHintNow, sTipNow, iLevel); }));
             }
-            else if (evArgs.KeyData == (Keys.Alt | Keys.Shift | Keys.OemQuestion))
+            else if (evArgs.KeyData == (Keys.Control | Keys.OemQuestion))
             {
-                // WHERE AM I: Alt+Shift+Slash, the question key, in every Lbc dialog of every Homer app.
+                // WHERE AM I: Control+Slash in every Lbc dialog of every Homer app (9 November 2026; it was
+                // Alt+Shift+Slash). Everything on the first press, a window to review on the second.
                 evArgs.Handled = true;
                 evArgs.SuppressKeyPress = true;
-                Say.say(whereAmI(ctlNow, LbcHints.pressCount("Alt+Shift+Slash")));
+                Control ctlWhere = ctlNow;
+                LbcHints.answer(frm, "Control+Slash", "Where Am I", LbcHints.allLevels(delegate(int iLevel) { return whereAmI(ctlWhere, iLevel); }));
             }
             else if (evArgs.KeyData == (Keys.Control | Keys.Home) && !bInMemo && !bInList)
             {
@@ -3666,8 +3707,7 @@ public class LbcDialog : IDisposable
             string sDefault = frm.AcceptButton is Button ? LbcHints.plainName(((Button) frm.AcceptButton).Text) : "the default button";
             return sTitle + " keys: Control+Enter presses " + sDefault + "; Escape cancels; F1 opens help; F7 lists the controls to jump to; "
                 + "Tab and Shift+Tab move between them, and an underlined letter with Alt goes straight to one. "
-                + "Shift+F1 says what a control does, twice its whole description, three times its keys. "
-                + "Alt+Shift+Slash says where you are, twice every control, three times these keys.";
+                + "Shift+F1 says what a control does, and Control+Slash says where you are; pressed twice, either shows what it said in a window.";
         }
         if (iLevel == 2)
         {
@@ -6069,7 +6109,7 @@ public static class Search
 }
 
 // LbcMessage: MessageBox.Show's own arguments and answers, shown as an Lbc dialog (5 November 2026), so a message
-// answers Alt+Shift+Slash, Shift+F1, Control+Enter and Escape like every other Homer dialog. A short message is a line
+// answers Control+Slash, Shift+F1, Control+Enter and Escape like every other Homer dialog. A short message is a line
 // of text, said as the dialog opens; a long one, or one of several lines, is a read-only box the screen reader reads
 // when it takes focus. Should the dialog fail, Windows's own message box shows it, so no message is ever lost.
 public static class LbcMessage

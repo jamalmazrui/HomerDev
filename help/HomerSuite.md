@@ -146,14 +146,14 @@ Jamal asked Claude to settle the pending decisions by best judgment, as optimiza
 - **Help family:**
   - **F1:** Documentation.
   - **Shift+F1:** What This Does, the focused control's one-sentence hint, in every main window and dialog.
-  - **Alt+Shift+Slash:** Where Am I, in every main window and dialog.
+  - **Control+Slash:** Where Am I, in every main window and dialog: everything at once; pressed twice, a window with the same, then every command and key.
   - **Alt+F1:** About.
   - **Control+F1:** Key Describer Toggle.
   - **Control+Shift+F1:** History of Changes.
   - **Alt+Shift+F1:** ReadMe.
-  - **Hotkeys:** the document of every key, from the Help menu; Alt+Shift+H lists the same keys, live.
+  - **Hotkeys:** the document of every key, from the Help menu; Control+Slash pressed twice lists the same keys, live.
   - **Alt+F10:** Alternate Menu.
-  - **Alt+Shift+H or Control+Slash:** Hotkey Summary. Alt+Shift+H matches JAWS+H, Hot Key Help; Control+Slash is the key Google Docs, Slack, ChatGPT and Claude Docs use to list their shortcuts.
+  - **Hotkey Summary:** on the Help menu, without a key; Control+Slash pressed twice shows the same list after Where Am I. In each app's JAWS scripts, JAWS+H, Hot Key Help, presses Control+Slash twice.
   - **F11:** Elevate Version.
   - **Control+F12:** Copy Log.
   - **Play Tutorials,** with no key, plays the walks in the Homer Player.

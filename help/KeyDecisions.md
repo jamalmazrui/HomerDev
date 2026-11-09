@@ -101,7 +101,19 @@ Each decision is one or two lines in the app's source, named in the comment besi
   - EdSharp's Style dialog moves to Alt+Slash pressed twice: Alt+Slash, Say Styles, says the styles, and a second press opens the dialog to change them, so the dialog keeps a key and joins the command it belongs with.
 - **Rollback.** Kit: the What This Does, Where Am I, History and Hotkeys lines in Mdi.cs's Help menu. Apps: the Help-menu lines marked 7 November 2026 in DbDo.cs, EdSharp.cs and FileDir.cs, and their Hotkeys files. Rollback.zip of that date holds every file before the change.
 
-### Control+Slash lists the keys (8 November 2026)
+### Three help keys, and two presses at most (9 November 2026)
+
+- **Problem.** Jamal found the help keys overlapping: Alt+Shift+H and Control+Slash both opened Hotkey Summary, Alt+Shift+Slash's third press also spoke the keys, and a second press meant "more", "something else" or "spell" depending on the window. He saw Control+Slash as a friendlier Alt+Shift+Slash. In a dialog, Alt+Shift+H would also press the Help button, because Windows matches an access letter whether or not Shift is down.
+- **Chosen.** Three keys, one question each: Shift+F1, what is this; Control+Slash, where am I and what can I do; Control+F1, what does this key do. The first press of Shift+F1 or Control+Slash reads everything -- Control stops speech -- and a second press shows the same in a read-only window; there is no third press. A command that says one short value keeps the screen readers' habit: a second press spells it. Control+Slash replaces Alt+Shift+Slash in every main window and Lbc dialog; its window in a main window ends with every command and key, so Hotkey Summary keeps only its menu item, and Alt+Shift+H is free.
+- **JAWS and NVDA.** JAWS's Insert+H, Hot Key Help, has nothing to say about an app Freedom Scientific does not script, so each Homer app's JAWS scripts answer it by pressing Control+Slash twice. Insert+W, Windows Keys Help, and Insert+F1 stay JAWS's own. NVDA has no hot key help; Control+Slash serves its users.
+- **HomerView.** Web pages own Control+Slash in Edge, so HomerView keeps Alt+Shift+Slash for Where Am I, its one exception.
+- **Rollback.** Lbc.cs (allLevels, answer, pressCount and the three key handlers), Mdi.cs's Where Am I and Hotkey Summary lines, and the lines marked 9 November 2026 in DbDo.cs, EdSharp.cs, FileDir.cs and their JAWS scripts; Rollback.zip of that date holds every file before the change.
+
+### Control+P plays media (9 November 2026)
+
+- **Chosen.** Play Stream in DbDo and Play Media in FileDir take Control+P, as in Windows Media Player, the Windows 11 Media Player and Movies and TV; VLC and Spotify use it for preferences and browsers to print, and few people print now. Print keeps no key: on EdSharp's and FileDir's Misc menus, and hidden in DbDo until it prints. DbDo's Alt+Shift+P and FileDir's Alt+Shift+L are free. HomerView is unchanged: Control+P prints the page in Edge.
+
+### Control+Slash lists the keys (8 November 2026; superseded 9 November 2026)
 
 - **Problem.** Jamal asked whether Homer should follow the key that web apps use to list their shortcuts.
 - **Found.** The slash and question-mark key is the de facto convention. Control+Slash lists the shortcuts in Google Docs and Drive, Slack, ChatGPT, Claude Docs, Discord and on Chromebooks; the question mark alone does so in Gmail, Outlook and GitHub, apps whose shortcuts are single keys; Teams uses Control+Period and Figma Control+Shift+Slash.
