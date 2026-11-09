@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.172.0 -- 9 November 2026
+
+- **Screen reader scripts say Update only when they changed.** The fingerprint installScreenReaderSupport compares leaves out the version line of an NVDA add-on's manifest.ini. An app whose build stamps its version there, as EdSharp's does, had every release offered as Update; now Update means the scripts changed and Reinstall that they are the same.
+
 ## 1.171.0 -- 9 November 2026
 
 - **Three help keys, two presses at most.** Control+Slash is Where Am I in every window and dialog, in place of Alt+Shift+Slash. Its first press, like Shift+F1's, reads everything, and Control stops it; a second press shows the same in a read-only window, ending in a main window with every command and key. There is no third press. Hotkey Summary keeps its menu item without a key. LbcHints.allLevels and LbcHints.answer, and SuiteCommands.whereAmI for main windows, do it for every app.
