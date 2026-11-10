@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.196.0 -- 10 November 2026
+
+- **The menu gate counts submenus and the menu bar.** A submenu's own caption, made with new ToolStripMenuItem, and each menu on the menu bar share letters with the items beside them, and the gate had not counted them: DbDo's Query menu had Say and Show Schema both on S. They are counted now.
+- **recordWalk menus walks the menus as the code builds them.** UI Automation found DbDo's seven menus but none of their items, twice, so the walk fell back to pressing Down Arrow 25 times, and short menus wrapped and repeated -- Window's Open Table three times over. The walk now reads each menu's items, submenus included and hidden items left out, from the app's own code, the reading the gate checks, and UI Automation only when that finds none. Its audit applies the gate's rules: an item with no letter is not a finding.
+
 ## 1.195.0 -- 10 November 2026
 
 - **The menu letters check is a gate, with every rule.** It had missed three of Homer's rules: two items in one menu sharing a letter; an access letter that is not its key's letter when the key has Shift, as Alt+Shift+D's item carrying O; and a letter on an item whose key is a function key or symbol, such as F4 or Control+F4, which takes none. It now reads which menu each item is in, checks six rules -- shared letters, letters inside a word, letters that are not the key's, letters on function and symbol keys, key letters that start no word, and more than one letter marked in a caption -- and fails the release on any break. Tested on made-up items with each break; DbDo, EdSharp and FileDir pass.

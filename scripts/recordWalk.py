@@ -132,6 +132,69 @@ def menuItemsOf(oItem, iDepth):
     except Exception: pass
     return lItems
 
+def menuTreeFromCode(sRoot):
+    """The app's menus as its code builds them (10 November 2026): each menu's items in order, a submenu's items one
+    level down, hidden items left out, and each item's access letter and key. UI Automation found Windows Forms
+    menus but none of their items, twice, so the walk fell back to pressing Down Arrow 25 times, and short menus
+    wrapped and repeated; the code is the same source the release gate checks. [] when no menu is found."""
+    sCode = ""
+    for sPath in sorted(glob.glob(os.path.join(sRoot, "*.cs"))):
+        try:
+            with open(sPath, encoding="utf-8-sig", errors="replace") as fIn: sText = fIn.read()
+        except Exception: continue
+        sCode += "\n".join(s for s in sText.splitlines() if not s.lstrip().startswith("//")) + "\n"
+    def letterOfCaption(sCaption):
+        oMatch = re.search(r"&([^&])", sCaption)
+        return oMatch.group(1).upper() if oMatch else ""
+    def plain(sCaption): return sCaption.replace("&", "").replace("...", "").strip()
+    setHidden = set(re.findall(r"\b(\w+)\.Visible\s*=\s*false\s*;", sCode))
+    lMenus = []
+    lTops = re.findall(r'(mi[A-Za-z]+)\s*=\s*addMenu\("([^"]*)"\)', sCode)
+    if lTops:
+        # DbDo: addMenu for each menu, addItem(parent, ...) for each item, parent.DropDownItems.Add(sub) for a submenu,
+        # all in the order the code runs them.
+        dSub = dict(re.findall(r'ToolStripMenuItem\s+(mi[A-Za-z]+)\s*=\s*new\s+\w*MenuItem\("([^"]*)"\)', sCode))
+        dChildren = {}
+        oScan = re.compile(r'(?:(\w+)\s*=\s*)?addItem\((mi[A-Za-z]+),\s*"([^"]*)",\s*"[^"]*",\s*([^,]+?),|(mi[A-Za-z]+)\.DropDownItems\.Add\((mi[A-Za-z]+)\)')
+        for oMatch in oScan.finditer(sCode):
+            if oMatch.group(2):
+                sVar, sParent, sCaption, sKeys = oMatch.group(1), oMatch.group(2), oMatch.group(3), oMatch.group(4)
+                if sVar and sVar in setHidden: continue
+                dChildren.setdefault(sParent, []).append({"name": plain(sCaption), "access": letterOfCaption(sCaption),
+                    "key": sKeys.replace("Keys.", "").replace(" | ", "+").replace("|", "+").strip(), "enabled": True, "items": [], "var": sVar or ""})
+            elif oMatch.group(5) and oMatch.group(6) in dSub:
+                sSub = oMatch.group(6)
+                dChildren.setdefault(oMatch.group(5), []).append({"name": plain(dSub[sSub]), "access": letterOfCaption(dSub[sSub]),
+                    "key": "", "enabled": True, "items": [], "var": sSub})
+        for dList in dChildren.values():
+            for dItem in dList:
+                if dItem["var"] in dChildren and not dItem["items"]: dItem["items"] = dChildren[dItem["var"]]
+        for sVar, sCaption in lTops:
+            lMenus.append({"name": plain(sCaption), "access": letterOfCaption(sCaption), "items": dChildren.get(sVar, [])})
+        return lMenus
+    # EdSharp and FileDir: each item assigned to a variable, then each menu's items listed in order with AddRange.
+    dItems = {}
+    for sVar, sCaption, sRest in re.findall(r'(\w+)\s*=\s*(?:CreateMenuItem|menu_Helper|CreateMenu)\("([^"]*)"(.*?)\)\s*;', sCode):
+        oKey = re.match(r',\s*"([^"]*)"', sRest)
+        dItems[sVar] = {"name": plain(sCaption), "access": letterOfCaption(sCaption), "key": oKey.group(1) if oKey else "", "enabled": True, "items": []}
+    for sVar, sCaption in re.findall(r'(\w+)\s*=\s*new\s+\w*MenuItem\("([^"]*)"', sCode):
+        dItems.setdefault(sVar, {"name": plain(sCaption), "access": letterOfCaption(sCaption), "key": "", "enabled": True, "items": []})
+    dLists = {}
+    for sParent, sList in re.findall(r'(\w+)\.DropDownItems\.AddRange\(new ToolStrip(?:Menu)?Item\[\]\s*\{([^}]*)\}', sCode, re.S):
+        dLists[sParent] = [s for s in re.findall(r"\w+", sList) if s in dItems and s not in setHidden]
+    def build(sVar, iDepth):
+        dItem = dict(dItems[sVar])
+        if iDepth < 2 and sVar in dLists: dItem["items"] = [build(s, iDepth + 1) for s in dLists[sVar]]
+        return dItem
+    oTops = re.search(r'\w+\.Items\.AddRange\(new ToolStrip(?:Menu)?Item\[\]\s*\{([^}]*)\}', sCode, re.S)
+    if not oTops: return []
+    for sTop in re.findall(r"\w+", oTops.group(1)):
+        if sTop in dItems:
+            dMenu = build(sTop, 0)
+            lMenus.append({"name": dMenu["name"], "access": dMenu["access"], "items": dMenu["items"]})
+    return lMenus
+
+
 def openMenuItems(sPid, setSeen):
     """The items of the menu that has just opened: a visible window of the app's process not in setSeen. Each item is
     {name, access, key, enabled, sub}, sub True when it opens a submenu."""
@@ -188,39 +251,41 @@ def readMenus(sApp):
         logLine("menu reader: the menus could not be read: " + traceback.format_exc()); return []
 
 def checkMenus(lMenus):
-    """Homer's menu rules, checked on what was read: each line a finding; [] when every rule holds."""
+    """Homer's menu rules, checked on what was read: each line a finding; [] when every rule holds. The same rules
+    check.py's release gate applies (10 November 2026): no letter shared in one menu; a letter starts a word of the
+    name and is the key's letter, Shift or not; no letter on a function, arrow or symbol key; a key's letter starts a
+    word. An item with no letter is not a finding: a function key's item, or one whose key letter another item has,
+    takes none."""
     lFindings = []
-    def words(sName): return [w for w in re.findall(r"[A-Za-z][A-Za-z0-9']*", sName)]
+    def words(sName): return re.findall(r"[A-Za-z][A-Za-z0-9']*", sName)
+    def mainKey(sKey):
+        lParts = [s for s in re.split(r"[+ ]", sKey.split(" or ")[0].strip()) if s]
+        lMain = [s for s in lParts if s not in ("Alt", "Control", "Shift", "Ctrl")]
+        return lMain[-1] if lMain else ""
     def exempt(sLetter, sName):
-        # The standing exceptions in DbDo's audit: X for the "ex" sound, V for "voke", Z for a toggle or status.
         return (sLetter == "X" and re.search(r"ex", sName, re.I)) or (sLetter == "V" and re.search(r"voke", sName, re.I)) \
-            or (sLetter == "Z" and re.search(r"toggle|status", sName, re.I))
+            or (sLetter == "Z" and re.search(r"toggle|status", sName, re.I)) \
+            or (sLetter in "XCVZY" and re.search(r"cut|copy|paste|undo|redo|repeat", sName, re.I))
     def checkLevel(sWhere, lItems):
         dByLetter = {}
         for d in lItems:
-            sName = d["name"]; sLetter = d.get("access", "")
-            if not sLetter: lFindings.append("%s: %s has no access letter" % (sWhere, sName))
-            else:
+            sName = d["name"]; sLetter = d.get("access", ""); sMain = mainKey(d.get("key", ""))
+            bLetterKey = len(sMain) == 1 and sMain.isalpha()
+            bSymbolKey = sMain not in ("", "None") and not (len(sMain) == 1 and sMain.isalnum()) and not re.match(r"^D\d$", sMain)
+            lInitials = [w[0].upper() for w in words(sName)]
+            if sLetter:
                 dByLetter.setdefault(sLetter, []).append(sName)
-                if sLetter not in [w[0].upper() for w in words(sName)] and not exempt(sLetter, sName):
+                if sLetter not in lInitials and not exempt(sLetter, sName):
                     lFindings.append("%s: %s has access letter %s, which starts none of its words" % (sWhere, sName, sLetter))
-                sHot = letterOf(d.get("key", ""))
-                if sHot and sHot != sLetter and not exempt(sHot, sName):
+                if bLetterKey and sMain.upper() != sLetter and not exempt(sMain.upper(), sName):
                     lFindings.append("%s: %s has access letter %s but key %s" % (sWhere, sName, sLetter, d["key"]))
+                if bSymbolKey:
+                    lFindings.append("%s: %s has access letter %s, but its key %s is not a letter" % (sWhere, sName, sLetter, d["key"]))
             if d.get("items"): checkLevel(sWhere + " > " + sName, d["items"])
         for sLetter, lNames in sorted(dByLetter.items()):
             if len(lNames) > 1: lFindings.append("%s: access letter %s is shared by %s" % (sWhere, sLetter, "; ".join(lNames)))
     checkLevel("menu bar", [{"name": d["name"], "access": d["access"], "key": "", "items": []} for d in lMenus])
-    dNames = {}
-    for dMenu in lMenus:
-        checkLevel(dMenu["name"], dMenu["items"])
-        def gather(sWhere, lItems):
-            for d in lItems:
-                dNames.setdefault(d["name"].lower(), []).append(sWhere)
-                if d.get("items"): gather(sWhere + " > " + d["name"], d["items"])
-        gather(dMenu["name"], dMenu["items"])
-    for sName, lWhere in sorted(dNames.items()):
-        if len(lWhere) > 1: lFindings.append("the name %s appears %d times: %s" % (sName, len(lWhere), "; ".join(lWhere)))
+    for dMenu in lMenus: checkLevel(dMenu["name"], dMenu["items"])
     return lFindings
 
 def menuWalkSteps(lMenus, iAlternate):
@@ -757,14 +822,21 @@ def main():
     if oArgs.which.strip().lower() == "menus":
         sMenuWalk = os.path.join(sLogs, oArgs.app + "-menus-" + sStamp + ".inix")
         lLines = ["; written by recordWalk menus, " + sStamp, ""]
-        lMenus = []
+        # FROM THE CODE FIRST (10 November 2026): the app's own source, beside this script, says each menu's items in
+        # order -- the same reading the release gate checks. UI Automation is tried only when the code gives none.
+        lMenus = menuTreeFromCode(sProject)
+        if lMenus and any(d["items"] for d in lMenus):
+            logLine("menus read from the code in " + sProject + ": " + ", ".join("%s (%d)" % (d["name"], len(d["items"])) for d in lMenus))
+            sayLine("Read " + oArgs.app + "'s menus from its code.")
+        else:
+            lMenus = []
         # IN A PROCESS OF ITS OWN (10 November 2026). Reading the menus through UI Automation, in this process, came
         # before the recording, and the walk of 10 November stopped at "Starting in 5 seconds": pywinauto and soundcard
         # share COM badly, as ensurePackages notes. A separate process reads the menus into a file, with 90 seconds to
         # do it, and this one never touches UI Automation before it records.
         # THE PACKAGES FIRST (10 November 2026): bringForward loads pywinauto, and soundcard must start COM before it,
         # or the recording fails with "Error 0x100000001", as the walk of 10 November did at 8:32.
-        if ensurePackages() and bringForward(oArgs.app):
+        if not lMenus and ensurePackages() and bringForward(oArgs.app):
             sayLine("Reading " + oArgs.app + "'s menus.")
             sMenuFile = os.path.join(sLogs, oArgs.app + "-menuRead-" + sStamp + ".json")
             lReader = [sys.executable, os.path.abspath(__file__), "--read-menus", oArgs.app, sMenuFile]
