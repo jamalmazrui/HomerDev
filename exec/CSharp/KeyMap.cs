@@ -279,9 +279,19 @@ public static class KeyMap {
     public static string[] describeParts(Keys k, Command oCommand, Form oWindow) {
         List<string> lsParts = new List<string>();
         if (oCommand == null) {
-            string sMenu = menuForKey(oWindow, k);
+            // A MENU KEY IS DESCRIBED LIKE A COMMAND (kit 1.168.0): its name, its key, then what it does --
+            // "File menu", "Alt+F", "Opens a menu of 24 commands." -- and the menu does not open.
+            ToolStripMenuItem oMenu = menuItemForKey(oWindow, k);
+            if (oMenu != null) {
+                int iCount = 0;
+                foreach (ToolStripItem oSub in oMenu.DropDownItems) if (oSub is ToolStripMenuItem && oSub.Available) iCount++;
+                lsParts.Add(oMenu.Text.Replace("&", "") + " menu");
+                lsParts.Add(friendlyKey(k));
+                lsParts.Add("Opens a menu of " + iCount + (iCount == 1 ? " command." : " commands."));
+                return lsParts.ToArray();
+            }
             lsParts.Add(friendlyKey(k));
-            lsParts.Add(sMenu.Length > 0 ? sMenu + " menu." : "No " + Application.ProductName + " command.");
+            lsParts.Add("No " + Application.ProductName + " command.");
             return lsParts.ToArray();
         }
         lsParts.Add(oCommand.sName);
@@ -309,28 +319,46 @@ public static class KeyMap {
         return sb.ToString();
     }
 
-    // menuForKey: the top-level menu an Alt+letter opens in this window or its
-    // MDI parent, without its ampersand; "" when the key opens none.
+    // menuForKey: the name of the top-level menu an Alt+letter opens, without its ampersand; "" when none.
     public static string menuForKey(Form oWindow, Keys k) {
+        ToolStripMenuItem oMenu = menuItemForKey(oWindow, k);
+        return oMenu == null ? "" : oMenu.Text.Replace("&", "");
+    }
+
+    // menuItemForKey: the top-level menu an Alt+letter opens in this window or its MDI frame, or null (kit
+    // 1.168.0). It had looked only at the frame's MainMenuStrip and skipped any item whose Visible read false,
+    // and Visible reads false for an item whose strip Windows has not yet shown -- so in the Key Describer
+    // Alt+F said nothing about the File menu. Every MenuStrip of the window and the frame is searched now,
+    // an item counts when Available (its own setting, not its strip's), and the letter is matched as Windows
+    // matches a mnemonic.
+    public static ToolStripMenuItem menuItemForKey(Form oWindow, Keys k) {
         try {
-            if (oWindow == null || (k & Keys.Modifiers) != Keys.Alt) return "";
+            if (oWindow == null || (k & Keys.Modifiers) != Keys.Alt) return null;
             Keys kCode = k & Keys.KeyCode;
-            if (kCode < Keys.A || kCode > Keys.Z) return "";
-            string sLetter = ((char)('a' + (kCode - Keys.A))).ToString();
-            Form oFrame = oWindow.MdiParent != null ? oWindow.MdiParent : oWindow;
-            MenuStrip oStrip = oFrame.MainMenuStrip;
-            if (oStrip == null) return "";
-            foreach (ToolStripItem oItem in oStrip.Items) {
-                if (!oItem.Visible || string.IsNullOrEmpty(oItem.Text)) continue;
-                int iAmp = oItem.Text.IndexOf('&');
-                if (iAmp < 0 || iAmp + 1 >= oItem.Text.Length) continue;
-                if (oItem.Text.Substring(iAmp + 1, 1).ToLowerInvariant() == sLetter) return oItem.Text.Replace("&", "");
+            if (kCode < Keys.A || kCode > Keys.Z) return null;
+            char chLetter = (char)('A' + (kCode - Keys.A));
+            List<MenuStrip> lStrips = new List<MenuStrip>();
+            foreach (Form oForm in new Form[] { oWindow.MdiParent, oWindow }) {
+                if (oForm == null) continue;
+                if (oForm.MainMenuStrip != null && !lStrips.Contains(oForm.MainMenuStrip)) lStrips.Add(oForm.MainMenuStrip);
+                foreach (Control oControl in oForm.Controls) {
+                    MenuStrip oStrip = oControl as MenuStrip;
+                    if (oStrip != null && !lStrips.Contains(oStrip)) lStrips.Add(oStrip);
+                }
             }
+            foreach (MenuStrip oStrip in lStrips) {
+                foreach (ToolStripItem oItem in oStrip.Items) {
+                    ToolStripMenuItem oMenu = oItem as ToolStripMenuItem;
+                    if (oMenu == null || !oMenu.Available || string.IsNullOrEmpty(oMenu.Text)) continue;
+                    if (Control.IsMnemonic(chLetter, oMenu.Text)) return oMenu;
+                }
+            }
+            Log.info("Key Describer: " + friendlyKey(k) + " opens no menu among " + lStrips.Count + " menu bar(s).");
         }
         catch (Exception oError) {
             Log.exception(oError);
         }
-        return "";
+        return null;
     }
 
     // ------------------------------------------------------------- routing
@@ -641,7 +669,7 @@ public static class KeyMap {
         return iPressCount;
     }
 
-    // answer: what every Say command calls -- ONE, TWO OR THREE PRESSES (kit
+    // answer: what every Say command calls -- once ONE, TWO OR THREE PRESSES (kit
     // 1.73.8), the pattern NVDA's own reading commands use. NVDA's Report
     // Current Line speaks on one press, spells on two, and spells phonetically
     // on three; Read Window Title spells on two and copies on three. Homer
@@ -651,15 +679,24 @@ public static class KeyMap {
     // second press and DbDo's review window both survive. The first press
     // speaks the parts as separate utterances, at once; Escape closes the
     // window and returns to where you were.
+    //
+    // TWO PRESSES AT MOST (kit 1.176.0, 9 November 2026, Jamal's rule). The first press says everything. The second
+    // depends on the answer: a short value -- one part, or a label and one part, of 40 characters or fewer after its
+    // label -- is spelled, the value alone, not its label; anything longer is shown in the read-only window, where the
+    // screen reader can review and spell it. A third press starts again. testSay heard the old second press spell
+    // whole long answers, such as Say Database's full path, which no one can follow by ear.
     public static bool answer(string sTitle, params string[] aParts) {
         if (aParts == null) aParts = new string[0];
-        if (iPressCount >= 3) {
-            HelpDialog.show(Form.ActiveForm, sTitle, string.Join("\r\n", aParts));
-            iPressCount = 1;
-            return true;
-        }
         if (iPressCount == 2) {
-            Say.sayForced(spelled(string.Join(" ", aParts)));
+            List<string> lsParts = new List<string>();
+            foreach (string sPart in aParts) if (!string.IsNullOrEmpty(sPart) && sPart.Trim().Length > 0) lsParts.Add(sPart.Trim());
+            string sValue = lsParts.Count == 1 ? lsParts[0] : (lsParts.Count == 2 && lsParts[0].EndsWith(":") ? lsParts[1] : "");
+            if (lsParts.Count == 1) {
+                int iColon = sValue.IndexOf(": ");
+                if (iColon > 0) sValue = sValue.Substring(iColon + 2);
+            }
+            if (sValue.Length > 0 && sValue.Length <= 40) Say.sayForced(spelled(sValue));
+            else HelpDialog.show(Form.ActiveForm, sTitle, string.Join("\r\n", aParts));
             return true;
         }
         Say.say(aParts);

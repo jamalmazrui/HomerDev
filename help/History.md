@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.176.0 -- 9 November 2026
+
+- **Say keys: two presses at most.** KeyMap.answer, which every Say command calls, says everything on the first press. On the second it spells a short value, the value alone without its label, and shows anything longer in the read-only window; there is no third press. DbDo's testSay heard the old second press spell whole long answers, such as a database's full path.
+
 ## 1.175.0 -- 9 November 2026
 
 - **The Alternate Menu in an MDI child.** A child's menus move into its frame's menu bar, leaving its own empty, so DbDo's Alternate Menu said "0 commands". SuiteCommands.alternateEntries reads the frame's merged menus when a window's own bar is empty.
