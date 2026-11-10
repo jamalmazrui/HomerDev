@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.195.0 -- 10 November 2026
+
+- **The menu letters check is a gate, with every rule.** It had missed three of Homer's rules: two items in one menu sharing a letter; an access letter that is not its key's letter when the key has Shift, as Alt+Shift+D's item carrying O; and a letter on an item whose key is a function key or symbol, such as F4 or Control+F4, which takes none. It now reads which menu each item is in, checks six rules -- shared letters, letters inside a word, letters that are not the key's, letters on function and symbol keys, key letters that start no word, and more than one letter marked in a caption -- and fails the release on any break. Tested on made-up items with each break; DbDo, EdSharp and FileDir pass.
+
 ## 1.194.0 -- 10 November 2026
 
 - **HomerList is the kit's.** FileDir's list of strings -- find, keep or remove what matches, pad, trim, case, segments, stack and queue -- moved into Util.cs as Homer.HomerList, and FileDir uses it. EdSharp keeps its older copy, marked KEPT ON PURPOSE: its methods' upper-camel names are also string and list methods, so its calls need a compiler in the loop to move.
