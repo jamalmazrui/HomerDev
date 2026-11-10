@@ -673,6 +673,8 @@ public static class KeyMap {
         keyLast = keyData;
         iTickLast = iNow;
         oWindowLast = oWindow;
+        Say.iKeyPresses = iPressCount;   // Say spells a repeated line on a second press (kit 1.179.0)
+        Say.iKeyPressTick = iNow;
         return iPressCount;
     }
 

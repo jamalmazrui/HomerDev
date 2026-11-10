@@ -228,8 +228,39 @@ public static class Say
         return false;
     }
 
+    // iKeyPresses: how many times in a row the last key was pressed, as KeyMap counted it; 1 when no KeyMap runs.
+    public static int iKeyPresses = 1;
+    public static int iKeyPressTick = 0;   // when it was counted; a count older than 2 seconds no longer applies
+
+    // spelledText: each character with a space after it, "space" for a space -- the same as KeyMap.spelled.
+    public static string spelledText(string sText)
+    {
+        if (string.IsNullOrEmpty(sText)) return "";
+        StringBuilder sb = new StringBuilder();
+        foreach (char ch in sText)
+        {
+            if (ch == '\r') continue;
+            if (ch == ' ' || ch == '\t' || ch == '\n') sb.Append("space ");
+            else { sb.Append(ch); sb.Append(' '); }
+        }
+        return sb.ToString().TrimEnd();
+    }
+
     public static void say(string sText)
     {
+        // A SECOND PRESS SPELLS WHAT THE FIRST SAID (kit 1.178.0, 9 November 2026). A Say command that speaks its
+        // answer directly -- "filter: none", "bookmark: none" -- said the same line again on a quick second press, and
+        // the guard against repeats dropped it, so the second press was silent. When the key was pressed twice and the
+        // line repeats, its value is spelled instead, as KeyMap.answer does for the commands that go through it.
+        // Say knows nothing of KeyMap, so it compiles alone, as the conversion classes and the template app compile it:
+        // KeyMap.notePress sets iKeyPresses as it counts each press (kit 1.179.0).
+        if (iKeyPresses == 2 && unchecked(Environment.TickCount - iKeyPressTick) <= 2000
+            && !string.IsNullOrEmpty(sText) && flatten(sText) == sLastGuarded) {
+            string sValue = sText;
+            int iColon = sValue.IndexOf(": ");
+            if (iColon > 0) sValue = sValue.Substring(iColon + 2);
+            if (sValue.Length <= 40) { sayForced(spelledText(sValue)); return; }
+        }
         if (alreadySaid(sText)) return;
         // Extra-Speech gate: when off, DbDo's direct speech is
         // suppressed but the screen reader's natural focus and

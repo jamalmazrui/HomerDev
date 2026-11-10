@@ -7,6 +7,16 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.179.0 -- 9 November 2026
+
+- **Say compiles alone again.** 1.178.0's spelling of a repeated line made Say.cs use KeyMap, which the conversion classes, the template app and a sample compile without; the kit's build stopped. KeyMap now hands Say the press count as it counts each press, and Say spells with its own copy of the rule.
+
+## 1.178.0 -- 9 November 2026
+
+- **A second press spells what the first said, every time.** Say commands that speak their answer directly, such as "filter: none", said it again on a second press, and the guard against repeats dropped it, so the second press was silent. Say.say now spells the value instead when the same key is pressed twice.
+- **recordWalk menus** walks every menu item and the Alternate Menu without a walk file; --menus and --items set how far.
+- **check.py takes the kit's axeWindow first** and logs which one ran. An app's own scripts folder came first, so an old copy outranked the kit's, and DbDo's main window went on being scanned for 5 minutes in every check.
+
 ## 1.177.0 -- 9 November 2026
 
 - **A second press reaches the command.** KeyMap.runCommand marks a command as run from a key while its fRun runs, as it did only around a menu click. DbDo runs its commands through fRun, so its menu handler took each press for a click by hand and counted it as a first; testSay heard every second Say key press as a first press, dropped as a repeat.

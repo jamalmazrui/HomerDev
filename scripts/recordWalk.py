@@ -23,6 +23,8 @@ its own, both optional:
     Wait=6              seconds to listen after the key, instead of the default
     Press=2             the key pressed twice in quick succession, a double press
 
+recordWalk menus walks every menu item and the Alternate Menu without a walk file; --menus and --items set how far.
+
 USAGE
 
     recordWalk                          WITH NO ARGUMENTS, THE SENSIBLE WHOLE: the pilot walk, each window scanned once with
@@ -554,6 +556,8 @@ def main():
     oParser.add_argument("--axe", action="store_true")      # kept for old command lines; scans are on by default
     oParser.add_argument("--no-axe", action="store_true")
     oParser.add_argument("--tutorial", action="store_true")
+    oParser.add_argument("--menus", type=int, default=7)     # with "menus": how many top-level menus to walk
+    oParser.add_argument("--items", type=int, default=25)    # with "menus": how many items to walk in each menu and the Alternate Menu
     oArgs = oParser.parse_args([s.lower() if s.startswith("--") else s for s in sys.argv[1:]])
 
     sLogs = os.path.join(sProject, "logs"); os.makedirs(sLogs, exist_ok=True)
@@ -568,6 +572,36 @@ def main():
 
     # recordWalk 1 PERFORMS TUTORIAL 1 LIVE (5 November 2026, evening): "recordWalk" alone walks the pilot, and the
     # menu tour needed --tutorial --walk 1, which no one remembers. A number given first is a tutorial, performed live.
+    # recordWalk menus WALKS THE MENUS AND THE ALTERNATE MENU (9 November 2026). No walk is written by hand: one is made
+    # here, in logs. F10 opens the menu bar and Down Arrow the first menu; Down Arrow then visits each item, and Right
+    # Arrow the next menu, for --menus menus of --items items each (a menu shorter than that wraps round, which the
+    # report shows as repeats). Escape twice leaves the menus. Alt+F10 opens the Alternate Menu, Down Arrow visits its
+    # first --items commands, Home and End reach its ends, and Escape closes it. Each item is one step, heard and logged.
+    if oArgs.which.strip().lower() == "menus":
+        sMenuWalk = os.path.join(sLogs, oArgs.app + "-menus-" + sStamp + ".inix")
+        lLines = ["; written by recordWalk menus, " + sStamp, ""]
+        def menuStep(sKey, sSay, iWait=2):
+            lLines.extend(["[step]", "Say=" + sSay, "Key=" + sKey, "Wait=" + str(iWait), ""])
+        menuStep("F10", "F10, the menu bar.", 3)
+        for iMenu in range(1, max(1, oArgs.menus) + 1):
+            menuStep("Down", "Menu %d, opened." % iMenu, 3)
+            for iItem in range(2, max(2, oArgs.items) + 1):
+                menuStep("Down", "Menu %d, item %d." % (iMenu, iItem))
+            if iMenu < oArgs.menus:
+                menuStep("Escape", "Menu %d, closed." % iMenu)
+                menuStep("Right", "The next menu's name.")
+        menuStep("Escape", "Leaving the menu.")
+        menuStep("Escape", "Leaving the menu bar.")
+        menuStep("Alt+F10", "Alt+F10, the Alternate Menu.", 4)
+        for iItem in range(2, max(2, oArgs.items) + 1):
+            menuStep("Down", "Alternate Menu, command %d." % iItem)
+        menuStep("End", "Alternate Menu, the last command.")
+        menuStep("Home", "Alternate Menu, the first command.")
+        menuStep("Escape", "The Alternate Menu closed.")
+        with open(sMenuWalk, "w", encoding="utf-8-sig", newline="\r\n") as fWalk:
+            fWalk.write("\n".join(lLines))
+        logLine("menu walk written: %s, %d menus of %d items" % (sMenuWalk, oArgs.menus, oArgs.items))
+        oArgs.which = sMenuWalk
     if oArgs.which:
         oArgs.walk = oArgs.which
         if oArgs.which.strip().isdigit(): oArgs.tutorial = True
