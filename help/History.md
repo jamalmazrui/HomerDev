@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.180.0 -- 9 November 2026
+
+- **A kept Axe record is said in the log.** axeWindow logs each record it keeps, fingerprint and outcome, so a log shows that an unchanged window, such as DbDo's, whose scan does not finish, will be skipped next time.
+
 ## 1.179.0 -- 9 November 2026
 
 - **Say compiles alone again.** 1.178.0's spelling of a repeated line made Say.cs use KeyMap, which the conversion classes, the template app and a sample compile without; the kit's build stopped. KeyMap now hands Say the press count as it counts each press, and Say spells with its own copy of the rule.

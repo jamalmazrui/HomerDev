@@ -308,6 +308,10 @@ def saveScan(sKey, sFingerprint, dResult):
     try:
         os.makedirs(os.path.dirname(scansFile()), exist_ok=True)
         with open(scansFile(), "w", encoding="utf-8-sig", newline="\r\n") as fOut: fOut.write("\n".join(lLines))
+        # SAID IN THE LOG (9 November 2026): a kept record was silent, so no one could tell from the logs that an
+        # unchanged window would be skipped next time.
+        logLine("scan record kept for %s in %s: fingerprint %s, %s" % (sKey, scansFile(), sFingerprint[:16],
+            ("problem: " + dResult["sProblem"]) if dResult.get("sProblem") else ("%s error(s)" % dResult["iErrors"])))
         sOld = os.path.join(os.path.dirname(scansFile()), "axeScans.json")
         if os.path.isfile(sOld): os.remove(sOld); logLine("removed " + sOld + "; axeScans.inix replaces it")
     except Exception as oError: logLine("scan record not saved: " + str(oError))
