@@ -252,7 +252,14 @@ public static class KeyMap {
         try {
             if (bEchoCommands && !oCommand.bNoEcho && shouldEcho(oCommand.sName, oCommand.oItem != null && oCommand.oItem.Text.TrimEnd().EndsWith("...")))
                 Say.say(oCommand.sName);
-            if (oCommand.fRun != null) return oCommand.fRun();
+            // RUNNING FROM A KEY, HOWEVER IT RUNS (kit 1.177.0, 9 November 2026). bRunningCommand was set only around a
+            // menu click; DbDo's commands run through fRun, so DbDo's menu handler saw no key, reset iPressCount to 1,
+            // and no Say key ever had a second press -- testSay heard each second press as a first, its speech dropped
+            // as a repeat.
+            if (oCommand.fRun != null) {
+                bRunningCommand = true;
+                try { return oCommand.fRun(); } finally { bRunningCommand = false; }
+            }
             if (oCommand.oItem != null) {
                 bRunningCommand = true;
                 try { oCommand.oItem.PerformClick(); } finally { bRunningCommand = false; }

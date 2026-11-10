@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.177.0 -- 9 November 2026
+
+- **A second press reaches the command.** KeyMap.runCommand marks a command as run from a key while its fRun runs, as it did only around a menu click. DbDo runs its commands through fRun, so its menu handler took each press for a click by hand and counted it as a first; testSay heard every second Say key press as a first press, dropped as a repeat.
+
 ## 1.176.0 -- 9 November 2026
 
 - **Say keys: two presses at most.** KeyMap.answer, which every Say command calls, says everything on the first press. On the second it spells a short value, the value alone without its label, and shows anything longer in the read-only window; there is no third press. DbDo's testSay heard the old second press spell whole long answers, such as a database's full path.
