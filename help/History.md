@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.187.0 -- 10 November 2026
+
+- **No app class repeats a kit class by accident.** The check named five: FileDir's MdiChild, EdSharp's MdiChild, MdiFrame and Util, and DbDo's KeyMap. Four shared nothing with the kit's but a name, so they are named for what they are -- FolderWindow, DocumentWindow and EdSharpFrame. Two keep the kit's name for a reason written above them, which the check now reads: a class whose comment says KEPT ON PURPOSE is reported, not warned about. EdSharp's Util is the interface its snippets call; DbDo's KeyMap maps keys to its menu items while the kit's KeyMap routes them.
+
 ## 1.186.0 -- 10 November 2026
 
 - **LbcAsk: the standard dialogs, in the kit.** FileDir's Dialogs.cs kept its own layer over LbcDialog -- inputDialog, fieldDialog, listDialog, confirmDialog, buttonDialog, directoryDialog, openFileDialog, saveFileDialog, show and the rest -- as a class named Lbc. It now lives in Lbc.cs as Homer.LbcAsk, in Camel Type, for every app to ask with. An app sets oMainForm, fSay, fReadSetting, fWriteSetting and fRecentFolders at startup; left empty, each has a plain default.
