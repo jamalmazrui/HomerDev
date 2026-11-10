@@ -138,7 +138,14 @@ def readMenus(sApp):
         from pywinauto.application import Application
         hWnd = windowsOf(sApp + ".exe")[0][0]
         oWin = Application(backend="uia").connect(handle=hWnd).window(handle=hWnd)
-        lBars = oWin.descendants(control_type="MenuBar")
+        # THE WINDOW'S OWN CHILDREN ONLY (10 November 2026). Asking for every descendant walked all 49,186 rows of
+        # DbDo's grid: 67 seconds, and no menu bar found. A menu strip is a direct child of its window, reported as a
+        # menu bar or, by Windows Forms, sometimes as a toolbar; the one holding the most menu items is the menu bar.
+        lBars = []
+        for oChild in oWin.children():
+            try:
+                if oChild.element_info.control_type in ("MenuBar", "ToolBar") and oChild.children(control_type="MenuItem"): lBars.append(oChild)
+            except Exception: pass
         oBar = max(lBars, key=lambda o: len(o.children(control_type="MenuItem"))) if lBars else None
         if oBar is None: logLine("menu audit: no menu bar found"); return []
         lMenus = []
@@ -669,7 +676,18 @@ def hearMatch(sExpected, sHeard):
 
 # ---- the run ----
 
+def readMenusToFile(sApp, sPath):
+    """--read-menus: the menus of sApp's window, written to sPath as JSON, in this process alone."""
+    logLine("menu reader started for " + sApp)
+    lMenus = readMenus(sApp)
+    with open(sPath, "w", encoding="utf-8") as fOut: json.dump(lMenus, fOut)
+    print("%d menus" % len(lMenus))
+    return 0 if lMenus else 1
+
+
 def main():
+    if len(sys.argv) == 4 and sys.argv[1] == "--read-menus":
+        return readMenusToFile(sys.argv[2], sys.argv[3])
     global sLogPath
     oParser = argparse.ArgumentParser(description="Drive a Homer app through a walk and record what is said.")
     oParser.add_argument("which", nargs="?", default="", help="a tutorial's number, performed live, or a walk's path")
@@ -709,9 +727,23 @@ def main():
         sMenuWalk = os.path.join(sLogs, oArgs.app + "-menus-" + sStamp + ".inix")
         lLines = ["; written by recordWalk menus, " + sStamp, ""]
         lMenus = []
-        if ensurePackages() and bringForward(oArgs.app):
+        # IN A PROCESS OF ITS OWN (10 November 2026). Reading the menus through UI Automation, in this process, came
+        # before the recording, and the walk of 10 November stopped at "Starting in 5 seconds": pywinauto and soundcard
+        # share COM badly, as ensurePackages notes. A separate process reads the menus into a file, with 90 seconds to
+        # do it, and this one never touches UI Automation before it records.
+        if bringForward(oArgs.app):
             sayLine("Reading " + oArgs.app + "'s menus.")
-            lMenus = readMenus(oArgs.app)
+            sMenuFile = os.path.join(sLogs, oArgs.app + "-menuRead-" + sStamp + ".json")
+            lReader = [sys.executable, os.path.abspath(__file__), "--read-menus", oArgs.app, sMenuFile]
+            try:
+                oDone = subprocess.run(lReader, timeout=90, capture_output=True, text=True)
+                logLine("menu reader exit %d: %s" % (oDone.returncode, (oDone.stdout + oDone.stderr).strip()[:2000]))
+                if os.path.isfile(sMenuFile):
+                    with open(sMenuFile, encoding="utf-8") as fIn: lMenus = json.load(fIn)
+            except subprocess.TimeoutExpired:
+                logLine("menu reader: still reading after 90 seconds, so stopped")
+                sayLine("Reading the menus took too long.")
+            bringForward(oArgs.app)
         if lMenus:
             lFindings = checkMenus(lMenus)
             iItems = sum(len(d["items"]) + sum(len(s["items"]) for s in d["items"]) for d in lMenus)
