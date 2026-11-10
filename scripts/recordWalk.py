@@ -452,9 +452,19 @@ def focusNow():
 # ---- the app's own speech ----
 
 def speechLogFiles(sApp):
-    """The app's speech log files, where Say writes what the app said, newest last."""
-    sFolder = os.path.join(os.environ.get("LOCALAPPDATA", ""), sApp, "logs")
-    return sorted(glob.glob(os.path.join(sFolder, "*peech*")), key=os.path.getmtime)
+    """The app's speech log files, where Say writes what the app said, newest last.
+
+    THE SESSION LOG TOO (9 November 2026). A Homer app writes what it says as "say:" lines in its session log,
+    <App>-<date>-<time>.log, kept in %LOCALAPPDATA%\\<App>\\logs and in the project's own logs folder; only a file named
+    for speech was looked for, so every step of DbDo's walks reported "nothing in its speech log" though DbDo had
+    spoken. Session logs of the last two days are read now, for their say: lines only."""
+    lFiles = []
+    nRecent = time.time() - 2 * 86400
+    for sFolder in (os.path.join(os.environ.get("LOCALAPPDATA", ""), sApp, "logs"), os.path.join(sProject, "logs")):
+        lFiles += glob.glob(os.path.join(sFolder, "*peech*"))
+        lFiles += [s for s in glob.glob(os.path.join(sFolder, sApp + "-2*.log"))
+                   if re.match(re.escape(sApp) + r"-\d{8}-\d{6}\.log$", os.path.basename(s), re.I) and os.path.getmtime(s) >= nRecent]
+    return sorted(set(lFiles), key=os.path.getmtime)
 
 
 def speechSizes(sApp):
@@ -469,7 +479,11 @@ def speechSince(sApp, dBefore):
         try:
             with open(sPath, "rb") as fIn:
                 fIn.seek(iFrom)
-                lNew.append(fIn.read().decode("utf-8", "replace").strip())
+                sText = fIn.read().decode("utf-8", "replace")
+            if "peech" not in os.path.basename(sPath):
+                # a session log: only what the app said, from its say: lines
+                sText = " | ".join(oMatch.group(1).strip() for oMatch in re.finditer(r"\bsay: (.*)", sText, re.I))
+            lNew.append(sText.strip())
         except OSError as exceptionError:
             logLine("speech log unreadable: " + sPath + ": " + str(exceptionError))
     return " | ".join(s for s in lNew if s)

@@ -23,8 +23,8 @@ Hear=Access On, Track list: list box, Episode 212, 1 of 4
 
 [step]
 
-Say=Now the same player in DbDo, on a radio station.
-Key=Alt+Shift+P
+Say=Now the same player in DbDo, on a radio station. Control plus P plays it.
+Key=Control+P
 Hear=1 track from stations
 Hear=RadioTrail, Track list: list box, KIRO 710 ESPN Seattle, 1 of 1
 

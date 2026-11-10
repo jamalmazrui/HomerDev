@@ -289,6 +289,13 @@ public static class SuiteCommands {
     public static List<AlternateEntry> alternateEntries(MenuStrip oStrip, Func<ToolStripMenuItem, string> fSummary, ToolStripMenuItem miSkip) {
         List<AlternateEntry> lEntries = new List<AlternateEntry>();
         if (oStrip == null) return lEntries;
+        // AN MDI CHILD'S MENUS ARE IN ITS FRAME (kit 1.175.0, 9 November 2026). Windows Forms moves a child's menu items
+        // into the frame's menu bar while the child is active, leaving the child's own bar empty, so DbDo's Alternate
+        // Menu said "0 commands". An empty bar is read from the frame that holds the merged menus.
+        if (oStrip.Items.Count == 0) {
+            Form oForm = oStrip.FindForm();
+            if (oForm != null && oForm.MdiParent != null && oForm.MdiParent.MainMenuStrip != null) oStrip = oForm.MdiParent.MainMenuStrip;
+        }
         foreach (ToolStripItem oTop in oStrip.Items) {
             ToolStripMenuItem miTop = oTop as ToolStripMenuItem;
             if (miTop != null && miTop.Available) addAlternateEntries(miTop, fSummary, miSkip, lEntries);

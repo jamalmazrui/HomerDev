@@ -803,7 +803,7 @@ Now the rules behind every key, the same in every Homer program. The word gives 
 
 ### Step 16
 
-Adding Shift to a doing key reverses it: Control plus M marks, Control plus Shift plus M unmarks. Alt plus Shift plus a letter is a command with no control of its own: Alt plus Shift plus P plays a stream.
+Adding Shift to a doing key reverses it: Control plus M marks, Control plus Shift plus M unmarks. Alt plus Shift plus a letter is a command with no control of its own: Alt plus Shift plus E edits the settings.
 
 ### Step 17: Insert+T
 
@@ -1569,9 +1569,9 @@ Screen reader:
 
 - Access On, Track list: list box, Episode 212, 1 of 4
 
-### Step 4: Alt+Shift+P
+### Step 4: Control+P
 
-Now the same player in DbDo, on a radio station.
+Now the same player in DbDo, on a radio station. Control plus P plays it.
 
 Screen reader:
 

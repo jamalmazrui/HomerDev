@@ -109,7 +109,7 @@ Hear=
 
 [step]
 
-Say=Adding Shift to a doing key reverses it: Control plus M marks, Control plus Shift plus M unmarks. Alt plus Shift plus a letter is a command with no control of its own: Alt plus Shift plus P plays a stream.
+Say=Adding Shift to a doing key reverses it: Control plus M marks, Control plus Shift plus M unmarks. Alt plus Shift plus a letter is a command with no control of its own: Alt plus Shift plus E edits the settings.
 Key=
 Hear=
 

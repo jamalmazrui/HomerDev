@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.175.0 -- 9 November 2026
+
+- **The Alternate Menu in an MDI child.** A child's menus move into its frame's menu bar, leaving its own empty, so DbDo's Alternate Menu said "0 commands". SuiteCommands.alternateEntries reads the frame's merged menus when a window's own bar is empty.
+- **recordWalk hears what the app said.** It looked only for a file named for speech; a Homer app writes its say: lines in its session log, in %LOCALAPPDATA%\\<App>\\logs and in the project's logs folder, which it now reads too.
+- **Tutorials teach Control+P for playing,** as the keys now are.
+
 ## 1.174.0 -- 9 November 2026
 
 - **An unchanged window is not scanned again.** axeWindow's fingerprint now counts the captions of buttons and labels only; a folder window's title or a status bar's text, which change with what the program shows, had made FileDir's main window look new on every check. A scan that does not finish in its time is now kept too, so DbDo's main window, whose scan has never finished within 5 minutes, is not scanned again while it is unchanged; removing its section from axeScans.inix forces a scan.

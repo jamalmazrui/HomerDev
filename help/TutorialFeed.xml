@@ -5,7 +5,7 @@
     <link>Tutorials.htm</link>
     <description>Spoken walks through the Homer Development Kit: what it is, how it builds and releases an app, and what its shared code makes a person hear. Ten walks in the pattern of ten, each three to five minutes.</description>
     <language>en-us</language>
-    <lastBuildDate>Mon, 09 Nov 2026 19:55:56 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 10 Nov 2026 00:22:49 +0000</lastBuildDate>
     <itunes:author>Jamal Mazrui</itunes:author>
     <itunes:explicit>false</itunes:explicit>
     <itunes:category text="Technology"/>
@@ -24,8 +24,8 @@
       <description>Nothing is needed; this walk is listened to. Full transcript: Tutorials.htm#0a-1-user-interface</description>
       <link>Tutorials.htm#0a-1-user-interface</link>
       <guid isPermaLink="false">homer-tutorial_1_user_interface</guid>
-      <enclosure url="tutorials/1_User_Interface.mp3" length="2017144" type="audio/mpeg"/>
-      <itunes:duration>00:04:54</itunes:duration>
+      <enclosure url="tutorials/1_User_Interface.mp3" length="2021807" type="audio/mpeg"/>
+      <itunes:duration>00:04:55</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
     </item>
     <item>
@@ -78,8 +78,8 @@
       <description>FileDir and DbDo are installed, with mpv. Full transcript: Tutorials.htm#0g-7-shared-code-and-the-homer-player</description>
       <link>Tutorials.htm#0g-7-shared-code-and-the-homer-player</link>
       <guid isPermaLink="false">homer-tutorial_7_shared_code_and_the_homer_player</guid>
-      <enclosure url="tutorials/7_Shared_Code_and_the_Homer_Player.mp3" length="1662433" type="audio/mpeg"/>
-      <itunes:duration>00:03:45</itunes:duration>
+      <enclosure url="tutorials/7_Shared_Code_and_the_Homer_Player.mp3" length="1663676" type="audio/mpeg"/>
+      <itunes:duration>00:03:46</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
     </item>
     <item>
