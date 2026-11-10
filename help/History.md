@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.186.0 -- 10 November 2026
+
+- **LbcAsk: the standard dialogs, in the kit.** FileDir's Dialogs.cs kept its own layer over LbcDialog -- inputDialog, fieldDialog, listDialog, confirmDialog, buttonDialog, directoryDialog, openFileDialog, saveFileDialog, show and the rest -- as a class named Lbc. It now lives in Lbc.cs as Homer.LbcAsk, in Camel Type, for every app to ask with. An app sets oMainForm, fSay, fReadSetting, fWriteSetting and fRecentFolders at startup; left empty, each has a plain default.
+
+## 1.185.0 -- 10 November 2026
+
+- **recordWalk menus reads the items, and records.** It read DbDo's seven menus but none of their items, since Windows Forms menus do not open for UI Automation's expand; it now opens each menu with the keyboard, as a person does, and reads the window that appears, a submenu's too. The packages load before the app is brought forward again, so the recording no longer fails with "Error 0x100000001"; the menu reader keeps a log of its own; and a reading with no items falls back to the fixed walk.
+
 ## 1.184.0 -- 10 November 2026
 
 - **recordWalk menus no longer hangs.** The menus are read in a process of their own, given 90 seconds, so UI Automation never shares COM with the recording, which had stopped at "Starting in 5 seconds". The menu bar is looked for among the window's own children, which is instant, where every descendant had been walked, all 49,186 rows of DbDo's grid, for 67 seconds.

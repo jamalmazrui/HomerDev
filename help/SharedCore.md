@@ -61,3 +61,7 @@ Each step is built and released before the next, so a fault is found where it wa
 4. **DbDo's KeyMap and KeyBinding:** the kit's, with DbDo's commands registered as FileDir's are.
 5. **Hints.inix for EdSharp and FileDir,** written against their own dialogs, as complete as DbDo's.
 6. **The components still built in each app** -- marking, the main-list search family, recent files, the error window and main-window Where Am I -- each written once in the kit and taken by every app.
+
+## Moved, 10 November 2026
+
+- **LbcAsk** (Lbc.cs): the standard dialogs, from FileDir's Dialogs.cs class Lbc. FileDir uses it now; EdSharp's Dialog class and FileDir's Dialog class are the next to move onto it.

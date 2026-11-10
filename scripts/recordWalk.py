@@ -132,31 +132,60 @@ def menuItemsOf(oItem, iDepth):
     except Exception: pass
     return lItems
 
+def openMenuItems(sPid, setSeen):
+    """The items of the menu that has just opened: a visible window of the app's process not in setSeen. Each item is
+    {name, access, key, enabled, sub}, sub True when it opens a submenu."""
+    from pywinauto import Desktop
+    for iTry in range(6):
+        time.sleep(0.4)
+        for oWin in Desktop(backend="uia").windows(process=sPid):
+            if oWin.handle in setSeen: continue
+            try: lKids = oWin.descendants(control_type="MenuItem")
+            except Exception: lKids = []
+            if lKids:
+                setSeen.add(oWin.handle)
+                return [{"name": o.window_text().strip(), "access": letterOf(uiaKeyOf(o, "AccessKey")), "key": uiaKeyOf(o, "AcceleratorKey"),
+                         "enabled": o.is_enabled(), "sub": hasSubmenu(o), "items": []} for o in lKids]
+    return []
+
 def readMenus(sApp):
-    """The app's menu bar as a list of menus, each {name, access, items}; [] when it cannot be read."""
+    """The app's menus, read by opening each with the keyboard (10 November 2026): Windows Forms menus did not open
+    for UI Automation's expand, so each menu is opened as a person opens it -- F10, Right Arrow to it, Down Arrow --
+    and read from the window that appears; a submenu is opened with Right Arrow and read the same way."""
     try:
         from pywinauto.application import Application
-        hWnd = windowsOf(sApp + ".exe")[0][0]
-        oWin = Application(backend="uia").connect(handle=hWnd).window(handle=hWnd)
-        # THE WINDOW'S OWN CHILDREN ONLY (10 November 2026). Asking for every descendant walked all 49,186 rows of
-        # DbDo's grid: 67 seconds, and no menu bar found. A menu strip is a direct child of its window, reported as a
-        # menu bar or, by Windows Forms, sometimes as a toolbar; the one holding the most menu items is the menu bar.
+        from pywinauto.keyboard import send_keys
+        lWindows = windowsOf(sApp + ".exe")
+        hWnd = lWindows[0][0]
+        oApp = Application(backend="uia").connect(handle=hWnd)
+        sPid = oApp.process
+        oWin = oApp.window(handle=hWnd)
         lBars = []
         for oChild in oWin.children():
             try:
                 if oChild.element_info.control_type in ("MenuBar", "ToolBar") and oChild.children(control_type="MenuItem"): lBars.append(oChild)
             except Exception: pass
-        oBar = max(lBars, key=lambda o: len(o.children(control_type="MenuItem"))) if lBars else None
-        if oBar is None: logLine("menu audit: no menu bar found"); return []
-        lMenus = []
-        for oTop in oBar.children(control_type="MenuItem"):
-            lMenus.append({"name": oTop.window_text().strip(), "access": letterOf(uiaKeyOf(oTop, "AccessKey")), "items": menuItemsOf(oTop, 0)})
-        from pywinauto.keyboard import send_keys
-        send_keys("{ESC}{ESC}")
-        logLine("menu audit: %d menus read: %s" % (len(lMenus), ", ".join("%s (%d)" % (d["name"], len(d["items"])) for d in lMenus)))
+        if not lBars: logLine("menu reader: no menu bar among the window's children"); return []
+        oBar = max(lBars, key=lambda o: len(o.children(control_type="MenuItem")))
+        lMenus = [{"name": o.window_text().strip(), "access": letterOf(uiaKeyOf(o, "AccessKey")), "items": []} for o in oBar.children(control_type="MenuItem")]
+        for iMenu, dMenu in enumerate(lMenus):
+            oWin.set_focus(); time.sleep(0.3)
+            setSeen = set(o.handle for o in __import__("pywinauto").Desktop(backend="uia").windows(process=sPid))
+            send_keys("{F10}" + "{RIGHT}" * iMenu + "{DOWN}")
+            dMenu["items"] = openMenuItems(sPid, setSeen)
+            iAt = 0
+            for iItem, dItem in enumerate(dMenu["items"]):
+                if not dItem["sub"]: continue
+                send_keys("{DOWN}" * (iItem - iAt)); iAt = iItem
+                send_keys("{RIGHT}")
+                dItem["items"] = [dict(d, sub=False) for d in openMenuItems(sPid, setSeen)]
+                send_keys("{ESC}"); time.sleep(0.2)
+                if not dItem["items"]: dItem["sub"] = False
+            send_keys("{ESC}{ESC}{ESC}"); time.sleep(0.3)
+            logLine("menu reader: %s, %d items" % (dMenu["name"], len(dMenu["items"])))
         return lMenus
     except Exception:
-        logLine("menu audit: the menus could not be read: " + traceback.format_exc()); return []
+        logLine("menu reader: the menus could not be read: " + traceback.format_exc()); return []
 
 def checkMenus(lMenus):
     """Homer's menu rules, checked on what was read: each line a finding; [] when every rule holds."""
@@ -677,8 +706,10 @@ def hearMatch(sExpected, sHeard):
 # ---- the run ----
 
 def readMenusToFile(sApp, sPath):
-    """--read-menus: the menus of sApp's window, written to sPath as JSON, in this process alone."""
-    logLine("menu reader started for " + sApp)
+    """--read-menus: the menus of sApp's window, written to sPath as JSON, in this process alone, with its own log."""
+    global sLogPath
+    sLogPath = os.path.splitext(sPath)[0] + ".log"
+    logLine("menu reader started for %s; Python %s; %s" % (sApp, sys.version.split()[0], platform.platform()))
     lMenus = readMenus(sApp)
     with open(sPath, "w", encoding="utf-8") as fOut: json.dump(lMenus, fOut)
     print("%d menus" % len(lMenus))
@@ -731,7 +762,9 @@ def main():
         # before the recording, and the walk of 10 November stopped at "Starting in 5 seconds": pywinauto and soundcard
         # share COM badly, as ensurePackages notes. A separate process reads the menus into a file, with 90 seconds to
         # do it, and this one never touches UI Automation before it records.
-        if bringForward(oArgs.app):
+        # THE PACKAGES FIRST (10 November 2026): bringForward loads pywinauto, and soundcard must start COM before it,
+        # or the recording fails with "Error 0x100000001", as the walk of 10 November did at 8:32.
+        if ensurePackages() and bringForward(oArgs.app):
             sayLine("Reading " + oArgs.app + "'s menus.")
             sMenuFile = os.path.join(sLogs, oArgs.app + "-menuRead-" + sStamp + ".json")
             lReader = [sys.executable, os.path.abspath(__file__), "--read-menus", oArgs.app, sMenuFile]
@@ -744,6 +777,9 @@ def main():
                 logLine("menu reader: still reading after 90 seconds, so stopped")
                 sayLine("Reading the menus took too long.")
             bringForward(oArgs.app)
+        if lMenus and not any(d["items"] for d in lMenus):
+            logLine("menu audit: %d menus but no items read, so the fixed walk is used" % len(lMenus))
+            lMenus = []
         if lMenus:
             lFindings = checkMenus(lMenus)
             iItems = sum(len(d["items"]) + sum(len(s["items"]) for s in d["items"]) for d in lMenus)
