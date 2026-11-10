@@ -6256,6 +6256,40 @@ if (iRow < 0 || iRow >= lsOrder.Count) return "";
 return aValue[lsOrder[iRow]];
 }
 } // pick method
+
+// choose: a question with a row of answers (kit 1.190.0, 10 November 2026), from FileDir's Dialog.Choose; EdSharp's had
+// the same shape but ignored iDefault, so its chosen default button never took. A Cancel is added when the caller lists
+// none. The answer comes back as the caller wrote it ("&Try anyway"); Escape gives the caller's own "Cancel" when it
+// listed one, and "" otherwise. The answer chosen is spoken.
+public static string choose(string sTitle, string sText, string[] aButtons, int iDefault) {
+if (aButtons == null || aButtons.Length == 0) return "";
+List<string> lsButtons = new List<string>(aButtons);
+bool bOwnCancel = false;
+foreach (string sOne in aButtons) if (sOne.Replace("&", "").Equals("Cancel", StringComparison.OrdinalIgnoreCase)) bOwnCancel = true;
+if (!bOwnCancel) lsButtons.Add("Cancel");
+int iAt = (iDefault >= 0 && iDefault < aButtons.Length) ? iDefault : 0;
+string sPressed;
+using (LbcDialog dlg = new LbcDialog(sTitle, ownerForm())) {
+if (!string.IsNullOrEmpty(sText)) dlg.addLabel(sText);
+sPressed = dlg.runWithButtons(lsButtons.ToArray(), false, aButtons[iAt].Replace("&", ""));
+}
+if (string.IsNullOrEmpty(sPressed)) sPressed = "Cancel";
+if (sPressed == "Cancel" && !bOwnCancel) return "";
+foreach (string sOne in aButtons) {
+if (sOne.Replace("&", "") == sPressed) {
+say(sPressed);
+return sOne;
+}
+}
+return "";
+} // choose method
+
+// message: a message in a box, title first, as EdSharp's and FileDir's Dialog.Show had it (kit 1.190.0, 10 November
+// 2026); show, from FileDir's older layer, takes the text first. With no title, the window is named for the program.
+public static void message(object oText) { message(Application.ProductName, oText); }
+public static void message(object oTitle, object oText) {
+LbcMessage.show(Convert.ToString(oText), Convert.ToString(oTitle));
+} // message method
 // fMapDrive: maps a network share to a drive letter, for the folder dialog when a \\server\share path is typed;
 // FileDir sets it to its NetworkDrive. Left empty, the dialog says mapping is not available here.
 public static Func<string, string, bool> fMapDrive = null;

@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.190.0 -- 10 November 2026
+
+- **LbcAsk.choose and LbcAsk.message.** A question with a row of answers, and a message in a box, title first, join pick in the kit; EdSharp and FileDir both use them. EdSharp's own Choose had ignored the default button it was given.
+
 ## 1.189.0 -- 10 November 2026
 
 - **LbcAsk.pick, one list for picking.** EdSharp and FileDir each had a Pick: EdSharp's labelled its list but answered by row, so a list narrowed with Control+F gave back the wrong item; FileDir's answered by the item but had no label. The kit's pick does both, a &Choices pick box answered through listSourceIndex, and both apps use it.
