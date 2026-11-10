@@ -462,7 +462,7 @@ def scanProgramWindow(sExe, sRoot, sApp, sLogDir, iLimit=300):
     sReport = os.path.join(sLogDir, sApp + "-a11yScan-" + sStamp + ".md")
     iNew = axeScan.writeReport(sReport, sApp, "the window " + sTitle, dScan["iErrors"], "", dScan["lFindings"], axeScan.acceptedIn(sRoot), dScan["sFile"])
     if dScan["iErrors"] == 0: return "pass", "Axe.Windows found 0 errors in the window %s" % sTitle, sReport
-    return "warn", ("Axe.Windows: %d error%s in the window %s, %d new; review %s before changing anything -- never a name the reader already has"
+    return "warn", ("Axe.Windows: %d error%s in the window %s, " + str(axeScan.iToReview) + " to review, %d new; review %s before changing anything -- never a name the reader already has"
                     % (dScan["iErrors"], "" if dScan["iErrors"] == 1 else "s", sTitle, iNew, os.path.basename(sReport))), sReport
 
 

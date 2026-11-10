@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.198.0 -- 10 November 2026
+
+- **The check's accessibility line says how many findings are to review,** as the report does; axeWindow wrote its own line and had kept the old one.
+
 ## 1.197.0 -- 10 November 2026
 
 - **An Axe report says how many findings are to review.** FileDir's opened with 734 errors, 732 of them how Windows Forms' list box reports its items, which needs no change; the two that did were lost in the count. Each report and the check's line now say how many of the findings listed need no change and how many are to review.
