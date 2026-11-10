@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.188.0 -- 10 November 2026
+
+- **Script, not snippet, across Homer.** DbDo and EdSharp both invoke scripts of several kinds, so the suite's catalog of commands, the command echo and the kit's comments say script: EdSharp's Save Script, Invoke Script and View Script, DbDo's Edit Script beside its Invoke Script.
+
 ## 1.187.0 -- 10 November 2026
 
 - **No app class repeats a kit class by accident.** The check named five: FileDir's MdiChild, EdSharp's MdiChild, MdiFrame and Util, and DbDo's KeyMap. Four shared nothing with the kit's but a name, so they are named for what they are -- FolderWindow, DocumentWindow and EdSharpFrame. Two keep the kit's name for a reason written above them, which the check now reads: a class whose comment says KEPT ON PURPOSE is reported, not warned about. EdSharp's Util is the interface its snippets call; DbDo's KeyMap maps keys to its menu items while the kit's KeyMap routes them.

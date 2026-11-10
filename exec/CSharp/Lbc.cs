@@ -1348,7 +1348,7 @@ public class LbcDialog : IDisposable
     // honest, and the answer is to rename it.
     //
     // Lifted out of the button row, which had this reasoning inline, so the
-    // field labels built at run time -- a snippet's variable names, say --
+    // field labels built at run time -- a script's variable names, say --
     // obey the same rule instead of blindly taking an ampersand in front.
     public static string markTriggerLetter(string sLabel, string sTaken)
     {

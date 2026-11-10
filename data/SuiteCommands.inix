@@ -232,11 +232,11 @@ name=Edit Settings
 keys=Alt+Shift+E
 status=current
 
-[DbDo editSnippet]
-name=Edit Snippet
+[DbDo editScript]
+name=Edit Script
 keys=Alt+Shift+S
 change=was Control+Shift+E, 5 November 2026
-reason=S for Snippet; Control+Shift+E went to Extract with Regex, the suite's key for it
+reason=S for Script; Control+Shift+E went to Extract with Regex, the suite's key for it
 status=implemented
 
 [DbDo editTags]
@@ -1528,8 +1528,8 @@ name=Insert Time
 keys=Alt+Shift+SemiColon
 status=current
 
-[EdSharp invokeSnippet]
-name=Invoke Snippet
+[EdSharp invokeScript]
+name=Invoke Script
 keys=Alt+V
 status=current
 
@@ -2059,8 +2059,8 @@ name=Save Copy
 keys=Alt+Shift+S
 status=current
 
-[EdSharp saveSnippet]
-name=Save Snippet
+[EdSharp saveScript]
+name=Save Script
 keys=Alt+S
 status=current
 
@@ -2342,8 +2342,8 @@ name=Upper Case
 keys=Control+U
 status=current
 
-[EdSharp viewSnippet]
-name=View Snippet
+[EdSharp viewScript]
+name=View Script
 keys=Alt+Shift+V
 status=current
 
