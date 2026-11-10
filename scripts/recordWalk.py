@@ -83,6 +83,134 @@ def sayLine(sText=""):
     return True
 
 
+# ---- the menus, read and checked (10 November 2026) ----
+#
+# WHY. recordWalk menus pressed Down Arrow 25 times in every menu, so a short menu wrapped and repeated, a submenu was
+# never opened, and nothing was checked: the report held only what the recognizer made of JAWS's speech. Now the
+# menus are read first through UI Automation -- each menu's items, a submenu's items, each item's access letter and
+# key -- and the walk is made from what is there: Down Arrow once per item, Right Arrow into a submenu and Left Arrow
+# out, Escape and Right Arrow to the next menu. Homer's menu rules are checked on what was read, and the findings
+# lead the report.
+lsMenuAudit = []
+
+def uiaKeyOf(oElement, sProperty):
+    """An element's AccessKey or AcceleratorKey, as UI Automation reports it; "" when it has none."""
+    try: return (getattr(oElement.element_info.element, "Current" + sProperty) or "").strip()
+    except Exception: return ""
+
+def letterOf(sKey):
+    """The letter of a key such as "Alt+F" or "Control+O"; "" when the key is not a letter."""
+    sLast = re.split(r"[+ ]", sKey.strip())[-1] if sKey.strip() else ""
+    return sLast.upper() if len(sLast) == 1 and sLast.isalpha() else ""
+
+def hasSubmenu(oItem):
+    try: return oItem.iface_expand_collapse.CurrentExpandCollapseState != 3   # 3 is a leaf, with nothing to open
+    except Exception: return False
+
+def menuItemsOf(oItem, iDepth):
+    """The items of the menu oItem opens, a submenu's items one level down; oItem is closed again after."""
+    lItems = []
+    try:
+        oItem.expand(); time.sleep(0.5)
+    except Exception as exceptionError:
+        logLine("menu audit: " + oItem.window_text() + " did not open: " + str(exceptionError)); return lItems
+    lKids = oItem.children(control_type="MenuItem")
+    if not lKids:
+        # Windows Forms may put an open menu under the desktop, as its own Menu window.
+        try:
+            from pywinauto import Desktop
+            for oMenu in Desktop(backend="uia").windows(control_type="Menu"):
+                lKids = oMenu.children(control_type="MenuItem")
+                if lKids: break
+        except Exception as exceptionError: logLine("menu audit: no open menu found: " + str(exceptionError))
+    for oKid in lKids:
+        dItem = {"name": oKid.window_text().strip(), "access": letterOf(uiaKeyOf(oKid, "AccessKey")), "key": uiaKeyOf(oKid, "AcceleratorKey"),
+                 "enabled": oKid.is_enabled(), "items": []}
+        if iDepth < 1 and hasSubmenu(oKid): dItem["items"] = menuItemsOf(oKid, iDepth + 1)
+        lItems.append(dItem)
+    try: oItem.collapse()
+    except Exception: pass
+    return lItems
+
+def readMenus(sApp):
+    """The app's menu bar as a list of menus, each {name, access, items}; [] when it cannot be read."""
+    try:
+        from pywinauto.application import Application
+        hWnd = windowsOf(sApp + ".exe")[0][0]
+        oWin = Application(backend="uia").connect(handle=hWnd).window(handle=hWnd)
+        lBars = oWin.descendants(control_type="MenuBar")
+        oBar = max(lBars, key=lambda o: len(o.children(control_type="MenuItem"))) if lBars else None
+        if oBar is None: logLine("menu audit: no menu bar found"); return []
+        lMenus = []
+        for oTop in oBar.children(control_type="MenuItem"):
+            lMenus.append({"name": oTop.window_text().strip(), "access": letterOf(uiaKeyOf(oTop, "AccessKey")), "items": menuItemsOf(oTop, 0)})
+        from pywinauto.keyboard import send_keys
+        send_keys("{ESC}{ESC}")
+        logLine("menu audit: %d menus read: %s" % (len(lMenus), ", ".join("%s (%d)" % (d["name"], len(d["items"])) for d in lMenus)))
+        return lMenus
+    except Exception:
+        logLine("menu audit: the menus could not be read: " + traceback.format_exc()); return []
+
+def checkMenus(lMenus):
+    """Homer's menu rules, checked on what was read: each line a finding; [] when every rule holds."""
+    lFindings = []
+    def words(sName): return [w for w in re.findall(r"[A-Za-z][A-Za-z0-9']*", sName)]
+    def exempt(sLetter, sName):
+        # The standing exceptions in DbDo's audit: X for the "ex" sound, V for "voke", Z for a toggle or status.
+        return (sLetter == "X" and re.search(r"ex", sName, re.I)) or (sLetter == "V" and re.search(r"voke", sName, re.I)) \
+            or (sLetter == "Z" and re.search(r"toggle|status", sName, re.I))
+    def checkLevel(sWhere, lItems):
+        dByLetter = {}
+        for d in lItems:
+            sName = d["name"]; sLetter = d.get("access", "")
+            if not sLetter: lFindings.append("%s: %s has no access letter" % (sWhere, sName))
+            else:
+                dByLetter.setdefault(sLetter, []).append(sName)
+                if sLetter not in [w[0].upper() for w in words(sName)] and not exempt(sLetter, sName):
+                    lFindings.append("%s: %s has access letter %s, which starts none of its words" % (sWhere, sName, sLetter))
+                sHot = letterOf(d.get("key", ""))
+                if sHot and sHot != sLetter and not exempt(sHot, sName):
+                    lFindings.append("%s: %s has access letter %s but key %s" % (sWhere, sName, sLetter, d["key"]))
+            if d.get("items"): checkLevel(sWhere + " > " + sName, d["items"])
+        for sLetter, lNames in sorted(dByLetter.items()):
+            if len(lNames) > 1: lFindings.append("%s: access letter %s is shared by %s" % (sWhere, sLetter, "; ".join(lNames)))
+    checkLevel("menu bar", [{"name": d["name"], "access": d["access"], "key": "", "items": []} for d in lMenus])
+    dNames = {}
+    for dMenu in lMenus:
+        checkLevel(dMenu["name"], dMenu["items"])
+        def gather(sWhere, lItems):
+            for d in lItems:
+                dNames.setdefault(d["name"].lower(), []).append(sWhere)
+                if d.get("items"): gather(sWhere + " > " + d["name"], d["items"])
+        gather(dMenu["name"], dMenu["items"])
+    for sName, lWhere in sorted(dNames.items()):
+        if len(lWhere) > 1: lFindings.append("the name %s appears %d times: %s" % (sName, len(lWhere), "; ".join(lWhere)))
+    return lFindings
+
+def menuWalkSteps(lMenus, iAlternate):
+    """The walk's lines for what was read: each item heard by name, submenus entered and left."""
+    lLines = []
+    def step(sKey, sSay, sHear="", iWait=2):
+        lLines.extend(["[step]", "Say=" + sSay, "Key=" + sKey, "Wait=" + str(iWait)] + (["Hear=" + sHear] if sHear else []) + [""])
+    step("F10", "F10, the menu bar.", lMenus[0]["name"] if lMenus else "", 3)
+    for iMenu, dMenu in enumerate(lMenus):
+        if iMenu > 0: step("Right", "The " + dMenu["name"] + " menu.", dMenu["name"])
+        for iItem, dItem in enumerate(dMenu["items"]):
+            step("Down", "%s menu, %s." % (dMenu["name"], dItem["name"]), dItem["name"], 3 if iItem == 0 else 2)
+            if dItem["items"]:
+                for iSub, dSub in enumerate(dItem["items"]):
+                    step("Right" if iSub == 0 else "Down", "%s submenu, %s." % (dItem["name"], dSub["name"]), dSub["name"])
+                step("Left", "Back to %s." % dItem["name"], dItem["name"])
+        step("Escape", "The " + dMenu["name"] + " menu closed.", dMenu["name"])
+    step("Escape", "Leaving the menu bar.")
+    step("Alt+F10", "Alt+F10, the Alternate Menu.", "Alternate Menu", 4)
+    for iItem in range(2, max(2, iAlternate) + 1): step("Down", "Alternate Menu, command %d." % iItem)
+    step("End", "Alternate Menu, the last command.")
+    step("Home", "Alternate Menu, the first command.")
+    step("Escape", "The Alternate Menu closed.")
+    return lLines
+
+
 def ensurePackages():
     """Installs, for this user only, the packages the run needs, when they are missing. Returns True when all import."""
     # SOUNDCARD FIRST (3 November 2026). pywinauto starts COM in multithreaded mode as it loads; soundcard then
@@ -580,28 +708,53 @@ def main():
     if oArgs.which.strip().lower() == "menus":
         sMenuWalk = os.path.join(sLogs, oArgs.app + "-menus-" + sStamp + ".inix")
         lLines = ["; written by recordWalk menus, " + sStamp, ""]
-        def menuStep(sKey, sSay, iWait=2):
-            lLines.extend(["[step]", "Say=" + sSay, "Key=" + sKey, "Wait=" + str(iWait), ""])
-        menuStep("F10", "F10, the menu bar.", 3)
-        for iMenu in range(1, max(1, oArgs.menus) + 1):
-            menuStep("Down", "Menu %d, opened." % iMenu, 3)
+        lMenus = []
+        if ensurePackages() and bringForward(oArgs.app):
+            sayLine("Reading " + oArgs.app + "'s menus.")
+            lMenus = readMenus(oArgs.app)
+        if lMenus:
+            lFindings = checkMenus(lMenus)
+            iItems = sum(len(d["items"]) + sum(len(s["items"]) for s in d["items"]) for d in lMenus)
+            lsMenuAudit.extend(["## Menu audit", "",
+                "%d menus, %d items, submenus included; %d finding%s against Homer's menu rules." % (len(lMenus), iItems, len(lFindings), "" if len(lFindings) == 1 else "s"), ""]
+                + ["- " + s for s in lFindings] + [""] + ["### The menus as read", ""])
+            for dMenu in lMenus:
+                lsMenuAudit.append("- **%s** (Alt+%s)" % (dMenu["name"], dMenu["access"] or "?"))
+                for dItem in dMenu["items"]:
+                    lsMenuAudit.append("    - %s, letter %s, key %s%s" % (dItem["name"], dItem["access"] or "none", dItem["key"] or "none", "" if dItem["enabled"] else ", unavailable now"))
+                    for dSub in dItem["items"]:
+                        lsMenuAudit.append("        - %s, letter %s, key %s" % (dSub["name"], dSub["access"] or "none", dSub["key"] or "none"))
+            lsMenuAudit.append("")
+            sayLine("%d menus read, %d items; %d finding%s against the menu rules." % (len(lMenus), iItems, len(lFindings), "" if len(lFindings) == 1 else "s"))
+            lLines += menuWalkSteps(lMenus, oArgs.items)
+            with open(sMenuWalk, "w", encoding="utf-8-sig", newline="\r\n") as fWalk:
+                fWalk.write("\n".join(lLines))
+            logLine("menu walk written from the menus as read: %s" % sMenuWalk)
+            oArgs.which = sMenuWalk
+        else:
+            sayLine("The menus could not be read, so the walk presses the keys a fixed number of times instead.")
+            def menuStep(sKey, sSay, iWait=2):
+                lLines.extend(["[step]", "Say=" + sSay, "Key=" + sKey, "Wait=" + str(iWait), ""])
+            menuStep("F10", "F10, the menu bar.", 3)
+            for iMenu in range(1, max(1, oArgs.menus) + 1):
+                menuStep("Down", "Menu %d, opened." % iMenu, 3)
+                for iItem in range(2, max(2, oArgs.items) + 1):
+                    menuStep("Down", "Menu %d, item %d." % (iMenu, iItem))
+                if iMenu < oArgs.menus:
+                    menuStep("Escape", "Menu %d, closed." % iMenu)
+                    menuStep("Right", "The next menu's name.")
+            menuStep("Escape", "Leaving the menu.")
+            menuStep("Escape", "Leaving the menu bar.")
+            menuStep("Alt+F10", "Alt+F10, the Alternate Menu.", 4)
             for iItem in range(2, max(2, oArgs.items) + 1):
-                menuStep("Down", "Menu %d, item %d." % (iMenu, iItem))
-            if iMenu < oArgs.menus:
-                menuStep("Escape", "Menu %d, closed." % iMenu)
-                menuStep("Right", "The next menu's name.")
-        menuStep("Escape", "Leaving the menu.")
-        menuStep("Escape", "Leaving the menu bar.")
-        menuStep("Alt+F10", "Alt+F10, the Alternate Menu.", 4)
-        for iItem in range(2, max(2, oArgs.items) + 1):
-            menuStep("Down", "Alternate Menu, command %d." % iItem)
-        menuStep("End", "Alternate Menu, the last command.")
-        menuStep("Home", "Alternate Menu, the first command.")
-        menuStep("Escape", "The Alternate Menu closed.")
-        with open(sMenuWalk, "w", encoding="utf-8-sig", newline="\r\n") as fWalk:
-            fWalk.write("\n".join(lLines))
-        logLine("menu walk written: %s, %d menus of %d items" % (sMenuWalk, oArgs.menus, oArgs.items))
-        oArgs.which = sMenuWalk
+                menuStep("Down", "Alternate Menu, command %d." % iItem)
+            menuStep("End", "Alternate Menu, the last command.")
+            menuStep("Home", "Alternate Menu, the first command.")
+            menuStep("Escape", "The Alternate Menu closed.")
+            with open(sMenuWalk, "w", encoding="utf-8-sig", newline="\r\n") as fWalk:
+                fWalk.write("\n".join(lLines))
+            logLine("menu walk written: %s, %d menus of %d items" % (sMenuWalk, oArgs.menus, oArgs.items))
+            oArgs.which = sMenuWalk
     if oArgs.which:
         oArgs.walk = oArgs.which
         if oArgs.which.strip().isdigit(): oArgs.tutorial = True
@@ -835,6 +988,7 @@ def main():
     lsReport.insert(3, "**" + str(iMatched) + " of " + str(iChecked) + " expected lines heard.**")
     lsReport.insert(4, "")
     if sAxeCli: lsReport.insert(5, "**Axe.Windows: " + str(iAxeErrors) + (" error" if iAxeErrors == 1 else " errors") + " across the steps; each .a11ytest file opens in Accessibility Insights for Windows.**\n")
+    if lsMenuAudit: lsReport[5:5] = lsMenuAudit
     with open(sReportPath, "w", encoding="utf-8") as fOut: fOut.write("\n".join(lsReport) + "\n")
     if sAxeCli: sayLine("Axe.Windows: " + str(iAxeErrors) + (" error" if iAxeErrors == 1 else " errors") + " across the steps; the report lists them by step.")
     if oArgs.tutorial and lLive:

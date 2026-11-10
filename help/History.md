@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.183.0 -- 10 November 2026
+
+- **recordWalk menus reads the menus before it walks them.** It had pressed Down Arrow 25 times in every menu, so short menus repeated, submenus were never opened, and nothing was checked. It now reads each menu's items through UI Automation, submenus included, with their access letters and keys; walks exactly those, Right Arrow into a submenu and Left Arrow out, listening for each item by name; and opens its report with a menu audit: items without an access letter, letters that start none of the item's words or differ from its key's letter, letters shared in one menu, and names used twice.
+
 ## 1.182.0 -- 10 November 2026
 
 - **Shift+F1 in a main window.** A main window's title and its list's name change with what it shows, so Shift+F1 there said no hint was written. LbcHints now also looks in an app's [Main window] section for an MDI frame or child, and in every section for the control's accessibility role, as "role List".
