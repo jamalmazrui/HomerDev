@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.192.0 -- 10 November 2026
+
+- **One input.** LbcAsk had two ways to ask for one line of text, FileDir's inputDialog and EdSharp's input; input is now the one, with inputDialog's care: a prompt naming a password hides what is typed, and cancelling is said.
+
+## 1.191.0 -- 10 November 2026
+
+- **LbcAsk.input and multiInput.** One field or several, each with its own remembered history, a list of choices or a focus tip, from EdSharp's Dialog.Input and MultiInput. History is kept where it always was, through fReadSetting and fWriteSetting, so what a person typed before is still offered.
+
 ## 1.190.0 -- 10 November 2026
 
 - **LbcAsk.choose and LbcAsk.message.** A question with a row of answers, and a message in a box, title first, join pick in the kit; EdSharp and FileDir both use them. EdSharp's own Choose had ignored the default button it was given.

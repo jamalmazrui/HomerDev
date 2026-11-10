@@ -6290,6 +6290,84 @@ public static void message(object oText) { message(Application.ProductName, oTex
 public static void message(object oTitle, object oText) {
 LbcMessage.show(Convert.ToString(oText), Convert.ToString(oTitle));
 } // message method
+
+// input and multiInput: one field, or several, each with its own history when given a key (kit 1.191.0, 10 November
+// 2026), from EdSharp's Dialog.Input and MultiInput. A field may offer a list of choices and a focus tip; trigger
+// letters are given by LbcDialog's shared rule. History is kept as FileDir's and EdSharp's always was -- section
+// "Recent" plus the key, through fReadSetting and fWriteSetting -- so what a person typed before is still offered.
+
+
+public static string[] multiInput(string sTitle, string[] aLabel, string[] aValue, string[][] aaChoice, string[] aTip) {
+// MultiInput where a field may offer a list of choices rather than free
+// text. Built from Lbc primitives so it inherits what they do: reading
+// order matching tab order, the automatic Help button, F1 describing every
+// field, Control+Enter and Escape.
+//
+// Two Homer form rules are honoured here that the plain overload could not:
+// every field gets a trigger letter that BEGINS A WORD and that no other
+// field holds, by Lbc's shared rule rather than an ampersand pushed in
+// front of whatever the label happens to be; and every field gets a focus
+// tip, since F1 has nothing to describe without one.
+List<string> lsLabels = new List<string>();
+foreach (string sLabel in aLabel) lsLabels.Add(sLabel);
+List<string> lsMarked = LbcDialog.markTriggerLetters(lsLabels);
+LbcDialog dlg = new LbcDialog(sTitle, ownerForm());
+List<Control> lBoxes = new List<Control>();
+for (int i = 0; i < aLabel.Length; i++) {
+string sVal = (aValue != null && i < aValue.Length && aValue[i] != null) ? aValue[i] : "";
+string sTip = (aTip != null && i < aTip.Length && aTip[i] != null) ? aTip[i] : "";
+string[] aChoice = (aaChoice != null && i < aaChoice.Length) ? aaChoice[i] : null;
+if (aChoice != null && aChoice.Length > 0) lBoxes.Add(dlg.addComboPickBox(lsMarked[i], aChoice, sVal, sTip));
+else lBoxes.Add(dlg.addInputBox(lsMarked[i], sVal, sTip));
+}
+List<string> lReturn = new List<string>();
+if (dlg.runOkCancel()) foreach (Control ctl in lBoxes) lReturn.Add(ctl.Text);
+dlg.Dispose();
+return lReturn.ToArray();
+} // MultiInput method (choices overload)
+
+public static string[] multiInput(string sTitle, string[] aLabel, string[] aValue) {
+LbcDialog dlg = new LbcDialog(sTitle, ownerForm());
+List<TextBox> lBoxes = new List<TextBox>();
+for (int i = 0; i < aLabel.Length; i++) {
+string sVal = (aValue != null && i < aValue.Length && aValue[i] != null) ? aValue[i] : "";
+lBoxes.Add(dlg.addInputBox(aLabel[i], sVal));
+}
+List<string> lReturn = new List<string>();
+if (dlg.runOkCancel()) foreach (TextBox txt in lBoxes) lReturn.Add(txt.Text);
+dlg.Dispose();
+return lReturn.ToArray();
+} // MultiInput method
+
+public static string[] multiInput(string sTitle, string[] aLabel, string[] aValue, string[] aHistoryKey) {
+if (aHistoryKey == null) return multiInput(sTitle, aLabel, aValue);
+int iCount = Homer.InputHistory.clampCount(readSetting("General", "historyCount"));
+LbcDialog dlg = new LbcDialog(sTitle, ownerForm());
+List<Control> lBoxes = new List<Control>();
+for (int i = 0; i < aLabel.Length; i++) {
+string sVal = (aValue != null && i < aValue.Length && aValue[i] != null) ? aValue[i] : "";
+string sKey = (i < aHistoryKey.Length) ? aHistoryKey[i] : null;
+if (String.IsNullOrEmpty(sKey)) { lBoxes.Add(dlg.addInputBox(aLabel[i], sVal)); continue; }
+string sSection = "Recent" + sKey;
+List<string> lRecent = Homer.InputHistory.load(delegate(string sSlot) { return readSetting(sSection, sSlot); }, iCount);
+lBoxes.Add(dlg.addComboHistoryBox(aLabel[i], lRecent, sVal, ""));
+}
+List<string> lReturn = new List<string>();
+if (dlg.runOkCancel()) {
+for (int i = 0; i < lBoxes.Count; i++) {
+string sText = lBoxes[i].Text;
+lReturn.Add(sText);
+string sKey = (i < aHistoryKey.Length) ? aHistoryKey[i] : null;
+if (String.IsNullOrEmpty(sKey) || sText == null || sText.Trim().Length == 0) continue;
+string sSection = "Recent" + sKey;
+List<string> lRecent = Homer.InputHistory.load(delegate(string sSlot) { return readSetting(sSection, sSlot); }, iCount);
+lRecent = Homer.InputHistory.push(lRecent, sText.Trim(), iCount);
+Homer.InputHistory.store(lRecent, delegate(string sSlot, string sSlotValue) { writeSetting(sSection, sSlot, sSlotValue); }, iCount);
+}
+}
+dlg.Dispose();
+return lReturn.ToArray();
+} // MultiInput method (history overload)
 // fMapDrive: maps a network share to a drive letter, for the folder dialog when a \\server\share path is typed;
 // FileDir sets it to its NetworkDrive. Left empty, the dialog says mapping is not available here.
 public static Func<string, string, bool> fMapDrive = null;
@@ -6443,8 +6521,8 @@ return sReturn;
 
 // ---- input / field dialogs ----
 
-public static string inputDialog(string sTitle, string sLabel, string sValue) {
-return inputDialog(sTitle, sLabel, sValue, null);
+public static string input(string sTitle, string sLabel, string sValue) {
+return input(sTitle, sLabel, sValue, null);
 } // InputDialog method
 
 // InputDialog with input history: when sHistoryKey is given (for example
@@ -6455,7 +6533,10 @@ return inputDialog(sTitle, sLabel, sValue, null);
 // uses. [General] historyCount sets the depth; default 10, ceiling 100.
 // Password prompts and callers that pass no key keep the plain text box,
 // so passwords are never recorded.
-public static string inputDialog(string sTitle, string sLabel, string sValue, string sHistoryKey) {
+// ONE INPUT (kit 1.192.0, 10 November 2026): inputDialog, from FileDir, and input, from EdSharp, asked the same
+// question two ways; this is the one, under the name EdSharp used. A prompt naming a password hides what is typed, and
+// cancelling is said.
+public static string input(string sTitle, string sLabel, string sValue, string sHistoryKey) {
 // One line of input, built on the kit's LbcDialog.
 //
 // With a history key the field is an editable combo whose list holds the
