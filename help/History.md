@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.189.0 -- 10 November 2026
+
+- **LbcAsk.pick, one list for picking.** EdSharp and FileDir each had a Pick: EdSharp's labelled its list but answered by row, so a list narrowed with Control+F gave back the wrong item; FileDir's answered by the item but had no label. The kit's pick does both, a &Choices pick box answered through listSourceIndex, and both apps use it.
+
 ## 1.188.0 -- 10 November 2026
 
 - **Script, not snippet, across Homer.** DbDo and EdSharp both invoke scripts of several kinds, so the suite's catalog of commands, the command echo and the kit's comments say script: EdSharp's Save Script, Invoke Script and View Script, DbDo's Edit Script beside its Invoke Script.

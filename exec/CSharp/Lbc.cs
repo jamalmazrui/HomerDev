@@ -6225,6 +6225,37 @@ public static Func<object, bool, bool> fSay = null;
 public static Func<string, string, string> fReadSetting = null;
 public static Action<string, string, string> fWriteSetting = null;
 public static Func<IEnumerable<string>> fRecentFolders = null;
+
+// pick: one item from a list, shown by one name and answered with another -- aDisplay is what the list says, aValue
+// what comes back, the same when aDisplay is null (kit 1.189.0, 10 November 2026). EdSharp and FileDir each had a
+// Pick of their own: EdSharp's labelled its list, as a Homer list must be, but answered by row, so a list narrowed
+// with Control+F gave back the wrong item; FileDir's answered by the item but had no label. This one does both: the
+// &Choices pick box, with jump, search and filter, answered through listSourceIndex. iIndex is the item selected at
+// first, counted in the list as shown. Returns "" when cancelled.
+public static string pick(string sTitle, string[] aValue, bool bSort) { return pick(sTitle, aValue, null, bSort, 0); }
+public static string pick(string sTitle, string[] aValue, bool bSort, int iIndex) { return pick(sTitle, aValue, null, bSort, iIndex); }
+public static string pick(string sTitle, string[] aValue, string[] aDisplay, bool bSort, int iIndex) {
+if (aValue == null || aValue.Length == 0) return "";
+string[] aShown = (aDisplay != null && aDisplay.Length == aValue.Length) ? aDisplay : aValue;
+List<int> lsOrder = new List<int>();
+for (int i = 0; i < aShown.Length; i++) lsOrder.Add(i);
+if (bSort) lsOrder.Sort(delegate(int a, int b) { int iCompare = string.Compare(aShown[a], aShown[b], StringComparison.OrdinalIgnoreCase); return iCompare != 0 ? iCompare : a.CompareTo(b); });
+List<string> lsNames = new List<string>();
+foreach (int iAt in lsOrder) lsNames.Add(aShown[iAt]);
+string sSelected = (iIndex >= 0 && iIndex < lsNames.Count) ? lsNames[iIndex] : lsNames[0];
+using (LbcDialog dlg = new LbcDialog(sTitle, ownerForm())) {
+ListBox lb = dlg.addPickBox("&Choices", lsNames, sSelected, "");
+if (iIndex >= 0 && iIndex < lsNames.Count) lb.SelectedIndex = iIndex;
+dlg.primaryList = lb;
+if (!dlg.runOkCancel()) {
+say("Cancel", true);
+return "";
+}
+int iRow = dlg.listSourceIndex(lb, lb.SelectedIndex);
+if (iRow < 0 || iRow >= lsOrder.Count) return "";
+return aValue[lsOrder[iRow]];
+}
+} // pick method
 // fMapDrive: maps a network share to a drive letter, for the folder dialog when a \\server\share path is typed;
 // FileDir sets it to its NetworkDrive. Left empty, the dialog says mapping is not available here.
 public static Func<string, string, bool> fMapDrive = null;
