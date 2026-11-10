@@ -656,6 +656,8 @@ public class MdiFrame : LbcForm {
         this.WindowState = FormWindowState.Maximized;
 
         menuBar = new MenuStrip();
+        // NAMED FOR THE PROGRAM (10 November 2026): Axe.Windows found the menu bar with no name; nothing else names a menu bar for the reader, so it takes the program's name, read as "<program> menu bar".
+        menuBar.AccessibleName = Application.ProductName;
         menuBar.Dock = DockStyle.Top;
         this.MainMenuStrip = menuBar;
         this.Controls.Add(menuBar);

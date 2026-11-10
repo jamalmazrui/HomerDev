@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.197.0 -- 10 November 2026
+
+- **An Axe report says how many findings are to review.** FileDir's opened with 734 errors, 732 of them how Windows Forms' list box reports its items, which needs no change; the two that did were lost in the count. Each report and the check's line now say how many of the findings listed need no change and how many are to review.
+- **The menu bar has a name.** The kit's MDI frame names its menu bar for the program, as Axe.Windows asked; nothing else names a menu bar for the reader.
+
 ## 1.196.0 -- 10 November 2026
 
 - **The menu gate counts submenus and the menu bar.** A submenu's own caption, made with new ToolStripMenuItem, and each menu on the menu bar share letters with the items beside them, and the gate had not counted them: DbDo's Query menu had Say and Show Schema both on S. They are counted now.

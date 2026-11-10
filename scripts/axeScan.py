@@ -157,6 +157,9 @@ def walkJson(oNode, lFindings, sElement=""):
         for oValue in oNode: walkJson(oValue, lFindings, sElement)
 
 
+iToReview = 0
+
+
 def adviceFor(sFinding):
     """Homer's guidance for a finding, by the kind of rule it names."""
     s = sFinding.lower()
@@ -190,12 +193,23 @@ def acceptedIn(sRoot):
         return set(s.strip() for s in fIn if s.strip() and not s.strip().startswith(("#", ";")))
 
 
+def needsNoChange(sFinding):
+    """A finding Homer's guidance says needs no change in the app: how Windows reports its own controls."""
+    return "nothing to change" in (adviceFor(sFinding) or "")
+
+
 def writeReport(sPath, sApp, sWhat, iErrors, sSummary, lFindings, setAccepted, sFile):
     lNew = [s for s in lFindings if s not in setAccepted]
+    # THE FEW AMONG THE MANY (10 November 2026): 734 errors headed FileDir's report, 732 of them how Windows Forms'
+    # list box reports its items, which needs no change; the two that did were lost in the count.
+    iNoChange = len([s for s in lFindings if needsNoChange(s)])
+    global iToReview
+    iToReview = len(lFindings) - iNoChange
     lLines = ["# Accessibility scan of " + sApp, "",
               "Scanned " + datetime.datetime.now().strftime("%d %B %Y at %H:%M") + ": " + sWhat + ", with Axe.Windows, the rule engine of Accessibility Insights for Windows.", "",
               "**" + (("%d error%s" % (iErrors, "" if iErrors == 1 else "s")) if iErrors is not None else "The error count could not be read") + "; "
               + "%d finding%s listed, %d new.**" % (len(lFindings), "" if len(lFindings) == 1 else "s", len(lNew)), "",
+              "**Of the findings listed, %d need%s no change in the app, and %d %s to review.**" % (iNoChange, "s" if iNoChange == 1 else "", iToReview, "is" if iToReview == 1 else "are"), "",
               "A finding is a question, not an order. Before changing anything, check what a screen reader user would meet; "
               "never add an accessible name where a label before the control, its own caption, or the window's title already "
               "names it, since the reader would then say it twice. A finding reviewed and accepted goes in " + sAccepted + ", one per line, as written here.", ""]
@@ -289,9 +303,9 @@ def scanProgram(sExe, sRoot, sApp, sLogDir):
     sReport = os.path.join(sLogDir, sApp + "-a11yScan-" + sStamp + ".md")
     iNew = writeReport(sReport, sApp, sWhat, iErrors, sSummary, lFindings, acceptedIn(sRoot), sFile)
     if iErrors == 0: return "pass", "Axe.Windows found 0 errors in %s" % sWhat, sReport
-    return "warn", ("Axe.Windows: %s in %s, %d new; review %s before changing anything -- never a name the reader already has"
+    return "warn", ("Axe.Windows: %s in %s, %d to review and %d new; review %s before changing anything -- never a name the reader already has"
                     % (("%d error%s" % (iErrors, "" if iErrors == 1 else "s")) if iErrors is not None else "an unread count of errors",
-                       sWhat, iNew, os.path.basename(sReport))), sReport
+                       sWhat, iToReview, iNew, os.path.basename(sReport))), sReport
 
 
 def main():
