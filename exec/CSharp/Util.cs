@@ -1118,4 +1118,358 @@ return textStatistics;
 
 } // class Util
 
+// HomerList: a list of strings with the operations Homer apps do on lines and names -- find, keep or remove what
+// matches, pad, trim, case, segments, stack and queue (kit 1.194.0, 10 November 2026). It was FileDir's own; FileDir
+// uses this one now. EdSharp keeps its older copy for the reason written above it.
+public class HomerList : List<string> {
+
+public char Delimiter = '|';
+public bool CaseSensitive = false;
+
+public int Max {
+get {
+return this.Count - 1;
+}
+}
+
+public string Segments {
+get {
+string[] aSegments = this.ToArray();
+string sSegments = String.Join(this.Delimiter.ToString(), aSegments);
+return sSegments;
+}
+set {
+string[] aSegments = value.Split(this.Delimiter);
+this.Clear();
+if (value.Length > 0) this.AddRange(aSegments);
+}
+} // Segments property
+
+public HomerList() {
+//new HomerList(this.Segments, this.Delimiter, this.CaseSensitive);
+} // HomerList constructor
+
+public HomerList(string sSegments) {
+//new HomerList(sSegments, this.Delimiter, this.CaseSensitive);
+this.Segments = sSegments;
+//new HomerList();
+} // HomerList constructor
+
+public HomerList(string sSegments, char cDelimiter) {
+this.Delimiter = cDelimiter;
+this.Segments = sSegments;
+} // HomerList constructor
+
+public HomerList(string sSegments, char cDelimiter, bool bCaseSensitive) {
+this.Delimiter = cDelimiter;
+this.Segments = sSegments;
+this.CaseSensitive = bCaseSensitive;
+} // HomerList constructor
+
+public HomerList(string[] aItems) {
+this.AddRange(aItems);
+} // HomerList constructor
+
+public new int IndexOf(string sItem) {
+if (this.CaseSensitive) return base.IndexOf(sItem);
+else {
+int iIndex = -1;
+string sValue = sItem.ToLower();
+for (int i = 0; i < this.Count; i++) {
+if (this[i].ToLower() == sValue) {
+iIndex = i;
+break;
+}
+}
+return iIndex;
+}
+} // IndexOf method
+
+public new bool Contains(string sItem) {
+return this.IndexOf(sItem) >= 0;
+} // Contains method
+
+public new void Sort() {
+if (this.CaseSensitive) base.Sort();
+else {
+string[] a = this.ToArray();
+Array.Sort(a, new System.Collections.CaseInsensitiveComparer());
+this.Clear();
+this.AddRange(a);
+}
+} // Sort method
+
+public string getSegments(char cDelimiter) {
+this.Delimiter = cDelimiter;
+return this.Segments;
+} // getSegments method
+
+public void keepUnique() {
+for (int i = this.Count - 1; i >=0; i--) {
+string s = this[i];
+if (this.IndexOf(s) < i) this.RemoveAt(i);
+}
+} // keepUnique method
+
+public void removeLike(string sMatch) {
+RegexOptions options = RegexOptions.Multiline;
+if (!this.CaseSensitive) options |= RegexOptions.IgnoreCase;
+Regex rx = new Regex(sMatch, options);
+
+for (int i = this.Count - 1; i >= 0; i--) {
+if (rx.IsMatch(this[i])) this.RemoveAt(i);
+}
+} // removeLike method
+
+public void keepLike(string sMatch) {
+HomerList hl = this.findLike(sMatch);
+this.Clear();
+this.AddRange(hl);
+} // keepLike method
+
+public HomerList findLike(string sMatch) {
+RegexOptions options = RegexOptions.Multiline;
+if (!this.CaseSensitive) options |= RegexOptions.IgnoreCase;
+Regex rx = new Regex(sMatch, options);
+
+HomerList hl = new HomerList();
+foreach (string s in this) {
+if (rx.IsMatch(s)) hl.Add(s);
+}
+return hl;
+} // findLike method
+
+public void replaceLike(string sMatch, string sReplace) {
+RegexOptions options = RegexOptions.Multiline;
+if (!this.CaseSensitive) options |= RegexOptions.IgnoreCase;
+Regex rx = new Regex(sMatch, options);
+
+for (int i = 0; i < this.Count; i++)  this[i] = rx.Replace(this[i], sReplace);
+} // replaceLike method
+
+public void Push(string sItem) {
+this.Insert(0, sItem);
+} // Push method
+
+public string Pop() {
+int iUpper = this.Count - 1;
+string sItem = this[iUpper];
+this.RemoveAt(iUpper);
+return sItem;
+} // Pop method
+
+public string Shift() {
+int iLower = 0;
+string sItem = this[iLower];
+this.RemoveAt(iLower);
+return sItem;
+} // Shift method
+
+public new void Remove(string sItem) {
+bool bLoop = true;
+while (bLoop) {
+int iIndex = this.IndexOf(sItem);
+if (iIndex == -1) break;
+this.RemoveAt(iIndex);
+}
+} // Remove method
+
+public void RemoveRange(HomerList hl) {
+foreach (string sItem in hl) this.Remove(sItem);
+} // RemoveRange method
+
+public void RemoveRange(string[] aItems) {
+HomerList hl = new HomerList(aItems);
+this.RemoveRange(hl);
+} // RemoveRange method
+
+public void addUnique(string sItem) {
+if (!this.Contains(sItem)) this.Add(sItem);
+} // addUnique method
+
+public void pushUnique(string sItem) {
+if (!this.Contains(sItem)) this.Push(sItem);
+} // pushUnique method
+
+public void RemoveRange(string sSegments) {
+Char cDelimiter = '|';
+HomerList hl = new HomerList(sSegments, cDelimiter);
+this.RemoveRange(hl);
+} // RemoveRange method
+
+public void RemoveRange(string sSegments, Char cDelimiter) {
+HomerList hl = new HomerList(sSegments, cDelimiter);
+this.RemoveRange(hl);
+} // RemoveRange method
+
+public void saveAddRange(HomerList hl) {
+this.AddRange(hl);
+} // AddRange method
+
+public void OldAddRange(string[] aItems) {
+HomerList hl = new HomerList(aItems);
+this.AddRange(hl);
+} // AddRange method
+
+public void AddRange(string sSegments) {
+Char cDelimiter = this.Delimiter;
+HomerList hl = new HomerList(sSegments, cDelimiter);
+this.AddRange(hl);
+} // AddRange method
+
+public void AddRange(string sSegments, Char cDelimiter) {
+HomerList hl = new HomerList(sSegments, cDelimiter);
+this.AddRange(hl);
+} // AddRange method
+
+public void addUniqueRange(HomerList hl) {
+foreach (string s in hl) if (!this.Contains(s)) this.Add(s);
+} // addUniqueRange method
+
+public void addUniqueRange(string[] aItems) {
+HomerList hl = new HomerList(aItems);
+this.addUniqueRange(hl);
+} // addUniqueRange method
+
+public void addUniqueRange(string sSegments) {
+Char cDelimiter = this.Delimiter;
+HomerList hl = new HomerList(sSegments, cDelimiter);
+this.addUniqueRange(hl);
+} // addUniqueRange method
+
+public void addUniqueRange(string sSegments, Char cDelimiter) {
+HomerList hl = new HomerList(sSegments, cDelimiter);
+this.addUniqueRange(hl);
+} // addUniqueRange method
+
+public HomerList findRange(HomerList hl) {
+HomerList hlReturn = new HomerList();
+foreach (string sItem in hl) if (this.Contains(sItem)) hlReturn.Add(sItem);
+return hlReturn;
+} // findRange method
+
+public void findRange(string[] aItems) {
+HomerList hl = new HomerList(aItems);
+this.findRange(hl);
+} // findRange method
+
+public void findRange(string sSegments) {
+Char cDelimiter = '|';
+HomerList hl = new HomerList(sSegments, cDelimiter);
+this.findRange(hl);
+} // findRange method
+
+public void findRange(string sSegments, Char cDelimiter) {
+HomerList hl = new HomerList(sSegments, cDelimiter);
+this.findRange(hl);
+} // findRange method
+
+public HomerList Clone() {
+string[] aItems = this.ToArray();
+HomerList hl = new HomerList(aItems);
+return hl;
+} // Clone method
+
+public string minValue() {
+if (this.Count == 0) return "";
+
+HomerList hl = this.Clone();
+hl.Sort();
+return hl[0];
+} // minValue method
+
+public string maxValue() {
+if (this.Count == 0) return "";
+
+HomerList hl = this.Clone();
+hl.Sort();
+return hl[hl.Count - 1];
+} // maxValue method
+
+public int minLength() {
+int iLength = 2000000000;
+foreach (string sItem in this) if (sItem.Length < iLength) iLength = sItem.Length;
+if (iLength == 2000000000) iLength = 0;
+return iLength;
+} // minLength method
+
+public int maxLength() {
+int iLength = 0;
+foreach (string sItem in this) if (sItem.Length > iLength) iLength = sItem.Length;
+return iLength;
+} // maxLength method
+
+public void sortLength() {
+this.Sort(delegate(string s1, string s2) {return s1.Length.CompareTo(s2.Length);} );
+} // sortLength method
+
+public void ToLower() {
+for (int i = 0; i < this.Count; i++) this[i] = this[i].ToLower();
+} // ToLower method
+
+public void ToUpper() {
+for (int i = 0; i < this.Count; i++) this[i] = this[i].ToUpper();
+} // ToUpper method
+
+public void TrimStart() {
+for (int i = 0; i < this.Count; i++) this[i] = this[i].TrimStart();
+} // TrimStart method
+
+public void TrimEnd() {
+for (int i = 0; i < this.Count; i++) this[i] = this[i].TrimEnd();
+} // TrimEnd method
+
+public void TrimStart(char[] a) {
+for (int i = 0; i < this.Count; i++) this[i] = this[i].TrimStart(a);
+} // TrimStart method
+
+public void TrimEnd(char[] a) {
+for (int i = 0; i < this.Count; i++) this[i] = this[i].TrimEnd(a);
+} // TrimEnd method
+
+public void PadLeft(int iLength, char c) {
+for (int i = 0; i < this.Count; i++) this[i] = this[i].PadLeft(iLength, c);
+} // PadLeft method
+
+public void PadRight(int iLength, char c) {
+for (int i = 0; i < this.Count; i++) this[i] = this[i].PadRight(iLength, c);
+} // PadRight method
+
+public void pushRange(HomerList hl) {
+this.InsertRange(0, hl);
+} // pushRange method
+
+public void pushRange(string sSegments) {
+Char cDelimiter = this.Delimiter;
+HomerList hl = new HomerList(sSegments, cDelimiter);
+this.pushRange(hl);
+} // pushRange method
+
+public void pushRange(string sSegments, Char cDelimiter) {
+HomerList hl = new HomerList(sSegments, cDelimiter);
+this.pushRange(hl);
+} // pushRange method
+
+public void pushUniqueRange(HomerList hl) {
+foreach (string s in hl) if (!this.Contains(s)) this.Push(s);
+} // pushUniqueRange method
+
+public void pushUniqueRange(string[] aItems) {
+HomerList hl = new HomerList(aItems);
+this.pushUniqueRange(hl);
+} // pushUniqueRange method
+
+public void pushUniqueRange(string sSegments) {
+Char cDelimiter = this.Delimiter;
+HomerList hl = new HomerList(sSegments, cDelimiter);
+this.pushUniqueRange(hl);
+} // pushUniqueRange method
+
+public void pushUniqueRange(string sSegments, Char cDelimiter) {
+HomerList hl = new HomerList(sSegments, cDelimiter);
+this.pushUniqueRange(hl);
+} // pushUniqueRange method
+
+} // HomerList class
+
 } // namespace Homer

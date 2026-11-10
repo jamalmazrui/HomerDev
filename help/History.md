@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.194.0 -- 10 November 2026
+
+- **HomerList is the kit's.** FileDir's list of strings -- find, keep or remove what matches, pad, trim, case, segments, stack and queue -- moved into Util.cs as Homer.HomerList, and FileDir uses it. EdSharp keeps its older copy, marked KEPT ON PURPOSE: its methods' upper-camel names are also string and list methods, so its calls need a compiler in the loop to move.
+
+## 1.193.0 -- 10 November 2026
+
+- **Homer's letter rules, checked in every app.** check.py's new menu letters check reads each app's menu items -- DbDo's addItem, EdSharp's CreateMenuItem, FileDir's menu_Helper -- and checks that a key's letter starts a word of the command's name and that an access letter starts a word. Only DbDo's own audit had checked this. Exceptions are the standing ones -- X for the ex sound, V for voke, Z for a toggle or status -- plus Windows' own clipboard and undo keys, Shift's relatives, and a letter a command family shares, as Proper Case keeps Upper Case's U. All 641 menu items in the three apps pass. A warning, not a failure, so it never stops a release.
+
 ## 1.192.0 -- 10 November 2026
 
 - **One input.** LbcAsk had two ways to ask for one line of text, FileDir's inputDialog and EdSharp's input; input is now the one, with inputDialog's care: a prompt naming a password hides what is typed, and cancelling is said.
