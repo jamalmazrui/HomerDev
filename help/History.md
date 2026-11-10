@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.182.0 -- 10 November 2026
+
+- **Shift+F1 in a main window.** A main window's title and its list's name change with what it shows, so Shift+F1 there said no hint was written. LbcHints now also looks in an app's [Main window] section for an MDI frame or child, and in every section for the control's accessibility role, as "role List".
+
+## 1.181.0 -- 10 November 2026
+
+- **recordWalk brings the app back from its own console.** A walk stopped whenever another window was in front, and testSay's run of 9 November stopped at step 97 of 106 because its own command prompt had come forward. When the window in front is a console, the app is brought back once and the walk goes on; any other window still stops it.
+
 ## 1.180.0 -- 9 November 2026
 
 - **A kept Axe record is said in the log.** axeWindow logs each record it keeps, fingerprint and outcome, so a log shows that an unchanged window, such as DbDo's, whose scan does not finish, will be skipped next time.

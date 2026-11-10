@@ -921,15 +921,32 @@ public static class LbcHints
         lock (dNames) { if (ctl != null && dNames.TryGetValue(ctl, out aName)) { sPlain = aName[0]; sKind = aName[1]; } }
         if (sPlain.Length == 0 && ctl != null) sPlain = plainName(ctl.AccessibleName ?? ctl.Text ?? "");
         string sDialog = "";
-        try { Form frm = ctl == null ? null : ctl.FindForm(); if (frm != null) sDialog = (frm.Text ?? "").Trim(); } catch { }
-        string sFile = hintsFile();
-        if (sFile.Length > 0 && System.IO.File.Exists(sFile) && sPlain.Length > 0)
+        // A MAIN WINDOW'S HINTS (kit 1.182.0, 10 November 2026). A main window's title changes with what it shows -- a
+        // table, a folder, a document -- and its list or text box often has no lasting name, so Shift+F1 there said "No
+        // hint is written for it yet". A window that is an MDI frame or child also looks in the section [Main window],
+        // and every section is also asked for the control's accessibility role, as "role List" or "role Text".
+        string sMain = "";
+        string sRole = "";
+        try
         {
-            foreach (string sSection in new string[] { sDialog, "All dialogs" })
+            Form frm = ctl == null ? null : ctl.FindForm();
+            if (frm != null)
+            {
+                sDialog = (frm.Text ?? "").Trim();
+                if (frm.IsMdiContainer || frm.MdiParent != null) sMain = "Main window";
+            }
+            if (ctl != null) sRole = "role " + ctl.AccessibilityObject.Role.ToString();
+        }
+        catch { }
+        string sFile = hintsFile();
+        if (sFile.Length > 0 && System.IO.File.Exists(sFile) && (sPlain.Length > 0 || sRole.Length > 0))
+        {
+            foreach (string sSection in new string[] { sDialog, sMain, "All dialogs" })
             {
                 if (sSection.Length == 0) continue;
-                foreach (string sKey in new string[] { sPlain + " (" + sKind + ")", sPlain })
+                foreach (string sKey in new string[] { sPlain + " (" + sKind + ")", sPlain, sRole })
                 {
+                    if (sKey.Length == 0 || sKey == " ()") continue;
                     string sHint = "";
                     try { sHint = InixCodec.readValue(sFile, sSection, sKey, ""); } catch { }
                     if (!string.IsNullOrEmpty(sHint)) return sHint.Trim();

@@ -675,6 +675,15 @@ def main():
     logLine("launch key: " + ("+".join(sorted(setLaunch)) if setLaunch else "none found"))
     for iIndex, dStep in enumerate(lSteps, 1):
         sExeNow, sTitleNow = foregroundExe()
+        # ITS OWN CONSOLE IS NOT A REASON TO STOP (10 November 2026). testSay's run of 9 November stopped at step 97 of
+        # 106 because the command prompt running testSay had come to the front. When the window in front is a console
+        # -- the one running this walk -- the app is brought back once and the walk goes on; any other window stops it,
+        # as before, so keys never go where they were not meant to.
+        if sExeNow.lower() != (oArgs.app + ".exe").lower() and sExeNow.lower() in ("cmd.exe", "conhost.exe", "windowsterminal.exe", "openconsole.exe", "python.exe", "py.exe", "powershell.exe", "pwsh.exe"):
+            logLine("before step %d the console %s %r was in front; bringing %s back" % (iIndex, sExeNow, sTitleNow, oArgs.app))
+            if bringForward(oArgs.app):
+                time.sleep(0.5)
+                sExeNow, sTitleNow = foregroundExe()
         if sExeNow.lower() != (oArgs.app + ".exe").lower():
             sayLine("Stopped before step " + str(iIndex) + ": " + (sTitleNow or sExeNow or "another window") + " is in front.")
             logLine("stopped: foreground " + sExeNow + " " + repr(sTitleNow))
