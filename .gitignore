@@ -47,7 +47,7 @@
 !/releaseHomerDev.cmd
 !/RepoFiles.txt
 !/scripts/
-!/templates/
+!/Templates/
 !/updateAppBuilds.cmd
 !/updateAppBuilds.py
 !/version.txt
