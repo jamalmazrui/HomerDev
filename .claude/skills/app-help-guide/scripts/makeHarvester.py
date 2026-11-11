@@ -1,12 +1,29 @@
-﻿"""makeHarvester.py version 1
+﻿r"""makeHarvester.py version 2
 
 Writes a harvester: a standalone Python crawler for ONE product's help estate.
 
 HOW TO USE IT. Add a block to the configuration list near the bottom of this
 file — product name, script name, folder name, seed addresses, fence pattern,
-optional subject gate — then run it. It writes get<Product>Help.py into the
-folder you name (the current one by default), and that script is what you hand
-to the person who will run it.
+optional subject gate — then run it. It writes get<Product>Help.py, and a .cmd
+that runs it, into the folder you name: by default the scripts folder of the
+collection in the current folder (C:\AppHelpGuides\scripts), else the current
+folder. That script is what you hand to the person who will run it.
+
+THE HOMER LAYOUT (version 2, 11 November 2026). A harvester in a collection's
+scripts folder keeps everything where the Homer tree says it belongs:
+
+    data\harvests\<Product>Help\   the saved pages and manifest.txt. They are
+                                    kept between runs, because a run resumes
+                                    over them and buildGuide reads them.
+    results\<Product>Help.zip      the archive to upload: an output, which may
+                                    be moved away; nothing reads it again.
+    logs\<Collection>-get<Product>Help-yyyyMMdd-HHmmss.log
+                                    one log per run, UTF-8 with a byte order
+                                    mark and Windows line endings; a copy goes
+                                    into the archive, so one upload carries both.
+
+A harvester run from anywhere else (sent to somebody on its own) keeps all of
+that beside itself, as Homer's logging convention says of a standalone script.
 
 WHY A GENERATOR RATHER THAN ONE PARAMETERISED CRAWLER. Every harvester is a
 single self-contained file needing nothing beyond the standard library, so it
@@ -16,8 +33,8 @@ and ceiling.
 
 WHAT EVERY GENERATED HARVESTER DOES: refuses addresses outside its fence,
 refuses translated editions, sends a Referer naming the site's front page,
-waits between requests, stops at a page ceiling, writes a debugging log beside
-itself, saves each page with a manifest, and zips the folder at the end.
+waits between requests, stops at a page ceiling, writes a debugging log in the
+Homer place, saves each page with a manifest, and zips the folder at the end.
 
 THE FENCE FAULTS THAT HAVE COST RUNS are in references/fence-faults.md. Read
 that before writing a new fence.
@@ -29,12 +46,14 @@ sChassis = r'''"""
 {sScriptName}
 
 Gathers the {sProduct} help estate ({sSystem}).
-Run it from any folder; it writes everything BESIDE THIS SCRIPT:
+Written by the HomerDev kit's makeHarvester. In a collection's scripts folder
+it keeps the Homer layout:
 
-    {sFolder}          a folder holding the saved pages
-    {sFolder}/manifest.txt   every address and the file it became
-    {sLogName}     a detailed log
-    {sZipName}     the archive to upload
+    data\\harvests\\{sFolder}\\    the saved pages, and manifest.txt naming each
+    results\\{sZipName}    the archive to upload, with this run's log inside
+    logs\\<Collection>-<script>-yyyyMMdd-HHmmss.log    this run's detailed log
+
+Run from anywhere else, it keeps the same three things beside itself.
 
 Nothing is fetched twice: a page already saved is skipped, so the script
 can be stopped and run again.
@@ -56,11 +75,11 @@ lLanguageCodes = ["af", "am", "ar", "az", "be", "bg", "bn", "bs", "ca", "cs", "c
 nDelay = {nDelay}
 nTimeout = 30
 sFolderName = "{sFolder}"
-sLogName = "{sLogName}"
 sProduct = "{sProduct}"
 sSubjectPattern = r"{sSubjectPattern}"
 sZipName = "{sZipName}"
 
+g_dPaths = {{"sLog": ""}}
 g_dRepeatCounts = {{}}
 g_dSeenFingerprints = {{}}
 
@@ -192,7 +211,7 @@ def gatherEstate(sFolder, lManifest):
     for sSeed in lQueue:
         if not belongs(sSeed):
             logging.error("SEED REFUSED BY ITS OWN FENCE: %s — the fence pattern is wrong, nothing will be gathered", sSeed)
-            print("STOPPING: the seed " + sSeed + " fails this script's own fence. See " + sLogName)
+            print("STOPPING: the seed " + sSeed + " fails this script's own fence. See " + g_dPaths["sLog"])
             return 0
     while lQueue:
         if iSaved >= iMaxPages:
@@ -295,21 +314,50 @@ def writeArchive(sFolder, sZipPath):
     return iFiles
 
 
+def homerPlaces(sScriptDir):
+    """Where this run keeps its pages, its archive and its log: (pages, results, logs, log name prefix).
+
+    In a collection's scripts folder the Homer tree decides (version 2, 11 November 2026): pages in
+    data\\harvests, which a later run resumes over and the guide builder reads; the archive in results, an output
+    that may be moved away; the log in logs, named <Collection>-<script>-<stamp>.log. Anywhere else, everything
+    stays beside the script, as the logging convention says of a standalone script."""
+    sStem = os.path.splitext(os.path.basename(os.path.abspath(__file__)))[0]
+    if os.path.basename(sScriptDir).lower() == "scripts":
+        sRoot = os.path.dirname(sScriptDir)
+        sCollection = os.path.basename(sRoot) or "Homer"
+        return (os.path.join(sRoot, "data", "harvests", sFolderName), os.path.join(sRoot, "results"),
+                os.path.join(sRoot, "logs"), sCollection + "-" + sStem)
+    return os.path.join(sScriptDir, sFolderName), sScriptDir, sScriptDir, sStem
+
+
 def main():
     """Gathers the estate, writes the manifest and the archive, and says what to upload."""
     sScriptDir = os.path.dirname(os.path.abspath(__file__))
-    sFolder = os.path.join(sScriptDir, sFolderName)
-    if not os.path.isdir(sFolder): os.makedirs(sFolder)
-    logging.basicConfig(filename=os.path.join(sScriptDir, sLogName), filemode="w", level=logging.INFO,
-                        format="%(asctime)s %(levelname)s %(message)s", encoding="utf-8", errors="backslashreplace")
+    sFolder, sResults, sLogs, sLogPrefix = homerPlaces(sScriptDir)
+    for sMake in (sFolder, sResults, sLogs): os.makedirs(sMake, exist_ok=True)
+    sLogPath = os.path.join(sLogs, sLogPrefix + "-" + time.strftime("%Y%m%d-%H%M%S") + ".log")
+    # Two runs in the same second must not share a log, or the second erases the first.
+    iSame = 2
+    while os.path.exists(sLogPath):
+        sLogPath = os.path.join(sLogs, sLogPrefix + "-" + time.strftime("%Y%m%d-%H%M%S") + "-%d.log" % iSame)
+        iSame += 1
+    g_dPaths["sLog"] = sLogPath
+    # UTF-8 WITH A BYTE ORDER MARK AND WINDOWS LINE ENDINGS, on every system: the stream is opened here rather than
+    # by logging.basicConfig, which takes neither choice.
+    fLogStream = io.open(sLogPath, "w", encoding="utf-8-sig", newline="\r\n", errors="backslashreplace")
+    oHandler = logging.StreamHandler(fLogStream)
+    oHandler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+    logging.getLogger().addHandler(oHandler)
+    logging.getLogger().setLevel(logging.INFO)
     sys.excepthook = lambda oType, oValue, oTrace: logging.error(
         "UNCAUGHT %s: %s", oType.__name__, oValue, exc_info=(oType, oValue, oTrace))
-    logging.info("{sScriptName} version 1 for %s", sProduct)
+    logging.info("{sScriptName} (makeHarvester version 2) for %s", sProduct)
     logging.info("script %s", os.path.abspath(__file__))
     logging.info("Python %s on %s", platform.python_version(), platform.platform())
     logging.info("working directory %s; command line %s", os.getcwd(), " ".join(sys.argv))
-    logging.info("settings: maxPages %d, delay %.1f, timeout %d, retries %d, folder %s",
-                 iMaxPages, nDelay, nTimeout, iRetries, sFolder)
+    logging.info("settings: maxPages %d, delay %.1f, timeout %d, retries %d", iMaxPages, nDelay, nTimeout, iRetries)
+    logging.info("places: pages %s; archive %s; log %s", sFolder, os.path.join(sResults, sZipName), sLogPath)
+    print("Gathering %s help. Pages go to %s" % (sProduct, sFolder))
     lManifest = []
     iSaved = 0
     iResult = 0
@@ -333,7 +381,7 @@ def main():
         iResult = 1
     for sKind, iCount in sorted(g_dRepeatCounts.items()):
         logging.info("tally: %s occurred %d times", sKind, iCount)
-    sZipPath = os.path.join(sScriptDir, sZipName)
+    sZipPath = os.path.join(sResults, sZipName)
     iFiles = 0
     try:
         iFiles = writeArchive(sFolder, sZipPath)
@@ -344,11 +392,21 @@ def main():
         iResult = 1
     logging.info("RUN ENDED %s: %d pages saved, %d files archived",
                  "with an error" if iResult else "cleanly", iSaved, iFiles)
+    # THE LOG GOES INTO THE ARCHIVE LAST, complete with its RUN ENDED line, so one upload carries the pages and the
+    # account of how they were gathered.
+    try:
+        oHandler.flush()
+        if os.path.isfile(sZipPath):
+            with zipfile.ZipFile(sZipPath, "a", zipfile.ZIP_DEFLATED) as oZip: oZip.write(sLogPath, os.path.basename(sLogPath))
+    except BaseException as oError:
+        logging.exception("the log could not be added to the archive: %s: %s", type(oError).__name__, oError)
     print("Saved this run: %d" % iSaved)
     print("Files in the archive: %d" % iFiles)
     print("UPLOAD THIS FILE: " + sZipPath)
-    print("Log: " + os.path.join(sScriptDir, sLogName))
+    print("Log: " + sLogPath)
     if iResult: print("THE RUN ENDED WITH AN ERROR. Its reason is written in the log.")
+    logging.getLogger().removeHandler(oHandler)
+    fLogStream.close()
     return iResult
 
 
@@ -3003,6 +3061,44 @@ lEstates = [
         "sOkStatuses": "200, 202",
         "sExtraLinks": "",
     },
+    # GOODMAPS (11 November 2026). A HubSpot knowledge base whose articles moved under /migration/: the four article
+    # addresses a first probe saw all answered 404 on the day of the run, while the site map listed every article at
+    # its new address. So the site map is a seed, its <loc> entries are read as links, and the fence admits the
+    # map and the /migration/ tree, less HubSpot's search, ticket and 404 pages.
+    {
+        "sProduct": "GoodMaps",
+        "sScriptName": "getGoodMapsHelp.py",
+        "sSystem": "the HubSpot knowledge base at support.goodmaps.com, read from its site map and its /migration/ tree",
+        "sFolder": "GoodMapsHelp",
+        "sZipName": "GoodMapsHelp.zip",
+        "iMaxPages": 150,
+        "nDelay": 2.0,
+        "sSeeds": ('"https://support.goodmaps.com/sitemap.xml",\n'
+                   '              "https://support.goodmaps.com/migration"'),
+        "sFencePattern": r"^https://support\.goodmaps\.com/(sitemap\.xml|migration(/(?!kb-search-results|kb-tickets|kb-404)[a-z0-9._-]+)?)$",
+        "sSubjectPattern": "",
+        "sReadyPattern": r"(hs-kb-|article-wrapper|<urlset|<sitemapindex)",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": "    for oMatch in re.finditer(r'<loc>\\s*([^<]+?)\\s*</loc>', sText, re.I): lFound.append(html.unescape(oMatch.group(1)).strip())",
+    },
+    # AI CONTENT DESCRIBER (11 November 2026). The NVDA add-on's manual is one long readme in its GitHub repository,
+    # fetched plainly from raw.githubusercontent.com (the default branch, main, confirmed by GitHub's own answer).
+    # Ten translations in addon/doc and the developer document on adding a service are outside the fence.
+    {
+        "sProduct": "AI Content Describer",
+        "sScriptName": "getAiContentDescriberHelp.py",
+        "sSystem": "the NVDA add-on's readme in its GitHub repository; translations and developer documents are left out",
+        "sFolder": "AiContentDescriberHelp",
+        "sZipName": "AiContentDescriberHelp.zip",
+        "iMaxPages": 5,
+        "nDelay": 2.0,
+        "sSeeds": '"https://raw.githubusercontent.com/cartertemm/AI-content-describer/main/readme.md"',
+        "sFencePattern": r"^https://raw\.githubusercontent\.com/cartertemm/AI-content-describer/main/readme\.md$",
+        "sSubjectPattern": "",
+        "sReadyPattern": r"AI Content Describer",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": "",
+    },
 ]
 
 
@@ -3015,6 +3111,13 @@ def writeScripts(sOutputFolder):
         fHandle = io.open(sPath, "w", encoding="utf-8-sig", newline="\r\n")
         fHandle.write(sText)
         fHandle.close()
+        # EVERY SCRIPT HAS ITS .cmd (version 2): the Homer way to run a script by name. Plain ASCII with Windows line
+        # endings and no byte order mark, which cmd.exe would read as part of the first command.
+        sStem = os.path.splitext(dEstate["sScriptName"])[0]
+        sCmd = ("@echo off\r\nrem %s.cmd -- runs %s, written by the HomerDev kit's makeHarvester. It gathers %s help into\r\n"
+                "rem data\\harvests, writes the archive to upload into results and its log into logs.\r\n"
+                "python \"%%~dp0%s\" %%*\r\nexit /b %%errorlevel%%\r\n") % (sStem, dEstate["sScriptName"], dEstate["sProduct"], dEstate["sScriptName"])
+        io.open(os.path.join(sOutputFolder, sStem + ".cmd"), "wb").write(sCmd.encode("ascii", "replace"))
         lPaths.append(sPath)
     return lPaths
 
@@ -3045,8 +3148,16 @@ def selfTest(sPath):
 
 
 def main():
-    """Writes one harvester per estate into the folder named on the command line, and tests each one written."""
-    sOutputFolder = sys.argv[1] if len(sys.argv) > 1 else "."
+    """Writes one harvester per estate into the folder named on the command line, and tests each one written.
+
+    With no folder named, a collection's scripts folder is the place when the current folder has one (version 2),
+    and the current folder otherwise. Naming products after the folder writes only those."""
+    sOutputFolder = sys.argv[1] if len(sys.argv) > 1 else ("scripts" if os.path.isdir("scripts") else ".")
+    # The self-test imports each harvester it writes; no __pycache__ is left in the collection's scripts folder.
+    sys.dont_write_bytecode = True
+    lOnly = [s.lower() for s in sys.argv[2:]]
+    if lOnly:
+        lEstates[:] = [d for d in lEstates if d["sProduct"].lower() in lOnly or os.path.splitext(d["sScriptName"])[0].lower() in lOnly]
     lFailed = []
     for sPath in writeScripts(sOutputFolder):
         sFault = selfTest(sPath)

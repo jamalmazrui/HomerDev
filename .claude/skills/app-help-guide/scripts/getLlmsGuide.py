@@ -1,4 +1,4 @@
-﻿"""getLlmsGuide.py version 2
+﻿r"""getLlmsGuide.py version 3
 
 Gathers a product's help from the publisher's own llms.txt index and builds the guide in one run.
 
@@ -18,9 +18,14 @@ stops and says so.
 
 RUN IT with no arguments to gather and build every product, or name products: expo, hermes, kiro. Switches, in any
 case: /gather (gather only), /build (build from what was gathered before), /fresh (fetch every page again rather
-than reuse the copy saved last time). Harvests go in <Name>Help folders beside this script, zipped as <Name>Help.zip;
-the guides are written as <Name>.md and <Name>.htm beside it. The .htm is built by fixPages.py from this folder or
-from the kit, so it has one level-one heading and the Homer encoding.
+than reuse the copy saved last time).
+
+THE HOMER LAYOUT (version 3, 11 November 2026). Run it from the collection's folder (C:\AppHelpGuides), where the
+collection's scripts\getLlmsGuide.cmd runs it from the kit; it is never copied into the collection. Harvests go in
+data\harvests\<Name>Help, kept for the next build; the guides are written as <Name>.md and <Name>.htm at the
+collection's top; the log is logs\<Collection>-getLlmsGuide-yyyyMMdd-HHmmss.log, in UTF-8 with a byte order mark and
+Windows line endings. Version 2 wrote all three beside itself, so run from the kit it would have written guides into
+the kit. The .htm is built by the kit's fixPages.py, so it has one level-one heading and the Homer encoding.
 """
 
 import datetime, hashlib, html, importlib.util, io, logging, os, platform, re, shutil, subprocess, sys, tempfile, time, urllib.error, urllib.parse, urllib.request
@@ -30,7 +35,6 @@ nPauseSeconds = 1.0
 sAccept = "text/markdown, text/plain;q=0.9, */*;q=0.1"
 sLicense = ("The help text belongs to its publisher and is gathered here unchanged for accessible reading. "
               "This guide's own arrangement and wording are available under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).")
-sLogName = "getLlmsGuide.log"
 sMiscellaneous = "Miscellaneous"
 sNewLine = "\r\n"
 sPlaceholder = "\u0001"
@@ -111,11 +115,21 @@ lProducts = [
 ]
 
 
-def startLog(sHere):
-    """Opens the detailed log beside the script and records the environment."""
-    sPath = os.path.join(sHere, sLogName)
-    logging.basicConfig(filename=sPath, filemode="w", level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s",
-                        encoding="utf-8", errors="backslashreplace")
+def startLog(sRoot):
+    """Opens this run's log in the collection's logs folder and records the environment."""
+    sLogs = os.path.join(sRoot, "logs")
+    os.makedirs(sLogs, exist_ok=True)
+    sStamp = time.strftime("%Y%m%d-%H%M%S")
+    sCollection = os.path.basename(sRoot.rstrip("\\/")) or "Guides"
+    sPath = os.path.join(sLogs, "%s-getLlmsGuide-%s.log" % (sCollection, sStamp))
+    iSame = 2
+    while os.path.exists(sPath):
+        sPath = os.path.join(sLogs, "%s-getLlmsGuide-%s-%d.log" % (sCollection, sStamp, iSame))
+        iSame += 1
+    oHandler = logging.StreamHandler(io.open(sPath, "w", encoding="utf-8-sig", newline="\r\n", errors="backslashreplace"))
+    oHandler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+    logging.getLogger().addHandler(oHandler)
+    logging.getLogger().setLevel(logging.INFO)
     logging.info("getLlmsGuide.py version %s", sVersion)
     logging.info("script %s; Python %s (%s) on %s", os.path.abspath(__file__), platform.python_version(), sys.executable, platform.platform())
     logging.info("working directory %s; command line: %s", os.getcwd(), " ".join(sys.argv))
@@ -303,9 +317,14 @@ def gatherPages(dProduct, sFolder, lEntries, dRobots, bFresh):
     return lRows
 
 
+def harvestFolder(sRoot, dProduct):
+    """Where a product's pages are kept between runs: the collection's data\\harvests\\<Name>Help."""
+    return os.path.join(sRoot, "data", "harvests", dProduct["sName"] + "Help")
+
+
 def gatherProduct(dProduct, sHere, dRobots, bFresh):
     """Reads the index and saves what the product's mode calls for. Returns True when there is something to build."""
-    sFolder = os.path.join(sHere, dProduct["sName"] + "Help")
+    sFolder = harvestFolder(sHere, dProduct)
     os.makedirs(sFolder, exist_ok=True)
     say("%s: reading the %s" % (dProduct["sProduct"], "sitemap" if dProduct["sMode"] == "sitemap" else "index"))
     if dProduct["sMode"] == "sitemap": return gatherSitemap(dProduct, sFolder, dRobots, bFresh)
@@ -1008,8 +1027,10 @@ def runGates(sProduct, sPath, sText):
 
 
 def loadFixPages(sHere):
-    """The kit's fixPages.py (version 4, with its page rules) or, failing that, the collection's own copy."""
-    for sFolder in (os.path.join(os.environ.get("HomerDev", "") or r"C:\HomerDev", "scripts"), sHere):
+    """The kit's fixPages.py: first the kit this script belongs to (scripts -> app-help-guide -> skills -> .claude ->
+    the kit), then the HomerDev variable's, then C:\\HomerDev's."""
+    sKit = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", ".."))
+    for sFolder in (os.path.join(sKit, "scripts"), os.path.join(os.environ.get("HomerDev", "") or r"C:\HomerDev", "scripts"), sHere):
         sPath = os.path.join(sFolder, "fixPages.py")
         if not os.path.isfile(sPath): continue
         try:
@@ -1067,7 +1088,7 @@ def buildPage(oFixPages, sMarkdownPath, sTitle):
 
 def buildProduct(dProduct, sHere, oFixPages, sDate):
     """Builds one guide and its pair from the harvest. Returns True when every gate passed."""
-    sFolder = os.path.join(sHere, dProduct["sName"] + "Help")
+    sFolder = harvestFolder(sHere, dProduct)
     if not os.path.isfile(os.path.join(sFolder, "manifest.txt")):
         say("%s: nothing gathered yet, so nothing to build" % dProduct["sProduct"])
         logging.error("%s: no harvest at %s", dProduct["sProduct"], sFolder)
@@ -1096,7 +1117,12 @@ def buildProduct(dProduct, sHere, oFixPages, sDate):
 
 
 def main():
-    sHere = os.path.dirname(os.path.abspath(__file__))
+    # THE COLLECTION IS THE CURRENT FOLDER (version 3): the collection's scripts\getLlmsGuide.cmd starts it there. A
+    # run from inside the kit would write guides into the kit, so it stops and says where to run it.
+    sHere = os.getcwd()
+    if os.path.isfile(os.path.join(sHere, "HomerDev.cs")) or os.path.abspath(sHere).startswith(os.path.dirname(os.path.abspath(__file__))):
+        say("Run getLlmsGuide from the collection's folder, such as C:\\AppHelpGuides, not from the kit.")
+        return 2
     sLogPath = startLog(sHere)
     lSwitches = [s.lower() for s in sys.argv[1:] if s.startswith("/")]
     lNames = [s.lower() for s in sys.argv[1:] if not s.startswith("/")]

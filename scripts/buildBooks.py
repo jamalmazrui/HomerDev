@@ -197,9 +197,9 @@ def titleKey(sTitle):
 
 
 def workFolder(*lsParts):
-    """A folder under MyBooks' per-user temp folder, %LOCALAPPDATA%\\MyBooks\\temp, from the kit's paths.temp(): the
+    """A folder under MyBooks' per-user work folder, %LOCALAPPDATA%\\MyBooks\\work, from the kit's paths.work(): the
     Homer place for scratch files, emptied at the start of each build."""
-    sPath = os.path.join(paths.temp(), *lsParts)
+    sPath = os.path.join(paths.work(), *lsParts)
     os.makedirs(sPath, exist_ok=True)
     return sPath
 
@@ -2000,7 +2000,7 @@ def previewerRun(sEpub, sOut, sLabel):
 
 def enhancedTypesettingOk(sEpub, sLabel):
     """True, False or None: whether Kindle Previewer finds Enhanced Typesetting supported for this EPUB."""
-    dSummary, _, _ = previewerRun(sEpub, os.path.join(paths.temp(), "kindlePreviewerProbe"), sLabel)
+    dSummary, _, _ = previewerRun(sEpub, os.path.join(paths.work(), "kindlePreviewerProbe"), sLabel)
     sStatus = dSummary.get("Enhanced Typesetting Status", "").lower()
     return None if not sStatus else sStatus == "supported"
 
@@ -2016,7 +2016,7 @@ def probeEnhancedTypesetting(sEpub, dAudit):
     sOpfPath, sOpf, sBase, dItems, lSpine = kdpEpub.epubPaths(dData, lNames)
     dIdByHref = {h: i for i, (h, p) in dItems.items()}
     lDocs = [h for h in lSpine if h.endswith(".xhtml") and "title_page" not in h and "cover" not in h]
-    sVariant = os.path.join(paths.temp(), "kindlePreviewerProbe.epub")
+    sVariant = os.path.join(paths.work(), "kindlePreviewerProbe.epub")
     def write(dChanged, lKeep=None):
         sNewOpf = sOpf
         if lKeep is not None:
@@ -2080,7 +2080,7 @@ def runKindlePreviewer(sEpub, dAudit):
     if "kindlePreviewer" not in dTools:
         dAudit["warnings"].append("Kindle Previewer was not found or could not be installed, so Amazon's own conversion checks were not run; see the log.")
         return False
-    sOut = os.path.join(paths.temp(), "kindlePreviewer", dAudit["root"])
+    sOut = os.path.join(paths.work(), "kindlePreviewer", dAudit["root"])
     dSummary, lDetail, lProduced = previewerRun(sEpub, sOut, dAudit["root"])
     sKeep = os.path.join(os.path.dirname(sLogPath), "kindlePreviewer", dAudit["root"])
     shutil.rmtree(sKeep, ignore_errors=True)
@@ -2157,7 +2157,7 @@ def runAce(sEpub, dAudit):
     if "ace" not in dTools:
         dAudit["errors"].append("Ace by DAISY could not be installed, so accessibility was not checked; see the log.")
         return False
-    sOut = os.path.join(paths.temp(), "ace", dAudit["root"])
+    sOut = os.path.join(paths.work(), "ace", dAudit["root"])
     shutil.rmtree(sOut, ignore_errors=True)
     dAudit["aceReport"] = os.path.join(sOut, "report.html")
     iCode, sText = run([dTools["ace"], "--force", "--silent", "--outdir", sOut, sEpub], iTimeout=1800)

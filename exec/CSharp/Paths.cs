@@ -14,14 +14,14 @@
 //     s  scripts     scripts, add-ons and plugins that change behaviour later
 //     l  logs        one file per session
 //     r  results     what the program produced
-//     //     t  temp        scratch, deletable at the start of the next run
 //     t  templates   files a user copies and fills in
+//     w  work        scratch: what one run leaves, the next run deletes
 //
-// TWO t NAMES, AND THEY NEVER MEET. temp exists only in the per-user tree;
-// templates exists only in the installed tree. A listing therefore never holds
-// both, and first-letter navigation stays exact. The rule is worth keeping
-// deliberately: a temp folder under Program Files could not be written to
-// anyway, since that is the whole reason the per-user tree exists.
+// ONE LETTER, ONE FOLDER (1.203.0, his ruling of 11 November 2026). The scratch
+// folder was called temp, sharing its t with templates. Now t means templates and
+// nothing else, in both trees, and scratch is work: w was free. A new session may
+// delete whatever an earlier one left in work; clearWork does so once, at startup,
+// and also deletes a temp folder an older version left in the per-user tree.
 //
 // THREE TREES, AND WHAT EACH HOLDS.
 //
@@ -33,7 +33,7 @@
 //
 //   The PER-USER tree, %LOCALAPPDATA%\<App>, which the program owns and writes:
 //       <App>\configs  <App>\data  <App>\scripts  <App>\logs
-//       <App>\results  <App>\temp
+//       <App>\results  <App>\work
 //       No exec, no templates: those are shipped, not made.
 //
 //   The DEVELOPMENT folder, <App> on any drive and at any depth, stays flat. It is a git repository, and
@@ -50,7 +50,7 @@
 //     Paths.start("JobDo");
 //     string sInix = Paths.configFile("JobDo.inix");   // the user's, else the shipped one
 //     string sOut  = Paths.results();                  // where output goes
-//     Paths.clearTemp();                               // at startup, once
+//     Paths.clearWork();                               // at startup, once
 //
 // Nothing here throws. A folder that cannot be made comes back as a path that
 // does not exist, and the caller's own error handling deals with it.
@@ -130,7 +130,8 @@ public static class Paths
     public static string scripts() { return madeUnder(userFolder, "scripts"); }
     public static string logs() { return madeUnder(userFolder, "logs"); }
     public static string results() { return madeUnder(userFolder, "results"); }
-    public static string temp() { return madeUnder(userFolder, "temp"); }
+    public static string work() { return madeUnder(userFolder, "work"); }
+    public static string temp() { return work(); }   // the old name of work (1.203.0)
 
     // The shipped folders, read-only, never created here: a program that has to
     // create its own templates folder has no templates.
@@ -190,7 +191,8 @@ public static class Paths
         return sUser;
     }
 
-    // clearTemp: empty the temp folder, at startup, once.
+    // clearWork: empty the work folder, at startup, once, and delete the temp folder
+    // an older version kept beside it. clearTemp is its old name.
     //
     // Anything still in there is what a previous run could not clean up after
     // itself, which is exactly what the folder is for: a crash leaves its
@@ -259,19 +261,24 @@ public static class Paths
         return lsLines;
     }
 
-    public static int clearTemp()
+    public static int clearWork()
     {
         int iRemoved = 0;
         try
         {
-            DirectoryInfo oTemp = new DirectoryInfo(temp());
-            foreach (FileInfo oFile in oTemp.GetFiles())
+            DirectoryInfo oWork = new DirectoryInfo(work());
+            foreach (FileInfo oFile in oWork.GetFiles())
             {
                 try { oFile.Delete(); iRemoved++; } catch (Exception) { }
             }
-            foreach (DirectoryInfo oFolder in oTemp.GetDirectories())
+            foreach (DirectoryInfo oFolder in oWork.GetDirectories())
             {
                 try { oFolder.Delete(true); iRemoved++; } catch (Exception) { }
+            }
+            string sOld = Path.Combine(userFolder, "temp");
+            if (Directory.Exists(sOld))
+            {
+                try { Directory.Delete(sOld, true); iRemoved++; } catch (Exception) { }
             }
         }
         catch (Exception)
@@ -280,14 +287,18 @@ public static class Paths
         return iRemoved;
     }
 
-    // tempFile: a name inside temp that nothing else is using.
-    public static string tempFile(string sExtension)
+    public static int clearTemp() { return clearWork(); }   // the old name of clearWork (1.203.0)
+
+    // workFile: a name inside work that nothing else is using. tempFile is its old name.
+    public static string workFile(string sExtension)
     {
         if (sExtension == null) sExtension = ".tmp";
         if (!sExtension.StartsWith(".")) sExtension = "." + sExtension;
-        return Path.Combine(temp(), appName + "-" +
+        return Path.Combine(work(), appName + "-" +
             DateTime.Now.ToString("yyyyMMdd-HHmmss-fff") + sExtension);
     }
+
+    public static string tempFile(string sExtension) { return workFile(sExtension); }
 }
 
 } // namespace Homer (Paths.cs)

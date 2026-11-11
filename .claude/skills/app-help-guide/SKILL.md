@@ -38,28 +38,56 @@ Read `references/fence-faults.md` before writing a fence,
    this estate, and what is excluded — forums, translated editions, developer
    documentation, badge and profile pages, revision histories, the shop. Add the
    block to `makeHarvester.py` and generate the harvester.
-3. **Harvest.** The person with the network runs the harvester and sends back
-   its `.log` and its `.zip`. Read the log first: it says what was refused and
-   why, and a run that gathered nothing says so in one line.
-4. **Build.** Write a reader for that publisher's page shape in `buildGuide.py`,
-   run it, check the gates, and build the `.htm`, then finish it with the
-   homer-convert skill's `toHomerEncoding` -- the Homer encoding, and the title
-   said once where Pandoc's title block repeats the guide's first heading.
-   cleanFeedback does both when it rebuilds a page. The collection's ReadMe
+3. **Harvest.** The person with the network runs the harvester from the
+   collection's `scripts` folder and sends back the archive it writes to
+   `results`, which carries the run's log inside. Read the log first: it says
+   what was refused and why, and a run that gathered nothing says so in one line.
+4. **Build.** Write a reader for that publisher's page shape in `buildGuide.py`
+   and add the guide to its plan. In the collection, `build` (the first step of
+   build_release) then builds every guide whose harvest is newer than the guide,
+   runs the gates, and has the kit's fixPages build the `.htm` of each guide that
+   changed -- one level-one heading, the language, a main landmark, working links.
+   A gate failure fails the build, so nothing broken is pushed. The collection's ReadMe
    names its license: CC BY-SA 4.0 for the collection's own selection,
    arrangement and wording, while each guide's help text keeps its publisher's
    terms -- one sentence, kept whenever the ReadMe is rewritten.
 
+## Where things go: the Homer layout
+
+A collection of guides (C:\AppHelpGuides) keeps the Homer tree (11 November 2026):
+
+- **The guides,** each `.md` with its `.htm`, at the top, beside the ReadMe and
+  the License, with `build.cmd`, which runs `buildGuide --build`.
+- **`scripts`:** the harvesters makeHarvester wrote, each `get<Product>Help.py`
+  with its `.cmd`.
+- **`data\harvests\<Product>Help`:** the pages a harvester saved, with
+  `manifest.txt`. They stay between runs, because a run resumes over them and
+  the build reads them. Never pushed (LocalFiles.txt).
+- **`results\<Product>Help.zip`:** the archive to upload, with the run's log
+  inside. An output that may be moved away; nothing reads it again.
+- **`logs`:** one log per run, `<Collection>-<task>-yyyyMMdd-HHmmss.log`, in UTF-8
+  with a byte order mark and Windows line endings.
+
+The kit's scripts are run from the kit, never copied into the collection: copies
+only drift. The build settles an older collection once, logging every move:
+harvesters at the top go to `scripts`, harvest folders to `data\harvests`,
+harvest archives to `results`, logs to `logs`, and copies of the kit's scripts
+to `notes\retired`.
+
 ## Running the scripts
 
-    makeHarvester.cmd .            writes every configured harvester here
-    buildGuide.cmd harvests guides builds each guide from its harvest folder
-    cleanFeedback.cmd report       lists the furniture it would remove
-    cleanFeedback.cmd              removes it and rebuilds each .htm
-    getLlmsGuide.cmd [products]    gathers from llms.txt and builds, in one run
+    makeHarvester.cmd [folder] [products]   writes harvesters, by default into the collection's scripts
+    build                                   in the collection: settle, build changed guides, gate, make .htm
+    build GoodMaps                          rebuild one guide, as after its reader changes
+    buildGuide.cmd [harvests] [guides] [products] [--changed]   the same build by hand
+    cleanFeedback.cmd report                lists the furniture it would remove
+    cleanFeedback.cmd                       removes it and rebuilds each .htm
+    getLlmsGuide.cmd [products]             gathers from llms.txt and builds, in one run
 
-Each writes a debugging log beside itself: the environment, every setting, every
-address with its status, and the reason for anything not kept.
+Each writes a debugging log in the collection's logs folder: the environment,
+every setting, every address with its status, and the reason for anything not
+kept. A harvester sent to somebody on its own keeps its pages, archive and log
+beside itself.
 
 ## Conventions (do not deviate without reason)
 
@@ -123,7 +151,16 @@ address with its status, and the reason for anything not kept.
 - **Identical word counts across different addresses** mean the site is serving
   one shell. Stop guessing addresses.
 - **An estate can move house.** plainlanguage.gov now redirects to digital.gov;
-  the redirect looked like a dead estate and was a live one.
+  the redirect looked like a dead estate and was a live one. GoodMaps' HubSpot
+  knowledge base moved every article under `/migration/` between a probe and the
+  run (11 November 2026): the addresses the probe saw answered 404, and the
+  site map, read as a seed, found all of them. Seed a site map when there is one.
+- **An article's own heading can take an article's anchor.** Pandoc names
+  headings in the order it meets them, so a heading "Favorites" inside an earlier
+  article took the identifier the contents entry for the article "Favorites"
+  pointed to. The builder now gives such a heading an identifier of its own, and
+  computes anchors by Pandoc's rule: a leading digit goes ("2D Map View" is
+  `d-map-view`) and periods stay ("llama.cpp").
 - **Count what you leave out, and say it.** Every guide that drops material —
   translations, a changelog, an administrator's half, badge pages — says how
   many and why, in its preamble or its log.

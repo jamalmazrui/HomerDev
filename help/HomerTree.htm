@@ -1,0 +1,310 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.13" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Jamal Mazrui" />
+  <title>HomerTree</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      color: light-dark(#1a1a1a, #fdfdfd);
+      background-color: #fdfdfd;
+      background-color: light-dark(#fdfdfd, #1a1a1a);
+      color-scheme: light dark;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a, a:visited {
+      color: inherit;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid;
+      border-color: #e6e6e6;
+      border-color: light-dark(#e6e6e6, #4c4c4c);
+      color: #606060;
+      color: light-dark(#606060, #b6b6b6);
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid currentColor;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+    }
+    th {
+      border-top: 1px solid currentColor;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<p class="author">Jamal Mazrui</p>
+</header>
+<main>
+<h1 id="the-homer-tree">The Homer Tree</h1>
+<p>Every Homer project keeps the same folders and files, so you find
+anything by name, and one letter takes you to each folder. This page
+names each entry and says what it is for. The kit’s kind.py holds the
+same lists, and check fails a project that drifts from them.</p>
+<h2 id="rules">Rules</h2>
+<ul>
+<li><strong>One letter, one folder.</strong> No two top-level folders
+share a first letter, so first-letter navigation lands exactly.</li>
+<li><strong>No new folders unasked.</strong> A folder not named here
+goes to notes, unless the project’s RepoFiles.txt or LocalFiles.txt
+names it.</li>
+<li><strong>Subfolders are free.</strong> Nest inside a standard folder,
+such as dataor notes.</li>
+<li><strong>De facto names win.</strong> Where a tool or industry
+expects a name, such as .github, AGENTS.md or _config.yml, Homer uses
+it.</li>
+<li><strong>One source.</strong> A document, script or setting lives in
+one place. Kit tools are copied into a project’s scripts folder by its
+build, never edited there.</li>
+</ul>
+<h2 id="folders">Folders</h2>
+<ul>
+<li><strong>books:</strong> each book’s sources, one folder per book.
+Book projects only.</li>
+<li><strong>configs:</strong> settings that decide how a program or
+script starts, in .inix.</li>
+<li><strong>data:</strong> databases, seed data, and anything kept
+between sessions, such as data.</li>
+<li><strong>exec:</strong> the built program and its libraries. Apps and
+the kit only; never pushed.</li>
+<li><strong>help:</strong> every document besides the ReadMe and
+License: the guide, Developer, History, Hotkeys, tutorials.</li>
+<li><strong>logs:</strong> one log per run, named <Project>-
+<task>
+-yyyyMMdd-HHmmss.log; never pushed.</li>
+<li><strong>notes:</strong> files kept on this disk but never pushed or
+installed; tidy puts strays here, and notesholds what a build
+retired.</li>
+<li><strong>pages:</strong> one folder per GitHub Page. Pages projects
+only.</li>
+<li><strong>results:</strong> outputs, such as built books or harvest
+archives. Nothing reads them again, so they may be moved away.</li>
+<li><strong>scripts:</strong> scripts, add-ons and plugins: the
+project’s own and the kit tools its build refreshes.</li>
+<li><strong>templates:</strong> files a person copies and fills in. The
+only folder starting with t.</li>
+<li><strong>work:</strong> scratch. Each new session may delete what an
+earlier one left.</li>
+</ul>
+<p>Page projects may also have **_data<strong>,
+</strong>_includes<strong>, </strong>_layouts** and
+<strong>assets</strong>, the names GitHub Pages expects.</p>
+<h2 id="hidden-folders">Hidden folders</h2>
+<ul>
+<li><strong>.claude:</strong> skills and agents for Claude and other
+agents that read the same layout.</li>
+<li><strong>.claude-plugin:</strong> the plugin manifest that shares
+those skills.</li>
+<li><strong>.git:</strong> the repository.</li>
+<li><strong>.github:</strong> Copilot instructions and GitHub
+settings.</li>
+<li><strong>.vs, .vscode:</strong> an editor’s own state; never
+pushed.</li>
+</ul>
+<h2 id="files-at-the-top">Files at the top</h2>
+<ul>
+<li><strong>.gitattributes, .gitignore:</strong> git’s rules; tidy
+writes .gitignore from LocalFiles.txt.</li>
+<li><strong><App>.cs, <App>.py:</strong> an app’s source, named for its
+folder.</li>
+<li>**<App>.ico, <App>_setup.iss:** an app’s icon and installer
+script.</li>
+<li>**_config.yml:** a GitHub Page’s site settings. Page projects
+only.</li>
+<li><strong>ACCESSIBILITY.md:</strong> the accessibility statement
+GitHub shows as a tab.</li>
+<li><strong>AGENTS.md, CLAUDE.md, GEMINI.md, llms.txt:</strong> what AI
+agents read first, by each tool’s convention.</li>
+<li><strong>build.cmd:</strong> an app’s or the kit’s build. Other
+projects have none; the kit builds them by role.</li>
+<li><strong>build_release.bat:</strong> the cycle: build, tidy, push,
+release.</li>
+<li><strong>KeepEncoding.txt:</strong> files fixEncoding leaves as they
+are.</li>
+<li><strong>License.md, License.htm:</strong> the license: MIT for code,
+CC BY-SA 4.0 for writing.</li>
+<li><strong>LocalFiles.txt:</strong> what belongs on this disk but never
+in the repository.</li>
+<li><strong>ReadMe.md, ReadMe.htm:</strong> the quick start.</li>
+<li><strong>RepoFiles.txt:</strong> what push puts on GitHub; tidy needs
+it to know what belongs.</li>
+<li><strong>version.txt:</strong> an app’s or the kit’s version.</li>
+</ul>
+<p>A collection’s documents, each .md with its .htm, sit at the top too.
+So does a page project’s own page, <Folder>.md.</p>
+<h2 id="kinds-and-roles">Kinds and roles</h2>
+<ul>
+<li><strong>app:</strong> builds a program and its installer; releases
+on GitHub.</li>
+<li><strong>books:</strong> MyBooks; builds with buildBooks, releases
+with kdpSubmit.</li>
+<li><strong>guides:</strong> AppHelpGuides; builds changed guides; the
+push publishes them.</li>
+<li><strong>kit:</strong> HomerDev; builds, checks and releases
+itself.</li>
+<li><strong>pages:</strong> MyPages; nothing to compile; releases with
+post.</li>
+<li><strong>podcasts:</strong> PodcastDirectories; rebuilds changed
+pages; the push publishes them.</li>
+</ul>
+<h2 id="the-two-installed-trees">The two installed trees</h2>
+<ul>
+<li><strong>%ProgramFiles%\<App>:</strong> configs, data, exec, help,
+scripts, templates, and the ReadMe and License. Read-only.</li>
+<li><strong>%LOCALAPPDATA%\<App>:</strong> configs, data, logs, results,
+scripts, work. The program writes only here, never under %APPDATA%.</li>
+</ul>
+</main>
+</body>
+</html>

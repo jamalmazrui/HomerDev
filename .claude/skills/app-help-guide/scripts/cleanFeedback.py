@@ -34,7 +34,7 @@ RUN IT WITH NO ARGUMENTS to clean the folder it sits in. Run it with the word
 report to list what it WOULD remove and change nothing.
 """
 
-import io, logging, os, platform, re, shutil, subprocess, sys
+import io, logging, os, platform, re, shutil, subprocess, sys, time
 
 iAnswerWindow = 3
 lAnswers = ["yes", "no", "yes no", "disappointed", "neutral", "smiley",
@@ -67,14 +67,20 @@ lAfterwards = [
     ("HelpDocs", "we appreciate your effort and will try to fix the article"),
 ]
 lCounts = [r"^\d+ out of \d+ found this helpful$", r"^\d+ of \d+ people found this helpful$"]
-sLogName = "cleanFeedback.log"
 
 
 def startLog():
-    sHere = os.path.dirname(os.path.abspath(__file__))
-    sPath = os.path.join(sHere, sLogName)
-    logging.basicConfig(filename=sPath, filemode="w", level=logging.INFO,
-                        format="%(asctime)s %(levelname)s %(message)s", encoding="utf-8", errors="backslashreplace")
+    """THE COLLECTION'S LOGS FOLDER (1.203.0): logs\\<Collection>-cleanFeedback-yyyyMMdd-HHmmss.log in the folder it
+    cleans, the current one, in UTF-8 with a byte order mark and Windows line endings. Version 1 wrote a fixed-name
+    log beside itself and cleaned the guides beside itself, so it had to be copied into the collection."""
+    sRoot = os.getcwd()
+    sLogs = os.path.join(sRoot, "logs")
+    os.makedirs(sLogs, exist_ok=True)
+    sPath = os.path.join(sLogs, "%s-cleanFeedback-%s.log" % (os.path.basename(sRoot.rstrip("\\/")) or "Guides", time.strftime("%Y%m%d-%H%M%S")))
+    oHandler = logging.StreamHandler(io.open(sPath, "w", encoding="utf-8-sig", newline="\r\n", errors="backslashreplace"))
+    oHandler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+    logging.getLogger().addHandler(oHandler)
+    logging.getLogger().setLevel(logging.INFO)
     logging.info("cleanFeedback.py running under Python %s on %s", platform.python_version(), platform.platform())
     logging.info("script at %s, working directory %s", os.path.abspath(__file__), os.getcwd())
     logging.info("command line: %s", " ".join(sys.argv))
@@ -237,7 +243,7 @@ def rebuildPage(sMarkdownPath):
 def main():
     sLogPath = startLog()
     bReportOnly = len(sys.argv) > 1 and sys.argv[1].lower().startswith("report")
-    sFolder = os.path.dirname(os.path.abspath(__file__))
+    sFolder = os.getcwd()
     logging.info("folder %s, report only %s", sFolder, bReportOnly)
     lNames = sorted(s for s in os.listdir(sFolder) if s.lower().endswith(".md"))
     iFiles, iLines, iRebuilt = 0, 0, 0

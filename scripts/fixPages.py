@@ -1,9 +1,12 @@
-﻿"""fixPages.py version 4 -- the kit's page finisher for a collection: help guides, podcast directories, any folder of
+﻿"""fixPages.py version 5 -- the kit's page finisher for a collection: help guides, podcast directories, any folder of
 .md pages and the .htm pages built from them.
 
     fixPages [folder]            rebuild each .htm from its .md, then finish it; finish any .htm that has no .md
     fixPages [folder] --pages    finish the .htm pages as they are, rebuilding nothing (fast; works on a repository
                                  that holds only the published pages)
+    fixPages [folder] --changed  rebuild and finish only the .md pages newer than their .htm, or with none (version 5,
+                                 11 November 2026: a collection's build calls it so, after building its guides, and a
+                                 page nobody changed is left exactly as it was)
 
 WHERE IT CAME FROM. Version 3 lived in AppHelpGuides and gave every page one level-one heading. Audits of the help
 guides and the podcast directories on 12 October 2026 found what it did not touch: pages with no language, no main
@@ -23,7 +26,7 @@ THE LOG is logs\\<Collection>-fixPages-<date>-<time>.log in the collection, with
 
 import datetime, importlib.util, io, os, platform, re, shutil, subprocess, sys
 
-sVersion = "2026-10-12 version 4: the kit's finisher; language, landmark, IDs, links; titles from the page itself"
+sVersion = "2026-11-11 version 5: --changed rebuilds only the pages whose .md is newer; version 4 the kit's finisher"
 sLogPath = ""
 
 
@@ -119,6 +122,7 @@ def residue(sHtml, setLocal):
 def main(lsArgs):
     global sLogPath
     bPagesOnly = "--pages" in lsArgs
+    bChangedOnly = "--changed" in lsArgs and not bPagesOnly
     lsFolders = [s for s in lsArgs if not s.startswith("--")]
     sFolder = os.path.abspath(lsFolders[0] if lsFolders else os.getcwd())
     sCollection = os.path.basename(sFolder.rstrip("\\/")) or "Pages"
@@ -126,7 +130,7 @@ def main(lsArgs):
     sLogPath = os.path.join(sFolder, "logs", "%s-fixPages-%s.log" % (sCollection, datetime.datetime.now().strftime("%Y%m%d-%H%M%S")))
     log("fixPages.py started; %s; script %s" % (sVersion, os.path.abspath(__file__)))
     log("Python %s at %s on %s; cwd %s; command line %s" % (platform.python_version(), sys.executable, platform.platform(), os.getcwd(), " ".join(sys.argv)))
-    log("Settings: folder %s; pages only %s" % (sFolder, bPagesOnly))
+    log("Settings: folder %s; pages only %s; changed only %s" % (sFolder, bPagesOnly, bChangedOnly))
     oRules = loadRules()
     dFixes = readFixes(sFolder)
     sPandoc = "" if bPagesOnly else findPandoc()
@@ -137,6 +141,14 @@ def main(lsArgs):
     lsMarkdown = [] if bPagesOnly else sorted(s for s in os.listdir(sFolder) if s.lower().endswith(".md"))
     setFromMarkdown = {s[:-3].lower() + ".htm" for s in lsMarkdown}
     lsPages = sorted(s for s in os.listdir(sFolder) if s.lower().endswith(".htm") and s.lower() not in setFromMarkdown)
+    if bChangedOnly:
+        def isChanged(sName):
+            sHtm = os.path.join(sFolder, sName[:-3] + ".htm")
+            return not os.path.isfile(sHtm) or os.path.getmtime(os.path.join(sFolder, sName)) > os.path.getmtime(sHtm)
+        iAll = len(lsMarkdown)
+        lsMarkdown = [sName for sName in lsMarkdown if isChanged(sName)]
+        lsPages = []
+        log("changed only: %d of %d .md pages are newer than their .htm" % (len(lsMarkdown), iAll))
     iTotal = len(lsMarkdown) + len(lsPages)
     say("%d page%s to %s in %s" % (iTotal, "" if iTotal == 1 else "s", "finish" if bPagesOnly else "rebuild and finish", sFolder))
     dChanges, dResidue, lsFailed = {}, {}, []

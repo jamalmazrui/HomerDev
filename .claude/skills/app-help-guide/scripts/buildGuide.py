@@ -1,10 +1,27 @@
-﻿"""buildGuide.py version 1
+﻿r"""buildGuide.py version 2
 
 Turns a folder of harvested pages into one help guide: a Markdown file and its
 HTML pair.
 
-HOW TO USE IT. Run it with the folder holding the harvests and the folder to
-write guides into: buildGuide.cmd harvests guides
+HOW TO USE IT. A collection's own build runs it (version 2, 11 November 2026):
+
+    build                          C:\AppHelpGuides\build.cmd, the first step of build_release
+    buildGuide --build <collection>      what that build.cmd runs
+
+and by hand:
+
+    buildGuide [harvests] [guides] [products...] [--changed]
+
+With --build, the collection's harvests are its data\harvests folder and its guides
+are at its top. The build first settles the old layout into the Homer one, then
+builds every guide whose harvest is newer than the guide, then has the kit's
+fixPages build the .htm of every guide that changed. Each run writes its own log,
+logs\<Collection>-buildGuide-<stamp>.log, in UTF-8
+with a byte order mark and Windows line endings. A gate failure fails the run, so
+build_release stops before anything is pushed.
+
+Naming products builds only those, by product name or guide file name, and always
+rebuilds them, so "build GoodMaps" brings a guide up to date after its reader changes.
 
 Each product has a reader function here that knows the shape of that
 publisher's pages — where the article's body is, where its title is, and how
@@ -17,12 +34,11 @@ THE GUIDE FORMAT, THE CATEGORY RULES AND THE GATES are in
 references/guide-format.md.
 """
 
-import html, html.parser, io, json, logging, os, platform, re, sys, urllib.parse
+import html, html.parser, io, json, logging, os, platform, re, shutil, subprocess, sys, time, urllib.parse
 
 iMinCategory = 2
 sBom = "\ufeff"
 sEncoding = "utf-8-sig"
-sLogName = "buildMagazines.log"
 sMiscellaneous = "Miscellaneous"
 sNewLine = "\r\n"
 
@@ -372,9 +388,17 @@ def sortKeyCategory(sCategory):
 
 
 def makeAnchor(sTitle):
-    """Builds the Pandoc anchor for a heading."""
-    sAnchor = re.sub(r"[^\w\s-]", "", sTitle.lower(), flags=re.U)
-    return re.sub(r"\s+", "-", sAnchor.strip())
+    """Builds the anchor Pandoc gives a heading.
+
+    PANDOC'S OWN RULE (version 2, 11 November 2026): letters, digits, _ - and . are kept, spaces become hyphens, and
+    everything before the first letter goes. Version 1 kept a leading digit and dropped every period, so the contents
+    entries for "2D Map View" (GoodMaps) and "Setting up llama.cpp" (AI Content Describer) linked to anchors Pandoc
+    never made. The gates compared the contents with this same function, so they could not see it; fixPages counted
+    such links as "in-page links to nothing" in the finished page."""
+    sAnchor = re.sub(r"[^\w\s.-]", "", sTitle.lower(), flags=re.U)
+    sAnchor = re.sub(r"\s+", "-", sAnchor.strip())
+    iFirst = next((i for i, sCharacter in enumerate(sAnchor) if sCharacter.isalpha()), len(sAnchor))
+    return sAnchor[iFirst:] or "section"
 
 
 def readManifest(sFolder):
@@ -2434,6 +2458,28 @@ def dropDeveloperMaterial(lArticles, sOutputPath):
     return lKept
 
 
+def uniqueSubheadings(lLines, sArticleAnchor, setArticleAnchors):
+    """Gives an article's own heading an identifier of its own when Pandoc would otherwise give it an article's.
+
+    A CONTENTS ENTRY MUST LAND ON ITS ARTICLE (version 2, 11 November 2026). GoodMaps' "Building & Destination
+    Information Cards" has a heading "Favorites" of its own, and comes before the article "Favorites", so Pandoc gave
+    the first one the identifier "favorites" and the contents entry jumped to the wrong place. A heading inside an
+    article whose identifier an article would have is now written with an explicit one, the article's identifier
+    first ("building-destination-information-cards-favorites"), which Pandoc keeps as it is."""
+    lOut, iFence = [], 0
+    for sLine in lLines:
+        oFence = re.match(r"\s*(`{3,})", sLine)
+        if oFence:
+            iRun = len(oFence.group(1))
+            if not iFence: iFence = iRun
+            elif iRun >= iFence: iFence = 0
+        oHeading = None if iFence else re.match(r"^(#{4,6}) (.+?)\s*$", sLine)
+        if oHeading and makeAnchor(oHeading.group(2)) in setArticleAnchors and not oHeading.group(2).endswith("}"):
+            sLine = "%s %s {#%s-%s}" % (oHeading.group(1), oHeading.group(2), sArticleAnchor, makeAnchor(oHeading.group(2)))
+        lOut.append(sLine)
+    return lOut
+
+
 def buildGuide(sProduct, sTitle, sPreamble, lArticles, sOutputPath):
     """Writes one guide and returns its text."""
     # Disambiguate BEFORE folding small categories, not after: folding moves
@@ -2455,6 +2501,7 @@ def buildGuide(sProduct, sTitle, sPreamble, lArticles, sOutputPath):
         for sArticleTitle, lBody in sorted(dCategories[sCategory], key=lambda tItem: sortKeyTitle(tItem[0])):
             lLines.append("    - [" + sArticleTitle + "](#" + makeAnchor(sArticleTitle) + ")")
     lLines.append("")
+    setArticleAnchors = {makeAnchor(sArticleTitle) for sCategory in dCategories for sArticleTitle, lBody in dCategories[sCategory]}
     for sCategory in sorted(dCategories, key=sortKeyCategory):
         lLines.append("## " + sCategory)
         lLines.append("")
@@ -2467,7 +2514,7 @@ def buildGuide(sProduct, sTitle, sPreamble, lArticles, sOutputPath):
             lClean = list(renumberHeadings(balanceFences(lBody)))
             while lClean and not lClean[0].strip(): lClean.pop(0)
             if lClean and lClean[0].strip().lower() == sArticleTitle.strip().lower(): lClean.pop(0)
-            lLines.extend(lClean)
+            lLines.extend(uniqueSubheadings(lClean, makeAnchor(sArticleTitle), setArticleAnchors))
             lLines.append("")
     lFlat = []
     for sLine in dropLitter(lLines): lFlat.extend(sLine.replace("\r\n", "\n").split("\n"))
@@ -2775,16 +2822,272 @@ def readWinlink(sFolder):
     return lArticles
 
 
+
+# GOODMAPS AND AI CONTENT DESCRIBER (11 November 2026).
+
+def allBalanced(sMarkup, sPattern, sTag):
+    """Every element matching sPattern, in order, brackets balanced."""
+    lOut, iAt, oPattern = [], 0, re.compile(sPattern, re.I)
+    while True:
+        oMatch = oPattern.search(sMarkup, iAt)
+        if not oMatch: return lOut
+        sBlock = findBalanced(sMarkup[oMatch.start():], sPattern, sTag)
+        lOut.append(sBlock)
+        iAt = oMatch.start() + max(len(sBlock), 1)
+
+
+def sourceOf(sFolder, sName, sMarkup, dManifest):
+    """A saved page's own address: from the manifest, else from a source comment at its top."""
+    if sName in dManifest: return dManifest[sName]
+    oSource = re.match(r"\s*<!-- source: (\S+) -->", sMarkup)
+    return oSource.group(1) if oSource else ""
+
+
+def readGoodMaps(sFolder):
+    """GoodMaps' HubSpot knowledge base. The article is the page's article-wrapper: its h1 is the title, its first
+    h2 a one-line summary kept as an italic lead, and its rich-text fields the body. The trail above the article
+    (ol.hs-kb-breadcrumbs) names the product and the section; the section is the category.
+
+    HubSpot draws some section headings as large bold text in a div of its own ("Highlights & Specifications");
+    those become real headings. Kept: the navigation app's own articles and "What is GoodMaps?". Set aside, and
+    counted in the log: GoodMaps Studio, the mapping service, the lidar scanner, the client FAQ addressed to venue
+    customers, and the sales page for venues -- all written for the buildings that host GoodMaps, not its users."""
+    dManifest = readManifest(sFolder)
+    lArticles, lSetAside = [], []
+    for sName in sorted(os.listdir(sFolder)):
+        if not sName.lower().endswith((".html", ".htm")): continue
+        sMarkup = readText(os.path.join(sFolder, sName))
+        sWrapper = findBalanced(sMarkup, r'<div[^>]*class="[^"]*\barticle-wrapper\b', "div")
+        oTitle = re.search(r"(?is)<h1[^>]*>(.*?)</h1>", sWrapper)
+        if not oTitle: continue
+        sTitle = stripTags(oTitle.group(1))
+        sCrumbs = findBalanced(sMarkup, r'<ol[^>]*class="[^"]*hs-kb-breadcrumbs', "ol")
+        lCrumbs = [stripTags(sCrumb) for sCrumb in re.findall(r"(?is)<li[^>]*>(.*?)</li>", sCrumbs)][1:]
+        bApp = lCrumbs[:1] == ["GoodMaps Navigation App"] and "client faq" not in sTitle.lower()
+        bIntro = lCrumbs[:1] == ["Products and Services"] and sTitle.lower() == "what is goodmaps?"
+        if not (bApp or bIntro):
+            lSetAside.append(" > ".join(lCrumbs) + ": " + sTitle)
+            continue
+        sCategory = lCrumbs[1] if bApp and len(lCrumbs) > 1 else "About GoodMaps"
+        oLead = re.search(r"(?is)<h2[^>]*inline_text_field[^>]*>(.*?)</h2>", sWrapper)
+        sLead = stripTags(oLead.group(1)) if oLead else ""
+        sBody = "".join(allBalanced(sWrapper, r'<div[^>]*class="[^"]*hs_cos_wrapper_type_(?:inline_richtext_field|rich_text)\b', "div"))
+        # The bold text stands alone in a div or a paragraph, sometimes after a no-break space.
+        sBody = re.sub(r'(?is)<(div|p)[^>]*>(?:\s|&nbsp;)*<span[^>]*style="[^"]*(?:font-size[^"]*font-weight:\s*bold|font-weight:\s*bold[^"]*font-size)[^"]*"[^>]*>(.*?)</span>(?:\s|&nbsp;)*</\1>',
+                       r"<h3>\2</h3>", sBody)
+        lBody = toMarkdown(sBody, 0, sourceOf(sFolder, sName, sMarkup, dManifest))
+        if len(" ".join(lBody).split()) < 20: continue
+        if sLead: lBody = ["*" + sLead + ("" if sLead[-1:] in ".!?" else ".") + "*", ""] + lBody
+        lArticles.append((sCategory, sTitle, lBody))
+    logging.info("GoodMaps: %d articles kept, %d set aside as written for venues", len(lArticles), len(lSetAside))
+    for sSetAside in lSetAside: logging.info("    set aside: %s", sSetAside)
+    return lArticles
+
+
+def splitMarkdown(lLines, sMarker):
+    """Splits Markdown lines at headings of one level, outside fenced code: (lead lines, [(title, lines)])."""
+    lLead, lSections, iFence = [], [], 0
+    for sLine in lLines:
+        oFence = re.match(r"\s*(`{3,})", sLine)
+        if oFence:
+            iRun = len(oFence.group(1))
+            if not iFence: iFence = iRun
+            elif iRun >= iFence: iFence = 0
+        oHeading = None if iFence else re.match(r"^" + re.escape(sMarker) + r" (.+?)\s*$", sLine)
+        if oHeading: lSections.append((oHeading.group(1).strip(), []))
+        elif lSections: lSections[-1][1].append(sLine)
+        else: lLead.append(sLine)
+    return lLead, lSections
+
+
+def readAiContentDescriber(sFolder):
+    """AI Content Describer's manual is its GitHub readme, one Markdown file. Its level-two sections are articles, and
+    so are the level-three ones under Getting started and Usage, one for each AI service and each way of working.
+    Set aside, as written for people changing the add-on's code: Building the add-on, How to translate? and
+    Contributions."""
+    lFiles = [s for s in sorted(os.listdir(sFolder)) if "readme" in s.lower()]
+    if not lFiles: return []
+    sText = readText(os.path.join(sFolder, lFiles[0])).replace("\r\n", "\n")
+    sText = re.sub(r"^\s*<!-- source:.*?-->\s*\n", "", sText)
+    # A link whose words are its own address takes the words before the colon instead; a sample address in
+    # quotation marks is an example to type, so it reads as code.
+    sText = re.sub(r"(\w[\w -]{0,60}): \[(https?://[^\]]+)\]\(\2\)", r"[\1](\2)", sText)
+    sText = re.sub(r'"(https?://localhost[^"]*)"', r"`\1`", sText)
+    lLines = [sLine.rstrip() for sLine in sText.split("\n")]
+    while lLines and not lLines[0].strip(): lLines.pop(0)
+    if lLines and lLines[0].startswith("# "): lLines.pop(0)
+    lIntro, lSections = splitMarkdown(lLines, "##")
+    dSections = dict(lSections)
+    lSetAside = [s for s in ("Building the add-on", "How to translate?", "Contributions") if s in dSections]
+    lArticles = [("About the add-on", "What it does", lIntro)]
+    for sName in ("Features", "Use case", "Models"):
+        if sName in dSections: lArticles.append(("About the add-on", sName, dSections[sName]))
+    for sParent, sCategory in (("Getting started", "Setting up a model"), ("Usage", "Using the add-on")):
+        if sParent not in dSections: continue
+        lLead, lSubsections = splitMarkdown(dSections[sParent], "###")
+        lArticles.append((sCategory, sParent, lLead))
+        for sTitle, lBody in lSubsections: lArticles.append((sCategory, sTitle.rstrip(":"), lBody))
+    if "Dependencies" in dSections: lArticles.append(("Using the add-on", "Dependencies", dSections["Dependencies"]))
+    logging.info("AI Content Describer: %d articles from %s; set aside as developer material: %s",
+                 len(lArticles), lFiles[0], ", ".join(lSetAside) or "none")
+    return lArticles
+
+
+# THE HOMER LAYOUT FOR A COLLECTION OF GUIDES (version 2, 11 November 2026).
+#
+# Before, every harvester wrote its pages, its archive and a fixed-name log beside itself, so a collection's top
+# filled with get*Help scripts, harvest folders, archives and logs, and copies of kit scripts. The build settles that
+# once, logging every move and never overwriting: harvesters go to scripts; harvest folders to data\harvests, which
+# the builder reads and a harvester resumes over; harvest archives to results, an output; logs to logs; and copies
+# of the kit's own scripts, which only drift, to notes\retired. Guides, the ReadMe, the License and the project's own
+# files are left where they are.
+
+lsHomerFolders = ["configs", "data", "help", "logs", "notes", "results", "scripts", "templates"]
+lsKitScripts = ["buildguide", "buildmagazines", "buildnewguides", "checkguides", "cleanfeedback", "fixpages",
+                "getllmsguide", "makeharvester"]
+lsLocalLines = ["data/harvests/", "results/"]
+lsRepoLines = ["scripts/"]
+
+
+def moveInto(sSource, sFolder, lMoves):
+    """Moves one file or folder into sFolder without overwriting: a name already there gains -2, -3 and so on."""
+    os.makedirs(sFolder, exist_ok=True)
+    sName = os.path.basename(sSource)
+    sTarget = os.path.join(sFolder, sName)
+    iNext = 2
+    while os.path.exists(sTarget):
+        sStem, sExtension = os.path.splitext(sName)
+        sTarget = os.path.join(sFolder, "%s-%d%s" % (sStem, iNext, sExtension))
+        iNext += 1
+    shutil.move(sSource, sTarget)
+    lMoves.append((sSource, sTarget))
+    logging.info("MOVED %s -> %s", sSource, sTarget)
+    return sTarget
+
+
+def ensureLines(sPath, lsWanted, lsUnwanted, sHeader):
+    """Adds each wanted line a list file lacks, and removes each unwanted one. Creates the file only when sHeader is
+    given. Returns a short account for the log, or "" when nothing changed."""
+    if not os.path.isfile(sPath):
+        if not sHeader: return ""
+        sText = ""
+    else:
+        sText = io.open(sPath, "rb").read().decode("utf-8-sig", errors="replace").replace("\r\n", "\n")
+    lLines = sText.split("\n") if sText else []
+    lsHave = [sLine.strip().replace("\\", "/").lower() for sLine in lLines]
+    lAdded = [sWanted for sWanted in lsWanted if sWanted.lower() not in lsHave]
+    lKept = [sLine for sLine in lLines if sLine.strip().replace("\\", "/").lower() not in [s.lower() for s in lsUnwanted]]
+    lRemoved = len(lLines) - len(lKept)
+    if not lAdded and not lRemoved: return ""
+    if not lLines and sHeader: lKept = sHeader.split("\n")
+    while lKept and not lKept[-1].strip(): lKept.pop()
+    sOut = "\n".join(lKept + lAdded) + "\n"
+    io.open(sPath, "wb").write(b"\xef\xbb\xbf" + sOut.replace("\n", "\r\n").encode("utf-8"))
+    return "%s: added %s; removed %d line%s" % (os.path.basename(sPath), ", ".join(lAdded) or "nothing", lRemoved, "" if lRemoved == 1 else "s")
+
+
+def settleLayout(sRoot):
+    """Moves an older collection's loose files into the Homer folders. Returns the list of (source, target)."""
+    lMoves, lsRetired = [], []
+    for sName in sorted(os.listdir(sRoot)):
+        sPath = os.path.join(sRoot, sName)
+        sLower = sName.lower()
+        sStem, sExtension = os.path.splitext(sLower)
+        if os.path.isdir(sPath):
+            if sName.startswith(".") or sLower in lsHomerFolders: continue
+            if os.path.isfile(os.path.join(sPath, "manifest.txt")) or re.match(r"^.+(help|faqs|guide)\d*$", sLower):
+                sHarvests = os.path.join(sRoot, "data", "harvests")
+                sTarget = os.path.join(sHarvests, sName)
+                if not os.path.exists(sTarget):
+                    moveInto(sPath, sHarvests, lMoves)
+                    continue
+                # A later harvest of the same estate already lives in data\harvests: its pages win, and any page only
+                # the older folder holds joins them.
+                for sFile in sorted(os.listdir(sPath)):
+                    if not os.path.exists(os.path.join(sTarget, sFile)): moveInto(os.path.join(sPath, sFile), sTarget, lMoves)
+                if not os.listdir(sPath): os.rmdir(sPath)
+                else: moveInto(sPath, os.path.join(sRoot, "notes", "retired"), lMoves)
+            continue
+        if sExtension in (".py", ".cmd") and sStem in lsKitScripts:
+            moveInto(sPath, os.path.join(sRoot, "notes", "retired"), lMoves)
+            lsRetired.append(sName)
+        elif sExtension in (".py", ".cmd") and sLower.startswith("get"):
+            sScripts = os.path.join(sRoot, "scripts")
+            if os.path.exists(os.path.join(sScripts, sName)):
+                moveInto(sPath, os.path.join(sRoot, "notes", "retired"), lMoves)
+                lsRetired.append(sName)
+            else:
+                moveInto(sPath, sScripts, lMoves)
+                lsRetired.append(sName)
+        elif sExtension == ".log":
+            moveInto(sPath, os.path.join(sRoot, "logs"), lMoves)
+        elif sExtension == ".zip" and re.match(r"^.+(help|faqs)\d*(_part\d+)?\.zip$", sLower) and not sLower.endswith("_guide.zip"):
+            moveInto(sPath, os.path.join(sRoot, "results"), lMoves)
+    sLocal = ensureLines(os.path.join(sRoot, "LocalFiles.txt"), lsLocalLines, [],
+                         "# LocalFiles.txt -- what belongs to this collection on this disk, but never in the repository.\n"
+                         "# Harvested pages are kept in data\\harvests for the next build; harvest archives are outputs.")
+    if sLocal: logging.info("SETTLED %s", sLocal)
+    sRepo = ensureLines(os.path.join(sRoot, "RepoFiles.txt"), lsRepoLines, lsRetired, "")
+    if sRepo: logging.info("SETTLED %s", sRepo)
+    return lMoves
+
+
+def startLog(sRoot, sCollection, sTask):
+    """Opens this run's log, logs\\<Collection>-<task>-<stamp>.log, in UTF-8 with a byte order mark and Windows line
+    endings, and returns its path."""
+    sLogs = os.path.join(sRoot, "logs")
+    os.makedirs(sLogs, exist_ok=True)
+    sStamp = time.strftime("%Y%m%d-%H%M%S")
+    sLogPath = os.path.join(sLogs, "%s-%s-%s.log" % (sCollection, sTask, sStamp))
+    iSame = 2
+    while os.path.exists(sLogPath):
+        sLogPath = os.path.join(sLogs, "%s-%s-%s-%d.log" % (sCollection, sTask, sStamp, iSame))
+        iSame += 1
+    oHandler = logging.StreamHandler(io.open(sLogPath, "w", encoding="utf-8-sig", newline="\r\n", errors="backslashreplace"))
+    oHandler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+    logging.getLogger().addHandler(oHandler)
+    logging.getLogger().setLevel(logging.INFO)
+    return sLogPath
+
+
+def newestTime(sFolder):
+    """The latest modification time of any file in a folder, or 0."""
+    nNewest = 0.0
+    for sDir, lDirs, lFiles in os.walk(sFolder):
+        for sFile in lFiles: nNewest = max(nNewest, os.path.getmtime(os.path.join(sDir, sFile)))
+    return nNewest
+
+
+def kitFolder():
+    """The kit this script belongs to: scripts -> app-help-guide -> skills -> .claude -> the kit."""
+    return os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", ".."))
+
+
 def main():
-    """Builds the magazine guides and reports what passed."""
-    sScriptDir = os.path.dirname(os.path.abspath(__file__))
-    logging.basicConfig(filename=os.path.join(sScriptDir, "buildMagazines.log"), filemode="w", level=logging.INFO,
-                        format="%(asctime)s %(levelname)s %(message)s")
-    sParent = sys.argv[1] if len(sys.argv) > 1 else "."
-    sOutput = sys.argv[2] if len(sys.argv) > 2 else "."
-    logging.info("buildMagazines.py version 1; script %s", os.path.abspath(__file__))
-    logging.info("Python %s on %s; working directory %s", platform.python_version(), platform.platform(), os.getcwd())
-    logging.info("harvests under %s; output to %s", os.path.abspath(sParent), os.path.abspath(sOutput))
+    """Builds the guides whose harvests are here, gates each one, and reports what passed."""
+    lArgs = sys.argv[1:]
+    bBuild = "--build" in lArgs
+    bChanged = bBuild or "--changed" in lArgs
+    lPlain = [s for s in lArgs if not s.startswith("--")]
+    if bBuild:
+        sOutput = os.path.abspath(lPlain[0] if lPlain else os.getcwd())
+        sParent = os.path.join(sOutput, "data", "harvests")
+        lOnly = lPlain[1:]
+    else:
+        sOutput = os.path.abspath(lPlain[1] if len(lPlain) > 1 else ".")
+        sHarvests = os.path.join(sOutput, "data", "harvests")
+        sParent = os.path.abspath(lPlain[0]) if lPlain else (sHarvests if os.path.isdir(sHarvests) else os.path.abspath("."))
+        lOnly = lPlain[2:]
+    sCollection = os.path.basename(sOutput.rstrip("\\/")) or "Guides"
+    sLogPath = startLog(sOutput, sCollection, "buildGuide")
+    logging.info("buildGuide.py version 2; script %s", os.path.abspath(__file__))
+    logging.info("Python %s at %s on %s; working directory %s; command line %s", platform.python_version(), sys.executable,
+                 platform.platform(), os.getcwd(), " ".join(sys.argv))
+    logging.info("settings: build %s; changed only %s; harvests %s; guides %s; products %s", bBuild, bChanged, sParent,
+                 sOutput, ", ".join(lOnly) or "all")
+    if bBuild:
+        lMoves = settleLayout(sOutput)
+        if lMoves: print("Settled the Homer layout: %d item%s moved; the log names each." % (len(lMoves), "" if len(lMoves) == 1 else "s"))
     lPlan = [
         ("The Atlantic", "AtlanticHelp", readZendesk, "Atlantic.md", "The Atlantic help",
          "This guide holds The Atlantic's own reader help, gathered from the publisher's own listing on 18 August 2026, so every article arrived with its title, its section and its body. It covers subscriptions, accounts, apps, newsletters and the archive rather than The Atlantic's journalism."),
@@ -3016,12 +3319,40 @@ def main():
         # INTERNET RADIO (3 November 2026)
         ("Shoutcast", "ShoutcastHelp", readZendesk, "Shoutcast.md", "Shoutcast help",
          "This guide holds Shoutcast's own help centre, gathered from the publisher's own listing: the Shoutcast directory, the Radio Manager where a station is listed and earns, and the Shoutcast server software. The categories are Shoutcast's own sections. RadioTrail, DbDo's radio template, draws its stations from Radio Browser and SomaFM; Shoutcast's directory needs a developer key to read."),
+        # ASSISTIVE APPS FROM NO SIGHT REQUIRED (11 November 2026)
+        ("GoodMaps", "GoodMapsHelp", readGoodMaps, "GoodMaps.md", "GoodMaps help",
+         "This guide holds the official help for GoodMaps, the free indoor navigation app for iPhone and Android, gathered from the GoodMaps knowledge base on 11 November 2026. The categories are the knowledge base's own sections.\r\n\r\nMost parts of the app have two articles: a short how-to under Getting Started, and a fuller description under Features, often comparing the current app with version 1.0 and ending with a few questions and answers. GoodMaps finds where you are in a building through your phone's camera, so several articles explain how to hold the phone and why the app needs camera access. The help is written for every user, sighted and blind, and in places describes the visual map.\r\n\r\nLeft out on purpose: the pages written for the buildings that host GoodMaps rather than for people using the app. These cover GoodMaps Studio, the tool venues use to manage their maps; the mapping service and the safety of its lidar scanner; a sales page addressed to venues; and a 2023 notice to venue customers about the move to the new app. The screenshots are left out too, because their only descriptions are labels such as \"Check In 1.\" For questions the help does not answer, GoodMaps takes email at support@goodmaps.com."),
+        ("AI Content Describer", "AiContentDescriberHelp", readAiContentDescriber, "AiContentDescriber.md", "AI Content Describer help",
+         "This guide holds the documentation for AI Content Describer, a free add-on for the NVDA screen reader that asks an AI model to describe whatever is in focus, the navigator object, the whole screen, an image on the clipboard or a picture from your camera, and lets you ask follow-up questions. It was gathered from the add-on's GitHub repository on 11 November 2026.\r\n\r\nThe add-on's whole manual is one long readme, so this guide divides it at the readme's own headings. Setting up a model holds one article for each AI service the add-on supports, from those that need a key you get from the company to models that run on your own computer.\r\n\r\nLeft out on purpose: the parts written for people who change the add-on's code rather than use it -- the readme's sections on building, translating and contributing, and a separate developer document on adding a new AI service. The readme's translations into ten other languages were not gathered."),
     ]
+    # ONE ENTRY PER GUIDE (version 2). The plan had grown a second copy of twenty entries, from Org mode to Remote
+    # Incident Manager, so those guides were built twice in every run; the first entry for a guide now wins.
+    lUnique, setFiles = [], set()
+    for tEntry in lPlan:
+        if tEntry[3].lower() in setFiles:
+            logging.info("plan: a second entry for %s is ignored", tEntry[3])
+            continue
+        setFiles.add(tEntry[3].lower())
+        lUnique.append(tEntry)
+    lPlan = lUnique
+    if lOnly:
+        setOnly = {s.lower() for s in lOnly}
+        lPlan = [t for t in lPlan if t[0].lower() in setOnly or os.path.splitext(t[3])[0].lower() in setOnly or t[3].lower() in setOnly]
     lResults = []
+    iNoHarvest = iCurrent = 0
     for sProduct, sFolder, functionRead, sFile, sTitle, sPreamble in lPlan:
         sHarvest = os.path.join(sParent, sFolder)
         if not os.path.isdir(sHarvest):
-            logging.error("no harvest folder at %s", sHarvest)
+            iNoHarvest += 1
+            logging.info("%s: no harvest folder at %s, so it is not built", sProduct, sHarvest)
+            continue
+        sGuide = os.path.join(sOutput, sFile)
+        # A GUIDE IS REBUILT ONLY WHEN ITS HARVEST IS NEWER (version 2): the Homer rule that a build does again only
+        # what has changed. A guide named on the command line is always rebuilt, which is how a guide whose reader
+        # changed is brought up to date: build GoodMaps.
+        if bChanged and not lOnly and os.path.isfile(sGuide) and os.path.getmtime(sGuide) >= newestTime(sHarvest):
+            iCurrent += 1
+            logging.info("%s: %s is newer than its harvest, so it is left as it is", sProduct, sFile)
             continue
         try:
             lArticles = functionRead(sHarvest)
@@ -3035,8 +3366,31 @@ def main():
     for sProduct, iArticles, iWords, iFailures in lResults:
         print("%-20s %4d articles %8d words %s" % (sProduct, iArticles, iWords,
                                                    "ALL CLEAN" if iFailures == 0 else "%d gate failures" % iFailures))
-    print("Log: " + os.path.join(sScriptDir, "buildMagazines.log"))
-    return 0
+    iBuilt = len(lResults)
+    print("Guides built: %d; already current: %d; no harvest here: %d." % (iBuilt, iCurrent, iNoHarvest))
+    logging.info("SUMMARY: %d built, %d current, %d without a harvest", iBuilt, iCurrent, iNoHarvest)
+    iResult = 1 if any(t[3] != 0 for t in lResults) else 0
+    if iResult: print("A guide failed its gates or its build, so this run fails; the log names the failures.")
+    # THE .htm OF EVERY CHANGED GUIDE (version 2): the kit's fixPages, which gives each page one level-one heading,
+    # its language, a main landmark and working links, and reports what it could not settle.
+    if bBuild:
+        sFix = os.path.join(kitFolder(), "scripts", "fixPages.py")
+        lCommand = [sys.executable, sFix, sOutput, "--changed"]
+        if not os.path.isfile(sFix):
+            logging.error("the kit's fixPages.py is not at %s, so no .htm was built", sFix)
+            print("The kit's fixPages.py was not found, so no web page was built.")
+            iResult = 1
+        else:
+            oRun = subprocess.run(lCommand, capture_output=True, text=True, errors="replace")
+            logging.info("RUN %s: exit %d", " ".join(lCommand), oRun.returncode)
+            for sLine in (oRun.stdout or "").splitlines(): logging.info("    fixPages: %s", sLine)
+            for sLine in (oRun.stderr or "").splitlines(): logging.error("    fixPages: %s", sLine)
+            sSaid = [sLine for sLine in (oRun.stdout or "").splitlines() if not re.match(r"\d+ of \d+: ", sLine)]
+            for sLine in sSaid: print(sLine)
+            if oRun.returncode != 0: iResult = 1
+    logging.info("RUN ENDED %s", "with failures" if iResult else "cleanly")
+    print("Log: " + sLogPath)
+    return iResult
 
 
 if __name__ == "__main__": sys.exit(main())

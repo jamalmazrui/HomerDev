@@ -15,9 +15,29 @@ rem A LOG OF ITS OWN: logs\<Project>-build_release-<stamp>.log holds the environ
 rem code and time; each step also writes its own detailed log. The console says one line a step.
 
 for %%I in ("%CD%") do set "sName=%%~nxI"
+rem EVERY KIND OF HOMER PROJECT (1.203.0). An app or the kit has its own build.cmd and scripts\release.cmd. A book
+rem project (MyBooks), a pages project (MyPages) and the collections (AppHelpGuides, PodcastDirectories) need none:
+rem the kit's projectCycle does their build and release by the project's role, which kind.py reads from the folder's
+rem name or contents, on any drive and at any depth. tidy and push are the kit's own, refreshed into scripts by the build.
+call :findKit
+set "sBuild=build.cmd"
+set "sBuildArgs="
+set "sRole="
 if not exist "build.cmd" (
-  echo There is no build.cmd in %CD%, so this is not a Homer project folder. Change to the project's folder first.
-  exit /b 1
+  if not defined sKitDir (
+    echo There is no build.cmd in %CD%, and the HomerDev kit was not found to build it another way.
+    exit /b 1
+  )
+  for /f "usebackq delims=" %%R in (`python "!sKitDir!\scripts\kind.py" "%CD%" --role 2^>nul`) do set "sRole=%%R"
+  if /i "!sRole!"=="app" set "sRole="
+  if /i "!sRole!"=="kit" set "sRole="
+  if /i "!sRole!"=="unknown" set "sRole="
+  if not defined sRole (
+    echo There is no build.cmd in %CD%, and kind.py does not know what this folder is for, so this is not a Homer project folder.
+    exit /b 1
+  )
+  set "sBuild=!sKitDir!\scripts\projectCycle.cmd"
+  set "sBuildArgs=build"
 )
 if not exist "logs" mkdir "logs"
 for /f %%i in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd-HHmmss"') do set "sStamp=%%i"
@@ -137,10 +157,12 @@ rem THE DEVELOPMENT KIT FIRST (12 October 2026): the HomerDev variable points to
 rem beside the projects until it is installed, so a fix to this runner reached no project until then.
 if not defined sRunner if exist "..\HomerDev\scripts\build_release.cmd" for %%R in ("..\HomerDev\scripts\build_release.cmd") do set "sRunner=%%~fR"
 if not defined sRunner if defined HomerDev if exist "%HomerDev%\scripts\build_release.cmd" set "sRunner=%HomerDev%\scripts\build_release.cmd"
->> "%sLog%" echo Settings: release=!sRelease! !sReleaseArgs! runner=!sRunner!
+rem ANY DRIVE, ANY DEPTH (1.203.0): the kit :findKit found serves a project that is not beside it.
+if not defined sRunner if defined sKitDir if exist "!sKitDir!\scripts\build_release.cmd" set "sRunner=!sKitDir!\scripts\build_release.cmd"
+>> "%sLog%" echo Settings: build=!sBuild! !sBuildArgs! role=!sRole! kit=!sKitDir! release=!sRelease! !sReleaseArgs! runner=!sRunner!
 set "sSummary="
 
-call :step build "build.cmd" || goto :stopped
+call :step build "!sBuild!" !sBuildArgs! || goto :stopped
 call :step tidy "scripts\tidy.cmd" || goto :stopped
 rem PUSH AND RELEASE VERIFY (14 October 2026, from an audit by another AI). Build and tidy may trust a file's
 rem remembered hash while its size and time are unchanged, which keeps them quick; the checks before anything goes
@@ -148,6 +170,8 @@ rem public read every file again, so a file changed without changing its size or
 set "HomerVerify=1"
 >> "%sLog%" echo Settings: HomerVerify=1 for push and release, so their checks read every file again
 call :step push "scripts\push.cmd" || goto :stopped
+rem A project with no release of its own releases by its role, through the projectCycle its build put in scripts.
+if not exist "!sRelease!" if defined sRole if exist "scripts\projectCycle.cmd" (set "sRelease=scripts\projectCycle.cmd" & set "sReleaseArgs=release")
 call :step release "!sRelease!" !sReleaseArgs! || goto :stopped
 
 echo(
@@ -214,3 +238,20 @@ if not exist "!sLock!" set "bOwnLock="
 if defined bOwnLock rmdir /s /q "!sLock!" 2>nul
 if defined sRunner if defined bOwnLock copy /y "!sRunner!" "build_release.bat" >nul & exit /b 1
 exit /b 1
+
+:findKit
+rem Sets sKitDir to the HomerDev kit: one beside this project, then one beside any folder above it, then one at the top
+rem of any drive, then the HomerDev variable's. A kit has HomerDev.cs at its top. Only Windows and the name are assumed.
+set "sKitDir="
+if exist "HomerDev.cs" if exist "exec\CSharp\Lbc.cs" (set "sKitDir=%CD%" & goto :eof)
+set "sKitUp=%CD%"
+:findKitUp
+for %%P in ("!sKitUp!\..") do set "sKitParent=%%~fP"
+if exist "!sKitParent!\HomerDev\HomerDev.cs" (set "sKitDir=!sKitParent!\HomerDev" & goto :eof)
+if /i "!sKitParent!"=="!sKitUp!" goto :findKitDrives
+set "sKitUp=!sKitParent!"
+goto :findKitUp
+:findKitDrives
+for %%L in (C D E F G H I J K L M N O P Q R S T U V W X Y Z) do if not defined sKitDir if exist "%%L:\HomerDev\HomerDev.cs" set "sKitDir=%%L:\HomerDev"
+if not defined sKitDir if defined HomerDev if exist "%HomerDev%\HomerDev.cs" set "sKitDir=%HomerDev%"
+goto :eof

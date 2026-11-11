@@ -144,7 +144,7 @@ lsNeverPushed = [
     # *.jsb (1.43.38): a compiled JAWS script belongs to the JAWS version
     # that built it; the installer compiles on the user's machine.
     "*.exe", "*.jsb", "*.log", "*.obj", "*.pdb", "Version.cs", "__pycache__/",
-    ".venv/", "build/", "create*Repo.cmd", "create*Repo.ps1", "dist/", "notes/",
+    ".venv/", "build/", "create*Repo.cmd", "create*Repo.ps1", "dist/", "notes/", "work/",
     # /version.py, AT THE TOP ONLY (1.43.16): it is the file a Python app's
     # build generates beside its source. HomerView's NVDA add-on carries its
     # own homer\version.py, which the add-on imports, and a bare version.py

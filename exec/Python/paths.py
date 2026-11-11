@@ -4,8 +4,9 @@ WHERE A HOMER APP PUTS ITS FILES, AND WHY THE NAMES ARE WHAT THEY ARE.
 
 THIS MODULE AND CSharp\Paths.cs ARE THE SAME CLASS IN TWO LANGUAGES. Same
 folder names, same fallback rule, same function names: start, appName,
-installedFolder, userFolder, configs, data, logs, results, temp, the
-shipped counterparts, configFile, clearTemp and tempFile.
+installedFolder, userFolder, configs, data, logs, results, work, the
+shipped counterparts, configFile, clearWork and workFile. The old names
+temp, clearTemp and tempFile still work, as other names for the same three.
 
 A screen reader user moves through a folder listing by first letter. Nine
 folders whose names all begin with the same letter cost nine keystrokes each
@@ -19,14 +20,17 @@ starts with a different letter, and the letter is the fast way in:
     s  scripts     scripts, add-ons and plugins that change behaviour later
     l  logs        one file per session
     r  results     what the program produced
-        t  temp        scratch, deletable at the start of the next run
     t  templates   files a user copies and fills in
+    w  work        scratch: what one run leaves, the next run deletes
 
-TWO t NAMES, AND THEY NEVER MEET. temp exists only in the per-user tree;
-templates exists only in the installed tree. A listing therefore never holds
-both, and first-letter navigation stays exact. A temp folder under Program Files
-could not be written to anyway, which is the whole reason the per-user tree
-exists.
+ONE LETTER, ONE FOLDER (1.203.0, his ruling of 11 November 2026). The scratch
+folder was called temp, which shared its t with templates; the rule had been
+that the two never met in one tree. Now t means templates and nothing else, in
+the installed tree and the per-user tree alike, and scratch is work: w was free.
+Every new session of a Homer program or script may delete whatever a previous
+session left in work, and clearWork does exactly that, once, at startup. A
+temp folder an older version left in the per-user tree is deleted by clearWork
+too, since it held only scratch.
 
 THREE TREES, AND WHAT EACH HOLDS.
 
@@ -35,7 +39,7 @@ THREE TREES, AND WHAT EACH HOLDS.
       root where a person looking for the ReadMe expects them.
 
   The PER-USER tree, %LOCALAPPDATA%\<App>, which the program owns and writes:
-      configs, data, logs, results, scripts, temp. No exec and no
+      configs, data, logs, results, scripts, work. No exec and no
       templates: those are shipped, not made.
 
   The DEVELOPMENT folder, <App> on any drive and at any depth, mirrors the installed tree (21 Sep 2026,
@@ -50,7 +54,7 @@ Usage:
     paths.start("JobDo")
     sInix = paths.configFile("JobDo.inix")   # the user's, else the shipped one
     sOut = paths.results()                   # where output goes
-    paths.clearTemp()                        # at startup, once
+    paths.clearWork()                        # at startup, once
 
 Nothing here raises. A folder that cannot be made comes back as a path that does
 not exist, and the caller's own error handling deals with it.
@@ -152,7 +156,8 @@ def data(): return _madeUnder(userFolder(), "data")
 def scripts(): return _madeUnder(userFolder(), "scripts")
 def logs(): return _madeUnder(userFolder(), "logs")
 def results(): return _madeUnder(userFolder(), "results")
-def temp(): return _madeUnder(userFolder(), "temp")
+def work(): return _madeUnder(userFolder(), "work")
+def temp(): return work()   # the old name of work (1.203.0)
 
 
 # The shipped folders, read-only, never created here: a program that has to
@@ -196,18 +201,21 @@ def configFile(sFileName):
     return sUser
 
 
-def clearTemp():
-    """Empty the temp folder, at startup, once.
+def clearWork():
+    """Empty the work folder, at startup, once, and delete an older temp folder.
 
-    Anything still in there is what a previous run could not clean up after
+    Anything still in work is what a previous run could not clean up after
     itself, which is exactly what the folder is for: a crash leaves its
-    half-written files somewhere known rather than somewhere shared.
+    half-written files somewhere known rather than somewhere shared. A temp
+    folder beside it is where versions before 1.203.0 kept the same scratch.
     """
     iRemoved = 0
     try:
-        sTemp = temp()
-        for sName in os.listdir(sTemp):
-            sPath = os.path.join(sTemp, sName)
+        sWork = work()
+        lsPaths = [os.path.join(sWork, sName) for sName in os.listdir(sWork)]
+        sOld = os.path.join(userFolder(), "temp")
+        if os.path.isdir(sOld): lsPaths.append(sOld)
+        for sPath in lsPaths:
             try:
                 if os.path.isdir(sPath): shutil.rmtree(sPath)
                 else: os.remove(sPath)
@@ -219,8 +227,14 @@ def clearTemp():
     return iRemoved
 
 
-def tempFile(sExtension=".tmp"):
-    """A name inside temp that nothing else is using."""
+def clearTemp(): return clearWork()   # the old name of clearWork (1.203.0)
+
+
+def workFile(sExtension=".tmp"):
+    """A name inside work that nothing else is using."""
     if not sExtension.startswith("."): sExtension = "." + sExtension
-    return os.path.join(temp(), "%s-%s%s" % (appName(),
+    return os.path.join(work(), "%s-%s%s" % (appName(),
         datetime.datetime.now().strftime("%Y%m%d-%H%M%S-%f")[:-3], sExtension))
+
+
+def tempFile(sExtension=".tmp"): return workFile(sExtension)   # the old name of workFile (1.203.0)

@@ -190,7 +190,66 @@
 <h1 id="history">History</h1>
 <p>Each version is a level-2 heading, newest first, so your screen
 reader’s heading keys move from one version to the next.</p>
-<h2 id="november-2026">1.202.0 – 10 November 2026</h2>
+<h2 id="november-2026">1.204.0 – 11 November 2026</h2>
+<ul>
+<li><strong>The Homer tree, defined.</strong> help\HomerTree.md names
+every folder and top-level file a Homer project may have, says what each
+is for, and gives the rules: one letter, one folder; no new folders
+unasked; subfolders free; de facto names win; one source. books, pages
+and work are standard folders now, with the agent folders .claude and
+.claude-plugin; kind.py holds the same lists, one base list for every
+kind.</li>
+<li><strong>auditTree</strong> checks every Homer project beside the
+kit, or the folders named, against the tree, and changes nothing: a
+folder the tree does not name, a name in the wrong case, a temp folder,
+a log, archive or script loose at the top. Its report is
+results\HomerDev-auditTree-<stamp>.md, one heading per project.</li>
+<li><strong>The kit settles its own drift in its build:</strong>
+examples at the top, a leftover of help\examples, goes; Templates
+becomes templates.</li>
+</ul>
+<h2 id="november-2026-1">1.203.0 – 11 November 2026</h2>
+<ul>
+<li><strong>build_release works in every kind of Homer project.</strong>
+Typed in MyBooks, MyPages, AppHelpGuides or PodcastDirectories – on any
+drive, at any depth – it runs build, tidy, push and release as it does
+in an app’s folder. kind.py’s new role, read from the folder’s name or
+its contents, tells the kit’s new projectCycle what the build and
+release steps do: MyBooks builds with buildBooks and releases with
+kdpSubmit; MyPages has nothing to compile and releases with its post;
+AppHelpGuides builds its changed guides with the app-help-guide skill;
+PodcastDirectories rebuilds its changed pages with fixPages. tidy and
+push are the kit’s own. The build refreshes the kit’s tools into the
+project’s scripts folder, as an app’s build does, and writes a
+collection’s RepoFiles.txt and LocalFiles.txt when it has none.
+build_release finds the kit beside the project, beside any folder above
+it, at the top of any drive, or by the HomerDev variable.</li>
+<li><strong>Work, not temp.</strong> T means templates and nothing else,
+in the installed tree and the per-user tree. The scratch folder is work:
+Paths.work, clearWork and workFile, in C# and Python, with the old names
+temp, clearTemp and tempFile kept as other names for the same three, so
+no app needs a change. clearWork also deletes the temp folder an older
+version left. kind.py counts work as a standard folder, tidy never
+pushes it, and projectCycle clears a project’s work folder at the start
+of every build. buildBooks keeps its scratch in work.</li>
+<li><strong>Help guides keep the Homer layout.</strong> makeHarvester
+version 2 writes each harvester and its .cmd into the collection’s
+scripts folder; a harvester keeps its pages in data\harvests, its
+archive in results, and a log in logs that also goes into the archive.
+buildGuide version 2, run by the collection’s build, first settles an
+older collection’s loose harvesters, harvest folders, archives and logs
+into those folders, then rebuilds only the guides whose harvests are
+newer, fails on a gate failure, and has fixPages version 5 (–changed)
+build each changed page. getLlmsGuide and cleanFeedback run from the kit
+on the current collection and log there. GoodMaps and AI Content
+Describer are new estates and readers.</li>
+<li><strong>Contents links land on their articles.</strong> A guide’s
+anchors now follow Pandoc’s own rule (a leading digit goes, periods
+stay), and a heading inside an article that would take an article’s
+anchor gets one of its own. The builder’s plan builds each guide once;
+twenty entries had been listed twice.</li>
+</ul>
+<h2 id="november-2026-2">1.202.0 – 10 November 2026</h2>
 <ul>
 <li><strong>HomerView is in the suite’s catalog.</strong> Its shared
 commands say the suite’s sentences, with its own words: the line, the
@@ -203,14 +262,14 @@ counts the commands that differ rather than their differences. Say
 Position says “the current position” in every app, so one sentence fits
 a record, an item and a line of a page.</li>
 </ul>
-<h2 id="november-2026-1">1.201.0 – 10 November 2026</h2>
+<h2 id="november-2026-3">1.201.0 – 10 November 2026</h2>
 <ul>
 <li><strong>The suite commands check runs.</strong> It called a kind it
 had never imported, with the wrong argument, so it stopped every app’s
 release with a traceback before checking anything; it now finds the kit
 as the other checks do.</li>
 </ul>
-<h2 id="november-2026-2">1.200.0 – 10 November 2026</h2>
+<h2 id="november-2026-4">1.200.0 – 10 November 2026</h2>
 <ul>
 <li><strong>No extra-speech switch.</strong> Every message a Homer app
 speaks was chosen for the app, the screen reader and Windows together,
@@ -221,7 +280,7 @@ everything, where EdSharp and FileDir had kept a separate speech.log of
 what they did not speak. Extra Speech Toggle and Extra Speech Log leave
 the suite’s catalog.</li>
 </ul>
-<h2 id="november-2026-3">1.199.0 – 10 November 2026</h2>
+<h2 id="november-2026-5">1.199.0 – 10 November 2026</h2>
 <ul>
 <li><strong>Homer Suite.</strong> data\SuiteCatalog.inix holds every
 command DbDo, EdSharp and FileDir share – 91 of them – with its one
@@ -233,13 +292,13 @@ is, and why some Homer projects are in it and others are not.</li>
 of findings to review had been joined on so that the line raised an
 error instead.</li>
 </ul>
-<h2 id="november-2026-4">1.198.0 – 10 November 2026</h2>
+<h2 id="november-2026-6">1.198.0 – 10 November 2026</h2>
 <ul>
 <li><strong>The check’s accessibility line says how many findings are to
 review,</strong> as the report does; axeWindow wrote its own line and
 had kept the old one.</li>
 </ul>
-<h2 id="november-2026-5">1.197.0 – 10 November 2026</h2>
+<h2 id="november-2026-7">1.197.0 – 10 November 2026</h2>
 <ul>
 <li><strong>An Axe report says how many findings are to review.</strong>
 FileDir’s opened with 734 errors, 732 of them how Windows Forms’ list
@@ -250,7 +309,7 @@ findings listed need no change and how many are to review.</li>
 its menu bar for the program, as Axe.Windows asked; nothing else names a
 menu bar for the reader.</li>
 </ul>
-<h2 id="november-2026-6">1.196.0 – 10 November 2026</h2>
+<h2 id="november-2026-8">1.196.0 – 10 November 2026</h2>
 <ul>
 <li><strong>The menu gate counts submenus and the menu bar.</strong> A
 submenu’s own caption, made with new ToolStripMenuItem, and each menu on
@@ -266,7 +325,7 @@ left out, from the app’s own code, the reading the gate checks, and UI
 Automation only when that finds none. Its audit applies the gate’s
 rules: an item with no letter is not a finding.</li>
 </ul>
-<h2 id="november-2026-7">1.195.0 – 10 November 2026</h2>
+<h2 id="november-2026-9">1.195.0 – 10 November 2026</h2>
 <ul>
 <li><strong>The menu letters check is a gate, with every rule.</strong>
 It had missed three of Homer’s rules: two items in one menu sharing a
@@ -280,7 +339,7 @@ than one letter marked in a caption – and fails the release on any
 break. Tested on made-up items with each break; DbDo, EdSharp and
 FileDir pass.</li>
 </ul>
-<h2 id="november-2026-8">1.194.0 – 10 November 2026</h2>
+<h2 id="november-2026-10">1.194.0 – 10 November 2026</h2>
 <ul>
 <li><strong>HomerList is the kit’s.</strong> FileDir’s list of strings –
 find, keep or remove what matches, pad, trim, case, segments, stack and
@@ -289,7 +348,7 @@ EdSharp keeps its older copy, marked KEPT ON PURPOSE: its methods’
 upper-camel names are also string and list methods, so its calls need a
 compiler in the loop to move.</li>
 </ul>
-<h2 id="november-2026-9">1.193.0 – 10 November 2026</h2>
+<h2 id="november-2026-11">1.193.0 – 10 November 2026</h2>
 <ul>
 <li><strong>Homer’s letter rules, checked in every app.</strong>
 check.py’s new menu letters check reads each app’s menu items – DbDo’s
@@ -302,14 +361,14 @@ relatives, and a letter a command family shares, as Proper Case keeps
 Upper Case’s U. All 641 menu items in the three apps pass. A warning,
 not a failure, so it never stops a release.</li>
 </ul>
-<h2 id="november-2026-10">1.192.0 – 10 November 2026</h2>
+<h2 id="november-2026-12">1.192.0 – 10 November 2026</h2>
 <ul>
 <li><strong>One input.</strong> LbcAsk had two ways to ask for one line
 of text, FileDir’s inputDialog and EdSharp’s input; input is now the
 one, with inputDialog’s care: a prompt naming a password hides what is
 typed, and cancelling is said.</li>
 </ul>
-<h2 id="november-2026-11">1.191.0 – 10 November 2026</h2>
+<h2 id="november-2026-13">1.191.0 – 10 November 2026</h2>
 <ul>
 <li><strong>LbcAsk.input and multiInput.</strong> One field or several,
 each with its own remembered history, a list of choices or a focus tip,
@@ -317,14 +376,14 @@ from EdSharp’s Dialog.Input and MultiInput. History is kept where it
 always was, through fReadSetting and fWriteSetting, so what a person
 typed before is still offered.</li>
 </ul>
-<h2 id="november-2026-12">1.190.0 – 10 November 2026</h2>
+<h2 id="november-2026-14">1.190.0 – 10 November 2026</h2>
 <ul>
 <li><strong>LbcAsk.choose and LbcAsk.message.</strong> A question with a
 row of answers, and a message in a box, title first, join pick in the
 kit; EdSharp and FileDir both use them. EdSharp’s own Choose had ignored
 the default button it was given.</li>
 </ul>
-<h2 id="november-2026-13">1.189.0 – 10 November 2026</h2>
+<h2 id="november-2026-15">1.189.0 – 10 November 2026</h2>
 <ul>
 <li><strong>LbcAsk.pick, one list for picking.</strong> EdSharp and
 FileDir each had a Pick: EdSharp’s labelled its list but answered by
@@ -333,7 +392,7 @@ FileDir’s answered by the item but had no label. The kit’s pick does
 both, a &amp;Choices pick box answered through listSourceIndex, and both
 apps use it.</li>
 </ul>
-<h2 id="november-2026-14">1.188.0 – 10 November 2026</h2>
+<h2 id="november-2026-16">1.188.0 – 10 November 2026</h2>
 <ul>
 <li><strong>Script, not snippet, across Homer.</strong> DbDo and EdSharp
 both invoke scripts of several kinds, so the suite’s catalog of
@@ -341,7 +400,7 @@ commands, the command echo and the kit’s comments say script: EdSharp’s
 Save Script, Invoke Script and View Script, DbDo’s Edit Script beside
 its Invoke Script.</li>
 </ul>
-<h2 id="november-2026-15">1.187.0 – 10 November 2026</h2>
+<h2 id="november-2026-17">1.187.0 – 10 November 2026</h2>
 <ul>
 <li><strong>No app class repeats a kit class by accident.</strong> The
 check named five: FileDir’s MdiChild, EdSharp’s MdiChild, MdiFrame and
@@ -353,7 +412,7 @@ reported, not warned about. EdSharp’s Util is the interface its snippets
 call; DbDo’s KeyMap maps keys to its menu items while the kit’s KeyMap
 routes them.</li>
 </ul>
-<h2 id="november-2026-16">1.186.0 – 10 November 2026</h2>
+<h2 id="november-2026-18">1.186.0 – 10 November 2026</h2>
 <ul>
 <li><strong>LbcAsk: the standard dialogs, in the kit.</strong> FileDir’s
 Dialogs.cs kept its own layer over LbcDialog – inputDialog, fieldDialog,
@@ -364,7 +423,7 @@ app to ask with. An app sets oMainForm, fSay, fReadSetting,
 fWriteSetting and fRecentFolders at startup; left empty, each has a
 plain default.</li>
 </ul>
-<h2 id="november-2026-17">1.185.0 – 10 November 2026</h2>
+<h2 id="november-2026-19">1.185.0 – 10 November 2026</h2>
 <ul>
 <li><strong>recordWalk menus reads the items, and records.</strong> It
 read DbDo’s seven menus but none of their items, since Windows Forms
@@ -375,7 +434,7 @@ again, so the recording no longer fails with “Error 0x100000001”; the
 menu reader keeps a log of its own; and a reading with no items falls
 back to the fixed walk.</li>
 </ul>
-<h2 id="november-2026-18">1.184.0 – 10 November 2026</h2>
+<h2 id="november-2026-20">1.184.0 – 10 November 2026</h2>
 <ul>
 <li><strong>recordWalk menus no longer hangs.</strong> The menus are
 read in a process of their own, given 90 seconds, so UI Automation never
@@ -384,7 +443,7 @@ seconds”. The menu bar is looked for among the window’s own children,
 which is instant, where every descendant had been walked, all 49,186
 rows of DbDo’s grid, for 67 seconds.</li>
 </ul>
-<h2 id="november-2026-19">1.183.0 – 10 November 2026</h2>
+<h2 id="november-2026-21">1.183.0 – 10 November 2026</h2>
 <ul>
 <li><strong>recordWalk menus reads the menus before it walks
 them.</strong> It had pressed Down Arrow 25 times in every menu, so
@@ -396,7 +455,7 @@ name; and opens its report with a menu audit: items without an access
 letter, letters that start none of the item’s words or differ from its
 key’s letter, letters shared in one menu, and names used twice.</li>
 </ul>
-<h2 id="november-2026-20">1.182.0 – 10 November 2026</h2>
+<h2 id="november-2026-22">1.182.0 – 10 November 2026</h2>
 <ul>
 <li><strong>Shift+F1 in a main window.</strong> A main window’s title
 and its list’s name change with what it shows, so Shift+F1 there said no
@@ -404,7 +463,7 @@ hint was written. LbcHints now also looks in an app’s [Main window]
 section for an MDI frame or child, and in every section for the
 control’s accessibility role, as “role List”.</li>
 </ul>
-<h2 id="november-2026-21">1.181.0 – 10 November 2026</h2>
+<h2 id="november-2026-23">1.181.0 – 10 November 2026</h2>
 <ul>
 <li><strong>recordWalk brings the app back from its own
 console.</strong> A walk stopped whenever another window was in front,
@@ -413,14 +472,14 @@ own command prompt had come forward. When the window in front is a
 console, the app is brought back once and the walk goes on; any other
 window still stops it.</li>
 </ul>
-<h2 id="november-2026-22">1.180.0 – 9 November 2026</h2>
+<h2 id="november-2026-24">1.180.0 – 9 November 2026</h2>
 <ul>
 <li><strong>A kept Axe record is said in the log.</strong> axeWindow
 logs each record it keeps, fingerprint and outcome, so a log shows that
 an unchanged window, such as DbDo’s, whose scan does not finish, will be
 skipped next time.</li>
 </ul>
-<h2 id="november-2026-23">1.179.0 – 9 November 2026</h2>
+<h2 id="november-2026-25">1.179.0 – 9 November 2026</h2>
 <ul>
 <li><strong>Say compiles alone again.</strong> 1.178.0’s spelling of a
 repeated line made Say.cs use KeyMap, which the conversion classes, the
@@ -428,7 +487,7 @@ template app and a sample compile without; the kit’s build stopped.
 KeyMap now hands Say the press count as it counts each press, and Say
 spells with its own copy of the rule.</li>
 </ul>
-<h2 id="november-2026-24">1.178.0 – 9 November 2026</h2>
+<h2 id="november-2026-26">1.178.0 – 9 November 2026</h2>
 <ul>
 <li><strong>A second press spells what the first said, every
 time.</strong> Say commands that speak their answer directly, such as
@@ -442,7 +501,7 @@ which one ran. An app’s own scripts folder came first, so an old copy
 outranked the kit’s, and DbDo’s main window went on being scanned for 5
 minutes in every check.</li>
 </ul>
-<h2 id="november-2026-25">1.177.0 – 9 November 2026</h2>
+<h2 id="november-2026-27">1.177.0 – 9 November 2026</h2>
 <ul>
 <li><strong>A second press reaches the command.</strong>
 KeyMap.runCommand marks a command as run from a key while its fRun runs,
@@ -451,7 +510,7 @@ so its menu handler took each press for a click by hand and counted it
 as a first; testSay heard every second Say key press as a first press,
 dropped as a repeat.</li>
 </ul>
-<h2 id="november-2026-26">1.176.0 – 9 November 2026</h2>
+<h2 id="november-2026-28">1.176.0 – 9 November 2026</h2>
 <ul>
 <li><strong>Say keys: two presses at most.</strong> KeyMap.answer, which
 every Say command calls, says everything on the first press. On the
@@ -460,7 +519,7 @@ shows anything longer in the read-only window; there is no third press.
 DbDo’s testSay heard the old second press spell whole long answers, such
 as a database’s full path.</li>
 </ul>
-<h2 id="november-2026-27">1.175.0 – 9 November 2026</h2>
+<h2 id="november-2026-29">1.175.0 – 9 November 2026</h2>
 <ul>
 <li><strong>The Alternate Menu in an MDI child.</strong> A child’s menus
 move into its frame’s menu bar, leaving its own empty, so DbDo’s
@@ -473,7 +532,7 @@ folder, which it now reads too.</li>
 <li><strong>Tutorials teach Control+P for playing,</strong> as the keys
 now are.</li>
 </ul>
-<h2 id="november-2026-28">1.174.0 – 9 November 2026</h2>
+<h2 id="november-2026-30">1.174.0 – 9 November 2026</h2>
 <ul>
 <li><strong>An unchanged window is not scanned again.</strong>
 axeWindow’s fingerprint now counts the captions of buttons and labels
@@ -487,7 +546,7 @@ axeScans.inix forces a scan.</li>
 Press=2 double-presses its key, as a person does for a Homer key’s
 second meaning.</li>
 </ul>
-<h2 id="november-2026-29">1.173.0 – 9 November 2026</h2>
+<h2 id="november-2026-31">1.173.0 – 9 November 2026</h2>
 <ul>
 <li><strong>One Alternate Menu for every Homer app.</strong>
 SuiteCommands.showAlternateMenu is the dialog, and
@@ -499,7 +558,7 @@ previous match, all without regard to case. Menu order (the default),
 Name order and Key order buttons sort it, keeping any filter.
 LbcDialog.setListItemsKeepingFilter re-sorts a list that way.</li>
 </ul>
-<h2 id="november-2026-30">1.172.0 – 9 November 2026</h2>
+<h2 id="november-2026-32">1.172.0 – 9 November 2026</h2>
 <ul>
 <li><strong>Screen reader scripts say Update only when they
 changed.</strong> The fingerprint installScreenReaderSupport compares
@@ -508,7 +567,7 @@ whose build stamps its version there, as EdSharp’s does, had every
 release offered as Update; now Update means the scripts changed and
 Reinstall that they are the same.</li>
 </ul>
-<h2 id="november-2026-31">1.171.0 – 9 November 2026</h2>
+<h2 id="november-2026-33">1.171.0 – 9 November 2026</h2>
 <ul>
 <li><strong>Three help keys, two presses at most.</strong> Control+Slash
 is Where Am I in every window and dialog, in place of Alt+Shift+Slash.
@@ -521,7 +580,7 @@ every app.</li>
 <li><strong>JAWS+H in Homer apps.</strong> The JAWS script template
 answers Hot Key Help by pressing Control+Slash twice.</li>
 </ul>
-<h2 id="november-2026-32">1.170.0 – 8 November 2026</h2>
+<h2 id="november-2026-34">1.170.0 – 8 November 2026</h2>
 <ul>
 <li><strong>Binding redirects cover every version.</strong>
 getPdfPig.ps1 sent each library only versions up to the one shipped, so
@@ -529,14 +588,14 @@ a library asking for a newer one, such as System.Memory asking for
 System.Runtime.CompilerServices.Unsafe 6.0.3.0, failed to load. Each
 redirect now sends every version to the copy on disk.</li>
 </ul>
-<h2 id="november-2026-33">1.169.0 – 8 November 2026</h2>
+<h2 id="november-2026-35">1.169.0 – 8 November 2026</h2>
 <ul>
 <li><strong>Control+Slash shows Hotkey Summary,</strong> as well as
 Alt+Shift+H: the key Google Docs and Drive, Slack, ChatGPT and Claude
 Docs use to list their shortcuts. KeyDecisions.md gives the research and
 the rollback.</li>
 </ul>
-<h2 id="november-2026-34">1.168.0 – 8 November 2026</h2>
+<h2 id="november-2026-36">1.168.0 – 8 November 2026</h2>
 <ul>
 <li><strong>Menu keys are described.</strong> In the Key Describer,
 Alt+F says “File menu”, “Alt+F”, then how many commands the menu holds,
@@ -544,7 +603,7 @@ and the menu does not open. It had said nothing about the menu: the
 lookup checked one menu bar and skipped items Windows had not yet drawn.
 A key that opens no menu is noted in the log.</li>
 </ul>
-<h2 id="november-2026-35">1.167.0 – 7 November 2026</h2>
+<h2 id="november-2026-37">1.167.0 – 7 November 2026</h2>
 <ul>
 <li><strong>The help keys of every main window.</strong> Shift+F1 says
 what the focused control does, and Alt+Shift+Slash says where you are,
@@ -553,7 +612,7 @@ Shift+F1 to Control+Shift+F1. The Hotkeys document keeps its place in
 the Help menu without a key, since Alt+Shift+H lists every key, live.
 KeyDecisions.md gives the reasons and the rollback.</li>
 </ul>
-<h2 id="november-2026-36">1.166.0 – 7 November 2026</h2>
+<h2 id="november-2026-38">1.166.0 – 7 November 2026</h2>
 <ul>
 <li><strong>The Key Describer speaks in parts.</strong> Name, key and
 one-sentence summary are separate utterances, through the new
@@ -571,7 +630,7 @@ own keys, such as cut and delete line, are named instead of done.</li>
 Alt+F4’s way out now say “Key Describer On” and “No Key Describer”, as
 DbDo, EdSharp and FileDir do and the tutorials teach.</li>
 </ul>
-<h2 id="november-2026-37">1.165.0 – 6 November 2026</h2>
+<h2 id="november-2026-39">1.165.0 – 6 November 2026</h2>
 <ul>
 <li><strong>Shift+F1 on any LbcForm.</strong> Alt+Shift+Slash already
 worked on every form built on LbcForm, but Shift+F1 only in LbcDialog’s
@@ -580,7 +639,7 @@ LbcForm now answers Shift+F1 with the focused control’s hint, from
 Hints.inix or its own description; LbcDialog keeps its own answer, with
 each control’s tip.</li>
 </ul>
-<h2 id="november-2026-38">1.164.0 – 6 November 2026</h2>
+<h2 id="november-2026-40">1.164.0 – 6 November 2026</h2>
 <ul>
 <li><strong>The kit-classes check counts top-level classes
 only.</strong> DbDo’s KeyBinding and Result are helpers nested inside
@@ -590,7 +649,7 @@ Util; FileDir’s MdiChild. Each is a large working part of its app, to be
 moved into the kit and generalized one per build, as help\SharedCore.md
 and the transition brief of this date describe.</li>
 </ul>
-<h2 id="november-2026-39">1.163.0 – 6 November 2026</h2>
+<h2 id="november-2026-41">1.163.0 – 6 November 2026</h2>
 <ul>
 <li><strong>kdpSubmit and buildBooks work for the project a caller
 names.</strong> Run from C:\HomerDev\scripts, they took the kit as their
@@ -599,7 +658,7 @@ folder, and the scripts it starts inherit it; kdpFix does, for
 C:\MyBooks. Run any other way, the project is the parent of scripts\, as
 before.</li>
 </ul>
-<h2 id="november-2026-40">1.162.0 – 6 November 2026</h2>
+<h2 id="november-2026-42">1.162.0 – 6 November 2026</h2>
 <ul>
 <li><strong>%LOCALAPPDATA%\HomerDev shrinks from 114 MB to about
 7.</strong> 107 MB of it was AxeWindowsCLI, fetched by every build and
@@ -609,7 +668,7 @@ only the library and remove the old tool’s folder; the installer checks
 the library. Nothing a Homer app runs depends on this folder: no app’s
 code refers to it, and it holds development tools and logs only.</li>
 </ul>
-<h2 id="november-2026-41">1.161.0 – 6 November 2026</h2>
+<h2 id="november-2026-43">1.161.0 – 6 November 2026</h2>
 <ul>
 <li><strong>HomerDev’s own window, scanned at last.</strong> The 12:26
 push opened HomerDev, scanned its main window in 6.6 seconds – 376 list
@@ -625,7 +684,7 @@ folder without spaces, answered 1.9.5. Each is now started through .NET,
 its output and error output both read, its raw answer logged, so no
 quoting of a path with a space can lose it.</li>
 </ul>
-<h2 id="november-2026-42">1.160.0 – 6 November 2026</h2>
+<h2 id="november-2026-44">1.160.0 – 6 November 2026</h2>
 <ul>
 <li><strong>Whisper’s Update is right, and now it updates.</strong> At
 12:02 the refresh asked the newest Windows build, b5454, its version and
@@ -639,7 +698,7 @@ Columns, Filter Records, Order Records and the Alternate Menu were
 unchanged since their scans, and scanned none of them; Current Windows,
 reached for the first time, was scanned: 0 errors.</li>
 </ul>
-<h2 id="november-2026-43">1.159.0 – 6 November 2026</h2>
+<h2 id="november-2026-45">1.159.0 – 6 November 2026</h2>
 <ul>
 <li><strong>The kit’s gate scans HomerDev’s own window.</strong>
 check.py in the kit handed everything to checkHomerDev and stopped, so
@@ -652,7 +711,7 @@ main window’s first fingerprint (8 controls, none before), scanned, and
 saved it; FileDir’s and EdSharp’s gates reused their whole earlier
 result, so neither scanned.</li>
 </ul>
-<h2 id="november-2026-44">1.158.0 – 6 November 2026</h2>
+<h2 id="november-2026-46">1.158.0 – 6 November 2026</h2>
 <ul>
 <li><strong>Whisper’s refresh reads each program’s own version.</strong>
 The 11:25 install fetched the newest Windows build, b5454, but
@@ -665,7 +724,7 @@ rows of a virtual list off screen have no on-screen rectangle, Windows’
 own list control; DbDo’s record list gave it 4,161 times, and there is
 nothing to change.</li>
 </ul>
-<h2 id="november-2026-45">1.157.0 – 6 November 2026</h2>
+<h2 id="november-2026-47">1.157.0 – 6 November 2026</h2>
 <ul>
 <li><strong>LbcMessage.native wraps the standard Windows message
 box,</strong> owned by the window in front, for a question whose Yes and
@@ -673,7 +732,7 @@ No must answer Y and N by Windows itself, Alt or not. FileDir’s “Create
 it?” still lost Alt+Y to its Yield Files after 1.154.0; FileDir’s
 confirmations use this now.</li>
 </ul>
-<h2 id="november-2026-46">1.156.0 – 6 November 2026</h2>
+<h2 id="november-2026-48">1.156.0 – 6 November 2026</h2>
 <ul>
 <li><strong>axeWindow keeps its fingerprints in axeScans.inix,</strong>
 not axeScans.json: a file a Homer tool creates is .inix unless .inix
@@ -681,7 +740,7 @@ cannot hold its data, and this data is a section a window with one line
 a value. A JSON copy left by 1.155.0 is removed the first time the .inix
 is written.</li>
 </ul>
-<h2 id="november-2026-47">1.155.0 – 6 November 2026</h2>
+<h2 id="november-2026-49">1.155.0 – 6 November 2026</h2>
 <ul>
 <li><strong>Every verb checked again, and one false Update
 found.</strong> In the 10:43 and 10:58 installs, the new lookups
@@ -702,7 +761,7 @@ with the Axe.Windows version, and keeps the fingerprints in
 When nothing has changed, JAWS says so with the error count of the last
 scan, and that scan’s findings stand.</li>
 </ul>
-<h2 id="november-2026-48">1.154.0 – 6 November 2026</h2>
+<h2 id="november-2026-50">1.154.0 – 6 November 2026</h2>
 <ul>
 <li><strong>A dialog’s own access keys come first, in every Homer
 app.</strong> FileDir binds Alt+Y to Yield Files, and LbcForm tried an
@@ -716,7 +775,7 @@ Cancel without an access key, since Escape is its key. Four OK and
 Cancel buttons in Lbc and one in the media player’s help, built directly
 with &amp;OK or &amp;Cancel, lose their letters.</li>
 </ul>
-<h2 id="november-2026-49">1.153.0 – 6 November 2026</h2>
+<h2 id="november-2026-51">1.153.0 – 6 November 2026</h2>
 <ul>
 <li><strong>Every component’s verb, checked against its
 versions.</strong> In the 10:01 install, every component whose newest
@@ -738,7 +797,7 @@ it is.</strong> Every run said the model is downloaded “the first time”;
 it is fetched once, by the faster-whisper component at install or the
 first walk, and loaded from its cache after.</li>
 </ul>
-<h2 id="november-2026-50">1.152.0 – 6 November 2026</h2>
+<h2 id="november-2026-52">1.152.0 – 6 November 2026</h2>
 <ul>
 <li><strong>Pick lists remember the last choice:</strong>
 LbcDialog.lastChoice and noteChoice, on the same history that prompts
@@ -754,7 +813,7 @@ plainly that the ScrollItem finding on Windows Forms list items is
 nothing to change; <strong>walks scan only the dialogs they
 open,</strong> since every push scans an app’s main window.</li>
 </ul>
-<h2 id="november-2026-51">1.151.0 – 5 November 2026</h2>
+<h2 id="november-2026-53">1.151.0 – 5 November 2026</h2>
 <ul>
 <li><strong>axeWindow finds ScanOptions wherever the library keeps
 it.</strong> The library loaded at last at 20:01, in 64-bit .NET
@@ -766,7 +825,7 @@ by reflection, its constructors logged.</li>
 <li><strong>Integration, step 1 begun:</strong> FileDir’s window
 commands run on the kit’s MdiWindows (help.md says what remains).</li>
 </ul>
-<h2 id="november-2026-52">1.150.0 – 5 November 2026</h2>
+<h2 id="november-2026-54">1.150.0 – 5 November 2026</h2>
 <ul>
 <li><strong>The gate measures integration.</strong> The shared check’s
 new kit classes finding lists every class an app defines under a name
@@ -776,13 +835,13 @@ KeyMap, KeyBinding and Result.</li>
 <li><strong>help.md</strong> now records EdSharp as measured, and the
 order of the remaining steps, one to a build.</li>
 </ul>
-<h2 id="november-2026-53">1.149.0 – 5 November 2026</h2>
+<h2 id="november-2026-55">1.149.0 – 5 November 2026</h2>
 <ul>
 <li><strong>SuiteCommands.inix:</strong> FileDir’s Window Toggle is
 retired from Shift+W, as planned, so Shift+W means Say Whole Record
 across the suite.</li>
 </ul>
-<h2 id="november-2026-54">1.148.0 – 5 November 2026</h2>
+<h2 id="november-2026-56">1.148.0 – 5 November 2026</h2>
 <ul>
 <li><strong>axeWindow reads the Axe.Windows package’s own folder
 name.</strong> The listing logged at 17:51 showed it: lib/netstandard20,
@@ -793,7 +852,7 @@ window: AxeWindowsCLI takes only a process id or name, and Accessibility
 Insights for Windows has no command-line scanner; the library’s
 scanRootWindowHandle is the way.</li>
 </ul>
-<h2 id="november-2026-55">1.147.0 – 5 November 2026</h2>
+<h2 id="november-2026-57">1.147.0 – 5 November 2026</h2>
 <ul>
 <li><strong>axeWindow finds Axe.Windows’ own library.</strong> The 13:07
 fetch brought every dependency from NuGet but read the Axe.Windows
@@ -803,7 +862,7 @@ written with / or , a fetch that ends without the library fails saying
 so, and the package’s contents are logged when its library is not
 found.</li>
 </ul>
-<h2 id="november-2026-56">1.146.0 – 5 November 2026</h2>
+<h2 id="november-2026-58">1.146.0 – 5 November 2026</h2>
 <ul>
 <li><strong>axeWindow loads the Axe.Windows library in 64-bit .NET
 Framework.</strong> It had borrowed AxeWindowsCLI’s runtime, which is
@@ -821,7 +880,7 @@ went to Windows Explorer since DbDo was already open, and the walk
 stopped at step 3. recordWalk reads the key from #define HotKey in the
 app’s installer script and keeps that step’s narration only.</li>
 </ul>
-<h2 id="november-2026-57">1.145.0 – 5 November 2026</h2>
+<h2 id="november-2026-59">1.145.0 – 5 November 2026</h2>
 <ul>
 <li><strong>No arguments to remember.</strong> recordWalk alone walks
 the pilot, scans each window once (spoken progress every 10 seconds),
@@ -839,7 +898,7 @@ walk.</li>
 sensible whole with no arguments, and routine checking belongs in build,
 tidy, push and release.</li>
 </ul>
-<h2 id="november-2026-58">1.144.0 – 5 November 2026</h2>
+<h2 id="november-2026-60">1.144.0 – 5 November 2026</h2>
 <ul>
 <li><strong>axeWindow scans one window, saying how it goes.</strong> The
 new scripts.py scans the window in front by its handle through the
@@ -858,7 +917,7 @@ the pilot.</li>
 <li><strong>The pywinauto component installs pythonnet too,</strong>
 which axeWindow needs.</li>
 </ul>
-<h2 id="november-2026-59">1.143.0 – 5 November 2026</h2>
+<h2 id="november-2026-61">1.143.0 – 5 November 2026</h2>
 <ul>
 <li><strong>Scans only when asked.</strong> The accessibility check
 opened DbDo at every push for a minute and found nothing, and
@@ -872,13 +931,13 @@ handle – ScanOptions(scanId, scanRootWindowHandle), added in 2.4.1 – so
 a dialog can be scanned without the record list behind it; the
 command-line tool cannot. A kit helper using it is the next step.</li>
 </ul>
-<h2 id="november-2026-60">1.142.0 – 5 November 2026</h2>
+<h2 id="november-2026-62">1.142.0 – 5 November 2026</h2>
 <ul>
 <li><strong>help.md:</strong> no new top-level folder without approval
 asked in advance, and never a declaration in RepoFiles.txt to quiet the
 layout check, from a samples folder made in DbDo unasked.</li>
 </ul>
-<h2 id="november-2026-61">1.141.0 – 5 November 2026</h2>
+<h2 id="november-2026-63">1.141.0 – 5 November 2026</h2>
 <ul>
 <li><strong>Accessibility scans at every push.</strong> The new
 scripts.py runs Axe.Windows, the rule engine of Accessibility Insights
@@ -923,7 +982,7 @@ with its small.en speech model fetched once) and pywinauto
 <li><strong>scripts.py carries its byte order mark,</strong> whose lack
 stopped the 11:05 build.</li>
 </ul>
-<h2 id="november-2026-62">1.140.0 – 5 November 2026</h2>
+<h2 id="november-2026-64">1.140.0 – 5 November 2026</h2>
 <ul>
 <li><strong>TutorialLearnings.md learns from Brian Hartgen’s database
 lessons</strong> (Catching Up with Leasey, Series 2): how a transcript’s
@@ -939,7 +998,7 @@ dialog</strong> (Replace, Replace with Regex), Extract with Regex on the
 suite’s Control+Shift+E, Edit Snippet on Alt+Shift+S, Say Replace Values
 on Shift+V, and Say Regex Replace retired.</li>
 </ul>
-<h2 id="november-2026-63">1.139.0 – 5 November 2026</h2>
+<h2 id="november-2026-65">1.139.0 – 5 November 2026</h2>
 <ul>
 <li><strong>SuiteCommands.inix records DbDo’s new keys:</strong> Add
 Column to Order (Alt+A) and its descending twin (Alt+Shift+A), the
@@ -949,7 +1008,7 @@ Record (Shift+W). FileDir’s Window Toggle on Shift+W is marked to retire
 when FileDir is next updated, since Control+Tab does the same and DbDo’s
 Shift+W now says the whole record.</li>
 </ul>
-<h2 id="november-2026-64">1.138.0 – 5 November 2026</h2>
+<h2 id="november-2026-66">1.138.0 – 5 November 2026</h2>
 <ul>
 <li><strong>Homer.ColumnTypes replaces TextTypes,</strong> in Schema.cs,
 with its twin scripts.py: forty declared column types that follow
@@ -975,7 +1034,7 @@ again.</strong> Its type list was widened in Conversion.cs but not in
 conversion.py, and the build’s twin check stopped the 21:35 build, as it
 should; both now list all forty types.</li>
 </ul>
-<h2 id="november-2026-65">1.137.0 – 5 November 2026</h2>
+<h2 id="november-2026-67">1.137.0 – 5 November 2026</h2>
 <ul>
 <li><strong>Homer.TextTypes, in Schema.cs, and its twin
 scripts.py:</strong> the vocabulary of declared text types, seventeen
@@ -985,13 +1044,13 @@ its name says the format. The conversion to DbDo format seeds all of
 them into defs, and help.md explains them.</li>
 <li><strong>checkDb knows the files table’s kind column.</strong></li>
 </ul>
-<h2 id="november-2026-66">1.136.0 – 5 November 2026</h2>
+<h2 id="november-2026-68">1.136.0 – 5 November 2026</h2>
 <ul>
 <li><strong>checkDb knows DbDo’s third table, files,</strong> the files
 a database carries – scripts, report definitions, settings – beside defs
 and maps.</li>
 </ul>
-<h2 id="november-2026-67">1.135.0 – 5 November 2026</h2>
+<h2 id="november-2026-69">1.135.0 – 5 November 2026</h2>
 <ul>
 <li><strong>A PDF read into Markdown gains a Contents list and citation
 links,</strong> from “Improving the accessibility of scientific
@@ -1008,7 +1067,7 @@ keeps the words and drops the links.</li>
 program’s path, file version and build time, under its title.</li>
 <li><strong>help.md</strong> gains the night’s lessons.</li>
 </ul>
-<h2 id="november-2026-68">1.134.0 – 5 November 2026</h2>
+<h2 id="november-2026-70">1.134.0 – 5 November 2026</h2>
 <ul>
 <li><strong>The kit’s C# is all C# 5 again.</strong> Two lambdas with
 parenthesized parameters, added to Lbc.cs on 5 November, matched the C#
@@ -1019,7 +1078,7 @@ owner too,</strong> from text alone to text, title, buttons, icon and
 default button. DbDo’s notice of recovered working copies, shown at
 startup, has no owner window, and failed to compile at 18:52.</li>
 </ul>
-<h2 id="november-2026-69">1.133.0 – 5 November 2026</h2>
+<h2 id="november-2026-71">1.133.0 – 5 November 2026</h2>
 <ul>
 <li><strong>The 18:38 build’s three problems are fixed:</strong>
 AGENTS.md and llms.txt list homer-gui-test, AGENTS.md says twenty-four
@@ -1029,7 +1088,7 @@ number can claim files that never arrived; redeliver every file changed
 since the last good build; trust the kit’s gates; and what the Do No
 Harm Guide and the Accessibility Metadata Display Guide teach.</li>
 </ul>
-<h2 id="november-2026-70">1.132.0 – 5 November 2026</h2>
+<h2 id="november-2026-72">1.132.0 – 5 November 2026</h2>
 <ul>
 <li><strong>A new skill, homer-gui-test:</strong> testing a running app
 the way a screen reader user meets it, with uiCheck (the accessibility
@@ -1044,7 +1103,7 @@ app’s and its walks from the app’s scripts.</li>
 newest first, from the 26 October transition brief and the work
 since.</li>
 </ul>
-<h2 id="november-2026-71">1.131.0 – 5 November 2026</h2>
+<h2 id="november-2026-73">1.131.0 – 5 November 2026</h2>
 <ul>
 <li><strong>help\SharedCore.md lists, from the code, what the Homer apps
 share and what is left.</strong> A first version, the same day, wrongly
@@ -1054,7 +1113,7 @@ and FileDir routes through it too. Left: the Key Describer in FileDir
 (DbDo’s done), the window family, DbDo’s older update class and settings
 reader, and five components the kit does not have yet.</li>
 </ul>
-<h2 id="november-2026-72">1.130.0 – 5 November 2026</h2>
+<h2 id="november-2026-74">1.130.0 – 5 November 2026</h2>
 <ul>
 <li><strong>The Key Describer’s rules, for every Homer app</strong>
 (HomerSuite.md, KeyDecisions.md): every key described even when its
@@ -1069,7 +1128,7 @@ Column, Statistics from Column, Count by Columns and the visited-table
 keys retired; Reverse Alpha Order, Say Header and Shift+W for Window
 Toggle withdrawn; Alpha Order kept on Alt+A.</li>
 </ul>
-<h2 id="november-2026-73">1.129.0 – 5 November 2026</h2>
+<h2 id="november-2026-75">1.129.0 – 5 November 2026</h2>
 <ul>
 <li><strong>SuiteCommands.inix records DbDo’s key review of 5
 November:</strong> Frequency by Columns on Alt+Shift+F (was Count by
@@ -1078,7 +1137,7 @@ Alt+Shift+A as in FileDir, Say Header on Shift+H, Window Toggle on
 Shift+W as in FileDir, and Open Table in New Window retired, freeing
 Control+Shift+T, since Query does the same.</li>
 </ul>
-<h2 id="november-2026-74">1.128.0 – 5 November 2026</h2>
+<h2 id="november-2026-76">1.128.0 – 5 November 2026</h2>
 <ul>
 <li><strong>Alt+Shift+Slash in every Lbc window.</strong> LbcForm
 answers it before any control sees the key: through an LbcDialog’s own,
@@ -1095,21 +1154,21 @@ and Escape like any Homer dialog. A short message is a line said as the
 dialog opens; a long one is a read-only box. Should the dialog fail,
 Windows’s message box shows it.</li>
 </ul>
-<h2 id="november-2026-75">1.127.0 – 4 November 2026</h2>
+<h2 id="november-2026-77">1.127.0 – 4 November 2026</h2>
 <ul>
 <li><strong>Lbc can change a field’s pattern while its dialog is
 open:</strong> setPattern replaces it (an empty pattern removes it), and
 patternOf tells which one OK will check. DbDo’s Alt+Shift+P uses it to
 edit the focused field’s pattern in a record form.</li>
 </ul>
-<h2 id="november-2026-76">1.126.0 – 4 November 2026</h2>
+<h2 id="november-2026-78">1.126.0 – 4 November 2026</h2>
 <ul>
 <li><strong>The SQLite script is the same in both copies again.</strong>
 Retiring the views table changed it in Conversion.cs but not in
 conversion.py, and the build’s own check stopped at 13:22 saying they
 differ; conversion.py now matches, all 126 lines.</li>
 </ul>
-<h2 id="november-2026-77">1.125.0 – 4 November 2026</h2>
+<h2 id="november-2026-79">1.125.0 – 4 November 2026</h2>
 <ul>
 <li><strong>lookups is now defs, with def_id,</strong> in the kit’s
 database conventions, checkDb and the conversion to DbDo’s form: DbDo’s
@@ -1122,7 +1181,7 @@ maps and map_id); not an SQL keyword, not the start of a standard field
 name (added, edited, id, look, marked, notes, prime, tags, url), and
 where it can be, beginning with a letter no common table uses.</li>
 </ul>
-<h2 id="november-2026-78">1.124.0 – 4 November 2026</h2>
+<h2 id="november-2026-80">1.124.0 – 4 November 2026</h2>
 <ul>
 <li><strong>DbDo’s own tables are lookups and maps; the views table is
 retired.</strong> A table named views, which kept a table’s shown
@@ -1131,7 +1190,7 @@ DbDo’s schema. checkDb no longer treats a table of that name as DbDo’s,
 and the conversion to DbDo’s form no longer creates one. A database may
 of course hold SQL views, which SQLite tells apart from tables.</li>
 </ul>
-<h2 id="november-2026-79">1.123.0 – 3 November 2026</h2>
+<h2 id="november-2026-81">1.123.0 – 3 November 2026</h2>
 <ul>
 <li><strong>kdpSubmit uploads a manuscript only when its book’s sources
 changed (version 48).</strong> On 3 November a bare run uploaded 17
@@ -1150,7 +1209,7 @@ to send one on purpose.</li>
 <li><strong>kdpSubmit –list</strong> says which books a bare run would
 submit, and why, and stops without sending or writing anything.</li>
 </ul>
-<h2 id="november-2026-80">1.122.0 – 3 November 2026</h2>
+<h2 id="november-2026-82">1.122.0 – 3 November 2026</h2>
 <ul>
 <li><strong>whoOpens names the program behind Windows’s “Select an app
 to open this file” prompt.</strong> The prompt came again and again on 3
@@ -1161,7 +1220,7 @@ its parent is whoever asked; whoOpens watches for it (ten minutes, or
 parent chain four levels up with each one’s command line. It changes
 nothing on the machine.</li>
 </ul>
-<h2 id="november-2026-81">1.121.0 – 3 November 2026</h2>
+<h2 id="november-2026-83">1.121.0 – 3 November 2026</h2>
 <ul>
 <li><strong>recordWalk listens until JAWS stops, not for a fixed
 time.</strong> The recordings of nine walks on 3 November showed JAWS
@@ -1174,7 +1233,7 @@ quiet for 0.8 seconds (at most fifteen); Wait= is only how long to wait
 for speech to begin. Each step reports its seconds of speech and says
 when speech ran past the limit.</li>
 </ul>
-<h2 id="november-2026-82">1.120.0 – 3 November 2026</h2>
+<h2 id="november-2026-84">1.120.0 – 3 November 2026</h2>
 <ul>
 <li><strong>recordWalk –axe scans the app after each step with
 Axe.Windows,</strong> the rules engine of Accessibility Insights for
@@ -1188,7 +1247,7 @@ error count, the rules it names and the .a11ytest file, which opens in
 Accessibility Insights; the log keeps the tool’s whole output. A scan
 that cannot run is said, and the walk goes on.</li>
 </ul>
-<h2 id="november-2026-83">1.119.0 – 3 November 2026</h2>
+<h2 id="november-2026-85">1.119.0 – 3 November 2026</h2>
 <ul>
 <li><strong>checkDb no longer takes a description for a choice.</strong>
 DbDo’s lookups now holds a data dictionary beside its choices: a row
@@ -1198,7 +1257,7 @@ database. checkDb counted those as choices for a field named None – ten
 warnings in BlindCreations alone – and now checks only rows that name a
 field.</li>
 </ul>
-<h2 id="november-2026-84">1.118.0 – 3 November 2026</h2>
+<h2 id="november-2026-86">1.118.0 – 3 November 2026</h2>
 <ul>
 <li><strong>A missing screen reader source is made again, not silently
 skipped.</strong> DbDo’s installer installed JAWS scripts and an NVDA
@@ -1214,7 +1273,7 @@ named in RepoFiles.txt so tidy keeps them. Sources that are there are
 never touched, and an app whose installer installs no screen reader
 support is left alone. The log says what was made.</li>
 </ul>
-<h2 id="november-2026-85">1.117.0 – 3 November 2026</h2>
+<h2 id="november-2026-87">1.117.0 – 3 November 2026</h2>
 <ul>
 <li><strong>A pattern can make a field required.</strong> Lbc’s pattern
 check now tests an empty value too, so ^refuses a blank and ^$| in front
@@ -1223,7 +1282,7 @@ with what is wrong – “This field cannot be left blank” or “This value
 does not fit” – and then the caller’s sentence, such as what the field
 is for.</li>
 </ul>
-<h2 id="november-2026-86">1.116.0 – 3 November 2026</h2>
+<h2 id="november-2026-88">1.116.0 – 3 November 2026</h2>
 <ul>
 <li><strong>Patterns, checked only when OK is pressed, in every Lbc
 dialog.</strong> addPattern(field, pattern, sentence) gives a field a
@@ -1239,7 +1298,7 @@ LbcHints.setItemHints gives a list a sentence per item, which Shift+F1
 says for the item selected, before the list’s own tip; DbDo’s table
 lists use it for each table’s description.</li>
 </ul>
-<h2 id="november-2026-87">1.115.0 – 3 November 2026</h2>
+<h2 id="november-2026-89">1.115.0 – 3 November 2026</h2>
 <ul>
 <li><strong>PDF tools stop asking to be updated after every
 install.</strong> HomerDev’s and BatCon’s installers registered PDF
@@ -1254,7 +1313,7 @@ Alt+F4 would, so its closing says the run is over; –keep leaves it open.
 Nothing is forced: an app still open after ten seconds is left so, and
 said.</li>
 </ul>
-<h2 id="november-2026-88">1.114.0 – 3 November 2026</h2>
+<h2 id="november-2026-90">1.114.0 – 3 November 2026</h2>
 <ul>
 <li><strong>recordWalk forgives the recognizer’s near-misses.</strong>
 At a fast JAWS rate it wrote “show now” for “shown now” and “rhymes” for
@@ -1264,7 +1323,7 @@ alike, in any order within the step; on the 14:09 run’s own transcripts
 that credits Shown now, Shows look’s columns and Prime columns button,
 and still refuses a line heard as “the false order”.</li>
 </ul>
-<h2 id="november-2026-89">1.113.0 – 3 November 2026</h2>
+<h2 id="november-2026-91">1.113.0 – 3 November 2026</h2>
 <ul>
 <li><strong>An inline field is named by its own label.</strong>
 addInlineInputBox registered each box through nameFromLabel, which looks
@@ -1274,7 +1333,7 @@ field edit, Sonic Radio, 1 of 38” for the name field. It now registers
 under its own label, and Where Am I also falls back to the label just
 before a control.</li>
 </ul>
-<h2 id="november-2026-90">1.112.0 – 3 November 2026</h2>
+<h2 id="november-2026-92">1.112.0 – 3 November 2026</h2>
 <ul>
 <li><strong>Where Am I and Shift+F1’s levels in the Python Lbc
 too,</strong> so the key is the same in every Homer app, whatever
@@ -1285,7 +1344,7 @@ sentence, twice the whole tip, three times the control’s keys. The rules
 match the C# Lbc’s LbcHints: one press counter, 1.2 seconds between
 presses, up to three.</li>
 </ul>
-<h2 id="november-2026-91">1.111.0 – 3 November 2026</h2>
+<h2 id="november-2026-93">1.111.0 – 3 November 2026</h2>
 <ul>
 <li><strong>Installers compile again.</strong> 1.108.0’s spoken status
 called GetTickCount, which Inno Setup does not have, so every installer
@@ -1302,7 +1361,7 @@ reported, and a silent one is flagged, since the default output – on
 Jamal’s machine a monitor’s speakers – may not be where JAWS speaks;
 –speaker chooses another, and the log names them all.</li>
 </ul>
-<h2 id="november-2026-92">1.110.0 – 3 November 2026</h2>
+<h2 id="november-2026-94">1.110.0 – 3 November 2026</h2>
 <ul>
 <li><strong>Where Am I on Alt+Shift+Slash, Alt and the question mark, in
 every Lbc dialog of every Homer app.</strong> Pressed once it says the
@@ -1327,7 +1386,7 @@ pywinauto starts COM as it loads, and soundcard took the “already
 started” answer for an error, stopping all three first runs with “Error
 0x100000001”.</li>
 </ul>
-<h2 id="november-2026-93">1.109.0 – 3 November 2026</h2>
+<h2 id="november-2026-95">1.109.0 – 3 November 2026</h2>
 <ul>
 <li><strong>recordWalk hears what uiCheck could not.</strong> uiCheck
 drives a program through UI Automation and says plainly it does not hear
@@ -1341,7 +1400,7 @@ moment another window comes to the front, so switching away is the way
 to stop it. Packages install for the user alone; no administrator
 rights.</li>
 </ul>
-<h2 id="november-2026-94">1.108.0 – 3 November 2026</h2>
+<h2 id="november-2026-96">1.108.0 – 3 November 2026</h2>
 <ul>
 <li><strong>Setup says what it is checking.</strong> Between the last
 file copied and the page with the Install button, every installer asks
@@ -1355,7 +1414,7 @@ controller library is 64-bit and Setup is a 32-bit program. Every status
 is in the setup log too. Every Homer installer gets this at its next
 build.</li>
 </ul>
-<h2 id="november-2026-95">1.107.0 – 3 November 2026</h2>
+<h2 id="november-2026-97">1.107.0 – 3 November 2026</h2>
 <ul>
 <li><strong>The JAWS template compiles again.</strong> Its
 ScreenSensitiveHelp script, added on 2 November for JAWS+F1 pressed
@@ -1365,7 +1424,7 @@ before every name, and scompile stopped there in JAWS 2024, 2025 and
 in all three. Every app built from the template since needs the fix,
 which is now <code>string sHelp, string sPath</code>.</li>
 </ul>
-<h2 id="november-2026-96">1.106.0 – 3 November 2026</h2>
+<h2 id="november-2026-98">1.106.0 – 3 November 2026</h2>
 <ul>
 <li><strong>Help guides for Shoutcast and Radio Browser.</strong> The
 app-help-guide skill’s generator has both: Shoutcast’s help centre by
@@ -1374,7 +1433,7 @@ questions page and how to add a station; its programming interface is
 left out, as the collection’s rule asks. The builder knows Shoutcast’s
 shape already; Radio Browser’s reader follows its first harvest.</li>
 </ul>
-<h2 id="november-2026-97">1.105.0 – 2 November 2026</h2>
+<h2 id="november-2026-99">1.105.0 – 2 November 2026</h2>
 <ul>
 <li><strong>Shift+F1 in any Lbc dialog says what the control with focus
 does, in one sentence.</strong> The new LbcHints looks for the sentence
@@ -1391,7 +1450,7 @@ to have a name of at least two words. Lbc logs each one-word name once
 per run, so an app’s log lists what is left to rename; nothing is
 refused.</li>
 </ul>
-<h2 id="november-2026-98">1.104.0 – 2 November 2026</h2>
+<h2 id="november-2026-100">1.104.0 – 2 November 2026</h2>
 <ul>
 <li><strong>The Homer Player’s Extra Info box is last of its fields
 again.</strong> It sat in the Tracks band, so Tab went from the list
@@ -1414,7 +1473,7 @@ minutes. The idea is from Leasey’s Media Player, chosen because people
 planning their listening ask it; its equalizer, audio notes and audio
 editing were not taken, being tunings few listeners use.</li>
 </ul>
-<h2 id="november-2026-99">1.103.0 – 2 November 2026</h2>
+<h2 id="november-2026-101">1.103.0 – 2 November 2026</h2>
 <ul>
 <li><strong>kdpSubmit version 47 waits out KDP’s reviews.</strong> KDP
 locks a book’s setup pages while it reviews or publishes an earlier
@@ -1444,7 +1503,7 @@ in the app-help-guide skill’s makeHarvester.py, replacing a one-off
 harvester written outside it. The skill now says so, and records what a
 browser road will need when one is built.</li>
 </ul>
-<h2 id="november-2026-100">1.102.0 – 2 November 2026</h2>
+<h2 id="november-2026-102">1.102.0 – 2 November 2026</h2>
 <ul>
 <li><strong>Spoken walks are kept in a cache.</strong> buildTutorials
 now keeps every recording under %LOCALAPPDATA%, named by its walk’s
@@ -1467,7 +1526,7 @@ through kdpBooks’ shared reader, before its status is called unknown:
 Mastery in Popular Song, live with an update publishing, was not on the
 first page.</li>
 </ul>
-<h2 id="november-2026-101">1.101.0 – 2 November 2026</h2>
+<h2 id="november-2026-103">1.101.0 – 2 November 2026</h2>
 <ul>
 <li><strong>NVDA’s own keys are in the key ownership data.</strong>
 KeyOwnership.inix, which checkKeys reads, named JAWS’s keys but none
@@ -1486,7 +1545,7 @@ typed key that announces itself and types its own character when pressed
 twice; and an article that teaches keys ends with a short list of them,
 in the homer-docs skill.</li>
 </ul>
-<h2 id="november-2026-102">1.100.0 – 2 November 2026</h2>
+<h2 id="november-2026-104">1.100.0 – 2 November 2026</h2>
 <ul>
 <li><p><strong>The ReadMe opens with what HomerDev gives you,</strong>
 in nine plain points: conversions, .inix, direct speech, dialog keys,
@@ -1512,7 +1571,7 @@ sayVersions.</p></li>
 one place, what Homer learned from QUILL and from Doug Lee’s scripts and
 tools.</p></li>
 </ul>
-<h2 id="november-2026-103">1.99.0 – 2 November 2026</h2>
+<h2 id="november-2026-105">1.99.0 – 2 November 2026</h2>
 <p>Lessons from the Quill family of accessible apps, whose guides,
 requirements and tutorials were studied for what fits Homer.</p>
 <ul>
@@ -1529,7 +1588,7 @@ teach the wants and F1 opens the full guide; walk 1 presents the keys
 that explain the keys as habits, the few things that make everything
 else easy.</li>
 </ul>
-<h2 id="november-2026-104">1.98.0 – 2 November 2026</h2>
+<h2 id="november-2026-106">1.98.0 – 2 November 2026</h2>
 <ul>
 <li><strong>JAWS scripts and NVDA add-ons are built, fingerprinted,
 installed and run the same way.</strong> installScreenReaderSupport’s
@@ -1555,7 +1614,7 @@ build,</strong> sources only for JAWS, and for NVDA the add-on with the
 kit’s keys.py copied in. DbDo’s build calls it instead of a block of its
 own.</li>
 </ul>
-<h2 id="november-2026-105">1.97.1 – 2 November 2026</h2>
+<h2 id="november-2026-107">1.97.1 – 2 November 2026</h2>
 <ul>
 <li><strong>The installer notices an NVDA add-on whose code changed at
 the same version.</strong> The finish page judged the add-on by manifest
@@ -1569,7 +1628,7 @@ sources. A difference is an Update, ticked. The JAWS side needed no
 change: its fingerprint was already of the sources inside the zip, so
 repacking it on every build changes nothing.</li>
 </ul>
-<h2 id="november-2026-106">1.97.0 – 2 November 2026</h2>
+<h2 id="november-2026-108">1.97.0 – 2 November 2026</h2>
 <ul>
 <li><strong>One key-handling framework for every Homer app’s screen
 reader scripts.</strong> Each key has a way – capture, pass quietly,
@@ -1587,7 +1646,7 @@ same code. It sends a key by its six-pack name even when the number pad
 was pressed, the lesson DbDo’s add-on learned. JAWS scripts, which use
 no Include, share the shapes in Templates.</li>
 </ul>
-<h2 id="november-2026-107">1.96.1 – 2 November 2026</h2>
+<h2 id="november-2026-109">1.96.1 – 2 November 2026</h2>
 <ul>
 <li><strong>Five standard ways to handle a key, for JAWS and NVDA
 alike.</strong> The homer-screen-reader skill’s new
@@ -1608,7 +1667,7 @@ readers’ own keyboard interrupt already cuts off speech when a key is
 pressed, and a quiet pass-through script keeps the reader from adding
 its own; DbDo’s grid now works that way.</li>
 </ul>
-<h2 id="november-2026-108">1.96.0 – 2 November 2026</h2>
+<h2 id="november-2026-110">1.96.0 – 2 November 2026</h2>
 <ul>
 <li><strong>Say.sayNow speaks in place of what the reader was
 saying.</strong> say() queues politely; sayNow flushes the screen
@@ -1618,7 +1677,7 @@ focus itself can say exactly what should be heard, with no JAWS or NVDA
 script. The Extra Speech gate still applies. DbDo’s grid is the first
 user.</li>
 </ul>
-<h2 id="november-2026-109">1.95.3 – 1 November 2026</h2>
+<h2 id="november-2026-111">1.95.3 – 1 November 2026</h2>
 <ul>
 <li><strong>The tutorials’ screen reader voice is a little
 slower,</strong> to be easier to understand: its pace setting goes from
@@ -1631,7 +1690,7 @@ voice settings are now part of each tutorial’s fingerprint. The next
 build of each app speaks all its tutorials once more, which takes a
 while.</li>
 </ul>
-<h2 id="november-2026-110">1.95.2 – 1 November 2026</h2>
+<h2 id="november-2026-112">1.95.2 – 1 November 2026</h2>
 <ul>
 <li><strong>The key check reads navigation keys correctly.</strong> It
 took the words “Alt+Control+Shift with an arrow” as a key named Shift,
@@ -1640,7 +1699,7 @@ table keys. A modifier named in prose is skipped, and Number Pad 5
 counts as a navigation key, as the arrows, Home, End, Page Up and Page
 Down already did. Every app’s copy of check.py is the kit’s.</li>
 </ul>
-<h2 id="november-2026-111">1.95.1 – 1 November 2026</h2>
+<h2 id="november-2026-113">1.95.1 – 1 November 2026</h2>
 <ul>
 <li><strong>A prompt’s ampersand is a character.</strong> The list
 Filter prompt said “with &amp; or | or *“, and its label took the

@@ -2098,6 +2098,50 @@ def removeStrayErrorLevel():
     return bFound
 
 
+def settleTree():
+    """THE KIT KEEPS THE HOMER TREE (1.204.0, help\\HomerTree.md). Two drifts are settled here, once, logged:
+    examples at the top, a leftover of help\\examples (the place the book and its directory name), is deleted file by
+    file where help\\examples holds the same file, and anything else in it goes to notes\\retired\\examples; and
+    Templates becomes templates, since every Homer folder name is lower case. Windows ignores the case, so nothing that
+    names Templates stops working; git is told in two steps, as it needs for a change of case only."""
+    import filecmp, shutil
+    sKit = os.path.dirname(os.path.abspath(__file__))
+    sTop, sHelp = os.path.join(sKit, "examples"), os.path.join(sKit, "help", "examples")
+    if os.path.isdir(sTop) and os.path.isdir(sHelp):
+        for sDir, lsDirs, lsFiles in os.walk(sTop, topdown=False):
+            for sName in lsFiles:
+                sPath = os.path.join(sDir, sName)
+                sTwin = os.path.join(sHelp, os.path.relpath(sPath, sTop))
+                if os.path.isfile(sTwin) and filecmp.cmp(sPath, sTwin, shallow=False):
+                    os.remove(sPath)
+                    logLine("TREE: deleted %s, the same as %s" % (sPath, sTwin))
+                else:
+                    sTarget = os.path.join(sKit, "notes", "retired", "examples", os.path.relpath(sPath, sTop))
+                    os.makedirs(os.path.dirname(sTarget), exist_ok=True)
+                    shutil.move(sPath, sTarget)
+                    logLine("TREE: moved %s to %s" % (sPath, sTarget))
+            try: os.rmdir(sDir)
+            except OSError: pass
+    if "Templates" in os.listdir(sKit):
+        sOld, sMid, sNew = (os.path.join(sKit, s) for s in ("Templates", "templates.renaming", "templates"))
+        bGit = os.path.isdir(os.path.join(sKit, ".git"))
+        for sFrom, sTo in ((sOld, sMid), (sMid, sNew)):
+            if bGit:
+                iCode = subprocess.run(["git", "mv", os.path.basename(sFrom), os.path.basename(sTo)], cwd=sKit).returncode
+                logLine("TREE: git mv %s %s: exit %d" % (os.path.basename(sFrom), os.path.basename(sTo), iCode))
+                if iCode != 0: os.rename(sFrom, sTo)
+            else:
+                os.rename(sFrom, sTo)
+        logLine("TREE: Templates is now templates")
+        sRepo = os.path.join(sKit, "RepoFiles.txt")
+        if os.path.isfile(sRepo):
+            binText = open(sRepo, "rb").read()
+            if b"\nTemplates/" in binText:
+                open(sRepo, "wb").write(binText.replace(b"\nTemplates/", b"\ntemplates/"))
+                logLine("TREE: RepoFiles.txt names templates/")
+    return True
+
+
 def main():
     global oLog
     if not os.path.isdir(os.path.dirname(sLogPath)): os.makedirs(os.path.dirname(sLogPath))
@@ -2108,6 +2152,8 @@ def main():
     logFact("windows", logWindows())
     logLine("Working directory: %s" % os.getcwd())
     logFact("arguments", " ".join(sys.argv[1:]))
+    try: settleTree()
+    except Exception as oError: logLine("TREE: could not settle the tree: %s" % oError)
 
     bCheckOnly = len(sys.argv) > 1 and sys.argv[1].lower() == "check"
     logLine("Check only: %s" % bCheckOnly)
