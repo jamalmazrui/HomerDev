@@ -1,8 +1,9 @@
 ﻿; SuiteCatalog.inix -- the Homer Suite's shared commands (10 November 2026): each command's name, its suite key, and
 ; one sentence that is word for word the same in every app, but for the app's own words: {app} its name, {thing}
 ; what it works on (record, line, item), and the like, listed under [words <app>]. A command with words of its own in
-; one app has them under [words <command>|<app>]. check.py's suite commands check fails a release whose key file
-; says otherwise. Change a shared command here, then in every app's key file, so the suite stays one.
+; one app has them under [words <command>|<app>]; a key an app keeps instead of the suite's, for a reason given, is
+; under [keys <app>]. check.py's suite commands check fails a release whose key file says otherwise. Change a shared
+; command here, then in every app's key file, so the suite stays one.
 
 [words DbDo]
 thing=record
@@ -33,6 +34,22 @@ folder=the current folder
 whose=item
 targets_files=the current item or the marked ones
 paste_what=items into the current folder
+
+[words HomerView]
+thing=line
+things=lines
+current=the current page
+targets=the selected text or the current line
+folder=the page's folder
+whose=text
+targets_files=the current page
+paste_what=text
+
+[keys HomerView]
+; F11 is Microsoft Edge's full screen
+Elevate Version=Control+F11
+; Control+F12 opens Edge's developer tools
+Copy Log=Alt+Shift+L
 
 [command About]
 key=Alt+F1
@@ -320,7 +337,7 @@ description=Say the full path of {current}
 
 [command Say Position]
 key=Alt+Delete
-description=Say the current {what}'s number, the count and the percent
+description=Say the current position: {what}
 
 [command Say Selected]
 key=Shift+Space
@@ -502,16 +519,22 @@ what=the current record
 what=the cursor's place
 
 [words Say Position|DbDo]
-what=record
+what=the record's number, the count and the percent
 
 [words Say Position|FileDir]
-what=item
+what=the item's number, the count and the percent
+
+[words Say Position|HomerView]
+what=the line, the column and the percent
 
 [words Say Selected|EdSharp]
 what=the selected text
 
 [words Say Selected|FileDir]
 what=the marked items, or the current one
+
+[words Say Selected|HomerView]
+what=the selected text
 
 [words Say Status|DbDo]
 what=the table, the current record, the order and the filter
@@ -528,6 +551,9 @@ what=records are in view
 [words Say Yield|EdSharp]
 what=characters, words and lines are in all or the selected text
 
+[words Say Yield|HomerView]
+what=characters, words and lines are in all or the selected text
+
 [words Search Next|DbDo]
 what=Keywords, Jump or Find Regex
 
@@ -536,6 +562,9 @@ what=search
 
 [words Search Next|FileDir]
 what=Keywords or Jump
+
+[words Search Next|HomerView]
+what=search
 
 [words Search Previous|DbDo]
 what=Keywords, Jump or Find Regex
@@ -546,8 +575,14 @@ what=search
 [words Search Previous|FileDir]
 what=Keywords or Jump
 
+[words Search Previous|HomerView]
+what=search
+
 [words Web Download|EdSharp]
 what=a web page or the current document
 
 [words Web Download|FileDir]
+what=a web page
+
+[words Web Download|HomerView]
 what=a web page

@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.202.0 -- 10 November 2026
+
+- **HomerView is in the suite's catalog.** Its shared commands say the suite's sentences, with its own words: the line, the page. [keys HomerView] records the two keys it keeps for Microsoft Edge's sake -- Elevate Version on Control+F11, since F11 is Edge's full screen, and Copy Log on Alt+Shift+L, since Control+F12 opens Edge's developer tools -- and the check accepts them. The check reads Alt+SemiColon as Alt+;, treats a closing period as each app's style, and counts the commands that differ rather than their differences. Say Position says "the current position" in every app, so one sentence fits a record, an item and a line of a page.
+
 ## 1.201.0 -- 10 November 2026
 
 - **The suite commands check runs.** It called a kind it had never imported, with the wrong argument, so it stopped every app's release with a traceback before checking anything; it now finds the kit as the other checks do.
