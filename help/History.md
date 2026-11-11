@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.201.0 -- 10 November 2026
+
+- **The suite commands check runs.** It called a kind it had never imported, with the wrong argument, so it stopped every app's release with a traceback before checking anything; it now finds the kit as the other checks do.
+
 ## 1.200.0 -- 10 November 2026
 
 - **No extra-speech switch.** Every message a Homer app speaks was chosen for the app, the screen reader and Windows together, and kept short, so Say no longer has a switch that silences them. Say.noteUnspoken writes a message an app chose not to speak -- its window not in front, say -- to the runtime log with the reason, so the log holds everything, where EdSharp and FileDir had kept a separate speech.log of what they did not speak. Extra Speech Toggle and Extra Speech Log leave the suite's catalog.

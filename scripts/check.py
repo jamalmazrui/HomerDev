@@ -1839,7 +1839,14 @@ def checkSuiteCommands():
     keeps them. This reads the app's key file -- configs\\<App>.inix's [Hotkeys], else configs\\Hotkeys.inix -- and fails
     when a shared command lacks its suite key or says a different sentence. A command the catalog does not list is
     the app's own, and is not judged here."""
-    sKit = kind.findKit(logLine)
+    # THE KIT AS THE OTHER CHECKS FIND IT (10 November 2026): kind is imported here, and findKit takes the folders to
+    # look from; the first version called a kind never imported, with the wrong argument, and stopped every release.
+    try:
+        import kind
+        sKit = kind.findKit([sRoot]) or ""
+    except Exception as exceptionError:
+        logLine("suite commands: the kit could not be found: %s" % exceptionError)
+        sKit = ""
     sCatalog = os.path.join(sKit or "", "data", "SuiteCatalog.inix")
     if not sKit or not os.path.isfile(sCatalog):
         return finding("suite commands", "skip", "no SuiteCatalog.inix in the kit")
