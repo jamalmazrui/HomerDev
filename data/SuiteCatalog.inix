@@ -1,0 +1,553 @@
+﻿; SuiteCatalog.inix -- the Homer Suite's shared commands (10 November 2026): each command's name, its suite key, and
+; one sentence that is word for word the same in every app, but for the app's own words: {app} its name, {thing}
+; what it works on (record, line, item), and the like, listed under [words <app>]. A command with words of its own in
+; one app has them under [words <command>|<app>]. check.py's suite commands check fails a release whose key file
+; says otherwise. Change a shared command here, then in every app's key file, so the suite stays one.
+
+[words DbDo]
+thing=record
+things=records
+current=the open database
+targets=the current record or the marked ones
+folder=the open database's folder
+whose=record
+targets_files=the open database's file
+paste_what=text
+
+[words EdSharp]
+thing=line
+things=lines
+current=the current file
+targets=the selected text or the current line
+folder=the current file's folder
+whose=text
+targets_files=the current file
+paste_what=text at the cursor
+
+[words FileDir]
+thing=item
+things=items
+current=the current item
+targets=the current item or the marked ones
+folder=the current folder
+whose=item
+targets_files=the current item or the marked ones
+paste_what=items into the current folder
+
+[command About]
+key=Alt+F1
+description=Say {app}'s version and release date
+
+[command Alternate Menu]
+key=Alt+F10
+description=Pick any command from one list, in menu, name or key order
+
+[command Announcement]
+key=
+description=Open the announcement of this version
+
+[command Append Clipboard]
+key=Control+Shift+'
+description=Add the clipboard text to the end of a file you name
+
+[command Arrange Icons]
+key=Alt+F11
+description=Arrange the open windows
+
+[command Burn to CD]
+key=Alt+Shift+B
+description=Burn {what} to a CD
+
+[command Cascade]
+key=Control+F11
+description=Cascade the open windows
+
+[command Chat with AI]
+key=F12
+description=Ask the AI model on this computer a question
+
+[command Clear Bookmark]
+key=Control+Shift+B
+description=Remove {what}
+
+[command Clear Clipboard]
+key=Alt+Shift+'
+description=Empty the clipboard
+
+[command Clear Filter]
+key=Control+Shift+F
+description=Show {what}
+
+[command Close All But Current Window]
+key=Control+Shift+F4
+description=Close every window but the current one
+
+[command Close Window]
+key=Control+F4
+description=Close the current window
+
+[command Complete Mark]
+key=Shift+F8
+description=Mark every {thing} from the range's start to the current one
+
+[command Complete Unmark]
+key=Alt+Shift+F8
+description=Unmark every {thing} from the range's start to the current one
+
+[command Context Menu]
+key=Shift+F10
+description=Open the Windows context menu for {what}
+
+[command Copy]
+key=Control+C
+description=Copy {targets} to the clipboard
+
+[command Copy Append]
+key=Alt+C
+description=Add {targets} to the end of the clipboard
+
+[command Copy Log]
+key=Control+F12
+description=Copy the session log to the clipboard as a file
+
+[command Current Windows]
+key=F4
+description=Switch to a window you pick from the list
+
+[command Cut]
+key=Control+X
+description=Cut {targets} to the clipboard
+
+[command Developer Guide]
+key=
+description=Open the guide for developers
+
+[command Documentation]
+key=F1
+description=Open the {app} guide
+
+[command Edit Settings]
+key=Alt+Shift+E
+description=Edit {app}'s settings file
+
+[command Edit Settings File]
+key=Alt+Shift+F2
+description=Edit {app}'s settings file in your text editor
+
+[command Elevate Version]
+key=F11
+description=Download and install the latest {app}
+
+[command Environment Variables]
+key=Control+E
+description=Change Windows environment variables for this process, your account or the system
+
+[command Evaluate Expression]
+key=Control+=
+description=Evaluate an expression and {what}
+
+[command Exit {app}]
+key=Alt+F4
+description=Close {app}
+
+[command Extract with Regex]
+key=Control+Shift+E
+description=Copy every match of a regular expression in {what}
+
+[command File Find]
+key=Alt+Shift+F
+description=Find files by name and content in this folder and below, and {what}
+
+[command Frequently Asked Questions]
+key=
+description=Open the answers to frequently asked questions
+
+[command Go to Special Folder]
+key=Control+Shift+G
+description=Go to a Windows special folder you pick
+
+[command History of Changes]
+key=Control+Shift+F1
+description=Open the history of {app}'s changes, newest first
+
+[command Hotkey Summary]
+key=
+description=List every command with its key and description
+
+[command Hotkeys]
+key=
+description=Open the list of every command and key
+
+[command Invert Marked]
+key=Alt+Shift+I
+description=Mark the unmarked {things} in view and unmark the marked ones
+
+[command Invoke Script]
+key=Alt+V
+description=Pick a script to {what}
+
+[command Jump]
+key=Control+J
+description=Go to the next {thing} whose {where} holds the text
+
+[command Key Describer Toggle]
+key=Control+F1
+description=Turn key describing on or off: a key says its command instead of running it
+
+[command Keywords]
+key=Control+K
+description=Go to the next {thing} whose {where} holds the keywords
+
+[command Launch {app}]
+key=
+description=Start {app}, or switch to it, from its desktop shortcut
+
+[command License]
+key=
+description=Open the license
+
+[command List Bookmarks]
+key=Alt+B
+description=Go to a {what} you pick from a list
+
+[command Mail Attachment]
+key=Control+Shift+M
+description=Send {targets_files} as email attachments
+
+[command Mail Body]
+key=Control+M
+description=Send the current file's text as the body of an email message
+
+[command Mark All]
+key=Control+A
+description=Mark every {thing} in view
+
+[command Mark and Next]
+key=Shift+DownArrow
+description=Mark the current {thing} and go to the next
+
+[command Mark and Previous]
+key=Shift+UpArrow
+description=Mark the current {thing} and go to the previous
+
+[command Next Marked]
+key=Control+DownArrow
+description=Go to the next marked {thing}
+
+[command Next Window]
+key=Control+Tab
+description=Switch to the next window
+
+[command Open Command Prompt]
+key=Control+\
+description=Open a command prompt in {folder}
+
+[command Open in Explorer]
+key=Alt+\
+description=Open {folder} in Windows Explorer
+
+[command Paste]
+key=Control+V
+description=Paste the clipboard {paste_what}
+
+[command Path to Clipboard]
+key=Alt+Shift+P
+description=Copy the full path of {current} to the clipboard
+
+[command Play Tutorials]
+key=Alt+F12
+description=Play the spoken tutorials
+
+[command Previous Marked]
+key=Control+UpArrow
+description=Go to the previous marked {thing}
+
+[command Previous Window]
+key=Control+Shift+Tab
+description=Switch to the previous window
+
+[command Print]
+key=
+description=Print {targets}
+
+[command Properties]
+key=Alt+Enter
+description=Show the Windows properties of {current}
+
+[command ReadMe]
+key=Alt+Shift+F1
+description=Open the quick start
+
+[command Rename]
+key=Shift+F2
+description=Rename {current} on disk
+
+[command Replace]
+key=Control+R
+description=Replace text in {where}
+
+[command Replace with Regex]
+key=Control+Shift+R
+description=Replace a regular expression's matches in {where}
+
+[command Reverse Keywords]
+key=Control+Shift+K
+description=Go to the previous {thing} whose {where} holds the keywords
+
+[command Save]
+key=Control+S
+description=Save {what}
+
+[command Save As]
+key=Control+Shift+S
+description=Save a copy of {what} under another name or format
+
+[command Save Bookmark]
+key=Control+B
+description=Bookmark {what}
+
+[command Save Clipboard]
+key=Control+'
+description=Save the clipboard text to a file you name
+
+[command Say Clipboard]
+key=Alt+'
+description=Say the clipboard text
+
+[command Say Path]
+key=Alt+P
+description=Say the full path of {current}
+
+[command Say Position]
+key=Alt+Delete
+description=Say the current {what}'s number, the count and the percent
+
+[command Say Selected]
+key=Shift+Space
+description=Say {what}
+
+[command Say Status]
+key=Alt+Z
+description=Say {what}
+
+[command Say Time]
+key=Alt+;
+description=Say the date and time
+
+[command Say Windows Open]
+key=Shift+F4
+description=Say how many windows are open, and their titles
+
+[command Say Yield]
+key=Alt+Y
+description=Say how many {what}
+
+[command Search Next]
+key=F3
+description=Repeat the last {what}, forward
+
+[command Search Previous]
+key=Shift+F3
+description=Repeat the last {what}, backward
+
+[command SendTo Menu]
+key=Control+F10
+description=Send {targets_files} to a Send To choice you pick
+
+[command Tile Horizontal]
+key=Alt+Shift+F11
+description=Tile the open windows across
+
+[command Tile Vertical]
+key=Shift+F11
+description=Tile the open windows down
+
+[command Tutorials Transcript]
+key=
+description=Open the text of the tutorials
+
+[command Unmark All]
+key=Control+Shift+A
+description=Unmark every {thing} in view
+
+[command Unmark and Next]
+key=Control+Shift+DownArrow
+description=Unmark the current {thing} and go to the next
+
+[command Unmark and Previous]
+key=Control+Shift+UpArrow
+description=Unmark the current {thing} and go to the previous
+
+[command Web Download]
+key=Alt+Shift+W
+description=Download files linked from {what}
+
+[command What This Does]
+key=Shift+F1
+description=Say what the control with focus does
+
+[command Where Am I]
+key=Control+/
+description=Say where you are, what has focus and its keys
+
+[words Burn to CD|EdSharp]
+what=the files or folders the document lists
+
+[words Burn to CD|FileDir]
+what=the current item or the marked ones
+
+[words Clear Bookmark|DbDo]
+what=a bookmark, or all of them
+
+[words Clear Bookmark|EdSharp]
+what=the bookmark at the cursor
+
+[words Clear Filter|DbDo]
+what=every record again, staying on the current one
+
+[words Clear Filter|FileDir]
+what=every item again, staying on the current one
+
+[words Context Menu|DbDo]
+what=the current record
+
+[words Context Menu|EdSharp]
+what=the current file
+
+[words Context Menu|FileDir]
+what=the current item or the marked ones
+
+[words Evaluate Expression|DbDo]
+what=say its result
+
+[words Evaluate Expression|EdSharp]
+what=insert its result
+
+[words Evaluate Expression|FileDir]
+what=copy its result to the clipboard
+
+[words Extract with Regex|DbDo]
+what=the fields and records you choose, to the clipboard
+
+[words Extract with Regex|EdSharp]
+what=the text, into a new window
+
+[words Extract with Regex|FileDir]
+what=the marked files, to the clipboard
+
+[words File Find|EdSharp]
+what=open one
+
+[words File Find|FileDir]
+what=go to one
+
+[words Invoke Script|DbDo]
+what=run
+
+[words Invoke Script|EdSharp]
+what=run or paste
+
+[words Jump|DbDo]
+where=current field
+
+[words Jump|FileDir]
+where=name
+
+[words Keywords|DbDo]
+where=fields
+
+[words Keywords|FileDir]
+where=content
+
+[words List Bookmarks|DbDo]
+what=bookmarked record
+
+[words List Bookmarks|EdSharp]
+what=bookmark in the current file
+
+[words Replace|DbDo]
+where=the fields and records you choose
+
+[words Replace|EdSharp]
+where=all or the selected text
+
+[words Replace with Regex|DbDo]
+where=the fields and records you choose
+
+[words Replace with Regex|EdSharp]
+where=all or the selected text
+
+[words Reverse Keywords|DbDo]
+where=fields
+
+[words Reverse Keywords|FileDir]
+where=content
+
+[words Save|DbDo]
+what=the open database's changes
+
+[words Save|EdSharp]
+what=the current file
+
+[words Save As|DbDo]
+what=the open database
+
+[words Save As|EdSharp]
+what=the current file
+
+[words Save Bookmark|DbDo]
+what=the current record
+
+[words Save Bookmark|EdSharp]
+what=the cursor's place
+
+[words Say Position|DbDo]
+what=record
+
+[words Say Position|FileDir]
+what=item
+
+[words Say Selected|EdSharp]
+what=the selected text
+
+[words Say Selected|FileDir]
+what=the marked items, or the current one
+
+[words Say Status|DbDo]
+what=the table, the current record, the order and the filter
+
+[words Say Status|EdSharp]
+what=whether the document is modified, and its encoding on a second press
+
+[words Say Status|FileDir]
+what=the current item's date and size, then the order and filter
+
+[words Say Yield|DbDo]
+what=records are in view
+
+[words Say Yield|EdSharp]
+what=characters, words and lines are in all or the selected text
+
+[words Search Next|DbDo]
+what=Keywords, Jump or Find Regex
+
+[words Search Next|EdSharp]
+what=search
+
+[words Search Next|FileDir]
+what=Keywords or Jump
+
+[words Search Previous|DbDo]
+what=Keywords, Jump or Find Regex
+
+[words Search Previous|EdSharp]
+what=search
+
+[words Search Previous|FileDir]
+what=Keywords or Jump
+
+[words Web Download|EdSharp]
+what=a web page or the current document
+
+[words Web Download|FileDir]
+what=a web page

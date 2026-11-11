@@ -143,6 +143,14 @@ public static class Say
     // Set it to the app's log writer. Unset, the kit's Log is used.
     public static Action<string> onSpoken = null;
 
+    // noteUnspoken: a message an app chose not to speak -- its window not in front, say -- written to the runtime log
+    // with the reason, so the log holds everything the app would have said (10 November 2026). It replaces the
+    // speech.log EdSharp and FileDir kept for what they did not speak.
+    public static void noteUnspoken(string sText, string sWhy)
+    {
+        logSpoken(sText ?? "", " (not spoken: " + sWhy + ")");
+    }
+
     private static void logSpoken(string sText, string sHow)
     {
         try
@@ -262,14 +270,8 @@ public static class Say
             if (sValue.Length <= 40) { sayForced(spelledText(sValue)); return; }
         }
         if (alreadySaid(sText)) return;
-        // Extra-Speech gate: when off, DbDo's direct speech is
-        // suppressed but the screen reader's natural focus and
-        // selection announcements still occur. The flag is toggled
-        // by Toggle-Extra-Speech (Alt+Shift+S) and persisted to
-        // [General] extraSpeech in DbDo.inix. The toggle command
-        // itself uses sayForced so the user always hears their
-        // own action confirmed regardless of the flag's state.
-        if (!bExtraSpeechEnabled) { logSpoken(sText ?? "", " (extra speech off, not spoken)"); return; }
+        // NO EXTRA-SPEECH SWITCH (10 November 2026, Jamal's ruling): every message a Homer app speaks was chosen for
+        // the app, the screen reader and Windows together, and kept short, so none is optional; the switch is gone.
         sayForced(sText);
     }
 
@@ -345,10 +347,6 @@ public static class Say
             if (!string.IsNullOrEmpty(sPart)) sayForced(sPart);
     }
 
-    // Extra-Speech enabled flag. Public mutable so the toggle
-    // command can flip it. Loaded from DbDo.inix at startup;
-    // default true. Persisted on change.
-    public static bool bExtraSpeechEnabled = true;
 
     // Optional SAPI text-to-speech backup, modeled on SayIt's UseSAPIAsBackup
     // property. Off by default, so the JAWS -> NVDA -> UIA cascade is exactly

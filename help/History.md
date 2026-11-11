@@ -7,6 +7,15 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.200.0 -- 10 November 2026
+
+- **No extra-speech switch.** Every message a Homer app speaks was chosen for the app, the screen reader and Windows together, and kept short, so Say no longer has a switch that silences them. Say.noteUnspoken writes a message an app chose not to speak -- its window not in front, say -- to the runtime log with the reason, so the log holds everything, where EdSharp and FileDir had kept a separate speech.log of what they did not speak. Extra Speech Toggle and Extra Speech Log leave the suite's catalog.
+
+## 1.199.0 -- 10 November 2026
+
+- **Homer Suite.** data\\SuiteCatalog.inix holds every command DbDo, EdSharp and FileDir share -- 91 of them -- with its one name, its suite key and one sentence, the same in every app but for the app's own words; check.py's new suite commands check fails a release whose key file says otherwise. help\\HomerSuite.md says what the suite is, and why some Homer projects are in it and others are not.
+- **The accessibility line is written again.** Its count of findings to review had been joined on so that the line raised an error instead.
+
 ## 1.198.0 -- 10 November 2026
 
 - **The check's accessibility line says how many findings are to review,** as the report does; axeWindow wrote its own line and had kept the old one.

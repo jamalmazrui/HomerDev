@@ -1,325 +1,69 @@
-﻿# The Homer Suite Contract
+﻿---
+title: "Homer Suite"
+subtitle: "Four desktop apps, one way of working"
+---
 
-The Homer Suite is four programs that share one set of habits:
+# Homer Suite
 
-- **DbDo** for data.
-- **EdSharp** for documents.
-- **FileDir** for files and folders.
-- **HomerView** for the web.
+Homer Suite is four free Windows apps built for screen reader users, which work the same way. Each one handles a different kind of work: data, documents, files and the web. Learn one, and you know most of how to use the other three.
 
-HomerDev is the kit beneath them, and DbDo is the reference for how a command is found, described and run.
+## The apps
 
-This page is the contract: the rules all four follow, the data files that record them, the stages of the work, and where the work stands. It was settled over five rounds of planning, with Claude leading and ChatGPT reviewing, and with Jamal Mazrui's rulings deciding every disagreement.
+- **DbDo** manages data. It opens SQLite, Access, Excel, dBASE and delimited text files, and shows each table as a list you move through cell by cell. Its template databases cover radio stations, job leads, books, music and more.
+- **EdSharp** edits text, documents and code. It reads and writes Word, PowerPoint, PDF, Markdown and many more formats, and runs scripts and compilers from inside the editor.
+- **FileDir** manages files and folders. It marks, copies, moves, renames, converts and compares files, and searches them by name or content, from a folder list.
+- **HomerView** reads web pages and documents. It drives Microsoft Edge so NVDA or JAWS can read a page as a structured document, and opens Word files, PDFs and ebooks the same way.
 
-## How to read a status
+## One way of working
 
-Every decision carries one of five statuses, and no status is assumed from another:
+The same command has the same name, the same key and the same one-sentence description in every app. A release check enforces it, so the apps cannot drift apart.
 
-- **Current** means it is how the program works today, with no change planned.
-- **Proposed** means both AIs recommend it; it waits for its stage.
-- **Ruled** means Jamal decided it.
-- **Implemented** means the code is written and delivered.
-- **Verified** means it was tested on Windows with a screen reader, and the result was recorded.
+- **Help:**
+  - F1 opens the app's guide.
+  - Shift+F1 says what the control with focus does.
+  - Control+Slash says where you are.
+  - Control+F1 turns the key describer on or off.
+  - Alt+F10 lists every command in one place.
+- **Documents:** the Help menus of DbDo, EdSharp and FileDir list the same documents: the guide, the quick start, the history of changes, the list of keys, answers to frequent questions, the tutorials, the announcement, the developer guide and the license.
+- **Keys you learn once:**
+  - F4 lists the open windows, and Control+Tab moves among them.
+  - Control+C copies, and Alt+C adds to what you copied.
+  - Control+J jumps, Control+K searches by keywords, and F3 repeats the last search.
+  - Alt+V runs a script.
+  - F11 installs the newest version.
+- **HomerView's exceptions:** HomerView follows these too, except where Microsoft Edge already owns a key. Its guide is a Help menu item with no key, Where Am I is Alt+Shift+Slash, and installing the newest version is Control+F11.
+- **Say keys:** each app answers a question in words, such as how many items there are or where you are. A second press spells a short answer or shows a long one in a window.
+- **Settings:** each app keeps its settings in a plain text file you can read and edit.
+- **Installers:** each app has one installer that also offers to install its screen reader scripts.
 
-## The data files
+## The foundation
 
-### Command manifest
+**HomerDev**, the Homer Development Kit, holds the parts the four apps share: their dialogs, menus, keys, speech, settings, file conversions, installers and release checks. It is how the apps stay one suite, and it is also a kit for developers who build accessible apps with AI help.
 
-The command manifest is data\\SuiteCommands.inix. It lists every command of the four apps, one section each, named by app and stable identifier, for example `[DbDo saveClipboard]`.
+## What else is Homer, and why it is not in the suite
 
-- **Each section** holds the command's name, its recommended keys, and its status.
-- **A changed command** also says what changed, why, and its disposition: accepted, accepted with a stated correction, or removed by ruling.
+The suite is kept small on purpose: four apps that each cover a broad kind of desktop work, and share one way of working. A project joins only if it adds a kind of work the four do not cover and can work the same way. The rest are Homer Tools: still built on HomerDev, still accessible, but for a narrower job.
 
-### Key ownership
+- **2htm** converts files to HTML. EdSharp and FileDir now make the same conversions, through HomerDev.
+- **BatCon** converts many files at once between formats. FileDir is the natural home for this, as one command on marked files, so it need not be a separate app in the suite. I recommend keeping BatCon as a tool for scripted batch work, and making sure FileDir offers the same conversions from its menus.
+- **bookFido** builds catalogs of your books from four libraries. It is a specialist tool; its results suit DbDo's book database.
+- **extCheck** and **urlCheck** check files and web pages for accessibility. They serve accessibility professionals and produce reports, not day-to-day desktop work.
+- **HomerScribe** describes and transcribes video and audio, using AI on your own computer. None of the four apps covers media, so it is the strongest candidate to join. I recommend it stay a companion, not a member, for now: it works as a single job you start and let run, not as windows you work in, and it needs several gigabytes of AI models. If it gains a window for reviewing and editing descriptions, it would fit the suite.
+- **KeyLine** is a command-line toolkit of file and text utilities. It serves people working at the command prompt.
+- **urlFido** downloads files linked from a web page. EdSharp and FileDir offer this as Web Download, Alt+Shift+W.
 
-Key ownership is in data\\KeyOwnership.inix. It lists the keys that Windows, the screen readers and the browsers own. Each key records its owner, its kind, where it applies, what happens to it, and what a Homer app may do with it.
+## My recommendation
 
-The kinds are:
+- **The suite:** keep it to DbDo, EdSharp, FileDir and HomerView. Four apps covering data, documents, files and the web is a story people can remember and a set they can learn. Five or more would add apps that share less of the way of working, which weakens the main promise: learn one, and you know the others.
+- **The companion:** name HomerScribe as the suite's companion for media.
+- **The tools:** list everything else as Homer Tools, each with its own one-line purpose.
+- **The kit:** present HomerDev separately, to developers.
+- **The announcement:** lead with the promise and back it with the check, which proves every shared command is the same in every app.
 
-- **System:** Windows takes the key first.
-- **Convention:** the app receives the key, but it means one thing everywhere.
-- **Conditional:** the key is taken only on some machines.
-- **Reader global:** a screen reader takes the key everywhere.
-- **Reader tables:** a screen reader takes the key only inside tables.
-- **Reader laptop:** JAWS takes the key in the laptop layout.
-- **Browser:** the browser owns the key, in HomerView only.
-- **Historical:** Window-Eyes, kept for reference, not enforced.
+## Summary
 
-### The checker
-
-The checker is scripts\\checkKeys in the kit. It reads both files, and also any file an app writes when started with `/exportkeys <file>`. It reports:
-
-- duplicate identifiers;
-- a key bound twice in one app;
-- a key that a system or a screen reader takes everywhere;
-- keys to test in their real control;
-- hotkey letters that start no word of their command;
-- every difference between what a program declares and what the manifest says.
-
-It runs inside the normal cycle, so nobody runs it by hand:
-
-- **The kit's build** checks the whole manifest and the MDI sample's export, and fails on a problem.
-- **Every app's push** runs the shared check, whose "suite" check exports the app's own keys when it is on the Homer frame and checks that app's manifest entries, and stops the push on a problem.
-- **One name, one piece of code:** a manifest command with a `shared=` line names a SuiteCommands method. The checker fails when the method does not exist and, on an app's push, when the app's own C# does not call it.
-
-A key shared on purpose carries an exception= line in the manifest saying why, and is counted as reviewed, not as a problem. Keys to test in their real control and first-letter misses are reported, never failed.
-
-## Rulings
-
-- **Alt+C appends.** Control+C copies the current item (a line without a selection, a cell, a file), and Alt+C appends it to the clipboard. (Ruled)
-- **Alt+Delete is Say Position.** It gives useful position information: a count and a percent for the current unit. Where JAWS would report pixel coordinates, each app's JAWS key map passes the key through to the app, from a reviewed allowlist. (Ruled)
-- **Claude leads; ChatGPT advises and reviews.** (Ruled)
-- **Control+Tab and Control+F6 never duplicate each other.** They are next-in-cycle at different levels or in different orders. (Ruled)
-- **Edit Settings is Alt+Shift+E in every app.** Alt+E already opens the Edit menu. X for export is an accepted exception to the first-letter rule. (Ruled)
-- **EdSharp's block movement is removed,** and its bookmarks move to the B keys. (Ruled)
-- **HomerView joins the suite,** and records in an .inix file the browser installations it is active in. (Ruled)
-- **New apps on a new core.** Settings are .inix only; the programs are 64-bit on .NET Framework 4.8.1, with NuGet; there is no transition code for existing users, beyond a History note. (Ruled)
-- **No c_ prefix on constants,** and url is written in lower case. (Ruled)
-
-## Principles and judgments of 19 October 2026
-
-Jamal asked Claude to settle the pending decisions by best judgment, as optimization under constraints rather than perfection.
-
-### The constraints
-
-- **Functionality is never lost.** A legacy key may move, but a command that becomes menu-only has lost something. Every command keeps a key.
-- **Agreed changes are implemented.** Where ChatGPT and Claude both recommended a change at the end of their exchanges, it is carried out.
-- **Lbc's patterns are part of the framework.** The keys, control names and sequences of Lbc dialogs hold in every Homer window.
-- **Control+PageUp and Control+PageDown serve a unique purpose, or none.** They never repeat what Control+Tab or the F6 family does.
-- **One name, key and description means one piece of code.** A command with the same name, key and description in several apps runs the same HomerDev code, so its wording and behavior are identical in documents and in use.
-- **Everything else is a preference, to be balanced.** For example, Alt+C for append is a habit, not a law: FileDir's Shift+A appends too, and both stay.
-
-### Judgments
-
-- **Append keys.** Both kept: Alt+C appends the current item in every app, and FileDir's Shift+A stays in its list layer. *Implemented: no change needed.*
-- **Compiler.** Roslyn at C# 7.3, as both AIs agreed. The kit classes stay in C# 5 syntax until the change lands, so nothing breaks meanwhile. *Next kit delivery.*
-- **Control+PageUp and Control+PageDown.**
-  - DbDo keeps them for the first and last row of a column, a purpose no other key has.
-  - EdSharp keeps them for the previous and next section, so EdSharp leaves Control+F6 undefined rather than repeat them.
-  - FileDir binds them only if a unique purpose appears.
-  
-  *Recorded; applied as each app moves.*
-- **DbDo's proposals from DbDialog.** Clone Table, Count by Columns, defining a table as text, the duplicate-letter warning, and Invert and Marked as filter buttons. These await Jamal's word, as he asked. *Stage 3.*
-- **EdSharp's JAWS key map lines for Alt+Control+PageUp and PageDown.** Both AIs agreed to drop them, so JAWS keeps its voice-rate keys. The EdSharp commands those lines served keep their function on new keys, found as FileDir's were today. *Stage 4.*
-- **Extra Speech Toggle on Alt+Shift+Z in every app,** as agreed (Z keys are toggles). FileDir is done. EdSharp's commands now on Alt+Shift+Z and its Extra Speech Log keep keys of their own. *FileDir implemented; EdSharp in stage 4.*
-- **FileDir's F6 family:** Next and Previous Part, Sibling Folder and Visited Folder, as both AIs agreed. *Stage 4.*
-- **FileDir's zip commands.**
-  - Zip then Delete moved from Control+Z, which is Undo, to Control+Shift+Delete, beside FileDir's other delete keys.
-  - Zip List keeps Control+Shift+Z as a recorded exception: FileDir has no Undo or Redo for it to meet, it only makes or updates an archive, and every first-letter key is taken.
-  
-  *Implemented.*
-- **HomerView.** The catalog and Choose Active Browsers were agreed, and wait for its stage. Control+F1 stays HomerView's User Guide, as agreed, and NVDA's own input help covers key describing there. *Stage 5.*
-- **"Homer Suite" as the name,** as both AIs recommend. *Adopted in the documents.*
-- **Lbc's keys in the framework.** The router now leaves Lbc's text-box keys to any text box that is not the app's editor: copy, cut and delete the line, copy all, read all, and the rest. The full list of Lbc's text, list and dialog keys is in KeyMap.cs and in the guide. The fruit basket's Add moved from Control+Shift+A, which Lbc's text boxes use, to Alt+Shift+A. *Implemented in kit 1.73.8.*
-- **Mark rather than Tag in FileDir,** as both AIs agreed. Only the words change, not the keys. *Stage 4.*
-- **Menu-only moves are withdrawn.** Every command that was to lose its key gets a new key instead, chosen by the same search for free first letters, with a recorded exception where none exists. These include Edit Settings File, Go to Special Folder, Say Folder, Folder to Clipboard, Say Font, Search for Topic, Toggle Indentation and the Tile commands. *Stage 4.*
-- **One piece of code for shared commands.** The kit class SuiteCommands, in Mdi.cs, holds the suite's shared commands, and each app's handlers call it:
-  - Say Clipboard, Say Time and Copy Log;
-  - Save, Append and Clear Clipboard;
-  - the Help openers: Documentation, History, ReadMe and Hotkeys;
-  - the window family, which stays in MdiWindows.
-  
-  The frame calls them, and so do EdSharp and FileDir from their own frames. A manifest command with a `shared=` line names its method, and the suite check fails when the method is missing or the app's code does not call it. *Implemented in kit 1.74.0 for the frame, EdSharp and FileDir. DbDo follows in stage 3, when its keys reach the kit's router, which counts the presses the Say commands answer. The window family in EdSharp and FileDir follows in stage 4, since their close commands carry their own unsaved-work questions.*
-- **Regex in command names,** as agreed. *Stage 4.*
-- **Repeat presses: one, two or three.** One press speaks, two spell, three show a read-only window. This follows NVDA, whose Report Current Line spells on two presses and spells phonetically on three. *Implemented in kit 1.73.8.*
-- **Say Status on Alt+Z in DbDo.** Read Only Toggle gets a new key rather than none. *Stage 3.*
-- **.inix only in EdSharp and FileDir.** Already ruled. *Next delivery.*
-- **Command names are spoken if and only if they help.** Command Echo Toggle is retired. A command that opens a dialog is confirmed by the dialog's title, which should be close to the command's name. A command that moves the focus is confirmed by the screen reader saying where it landed, as an arrow key is. A Say command or a toggle speaks its own answer or state. Every other command says its name at once, before its work. The rule is KeyMap.shouldEcho, and help\\CommandEcho.md lists every command's group. *Implemented in kit 1.74.1 for the frame and DbDo; EdSharp and FileDir move to it in stage 4.* (Ruled, 19 October 2026.)
-- **Control+Z in FileDir is Zip then Delete again,** and Control+Shift+Z in DbDo is Read Only Toggle. Neither app has Undo or Redo there, so each is a recorded exception to the Undo and Redo ruling. (Ruled, 19 October 2026.)
-- **One copy of every file conversion.** Every app converts files through the kit's Conversion.cs (C#) or conversion.py (Python), reading one routing table, exec\\conversions.inix, whose conversions are named source2target, such as pdf2txt. Office through COM is the last resort, with an Alert box when it is missing. help\\Conversions.md records the best engine for each conversion. *Implemented in kit 1.74.0, with FileDir moved; DbDo, EdSharp, HomerView, HomerScribe's PDF reader and 2htm follow, one each.* This was ruled on 9 October and missed from the first integration plan.
-
-## The key families
-
-- **Levels of next and previous:**
-  - **Control+Tab and Control+Shift+Tab:** the app's windows. In HomerView, the browser's tabs.
-  - **Control+F6 and Control+Shift+F6:** the things inside a window, in a fixed order.
-  - **Alt+F6 and Alt+Shift+F6:** the same things, in the order last visited.
-  - **F6 and Shift+F6:** the views or parts of the current thing.
-  
-  An app fills only the levels it has. HomerView leaves F6 to the browser.
-- **Window family:**
-  - **F4:** pick a window.
-  - **Shift+F4:** say the windows open.
-  - **Control+F4:** close this window.
-  - **Control+Shift+F4:** close all but this one. A window holding unsaved work may refuse, and the count of windows kept open is spoken.
-- **Key spellings** are KeyName.cs's, taken from JAWS's own default.jkm: modifiers in the order Alt, Control, Shift, Windows; Control spelled out; GraveAccent, Backslash and SemiColon for those keys. The checker accepts other spellings when comparing, but every file Homer writes uses these.
-- **Help family:**
-  - **F1:** Documentation.
-  - **Shift+F1:** What This Does, the focused control's one-sentence hint, in every main window and dialog.
-  - **Control+Slash:** Where Am I, in every main window and dialog: everything at once; pressed twice, a window with the same, then every command and key.
-  - **Alt+F1:** About.
-  - **Control+F1:** Key Describer Toggle.
-  - **Control+Shift+F1:** History of Changes.
-  - **Alt+Shift+F1:** ReadMe.
-  - **Hotkeys:** the document of every key, from the Help menu; Control+Slash pressed twice lists the same keys, live.
-  - **Alt+F10:** Alternate Menu.
-  - **Hotkey Summary:** on the Help menu, without a key; Control+Slash pressed twice shows the same list after Where Am I. In each app's JAWS scripts, JAWS+H, Hot Key Help, presses Control+Slash twice.
-  - **F11:** Elevate Version.
-  - **Control+F12:** Copy Log.
-  - **Play Tutorials,** with no key, plays the walks in the Homer Player.
-- **Say family:**
-  - **Alt+Apostrophe:** Say Clipboard.
-  - **Alt+P:** Say Path.
-  - **Alt+Delete:** Say Position.
-  - **Alt+Z:** Say Status.
-  - **Alt+SemiColon:** Say Time.
-  - **Shift+F4:** Say Windows Open.
-  - **Alt+Y:** Say Yield.
-
-  DbDo keeps its Shift+letter say layer as a second set of keys.
-- **Clipboard family:**
-  - **Alt+Apostrophe:** say the clipboard.
-  - **Alt+Shift+Apostrophe:** clear it.
-  - **Control+Apostrophe:** save the clipboard to a new text file.
-  - **Control+Shift+Apostrophe:** append the clipboard to a text file.
-- **Undo and Redo:** Control+Z and Control+Shift+Z everywhere.
-- **Export:** Alt+Shift+X. In the editors, Alt+X stays Cut Append.
-- **Repeat keys:** NVDA's pattern, one, two or three presses. One press of a Say key speaks the answer, a quick second press spells it, and a third shows it in a read-only window you can review, spell phonetically and copy. This keeps EdSharp's and HomerView's spelling on a second press and DbDo's review window, and follows NVDA, whose Report Current Line spells on two presses and spells phonetically on three. Control plus a letter asks; Alt plus the same letter repeats the last answer, but only where an app registers that pair. F3 and Shift+F3 repeat whichever search ran last in the window.
-- **Managed lists** (the DbDo grid, the FileDir list):
-  - unshifted letters move by first letter or by typed sequence;
-  - Shift plus a letter runs a command or says none is bound;
-  - Control+Space toggles the mark;
-  - Control+Home and End go to the first and last item;
-  - Control+Shift+Home and End go to the first and last marked item;
-  - Control+UpArrow and DownArrow go to the previous and next marked item.
-
-The exceptions each app keeps on purpose (EdSharp's F2 and F5, FileDir's Shift+letter actions, HomerView's browser keys) are recorded in the manifest.
-
-## AI attachment rules
-
-These apply to Chat with AI (F12) and Chat about (Shift+F12) in every app.
-
-- **No implicit attachment.** Chat with AI never attaches a document, table or file because of how a question is worded. When context is attached, the choice is shown plainly. EdSharp's current behavior, which attaches the document when the wording refers to it, must change, not merely be renamed.
-- **Say the source and scope first.** Chat about names the actual source and scope before sending: the selection, the marked rows, the visible view, or the whole thing.
-- **Report what happened.** Truncation, omitted content, conversion failures, and the model or service used are reported accurately.
-- **Answers are content, not instructions.** Instructions inside a document or an answer are treated as text. No SQL, script, browser action or file operation runs automatically from an answer.
-
-## Text files and settings
-
-- **New text files** are UTF-8 with a byte order mark and CRLF line endings, the Homer encoding.
-- **Appending to a file:**
-  - detect the existing file's encoding first;
-  - never put a second byte order mark in the middle of a file;
-  - say whether a separating line break is added;
-  - leave the file as it was if the append fails;
-  - if a file cannot be appended to safely, say so and offer a new file or an explicit conversion, never a mix of encodings.
-- **Saving the clipboard** proposes a new file name and never overwrites without asking.
-- **Settings in .inix:**
-  - writes are serialized and atomic, written to a temporary file and then swapped in;
-  - before a cached file is replaced, a change made outside the program is detected, and then the file is reloaded and the change applied again, or the conflict is reported;
-  - a malformed file is reported in plain words and kept intact, never treated as empty;
-  - each settings file carries a schema version.
-
-## HomerView: browsers and identity
-
-Four ideas are kept apart:
-
-- **The catalog** lists the known browser families, each with a stable browserId such as chrome. One authored file, configs\\HomerView.inix in the HomerView project, is the source. The build makes packaged copies (one inside the NVDA add-on) and checks them against it. Registry discovery stays, so browsers missing from the catalog are still found.
-- **Eligibility** records each browser installation HomerView may be active in. Each has its own installationId, resolved path, channel where known, and active flag. Two Chrome installations share a browserId but never an installationId. A missing or moved installation is reported, never silently replaced by another of the same family.
-- **The launch choice** names the installationId that Launch starts.
-- **The verified session** is the connected browser process family, window, page and document generation actually in front of you.
-
-Eligibility authorizes nothing. It only makes a window worth probing for a connection.
-
-Two rules govern identity:
-
-- **Identity is decided once, in identity.py,** by process, never by program name. With no process known, every key keeps its normal browser and screen reader meaning. (Implemented in stage 1.)
-- **A queued request carries a TargetStamp** of the session, window, page and document generation it was made for. Before it acts, the stamp is compared with what is current, and stale work is cancelled with a spoken reason. A read-only result about a page you have left names its source. (The stamp is implemented and tested in stage 1; the queue adopts it in stage 5.)
-
-The HomerView commands added to the manifest are:
-
-- **Choose Active Browsers** (chooseActiveBrowsers), menu only.
-- **Key Describer Toggle** (keyDescriberToggle), menu only. It describes HomerView's gestures without running them; gestures the browser or screen reader owns are named, not run.
-- **Open Saved Page in EdSharp** (openSavedPageInEdSharp), menu only. It opens an identified saved copy, and offers saving or extraction when there is none.
-- **Show Page Folder in FileDir** (showPageFolderInFileDir), menu only. Page Folder keeps opening Explorer.
-
-## Building and compiling
-
-- **Compiler.** Both AIs recommend the Roslyn compiler from Visual Studio Build Tools at C# 7.3, as the suite's chosen language baseline. The build would install it with winget when missing, then find it by an installation probe and verify that it can compile C#, rather than trusting that the install succeeded. (Proposed; awaiting your ruling.)
-- **Until that ruling,** the shared classes keep to C# 5, so they still build with the compiler that comes with Windows.
-- **.NET Framework 4.8.1.** A build pins the Microsoft.NETFramework.ReferenceAssemblies.net481 package and compiles against those references, not the installed runtime's. Each exe.config keeps version="v4.0" with sku=".NETFramework,Version=v4.8.1". The compiler's path, version and language option go in the build log.
-
-## Stages
-
-1. **Stage 0, the contract.** This page and the two data files. Implemented in kit 1.73.0.
-2. **Stage 1, the proofs.**
-   - **Desktop proof:** Templates\\samples\\FruitBasketMdiCs.cs on the new frame.
-   - **Browser-identity proof:** HomerView's identity.py and scripts\\testIdentity.py.
-   
-   Implemented and released on 18 October 2026, in kit 1.73.0 and HomerView 1.48.110:
-   - both full cycles passed;
-   - the sample compiled with the compiler that comes with Windows;
-   - its export listed all 35 commands with no problem;
-   - testIdentity passed 18 of 18 on Windows.
-
-   Verified needs one more thing: your JAWS and NVDA pass through the checklist below.
-3. **Stage 2, the minimum core.**
-   - **The checker is a gate** in the kit's build and in every app's push. Implemented in kit 1.73.1.
-   - **One table of key spellings.** KeyMap names every key through KeyName.cs, whose spellings come from JAWS's own default.jkm: GraveAccent, Backslash, SemiColon. Implemented in kit 1.73.2.
-   - **The clipboard family in the frame:** Save Clipboard, Append Clipboard and Clear Clipboard, by the text-file rules above. Every app on the frame has them. Implemented in kit 1.73.3.
-   - **One trigger letter per menu, enforced by the frame.** A later item that would repeat a letter loses its ampersand, so an app's items and the frame's never clash. Implemented in kit 1.73.3.
-   - **Safer .inix files.** InixCodec now does three things:
-     - readValue parses a file once and again only when its time or length changes;
-     - writeValue and writeAsConfig write a temporary file and swap it in;
-     - a file that cannot be read is reported once, through onProblem, which the frame connects to the log, and is never taken as empty.
-     
-     Implemented in kit 1.73.4. The schema version in each settings file comes with each app's move to the frame.
-   - **The reviewed JAWS pass-through.** Each tidy writes into an app's scripts\\jaws\\\<App\>.jkm the keys the suite allows it to hand on, which today is Alt+Delete, Say Position. The allowed keys are those with passThrough=yes in data\\KeyOwnership.inix; a key is handed on only when the app really binds it, by its own Hotkeys.md. The lines go in a marked block, and keys the app maps itself are left alone. Tidy also names bracket keys that a bare "[" would turn into a section. The shared check confirms the block before every push. HomerView is excepted in the data, because its key map is chained into the browsers'. Implemented in kit 1.73.5.
-   - **Stage 2 is complete.** The menu repaint change is EdSharp's and FileDir's own code, so it moves to stage 4.
-   - **Verified in the cycle, 18 October 2026:** the Python fruit basket loaded the C# frame through pythonnet and exported the same 38 commands as the C# one; FileDir's tidy wrote its JAWS pass-through for Alt+Delete and named its bracket keys.
-   - **One frame for both languages.** Homer.dll now carries KeyMap, KeyName and Mdi, so a Python app builds the C# frame through pythonnet (exec\\Python\\mdi.py), not a wxPython copy. The fruit basket samples in C# and Python are twins, and the kit's build exports both and fails if their commands, keys or contexts differ. newHomerApp makes a Python MDI app with `--mdi --python`. Implemented in kit 1.73.6.
-**Where the work stands, 5 November 2026:** the stage list below was not updated after the October work. The code shows DbDo on the kit's router since 19 October (phase B, all 153 keys equivalent) and FileDir routing through it too, both with the shared commands. SharedCore.md lists, from the code, what is shared and what is left.
-
-4. **Stage 3, DbDo.** Its private KeyMap is replaced through an adapter and retired once equivalence is shown, then its key changes, JAWS scripts and laptop-layout tests follow.
-5. **Stage 4, EdSharp, then FileDir,** each on its own, with new commands implemented before their keys are checked.
-6. **Stage 5, HomerView.** The catalog, eligibility, verified session routing, per-browser JAWS script sets and the key alignment.
-7. **Stage 6, documents, tutorials and packaging.**
-8. **Stage 7, release** of each tested app, then one announcement.
-9. **Later:** common frame inheritance, a combined installer, shared suite settings, round-trip edits between apps.
-
-## Testing stage 1 on Windows
-
-### The desktop proof
-
-1. Run build_release in the kit, as usual. The build compiles the sample whenever it or the shared classes change, exports its keys without opening a window, and runs checkKeys; the build log has the results. Then start Templates\\samples\\FruitBasketMdiCs.exe.
-2. Check each of these with JAWS, then with NVDA:
-   - **Windows:** Control+N opens Basket 2. F4 lists both baskets, Shift+F4 says them, and Control+Tab moves between them.
-   - **Typing:** in the Fruit field, type a word with capital letters; capitals and Shift+F type.
-   - **The list:** Alt+Shift+A adds fruit. In the basket list, typing the start of a fruit goes to it, Shift+F says the fruit, Shift+Y the count, and Shift+Q says it has no command.
-   - **The alias:** Delete in the list deletes the fruit; Delete in the Fruit field deletes a character.
-   - **Unavailable:** delete every fruit, then press Control+Shift+D; it says the basket is empty.
-   - **Modal:** F2 renames the basket in a dialog, and the dialog's own keys work.
-   - **Repeat presses:** Alt+Delete says the position; pressed twice quickly it spells it; three times shows it in a window, and Escape returns.
-   - **Again:** Control+J asks for a fruit, Alt+J and F3 go to the next match without asking, and the other basket has its own answer.
-   - **Closing:** Control+F4 on a basket holding fruit asks first; choosing Keep open keeps it. Control+Shift+F4 says how many windows closed and how many were kept.
-   - **Help:** Control+F1 makes keys describe themselves; Alt+F10 lists every command; Alt+Shift+E changes Basket Size at once.
-
-### The browser-identity proof
-
-1. Run build_release in HomerView, as usual. Its build now runs scripts\\testIdentity.py and stops if a case fails.
-2. Under NVDA, with HomerView launched in Chrome, its page commands work there.
-3. In an ordinary Chrome or Edge window, and before HomerView's browser is running, every key keeps its browser and screen reader meaning.
-
-## Evidence so far
-
-These results come from a Linux container with Python 3. No Windows build, installer or screen reader session was run.
-
-- **The C# sources were not compiled.** Their braces and brackets balance, and they use no syntax newer than C# 5. The first Windows build is the real test.
-- **checkKeys on the manifest reported:**
-  - 5 shared keys needing review: EdSharp Control+I, Control+Shift+I and Control+L, and FileDir Backspace and Comma, each shared by context or listed twice;
-  - 13 keys to test in their real control: the laptop-layout table keys and Control+Space;
-  - 9 first-letter misses, such as FileDir's Play Media on Alt+Shift+L.
-- **testIdentity:** 18 of 18 cases pass. Its first run found a real fault, Windows paths split wrongly on another system, which was fixed before delivery.
-
-## The Key Describer, in every Homer app
-
-Control+F1 turns the Key Describer on and off. While it is on, a key says what it would do instead of doing it. Every Homer app follows these rules, which the kit's KeyMap carries out:
-
-- **Every key is described,** whether or not its command can run now. The description comes first: the command's name, the key, and one sentence of what it does. If the command cannot run now, the reason follows: "Unavailable now: no filter is in force." The describer never answers with only "unavailable."
-- **The reason is true or absent.** An app says why a command is unavailable only when it knows; it never guesses a reason such as "open a database first."
-- **A key with no command is named,** then "No DbDo command" (the app's own name), so the person knows the describer heard it without being told the key does nothing anywhere; an Alt+letter that opens a menu names the menu, as in "Edit menu".
-- **Every answer is separate utterances,** the name, the key and the one-sentence summary, then where it works and "Unavailable now" when either applies (kit 1.166.0). The describer speaks them forced, so they are heard with extra speech off.
-- **Nothing acts in the describer.** An app's own key handling asks the router first while the describer is on, so a key handled outside the command table is described too; an Lbc text box's own keys are named, not done. A key a screen reader sends of its own, which has no name, is ignored rather than announced as "NoName".
-- **Alt+F4 turns the describer off** and says so, with "Alt+F4 again closes" the app. Someone who turned it on by accident, and does not know Control+F1, reaches for Alt+F4 to escape; a second Alt+F4 closes the app as usual. Control+F1 also turns it off.
-- **The describer's words are the app's own command descriptions,** from its command table, the same sentences its menus and Hotkey Summary use. A command without a description is a gap to fill, not something to describe by its bare name.
-- **Nothing runs while the describer is on,** except the two ways out: Control+F1 and Alt+F4.
+- **Homer Suite** is DbDo, EdSharp, FileDir and HomerView: data, documents, files and the web, with one way of working.
+- **What makes it a suite:** shared commands have the same names, keys and descriptions everywhere, and a release check enforces it.
+- **The foundation:** HomerDev.
+- **The companion:** HomerScribe, for media.
+- **Homer Tools:** everything else, kept outside the suite so it stays easy to learn.
