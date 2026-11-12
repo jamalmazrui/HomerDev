@@ -173,8 +173,21 @@ FRAME PDF Studio (MIT licensed, by ripplelearning) is a browser tool for remedia
 
 ## Speech and text (kit 1.84.0)
 
-- **Audio or video to a document:** a transcript, by Whisper on this computer, as plain text, Markdown, a web page, Word, PDF, OpenDocument, rich text, EPUB or Word 97. It needs ffmpeg and Whisper, both offered by the Homer installers.
+- **Audio to a document:** its transcript, by Whisper on this computer, as plain text, Markdown, a web page, Word, PDF, OpenDocument, rich text, EPUB or Word 97. Paragraphs break at a pause of two seconds or more, and a recording longer than ten minutes gets a time heading every five minutes, so a screen reader can move through it by heading. It needs ffmpeg and Whisper, both offered by the Homer installers.
 - **A document to audio:** its words spoken by Windows' speech synthesis, as MP3, M4A, WAV, Ogg, FLAC or Opus. It needs ffmpeg.
 - **A document to video:** the same speech over a plain black picture, as MP4, Matroska, WebM or QuickTime, since the kit makes no pictures of its own.
-- **A video to a described document:** with HomerScribe installed, what is said and what can be seen, as one document with a heading for each; HomerScribe describes, as the kit's engine for it. Without HomerScribe, the transcript alone.
+- **A video to a document (kit 1.219.0):** what is said and what can be seen, in time order. Each change of scene, and at least one moment every 30 seconds, is described by Ollama's local vision model; each description starts a heading with its time, "Seen:" gives it, and the speech until the next scene follows. A scene that has not changed is left out. Without a vision model, the transcript alone. No other Homer app is needed: this is the kit's own, and BatCon and every Homer app have it.
+- **A video to sound, described (kit 1.219.0):** mp4 to mp3, and to any other sound format, gives the video's sound with each scene's description spoken by Windows' speech in a pause made for it, at the end of the sentence being spoken, so the programme is never talked over. This is extended audio description; the result runs longer than the video by the length of the descriptions. Without a vision model, the sound alone.
+
+## Accessible output, every target (kit 1.219.0)
+
+Every conversion ends with the same finishing step, in both languages, so what a Homer app makes is as accessible as a program can make it without a person's judgement. What no program can judge -- whether a description is right, whether a heading says what its section is about -- is left for a person, and the checks say where to look.
+
+- **docx:** a title, author and language in the document's properties; a header row marked on every table, repeating on each page; checks for headings and for pictures without alternative text.
+- **epub:** a language and title in its package.
+- **htm:** one level-one heading, a language and a title; checks for what extCheck would report.
+- **md:** front matter with a title and a language.
+- **pdf:** made tagged, with an outline from its headings, by Edge from a web page or by Word's export. Then, where missing: its title, and the setting that shows the title in place of the file's name; its language; the flag that says it is tagged; and a tab order that follows its structure on any page with links or form fields -- the points of the Matterhorn Protocol (PDF/UA) a program can set without judgement. Checks follow for tags, bookmarks and pictures without alternative text.
+- **pptx:** a title in its properties; checks for slides without titles and pictures without alternative text.
+- **xlsx:** column headers and row labels marked where a table has them, so a screen reader announces them as it moves.
 

@@ -1137,6 +1137,80 @@ else:
 // anything else (vcf to xlsx is vcf2csv, then csv2xlsx). Like the SQLite engine, both languages run THIS SAME SCRIPT,
 // held word for word in exec\Python\conversion.py as sRecordsScript; the kit's build fails if the two ever differ.
 // From QUILL's playlist_formats.py: a .m3u8 that is a streaming manifest, not a playlist, is refused rather than read.
+// THE PDF FINISHING SCRIPT (kit 1.219.0), held word for word in conversion.py as sPdfScript.
+public const string sPdfScript =
+@"import os, shutil, sys, tempfile
+# THE PDF FINISHING SCRIPT (kit 1.219.0): what the Matterhorn Protocol (PDF/UA) asks that a program can set without
+# judgement, set on every PDF a Homer app makes, by both languages, held word for word in conversion.py and
+# Conversion.cs as sPdfScript. What it sets, only where missing: the title, and the flag that shows it in place of the
+# file's name; the language; the flag saying a tagged PDF is marked; and, on a page with links or form fields, a tab
+# order that follows the document's structure. Never the tags themselves: Edge and Word write those, and a structure
+# guessed afterwards would be worse than none. Saved incrementally, so the tags and outline stay exactly as written.
+#   python <script> <pdf> <title|language>
+sPath = sys.argv[1]
+sTitle, _, sLanguage = (sys.argv[2] if len(sys.argv) > 2 else '').partition('|')
+sTitle = sTitle.strip() or os.path.splitext(os.path.basename(sPath))[0].replace('_', ' ')
+sLanguage = sLanguage.strip() or 'en-US'
+lsDone = []
+try:
+    try:
+        import pymupdf
+    except ImportError:
+        import fitz as pymupdf
+    oDoc = pymupdf.open(sPath)
+    iCatalog = oDoc.pdf_catalog()
+    dMeta = dict(oDoc.metadata or {})
+    if not (dMeta.get('title') or '').strip():
+        dMeta['title'] = sTitle; oDoc.set_metadata(dMeta); lsDone.append('title')
+    if oDoc.xref_get_key(iCatalog, 'Lang')[0] == 'null':
+        oDoc.xref_set_key(iCatalog, 'Lang', pymupdf.get_pdf_str(sLanguage)); lsDone.append('language')
+    sKind, sValue = oDoc.xref_get_key(iCatalog, 'ViewerPreferences')
+    if 'DisplayDocTitle true' not in sValue.replace('/', ' ').replace('  ', ' '):
+        if sKind == 'xref': oDoc.xref_set_key(int(sValue.split()[0]), 'DisplayDocTitle', 'true')
+        else: oDoc.xref_set_key(iCatalog, 'ViewerPreferences', '<</DisplayDocTitle true>>')
+        lsDone.append('title shown')
+    if oDoc.xref_get_key(iCatalog, 'StructTreeRoot')[0] != 'null' and 'Marked true' not in oDoc.xref_get_key(iCatalog, 'MarkInfo')[1].replace('/', ' '):
+        oDoc.xref_set_key(iCatalog, 'MarkInfo', '<</Marked true>>'); lsDone.append('marked')
+    iTabs = 0
+    for oPage in oDoc:
+        if oDoc.xref_get_key(oPage.xref, 'Annots')[0] != 'null' and oDoc.xref_get_key(oPage.xref, 'Tabs')[1] != '/S':
+            oDoc.xref_set_key(oPage.xref, 'Tabs', '/S'); iTabs += 1
+    if iTabs: lsDone.append('tab order on %d page%s' % (iTabs, '' if iTabs == 1 else 's'))
+    if lsDone:
+        if oDoc.can_save_incrementally(): oDoc.saveIncr()
+        else:
+            sTemp = sPath + '.finishing.pdf'; oDoc.save(sTemp, garbage=0); oDoc.close(); shutil.move(sTemp, sPath)
+except ImportError:
+    from pypdf import PdfReader, PdfWriter
+    from pypdf.generic import BooleanObject, DictionaryObject, NameObject, TextStringObject
+    oReader = PdfReader(sPath)
+    oWriter = PdfWriter(clone_from=oReader)
+    oRoot = oWriter._root_object
+    if not ((oReader.metadata or {}).get('/Title') or '').strip():
+        oWriter.add_metadata({'/Title': sTitle}); lsDone.append('title')
+    if '/Lang' not in oRoot:
+        oRoot[NameObject('/Lang')] = TextStringObject(sLanguage); lsDone.append('language')
+    oPrefs = oRoot.get('/ViewerPreferences')
+    oPrefs = oPrefs.get_object() if oPrefs is not None else None
+    if oPrefs is None or not oPrefs.get('/DisplayDocTitle'):
+        if oPrefs is None: oPrefs = DictionaryObject(); oRoot[NameObject('/ViewerPreferences')] = oPrefs
+        oPrefs[NameObject('/DisplayDocTitle')] = BooleanObject(True); lsDone.append('title shown')
+    if '/StructTreeRoot' in oRoot:
+        oMark = oRoot.get('/MarkInfo')
+        if oMark is None or not oMark.get_object().get('/Marked'):
+            oRoot[NameObject('/MarkInfo')] = DictionaryObject({NameObject('/Marked'): BooleanObject(True)}); lsDone.append('marked')
+    iTabs = 0
+    for oPage in oWriter.pages:
+        if '/Annots' in oPage and oPage.get('/Tabs') != '/S':
+            oPage[NameObject('/Tabs')] = NameObject('/S'); iTabs += 1
+    if iTabs: lsDone.append('tab order on %d page%s' % (iTabs, '' if iTabs == 1 else 's'))
+    if lsDone:
+        sTemp = sPath + '.finishing.pdf'
+        with open(sTemp, 'wb') as oFile: oWriter.write(oFile)
+        shutil.move(sTemp, sPath)
+print(', '.join(lsDone))
+";
+
 private const string sRecordsScript =
 @"import csv, datetime, io, os, re, sys, uuid
 import xml.etree.ElementTree as ET
@@ -1405,6 +1479,19 @@ private const string sPyMuPdfText =
 private const string sPyMuPdfMarkdown =
 "import sys\nimport pymupdf4llm\n" +
 "open(sys.argv[2], 'w', encoding='utf-8-sig').write(pymupdf4llm.to_markdown(sys.argv[1]))\n";
+
+// runPythonOutput: runPython, keeping what the script prints (kit 1.219.0): the PDF script says what it set.
+private static bool runPythonOutput(string sCode, string sFirst, string sSecond, out string sOut, out string sError) {
+sOut = "";
+string sPython = pythonProgram();
+if (sPython == "") { sError = "Python is not installed; installPdfTools.cmd installs it with the PDF tools"; return false; }
+string sScript = Path.Combine(Path.GetTempPath(), "homerConversion_" + Guid.NewGuid().ToString("N").Substring(0, 8) + ".py");
+try {
+File.WriteAllText(sScript, sCode, new UTF8Encoding(false));
+return run(sPython, Util.stringQuote(sScript) + " " + Util.stringQuote(sFirst) + " " + Util.stringQuote(sSecond), out sOut, out sError);
+}
+finally { try { File.Delete(sScript); } catch (Exception) { } }
+} // runPythonOutput method
 
 private static bool runPython(string sCode, string sSource, string sTarget, out string sError) {
 string sPython = pythonProgram();
@@ -1923,7 +2010,15 @@ else if (sType == "pptx") finishOffice(sPath, "ppt", lsFindings);
 else if (sType == "epub") finishEpub(sPath, lsFindings);
 else if (sType == "md") finishMarkdown(sPath, lsFindings);
 else if (sType == "htm") checkPage(sPath, lsFindings);
-else if (sType == "pdf") checkPdfTags(sPath, lsFindings);
+else if (sType == "pdf") {
+// WHAT PDF/UA ASKS THAT NEEDS NO JUDGEMENT IS SET (kit 1.219.0), by the PDF script both languages share: title shown,
+// language, marked, tab order. The tags themselves are Edge's or Word's.
+string sDone;
+string sPdfError;
+if (runPythonOutput(sPdfScript, sPath, documentTitle(sPath) + "|" + documentLanguage(), out sDone, out sPdfError)) { if (sDone.Trim().Length > 0) lsFindings.Add("PdfFinished: fixed, " + sDone.Trim()); }
+else lsFindings.Add("PdfNotFinished: " + sPdfError);
+checkPdfTags(sPath, lsFindings);
+}
 qualityCheck(sPath, lsFindings);
 foreach (string sFinding in lsFindings) Log.info("Quality " + Path.GetFileName(sPath) + ": " + sFinding);
 return true;
@@ -2203,6 +2298,12 @@ if (!bLanguage) lsFindings.Add("MissingDocumentLanguage: the PDF names no langua
 if (!Regex.IsMatch(sBytes, "/Title\\s*(?:\\(\\s*[^)\\s]|<\\s*[0-9A-Fa-f]{4})") && !Regex.IsMatch(sBytes, "<dc:title>\\s*<rdf:Alt>\\s*<rdf:li[^>]*>\\s*[^<\\s]"))
 lsFindings.Add("MissingDocumentTitle: the PDF has no title, so a reader announces its file name");
 if (sBytes.IndexOf("/Outlines", StringComparison.Ordinal) < 0) lsFindings.Add("NoBookmarks: the PDF has no bookmarks to move by its headings");
+// The title shown, and pictures described (kit 1.218.0, from Vispero's guide to testing PDFs): without
+// /DisplayDocTitle true a viewer shows the file's name in place of its title; a figure tag with no /Alt is a
+// picture a screen reader passes over in silence.
+if (!Regex.IsMatch(sBytes, "/DisplayDocTitle\\s*true")) lsFindings.Add("TitleNotDisplayed: the PDF does not ask viewers to show its title in place of its file name");
+int iFigures = Regex.Matches(sBytes, "/S\\s*/Figure\\b").Count, iAlts = Regex.Matches(sBytes, "/Alt\\s*[(<]").Count;
+if (iFigures > iAlts) lsFindings.Add("FigureWithoutAlt: " + (iFigures - iAlts) + " of " + iFigures + " pictures have no alternative text");
 return true;
 } // checkPdfTags method
 

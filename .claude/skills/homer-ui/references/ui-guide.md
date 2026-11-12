@@ -211,6 +211,10 @@ belong in an app's Help or About, so a user can say what happened.
 
 ### What to speak, and what not to
 
+The AI points below follow Eric Bailey's guidance on accessible AI chat (Smashing
+Magazine, November 2026), adapted from web pages to Homer's direct speech.
+
+
 - **Do not repeat what the reader already says.** It announces a dialog's title
   when the dialog opens and a control's name when focus lands on it. An app
   that says these too makes the user hear everything twice.
@@ -222,6 +226,16 @@ belong in an app's Help or About, so a user can say what happened.
   summaries.
 - **Match the noun to the count.** "1 file", not "1 files". A count of zero is a
   real answer: "0 matches" is information, not an error.
+- **Speak an AI's reply once, when it is finished.** A reply that arrives a few
+  words at a time is spoken whole when the last words arrive, never piece by
+  piece, which judders and is hard to follow. Speak it the moment it is done,
+  not at the next progress notice.
+- **Say an AI is working when it takes a while.** If nothing has come back after
+  five seconds, say "Working", then the time so far about every ten seconds, so
+  the wait never sounds like a crash.
+- **Keep every reply where it can be read again.** Each turn of a conversation
+  starts with who spoke, "You:" or "AI:", in a read-only text box, and F6 moves
+  between the prompt and that text, as F6 moves between panes in every Homer app.
 
 ## Three kinds of Homer app
 

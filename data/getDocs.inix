@@ -3,6 +3,7 @@
 ; match; when one is found, the newest PDF or Word file is taken and the page itself is not converted. Without files,
 ; or when nothing matches, the page is turned into a structured, cleaned .md with its .htm.
 ; follow: a pattern for a link on the page to follow first, when the page only leads to the document.
+; also: other addresses, separated by |, tried in order when the page gives under 300 words.
 ; Added 12 November 2026, from Top Tech Tidbits, Volume 1093.
 
 [DBT_Producers_Manual]
@@ -14,6 +15,9 @@ files = producer|manual
 title = What's New in JAWS 2027
 url = https://support.freedomscientific.com/Downloads/JAWS/JAWSWhatsNew
 follow = Latest JAWS Enhancements|JAWS 2027
+; The What's New page builds its notes in the browser. Freedom Scientific's blog has carried each year's notes at
+; an address of one pattern (2025, 2026); this is 2027's by that pattern, tried when the page gives too little.
+also = https://blog.freedomscientific.com/whats-new-in-jaws-zoomtext-and-fusion-2027/
 
 [Accessible_LLM_Chat]
 title = Making Immersive LLM Chat Experiences More Accessible

@@ -889,7 +889,9 @@ def checkSqliteSame():
     sCs = open(os.path.join(sScriptDir, "exec", "CSharp", "Conversion.cs"), encoding="utf-8-sig").read()
     sPy = open(os.path.join(sScriptDir, "exec", "Python", "conversion.py"), encoding="utf-8-sig").read()
     # THE RECORDS SCRIPT TOO (1.93.0): every script both languages run is checked the same way.
-    for sName, sLabel in (("sSqliteScript", "SQLite"), ("sRecordsScript", "records")):
+    # THE MEDIA AND PDF SCRIPTS TOO (1.219.0); the media script lives in ConversionMedia.cs.
+    sCs += open(os.path.join(sScriptDir, "exec", "CSharp", "ConversionMedia.cs"), encoding="utf-8-sig").read()
+    for sName, sLabel in (("sSqliteScript", "SQLite"), ("sRecordsScript", "records"), ("sMediaScript", "media"), ("sPdfScript", "PDF")):
         oCs = reLocal.search(sName + r'\s*=\s*@"((?:[^"]|"")*)";', sCs)
         oPy = reLocal.search(sName + r" = r'''(.*?)'''", sPy, reLocal.S)
         if not oCs or not oPy: return "the %s script was not found in %s" % (sLabel, "Conversion.cs" if not oCs else "conversion.py")

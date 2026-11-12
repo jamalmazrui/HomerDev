@@ -109,69 +109,283 @@ for (int i = 0; i < aTargets.GetLength(0); i++) if (aTargets[i, 1] != "m3u") lsA
 }
 } // mediaAllTargets method
 
-// describeVideoTo: what a video says and shows, as one document, by HomerScribe. A context file
-// named after the video, beside it, is found by HomerScribe itself, as in its guide.
-private static bool describeVideoTo(string sSource, string sTarget, out string sError) {
-sError = "";
-string sScribe = Paths.homerProgram("HomerScribe");
-if (sScribe.Length == 0) { sError = "HomerScribe is not installed"; return false; }
-string sDir = Path.Combine(Path.GetTempPath(), "HomerDescribe-" + Guid.NewGuid().ToString("N").Substring(0, 8));
-string sMd = tempPath(sSource, ".md");
-try {
-Directory.CreateDirectory(sDir);
-string sOut, sErr;
-// Ten hours at most: a long film is described scene by scene by a local vision model.
-int iCode = Media.run(sScribe, "\"" + sSource + "\" --describe --transcribe --output-dir \"" + sDir + "\"", out sOut, out sErr, 600);
-string sFolder = Path.Combine(sDir, Path.GetFileNameWithoutExtension(sSource));
-string sDescribed = Path.Combine(sFolder, "described.md"), sTranscribed = Path.Combine(sFolder, "transcribed.md");
-if (!File.Exists(sDescribed)) {
-sError = "HomerScribe made no description (exit code " + iCode + ")";
-Log.info("HomerScribe: " + (sErr + " " + sOut).Trim());
-return false;
-}
-StringBuilder oMd = new StringBuilder("# " + Path.GetFileNameWithoutExtension(sSource) + "\r\n\r\n");
-if (File.Exists(sTranscribed)) oMd.Append("## What is said\r\n\r\n" + demoted(decodeText(File.ReadAllBytes(sTranscribed))) + "\r\n\r\n");
-oMd.Append("## What can be seen\r\n\r\n" + demoted(decodeText(File.ReadAllBytes(sDescribed))) + "\r\n");
-File.WriteAllText(sMd, oMd.ToString(), new UTF8Encoding(true));
-string sTo = typeOf(sTarget);
-if (sTo == "md" || sTo == "txt") { File.Copy(sMd, sTarget, true); return true; }
-return convert(sMd, sTarget, out sError);
-}
-catch (Exception oError) { sError = "HomerScribe could not be used: " + oError.Message; return false; }
-finally { try { Directory.Delete(sDir, true); } catch (Exception) { } try { File.Delete(sMd); } catch (Exception) { } }
-} // describeVideoTo method
-
 // demoted: a document's headings moved down two levels, under "## What is said" or "## What can be
 // seen", so the combined document keeps one outline.
 private static string demoted(string sMarkdown) {
 return System.Text.RegularExpressions.Regex.Replace(sMarkdown.Replace("\r\n", "\n"), @"(?m)^(#{1,4})(\s)", "##$1$2").Replace("\n", "\r\n").Trim();
 } // demoted method
 
-// transcribeTo: the words spoken in a recording, as a document of the target's type.
-private static bool transcribeTo(string sSource, string sTarget, out string sError) {
+// THE MEDIA SCRIPT (kit 1.219.0, the author's request of 12 November 2026): HomerScribe's transcribing and describing,
+// now the kit's, so BatCon and every Homer app transcribe and describe with no other Homer app installed. Held word
+// for word in conversion.py as sMediaScript; the kit's build fails if the two differ.
+public const string sMediaScript =
+@"import base64, glob, json, os, re, shutil, subprocess, sys, tempfile, time, urllib.request
+# THE MEDIA SCRIPT (kit 1.219.0, the author's request of 12 November 2026): what HomerScribe did, now the kit's, so
+# BatCon and every Homer app transcribe and describe with no other Homer app installed. Both languages run THIS SAME
+# SCRIPT, held word for word in conversion.py and Conversion.cs as sMediaScript; the kit's build fails if they differ.
+#   python <script> <source> <target>
+#   sound to a text target: the transcript, as Markdown, paragraphs by pause, a time heading every five minutes
+#   video to a text target:  what is said and what is seen, in time order, a heading at each scene, as Markdown
+#   video to a sound target: the sound with each scene's description spoken in a pause made for it -- extended
+#                            description, so the programme is never talked over -- at the end of a sentence
+# A text target is written as Markdown at the target's path; the caller turns it into .docx, .htm, .pdf and the rest
+# by the kit's own conversion, so every transcript is as accessible as anything else the kit makes.
+# Tools, all machine-wide and approved: ffmpeg; Whisper (whisper-cli) for speech; Ollama's local vision model for
+# pictures, over its local web interface, never its command; Windows speech for the spoken descriptions.
+lsAudio = ['aac', 'aif', 'aiff', 'flac', 'm4a', 'mp3', 'ogg', 'opus', 'wav', 'wma']
+lsVideo = ['3gp', 'avi', 'flv', 'm2ts', 'm4v', 'mkv', 'mov', 'mp4', 'mpeg', 'mpg', 'ogv', 'ts', 'webm', 'wmv']
+lsVisionModels = ['qwen2.5vl', 'gemma3', 'llama3.2-vision', 'llava', 'minicpm-v', 'moondream']
+iNoWindow = getattr(subprocess, 'CREATE_NO_WINDOW', 0)
+sOllama = 'http://127.0.0.1:11434'
+
+
+def note(sText):
+    sys.stderr.write(time.strftime('%H:%M:%S ') + sText + '\n'); sys.stderr.flush()
+
+
+def tool(lsCommand, iMinutes):
+    oDone = subprocess.run(lsCommand, capture_output=True, text=True, errors='replace', timeout=iMinutes * 60, creationflags=iNoWindow)
+    if oDone.returncode != 0: raise RuntimeError('%s failed (exit code %d): %s' % (os.path.basename(lsCommand[0]), oDone.returncode, (oDone.stderr or oDone.stdout).strip()[-300:]))
+    return (oDone.stdout or '') + (oDone.stderr or '')
+
+
+def findProgram(sName, lsPlaces):
+    for sPath in lsPlaces:
+        if sPath and os.path.isfile(sPath): return sPath
+    return shutil.which(sName) or ''
+
+
+def ffmpegPath():
+    sFiles, sLocal = os.environ.get('ProgramFiles', r'C:\Program Files'), os.environ.get('LOCALAPPDATA', '')
+    return findProgram('ffmpeg', [os.path.join(sFiles, 'ffmpeg', 'bin', 'ffmpeg.exe'), os.path.join(sLocal, 'Microsoft', 'WinGet', 'Links', 'ffmpeg.exe')])
+
+
+def whisperPaths():
+    sProgram = findProgram('whisper-cli', [os.path.join(os.environ.get('ProgramFiles', r'C:\Program Files'), 'Whisper', 'whisper-cli.exe')])
+    if not sProgram: return '', ''
+    lsModels = [s for s in sorted(glob.glob(os.path.join(os.path.dirname(sProgram), 'ggml-*.bin'))) if 'silero' not in os.path.basename(s).lower()]
+    lsModels.sort(key=lambda s: (0 if 'large-v3-turbo' in s else 1 if 'large' in s else 2 if 'medium' in s else 3))
+    return sProgram, (lsModels[0] if lsModels else '')
+
+
+def seconds(sClock):
+    h, m, s = sClock.replace(',', '.').split(':')
+    return int(h) * 3600 + int(m) * 60 + float(s)
+
+
+def clock(nSeconds):
+    i = int(nSeconds); h, m, s = i // 3600, (i % 3600) // 60, i % 60
+    return '%d:%02d:%02d' % (h, m, s) if h else '%d:%02d' % (m, s)
+
+
+def speech(sSource, sWork):
+    """"""[(start, end, words)] for what is said, by Whisper; [] when nothing is said.""""""
+    sFfmpeg = ffmpegPath()
+    if not sFfmpeg: raise RuntimeError('ffmpeg is not installed, and it is what takes the sound out')
+    sProgram, sModel = whisperPaths()
+    if not sProgram: raise RuntimeError(""Whisper is not installed; HomerDev's setup program offers it"")
+    if not sModel: raise RuntimeError(""Whisper has no speech model; run HomerDev's setup program again and leave Whisper marked"")
+    sWav = os.path.join(sWork, 'sound.wav')
+    note('Taking the sound out.')
+    tool([sFfmpeg, '-nostdin', '-y', '-i', sSource, '-vn', '-ar', '16000', '-ac', '1', '-c:a', 'pcm_s16le', sWav], 240)
+    note('Listening with Whisper; a long recording takes a while.')
+    sBase = os.path.join(sWork, 'words')
+    tool([sProgram, '-m', sModel, '-f', sWav, '-l', 'auto', '-osrt', '-of', sBase, '-np'], 600)
+    sSrt = open(sBase + '.srt', encoding='utf-8', errors='replace').read() if os.path.isfile(sBase + '.srt') else ''
+    lOut = []
+    for oCue in re.finditer(r'(\d+:\d+:\d+[,.]\d+)\s*-->\s*(\d+:\d+:\d+[,.]\d+)\s*\n(.*?)(?:\n\s*\n|\Z)', sSrt.replace('\r\n', '\n'), re.S):
+        sWords = re.sub(r'\s+', ' ', oCue.group(3)).strip()
+        if sWords and not re.fullmatch(r'\[[^\]]*\]|\([^)]*\)', sWords): lOut.append((seconds(oCue.group(1)), seconds(oCue.group(2)), sWords))
+    note('%d stretches of speech heard.' % len(lOut))
+    return lOut
+
+
+def visionModel():
+    try:
+        with urllib.request.urlopen(sOllama + '/api/tags', timeout=10) as oResponse: lsNames = [d.get('name', '') for d in json.load(oResponse).get('models', [])]
+    except Exception:
+        raise RuntimeError(""Ollama is not running, and it is what describes pictures; HomerDev's setup program offers it"")
+    for sWant in lsVisionModels:
+        for sName in lsNames:
+            if sName == sWant or sName.startswith(sWant + ':'): return sName
+    raise RuntimeError('Ollama has no model that sees pictures; one such as %s is needed' % lsVisionModels[0])
+
+
+def scenes(sSource, sWork):
+    """"""[(time, picture)] at each change of scene, at least one every 30 seconds, never two within 6.""""""
+    sFfmpeg = ffmpegPath()
+    sDir = os.path.join(sWork, 'frames'); os.makedirs(sDir, exist_ok=True)
+    sSelect = ""select='isnan(prev_selected_t)+gte(t-prev_selected_t\\,30)+gt(scene\\,0.3)*gte(t-prev_selected_t\\,6)',scale=768:-2,showinfo""
+    note('Finding the scenes.')
+    sLog = tool([sFfmpeg, '-nostdin', '-y', '-i', sSource, '-vf', sSelect, '-vsync', 'vfr', '-q:v', '4', os.path.join(sDir, 'f%05d.jpg')], 600)
+    lnTimes = [float(s) for s in re.findall(r'pts_time:([\d.]+)', sLog)]
+    lsFiles = sorted(glob.glob(os.path.join(sDir, 'f*.jpg')))
+    note('%d scenes to look at.' % min(len(lnTimes), len(lsFiles)))
+    return list(zip(lnTimes, lsFiles))
+
+
+def describe(sModel, sPicture, sBefore):
+    sPrompt = ('You describe a video for a listener who is blind. In one to three plain sentences, in the present tense, say what '
+               'can be seen in this frame that matters: the people, what they do, the setting, and any words shown on screen. '
+               'Do not begin with ""The image shows"" or anything like it. ' + ('Just before, the listener heard: ""%s"". If nothing '
+               'that matters has changed since then, answer only SAME.' % sBefore if sBefore else ''))
+    dBody = {'model': sModel, 'prompt': sPrompt, 'images': [base64.b64encode(open(sPicture, 'rb').read()).decode('ascii')], 'stream': False}
+    oRequest = urllib.request.Request(sOllama + '/api/generate', data=json.dumps(dBody).encode('utf-8'), headers={'Content-Type': 'application/json'})
+    with urllib.request.urlopen(oRequest, timeout=600) as oResponse: sText = json.load(oResponse).get('response', '').strip()
+    sText = re.sub(r'^(?:the |this )?(?:image|picture|frame|scene|screenshot)\s+(?:shows|depicts|displays)\s+', '', sText, flags=re.I)
+    return sText[:1].upper() + sText[1:] if sText else ''
+
+
+def descriptions(sSource, sWork):
+    """"""[(time, words)] for what is seen, a scene that has not changed left out.""""""
+    sModel = visionModel()
+    lScenes, lOut, sBefore, nStarted = scenes(sSource, sWork), [], '', time.time()
+    for i, (nTime, sPicture) in enumerate(lScenes, 1):
+        sText = describe(sModel, sPicture, sBefore)
+        if sText and not re.fullmatch(r'same\.?', sText.strip(), re.I): lOut.append((nTime, sText)); sBefore = sText
+        if time.time() - nStarted > 10 or i == len(lScenes):
+            note('Described %d of %d scenes, %d%%.' % (i, len(lScenes), 100 * i // max(1, len(lScenes)))); nStarted = time.time()
+    return lOut
+
+
+def paragraphs(lSpeech):
+    """"""Speech as paragraphs: a new one after a pause of two seconds or more, or once one runs past 600 characters.""""""
+    lOut, sNow, nEnd = [], '', None
+    for nStart, nStop, sWords in lSpeech:
+        if sNow and (nStart - nEnd >= 2 or len(sNow) > 600): lOut.append(sNow); sNow = ''
+        sNow = (sNow + ' ' + sWords).strip(); nEnd = nStop
+    return lOut + ([sNow] if sNow else [])
+
+
+def transcript(sTitle, lSpeech):
+    lsOut = ['# ' + sTitle, '', 'What is said in the recording, as heard by Whisper.', '']
+    nLength = lSpeech[-1][1] if lSpeech else 0
+    if nLength <= 600:
+        lsOut += [s + '\n' for s in paragraphs(lSpeech)]
+        return '\n'.join(lsOut)
+    for iBlock in range(0, int(nLength // 300) + 1):
+        lPart = [t for t in lSpeech if iBlock * 300 <= t[0] < (iBlock + 1) * 300]
+        if lPart: lsOut += ['## ' + clock(iBlock * 300), ''] + [s + '\n' for s in paragraphs(lPart)]
+    return '\n'.join(lsOut)
+
+
+def integrated(sTitle, lSpeech, lSeen):
+    """"""What is said and what is seen, in time order: a heading at each described scene, its description, then the
+    speech until the next one. Speech before the first scene sits under 0:00.""""""
+    lsOut = ['# ' + sTitle, '', 'What is said and what can be seen, in time order. Each heading is the time a scene begins; '
+             '""Seen"" is what a vision model saw there, and the paragraphs after it are what is said.', '']
+    lnMarks = [0.0] + [t for t, _ in lSeen if t > 0]
+    dSeen = dict(lSeen)
+    for i, nMark in enumerate(lnMarks):
+        nNext = lnMarks[i + 1] if i + 1 < len(lnMarks) else float('inf')
+        lPart = [t for t in lSpeech if nMark <= t[0] < nNext]
+        sSeen = dSeen.get(nMark, '')
+        if not sSeen and not lPart: continue
+        lsOut += ['## ' + clock(nMark), '']
+        if sSeen: lsOut += ['*Seen:* ' + sSeen, '']
+        lsOut += [s + '\n' for s in paragraphs(lPart)]
+    return '\n'.join(lsOut)
+
+
+def speak(sText, sWav):
+    sTxt = sWav + '.txt'
+    open(sTxt, 'w', encoding='utf-8-sig').write(sText)
+    sScript = (""Add-Type -AssemblyName System.Speech; $o = New-Object System.Speech.Synthesis.SpeechSynthesizer; ""
+               ""$o.SetOutputToWaveFile('%s'); $o.Speak([IO.File]::ReadAllText('%s')); $o.SetOutputToNull(); $o.Dispose()""
+               % (sWav.replace(""'"", ""''""), sTxt.replace(""'"", ""''"")))
+    tool(['powershell', '-NoProfile', '-NonInteractive', '-Command', sScript], 5)
+
+
+def insertionPoints(lSpeech, lSeen):
+    """"""Each description's place: its scene's time, moved to the end of the sentence being spoken there.""""""
+    lOut = []
+    for nTime, sText in lSeen:
+        for nStart, nStop, _ in lSpeech:
+            if nStart < nTime < nStop: nTime = nStop; break
+        lOut.append((nTime, sText))
+    return sorted(lOut)
+
+
+def describedSound(sSource, sTarget, lSpeech, lSeen, sWork):
+    sFfmpeg = ffmpegPath()
+    sAll = os.path.join(sWork, 'all.wav')
+    tool([sFfmpeg, '-nostdin', '-y', '-i', sSource, '-vn', '-ar', '44100', '-ac', '2', '-c:a', 'pcm_s16le', sAll], 240)
+    lsParts, nFrom = [], 0.0
+    for i, (nAt, sText) in enumerate(insertionPoints(lSpeech, lSeen)):
+        if nAt > nFrom:
+            sPart = os.path.join(sWork, 'part%05d.wav' % (2 * i))
+            tool([sFfmpeg, '-nostdin', '-y', '-ss', '%.3f' % nFrom, '-to', '%.3f' % nAt, '-i', sAll, '-c:a', 'pcm_s16le', sPart], 30)
+            lsParts.append(sPart)
+        sSaid, sSaid2 = os.path.join(sWork, 'said%05d.wav' % i), os.path.join(sWork, 'part%05d.wav' % (2 * i + 1))
+        speak(sText, sSaid)
+        tool([sFfmpeg, '-nostdin', '-y', '-i', sSaid, '-ar', '44100', '-ac', '2', '-c:a', 'pcm_s16le', sSaid2], 5)
+        lsParts.append(sSaid2); nFrom = nAt
+    sRest = os.path.join(sWork, 'rest.wav')
+    tool([sFfmpeg, '-nostdin', '-y', '-ss', '%.3f' % nFrom, '-i', sAll, '-c:a', 'pcm_s16le', sRest], 30)
+    lsParts.append(sRest)
+    sList = os.path.join(sWork, 'parts.txt')
+    open(sList, 'w', encoding='utf-8').write(''.join(""file '%s'\n"" % s.replace(""'"", ""'\\''"") for s in lsParts))
+    note('Joining the sound and %d spoken descriptions.' % len(lSeen))
+    tool([sFfmpeg, '-nostdin', '-y', '-f', 'concat', '-safe', '0', '-i', sList, sTarget], 120)
+
+
+def main():
+    sSource, sTarget = os.path.abspath(sys.argv[1]), os.path.abspath(sys.argv[2])
+    sFrom, sTo = os.path.splitext(sSource)[1].lower().lstrip('.'), os.path.splitext(sTarget)[1].lower().lstrip('.')
+    sTitle = os.path.splitext(os.path.basename(sSource))[0].replace('_', ' ')
+    sWork = tempfile.mkdtemp(prefix='homerMedia-')
+    try:
+        if sFrom in lsVideo and sTo in lsAudio:
+            lSpeech = speech(sSource, sWork)
+            describedSound(sSource, sTarget, lSpeech, descriptions(sSource, sWork), sWork)
+        elif sFrom in lsVideo:
+            lSpeech = speech(sSource, sWork)
+            try: lSeen = descriptions(sSource, sWork)
+            except Exception as oError: note('No descriptions: %s; the transcript alone.' % oError); lSeen = []
+            if not lSpeech and not lSeen: raise RuntimeError('nothing was heard or seen')
+            open(sTarget, 'w', encoding='utf-8-sig', newline='\r\n').write(integrated(sTitle, lSpeech, lSeen) if lSeen else transcript(sTitle, lSpeech))
+        elif sFrom in lsAudio:
+            lSpeech = speech(sSource, sWork)
+            if not lSpeech: raise RuntimeError('Whisper heard no words')
+            open(sTarget, 'w', encoding='utf-8-sig', newline='\r\n').write(transcript(sTitle, lSpeech))
+        else:
+            raise RuntimeError('%s is neither sound nor video' % os.path.basename(sSource))
+    except Exception as oError:
+        sys.stderr.write(str(oError) + '\n'); sys.exit(1)
+    finally:
+        shutil.rmtree(sWork, ignore_errors=True)
+
+
+if __name__ == '__main__':
+    main()
+";
+
+// mediaScriptTo: sound or video to a document, or video to described sound, by the media script. A text target is
+// made as Markdown, then by the kit's own conversion, so a transcript is as accessible as anything else the kit makes.
+// Ten hours at most, as HomerScribe had: a long film is described scene by scene by a local vision model.
+private static bool mediaScriptTo(string sSource, string sTarget, out string sError) {
 sError = "";
-string sFfmpeg = Media.ffmpegProgram();
-if (sFfmpeg.Length == 0) { sError = "ffmpeg is not installed, and it is what takes the sound out for Whisper"; return false; }
-string sWav = tempPath(sSource, ".wav");
-string sMd = tempPath(sSource, ".md");
+string sPython = pythonProgram();
+if (sPython == "") { sError = "Python is not installed; installPdfTools.cmd installs it"; return false; }
+string sToType = typeOf(sTarget);
+bool bText = Array.IndexOf(aTranscriptTargets, sToType) >= 0;
+string sMade = bText ? tempPath(sSource, ".md") : sTarget;
+string sScript = Path.Combine(Path.GetTempPath(), "homerMedia_" + Guid.NewGuid().ToString("N").Substring(0, 8) + ".py");
 try {
+File.WriteAllText(sScript, sMediaScript, new UTF8Encoding(false));
 string sOut, sErr;
-int iCode = Media.run(sFfmpeg, "-nostdin -y -i \"" + sSource + "\" -vn -ar 16000 -ac 1 -c:a pcm_s16le \"" + sWav + "\"", out sOut, out sErr, 120);
-if (iCode != 0 || !File.Exists(sWav)) { sError = "ffmpeg could not take the sound out (exit code " + iCode + ")"; Log.info("ffmpeg: " + sErr.Trim()); return false; }
-// Six hours is the longest a recording may take to transcribe; Whisper runs at many times real time.
-string sText = Voice.transcribe(sWav, 6 * 60 * 60 * 1000, out sError);
-if (sText.Length == 0) { if (sError == "") sError = "Whisper heard no words"; return false; }
-StringBuilder oMd = new StringBuilder("# Transcript of " + Path.GetFileNameWithoutExtension(sSource) + "\r\n\r\n");
-string[] aSentences = System.Text.RegularExpressions.Regex.Split(sText, @"(?<=[.!?])\s+");
-for (int i = 0; i < aSentences.Length; i += 5)
-oMd.Append(string.Join(" ", aSentences, i, Math.Min(5, aSentences.Length - i)) + "\r\n\r\n");
-File.WriteAllText(sMd, oMd.ToString(), new UTF8Encoding(true));
-string sTo = typeOf(sTarget);
-if (sTo == "md" || sTo == "txt") { File.Copy(sMd, sTarget, true); return true; }
-return convert(sMd, sTarget, out sError);
+int iCode = Media.run(sPython, Util.stringQuote(sScript) + " " + Util.stringQuote(sSource) + " " + Util.stringQuote(sMade), out sOut, out sErr, 600);
+foreach (string sLine in (sErr ?? "").Split('\n')) if (sLine.Trim().Length > 0) Log.info("media: " + sLine.Trim());
+if (iCode != 0 || !File.Exists(sMade)) { sError = lastLine(sErr ?? "") ; if (sError == "") sError = "the media script failed (exit code " + iCode + ")"; return false; }
+if (!bText) return true;
+if (sToType == "md" || sToType == "txt") { File.Copy(sMade, sTarget, true); return true; }
+return convert(sMade, sTarget, out sError);
 }
-finally { try { File.Delete(sWav); } catch (Exception) { } try { File.Delete(sMd); } catch (Exception) { } }
-} // transcribeTo method
+catch (Exception oError) { sError = "the media script could not run: " + oError.Message; return false; }
+finally { try { File.Delete(sScript); } catch (Exception) { } if (bText) try { File.Delete(sMade); } catch (Exception) { } }
+} // mediaScriptTo method
+
+
 
 // speakTo: a document's words spoken by Windows' speech synthesis, as sound or as video.
 // Reached by reflection, so no app's build needs a reference to System.Speech.
@@ -220,14 +434,18 @@ static partial void mediaConvert(string sSource, string sTarget, ref bool bHandl
 string sCategory = "";
 mediaCategory(Path.GetExtension(sSource).ToLowerInvariant(), ref sCategory);
 string sToType = typeOf(sTarget);
-if (sCategory == "video" && Array.IndexOf(aTranscriptTargets, sToType) >= 0) {
-bHandled = true;
-bMade = describeVideoTo(sSource, sTarget, out sError);
-if (!bMade) { Log.info("Described video: " + sError + "; the transcript alone instead"); bMade = transcribeTo(sSource, sTarget, out sError); }
-return;
+// SOUND AND VIDEO TO WORDS, AND VIDEO TO DESCRIBED SOUND (kit 1.219.0): sound to a document is its transcript;
+// video to a document is what is said and seen, in time order; video to sound is the sound with each scene described
+// in a pause made for it. A video that cannot be described still gives its sound, and the reason is logged.
+if ((sCategory == "audio" || sCategory == "video") && Array.IndexOf(aTranscriptTargets, sToType) >= 0) {
+bHandled = true; bMade = mediaScriptTo(sSource, sTarget, out sError); return;
 }
-if (sCategory == "audio" && Array.IndexOf(aTranscriptTargets, sToType) >= 0) {
-bHandled = true; bMade = transcribeTo(sSource, sTarget, out sError); return;
+if (sCategory == "video" && Array.IndexOf(new string[] { "aac", "flac", "m4a", "mp3", "ogg", "opus", "wav", "wma" }, sToType) >= 0) {
+bHandled = true;
+bMade = mediaScriptTo(sSource, sTarget, out sError);
+if (bMade) return;
+Log.info("Described sound: " + sError + "; the sound alone instead");
+bMade = convertMedia(sSource, sTarget, out sError); return;
 }
 if (sCategory == "" && (Array.IndexOf(aSpeechAudioTargets, sToType) >= 0 || Array.IndexOf(aSpeechVideoTargets, sToType) >= 0) && textAvailable(sSource)) {
 bHandled = true; bMade = speakTo(sSource, sTarget, out sError); return;

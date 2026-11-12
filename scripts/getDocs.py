@@ -86,6 +86,9 @@ def newestOf(lLinks):
 def mainContent(sHtml):
     """The page's article or main element, else its body, with its furniture dropped."""
     sHtml = re.sub(r"(?s)<!--.*?-->", "", sHtml)
+    # WHAT THE PUBLISHER HIDES FROM SCREEN READERS STAYS HIDDEN (1.218.0): an element marked aria-hidden="true" --
+    # Smashing Magazine's "(Large preview)" figure captions, eighteen of them -- is not meant to be read.
+    sHtml = re.sub(r'(?is)<(\w+)\b[^>]*\baria-hidden\s*=\s*["\']true["\'][^>]*>.*?</\1\s*>', "", sHtml)
     for sTag in lsDropTags: sHtml = re.sub(r"(?is)<%s\b.*?</%s\s*>" % (sTag, sTag), "", sHtml)
     sHtml = re.sub(r'(?is)<(div|section)\b[^>]*(?:class|id)="[^"]*(?:cookie|share|social|related|comment|newsletter|subscribe|sidebar|breadcrumb|advert|promo)[^"]*"[^>]*>', "<div>", sHtml)
     # THE MOST SUBSTANTIAL PART WINS (1.217.0). Vispero's guide sits in a page whose only <article> elements are cards
@@ -115,8 +118,27 @@ def pageToMarkdown(sHtml, sTitle, sUrl):
     """One structured, cleaned Markdown document: front matter, one level-one heading, a source note, the page."""
     sMd = subprocess.run(["pandoc", "-f", "html", "-t", "markdown-raw_html-native_divs-native_spans-fenced_divs-bracketed_spans-link_attributes-header_attributes-smart",
                           "--wrap=none"], input=mainContent(sHtml), capture_output=True, text=True, encoding="utf-8", check=True).stdout
-    sMd = re.sub(r"!\[\]\([^)]*\)", "", sMd)                      # pictures with no text
-    sMd = re.sub(r"(?m)^\[\s*\]\([^)]*\)\s*$", "", sMd)           # links with no text
+    # PICTURES AS WORDS (1.218.0): a document read by ear has no use for an image link. A picture with real
+    # alternative text keeps it as a line, "Picture: ..."; one with none, or with a link in place of text (Smashing
+    # Magazine's "Large preview" wrappers), goes, and so does the empty link left around it.
+    def picture(m):
+        sAlt = m.group(1).strip()
+        return "" if (len(sAlt) < 4 or re.search(r"[\[\]()]|https?://", sAlt)) else "*Picture: %s.*" % sAlt.rstrip(".")
+    sMd = re.sub(r"!\[((?:[^\[\]]|\[[^\]]*\])*)\]\([^)]*\)", picture, sMd)
+    sMd = re.sub(r"\[\s*\]\([^)]*\)", "", sMd)                       # links left with no text
+    # A SIDE PANEL INSIDE THE ARTICLE (1.218.0): "About The Author", "Email Newsletter", "Related", "Share" and the
+    # like are dropped with everything under them, up to the next heading of their level or higher.
+    lsLines, lsOut, iSkip = sMd.split("\n"), [], 0
+    for sLine in lsLines:
+        oHead = re.match(r"^(#{1,6}) (.*)$", sLine)
+        if oHead:
+            iLevel = len(oHead.group(1))
+            if iSkip and iLevel <= iSkip: iSkip = 0
+            if not iSkip and re.match(r"(?i)(about the author|email newsletter|newsletter|related (posts|articles|reading)|share( this)?|comments?|further reading)\b", oHead.group(2).strip()):
+                iSkip = iLevel
+                continue
+        if not iSkip: lsOut.append(sLine)
+    sMd = "\n".join(lsOut)
     lLevels = [len(m.group(1)) for m in re.finditer(r"(?m)^(#{1,6}) ", sMd)]
     iShift = (2 - min(lLevels)) if lLevels else 0
     sMd = re.sub(r"(?m)^(#{1,6}) ", lambda m: "#" * min(6, max(2, len(m.group(1)) + iShift)) + " ", sMd)
@@ -177,6 +199,20 @@ def getOne(sName, dDoc, sOut):
             return "%s: %s." % (sTitle, ", ".join(os.path.basename(s) for s in lsSaved))
         log("%s: no PDF or Word file matched, so the page is converted" % sName)
     sMd = pageToMarkdown(sHtml, sTitle, sUrl)
+    # OTHER ADDRESSES, IN ORDER (1.218.0): Freedom Scientific's What's New page builds its notes in the browser, so a
+    # plain fetch gets only its frame. When a page gives under 300 words, each address in "also" is tried in turn,
+    # and the first that gives a document of that size is kept; when none does, the first result stands.
+    if len(re.findall(r"\w+", sMd)) < 300:
+        for sAlso in [s.strip() for s in dDoc.get("also", "").split("|") if s.strip()]:
+            try:
+                binAlso, sFinalAlso, sTypeAlso = fetch(sAlso)
+                sMdAlso = pageToMarkdown(binAlso.decode("utf-8", "replace"), sTitle, sAlso)
+            except Exception as oError:
+                log("%s: also %s failed: %s" % (sName, sAlso, oError)); continue
+            log("%s: also %s gave %d words" % (sName, sAlso, len(re.findall(r"\w+", sMdAlso))))
+            if len(re.findall(r"\w+", sMdAlso)) >= 300:
+                sMd, sUrl = sMdAlso, sAlso
+                break
     sMdPath = os.path.join(sOut, sName + ".md")
     writeText(sMdPath, sMd)
     sHtm = subprocess.run(["pandoc", sMdPath, "-f", "markdown", "-s", "-M", "title=", "-M", "pagetitle=" + sTitle, "-M", "lang=en-US"],
@@ -200,7 +236,7 @@ def main():
     for sFolder in (sOut, os.path.join(sRoot, "logs")): os.makedirs(sFolder, exist_ok=True)
     sLogPath = os.path.join(sRoot, "logs", "%s-getDocs-%s.log" % (os.path.basename(sRoot.rstrip("\\/")) or "getDocs", datetime.datetime.now().strftime("%Y%m%d-%H%M%S")))
     dState["fLog"] = io.open(sLogPath, "w", encoding="utf-8-sig", newline="\r\n")
-    log("getDocs.py (HomerDev 1.217.0); script %s; Python %s on %s; cwd %s; command line %s" % (
+    log("getDocs.py (HomerDev 1.218.0); script %s; Python %s on %s; cwd %s; command line %s" % (
         os.path.abspath(__file__), platform.python_version(), platform.platform(), sRoot, " ".join(sys.argv)))
     log("settings: list %s; output %s" % (sList, sOut))
     iResult = 0

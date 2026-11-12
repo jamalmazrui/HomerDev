@@ -7,6 +7,21 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.219.0 -- 12 November 2026
+
+- **Sound and video are the kit's own.** What HomerScribe did -- transcribing and describing -- is now a Python script every Homer app runs, held word for word in conversion.py and ConversionMedia.cs as sMediaScript, so BatCon and every app have it with no other Homer app installed. Sound to a document is its transcript, in paragraphs by pause, with a time heading every five minutes for a long recording. Video to a document is what is said and what is seen, in time order: each change of scene, and at least one moment every 30 seconds, described by Ollama's local vision model, a heading at each with its time. Video to sound -- mp4 to mp3 -- is the sound with each description spoken in a pause made for it, at the end of a sentence: extended audio description. Whisper now keeps its times, which the integration needs.
+- **Every PDF gets what PDF/UA asks that needs no judgement.** A second shared script, sPdfScript, sets where missing the title, the setting that shows it in place of the file's name, the language, the flag that says the PDF is tagged, and a tab order following the structure on pages with links or form fields -- saved incrementally, so Edge's and Word's tags and outline stay as written. It uses PyMuPDF, which installPdfTools already installs, else pypdf.
+- **The build checks the media and PDF scripts** are the same in both languages, as it checks the SQLite and records scripts.
+- **Conversions.md lists what every target format is given** for accessibility, docx to xlsx.
+
+## 1.218.0 -- 12 November 2026
+
+Learnings from the documents getDocs fetched, for every Homer project:
+
+- **An AI's reply is spoken once, finished** (help\\HomerDev.md, What to speak): never piece by piece as it streams; "Working" after five seconds without a reply, then the time so far about every ten seconds; the reply spoken the moment it is done; every turn kept, "You:" or "AI:", in a read-only text box that F6 reaches. From Eric Bailey's guidance on accessible AI chat, adapted to Homer's direct speech.
+- **A PDF's check asks two more things** (Conversion.cs and conversion.py, from Vispero's guide to testing PDFs): whether viewers are asked to show its title in place of its file name, and whether every figure has alternative text. The DBT Producers' Manual passes both.
+- **getDocs reads pages as a screen reader would:** what the publisher hides from screen readers stays out; pictures become "Picture: ..." lines when their text says something, and go when it does not; side panels inside the article -- About the Author, Email Newsletter, Related, Share -- go with what is under them; and a list of other addresses is tried when a page builds its content in the browser, as Freedom Scientific's What's New page does.
+
 ## 1.217.0 -- 12 November 2026
 
 From getDocs' first run, which fetched the DBT Producers' Manual, fifth edition, as PDF and Word, and two pages of six and eight thousand words, but two pages too thin to be the documents:
