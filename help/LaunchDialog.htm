@@ -370,6 +370,19 @@ particular to say passes its own. sourcePaths reads the Source paths box
 by the kit’s convention – separated by spaces, with quotes around a path
 that has one – a folder as the files in it and below it, a wildcard as
 the files it matches, and a web address as it is.</p>
+<h2 id="the-same-words-everywhere-kit-1.221.0">The same words everywhere
+(kit 1.221.0)</h2>
+<p>The same command has the same name, description and binding in every
+launch app. Browse local source, Choose output directory, Use
+configuration and View output directory do the same thing everywhere, so
+an app passes “” for their tips and takes the kit’s sentence; Browse
+local source’s is made from what it picks and the folder it opens in.
+Source paths and Output directory say what that app reads and writes, so
+their tips are the app’s own. On the command line, -f, -u, -v, -d and -h
+are described by the same sentences in every app’s help, LaunchDialog’s
+forceSwitch, useConfigSwitch, viewOutputSwitch, defaultSettingsSwitch
+and helpSwitch, and -h is always help. The kit’s check, “launch words”,
+fails an app that words one of the four controls its own way.</p>
 <h2 id="offering-only-valid-formats-kit-1.220.0">Offering only valid
 formats (kit 1.220.0)</h2>
 <p>A launch app that converts, such as BatCon, offers only the target

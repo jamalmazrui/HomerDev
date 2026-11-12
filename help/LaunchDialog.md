@@ -100,6 +100,10 @@ Every launch dialog answers the two help keys of the Homer Suite, from any contr
 
 The standard controls have standard tips, the same in every launch app: an app passes an empty tip for Source paths, Browse local source, Output directory, Choose output directory, Use configuration or View output directory, and gets the kit's sentence; an app with something particular to say passes its own. sourcePaths reads the Source paths box by the kit's convention -- separated by spaces, with quotes around a path that has one -- a folder as the files in it and below it, a wildcard as the files it matches, and a web address as it is.
 
+## The same words everywhere (kit 1.221.0)
+
+The same command has the same name, description and binding in every launch app. Browse local source, Choose output directory, Use configuration and View output directory do the same thing everywhere, so an app passes "" for their tips and takes the kit's sentence; Browse local source's is made from what it picks and the folder it opens in. Source paths and Output directory say what that app reads and writes, so their tips are the app's own. On the command line, -f, -u, -v, -d and -h are described by the same sentences in every app's help, LaunchDialog's forceSwitch, useConfigSwitch, viewOutputSwitch, defaultSettingsSwitch and helpSwitch, and -h is always help. The kit's check, "launch words", fails an app that words one of the four controls its own way.
+
 ## Offering only valid formats (kit 1.220.0)
 
 A launch app that converts, such as BatCon, offers only the target formats every chosen source can become: Conversion.targetsForPaths(launch.sourcePaths(), out aLabels), asked again whenever the sources change (sourceChosen, and when focus leaves Source paths). Conversion.allTargets, which lists every format any route makes, is for no picker, and the kit's check fails an app that offers it. The same rule holds wherever a Homer app offers a conversion: one file is Conversion.targetsFor, several are targetsForPaths.

@@ -1082,6 +1082,44 @@ def checkKeys():
     return finding("keys", "pass", "0 reserved combinations, 0 access keys claimed twice")
 
 
+def checkLaunchWords():
+    """ONE NAME, ONE SENTENCE IN EVERY LAUNCH APP (1.221.0, the author's ruling of 12 November 2026: the same command has
+    the same name, description and binding in every launch app). Browse local source, Choose output directory, Use
+    configuration and View output directory do the same thing in 2htm, BatCon, extCheck, HomerScribe, urlCheck and
+    urlFido, so each takes the kit's sentence, passed as "" to LaunchDialog; an app that words its own fails. Source
+    paths and Output directory say what the app reads and writes, so their tips are its own."""
+    lsHits = []
+    for sPath in sourceFiles():
+        if not sPath.lower().endswith((".cs", ".py")): continue
+        if os.path.dirname(os.path.abspath(sPath)) != os.path.abspath(sRoot): continue
+        sText = readText(sPath)
+        for sCall, lsWhich in (("addSourceBand", [(2, "Browse local source")]), ("addOutputBand", [(2, "Choose output directory")]),
+                               ("addOperationBands", [(3, "Use configuration"), (5, "View output directory")])):
+            for oCall in re.finditer(r"\b" + sCall + r"\s*\(", sText):
+                lsArgs, sCur, iDepth, sQuote, k = [], "", 1, "", oCall.end()
+                while k < len(sText) and iDepth:
+                    ch = sText[k]
+                    if sQuote:
+                        if ch == "\\": sCur += sText[k:k + 2]; k += 2; continue
+                        if ch == sQuote: sQuote = ""
+                    elif ch in "\"'": sQuote = ch
+                    elif ch in "([{": iDepth += 1
+                    elif ch in ")]}":
+                        iDepth -= 1
+                        if not iDepth: break
+                    elif ch == "," and iDepth == 1: lsArgs.append(sCur.strip()); sCur = ""; k += 1; continue
+                    sCur += ch; k += 1
+                lsArgs.append(sCur.strip())
+                for iArg, sLabel in lsWhich:
+                    if iArg < len(lsArgs) and lsArgs[iArg] not in ('""', "''", "null", "None"):
+                        lsHits.append("%s: %s has its own tip, %s; pass \"\" for the kit's sentence" % (os.path.basename(sPath), sLabel, lsArgs[iArg][:60]))
+    if not lsHits:
+        return finding("launch words", "pass" if any(re.search(r"\baddOperationBands\s*\(", readText(p)) for p in sourceFiles() if p.lower().endswith((".cs", ".py"))) else "skip",
+                       "the standard launch controls use the kit's sentences" )
+    for sHit in lsHits: logLine("launch words: " + sHit)
+    return finding("launch words", "fail", "; ".join(lsHits))
+
+
 def checkConversions():
     """ONE COPY OF EVERY CONVERSION (1.74.0): an app converts files only through the kit's Conversion.
 
@@ -2220,6 +2258,7 @@ def main():
         checkKeys()
         checkSuite()
         checkConversions()
+        checkLaunchWords()
         checkBuild(dArguments.build)
         checkSmoke(dArguments.build)
         checkAccessibility(not dArguments.noscan)

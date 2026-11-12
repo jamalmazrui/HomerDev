@@ -5276,12 +5276,31 @@ public class LaunchDialog : IDisposable
 
     // THE SAME TIP FOR THE SAME CONTROL IN EVERY LAUNCH APP (kit 1.220.0). An app that passes "" for a standard
     // control's tip gets these; one that passes its own keeps it. Each is one sentence for Shift+F1.
+    // ONE NAME, ONE SENTENCE (kit 1.221.0, the author's ruling of 12 November 2026: the same command has the same name,
+    // description and binding in every launch app). Choose output directory, Use configuration and View output
+    // directory do the same thing everywhere, so every app takes these; Source paths and Output directory say what
+    // that app reads and writes, so an app may give its own; Browse local source's sentence is made from what it picks
+    // and where it opens (browseTipFor). The switches' sentences are the same words for the command line.
     public const string sourceTip = "The files or folders to work on, separated by spaces, with quotes around any that has a space; a folder means every file in it.";
-    public const string browseTip = "Pick the sources in a standard Open dialog.";
-    public const string outputTip = "The folder the results are written to; it is made if it does not exist.";
-    public const string chooseTip = "Pick the output folder in a standard folder dialog.";
-    public const string useConfigTip = "Start next time with this run's settings, kept in the app's configuration file.";
-    public const string viewOutputTip = "Open the output folder in File Explorer when the job is done.";
+    public const string outputTip = "The directory the results are written to; it is made if it does not exist.";
+    public const string chooseTip = "Pick the output directory in a standard folder dialog.";
+    public const string useConfigTip = "Load the saved settings at startup, and save them when you press OK.";
+    public const string viewOutputTip = "Open the output directory in File Explorer when the run is done.";
+    public const string forceSwitch = "Do the work again for a source whose result is already there, replacing the old result; without it, that source is skipped and its result kept.";
+    public const string useConfigSwitch = "Load the saved settings at startup, and in the dialog save them when you press OK.";
+    public const string viewOutputSwitch = "Open the output directory in File Explorer when the run is done.";
+    public const string defaultSettingsSwitch = "Forget the saved settings and stop.";
+    public const string helpSwitch = "Show these switches and stop.";
+
+    // browseTipFor: Browse local source's sentence, from what it picks and the folder it opens in when Source paths is
+    // empty, so it is right for every app without each wording its own.
+    public string browseTipFor()
+    {
+        string sFolder = knownFolder == Environment.SpecialFolder.MyVideos ? "Videos" : knownFolder == Environment.SpecialFolder.MyMusic ? "Music"
+            : knownFolder == Environment.SpecialFolder.MyPictures ? "Pictures" : "Documents";
+        string sWhat = sourcePick == "list" ? "Pick a text file that lists the sources, one per line," : sourcePick == "folder" ? "Pick a folder of sources" : "Pick one or more source files";
+        return sWhat + " in a standard dialog; it opens where Source paths points, else in your " + sFolder + " folder.";
+    }
 
     // sourcePaths: the sources the Source paths box names, by the kit's convention (help\LaunchDialog.md): separated by
     // spaces, with quotes around any that has a space -- as Browse local source writes them. A folder means the files in
@@ -5356,7 +5375,7 @@ public class LaunchDialog : IDisposable
     {
         dialog.addBand();
         sourceBox = dialog.addInputBox(markFree("&Source paths:"), sValue, string.IsNullOrEmpty(sTip) ? sourceTip : sTip);
-        browseButton = dialog.addButton(markFree("&Browse local source"), string.IsNullOrEmpty(sBrowseTip) ? browseTip : sBrowseTip);
+        browseButton = dialog.addButton(markFree("&Browse local source"), string.IsNullOrEmpty(sBrowseTip) ? browseTipFor() : sBrowseTip);
         dialog.endBand();
         if (!ownPickers) browseButton.Click += delegate(object o, EventArgs e) { browseSource(); };
         return sourceBox;

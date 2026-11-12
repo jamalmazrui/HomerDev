@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.221.0 -- 12 November 2026
+
+- **One name, one sentence, one key in every launch app.** Browse local source, Choose output directory, Use configuration and View output directory now say the kit's sentence in extCheck, HomerScribe, urlCheck and urlFido, as they will in 2htm and BatCon; Browse local source's sentence is made from what it picks and where it opens. The standard switches -- -f, -u, -v, -d and -h -- have the same words on every app's command line, and -h is help everywhere (HomerScribe's was -?, still accepted). The words are LaunchDialog's constants: forceSwitch, useConfigSwitch, viewOutputSwitch, defaultSettingsSwitch, helpSwitch and the tips beside them.
+- **The check holds them together:** "launch words" fails an app that gives its own wording to one of those four controls, so the apps cannot drift apart again.
+
 ## 1.220.0 -- 12 November 2026
 
 - **Only valid conversions are offered.** Conversion.targetsForPaths, in C# and Python, gives the target formats every one of several sources can become -- one file of each type asked, a format kept only if every type reaches it -- for BatCon's Target format and any picker serving several files; Conversion.targetsFor still serves one file. The kit's check now fails an app that offers allTargets, the list of every format any route makes, so no Homer app can offer a format its sources cannot reach.
