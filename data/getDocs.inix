@@ -1,0 +1,26 @@
+﻿; getDocs.inix -- the documents scripts\getDocs fetches. One section per document; the section name is the file name.
+; url: the page that holds or links the document. files: a pattern a downloadable file's link text or address must
+; match; when one is found, the newest PDF or Word file is taken and the page itself is not converted. Without files,
+; or when nothing matches, the page is turned into a structured, cleaned .md with its .htm.
+; Added 12 November 2026, from Top Tech Tidbits, Volume 1093.
+
+[DBT_Producers_Manual]
+title = Duxbury Braille Translator Producers' Manual, Fifth Edition
+url = https://brailleaustralia.org/about-braille/duxbury-braille-translator-producers-manual-2011/
+files = producer|manual
+
+[JAWS_2027_Whats_New]
+title = What's New in JAWS 2027
+url = https://support.freedomscientific.com/Downloads/JAWS/JAWSWhatsNew
+
+[Accessible_LLM_Chat]
+title = Making Immersive LLM Chat Experiences More Accessible
+url = https://smashingmagazine.com/2026/11/making-immersive-llm-chat-experiences-more-accessible/
+
+[PDF_Accessibility_Testing]
+title = How to Make a PDF Accessible: A Step-by-Step Guide to Testing and Remediation
+url = https://vispero.com/resources/pdf-accessibility-testing/
+
+[Braille_Display_iOS]
+title = Using a Braille Display on iOS: An Introduction
+url = https://www.applevis.com/guides/using-braille-display-ios-introduction

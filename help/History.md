@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.216.0 -- 12 November 2026
+
+- **getDocs fetches documents worth keeping.** It reads the list in data\\getDocs.inix -- or another of the same form -- and, for each document, takes the newest PDF or Word file its page offers, or else turns the page into one structured, cleaned Markdown document with its .htm: the page's article or main content only, one level-one heading, its own headings below, tracking codes taken out of every address, and a note naming the source and the date. Everything goes into the current folder's results\\getDocs, and a log into its logs. The first list holds five documents from Top Tech Tidbits of 12 November 2026: the DBT Producers' Manual, What's New in JAWS 2027, making AI chat accessible, testing PDFs for accessibility, and braille displays on iOS.
+
 ## 1.215.0 -- 12 November 2026
 
 - **tidy tidies MyBooks and MyPages.** Since 1.45.0 tidy stopped at once in a page project that is not a repository, so neither was ever tidied. It now runs its whole folder phase there -- files put in place, empty files and duplicates removed, strays moved to notes, logs at the top into logs, folder names in Homer case -- judged by the project's lists, and skips only the repository phase. MyBooks has a LocalFiles.txt that names what belongs.
