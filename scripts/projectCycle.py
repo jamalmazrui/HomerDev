@@ -323,8 +323,44 @@ def settleBooks(sRoot, sKit):
     return True
 
 
+def movePaper(sRoot, sRelative, sFolder, sWhy):
+    """Moves one file of the project into a notes subfolder, never over another, logged with the reason."""
+    sPath = os.path.join(sRoot, sRelative)
+    if not os.path.isfile(sPath): return False
+    sTarget = os.path.join(sRoot, "notes", sFolder)
+    os.makedirs(sTarget, exist_ok=True)
+    sTo, iNext = os.path.join(sTarget, os.path.basename(sPath)), 2
+    while os.path.exists(sTo):
+        sTo = os.path.join(sTarget, "%s-%d%s" % (os.path.splitext(os.path.basename(sPath))[0], iNext, os.path.splitext(sPath)[1]))
+        iNext += 1
+    shutil.move(sPath, sTo)
+    log("MOVED %s -> %s: %s" % (sRelative, os.path.relpath(sTo, sRoot), sWhy))
+    return True
+
+
+def settlePapers(sRoot):
+    """EACH FOLDER FOR ITS PURPOSE (1.215.0, from a look inside the folders tidy keeps whole). help holds the project's
+    own documents, so an audit and the response to it -- working papers -- go to notes\\drafts, where MyBooks keeps its
+    own (MyPages' Audit_GH_Pages and AuditResponse). And createDropboxFolder's guide and settings go to notes\\retired:
+    the script is in neither the project nor the kit, its test was retired before, and the settings hold people's email
+    addresses, so they are kept, never deleted, and never pushed."""
+    iMoved = 0
+    sHelp = os.path.join(sRoot, "help")
+    if os.path.isdir(sHelp):
+        for sName in sorted(os.listdir(sHelp)):
+            if re.match(r"(?i)^(audit.*|.*auditresponse)\.(md|htm)$", sName):
+                iMoved += movePaper(sRoot, os.path.join("help", sName), "drafts", "an audit is a working paper, not help")
+    if not os.path.isfile(os.path.join(sRoot, "scripts", "createDropboxFolder.py")):
+        for sRelative in (os.path.join("help", "createDropboxFolder_Guide.md"), os.path.join("help", "createDropboxFolder_Guide.htm"),
+                          os.path.join("configs", "createDropboxFolder.inix"), os.path.join("configs", "createDropboxFolder.example.inix")):
+            iMoved += movePaper(sRoot, sRelative, "retired", "createDropboxFolder is in neither this project nor the kit")
+    if iMoved: say("Moved %d paper%s to notes, where %s belong." % (iMoved, "" if iMoved == 1 else "s", "it does" if iMoved == 1 else "they"))
+    return iMoved
+
+
 def build(sRoot, sRole, sKit):
     """The role's build."""
+    if sRole in ("books", "pages"): settlePapers(sRoot)
     # Python's cache in scripts is remade when needed and never belongs to the project (1.212.0).
     shutil.rmtree(os.path.join(sRoot, "scripts", "__pycache__"), ignore_errors=True)
     if sRole == "books": settleBooks(sRoot, sKit)

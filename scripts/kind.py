@@ -130,7 +130,7 @@ def projectKind(sFolder):
     lsIssFirst = [s for s in glob.glob(os.path.join(sFolder, "*_setup.iss")) if os.path.basename(s).lower() != "homerdev_setup.iss"]
     bNamedProgram = sName.lower() != "homerdev" and any(os.path.isfile(os.path.join(sFolder, sName + sExt)) for sExt in (".cs", ".py", ".js", ".ps1"))
     if (not lsIssFirst and not bNamedProgram
-            and (os.path.isfile(os.path.join(sFolder, "templates", "HomerComponents.iss")) or os.path.isfile(os.path.join(sFolder, "Templates", "HomerComponents.iss")))
+            and (os.path.isfile(os.path.join(sFolder, "templates", "HomerComponents.iss")) or os.path.isfile(os.path.join(sFolder, "templates", "HomerComponents.iss")))
             and os.path.isfile(os.path.join(sFolder, "exec", "CSharp", "Lbc.cs"))):
         return "kit", "Templates\\HomerComponents.iss and exec\\CSharp\\Lbc.cs are here, and no app's installer or program"
     lsIss = sorted(glob.glob(os.path.join(sFolder, "*_setup.iss")), key=lambda s: os.path.basename(s).lower() != (sName + "_setup.iss").lower())

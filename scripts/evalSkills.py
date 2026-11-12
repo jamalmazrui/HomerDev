@@ -146,9 +146,9 @@ def prepareRun(sKit, sBase, sCondition, iRun):
     """Makes the run's folder and everything the build and uiCheck need."""
     sFolder = os.path.join(sBase, "%s-%d" % (sCondition, iRun), sApp)
     os.makedirs(sFolder)
-    shutil.copyfile(os.path.join(sKit, "Templates", "samples", "build%s.cmd" % sApp),
+    shutil.copyfile(os.path.join(sKit, "templates", "samples", "build%s.cmd" % sApp),
                     os.path.join(sFolder, "build%s.cmd" % sApp))
-    shutil.copyfile(os.path.join(sKit, "Templates", "samples", "version.txt"), os.path.join(sFolder, "version.txt"))
+    shutil.copyfile(os.path.join(sKit, "templates", "samples", "version.txt"), os.path.join(sFolder, "version.txt"))
     open(os.path.join(sFolder, "uiTest.inix"), "w", encoding="utf-8-sig", newline="\r\n").write(sUiTest)
     if sCondition == "homer":
         shutil.copytree(os.path.join(sKit, ".claude", "skills"), os.path.join(sFolder, ".claude", "skills"))

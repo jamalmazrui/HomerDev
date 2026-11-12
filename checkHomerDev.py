@@ -80,7 +80,7 @@ lAllSamples = [
 lsBuildProducts = ["Version.cs", "build", "dist", "version.py"]
 
 sKit = os.path.dirname(os.path.abspath(__file__))
-sSamples = os.path.join(sKit, "Templates", "samples")
+sSamples = os.path.join(sKit, "templates", "samples")
 # THE LOG AND REPORT GO IN logs (1.65.26), like every other script's: written at the top of the kit, a zip of the
 # logs folder held nothing to say why the check had failed.
 sLogs = os.path.join(sKit, "logs")
@@ -303,7 +303,7 @@ def recordSample(sName, sScript, sExe):
         import build, fingerprint
         oCache = fingerprint.Cache(sKit, logLine)
         sPrint = oCache.fingerprint(build.sampleInputs(sName, sScript))
-        oCache.record("sample " + sName, sPrint, ["Templates/samples/" + sExe])
+        oCache.record("sample " + sName, sPrint, ["templates/samples/" + sExe])
         logLine("recorded sample %s as built, so the next build need not build it again" % sName)
     except Exception as oError:
         logLine("sample %s not recorded, so the next build builds it again: %s" % (sName, oError))
@@ -323,7 +323,7 @@ def currentSamples():
         oCache = fingerprint.Cache(sKit, logLine)
         for sName, sScript, sExe in lAllSamples:
             sPrint = oCache.fingerprint(build.sampleInputs(sName, sScript))
-            if oCache.isCurrent("sample " + sName, sPrint, ["Templates/samples/" + sExe]):
+            if oCache.isCurrent("sample " + sName, sPrint, ["templates/samples/" + sExe]):
                 dCurrent[sName] = oCache.d["jobs"]["sample " + sName].get("when", "?")
     except Exception as oError:
         logLine("the sample cache could not be read, so every sample is built: %s" % oError)
@@ -460,7 +460,7 @@ def checkDependencies():
 
     lsBroken = []
     lsScripts = sorted(glob.glob(os.path.join(sSamples, "build*.cmd")) +
-                       glob.glob(os.path.join(sKit, "Templates", "build*.cmd")))
+                       glob.glob(os.path.join(sKit, "templates", "build*.cmd")))
     for sScript in lsScripts:
         sText = open(sScript, "rb").read().decode("utf-8-sig", "replace")
         # Only the lines that actually compile something: a commented line is a
@@ -619,7 +619,7 @@ def main():
     sys.path.insert(0, os.path.join(sKit, "scripts"))
     import fingerprint
     oCache = fingerprint.Cache(sKit, logLine)
-    lsInputs = ["Templates", "exec/CSharp", "exec/Python", "exec/conversions.inix", "scripts", "checkHomerDev.py", "build.py", "version.txt"]
+    lsInputs = ["templates", "exec/CSharp", "exec/Python", "exec/conversions.inix", "scripts", "checkHomerDev.py", "build.py", "version.txt"]
     sPrint = oCache.fingerprint(lsInputs, [platform.python_version()], bSkipProducts=True)
     bReusable = not (dArguments.fresh or dArguments.ui or dArguments.deep or dArguments.no_clean)
     if bReusable and oCache.isCurrent("checkHomerDev pass", sPrint, []):

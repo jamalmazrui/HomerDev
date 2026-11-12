@@ -7,6 +7,17 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.215.0 -- 12 November 2026
+
+- **tidy tidies MyBooks and MyPages.** Since 1.45.0 tidy stopped at once in a page project that is not a repository, so neither was ever tidied. It now runs its whole folder phase there -- files put in place, empty files and duplicates removed, strays moved to notes, logs at the top into logs, folder names in Homer case -- judged by the project's lists, and skips only the repository phase. MyBooks has a LocalFiles.txt that names what belongs.
+- **The tools a build refreshes are never strays.** tidy reads projectCycle's own tool list from beside itself, so they stay in scripts even when the kit cannot be found; in a rehearsal of MyPages, tidy had moved the freshly refreshed tools, tidy and push among them, into notes.
+- **Each folder for its purpose.** A page or book project's build moves an audit and its response from help to notes\\drafts, where working papers belong, and createDropboxFolder's guide and settings, whose script is in neither the project nor the kit, to notes\\retired, kept because the settings hold email addresses.
+- **The kit's code names templates in lower case,** as the folder now is.
+
+## 1.214.0 -- 12 November 2026
+
+- **A cleared rejection is a change, so build_release submits it.** A book that is not ready is skipped before kdpSubmit records any baseline, so Legacy of Mazrui's first ready run took its fixed sources as the starting point and sent nothing. Now, when a book's last build was rejected (its .rejected.epub lies beside its EPUB, older than it) and KDP was never given this EPUB, the fix is the change: the book is submitted, with no argument, and once KDP holds it the rejected EPUB is removed, so a later rebuild from the same sources is never taken for another fix. A book recorded only as a baseline is named on its own console line rather than listed as unchanged.
+
 ## 1.213.0 -- 12 November 2026
 
 - **Every directory's subtitle starts "A Directory of" and its number.** MyPages' build checks each page and stops, naming the page, when one does not, so a page that drifts is never posted. The subtitle tells a free directory from a commercial book on the same subject, such as the Blind Vibe Coding directory and the book.

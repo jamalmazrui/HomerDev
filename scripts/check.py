@@ -1299,7 +1299,7 @@ def checkInstallerNames():
     try:
         import kind
         sKit = kind.findKit([sRoot])
-        sComponents = os.path.join(sKit, "Templates", "HomerComponents.iss") if sKit else ""
+        sComponents = os.path.join(sKit, "templates", "HomerComponents.iss") if sKit else ""
         if not os.path.isfile(sComponents): return finding("installer", "skip", "the kit's HomerComponents.iss was not found")
         lsClash = kind.issFunctionClashes(sAppText, readText(sComponents))
     except Exception as oError:

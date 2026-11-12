@@ -39,21 +39,21 @@ lsExpected = [
     "exec/CSharp/Say.cs", "exec/CSharp/Util.cs", "exec/CSharp/Web.cs",
     "exec/CSharp/ConversionPdf.cs", "exec/CSharp/PdfReader.cs",
     "exec/CSharp/inixVert.cs",
-    "exec/Python/inix.py", "exec/Python/kdpEpub.py", "scripts/buildBooks.cmd", "scripts/buildBooks.py", "scripts/kdpBooks.cmd", "scripts/kdpBooks.py", "scripts/kdpSubmit.cmd", "scripts/kdpSubmit.py", "scripts/kdpUpdate.cmd", "scripts/kdpUpdate.py", "scripts/testKdpUpdate.py", "Templates/books/Book_KDP.inix", "Templates/books/books.inix", "Templates/books/buildBooks.inix", "Templates/books/epub.css", "Templates/books/tocEpub.lua", ".claude/skills/homer-books/SKILL.md", "exec/Python/lbc.py", "exec/Python/lbcnet.py", "exec/Python/log.py", "exec/Python/media.py",
+    "exec/Python/inix.py", "exec/Python/kdpEpub.py", "scripts/buildBooks.cmd", "scripts/buildBooks.py", "scripts/kdpBooks.cmd", "scripts/kdpBooks.py", "scripts/kdpSubmit.cmd", "scripts/kdpSubmit.py", "scripts/kdpUpdate.cmd", "scripts/kdpUpdate.py", "scripts/testKdpUpdate.py", "templates/books/Book_KDP.inix", "templates/books/books.inix", "templates/books/buildBooks.inix", "templates/books/epub.css", "templates/books/tocEpub.lua", ".claude/skills/homer-books/SKILL.md", "exec/Python/lbc.py", "exec/Python/lbcnet.py", "exec/Python/log.py", "exec/Python/media.py",
     "exec/Python/mdi.py", "exec/Python/elevate.py", "exec/Python/paths.py", "exec/Python/say.py", "exec/Python/util.py", "exec/Python/web.py",
-    "Templates/build_APP_.cmd", "Templates/build_APP_Py.cmd",
-    "Templates/_APP__setup.iss", "Templates/_APP_.cs",
-    "Templates/installModels.cmd",
+    "templates/build_APP_.cmd", "templates/build_APP_Py.cmd",
+    "templates/_APP__setup.iss", "templates/_APP_.cs",
+    "templates/installModels.cmd",
     "scripts/installOllama.cmd", "scripts/installScreenReaderSupport.cmd", "scripts/finish.cmd",
     "scripts/checkSkills.cmd", "scripts/checkSkills.py", "scripts/newest.cmd", "scripts/newest.ps1",
-    "Templates/HomerComponents.iss", "scripts/installCommon.cmd",
-    "Templates/accept.inix", "Templates/gitignore.txt", "Templates/version.txt",
+    "templates/HomerComponents.iss", "scripts/installCommon.cmd",
+    "templates/accept.inix", "templates/gitignore.txt", "templates/version.txt",
     "RepoFiles.txt", "LocalFiles.txt",
-    "Templates/samples/FruitBasketCs.cs", "Templates/samples/FruitBasketMdiCs.cs",
-    "Templates/samples/FruitBasketMdiPy.py", "Templates/samples/FruitBasketPy.py",
-    "Templates/samples/accept.inix", "Templates/samples/uiTest.inix",
-    "Templates/samples/buildFruitBasketCs.cmd", "Templates/samples/buildFruitBasketMdiCs.cmd",
-    "Templates/samples/buildFruitBasketMdiPy.cmd", "Templates/samples/buildFruitBasketPy.cmd", "Templates/samples/version.txt",
+    "templates/samples/FruitBasketCs.cs", "templates/samples/FruitBasketMdiCs.cs",
+    "templates/samples/FruitBasketMdiPy.py", "templates/samples/FruitBasketPy.py",
+    "templates/samples/accept.inix", "templates/samples/uiTest.inix",
+    "templates/samples/buildFruitBasketCs.cmd", "templates/samples/buildFruitBasketMdiCs.cmd",
+    "templates/samples/buildFruitBasketMdiPy.cmd", "templates/samples/buildFruitBasketPy.cmd", "templates/samples/version.txt",
     "checkHomerDev.cmd", "checkHomerDev.py", "releaseHomerDev.cmd",
     "scripts/evalSkills.cmd", "scripts/evalSkills.py", "scripts/kind.cmd", "scripts/kind.py", "scripts/post.cmd", "scripts/post.ps1", "scripts/push.cmd", "scripts/unpushed.cmd", "scripts/unpushed.py",
     "scripts/check.cmd", "scripts/check.py", "scripts/uiCheck.cmd", "scripts/uiCheck.py",
@@ -61,7 +61,7 @@ lsExpected = [
     "scripts/buildTutorials.cmd", "scripts/buildTutorials.ps1", "scripts/checkTutorial.cmd", "scripts/checkTutorial.py",
     "scripts/fixEncoding.cmd", "scripts/fixEncoding.py",
     "scripts/makeTutorials.cmd", "scripts/makeTutorials.py",
-    "help/Tutorial_0_Overview.inix", "help/Tutorial_1_User_Interface.inix", "help/Tutorial_2_Install_and_Launch.inix", "help/Tutorial_3_Start_an_App_from_the_Kit.inix", "help/Tutorial_4_Build_Check_and_Release.inix", "help/Tutorial_5_The_Installer_and_Its_Finish_Page.inix", "help/Tutorial_6_Spoken_Tutorials.inix", "help/Tutorial_7_Shared_Code_and_the_Homer_Player.inix", "help/Tutorial_8_Build_with_an_AI_Assistant.inix", "help/Tutorial_9_Conclusion.inix", "Templates/Tutorial_0_Overview.inix", "Templates/Tutorial_1_User_Interface.inix", "Templates/Tutorial_2_Install_and_Launch.inix", "Templates/Tutorial_3_Task_One.inix", "Templates/Tutorial_4_Task_Two.inix", "Templates/Tutorial_5_Task_Three.inix", "Templates/Tutorial_6_Task_Four.inix", "Templates/Tutorial_7_Task_Five.inix", "Templates/Tutorial_8_Task_Six.inix", "Templates/Tutorial_9_Conclusion.inix", ".claude/skills/ReadMe.md", ".claude/skills/app-help-guide/SKILL.md", ".claude/skills/blind-creators/SKILL.md",
+    "help/Tutorial_0_Overview.inix", "help/Tutorial_1_User_Interface.inix", "help/Tutorial_2_Install_and_Launch.inix", "help/Tutorial_3_Start_an_App_from_the_Kit.inix", "help/Tutorial_4_Build_Check_and_Release.inix", "help/Tutorial_5_The_Installer_and_Its_Finish_Page.inix", "help/Tutorial_6_Spoken_Tutorials.inix", "help/Tutorial_7_Shared_Code_and_the_Homer_Player.inix", "help/Tutorial_8_Build_with_an_AI_Assistant.inix", "help/Tutorial_9_Conclusion.inix", "templates/Tutorial_0_Overview.inix", "templates/Tutorial_1_User_Interface.inix", "templates/Tutorial_2_Install_and_Launch.inix", "templates/Tutorial_3_Task_One.inix", "templates/Tutorial_4_Task_Two.inix", "templates/Tutorial_5_Task_Three.inix", "templates/Tutorial_6_Task_Four.inix", "templates/Tutorial_7_Task_Five.inix", "templates/Tutorial_8_Task_Six.inix", "templates/Tutorial_9_Conclusion.inix", ".claude/skills/ReadMe.md", ".claude/skills/app-help-guide/SKILL.md", ".claude/skills/blind-creators/SKILL.md",
     ".claude/skills/homer-build-release/SKILL.md", ".claude/skills/homer-code/SKILL.md",
     ".claude/skills/homer-convert/SKILL.md", ".claude/skills/homer-docs/SKILL.md", ".claude/skills/homer-ui/SKILL.md",
     ".claude/skills/homer-elevate/SKILL.md", ".claude/skills/homer-installer/SKILL.md", ".claude/skills/homer-migrate/SKILL.md", ".claude/skills/homer-new-app/SKILL.md",
@@ -73,9 +73,9 @@ lsExpected = [
     ".claude/skills/homer-launch-dialog/SKILL.md", "exec/CSharp/Quality.cs", ".claude/skills/homer-launch-dialog/scripts/checkLaunch.cmd",
     ".claude/skills/homer-launch-dialog/scripts/checkLaunch.py", "help/LaunchDialog.md",
     ".claude/skills/homer-quality/SKILL.md", ".claude/skills/homer-quality/scripts/checkQuality.cmd", ".claude/skills/homer-quality/scripts/checkQuality.py",
-    "Templates/makeHotkeys.py",
-    "Templates/LocalFiles.txt",
-    "Templates/_APP_.cmd",
+    "templates/makeHotkeys.py",
+    "templates/LocalFiles.txt",
+    "templates/_APP_.cmd",
     "help/CamelType.md", "help/CamelType_CSharp.md", "help/CamelType_CSharp_Reference.md",
     "help/CamelType_JAWSScript.md", "help/CamelType_JavaScript.md", "help/CamelType_PowerShell.md",
     "help/CamelType_Python.md", "help/CamelType_VBScript.md",
@@ -203,7 +203,7 @@ lMoved = [
     ("skills/podcast-directory/scripts/buildDirectory.py", ".claude/skills/podcast-directory/scripts/buildDirectory.py"),
     ("skills/podcast-directory/scripts/harvestShows.cmd", ".claude/skills/podcast-directory/scripts/harvestShows.cmd"),
     ("skills/podcast-directory/scripts/harvestShows.py", ".claude/skills/podcast-directory/scripts/harvestShows.py"),
-    ("Templates/skills/homer-tutorial/SKILL.md", ".claude/skills/homer-tutorial/SKILL.md"),
+    ("templates/skills/homer-tutorial/SKILL.md", ".claude/skills/homer-tutorial/SKILL.md"),
     ("Announce.md", "help/Announce.md"),
     ("Announce.htm", "help/Announce.htm"),
     ("Developer.md", "help/Developer.md"),
@@ -220,17 +220,17 @@ lMoved = [
     ("Style/CamelType_CSharp_Reference.htm", "help/CamelType_CSharp_Reference.htm"),
     ("Style/CamelType_JAWSScript.md", "help/CamelType_JAWSScript.md"),
     ("Style/CamelType_JAWSScript.htm", "help/CamelType_JAWSScript.htm"),
-    ("Samples/FruitBasketMdi.cs", "Templates/samples/FruitBasketMdiCs.cs"),
-    ("Samples/FruitBasketMdi.exe", "Templates/samples/FruitBasketMdiCs.exe"),
-    ("Samples/buildFruitBasketMdi.log", "Templates/samples/buildFruitBasketMdiCs.log"),
+    ("Samples/FruitBasketMdi.cs", "templates/samples/FruitBasketMdiCs.cs"),
+    ("Samples/FruitBasketMdi.exe", "templates/samples/FruitBasketMdiCs.exe"),
+    ("Samples/buildFruitBasketMdi.log", "templates/samples/buildFruitBasketMdiCs.log"),
     ("Samples/buildFruitBasketMdi.cmd", "Samples/buildFruitBasketMdiCs.cmd"),
     ("Tutorials.md", "help/Tutorials.md"),
     ("Tutorials.htm", "help/Tutorials.htm"),
     ("self.md", "help/self.md"),
     ("self.htm", "help/self.htm"),
-    ("Samples/FruitBasketCs/FruitBasketCs.cs", "Templates/samples/FruitBasketCs.cs"),
-    ("Samples/FruitBasketMdi/FruitBasketMdi.cs", "Templates/samples/FruitBasketMdi.cs"),
-    ("Samples/FruitBasketPy/FruitBasketPy.py", "Templates/samples/FruitBasketPy.py"),
+    ("Samples/FruitBasketCs/FruitBasketCs.cs", "templates/samples/FruitBasketCs.cs"),
+    ("Samples/FruitBasketMdi/FruitBasketMdi.cs", "templates/samples/FruitBasketMdi.cs"),
+    ("Samples/FruitBasketPy/FruitBasketPy.py", "templates/samples/FruitBasketPy.py"),
     ("Python/homer/inix.py", "exec/Python/inix.py"),
     ("Python/homer/lbc.py", "exec/Python/lbc.py"),
     ("Python/homer/say.py", "exec/Python/say.py"),
@@ -242,10 +242,10 @@ lMoved = [
     ("Python/homer/__init__.py", "exec/Python/__init__.py"),
     # 1.43.0: the per-sample folders of the old Samples layout, which the
     # 1.37.0 pairs did not reach, so Samples never emptied.
-    ("Samples/FruitBasketCs/buildFruitBasketCs.cmd", "Templates/samples/buildFruitBasketCs.cmd"),
-    ("Samples/FruitBasketCs/version.txt", "Templates/samples/version.txt"),
-    ("Samples/FruitBasketPy/buildFruitBasketPy.cmd", "Templates/samples/buildFruitBasketPy.cmd"),
-    ("Samples/FruitBasketPy/version.txt", "Templates/samples/version.txt"),
+    ("Samples/FruitBasketCs/buildFruitBasketCs.cmd", "templates/samples/buildFruitBasketCs.cmd"),
+    ("Samples/FruitBasketCs/version.txt", "templates/samples/version.txt"),
+    ("Samples/FruitBasketPy/buildFruitBasketPy.cmd", "templates/samples/buildFruitBasketPy.cmd"),
+    ("Samples/FruitBasketPy/version.txt", "templates/samples/version.txt"),
     ("exec/CSharp/Keys.cs", "exec/CSharp/KeyName.cs"),
     # 1.29.0: four files delivered on 24 Sep 2026 under folders the kit never
     # had (Docs, Inno, Scripts) now sit where RepoFiles.txt says kit files go.
@@ -253,37 +253,37 @@ lMoved = [
     ("Docs/FinishPage.htm", "help/FinishPage.htm"),
     ("Docs/Logging.md", "help/Logging.md"),
     ("Docs/Logging.htm", "help/Logging.htm"),
-    ("Inno/HomerComponents.iss", "Templates/HomerComponents.iss"),
+    ("Inno/HomerComponents.iss", "templates/HomerComponents.iss"),
     ("buildHomerDev.log", "build.py"),
     # 1.43.58: the kit's build script is build.cmd, as every app's is; the old
     # pair, left behind when the kit is unzipped over it, is removed.
     ("buildHomerDev.cmd", "build.cmd"),
     ("buildHomerDev.py", "build.py"),
-    ("Samples/buildFruitBasketCs.log", "Templates/samples/buildFruitBasketCs.cmd"),
-    ("Samples/buildFruitBasketMdiCs.log", "Templates/samples/buildFruitBasketMdiCs.cmd"),
-    ("Samples/buildFruitBasketMdiPy.log", "Templates/samples/buildFruitBasketMdiPy.cmd"),
-    ("Samples/buildFruitBasketPy.log", "Templates/samples/buildFruitBasketPy.cmd"),
+    ("Samples/buildFruitBasketCs.log", "templates/samples/buildFruitBasketCs.cmd"),
+    ("Samples/buildFruitBasketMdiCs.log", "templates/samples/buildFruitBasketMdiCs.cmd"),
+    ("Samples/buildFruitBasketMdiPy.log", "templates/samples/buildFruitBasketMdiPy.cmd"),
+    ("Samples/buildFruitBasketPy.log", "templates/samples/buildFruitBasketPy.cmd"),
     # 1.37.0: Samples shared its first letter with scripts, so the sample programs
     # live under Templates, the folder for what an app starts from.
-    ("Samples/FruitBasketCs.cs", "Templates/samples/FruitBasketCs.cs"),
-    ("Samples/FruitBasketMdiCs.cs", "Templates/samples/FruitBasketMdiCs.cs"),
-    ("Samples/FruitBasketMdiPy.py", "Templates/samples/FruitBasketMdiPy.py"),
-    ("Samples/FruitBasketMdiPy.spec", "Templates/samples/FruitBasketMdiPy.spec"),
-    ("Samples/FruitBasketPy.py", "Templates/samples/FruitBasketPy.py"),
-    ("Samples/FruitBasketPy.spec", "Templates/samples/FruitBasketPy.spec"),
-    ("Samples/accept.inix", "Templates/samples/accept.inix"),
-    ("Samples/buildFruitBasketCs.cmd", "Templates/samples/buildFruitBasketCs.cmd"),
-    ("Samples/buildFruitBasketMdiCs.cmd", "Templates/samples/buildFruitBasketMdiCs.cmd"),
-    ("Samples/buildFruitBasketMdiPy.cmd", "Templates/samples/buildFruitBasketMdiPy.cmd"),
-    ("Samples/buildFruitBasketPy.cmd", "Templates/samples/buildFruitBasketPy.cmd"),
-    ("Samples/uiTest.inix", "Templates/samples/uiTest.inix"),
-    ("Samples/version.txt", "Templates/samples/version.txt"),
+    ("Samples/FruitBasketCs.cs", "templates/samples/FruitBasketCs.cs"),
+    ("Samples/FruitBasketMdiCs.cs", "templates/samples/FruitBasketMdiCs.cs"),
+    ("Samples/FruitBasketMdiPy.py", "templates/samples/FruitBasketMdiPy.py"),
+    ("Samples/FruitBasketMdiPy.spec", "templates/samples/FruitBasketMdiPy.spec"),
+    ("Samples/FruitBasketPy.py", "templates/samples/FruitBasketPy.py"),
+    ("Samples/FruitBasketPy.spec", "templates/samples/FruitBasketPy.spec"),
+    ("Samples/accept.inix", "templates/samples/accept.inix"),
+    ("Samples/buildFruitBasketCs.cmd", "templates/samples/buildFruitBasketCs.cmd"),
+    ("Samples/buildFruitBasketMdiCs.cmd", "templates/samples/buildFruitBasketMdiCs.cmd"),
+    ("Samples/buildFruitBasketMdiPy.cmd", "templates/samples/buildFruitBasketMdiPy.cmd"),
+    ("Samples/buildFruitBasketPy.cmd", "templates/samples/buildFruitBasketPy.cmd"),
+    ("Samples/uiTest.inix", "templates/samples/uiTest.inix"),
+    ("Samples/version.txt", "templates/samples/version.txt"),
     # 1.37.0: the shared install scripts are scripts, refreshed into every app,
     # not starters; only installModels.cmd stays a template, naming an app's models.
-    ("Templates/installOllama.cmd", "scripts/installOllama.cmd"),
-    ("Templates/homerInstall.cmd", "scripts/installCommon.cmd"),
-    ("Templates/installScreenReaderSupport.cmd", "scripts/installScreenReaderSupport.cmd"),
-    ("Templates/homerFinish.cmd", "scripts/finish.cmd"),
+    ("templates/installOllama.cmd", "scripts/installOllama.cmd"),
+    ("templates/homerInstall.cmd", "scripts/installCommon.cmd"),
+    ("templates/installScreenReaderSupport.cmd", "scripts/installScreenReaderSupport.cmd"),
+    ("templates/homerFinish.cmd", "scripts/finish.cmd"),
     # 1.34.0: the kit follows the layout it asks of every app. Tools is scripts.
     ("Tools/buildTutorials.cmd", "scripts/buildTutorials.cmd"),
     ("Tools/buildTutorials.ps1", "scripts/buildTutorials.ps1"),
@@ -315,7 +315,7 @@ lsRetired = [
     # stated skill by skill, is also simply easier to keep current.
     "help/A11ySkills.htm", "help/A11ySkills.md",
     "homer/__init__.py", "exec/homer/__init__.py",
-    "Templates/skills/homer-tutorial/SKILL.htm", "skills/homer-tutorial/SKILL.htm", "skills/ReadMe.md", "skills/ReadMe.htm",
+    "templates/skills/homer-tutorial/SKILL.htm", "skills/homer-tutorial/SKILL.htm", "skills/ReadMe.md", "skills/ReadMe.htm",
     "scripts/cleanDir.cmd", "scripts/cleanDir.py", "scripts/gitRelease.cmd", "scripts/homerPolicy.py",
     "scripts/installTools.cmd", "scripts/sayTutorial.cmd", "scripts/sayTutorial.py",
     "scripts/tidyRepo.cmd", "scripts/tidyRepo.py",
@@ -341,9 +341,9 @@ lsRetired = [
 lsOldFolders = ["skills/app-help-guide/references", "skills/app-help-guide/scripts", "skills/app-help-guide",
                   "skills/blind-creators/references", "skills/blind-creators/scripts", "skills/blind-creators",
                   "skills/homer-tutorial", "skills/podcast-directory/scripts", "skills/podcast-directory", "skills",
-                  "Templates/skills/homer-tutorial", "Templates/skills", "CSharp", "exec/homer", "homer", "Docs", "Inno", "Python/homer", "Python", "Samples/FruitBasketCs", "Samples/FruitBasketPy",
-                  "Templates/samples/FruitBasketCs",
-                  "Templates/samples/FruitBasketMdi", "Templates/samples/FruitBasketPy", "Samples", "Style", "Tools"]
+                  "templates/skills/homer-tutorial", "templates/skills", "CSharp", "exec/homer", "homer", "Docs", "Inno", "Python/homer", "Python", "Samples/FruitBasketCs", "Samples/FruitBasketPy",
+                  "templates/samples/FruitBasketCs",
+                  "templates/samples/FruitBasketMdi", "templates/samples/FruitBasketPy", "Samples", "Style", "Tools"]
 sScriptDir = os.path.dirname(os.path.abspath(__file__))
 sLogPath = os.path.join(sScriptDir, "logs", sLogName)
 oLog = None
@@ -521,11 +521,11 @@ def sampleInputs(sName, sScript):
     # compiled), and a Python sample's --hidden-import modules with every kit module those import in turn, plus the
     # classes of Homer.dll when that chain loads it. A script that names nothing readable keeps the whole folders, so a
     # sample is never checked against less than it uses.
-    lsInputs = ["Templates/samples/" + sScript, "Templates/samples/version.txt"]
+    lsInputs = ["templates/samples/" + sScript, "templates/samples/version.txt"]
     for sExt in (".cs", ".py", ".spec"):
-        if os.path.isfile(os.path.join(sScriptDir, "Templates", "samples", sName + sExt)): lsInputs.append("Templates/samples/" + sName + sExt)
+        if os.path.isfile(os.path.join(sScriptDir, "templates", "samples", sName + sExt)): lsInputs.append("templates/samples/" + sName + sExt)
     sText = ""
-    try: sText = open(os.path.join(sScriptDir, "Templates", "samples", sScript), "rb").read().decode("utf-8-sig", errors="replace")
+    try: sText = open(os.path.join(sScriptDir, "templates", "samples", sScript), "rb").read().decode("utf-8-sig", errors="replace")
     except Exception: pass
     lsClasses = [m.group(1) for m in re.finditer(r'(?im)^\s*set\s+"homerSources=[^\n]*?exec\\CSharp\\(\w+)\.cs', sText)]
     lsModules = re.findall(r"--hidden-import\s+(\w+)", sText)
@@ -552,7 +552,7 @@ def kitPythonChain(lsStart):
         if sModule in setSeen: continue
         setSeen.add(sModule)
         sPath = os.path.join(sKitPython, sModule + ".py")
-        if not os.path.isfile(sPath): sPath = os.path.join(sScriptDir, "Templates", "samples", sModule + ".py")
+        if not os.path.isfile(sPath): sPath = os.path.join(sScriptDir, "templates", "samples", sModule + ".py")
         if not os.path.isfile(sPath): continue
         sCode = open(sPath, encoding="utf-8-sig", errors="replace").read()
         for sName in re.findall(r"(?m)^\s*(?:from\s+(\w+)|import\s+([\w, ]+))", sCode):
@@ -578,7 +578,7 @@ def buildSamples():
     run. Each script writes its own log beside itself; the failures are named
     here and the detail is there.
     """
-    sSamples = os.path.join(sScriptDir, "Templates", "samples")
+    sSamples = os.path.join(sScriptDir, "templates", "samples")
     if not os.path.isdir(sSamples): return 0
     iFailed = 0
     for sScript in lsSampleScripts:
@@ -587,7 +587,7 @@ def buildSamples():
         # A SAMPLE IS BUILT WHEN IT CHANGED (1.65.34): its source, its build script, the version files or the kit's
         # code it compiles in -- or when its program is missing or not the one last built. Otherwise it stays.
         oCache = kitCache()
-        sOutput = "Templates/samples/" + sName + ".exe"
+        sOutput = "templates/samples/" + sName + ".exe"
         sPrint = oCache.fingerprint(sampleInputs(sName, sScript))
         if oCache.isCurrent("sample " + sName, sPrint, [sOutput]):
             unchangedLine(sName)
@@ -662,7 +662,7 @@ def checkSuiteKeys():
     dExports = {}
     sStamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     for sName in ("FruitBasketMdiCs", "FruitBasketMdiPy"):
-        sSample = os.path.join(sScriptDir, "Templates", "samples", sName + ".exe")
+        sSample = os.path.join(sScriptDir, "templates", "samples", sName + ".exe")
         if not os.path.isfile(sSample):
             logLine("checkKeys: no %s.exe yet, so no export of it to check" % sName)
             continue
@@ -933,13 +933,13 @@ def checkTemplateApp():
     names has changed. Returns a problem or "".
     """
     if os.name != "nt": return ""
-    sTemplates = os.path.join(sScriptDir, "Templates")
+    sTemplates = os.path.join(sScriptDir, "templates")
     sBuildTemplate = os.path.join(sTemplates, "build_APP_.cmd")
     if not os.path.isfile(os.path.join(sTemplates, "_APP_.cs")) or not os.path.isfile(sBuildTemplate): return ""
     oModules = re.search(r'set "homerModules=([^"\r\n]*)"', open(sBuildTemplate, encoding="utf-8", errors="replace").read())
     lsModules = oModules.group(1).split() if oModules else []
     oCache = kitCache()
-    sPrint = oCache.fingerprint(["Templates/_APP_.cs", "Templates/build_APP_.cmd", "newHomerApp.py", "version.txt"]
+    sPrint = oCache.fingerprint(["templates/_APP_.cs", "templates/build_APP_.cmd", "newHomerApp.py", "version.txt"]
                                 + ["exec/CSharp/" + sModule + ".cs" for sModule in lsModules])
     if oCache.isCurrent("template app", sPrint, []):
         unchangedLine("the template app")
@@ -1352,7 +1352,7 @@ def renameScripts():
     lsOldLogs += [os.path.join(sScripts, "uiCheck.log")]
     lsOldLogs += [os.path.join(sScriptDir, s) for s in os.listdir(sScriptDir) if s.lower().startswith("evidence-kit-") and s.lower().endswith(".md")]
     # The samples logged in Templates\\samples\\logs until 1.65.31; those logs join the kit's, under their own names.
-    sSampleLogs = os.path.join(sScriptDir, "Templates", "samples", "logs")
+    sSampleLogs = os.path.join(sScriptDir, "templates", "samples", "logs")
     if os.path.isdir(sSampleLogs):
         for sName in sorted(os.listdir(sSampleLogs)):
             sFrom = os.path.join(sSampleLogs, sName)
@@ -1368,7 +1368,7 @@ def renameScripts():
         try:
             os.rmdir(sSampleLogs); logLine("REMOVED: Templates/samples/logs, now empty")
         except OSError as oError:
-            logLine("Templates/samples/logs kept: %s" % oError)
+            logLine("templates/samples/logs kept: %s" % oError)
     for sOldLog in lsOldLogs:
         if not os.path.isfile(sOldLog): continue
         try:
@@ -1447,7 +1447,7 @@ def renameScripts():
     # Apps delete what the template lists as retired, so the old names join
     # that list: an app that carried homerTidy loses it on its next build
     # instead of keeping a copy that no longer refreshes.
-    sTemplate = os.path.join(sScriptDir, "Templates", "build_APP_.cmd")
+    sTemplate = os.path.join(sScriptDir, "templates", "build_APP_.cmd")
     if os.path.isfile(sTemplate):
         yRaw = open(sTemplate, "rb").read()
         sText = yRaw.decode("utf-8", errors="replace")
@@ -1643,7 +1643,7 @@ def removeMoved():
     # Templates\\samples -- held PyInstaller's work folders, and the setup program installed them into Program Files.
     for sFolder in ("Samples",):
         sPath = os.path.join(sScriptDir, sFolder)
-        if os.path.isdir(sPath) and not os.path.samefile(sPath, os.path.join(sScriptDir, "Templates", "samples")):
+        if os.path.isdir(sPath) and not os.path.samefile(sPath, os.path.join(sScriptDir, "templates", "samples")):
             try:
                 shutil.rmtree(sPath)
                 iRemoved += 1
@@ -1970,7 +1970,7 @@ def checkKit():
     # "call :seedVersion" that landed in the pasted copy, which found no
     # version.txt and failed twice without a word. cmd takes the first label
     # it meets, so a duplicate is never an error there -- only here.
-    for sFolder in ("Templates", os.path.join("Templates", "samples"), "scripts"):
+    for sFolder in ("templates", os.path.join("templates", "samples"), "scripts"):
         sDir = os.path.join(sScriptDir, sFolder)
         if not os.path.isdir(sDir): continue
         for sName in sorted(os.listdir(sDir)):
@@ -2039,7 +2039,7 @@ def checkKit():
     try:
         if os.path.join(sScriptDir, "scripts") not in sys.path: sys.path.insert(0, os.path.join(sScriptDir, "scripts"))
         import kind as kindModule
-        def issText(sName): return open(os.path.join(sScriptDir, "Templates", sName), "rb").read().decode("utf-8-sig")
+        def issText(sName): return open(os.path.join(sScriptDir, "templates", sName), "rb").read().decode("utf-8-sig")
         lsClash = kindModule.issFunctionClashes(issText("_APP__setup.iss"), issText("HomerComponents.iss"))
         if lsClash: lsProblems.append("Templates\\_APP__setup.iss defines what HomerComponents.iss does: " + ", ".join(lsClash))
     except Exception as oError:
@@ -2048,10 +2048,10 @@ def checkKit():
     # A template that has lost its token would silently produce a broken app.
     for sName in ["build_APP_.cmd", "build_APP_Py.cmd", "_APP__setup.iss", "_APP_.cs",
                   "create_APP_Repo.cmd", "create_APP_Repo.ps1"]:
-        sPath = os.path.join(sScriptDir, "Templates", sName)
+        sPath = os.path.join(sScriptDir, "templates", sName)
         if not os.path.exists(sPath): continue
         if "_APP_" not in open(sPath, "rb").read().decode("utf-8-sig"):
-            lsProblems.append("Templates/%s no longer carries the _APP_ token" % sName)
+            lsProblems.append("templates/%s no longer carries the _APP_ token" % sName)
 
     return lsProblems
 
@@ -2071,7 +2071,7 @@ def retireOldWalk():
     # beside the new. Once a folder holds its one-digit set, its two-digit walks
     # go; their audio goes on the next tutorial build, as audio no walk makes.
     import glob as oGlob
-    for sFolder in ("help", "Templates"):
+    for sFolder in ("help", "templates"):
         sDir = os.path.join(sScriptDir, sFolder)
         if not oGlob.glob(os.path.join(sDir, "Tutorial_[0-9]_*.inix")): continue
         for sPath in sorted(oGlob.glob(os.path.join(sDir, "Tutorial_[0-9][0-9]_*.inix"))):
@@ -2132,8 +2132,8 @@ def settleTree():
                     logLine("TREE: moved %s to %s" % (sPath, sTarget))
             try: os.rmdir(sDir)
             except OSError: pass
-    if "Templates" in os.listdir(sKit):
-        sOld, sMid, sNew = (os.path.join(sKit, s) for s in ("Templates", "templates.renaming", "templates"))
+    if "templates" in os.listdir(sKit):
+        sOld, sMid, sNew = (os.path.join(sKit, s) for s in ("templates", "templates.renaming", "templates"))
         bGit = os.path.isdir(os.path.join(sKit, ".git"))
         for sFrom, sTo in ((sOld, sMid), (sMid, sNew)):
             if bGit:

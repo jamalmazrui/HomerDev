@@ -269,7 +269,7 @@ def main():
     sTarget = lsWords[1] if len(lsWords) > 1 else os.path.join(os.path.dirname(sScriptDir), sApp)
     if os.name != "nt" and len(lsWords) <= 1:
         sTarget = os.path.join(os.getcwd(), sApp)
-    sTemplates = os.path.join(sScriptDir, "Templates")
+    sTemplates = os.path.join(sScriptDir, "templates")
 
     logLine("App: %s" % sApp)
     logLine("Target: %s" % sTarget)

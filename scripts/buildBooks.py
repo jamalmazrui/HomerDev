@@ -345,7 +345,7 @@ def bookTemplate(sName):
         log("template " + sName + ": the project's own, " + sOwn)
         return sOwn
     sKit = locateKit()
-    sShared = os.path.join(sKit, "Templates", "books", sName) if sKit else ""
+    sShared = os.path.join(sKit, "templates", "books", sName) if sKit else ""
     if sShared and os.path.exists(sShared):
         log("template " + sName + ": the kit's, " + sShared)
         return sShared
@@ -2473,7 +2473,7 @@ def buildKey(dBook, sBookDir, dKdp):
     # did not rebuild the book. The builder's own code is deliberately not hashed: kdpUpdate compares this fingerprint,
     # and an edit to buildBooks.py that changes nothing in a book would resend every book to KDP; sBuildFormat is raised
     # instead when a change to the builder changes what goes into a book.
-    lsDirs = [os.path.join(dTools.get("kit", ""), "Templates", "books")]
+    lsDirs = [os.path.join(dTools.get("kit", ""), "templates", "books")]
     if dSettings.get("ownTemplates", "").lower() == "yes": lsDirs.append(os.path.join(sProject, "templates"))
     for sDir in lsDirs:
         if os.path.isdir(sDir):

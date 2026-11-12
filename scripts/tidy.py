@@ -828,8 +828,8 @@ def addToGitignore(lsPaths):
 
 def isKitAt(sDir):
     """True when sDir is a HomerDev kit itself: its own markers, which no app holds."""
-    if not sDir or not os.path.isfile(os.path.join(sDir, "version.txt")) or not os.path.isdir(os.path.join(sDir, "Templates")): return False
-    return any(os.path.exists(os.path.join(sDir, s)) for s in ("releaseHomerDev.cmd", "checkHomerDev.py", os.path.join("Templates", "HomerComponents.iss")))
+    if not sDir or not os.path.isfile(os.path.join(sDir, "version.txt")) or not os.path.isdir(os.path.join(sDir, "templates")): return False
+    return any(os.path.exists(os.path.join(sDir, s)) for s in ("releaseHomerDev.cmd", "checkHomerDev.py", os.path.join("templates", "HomerComponents.iss")))
 
 
 def kitVersion(sDir):
@@ -885,7 +885,7 @@ def findKitFolder():
                    if ctypes.windll.kernel32.GetDriveTypeW(sLetter + ":\\") == 3]
     lsFound = []
     for sDir in lsDirs:
-        if sDir and os.path.isfile(os.path.join(sDir, "version.txt")) and os.path.isdir(os.path.join(sDir, "Templates")):
+        if sDir and os.path.isfile(os.path.join(sDir, "version.txt")) and os.path.isdir(os.path.join(sDir, "templates")):
             if os.path.abspath(sDir).lower() not in [s.lower() for s in lsFound]: lsFound.append(os.path.abspath(sDir))
     if not lsFound: return ""
     return max(lsFound, key=lambda s: (kitVersion(s), -lsFound.index(s)))
@@ -909,6 +909,15 @@ def kitPlaced():
     was running, which ended DbDo's cycle silently five times on 10 and 11 October, and scripts\\kind.cmd on every
     run. These names belong in the folder survey; git's whitelist is decided as before."""
     lsOut = ["build_release.bat"]
+    # THE TOOLS A COLLECTION'S OR PAGE PROJECT'S BUILD REFRESHES (1.215.0): projectCycle's own list, read from the copy
+    # beside this script, so they stay in scripts even when the kit itself cannot be found. In a rehearsal of
+    # MyPages, tidy moved the tools the build had just put there -- tidy and push among them -- into notes.
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import projectCycle
+        lsOut += ["scripts/" + s for s in sorted(set(projectCycle.lsCommonTools + [t for l in projectCycle.dRoleTools.values() for t in l]))]
+    except Exception as oError:
+        logLine("projectCycle's tool list not read: %s" % oError)
     sKit = findKitFolder()
     sScripts = os.path.join(sKit, "scripts") if sKit else ""
     if sScripts and os.path.isdir(sScripts):
@@ -1419,10 +1428,15 @@ def main():
     # repository has nothing for tidy to tidy: post stages and publishes it.
     sKind, sWhy = loadKind()(sRoot)
     logLine("setting kind=%s reason=%s" % (sKind, logValue(sWhy)))
+    # A PAGE PROJECT IS TIDIED TOO (1.215.0, his ruling of 12 November 2026: build_release's tidy makes sure everything
+    # is in its proper folder, notes included, or gone). Version 1.45.0 stopped here for a page project that is not a
+    # repository, so MyBooks and MyPages were never tidied at all. Such a project now gets the whole folder phase --
+    # files put in place, empty files and duplicates removed, strays moved to notes, logs at the top into logs, folder
+    # names in Homer case -- judged by its RepoFiles.txt and LocalFiles.txt; only the repository phase is skipped,
+    # since there is no repository.
     if sKind == "page" and not isGitRepo():
-        sayLine("%s is a page project, not a repository: its release publishes it, and tidy has nothing to do." % appName())
-        logLine("tidy end")
-        return 0
+        dArguments.folder_only = True
+        sayLine("%s is a page project, not a repository: tidying its folder; there is no repository to tidy." % appName())
     sayLine("%s in %s" % (appName(), sRoot))
     if not dArguments.repo_only:
         # The step itself declines when this folder is the kit's own; the kind

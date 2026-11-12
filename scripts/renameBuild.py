@@ -146,7 +146,7 @@ def loadKind():
 
 def isKit(sFolder):
     """The kit renames its own build script, in its build.py (1.43.58)."""
-    return os.path.isfile(os.path.join(sFolder, "Templates", "HomerComponents.iss"))
+    return os.path.isfile(os.path.join(sFolder, "templates", "HomerComponents.iss"))
 
 
 def renameApp(sAppDir):

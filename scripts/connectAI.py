@@ -72,7 +72,7 @@ def pointerText(sKit):
         "2. Use the skill that matches the task; the kit's skills are linked into this tool's skills folder, and are",
         "   also in %s." % os.path.join(sKit, ".claude", "skills"),
         "3. Use the kit's code rather than writing your own: shared classes in %s and %s, templates in %s." % (
-            os.path.join(sKit, "exec", "CSharp"), os.path.join(sKit, "exec", "Python"), os.path.join(sKit, "Templates")),
+            os.path.join(sKit, "exec", "CSharp"), os.path.join(sKit, "exec", "Python"), os.path.join(sKit, "templates")),
         "4. The cycle in a project folder is build_release: build, tidy, push and release. Read the logs it writes in",
         "   the project's logs folder before suggesting a fix.",
         sEnd, ""])
