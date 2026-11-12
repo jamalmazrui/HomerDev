@@ -1199,6 +1199,50 @@ def givePagesOneHeading():
     return iFixed
 
 
+def sweepTopLogs():
+    """A LOG AT THE TOP GOES TO logs (1.206.0). The first full audit found checkJawsScripts.log at HomerView's top and
+    fixPages.log at PodcastDirectories', written by older scripts beside themselves. A log is never pushed, so moving it
+    loses nothing; a name already in logs gains -2, -3. Returns how many moved."""
+    import shutil
+    sLogs = os.path.join(sRoot, "logs")
+    iMoved = 0
+    for sName in sorted(os.listdir(sRoot)):
+        sPath = os.path.join(sRoot, sName)
+        if not (os.path.isfile(sPath) and sName.lower().endswith(".log")): continue
+        os.makedirs(sLogs, exist_ok=True)
+        sTo, iNext = os.path.join(sLogs, sName), 2
+        while os.path.exists(sTo):
+            sTo = os.path.join(sLogs, "%s-%d.log" % (sName[:-4], iNext))
+            iNext += 1
+        shutil.move(sPath, sTo)
+        logLine("TOP LOG: moved %s to %s" % (sName, sTo))
+        iMoved += 1
+    if iMoved: sayLine("Moved %s from the top into logs." % countNoun(iMoved, "log"))
+    return iMoved
+
+
+def settleFolderCase(sKind):
+    """A STANDARD FOLDER TAKES ITS LOWER-CASE NAME (1.206.0): DbDuo's Scripts becomes scripts, as the kit's Templates
+    became templates. Windows ignores case, so nothing that names the folder breaks; git is told in two steps, which a
+    change of case alone needs. Returns how many folders were renamed."""
+    import kind
+    setStandard = kind.standardFolders(sKind)
+    bGit = isGitRepo()
+    iRenamed = 0
+    for sName in sorted(os.listdir(sRoot)):
+        sLower = sName.lower()
+        if sName == sLower or sLower not in setStandard or not os.path.isdir(os.path.join(sRoot, sName)): continue
+        if any(s == sLower for s in os.listdir(sRoot) if s != sName): continue   # both cases present: leave it for a person
+        sMid = sLower + ".renaming"
+        for sFrom, sTo in ((sName, sMid), (sMid, sLower)):
+            iCode = subprocess.run(["git", "mv", sFrom, sTo], cwd=sRoot, capture_output=True).returncode if bGit else 1
+            if iCode != 0: os.rename(os.path.join(sRoot, sFrom), os.path.join(sRoot, sTo))
+        logLine("FOLDER CASE: %s is now %s" % (sName, sLower))
+        iRenamed += 1
+    if iRenamed: sayLine("Gave %s its lower-case Homer name." % countNoun(iRenamed, "folder"))
+    return iRenamed
+
+
 def sweepStrayFolders(sKind):
     """A TOP-LEVEL FOLDER OUTSIDE THE HOMER TREE GOES TO NOTES (1.73.7). check's layout rule fails a folder at the top
     that is neither standard for the project's kind (kind.standardFolders), declared in RepoFiles.txt or
@@ -1376,7 +1420,7 @@ def main():
     sKind, sWhy = loadKind()(sRoot)
     logLine("setting kind=%s reason=%s" % (sKind, logValue(sWhy)))
     if sKind == "page" and not isGitRepo():
-        sayLine("%s is a page project, not a repository: post publishes it, and tidy has nothing to do." % appName())
+        sayLine("%s is a page project, not a repository: its release publishes it, and tidy has nothing to do." % appName())
         logLine("tidy end")
         return 0
     sayLine("%s in %s" % (appName(), sRoot))
@@ -1396,6 +1440,10 @@ def main():
         if sKind == "app":
             try: keepJawsKeys()
             except Exception as oError: logLine("JAWS key map: skipped, " + str(oError))
+        try: sweepTopLogs()
+        except Exception as oError: logLine("top logs: skipped, " + str(oError))
+        try: settleFolderCase(sKind)
+        except Exception as oError: logLine("folder case: skipped, " + str(oError))
         if sKind != "kit":
             try: sweepStrayFolders(sKind)
             except Exception as oError: logLine("stray folders: skipped, " + str(oError))

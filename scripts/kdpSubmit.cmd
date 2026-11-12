@@ -13,7 +13,10 @@ set "sProject=%CD%"
 popd
 for %%I in ("%sProject%") do set "sName=%%~nxI"
 if not exist "%sProject%\logs" mkdir "%sProject%\logs"
-set "sSetupLog=%sProject%\logs\kdpSubmit-setup.log"
+rem ONE LOG PER RUN, NAMED BY THE HOMER RULE (1.207.0): logs\<Project>-kdpSubmit-setup-yyyyMMdd-HHmmss.log. It was one
+rem fixed-name file that grew run after run, out of step with every other log in the folder.
+for /f %%T in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd-HHmmss"') do set "sNow=%%T"
+set "sSetupLog=%sProject%\logs\%sName%-kdpSubmit-setup-%sNow%.log"
 echo %date% %time% kdpSubmit.cmd started with arguments: %* >> "%sSetupLog%"
 set "sKit="
 rem THE DEVELOPMENT KIT FIRST (13 October 2026). The HomerDev variable names the installed kit, which lags the
@@ -43,7 +46,7 @@ python --version >nul 2>&1
 if errorlevel 1 goto installPython
 goto havePython
 :installPython
-echo Python was not found. Installing Python 3.12 with winget; details go to logs\kdpSubmit-setup.log.
+echo Python was not found. Installing Python 3.12 with winget; details go to the setup log in logs.
 winget install --id Python.Python.3.12 --exact --silent --accept-package-agreements --accept-source-agreements >> "%sSetupLog%" 2>&1
 set "PATH=%PATH%;%LOCALAPPDATA%\Programs\Python\Python312;%LOCALAPPDATA%\Programs\Python\Python312\Scripts"
 python --version >nul 2>&1
@@ -53,7 +56,7 @@ for /f "tokens=2" %%v in ('python --version 2^>^&1') do set "sPython=%%v"
 echo %date% %time% Python %sPython% >> "%sSetupLog%"
 python -c "import playwright" >nul 2>&1
 if not errorlevel 1 goto havePlaywright
-echo Installing the Playwright package with pip; details go to logs\kdpSubmit-setup.log.
+echo Installing the Playwright package with pip; details go to the setup log in logs.
 python -m pip install --quiet --upgrade "playwright>=1.47" >> "%sSetupLog%" 2>&1
 python -c "import playwright" >nul 2>&1
 if errorlevel 1 goto noPlaywright
@@ -71,5 +74,5 @@ exit /b %iCode%
 echo Python is still not available. If Windows opened the Store, turn off the python App Execution Alias in Settings, then run this again.
 exit /b 2
 :noPlaywright
-echo The Playwright package could not be installed. See logs\kdpSubmit-setup.log.
+echo The Playwright package could not be installed. See %sSetupLog%.
 exit /b 2

@@ -30,7 +30,7 @@ Every Homer project keeps the same folders and files, so you find anything by na
 - **templates:** files a person copies and fills in. The only folder starting with t.
 - **work:** scratch. Each new session may delete what an earlier one left.
 
-Page projects may also have **_data**, **_includes**, **_layouts** and **assets**, the names GitHub Pages expects.
+Page projects may also have **_data**, **_includes**, **_layouts** and **assets**, the names GitHub Pages expects. Python's **build** and **dist** output folders may appear too; git never takes them, and tidy and the audit pass them by.
 
 ## Hidden folders
 
@@ -49,6 +49,7 @@ Page projects may also have **_data**, **_includes**, **_layouts** and **assets*
 - **ACCESSIBILITY.md:** the accessibility statement GitHub shows as a tab.
 - **AGENTS.md, CLAUDE.md, GEMINI.md, llms.txt:** what AI agents read first, by each tool's convention.
 - **build.cmd:** an app's or the kit's build. Other projects have none; the kit builds them by role.
+- **create<App>Repo.cmd, .ps1:** the maintainer script that makes an app's repository; kept at the top, never pushed.
 - **build_release.bat:** the cycle: build, tidy, push, release.
 - **KeepEncoding.txt:** files fixEncoding leaves as they are.
 - **License.md, License.htm:** the license: MIT for code, CC BY-SA 4.0 for writing.

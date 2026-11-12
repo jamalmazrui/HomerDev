@@ -239,7 +239,10 @@ earlier one left.</li>
 </ul>
 <p>Page projects may also have **_data<strong>,
 </strong>_includes<strong>, </strong>_layouts** and
-<strong>assets</strong>, the names GitHub Pages expects.</p>
+<strong>assets</strong>, the names GitHub Pages expects. Python’s
+<strong>build</strong> and <strong>dist</strong> output folders may
+appear too; git never takes them, and tidy and the audit pass them
+by.</p>
 <h2 id="hidden-folders">Hidden folders</h2>
 <ul>
 <li><strong>.claude:</strong> skills and agents for Claude and other
@@ -268,6 +271,8 @@ GitHub shows as a tab.</li>
 agents read first, by each tool’s convention.</li>
 <li><strong>build.cmd:</strong> an app’s or the kit’s build. Other
 projects have none; the kit builds them by role.</li>
+<li><strong>create<App>Repo.cmd, .ps1:</strong> the maintainer script
+that makes an app’s repository; kept at the top, never pushed.</li>
 <li><strong>build_release.bat:</strong> the cycle: build, tidy, push,
 release.</li>
 <li><strong>KeepEncoding.txt:</strong> files fixEncoding leaves as they

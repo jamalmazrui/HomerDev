@@ -468,7 +468,9 @@ def checkEncoding():
     lsWrong = []
     iChecked = 0
     for sDirPath, lsDirs, lsNames in os.walk(sRoot):
-        lsDirs[:] = [s for s in lsDirs if s.lower() not in lsSkipFolders]
+        # HARVESTED PAGES KEEP THEIR OWN ENCODING (1.208.0): data\\harvests holds other people's web pages as they were
+        # fetched, read by the builder and never pushed; 111 of them refused AppHelpGuides' push on 11 November 2026.
+        lsDirs[:] = [s for s in lsDirs if s.lower() not in lsSkipFolders and not (s.lower() == "harvests" and os.path.basename(sDirPath).lower() == "data")]
         for sName in sorted(lsNames):
             if sName.lower() in lsGeneratedFiles: continue
             if not sName.lower().endswith(lsTextExtensions): continue

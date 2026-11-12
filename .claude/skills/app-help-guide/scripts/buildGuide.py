@@ -2933,6 +2933,88 @@ def readAiContentDescriber(sFolder):
     return lArticles
 
 
+
+# NVDA COACH (12 November 2026): an NVDA add-on, not a web estate. Its course is six chapters of lesson files inside the
+# add-on (globalPlugins\nvdaCoach\lessons\en\*.json), and its own user guide and resources page sit in doc\en.
+
+dNvdaKeyNames = {"downarrow": "Down Arrow", "leftarrow": "Left Arrow", "numpadenter": "Numpad Enter", "pagedown": "Page Down",
+                 "pageup": "Page Up", "return": "Enter", "rightarrow": "Right Arrow", "uparrow": "Up Arrow"}
+lsCoachGuideSkipped = ["lessons included", "what's new", "acknowledgments", "contact the developer"]
+
+
+def coachKeys(sGesture):
+    """kb:control+downArrow -> Control+Down Arrow."""
+    sKeys = re.sub(r"^kb(\([^)]*\))?:", "", sGesture)
+    return "+".join(dNvdaKeyNames.get(s.lower(), s.upper() if len(s) == 1 else s[:1].upper() + s[1:]) for s in sKeys.split("+"))
+
+
+def coachStep(dStep, iNumber):
+    """One lesson step as Markdown lines: what to do, the keys, what happens, the hints, any practice text."""
+    lLines = ["#### Step %d" % iNumber, ""]
+    for sPara in re.split(r"\n\s*\n", (dStep.get("instruction") or "").strip()): lLines += [sPara.strip(), ""]
+    lsKeys = []
+    for sGesture in dStep.get("expectedGestures") or []:
+        sKey = coachKeys(sGesture)
+        if sKey not in lsKeys: lsKeys.append(sKey)
+    if lsKeys: lLines += ["Keys: " + " or ".join(lsKeys) + ".", ""]
+    if dStep.get("successMessage"): lLines += ["When it works: " + dStep["successMessage"].strip(), ""]
+    lsHints = [h.strip() for h in (dStep.get("hints") or []) if h and h.strip()]
+    # The Coach's F2 cycles the list of hints; a single older "hint" field is used only when a step has no list.
+    if not lsHints and dStep.get("hint") and dStep["hint"].strip(): lsHints = [dStep["hint"].strip()]
+    if lsHints: lLines += ["Hints:", ""] + ["- " + h for h in lsHints] + [""]
+    if dStep.get("practiceText"):
+        # One quoted paragraph a line: Markdown would otherwise run the practice lines together.
+        lsPractice = [s.strip() for s in dStep["practiceText"].strip().split("\n") if s.strip()]
+        lLines += ["Practice text:", ""] + [s for sLine in lsPractice for s in ("> " + sLine, ">")][:-1] + [""]
+    return lLines
+
+
+def readNVDACoach(sFolder):
+    """NVDA Coach's course from the newest .nvda-addon in its harvest folder: an About category from the add-on's user
+    guide and resources page (less the lesson list, the old release notes and the thanks, which the course itself and
+    the repository cover), then one category per chapter in course order, one article per lesson numbered so the
+    builder's alphabetical order keeps the course's order (Lesson 1.01, 1.02 ...)."""
+    import zipfile
+    lsAddons = sorted((s for s in os.listdir(sFolder) if s.lower().endswith(".nvda-addon")),
+                      key=lambda s: [int(x) if x.isdigit() else x for x in re.split(r"(\d+)", s.lower())])
+    if not lsAddons: return []
+    sAddon = os.path.join(sFolder, lsAddons[-1])
+    oZip = zipfile.ZipFile(sAddon)
+    sManifest = oZip.read("manifest.ini").decode("utf-8-sig", "replace")
+    dManifest = dict((m.group(1).strip(), m.group(2).strip().strip('"')) for m in re.finditer(r"(?m)^(\w+)\s*=\s*(.*)$", sManifest))
+    lArticles = []
+    lArticles.append(("About NVDA Coach", "About this guide", [
+        "Built from NVDA Coach %s, the add-on file %s. It needs NVDA %s or later, and was tested through NVDA %s." % (
+            dManifest.get("version", "?"), lsAddons[-1], dManifest.get("minimumNVDAVersion", "?"), dManifest.get("lastTestedNVDAVersion", "?")), "",
+        "Each lesson below is laid out as the Coach presents it: one step at a time, with the keys the step expects, what the Coach says when it works, and the hints F2 gives. In the Coach itself, F1 repeats a step and F3 skips it."]))
+    for sDoc in ("doc/en/readme.html", "doc/en/resources.html"):
+        if sDoc not in oZip.namelist(): continue
+        sHtml = oZip.read(sDoc).decode("utf-8-sig", "replace")
+        sBody = re.sub(r"(?is)^.*?<body[^>]*>|</body>.*$", "", sHtml)
+        for oSection in re.finditer(r"(?is)<h2[^>]*>(.*?)</h2>(.*?)(?=<h2|$)", sBody):
+            sTitle = stripTags(oSection.group(1))
+            if sTitle.lower() in lsCoachGuideSkipped: continue
+            lBody = toMarkdown(oSection.group(2), 0, dManifest.get("url", ""))
+            if len(" ".join(lBody).split()) >= 5: lArticles.append(("About NVDA Coach", sTitle, lBody))
+    lsChapters = sorted((s for s in oZip.namelist() if re.match(r"globalPlugins/nvdaCoach/lessons/en/[^/]+\.json$", s)))
+    lChapters = [json.loads(oZip.read(s).decode("utf-8-sig")) for s in lsChapters]
+    iSteps = 0
+    for dChapter in sorted(lChapters, key=lambda d: d.get("order", 99)):
+        iChapter = dChapter.get("order", 0)
+        sCategory = "Chapter %d: %s" % (iChapter, dChapter.get("title", ""))
+        for iLesson, dLesson in enumerate(sorted(dChapter.get("lessons", []), key=lambda d: d.get("order", 99)), 1):
+            lBody = []
+            if iLesson == 1 and dChapter.get("description"): lBody += ["*" + dChapter["description"].strip() + "*", ""]
+            for iStep, dStep in enumerate(dLesson.get("steps", []), 1):
+                lBody += coachStep(dStep, iStep)
+                iSteps += 1
+            lArticles.append((sCategory, "Lesson %d.%02d: %s" % (iChapter, iLesson, dLesson.get("title", "")), lBody))
+    logging.info("NVDA Coach %s from %s: %d chapters, %d lessons, %d steps, %d About articles", dManifest.get("version"),
+                 lsAddons[-1], len(lChapters), sum(len(d.get("lessons", [])) for d in lChapters), iSteps,
+                 sum(1 for t in lArticles if t[0] == "About NVDA Coach"))
+    return lArticles
+
+
 # THE HOMER LAYOUT FOR A COLLECTION OF GUIDES (version 2, 11 November 2026).
 #
 # Before, every harvester wrote its pages, its archive and a fixed-name log beside itself, so a collection's top
@@ -2945,8 +3027,8 @@ def readAiContentDescriber(sFolder):
 lsHomerFolders = ["configs", "data", "help", "logs", "notes", "results", "scripts", "templates"]
 lsKitScripts = ["buildguide", "buildmagazines", "buildnewguides", "checkguides", "cleanfeedback", "fixpages",
                 "getllmsguide", "makeharvester"]
-lsLocalLines = ["data/harvests/", "results/"]
-lsRepoLines = ["scripts/"]
+lsLocalLines = ["*.md", "data/", "LocalFiles.txt", "RepoFiles.txt", "results/", "scripts/"]
+lsRepoLines = []   # what the repository holds is the .htm pages; scripts are local (1.208.0)
 
 
 def moveInto(sSource, sFolder, lMoves):
@@ -3023,11 +3105,57 @@ def settleLayout(sRoot):
             moveInto(sPath, os.path.join(sRoot, "logs"), lMoves)
         elif sExtension == ".zip" and re.match(r"^.+(help|faqs)\d*(_part\d+)?\.zip$", sLower) and not sLower.endswith("_guide.zip"):
             moveInto(sPath, os.path.join(sRoot, "results"), lMoves)
+    # THE scripts FOLDER HOLDS THE COLLECTION'S OWN SCRIPTS (1.208.0): its harvesters and the kit tools the build
+    # refreshes there. A copy of an app-help-guide skill script (cleanFeedback.py, buildGuide, makeHarvester,
+    # getLlmsGuide.py), which runs from the kit, and removeStrays.cmd, a one-off whose three deletions were done, go to
+    # notes\\retired; Python's __pycache__ is deleted. The scripts\\getLlmsGuide.cmd wrapper stays: it runs the kit's.
+    sScripts = os.path.join(sRoot, "scripts")
+    if os.path.isdir(sScripts):
+        for sName in sorted(os.listdir(sScripts)):
+            sPath = os.path.join(sScripts, sName)
+            sStem, sExtension = os.path.splitext(sName.lower())
+            if sName == "__pycache__" and os.path.isdir(sPath):
+                shutil.rmtree(sPath, ignore_errors=True)
+                logging.info("DELETED %s: Python's cache, remade when needed", sPath)
+            elif (sStem in ("buildguide", "buildmagazines", "cleanfeedback", "makeharvester") and sExtension in (".py", ".cmd")) \
+                    or sName.lower() in ("getllmsguide.py", "removestrays.cmd"):
+                moveInto(sPath, os.path.join(sRoot, "notes", "retired"), lMoves)
+    # AN ANNOUNCEMENT IS A DRAFT, NOT A GUIDE (1.208.0): Announce.md and its .htm, written to post about the collection,
+    # would have been published with the guides by *.htm.
+    for sName in sorted(os.listdir(sRoot)):
+        if re.match(r"(?i)^announce.*\.(md|htm)$", sName): moveInto(os.path.join(sRoot, sName), os.path.join(sRoot, "notes", "drafts"), lMoves)
+    # A HEADING TAG NAMED IN PROSE STAYS TEXT (1.208.0). The builder has escaped such tags since 12 October, but six
+    # guides built before then (Calibre, Craigslist, HumanWare, KindleDirectPublishing, OrgMode, Shopify) still had a
+    # bare <h1> in a sentence about headings, which Pandoc made a real heading: up to five level-one headings a page,
+    # so check refused the push. Outside code, such a tag is written &lt;h1>, which every reader shows as <h1>; the
+    # source becomes newer than its page, so fixPages rebuilds the page in this same build.
+    for sName in sorted(os.listdir(sRoot)):
+        if not sName.lower().endswith(".md"): continue
+        sPath = os.path.join(sRoot, sName)
+        sText = io.open(sPath, "rb").read().decode("utf-8-sig", errors="replace")
+        lLines, iFence, iFixed = sText.split("\n"), 0, 0
+        for iLine, sLine in enumerate(lLines):
+            oFence = re.match(r"\s*(`{3,})", sLine)
+            if oFence:
+                iRun = len(oFence.group(1))
+                if not iFence: iFence = iRun
+                elif iRun >= iFence: iFence = 0
+                continue
+            # An indented line is a code block in Markdown, where an entity would show literally (RevealJs' examples).
+            if iFence or re.match(r"( {4}|\t)", sLine) or ("<h" not in sLine.lower() and "</h" not in sLine.lower()): continue
+            lParts = re.split(r"(`[^`]*`)", sLine)
+            for iPart in range(0, len(lParts), 2):
+                lParts[iPart], iCount = re.subn(r"(?i)<(?=/?h[1-6](\s[^>]*)?>)", "&lt;", lParts[iPart])
+                iFixed += iCount
+            lLines[iLine] = "".join(lParts)
+        if iFixed:
+            io.open(sPath, "wb").write(b"\xef\xbb\xbf" + "\n".join(lLines).encode("utf-8"))
+            logging.info("ESCAPED %d heading tag%s named in the prose of %s", iFixed, "" if iFixed == 1 else "s", sName)
     sLocal = ensureLines(os.path.join(sRoot, "LocalFiles.txt"), lsLocalLines, [],
                          "# LocalFiles.txt -- what belongs to this collection on this disk, but never in the repository.\n"
                          "# Harvested pages are kept in data\\harvests for the next build; harvest archives are outputs.")
     if sLocal: logging.info("SETTLED %s", sLocal)
-    sRepo = ensureLines(os.path.join(sRoot, "RepoFiles.txt"), lsRepoLines, lsRetired, "")
+    sRepo = ensureLines(os.path.join(sRoot, "RepoFiles.txt"), lsRepoLines, lsRetired + ["LocalFiles.txt", "RepoFiles.txt", "scripts/", "*.md"], "")
     if sRepo: logging.info("SETTLED %s", sRepo)
     return lMoves
 
@@ -3319,6 +3447,8 @@ def main():
         # INTERNET RADIO (3 November 2026)
         ("Shoutcast", "ShoutcastHelp", readZendesk, "Shoutcast.md", "Shoutcast help",
          "This guide holds Shoutcast's own help centre, gathered from the publisher's own listing: the Shoutcast directory, the Radio Manager where a station is listed and earns, and the Shoutcast server software. The categories are Shoutcast's own sections. RadioTrail, DbDo's radio template, draws its stations from Radio Browser and SomaFM; Shoutcast's directory needs a developer key to read."),
+        ("NVDA Coach", "NVDACoachHelp", readNVDACoach, "NVDACoach.md", "NVDA Coach help",
+         "This guide holds the whole course of NVDA Coach, Tony Gebhard's free add-on that teaches the NVDA screen reader from inside NVDA, in 45 guided lessons across six chapters, with the add-on's own user guide and resources page. It is read from the add-on itself, so every step, key, hint and message is the author's own wording; the add-on and its lessons are licensed under the GNU General Public License, version 2. Get the add-on from NVDA's Add-on Store, or from the releases of its GitHub repository."),
         # ASSISTIVE APPS FROM NO SIGHT REQUIRED (11 November 2026)
         ("GoodMaps", "GoodMapsHelp", readGoodMaps, "GoodMaps.md", "GoodMaps help",
          "This guide holds the official help for GoodMaps, the free indoor navigation app for iPhone and Android, gathered from the GoodMaps knowledge base on 11 November 2026. The categories are the knowledge base's own sections.\r\n\r\nMost parts of the app have two articles: a short how-to under Getting Started, and a fuller description under Features, often comparing the current app with version 1.0 and ending with a few questions and answers. GoodMaps finds where you are in a building through your phone's camera, so several articles explain how to hold the phone and why the app needs camera access. The help is written for every user, sighted and blind, and in places describes the visual map.\r\n\r\nLeft out on purpose: the pages written for the buildings that host GoodMaps rather than for people using the app. These cover GoodMaps Studio, the tool venues use to manage their maps; the mapping service and the safety of its lidar scanner; a sales page addressed to venues; and a 2023 notice to venue customers about the move to the new app. The screenshots are left out too, because their only descriptions are labels such as \"Check In 1.\" For questions the help does not answer, GoodMaps takes email at support@goodmaps.com."),

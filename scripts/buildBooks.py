@@ -789,6 +789,12 @@ def isPicture(sPath):
         with open(sPath, "rb") as f: bHead = f.read(512)
     except OSError:
         return False
+    return isPictureBytes(bHead)
+
+
+def isPictureBytes(bHead):
+    """The same test on bytes already read, such as a picture inside a Word file."""
+    bHead = bHead[:512]
     if bHead.startswith(b"\xff\xd8\xff") or bHead.startswith(b"\x89PNG") or bHead[:4] in (b"GIF8",) or bHead.startswith(b"BM"): return True
     if bHead[:4] == b"RIFF" and bHead[8:12] == b"WEBP": return True
     return b"<svg" in bHead.lower()
@@ -1376,6 +1382,9 @@ def resolvePictures(dBook, sBody, sWork, dFound):
             sPath, sSource = os.path.join(sBookDir, urllib.parse.unquote(sUrl)), "manuscript folder"
         if not sPath:
             sPath = findInFolders(lFolders, sName)
+            if sPath and not isPicture(sPath):
+                log(dBook["root"] + ": " + sPath + " is not a picture; passed over")
+                sPath = ""
             if sPath: sSource = "images folder" if os.path.dirname(sPath) == sImages else "images folder found beside an earlier copy"
         if not sPath and lDocx:
             if not bDocxRead:
@@ -1384,6 +1393,13 @@ def resolvePictures(dBook, sBody, sWork, dFound):
             oHit = lookupNamed(dNamed, sName)
             lDistinct = list(dict.fromkeys(d["url"] for d in lRemote))
             if not oHit and not dNamed and bRemote and len(lOrdered) == len(lDistinct): oHit = lOrdered[lDistinct.index(sUrl)]
+            # A WORD FILE CAN HOLD A WEB PAGE WHERE A PICTURE SHOULD BE (12 November 2026, from Legacy of Mazrui's
+            # audit): the Word file was made from the same failed downloads, so twelve of its "pictures" were error
+            # pages, and taking them stopped the build from ever trying the picture's own address. Such a hit is passed
+            # over, logged, and the address is tried next.
+            if oHit and not isPictureBytes(oHit[0]):
+                log(dBook["root"] + ": the Word file holds a web page, not a picture, for " + sName + "; trying its address")
+                oHit = None
             if oHit:
                 dUsedDocx[sUrl] = next((i for i, o in enumerate(lOrdered) if o[0] is oHit[0] or o[0] == oHit[0]), -1)
                 sTargetName = sName if os.path.splitext(sName)[1].lower() == oHit[1].lower() else os.path.splitext(sName)[0] + oHit[1]
@@ -1393,9 +1409,17 @@ def resolvePictures(dBook, sBody, sWork, dFound):
                 sSource = "Word file " + os.path.basename(lDocx[-1])
         if not sPath and bRemote:
             sTarget = os.path.join(sImages, sName)
-            if not download(sUrl, sTarget): sPath, sSource = sTarget, "downloaded"
+            sFailed = download(sUrl, sTarget)
+            # A DOWNLOAD MUST BE A PICTURE (12 November 2026): a site that refuses a program often answers with a web
+            # page and status 200, which is how the twelve error pages came to be saved as pictures in the first place.
+            if not sFailed and not isPicture(sTarget):
+                os.remove(sTarget)
+                sFailed = "the site answered with a web page, not a picture"
+                log("  " + sUrl + ": " + sFailed + "; nothing kept")
+            if not sFailed: sPath, sSource = sTarget, "downloaded"
+            else: dPicture["failure"] = sFailed
         if not sPath:
-            lErrors.append("Picture not found anywhere: " + sUrl)
+            lErrors.append("Picture not found anywhere: " + sUrl + ((" (" + dPicture["failure"] + ")") if dPicture.get("failure") else ""))
             dRecord = {"url": sUrl, "name": sName, "source": "", "file": "", "alt": dPicture["alt"]}
         else:
             if sSource.startswith("images folder found"):
@@ -1423,7 +1447,7 @@ def resolvePictures(dBook, sBody, sWork, dFound):
             iHigh = min([dUsedDocx[u] for u in lOrder[iEnd:] if u in dUsedDocx] or [len(lOrdered)])
             setUsed = set(dUsedDocx.values())
             lFree = [i for i in range(iLow + 1, iHigh) if i not in setUsed]
-            if len(lFree) == iEnd - iAt:
+            if len(lFree) == iEnd - iAt and all(isPictureBytes(lOrdered[i][0]) for i in lFree):
                 for sUrl, iPick in zip(lOrder[iAt:iEnd], lFree):
                     oHit, dOld = lOrdered[iPick], dDone[sUrl]
                     sName = dOld["name"]
@@ -1725,7 +1749,7 @@ def buildEpub(dBook, dKdp, dAudit, dEdition=None):
         lAddresses = [s.split(": ", 1)[-1] for s in lErrors]
         # Not ready, unless the book's catalog entry says a text-only edition is intended (allowMissingPictures = yes):
         # valid EPUB syntax does not mean the book kept its content (8 October 2026, from an audit by another AI).
-        dAudit["warnings" if dBook.get("allowMissingPictures", "").lower() == "yes" else "errors"].append(plural(len(lAddresses), "picture") + " left out, found nowhere -- not in the images folder, a Word file, or at its address -- so each one's text alternative stands in its place. The book's Word file, if it has one, would restore them: start OneDrive and run with --gather. The addresses: " + "; ".join(lAddresses) + ".")
+        dAudit["warnings" if dBook.get("allowMissingPictures", "").lower() == "yes" else "errors"].append(plural(len(lAddresses), "picture") + " left out, found nowhere -- not in the images folder, a Word file, or at its address -- so each one's text alternative stands in its place. To restore one, save the real picture under its name in the book's images folder and build again; for an edition without them, set allowMissingPictures = yes in the book's catalog entry. The addresses: " + "; ".join(lAddresses) + ".")
     # The chapter level is the shallowest heading level used more than once: a manuscript whose only level-1 heading is its
     # own title (WCAG in a Book) has its chapters one level down, and listing that title alone would make a table of contents
     # of one entry. A heading shifted above level 1 becomes plain text; the title page already shows the title.

@@ -7,6 +7,56 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.213.0 -- 12 November 2026
+
+- **Every directory's subtitle starts "A Directory of" and its number.** MyPages' build checks each page and stops, naming the page, when one does not, so a page that drifts is never posted. The subtitle tells a free directory from a commercial book on the same subject, such as the Blind Vibe Coding directory and the book.
+- **The kit's History page has one level-one heading again.** An entry about bare heading tags in prose had one itself, so the kit's own build refused the page; such tags in the kit's help are written as code.
+
+## 1.212.0 -- 12 November 2026
+
+- **MyBooks and MyPages release by build_release.** In MyBooks the cycle builds with buildBooks and releases with kdpSubmit; in MyPages it has nothing to compile and releases with post; tidy and push leave both alone, since neither is a repository. kind.py now counts a project with a books catalog as a page project, so it stays unpushable without a page of its own.
+- **MyBooks settles its tree in its build:** its stale copy of its directory page (MyBooks.md and .htm, _config.yml, configs\\post.inix) goes to notes\\retired when MyPages keeps and posts that page; a test moves into scripts beside its script, or to notes\\retired\\tests when its script is gone (test_createDropboxFolder.py); and the books build refreshes the kit's kdpUpdate test with its other tools.
+- **Every collection or page build clears Python's cache** from scripts. auditTree asks for RepoFiles.txt only in a repository.
+
+## 1.211.0 -- 12 November 2026
+
+- **buildBooks takes only real pictures.** Legacy of Mazrui's Word file was made from the same failed downloads as its images folder, so twelve of its "pictures" were error pages, and taking them from the Word file stopped the build from ever trying each picture's own address. A Word file's picture, a picture found in another folder, and a download are now each kept only when their bytes are a picture; otherwise the next source is tried, and a site that answers with a web page leaves nothing behind. A picture still missing is named with the reason, and the advice says what restores it: the real picture saved under its name in the images folder, or allowMissingPictures = yes for an edition without it.
+
+## 1.210.0 -- 12 November 2026
+
+- **A guide from an add-on file.** buildGuide reads NVDA Coach's whole course from the newest .nvda-addon in data\\harvests\\NVDACoachHelp: an About category from the add-on's user guide and resources page, then a category per chapter in course order, an article per lesson (Lesson 1.01 to 6.04), and a heading per step, with the step's keys, success message, hints and practice text. The collection's scripts\\getNVDACoachHelp fetches the newest release from GitHub; each build_release after it rebuilds and publishes the guide.
+
+## 1.209.0 -- 11 November 2026
+
+- **PodcastDirectories keeps the Homer tree too.** Its build retires the old copies of the kit's podcast-directory scripts (harvestShows, buildDirectory), the one-page poster postPage, and the readme of the old harvester, to notes\\retired; then adds every show data\\addShows.inix lists without a page, through the collection's own scripts\\addShows; then finishes each changed page. A show Apple's search cannot match is logged and does not stop the cycle.
+- **projectCycle names the kit for what it runs:** HomerDev is set in every command's environment to the kit the cycle found, so a project script that looks for the kit finds the same one, on any drive at any depth.
+- **A collection's RepoFiles.txt from git names .gitignore** beside the pages.
+
+## 1.208.0 -- 11 November 2026
+
+From AppHelpGuides' first cycle under 1.206.0.
+
+- **A collection's sources stay home.** RepoFiles.txt named only what git tracks, the .htm pages, and nothing named the .md sources as local, so tidy moved all 283 into notes\\drafts. A collection's LocalFiles.txt now names *.md, data/, scripts/ and the two lists; its build puts back each source from notes\\drafts whose page is at the top. Its RepoFiles.txt names only what the repository holds: AppHelpGuides' is the .htm pages and .gitignore.
+- **Harvested pages keep their own encoding.** check and fixEncoding pass by data\\harvests, other people's web pages kept as fetched, which refused the push 111 times.
+- **The guides build settles AppHelpGuides' scripts and drafts:** copies of the skill's own scripts and the finished one-off removeStrays go to notes\\retired, __pycache__ goes, and an announcement goes to notes\\drafts rather than out with the guides.
+- **A heading tag named in prose stays text.** Seven guides built before the builder's 12 October fix kept a bare `<h1>` in sentences about headings, which Pandoc made real headings (Calibre had five). The build writes such a tag as `&lt;h1` outside code and indented code, and rebuilds the page.
+
+## 1.207.0 -- 11 November 2026
+
+From MyBooks' logs of 11 November.
+
+- **kdpSubmit reads the status KDP already gave.** After Publish, the Bookshelf drew Blind Vibe Coding's title before its status labels, so the label read empty and the run said the status could not be read, though KDP's acknowledgement in the same run said "Live / Updates in review". When the label is not yet drawn, the status now comes from that acknowledgement, by the same rule: Updates in review is In Review.
+- **kdpSubmit's setup log is one per run,** logs\\<Project>-kdpSubmit-setup-<stamp>.log, by the Homer rule; it was one fixed-name file that grew run after run.
+
+## 1.206.0 -- 11 November 2026
+
+From the first full audit: 22 projects, 308 findings.
+
+- **Runners only in Homer projects.** The kit's build wrote build_release.bat into every folder beside it with a build.cmd, C:\\bin among them, and the audit then counted 218 findings there. A runner now goes only where an installer script or RepoFiles.txt sits beside build.cmd, or into MyBooks, MyPages, AppHelpGuides or PodcastDirectories; a runner the kit once wrote elsewhere is removed, logged.
+- **The audit finds Homer projects by what they hold:** RepoFiles.txt, LocalFiles.txt, an installer script, a Projects.inix entry or a role name. It passes by Python's build and dist folders, as tidy does, and accepts each app's create<App>Repo maintainer script at the top.
+- **tidy settles two drifts in every project:** a log at the top moves into logs (HomerView, PodcastDirectories), and a standard folder in the wrong case takes its lower-case name, told to git in two steps (DbDuo's Scripts).
+- **A collection's build retires kit tools copied to its top** (fixPages at PodcastDirectories') into notes\\retired, since the build refreshes them into scripts. A collection's first RepoFiles.txt is drawn from what git already tracks, so writing it never changes what push sends.
+
 ## 1.205.0 -- 11 November 2026
 
 - **Marked, not ticked.** A checkbox is marked or unmarked, the word Homer already uses for records and files: in the spoken hint for every checkbox and checked list box ("Space marks or unmarks it"), in every installer's finish-page wording and comments, in error messages that say which box to mark, in the install scripts, the book tools, the skills and the help.

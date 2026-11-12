@@ -1777,7 +1777,17 @@ def refreshBuildRelease():
     try:
         for sName in sorted(os.listdir(sParent)):
             sDir = os.path.join(sParent, sName)
-            if os.path.normcase(sDir) != os.path.normcase(sScriptDir) and os.path.isfile(os.path.join(sDir, "build.cmd")): lsTargets.append(sDir)
+            if os.path.normcase(sDir) == os.path.normcase(sScriptDir) or not os.path.isdir(sDir): continue
+            # ONLY HOMER PROJECTS GET A RUNNER (1.206.0). A build.cmd alone made C:\\bin, a folder of personal batch
+            # files, a target, and the audit then counted 218 findings there. A Homer project has an installer
+            # script or a RepoFiles.txt beside its build.cmd, or is one of the four projects known by name.
+            bHomer = bool(glob.glob(os.path.join(sDir, "*_setup.iss"))) or os.path.isfile(os.path.join(sDir, "RepoFiles.txt"))
+            bNamed = sName.lower() in ("apphelpguides", "mybooks", "mypages", "podcastdirectories")
+            sRunner = os.path.join(sDir, "build_release.bat")
+            if (os.path.isfile(os.path.join(sDir, "build.cmd")) and bHomer) or bNamed: lsTargets.append(sDir)
+            elif os.path.isfile(sRunner) and b"sRunner" in open(sRunner, "rb").read():
+                os.remove(sRunner)
+                logLine("build_release: removed the runner an earlier build wrote into %s, which is not a Homer project" % sDir)
     except OSError as oError:
         logLine("build_release: could not list %s: %s" % (sParent, oError))
     # LOGS INSIDE A SKILL'S FOLDER ARE REMOVED (13 October 2026). buildCreators once wrote its log beside itself, in

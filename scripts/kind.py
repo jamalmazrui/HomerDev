@@ -149,6 +149,10 @@ def projectKind(sFolder):
         return "collection", "%d documents at the top, and no program" % len(lsStems)
     if len(lsStems) == 1:
         return "page", "%s is its one document, and there is no program" % lsStems[0]
+    # A BOOK PROJECT IS A PAGE PROJECT (1.212.0): published elsewhere, by kdpSubmit, and never a repository. Without
+    # this, retiring MyBooks.md -- a stale copy of the page MyPages publishes -- would have left MyBooks "unknown",
+    # and push would have tried to make a GitHub repository of commercial manuscripts.
+    if publishesBooks(sFolder): return "page", "configs\\books.inix is its catalog of books, which kdpSubmit publishes; it is not a repository"
     return "unknown", "no installer script, program source or document at the top"
 
 
