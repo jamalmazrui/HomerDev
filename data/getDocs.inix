@@ -2,6 +2,7 @@
 ; url: the page that holds or links the document. files: a pattern a downloadable file's link text or address must
 ; match; when one is found, the newest PDF or Word file is taken and the page itself is not converted. Without files,
 ; or when nothing matches, the page is turned into a structured, cleaned .md with its .htm.
+; follow: a pattern for a link on the page to follow first, when the page only leads to the document.
 ; Added 12 November 2026, from Top Tech Tidbits, Volume 1093.
 
 [DBT_Producers_Manual]
@@ -12,6 +13,7 @@ files = producer|manual
 [JAWS_2027_Whats_New]
 title = What's New in JAWS 2027
 url = https://support.freedomscientific.com/Downloads/JAWS/JAWSWhatsNew
+follow = Latest JAWS Enhancements|JAWS 2027
 
 [Accessible_LLM_Chat]
 title = Making Immersive LLM Chat Experiences More Accessible

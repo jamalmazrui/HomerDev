@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.217.0 -- 12 November 2026
+
+From getDocs' first run, which fetched the DBT Producers' Manual, fifth edition, as PDF and Word, and two pages of six and eight thousand words, but two pages too thin to be the documents:
+
+- **The most substantial part of a page wins.** Vispero's PDF guide sits in a page whose only article elements are cards for related posts; the largest article now wins unless the main element holds half again as much, and cards of under 300 characters are dropped from what is kept.
+- **A landing page can lead to the document.** A follow pattern in data\\getDocs.inix names the link to take first: What's New in JAWS 2027 follows "Latest JAWS Enhancements" to the notes themselves.
+- **A thin result is said,** under 300 words, with what to check; headings never skip a level; and run from inside a project's logs or results folder, getDocs puts its documents and log in the project's own.
+
 ## 1.216.0 -- 12 November 2026
 
 - **getDocs fetches documents worth keeping.** It reads the list in data\\getDocs.inix -- or another of the same form -- and, for each document, takes the newest PDF or Word file its page offers, or else turns the page into one structured, cleaned Markdown document with its .htm: the page's article or main content only, one level-one heading, its own headings below, tracking codes taken out of every address, and a note naming the source and the date. Everything goes into the current folder's results\\getDocs, and a log into its logs. The first list holds five documents from Top Tech Tidbits of 12 November 2026: the DBT Producers' Manual, What's New in JAWS 2027, making AI chat accessible, testing PDFs for accessibility, and braille displays on iOS.

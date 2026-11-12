@@ -88,10 +88,18 @@ def mainContent(sHtml):
     sHtml = re.sub(r"(?s)<!--.*?-->", "", sHtml)
     for sTag in lsDropTags: sHtml = re.sub(r"(?is)<%s\b.*?</%s\s*>" % (sTag, sTag), "", sHtml)
     sHtml = re.sub(r'(?is)<(div|section)\b[^>]*(?:class|id)="[^"]*(?:cookie|share|social|related|comment|newsletter|subscribe|sidebar|breadcrumb|advert|promo)[^"]*"[^>]*>', "<div>", sHtml)
-    for sPattern in (r"(?is)<article\b[^>]*>(.*)</article>", r"(?is)<main\b[^>]*>(.*)</main>", r'(?is)<[^>]+role="main"[^>]*>(.*)', r"(?is)<body\b[^>]*>(.*)</body>"):
+    # THE MOST SUBSTANTIAL PART WINS (1.217.0). Vispero's guide sits in a page whose only <article> elements are cards
+    # for related posts, and taking everything from the first card to the last kept 141 words of cards and none of the
+    # guide. Each article alone, the main element and the body are weighed by their text; the largest article wins
+    # unless main holds half again as much, and inside the winner, a card -- an article of under 300 characters -- goes.
+    def textOf(sPart): return len(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", sPart)).strip())
+    lsArticles = re.findall(r"(?is)<article\b[^>]*>(.*?)</article>", sHtml)
+    sBest = max(lsArticles, key=textOf) if lsArticles else ""
+    for sPattern in (r"(?is)<main\b[^>]*>(.*)</main>", r'(?is)<[^>]+role="main"[^>]*>(.*)', r"(?is)<body\b[^>]*>(.*)</body>"):
         oMatch = re.search(sPattern, sHtml)
-        if oMatch and len(re.sub(r"<[^>]+>", "", oMatch.group(1)).strip()) > 400: return oMatch.group(1)
-    return sHtml
+        if oMatch and textOf(oMatch.group(1)) > 1.5 * textOf(sBest): sBest = oMatch.group(1); break
+    sBest = sBest or sHtml
+    return re.sub(r"(?is)<article\b[^>]*>(.*?)</article>", lambda m: m.group(0) if textOf(m.group(1)) >= 300 else "", sBest)
 
 
 def cleanAddress(sUrl):
@@ -119,6 +127,12 @@ def pageToMarkdown(sHtml, sTitle, sUrl):
     sMd = re.sub(r"https?://[^)\s\"]+", lambda m: cleanAddress(m.group(0)), sMd)
     setIds = set(re.findall(r"\{#([^}]+)\}", sMd)) | set(re.sub(r"[^a-z0-9 -]", "", h.lower()).strip().replace(" ", "-") for h in re.findall(r"(?m)^#+ (.+)$", sMd))
     sMd = re.sub(r"\[([^\]]*)\]\(#([^)\s]+)[^)]*\)", lambda m: m.group(0) if m.group(2) in setIds else m.group(1), sMd)
+    # NO SKIPPED LEVEL (1.217.0): with the repeated title gone, the page's headings start at level 2, never 3, so
+    # a screen reader's heading levels mean what they say.
+    lLevels = [len(m.group(1)) for m in re.finditer(r"(?m)^(#{2,6}) ", sMd)]
+    if lLevels and min(lLevels) > 2:
+        iUp = min(lLevels) - 2
+        sMd = re.sub(r"(?m)^(#{2,6}) ", lambda m: "#" * (len(m.group(1)) - iUp) + " ", sMd)
     sMd = re.sub(r"\n{3,}", "\n\n", sMd).strip()
     sToday = datetime.date.today().strftime("%d %B %Y").lstrip("0")
     return ('---\ntitle: "%s"\nlang: en-US\n---\n\n# %s\n\n*Fetched %s from [the publisher\'s page](%s). The page\'s menus and side panels are left out.*\n\n%s\n'
@@ -134,6 +148,20 @@ def getOne(sName, dDoc, sOut):
     sUrl, sTitle = dDoc.get("url", ""), dDoc.get("title", sName.replace("_", " "))
     binPage, sFinal, sType = fetch(sUrl)
     sHtml = binPage.decode("utf-8", "replace")
+    # A LANDING PAGE CAN LEAD TO THE DOCUMENT (1.217.0): Freedom Scientific's What's New page holds only a version list
+    # and a link, "Latest JAWS Enhancements", to the notes themselves. A follow pattern names that link; its page is
+    # the one fetched and converted.
+    if dDoc.get("follow"):
+        for oLink in re.finditer(r'(?is)<a\b[^>]*href\s*=\s*["\']([^"\']+)["\'][^>]*>(.*?)</a>', sHtml):
+            sText = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", oLink.group(2)))).strip()
+            if re.search(dDoc["follow"], sText, re.I):
+                sUrl = urllib.parse.urljoin(sFinal, html.unescape(oLink.group(1)).strip())
+                log("%s: following \"%s\" to %s" % (sName, sText, sUrl))
+                binPage, sFinal, sType = fetch(sUrl)
+                sHtml = binPage.decode("utf-8", "replace")
+                break
+        else:
+            log("%s: no link matched the follow pattern %s; the page itself is used" % (sName, dDoc["follow"]))
     if dDoc.get("files"):
         lLinks = fileLinks(sHtml, sFinal, dDoc["files"])
         log("%s: %d matching file link%s: %s" % (sName, len(lLinks), "" if len(lLinks) == 1 else "s", "; ".join(t[0] for t in lLinks)))
@@ -156,18 +184,23 @@ def getOne(sName, dDoc, sOut):
     writeText(os.path.join(sOut, sName + ".htm"), sHtm)
     iWords = len(re.findall(r"\w+", sMd))
     log("CONVERTED %s: %d words" % (sMdPath, iWords))
-    return "%s: %s.md and .htm, %s words." % (sTitle, sName, format(iWords, ","))
+    sThin = " That is thin for a document; the log says which part of the page was kept, and a follow pattern may be needed." if iWords < 300 else ""
+    return "%s: %s.md and .htm, %s words.%s" % (sTitle, sName, format(iWords, ","), sThin)
 
 
 def main():
     sRoot = os.getcwd()
+    # Run from inside a project's own folder -- logs, results, notes -- the project is the folder above (1.217.0): a run
+    # in C:\\HomerDev\\logs had put its documents in logs\\results\\getDocs and its log in logs\\logs.
+    if os.path.basename(sRoot.rstrip("\\/")).lower() in ("configs", "data", "help", "logs", "notes", "results", "scripts", "templates", "work"):
+        sRoot = os.path.dirname(sRoot.rstrip("\\/"))
     sKit = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     sList = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else os.path.join(sKit, "data", "getDocs.inix")
     sOut = os.path.join(sRoot, "results", "getDocs")
     for sFolder in (sOut, os.path.join(sRoot, "logs")): os.makedirs(sFolder, exist_ok=True)
     sLogPath = os.path.join(sRoot, "logs", "%s-getDocs-%s.log" % (os.path.basename(sRoot.rstrip("\\/")) or "getDocs", datetime.datetime.now().strftime("%Y%m%d-%H%M%S")))
     dState["fLog"] = io.open(sLogPath, "w", encoding="utf-8-sig", newline="\r\n")
-    log("getDocs.py (HomerDev 1.216.0); script %s; Python %s on %s; cwd %s; command line %s" % (
+    log("getDocs.py (HomerDev 1.217.0); script %s; Python %s on %s; cwd %s; command line %s" % (
         os.path.abspath(__file__), platform.python_version(), platform.platform(), sRoot, " ".join(sys.argv)))
     log("settings: list %s; output %s" % (sList, sOut))
     iResult = 0
