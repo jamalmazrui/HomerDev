@@ -3714,8 +3714,15 @@ public class LbcDialog : IDisposable
         return sName;
     }
 
+    // purpose and summaryText (kit 1.220.0): a dialog may say what it is for, and add a summary of its state that its
+    // controls alone do not make plain. Control+Slash says them after the title. A launch app's dialog sets both: what
+    // it is for, then the job as it stands -- how many sources, what is marked, where the results go.
+    public string purpose = "";
+    public Func<string> summaryText;
+
     private string purposeOf()
     {
+        if (!string.IsNullOrEmpty(purpose)) return purpose;
         foreach (Control ctl in dWidgets.Values)
         {
             Label lbl = ctl as Label;
@@ -3755,6 +3762,12 @@ public class LbcDialog : IDisposable
         sb.Append(sTitle.Length > 0 ? sTitle + " dialog. " : "Dialog. ");
         string sPurpose = purposeOf();
         if (sPurpose.Length > 0) sb.Append(sPurpose.EndsWith(".") || sPurpose.EndsWith("?") ? sPurpose + " " : sPurpose + ". ");
+        if (summaryText != null)
+        {
+            string sSummary = "";
+            try { sSummary = (summaryText() ?? "").Trim(); } catch (Exception) { }
+            if (sSummary.Length > 0) sb.Append(sSummary.EndsWith(".") ? sSummary + " " : sSummary + ". ");
+        }
         if (!string.IsNullOrEmpty(summaryScript) && LbcHints.scriptEvaluator != null)
         {
             try
@@ -5255,6 +5268,82 @@ public class LaunchDialog : IDisposable
         appName = sAppName ?? "";
         dialog = new LbcDialog(appName, null);
         dialog.helpNote = helpNote(appName);
+        // WHERE AM I IN A LAUNCH APP (kit 1.220.0): Control+Slash says what the dialog is for, then the job as it
+        // stands, the same way in 2htm, BatCon, extCheck, HomerScribe, urlCheck and urlFido.
+        dialog.purpose = "Choose the sources, what to do with them and where the results go; Control+Enter starts.";
+        dialog.summaryText = jobSummary;
+    }
+
+    // THE SAME TIP FOR THE SAME CONTROL IN EVERY LAUNCH APP (kit 1.220.0). An app that passes "" for a standard
+    // control's tip gets these; one that passes its own keeps it. Each is one sentence for Shift+F1.
+    public const string sourceTip = "The files or folders to work on, separated by spaces, with quotes around any that has a space; a folder means every file in it.";
+    public const string browseTip = "Pick the sources in a standard Open dialog.";
+    public const string outputTip = "The folder the results are written to; it is made if it does not exist.";
+    public const string chooseTip = "Pick the output folder in a standard folder dialog.";
+    public const string useConfigTip = "Start next time with this run's settings, kept in the app's configuration file.";
+    public const string viewOutputTip = "Open the output folder in File Explorer when the job is done.";
+
+    // sourcePaths: the sources the Source paths box names, by the kit's convention (help\LaunchDialog.md): separated by
+    // spaces, with quotes around any that has a space -- as Browse local source writes them. A folder means the files in
+    // it and below it; a wildcard pattern, the files it matches; a web address stays as it is. At most 10,000.
+    public string[] sourcePaths()
+    {
+        List<string> lsOut = new List<string>();
+        string sText = sourceBox == null ? "" : sourceBox.Text;
+        foreach (System.Text.RegularExpressions.Match oMatch in System.Text.RegularExpressions.Regex.Matches(sText, "\"([^\"]+)\"|(\\S+)"))
+        {
+            string sPath = (oMatch.Groups[1].Success ? oMatch.Groups[1].Value : oMatch.Groups[2].Value).Trim().TrimEnd(';');
+            if (sPath.Length == 0) continue;
+            try
+            {
+                if (System.Text.RegularExpressions.Regex.IsMatch(sPath, "^[a-z]+://", System.Text.RegularExpressions.RegexOptions.IgnoreCase)) lsOut.Add(sPath);
+                else if (Directory.Exists(sPath))
+                {
+                    foreach (string sFile in Directory.EnumerateFiles(sPath, "*", SearchOption.AllDirectories))
+                    {
+                        lsOut.Add(sFile);
+                        if (lsOut.Count >= 10000) return lsOut.ToArray();
+                    }
+                }
+                else if (sPath.IndexOfAny(new char[] { '*', '?' }) >= 0)
+                {
+                    string sDir = Path.GetDirectoryName(sPath);
+                    if (string.IsNullOrEmpty(sDir)) sDir = Directory.GetCurrentDirectory();
+                    lsOut.AddRange(Directory.GetFiles(sDir, Path.GetFileName(sPath)));
+                }
+                else lsOut.Add(sPath);
+            }
+            catch (Exception) { lsOut.Add(sPath); }
+            if (lsOut.Count >= 10000) break;
+        }
+        return lsOut.ToArray();
+    }
+
+    // jobSummary: the job as it stands, for Control+Slash.
+    public string jobSummary()
+    {
+        List<string> lsSaid = new List<string>();
+        string[] aSources = sourcePaths();
+        if (aSources.Length == 0) lsSaid.Add("No sources yet");
+        else lsSaid.Add(aSources.Length + (aSources.Length == 1 ? " source, " : " sources, the first ") + Path.GetFileName(aSources[0]));
+        List<string> lsMarked = new List<string>();
+        Stack<Control> stControls = new Stack<Control>();
+        if (dialog.form != null) stControls.Push(dialog.form);
+        List<CheckBox> lsBoxes = new List<CheckBox>();
+        while (stControls.Count > 0)
+        {
+            Control ctl = stControls.Pop();
+            CheckBox chk = ctl as CheckBox;
+            if (chk != null && chk != forceBox && chk != useConfigBox && chk != viewOutputBox) lsBoxes.Add(chk);
+            foreach (Control ctlChild in ctl.Controls) stControls.Push(ctlChild);
+        }
+        lsBoxes.Sort(delegate(CheckBox a, CheckBox b) { return a.TabIndex.CompareTo(b.TabIndex); });
+        foreach (CheckBox chk in lsBoxes) if (chk.Checked) lsMarked.Add(LbcHints.plainName(chk.Text));
+        if (lsBoxes.Count > 0) lsSaid.Add(lsMarked.Count == 0 ? "Nothing marked to do" : "Marked: " + string.Join(", ", lsMarked.ToArray()));
+        string sOutput = outputBox == null ? "" : outputBox.Text.Trim();
+        lsSaid.Add(sOutput.Length == 0 ? "No output directory yet" : "Output directory: " + sOutput);
+        if (forceBox != null) lsSaid.Add("Force replacements " + (forceBox.Checked ? "marked" : "unmarked"));
+        return string.Join(". ", lsSaid.ToArray()) + ".";
     }
 
     // ---- the standard bands ----------------------------------------------
@@ -5266,8 +5355,8 @@ public class LaunchDialog : IDisposable
     public TextBox addSourceBand(string sValue, string sTip, string sBrowseTip)
     {
         dialog.addBand();
-        sourceBox = dialog.addInputBox(markFree("&Source paths:"), sValue, sTip);
-        browseButton = dialog.addButton(markFree("&Browse local source"), sBrowseTip);
+        sourceBox = dialog.addInputBox(markFree("&Source paths:"), sValue, string.IsNullOrEmpty(sTip) ? sourceTip : sTip);
+        browseButton = dialog.addButton(markFree("&Browse local source"), string.IsNullOrEmpty(sBrowseTip) ? browseTip : sBrowseTip);
         dialog.endBand();
         if (!ownPickers) browseButton.Click += delegate(object o, EventArgs e) { browseSource(); };
         return sourceBox;
@@ -5277,8 +5366,8 @@ public class LaunchDialog : IDisposable
     public TextBox addOutputBand(string sValue, string sTip, string sChooseTip)
     {
         dialog.addBand();
-        outputBox = dialog.addInputBox(markFree("&Output directory:"), sValue, sTip);
-        chooseButton = dialog.addButton(markFree("&Choose output directory"), sChooseTip);
+        outputBox = dialog.addInputBox(markFree("&Output directory:"), sValue, string.IsNullOrEmpty(sTip) ? outputTip : sTip);
+        chooseButton = dialog.addButton(markFree("&Choose output directory"), string.IsNullOrEmpty(sChooseTip) ? chooseTip : sChooseTip);
         dialog.endBand();
         if (!ownPickers) chooseButton.Click += delegate(object o, EventArgs e) { chooseOutput(); };
         return outputBox;
@@ -5292,7 +5381,7 @@ public class LaunchDialog : IDisposable
     // checkbox of the operation band, beside Use configuration and View output
     // directory, because, like them, it governs the run as a whole rather than
     // what is done to each source; help\LaunchDialog.md weighs the other place.
-    public const string forceTip = "Do the work again for a source whose result is already there, replacing the old result once the new one is complete. Unchecked, that source is skipped and its result kept.";
+    public const string forceTip = "Do the work again for a source whose result is already there, replacing the old result once the new one is complete. Unmarked, that source is skipped and its result kept.";
 
     // keptLine: the Results box's line for results kept because Force
     // replacements was off -- "Skipped 2 files whose results were already
@@ -5314,8 +5403,8 @@ public class LaunchDialog : IDisposable
         {
             dialog.addBand();
             if (sForceTip != null) forceBox = dialog.addCheckBox(markFree("&Force replacements"), bForce, sForceTip == "" ? forceTip : sForceTip);
-            if (sConfigTip != null) useConfigBox = dialog.addCheckBox(markFree("&Use configuration"), bUseConfig, sConfigTip);
-            if (sViewTip != null) viewOutputBox = dialog.addCheckBox(markFree("&View output directory"), bViewOutput, sViewTip);
+            if (sConfigTip != null) useConfigBox = dialog.addCheckBox(markFree("&Use configuration"), bUseConfig, sConfigTip == "" ? useConfigTip : sConfigTip);
+            if (sViewTip != null) viewOutputBox = dialog.addCheckBox(markFree("&View output directory"), bViewOutput, sViewTip == "" ? viewOutputTip : sViewTip);
             dialog.endBand();
         }
         dialog.addBand();

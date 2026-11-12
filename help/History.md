@@ -7,6 +7,13 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.220.0 -- 12 November 2026
+
+- **Only valid conversions are offered.** Conversion.targetsForPaths, in C# and Python, gives the target formats every one of several sources can become -- one file of each type asked, a format kept only if every type reaches it -- for BatCon's Target format and any picker serving several files; Conversion.targetsFor still serves one file. The kit's check now fails an app that offers allTargets, the list of every format any route makes, so no Homer app can offer a format its sources cannot reach.
+- **Launch apps answer Control+Slash with the job.** LbcDialog gains a purpose line and a summary hook; LaunchDialog fills both, so Control+Slash in 2htm, BatCon, extCheck, HomerScribe, urlCheck and urlFido says what the dialog is for, then how many sources, which choices are marked, the output directory and Force replacements. Shift+F1 already worked there, through LbcDialog.
+- **The standard launch controls have standard tips,** the same sentence in every app unless an app has its own; and sourcePaths reads the Source paths box by the kit's convention -- spaces between paths, quotes around one with a space, folders, wildcards and web addresses.
+- **Marked, not checked:** Force replacements' tip says "Unmarked".
+
 ## 1.219.0 -- 12 November 2026
 
 - **Sound and video are the kit's own.** What HomerScribe did -- transcribing and describing -- is now a Python script every Homer app runs, held word for word in conversion.py and ConversionMedia.cs as sMediaScript, so BatCon and every app have it with no other Homer app installed. Sound to a document is its transcript, in paragraphs by pause, with a time heading every five minutes for a long recording. Video to a document is what is said and what is seen, in time order: each change of scene, and at least one moment every 30 seconds, described by Ollama's local vision model, a heading at each with its time. Video to sound -- mp4 to mp3 -- is the sound with each description spoken in a pause made for it, at the end of a sentence: extended audio description. Whisper now keeps its times, which the integration needs.

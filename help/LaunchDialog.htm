@@ -349,6 +349,37 @@ OK and Escape presses Cancel, from any control in the dialog.</li>
 to install it. It works from any control, though no control shows it,
 and the Help box says so.</li>
 </ul>
+<h2 id="asking-the-dialog-kit-1.220.0">Asking the dialog (kit
+1.220.0)</h2>
+<p>Every launch dialog answers the two help keys of the Homer Suite,
+from any control, because LaunchDialog is built on LbcDialog:</p>
+<ul>
+<li><strong>Shift+F1</strong> says what the control with focus does, in
+one sentence. Pressed twice, it shows the answer in a window.</li>
+<li><strong>Control+Slash</strong> says where you are: what the dialog
+is for, then the job as it stands – how many sources and the first one’s
+name, which of the app’s own choices are marked, the output directory,
+and whether Force replacements is marked. Pressed twice, it shows the
+answer in a window.</li>
+</ul>
+<p>The standard controls have standard tips, the same in every launch
+app: an app passes an empty tip for Source paths, Browse local source,
+Output directory, Choose output directory, Use configuration or View
+output directory, and gets the kit’s sentence; an app with something
+particular to say passes its own. sourcePaths reads the Source paths box
+by the kit’s convention – separated by spaces, with quotes around a path
+that has one – a folder as the files in it and below it, a wildcard as
+the files it matches, and a web address as it is.</p>
+<h2 id="offering-only-valid-formats-kit-1.220.0">Offering only valid
+formats (kit 1.220.0)</h2>
+<p>A launch app that converts, such as BatCon, offers only the target
+formats every chosen source can become:
+Conversion.targetsForPaths(launch.sourcePaths(), out aLabels), asked
+again whenever the sources change (sourceChosen, and when focus leaves
+Source paths). Conversion.allTargets, which lists every format any route
+makes, is for no picker, and the kit’s check fails an app that offers
+it. The same rule holds wherever a Homer app offers a conversion: one
+file is Conversion.targetsFor, several are targetsForPaths.</p>
 <h2 id="opening-and-choosing-folders">Opening and choosing folders</h2>
 <ul>
 <li>The dialog opens with the focus in the Source paths box and its text

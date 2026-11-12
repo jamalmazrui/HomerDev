@@ -1827,6 +1827,33 @@ def canConvert(sSource, sTarget):
     return bool(loadTable().get(typeOf(sSource), {}).get(sTo)) or bool(hubFor(typeOf(sSource), sTo)) or mediaCan(sSource, sTo)
 
 
+def targetsFor(sSource):
+    """What a file can become, as extensions, by the same rule as Conversion.cs's targetsFor (1.220.0): the routes the
+    table names for its type, and what the media half makes of it; its own type left out. Alphabetical."""
+    sFrom = typeOf(sSource)
+    setOut = set(t for t in loadTable().get(sFrom, {}) if t != sFrom)
+    setOut |= set(t for t in lsTranscriptTargets + lsAudioSources + lsVideoSources + lsSpeechAudioTargets + lsSpeechVideoTargets
+                  if t != sFrom and mediaCan(sSource, t))
+    return sorted(setOut)
+
+
+def targetsForPaths(lsPaths):
+    """What EVERY one of several sources can become (1.220.0, "only offer valid conversions"), as Conversion.cs's
+    targetsForPaths: one file of each type asked, a target kept only if every type reaches it, the first type's order
+    kept; a type with no targets at all is passed over rather than emptying the list."""
+    lsOrder, setTypes, bFirst = [], set(), True
+    for sPath in lsPaths or []:
+        sType = typeOf(sPath)
+        if not sType or sType in setTypes: continue
+        setTypes.add(sType)
+        lsHere = targetsFor(sPath)
+        if not lsHere:
+            say("targetsForPaths: no target for .%s, so it does not narrow the list" % sType); continue
+        if bFirst: lsOrder, bFirst = list(lsHere), False
+        else: lsOrder = [t for t in lsOrder if t in lsHere]
+    return lsOrder
+
+
 # THROUGH MARKDOWN (1.90.0), as Conversion.cs does: a pair the table does not name, or whose every way fails,
 # goes in two of the table's own steps through Markdown, else a web page. Each step is an ordinary route.
 lsHubs = ["md", "htm", "csv"]

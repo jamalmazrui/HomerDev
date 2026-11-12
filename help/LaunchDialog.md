@@ -91,6 +91,19 @@ never sit in the row.
   works from any control, though no control shows it, and the Help box says
   so.
 
+## Asking the dialog (kit 1.220.0)
+
+Every launch dialog answers the two help keys of the Homer Suite, from any control, because LaunchDialog is built on LbcDialog:
+
+- **Shift+F1** says what the control with focus does, in one sentence. Pressed twice, it shows the answer in a window.
+- **Control+Slash** says where you are: what the dialog is for, then the job as it stands -- how many sources and the first one's name, which of the app's own choices are marked, the output directory, and whether Force replacements is marked. Pressed twice, it shows the answer in a window.
+
+The standard controls have standard tips, the same in every launch app: an app passes an empty tip for Source paths, Browse local source, Output directory, Choose output directory, Use configuration or View output directory, and gets the kit's sentence; an app with something particular to say passes its own. sourcePaths reads the Source paths box by the kit's convention -- separated by spaces, with quotes around a path that has one -- a folder as the files in it and below it, a wildcard as the files it matches, and a web address as it is.
+
+## Offering only valid formats (kit 1.220.0)
+
+A launch app that converts, such as BatCon, offers only the target formats every chosen source can become: Conversion.targetsForPaths(launch.sourcePaths(), out aLabels), asked again whenever the sources change (sourceChosen, and when focus leaves Source paths). Conversion.allTargets, which lists every format any route makes, is for no picker, and the kit's check fails an app that offers it. The same rule holds wherever a Homer app offers a conversion: one file is Conversion.targetsFor, several are targetsForPaths.
+
 ## Opening and choosing folders
 
 - The dialog opens with the focus in the Source paths box and its text

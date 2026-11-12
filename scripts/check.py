@@ -1108,7 +1108,10 @@ def checkConversions():
         oMatch = re.search(r"(?im)^\s*conversionsMoved\s*=\s*(.*)$", readText(sManifest))
         if oMatch: lsMoved = [s.strip().lower() for s in oMatch.group(1).split(",") if s.strip()]
     lsPatterns = [(r"pandoc\.exe", "its own Pandoc finder"), (r"2htm\.exe", "a 2htm call"),
-                  (r"\"(Word|Excel|PowerPoint)\.Application\"", "an Office COM object"), (r"pymupdf4llm", "its own PDF reader")]
+                  (r"\"(Word|Excel|PowerPoint)\.Application\"", "an Office COM object"), (r"pymupdf4llm", "its own PDF reader"),
+                  # ONLY VALID CONVERSIONS (1.220.0, the author's ruling of 12 November 2026): a picker of target formats
+                  # lists what the chosen sources can become -- Conversion.targetsForPaths -- never every format.
+                  (r"\ballTargets\s*\(", "a target list of every format; offer only what the sources can become, by Conversion.targetsForPaths")]
     lsHits = []
     for sPath in sourceFiles():
         if not sPath.lower().endswith(".cs"): continue

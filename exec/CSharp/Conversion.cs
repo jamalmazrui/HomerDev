@@ -27,6 +27,7 @@
 //                                    ("Markdown (.md)") with their extensions alongside:
 //                                    the list a target picker shows
 //   targetsFor(path)                 the same as [label, extension] pairs
+//   targetsForPaths(paths, out labels) what every one of several sources can become (kit 1.220.0)
 //   hasAnyRoute(path)                whether a file can be converted at all
 //   hasRoute(source, target)         whether one particular conversion exists
 //   convert(source, target, out error)  convert one file: the one technique every app uses
@@ -788,6 +789,35 @@ lsExts.Add(sExt);
 aExtensions = lsExts.ToArray();
 return lsLabels.ToArray();
 } // targetLabelsFor method
+
+// targetsForPaths: what EVERY one of several sources can become, as labels and extensions (kit 1.220.0, the author's
+// ruling of 12 November 2026: "only offer valid conversions"). BatCon's Target format, and any picker serving several
+// files at once, shows this rather than allTargets, which listed every type any route makes, so a person could pick a
+// format some of the files could never reach. One file of each type is asked, in the order the sources are named, and
+// a target stays only if every type can reach it; the first type's order is kept. A type the kit cannot read at all
+// is passed over rather than emptying the list, and said in the log.
+public static string[] targetsForPaths(string[] aPaths, out string[] aLabels) {
+List<string> lsOrder = new List<string>();
+Dictionary<string, string> dLabels = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+HashSet<string> hsTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+bool bFirst = true;
+foreach (string sPath in aPaths ?? new string[0]) {
+string sType = typeOf(sPath);
+if (sType == "" || !hsTypes.Add(sType)) continue;
+string[] aExts;
+string[] aTypeLabels = targetLabelsFor(sPath, out aExts);
+if (aExts.Length == 0) { Log.info("targetsForPaths: no target for ." + sType + ", so it does not narrow the list"); continue; }
+HashSet<string> hsHere = new HashSet<string>(aExts, StringComparer.OrdinalIgnoreCase);
+if (bFirst) {
+for (int i = 0; i < aExts.Length; i++) { lsOrder.Add(aExts[i]); dLabels[aExts[i]] = aTypeLabels[i]; }
+bFirst = false;
+}
+else lsOrder.RemoveAll(delegate(string sExt) { return !hsHere.Contains(sExt); });
+}
+aLabels = new string[lsOrder.Count];
+for (int i = 0; i < lsOrder.Count; i++) aLabels[i] = dLabels[lsOrder[i]];
+return lsOrder.ToArray();
+} // targetsForPaths method
 
 // convertAny: whatever the source, to the target path. Documents and tables go
 // by the routing table, media through ConversionMedia.cs.
