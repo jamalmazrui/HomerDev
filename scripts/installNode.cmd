@@ -64,7 +64,7 @@ if not "!iCode!"=="0" goto :failed
 goto :report
 
 :update
-rem SETUP HAS ALREADY DECIDED (13 October 2026): it compared the installed version with the newest and ticked Update only
+rem SETUP HAS ALREADY DECIDED (13 October 2026): it compared the installed version with the newest and marked Update only
 rem when a newer one exists, so this updates rather than checking again.
 call "%~dp0installCommon.cmd" wingetUpgrade !sFound! "Node.js"
 if errorlevel 1 goto :failed

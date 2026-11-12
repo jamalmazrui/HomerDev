@@ -141,7 +141,7 @@ That audit read the morning's logs: nine releases succeeded, and two candidates 
 ## The audit of 14 October midday
 
 - **HomerScribe-11, changed input skipped as done. Done.** Each results folder keeps the fingerprint of the recording that made it; a different recording, even of the same size and time, is made again. The acceptance test also takes a skip of an unchanged recording as success.
-- **HomerDev-11, standalone /defaults. Done, with one Enter.** /defaults alone skips every page Inno allows to be skipped, each keeping its default; the finish page shows with its default boxes ticked. Inno decides silence before code runs, so /verysilent /defaults remains the way to show nothing. Awaits a run on Windows: setup /defaults should show only the finish page.
+- **HomerDev-11, standalone /defaults. Done, with one Enter.** /defaults alone skips every page Inno allows to be skipped, each keeping its default; the finish page shows with its default boxes marked. Inno decides silence before code runs, so /verysilent /defaults remains the way to show nothing. Awaits a run on Windows: setup /defaults should show only the finish page.
 - **MyBooks-07, an ambiguous git message. Done.** No .git folder and no git program are now two answers; the second is a gap in the report.
 - **MyBooks' other findings.** Legacy of Mazrui is not ready because 14 of its pictures cannot be found anywhere; that awaits the author's decision. The report's four missing parts and the title, edition and sales matching await a report run with their logs.
 

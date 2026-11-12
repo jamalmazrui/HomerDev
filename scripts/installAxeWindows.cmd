@@ -24,7 +24,7 @@ for %%A in (%*) do if /i "%%A"=="reinstall" set "bReinstall=1"
 
 where python >nul 2>&1
 if errorlevel 1 (
-  echo Axe.Windows needs Python, which is not installed yet. Tick Python on this page, or run installPython, then this again.
+  echo Axe.Windows needs Python, which is not installed yet. Mark Python on this page, or run installPython, then this again.
   call "%~dp0installCommon.cmd" log "Python not found; Axe.Windows not installed"
   goto :failed
 )

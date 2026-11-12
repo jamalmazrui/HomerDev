@@ -6,7 +6,7 @@ description: >-
   optional components to offer, the finish page's checkbox wording, defaults,
   grouping and order, the JAWS and NVDA boxes, the Results box, and component
   logging. Use when creating or changing a _APP__setup.iss, when a finish-page
-  box is worded, ticked or ordered wrongly, when a component is detected wrongly
+  box is worded, marked or ordered wrongly, when a component is detected wrongly
   or reinstalled needlessly, or when an install script misbehaves.
 ---
 
@@ -62,7 +62,7 @@ put the screen reader support in place, and start the app.
 ## The finish page
 
 Read [references/FinishPage.md](references/FinishPage.md) before writing or
-changing any finish-page box: the ticked and unticked rule, the order (Install,
+changing any finish-page box: the marked and unmarked rule, the order (Install,
 Update, Reinstall; screen readers first, JAWS then NVDA; then Launch and the
 guide), the wording, the Results box, and the logging. In short: pressing
 Enter on the finish page must install what is missing, update what is stale,
@@ -77,8 +77,8 @@ outcome functions, and Ollama models.
 
 ## The Results box and Launch
 
-One line per ticked box, the install location first and the logs folder last,
-nothing else; an Update says whether it happened. Launch is ticked, leaves a
+One line per marked box, the install location first and the logs folder last,
+nothing else; an Update says whether it happened. Launch is marked, leaves a
 marker, and starts the app as the person once the Results box is closed.
 FinishPage.md has the details, and components.md the failures that looked
 like success.
@@ -87,7 +87,7 @@ like success.
 
 After a change, build, then install on the machine and read two logs: the
 setup log (`<App>-setup-<stamp>.log`), whose `Component <name>:` lines give
-each verdict, and the Results box, which must name only what was ticked. A box
+each verdict, and the Results box, which must name only what was marked. A box
 offered for something already current as Install, or a component the Results
 box calls missing that the setup log found, points at detection; see
 components.md.

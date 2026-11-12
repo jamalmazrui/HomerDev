@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.205.0 -- 11 November 2026
+
+- **Marked, not ticked.** A checkbox is marked or unmarked, the word Homer already uses for records and files: in the spoken hint for every checkbox and checked list box ("Space marks or unmarks it"), in every installer's finish-page wording and comments, in error messages that say which box to mark, in the install scripts, the book tools, the skills and the help.
+- **auditTree no longer stops at a folder it may not read.** Its first run, from C:\\HomerDev at the top of drive C, ended on C:\\Config.Msi with "Access is denied". It now audits only Homer projects -- those Projects.inix names, the four known by role, and folders with build_release.bat, RepoFiles.txt or LocalFiles.txt -- skips and logs a folder it cannot read, and always writes its report. kind.py reads an unreadable folder as one with no documents.
+- **connectAI lists two tools without a comma:** "Claude Code and Gemini CLI", as three or more keep theirs.
+
 ## 1.204.0 -- 11 November 2026
 
 - **The Homer tree, defined.** help\\HomerTree.md names every folder and top-level file a Homer project may have, says what each is for, and gives the rules: one letter, one folder; no new folders unasked; subfolders free; de facto names win; one source. books, pages and work are standard folders now, with the agent folders .claude and .claude-plugin; kind.py holds the same lists, one base list for every kind.
@@ -523,7 +529,7 @@ Lessons from the Quill family of accessible apps, whose guides, requirements and
 
 ## 1.97.1 -- 2 November 2026
 
-- **The installer notices an NVDA add-on whose code changed at the same version.** The finish page judged the add-on by manifest version alone, so an add-on with new code at the same version -- DbDo's, whose build copies the kit's keys.py in every time -- was offered as Reinstall, unticked, and a stale add-on stayed installed. When the versions match, installScreenReaderSupport now compares the add-on's files with the installed ones, names and bytes, leaving out the Python caches NVDA writes, the same way it has always fingerprinted the JAWS sources. A difference is an Update, ticked. The JAWS side needed no change: its fingerprint was already of the sources inside the zip, so repacking it on every build changes nothing.
+- **The installer notices an NVDA add-on whose code changed at the same version.** The finish page judged the add-on by manifest version alone, so an add-on with new code at the same version -- DbDo's, whose build copies the kit's keys.py in every time -- was offered as Reinstall, unmarked, and a stale add-on stayed installed. When the versions match, installScreenReaderSupport now compares the add-on's files with the installed ones, names and bytes, leaving out the Python caches NVDA writes, the same way it has always fingerprinted the JAWS sources. A difference is an Update, marked. The JAWS side needed no change: its fingerprint was already of the sources inside the zip, so repacking it on every build changes nothing.
 
 ## 1.97.0 -- 2 November 2026
 
@@ -585,7 +591,7 @@ From an audit by another AI of twelve Homer repositories; each fix keeps the int
 
 From MyBooks' kdpSubmit run of 26 October: 8 of 20 books submitted, 3 rightly left while KDP reviewed an earlier submission, and 9 stopped on the Content tab.
 
-- **Every accuracy box is ticked** (kdpSubmit version 45). After a new upload KDP shows two "I confirm that my answers are accurate" boxes, and only the first was ticked, so Save and Continue was refused with "Confirm your answers are accurate and check the box". confirmAnswers, written for this on 4 October, ticks every unticked one, and had never been called; it now runs in the Content tab and again before Save and Continue there.
+- **Every accuracy box is marked** (kdpSubmit version 45). After a new upload KDP shows two "I confirm that my answers are accurate" boxes, and only the first was marked, so Save and Continue was refused with "Confirm your answers are accurate and check the box". confirmAnswers, written for this on 4 October, ticks every unmarked one, and had never been called; it now runs in the Content tab and again before Save and Continue there.
 - **The keyboard focus stays in the page,** not Edge's address bar, where it sat through long waits; pressing F5 there reloaded KDP under the script.
 - **A long upload is never silent:** a line every 30 seconds says the manuscript is still processing.
 - **A window touched by hand is explained.** Pressing Save and Continue or F5 while the script works pulls the page out from under it; the run now says so plainly, notes the draft is saved, and asks the author, when Edge opens, to leave the window alone while a book runs.
@@ -819,7 +825,7 @@ Learnings from GLOW, the American Council of the Blind's Guided Layout & Output 
 
 ## 1.85.0 -- 20 October 2026
 
-- **/default installs as Enter on every screen would, with nothing to press,** in every Homer installer: `/default`, `/defaults`, `-d` or `--default`, in any case. Setup started with screens starts itself again silently with the same switches -- a progress window, every default taken, each default-ticked finish-page entry run, the Results box logged -- closing a running copy of the program first, which is the likeliest reason the first such restart failed on DbDo on 13 October. The second copy writes its own log in %TEMP%, named in the first's. In HomerComponents.iss, so every installer gains it at its next build. FinishPage.md says how.
+- **/default installs as Enter on every screen would, with nothing to press,** in every Homer installer: `/default`, `/defaults`, `-d` or `--default`, in any case. Setup started with screens starts itself again silently with the same switches -- a progress window, every default taken, each default-marked finish-page entry run, the Results box logged -- closing a running copy of the program first, which is the likeliest reason the first such restart failed on DbDo on 13 October. The second copy writes its own log in %TEMP%, named in the first's. In HomerComponents.iss, so every installer gains it at its next build. FinishPage.md says how.
 - **Correction:** the kit build does not compile an app made by newHomerApp; the logs that suggested it came from a test outside the build. A build self-test that does is queued.
 
 ## 1.84.1 -- 20 October 2026
@@ -915,7 +921,7 @@ Learned from BatCon, an app another AI (ChatGPT) built from the kit's documents 
 
 ## 1.77.7 -- 19 October 2026
 
-- **An installer says "current" when winget says so.** winget's list fills its Available column only when an upgrade exists, so a component it lists with that column empty is the newest it knows. HomerComponents.iss logged each such component as "no newer version could be looked up": 17 of 19 in Jamal's setup log of 19 October, though ImageMagick, offered as an Update the day before, showed the comparison works. They are now logged "found, current (version is the newest)". The boxes were already right: Reinstall, unticked.
+- **An installer says "current" when winget says so.** winget's list fills its Available column only when an upgrade exists, so a component it lists with that column empty is the newest it knows. HomerComponents.iss logged each such component as "no newer version could be looked up": 17 of 19 in Jamal's setup log of 19 October, though ImageMagick, offered as an Update the day before, showed the comparison works. They are now logged "found, current (version is the newest)". The boxes were already right: Reinstall, unmarked.
 
 ## 1.77.6 -- 19 October 2026
 
@@ -1098,7 +1104,7 @@ Learned from BatCon, an app another AI (ChatGPT) built from the kit's documents 
 
 ## 1.72.56 -- 15 October 2026
 
-- **A component found outside winget has its version read.** winget lists only what it installed. DbDo's installer found mpv by its file under Program Files and stopped there, so its log said the version "could not be read," and its box could only ever say Reinstall. HomerComponents.iss now asks the program found for its version, compares that with the newest release winget offers, and offers Update, ticked, when it is older. Two numbers that cannot be compared, such as a dated build against a numbered release, stay Reinstall, and the setup log says why.
+- **A component found outside winget has its version read.** winget lists only what it installed. DbDo's installer found mpv by its file under Program Files and stopped there, so its log said the version "could not be read," and its box could only ever say Reinstall. HomerComponents.iss now asks the program found for its version, compares that with the newest release winget offers, and offers Update, marked, when it is older. Two numbers that cannot be compared, such as a dated build against a numbered release, stay Reinstall, and the setup log says why.
 - **Updating a copy winget did not install now works.** winget upgrade answers such a copy with "no installed package found." installCommon's wingetUpgrade then installs the newest release in its default machine-wide folder, and reports the result like any other.
 
 ## 1.72.55 -- 15 October 2026
@@ -1125,7 +1131,7 @@ Learned from BatCon, an app another AI (ChatGPT) built from the kit's documents 
 
 ## 1.72.51 -- 14 October 2026
 
-- **setup /defaults takes the defaults, with one Enter.** Given alone, /defaults left the whole wizard showing, so "homerdev_setup /defaults" asked every question. Inno decides before any code runs whether a run is silent, so code cannot make it silent; but it can skip pages, and with /defaults every page Inno allows to be skipped now is, each keeping its default. The finish page stays, with its default boxes ticked, and Enter finishes. For no screens at all, /verysilent /defaults, as before. This is in the shared HomerComponents.iss, so every Homer installer has it (from an audit by another AI, HomerDev-11).
+- **setup /defaults takes the defaults, with one Enter.** Given alone, /defaults left the whole wizard showing, so "homerdev_setup /defaults" asked every question. Inno decides before any code runs whether a run is silent, so code cannot make it silent; but it can skip pages, and with /defaults every page Inno allows to be skipped now is, each keeping its default. The finish page stays, with its default boxes marked, and Enter finishes. For no screens at all, /verysilent /defaults, as before. This is in the shared HomerComponents.iss, so every Homer installer has it (from an audit by another AI, HomerDev-11).
 - **help\AnnounceStandard.md announces the standardization:** ten apps on one tested foundation, written to be pasted unchanged into Facebook, LinkedIn and email lists, at grade 7.5 and under 2,300 characters, with one address.
 - **help\AuditResponse.md answers the audit of 14 October midday:** HomerScribe-11, HomerDev-11 and MyBooks-07.
 
@@ -1263,13 +1269,13 @@ From ChatGPT's first audit of MyBooks.
 
 From another round of ChatGPT's audit, four of whose findings were in the review's own list, unanswered.
 
-- **Setup says "current" only when it compared.** mpv, Whisper, Ace by DAISY and EPUBCheck were logged "found, current; offered as Reinstall" with no version read. Reinstall, unticked, is still the offer; the log now says the version could not be read and whether a newer one exists is unknown, or that no newer version could be looked up, and "current" only beside the newest version it was compared with.
+- **Setup says "current" only when it compared.** mpv, Whisper, Ace by DAISY and EPUBCheck were logged "found, current; offered as Reinstall" with no version read. Reinstall, unmarked, is still the offer; the log now says the version could not be read and whether a newer one exists is unknown, or that no newer version could be looked up, and "current" only beside the newest version it was compared with.
 - **The HomerDev dialog knows its version.** It was compiled without one, so its log began "version=0.0.0.0" while a later line said 1.72.27. The kit's version.txt is now compiled in, and part of what decides whether the dialog is built again.
 - **The review leads with what matters, and catches three more kinds of finding.** Contradictions come first, skips next, the long caution list last. New rules flag a component called current with no version, a version of 0.0.0.0, and one app named at two versions in one batch, as a stale results file is. Run again on the same logs, it put all four findings at the top. The build-release skill adds: a narrow question does not excuse the review; answer it, then report the rest.
 
 ## 1.72.28 -- 13 October 2026
 
-- **Every default, with no screens: /verysilent /defaults.** Inno Setup decides whether to show screens from the command line, before any installer code runs, so /defaults alone used to start setup again with /verysilent added. On 13 October 2026 that start failed on DbDo with no reason given, and HomerDev's and HomerScribe's installers never tried it, so all three showed every screen. The restart is gone, and with it any need to press buttons for the user. /defaults now goes beside a silent switch, which is the installer's own decision to show no screens: /verysilent /defaults installs, runs each finish-page entry ticked by default, logs the Results box and launches the program; /silent /defaults shows a progress window. /defaults alone changes nothing, and the log says to add /verysilent. Switches are read in any case. HomerDev's own installer now honours /defaults: its 55 finish-page entries say Check: homerFinishRuns in place of skipifsilent. The guide's FinishPage.md says all this.
+- **Every default, with no screens: /verysilent /defaults.** Inno Setup decides whether to show screens from the command line, before any installer code runs, so /defaults alone used to start setup again with /verysilent added. On 13 October 2026 that start failed on DbDo with no reason given, and HomerDev's and HomerScribe's installers never tried it, so all three showed every screen. The restart is gone, and with it any need to press buttons for the user. /defaults now goes beside a silent switch, which is the installer's own decision to show no screens: /verysilent /defaults installs, runs each finish-page entry marked by default, logs the Results box and launches the program; /silent /defaults shows a progress window. /defaults alone changes nothing, and the log says to add /verysilent. Switches are read in any case. HomerDev's own installer now honours /defaults: its 55 finish-page entries say Check: homerFinishRuns in place of skipifsilent. The guide's FinishPage.md says all this.
 
 ## 1.72.27 -- 13 October 2026
 
@@ -1360,7 +1366,7 @@ From a ChatGPT audit of the kit, DbDo and HomerScribe, each finding checked agai
 
 ## 1.72.12 -- 12 October 2026
 
-- **Every Homer installer takes /DEFAULTS:** what pressing Enter at every step would do -- install, run each finish-page entry ticked by default (Install and Update, not Reinstall, not the user guide), take the Results box as read, and launch the program when Launch is ticked. Alone, it starts setup again very silently with the same parameters, so one switch is enough. The pieces are in Templates\\HomerComponents.iss: homerDefaults, homerFinishRuns, which each finish-page entry's Check now includes in place of skipifsilent, and homerStartForDefaults, called first in InitializeSetup. help\\FinishPage.md explains it.
+- **Every Homer installer takes /DEFAULTS:** what pressing Enter at every step would do -- install, run each finish-page entry marked by default (Install and Update, not Reinstall, not the user guide), take the Results box as read, and launch the program when Launch is marked. Alone, it starts setup again very silently with the same parameters, so one switch is enough. The pieces are in Templates\\HomerComponents.iss: homerDefaults, homerFinishRuns, which each finish-page entry's Check now includes in place of skipifsilent, and homerStartForDefaults, called first in InitializeSetup. help\\FinishPage.md explains it.
 - **A silent install no longer waits on a box nobody can see.** homerResultsBox drew the Results box with Windows' own MessageBox, which /SUPPRESSMSGBOXES does not reach, so a /VERYSILENT install of any app built from the template stopped at an invisible OK. Silent, the results now go to the setup log.
 
 ## 1.72.11 -- 12 October 2026
@@ -1608,7 +1614,7 @@ Four high findings from an audit of the kit by another AI, each fixed with the a
 ## 1.65.21 -- 10 October 2026
 
 - **One installer pattern, checked on every build.** Every Homer installer was meant to share one Finish page -- the verb (Install, Update, Reinstall) and tick of each box decided by the kit, so pressing Enter installs what is missing, updates what is stale and starts the app -- and to reuse the folder of an earlier install. The rule lived only in the homer-installer skill, and three apps kept code of their own: DbDo judged its JAWS scripts by DbDo's version, so every new installer said Update; EdSharp did not include HomerComponents.iss and asked for the folder on every reinstall; HomerView, like DbDo, kept its own wrappers behind HomerReaderWrappersInApp. check now has an installer check that fails any departure, naming each: no HomerComponents.iss, a folder not remembered (UsePreviousAppDir, DisableDirPage=auto, a fixed AppId), its own screen reader state, wrappers or version stamp, or no Install box for the JAWS scripts. Tested both ways: it fails the old DbDo, EdSharp and HomerView installers and passes the corrected ones, FileDir, HomerScribe, bookFido, 2htm, extCheck, urlCheck and urlFido.
-- **An app's own screen reader script, asked the kit's way.** HomerComponents.iss asks the script HomerReaderScript names, by default installScreenReaderSupport.cmd; an app whose support needs more, as HomerView's chaining does, names its own, which answers the kit's question, "state jaws <file>". The verbs and ticks come from the kit's one function in every installer.
+- **An app's own screen reader script, asked the kit's way.** HomerComponents.iss asks the script HomerReaderScript names, by default installScreenReaderSupport.cmd; an app whose support needs more, as HomerView's chaining does, names its own, which answers the kit's question, "state jaws <file>". The verbs and marks come from the kit's one function in every installer.
 - **homer-installer states the pattern and the check;** components.md says the kit supplies the screen reader wrappers and how HomerReaderScript works.
 
 ## 1.65.20 -- 10 October 2026
@@ -2710,11 +2716,11 @@ installOllama (DbDo, FileDir, HomerScribe) take it at their next build.
 ## 1.43.51 -- 30 September 2026
 
 **check enforces the finish page.** EdSharp's installer, called migrated, still
-left its Git, Node.js, Ollama and model boxes unticked, Install and Update
-alike, and DbDo's left Ollama unticked, offered its model with no verb, and
+left its Git, Node.js, Ollama and model boxes unmarked, Install and Update
+alike, and DbDo's left Ollama unmarked, offered its model with no verb, and
 opened its NVDA add-on, which starts NVDA. The new "finish" check reads the
-installer the build compiles and fails: an Install or Update box not ticked, a
-Reinstall box ticked, an unticked Launch box, a component box without Install,
+installer the build compiles and fails: an Install or Update box not marked, a
+Reinstall box marked, an unmarked Launch box, a component box without Install,
 Update or Reinstall, a box that starts NVDA, and a label saying NVDA must be
 running. Run on the apps, it finds those two and passes the rest.
 
@@ -2779,9 +2785,9 @@ log's first line says why.
 
 **The skills learn from EdSharp's and HomerView's installers.** FinishPage.md
 (which homer-installer carries) now says what the Results box holds -- the
-install location first, the logs folder last, one line per ticked box, an
+install location first, the logs folder last, one line per marked box, an
 Update that says whether it happened, one blank line at most -- and how Launch
-works: ticked, a marker, the app started as the person once the box is closed.
+works: marked, a marker, the app started as the person once the box is closed.
 homer-installer's components reference gains "Failures that looked like
 success": the winget update limited to machine scope that never updated, the
 support folder that only grew until stale scripts reached every JAWS
@@ -2828,8 +2834,8 @@ add-on". The state check reads the pending copy's manifest too.
 ## 1.43.43 -- 29 September 2026
 
 **The JAWS scripts and the NVDA add-on are components like any other.** Their
-boxes say Install, Update or Reinstall by what is on the computer, ticked for
-Install and Update and unticked for Reinstall, and they are no longer placed
+boxes say Install, Update or Reinstall by what is on the computer, marked for
+Install and Update and unmarked for Reinstall, and they are no longer placed
 first: each group -- Install, Update, Reinstall -- is in alphabetical order by
 component name, ignoring case, with Launch and the user guide still last.
 
@@ -2853,7 +2859,7 @@ startIfAsked started it with Exec through cmd, which still runs it with the
 installer's elevated rights; it now uses ExecAsOriginalUser, so the program
 runs as it will every other time. Each app's installer gets the change when
 it is next migrated; homer-migrate's checklist gains the item, with EdSharp's
-case: its Launch box was unticked, so pressing Enter on its finish page
+case: its Launch box was unmarked, so pressing Enter on its finish page
 installed EdSharp and never opened it.
 
 ## 1.43.41 -- 29 September 2026
@@ -3174,8 +3180,8 @@ Results box's title and the logged verdicts.
 
 **One order for the boxes: Install, Update, Reinstall.** FinishPage.md said so
 in one section and "Install, Reinstall, Update" in another, and homerGroup
-followed the second. The ticked boxes now come first everywhere, then the
-unticked ones, so homerOrder, which the Results box lists by, matches the page.
+followed the second. The marked boxes now come first everywhere, then the
+unmarked ones, so homerOrder, which the Results box lists by, matches the page.
 
 ## 1.43.24 -- 28 September 2026
 
@@ -3333,7 +3339,7 @@ From reinstalling all ten apps:
   shows the same OK box through Windows' MessageBox, with the title.
 - **Every component verdict is logged**: what was found and whether its box
   offers Install, Update or Reinstall. Before, only EdSharp and DbDo, with
-  their own probes, recorded why a box was ticked.
+  their own probes, recorded why a box was marked.
 - **Finish page wording** is written down in HomerDev.md, and the template's
   Launch and guide boxes follow it.
 
@@ -3661,7 +3667,7 @@ it at the top still works. A new define, AppLaunchParams, is what the program
 is started with after the Results box, as its desktop shortcut starts it.
 
 **urlCheck's installer follows the template's pattern whole**: the component
-table included from the kit the build names, the ticked boxes noted when Finish
+table included from the kit the build names, the marked boxes noted when Finish
 is pressed, the Results box, then the launch -- with no components registered,
 since urlCheck needs none.
 
@@ -4071,9 +4077,9 @@ carries the short form.
 Two patterns every Homer app is to follow, asked for on this date.
 
 THE ORDER OF THE FINISH-PAGE BOXES: Install (screen reader scripts first,
-then components alphabetically), ticked; Update, ticked, alphabetical;
-Reinstall, unticked, alphabetical; Launch, ticked; Open the user guide,
-unticked. Done with three [Run] entries per component, one per verb, using
+then components alphabetically), marked; Update, marked, alphabetical;
+Reinstall, unmarked, alphabetical; Launch, marked; Open the user guide,
+unmarked. Done with three [Run] entries per component, one per verb, using
 the new homerIs(i, state) and homerModelIs(model, present) checks; Inno's
 script order and Check: do the grouping. FinishPage.md states the rule.
 Templates\_APP__setup.iss is rewritten to it -- it includes
@@ -4107,11 +4113,11 @@ Help first, Enter in HomerScribe's source paths field opened Help.
 
 ## 1.30.0 -- 25 September 2026
 
-The Results box after an install reports only the boxes that were ticked,
-from a probe made after the scripts ran: homerNoteTicked records the ticked
+The Results box after an install reports only the boxes that were marked,
+from a probe made after the scripts ran: homerNoteTicked records the marked
 captions when Finish is pressed (from NextButtonClick at wpFinished);
 homerOutcomeLine and homerModelOutcomeLine each return a past-tense line for
-a ticked box and nothing for one that was not. Until now the box recited
+a marked box and nothing for one that was not. Until now the box recited
 every component from the probe made when the wizard opened -- so a minute
 after Whisper was installed and Ollama updated, it said neither had
 happened, and it listed three components nobody had asked about.
@@ -4159,7 +4165,7 @@ script belongs to, worked out by climbing out of scripts, tools or exec,
 rather than surveying whatever the current directory was.
 
 Two documents: FinishPage.md, the rule for what a finish-page checkbox says
-and whether it starts ticked; Logging.md, where logs go and what they open
+and whether it starts marked; Logging.md, where logs go and what they open
 with.
 
 ## 1.27.0 -- 23 September 2026
@@ -4389,7 +4395,7 @@ The guide also now states what was previously only in the template: the last
 checkbox runs `homerFinish.cmd` rather than the program, because Inno runs the
 entries in order and a program started last puts its window over whatever the
 other entries were still saying. And it says what the Results box should hold:
-the program and where it is, one line per ticked checkbox, and the log's
+the program and where it is, one line per marked checkbox, and the log's
 location. Nothing about a step that did not run.
 
 

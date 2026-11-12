@@ -285,7 +285,8 @@ def main(lsArgs):
         return 0
     lsConnected = [s for s in dFailed if dFailed[s] == 0]
     lsPartly = ["%s (%d skill link%s failed)" % (s, dFailed[s], "" if dFailed[s] == 1 else "s") for s in dFailed if dFailed[s]]
-    def listed(ls): return ls[0] if len(ls) == 1 else ", ".join(ls[:-1]) + ", and " + ls[-1]
+    # "A and B" for two, "A, B, and C" for three or more (1.205.0): two names took a comma, "Claude Code, and Gemini CLI".
+    def listed(ls): return ls[0] if len(ls) == 1 else (" and ".join(ls) if len(ls) == 2 else ", ".join(ls[:-1]) + ", and " + ls[-1])
     # "Claude Code, and Gemini CLI with Antigravity": a comma before the last name, so a name with its own "with" reads
     # as one item (1.72.1; it read "Claude Code and Gemini CLI and Antigravity").
     sResult = ("AI tools connected to the kit: %s." % listed(lsConnected)) if lsConnected else ""

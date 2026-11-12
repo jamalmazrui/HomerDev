@@ -269,7 +269,7 @@ public static string transcribe(string sWav, int iTimeoutMs, out string sError) 
     string sProgram = whisperProgram();
     string sModel = whisperModel();
     if (sProgram.Length == 0) { sError = "Whisper is not installed; HomerDev's setup program offers it"; return ""; }
-    if (sModel.Length == 0) { sError = "Whisper has no speech model; run HomerDev's setup program again and leave Whisper ticked"; return ""; }
+    if (sModel.Length == 0) { sError = "Whisper has no speech model; run HomerDev's setup program again and leave Whisper marked"; return ""; }
     ProcessStartInfo oStart = new ProcessStartInfo(sProgram, "-m \"" + sModel + "\" -f \"" + sWav + "\" -nt -np -l auto");
     oStart.UseShellExecute = false;
     oStart.CreateNoWindow = true;

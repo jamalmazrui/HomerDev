@@ -580,22 +580,22 @@ finish page</h3>
 <code>HomerComponents.iss</code> gives the finish page its shape
 (details in the kit’s <code>help\FinishPage.md</code>):</p>
 <ol type="1">
-<li>Install screen reader scripts (ticked,
+<li>Install screen reader scripts (marked,
 <code>isFreshInstall</code>).</li>
-<li>Install each component alphabetically (ticked,
+<li>Install each component alphabetically (marked,
 <code>homerIs(i,0)</code>).</li>
-<li>Update each component alphabetically (ticked,
+<li>Update each component alphabetically (marked,
 <code>homerIs(i,1)</code>).</li>
-<li>Reinstall each component alphabetically (unticked,
+<li>Reinstall each component alphabetically (unmarked,
 <code>homerIs(i,2)</code>).</li>
-<li>Models: Install (ticked), Reinstall (unticked).</li>
-<li>Launch the program (ticked; deferred until after the Results
+<li>Models: Install (marked), Reinstall (unmarked).</li>
+<li>Launch the program (marked; deferred until after the Results
 box).</li>
-<li>Open the user guide (unticked).</li>
+<li>Open the user guide (unmarked).</li>
 </ol>
 <p>Script order plus <code>Check:</code> visibility does the grouping.
 The Results box reports only what actually ran that session, in the past
-tense, built from the boxes that were ticked
+tense, built from the boxes that were marked
 (<code>homerNoteTicked</code>, <code>homerOutcomeLine</code>), never
 from a probe made when the wizard opened. Install scripts live in
 <code>scripts\</code> and are run from <code>{app}\scripts</code>.</p>
@@ -611,7 +611,7 @@ exists only when the app calls <code>homerAdd</code> for it.</p>
 <li><strong>Every screen reader line has its
 <code>Check:</code>.</strong> HomerView’s JAWS line had
 <code>HaveJaws</code>; its NVDA line had nothing, so a JAWS-only machine
-was offered an NVDA add-on, ticked, and a message box then warned it
+was offered an NVDA add-on, marked, and a message box then warned it
 would fail. The message existed only to excuse the missing
 <code>Check: HaveNvda</code>.</li>
 <li><strong><code>Source:</code> lines are relative</strong>
@@ -1401,7 +1401,7 @@ to <code>scripts</code> (the first refreshed from the kit, the second
 DbDo’s own). <code>README.md</code> becomes <code>ReadMe.md</code>.</li>
 <li><strong>Installer</strong>: install scripts from
 <code>scripts\</code> to <code>{app}\scripts</code>; the three-group
-finish page and the Results box from ticked boxes; the reader scripts
+finish page and the Results box from marked boxes; the reader scripts
 (<code>DbDo_JAWS.zip</code> unpacked into <code>scripts\jaws</code>)
 installed by <code>installScreenReaderSupport.cmd</code>.</li>
 <li><strong>Walks</strong>: keep <code>help\Tutorial_NN_*.inix</code> as
@@ -1594,7 +1594,7 @@ with <code>-build</code>, then the JScript.NET compile of
 <code>FileDirScript.dll</code> and the C# compile against the kit.
 <code>FileDir_setup.iss</code> ships install scripts from
 <code>scripts\</code> to <code>{app}\scripts</code>, with the
-three-group finish page and the Results box from ticked boxes; the JAWS
+three-group finish page and the Results box from marked boxes; the JAWS
 scripts through <code>installScreenReaderSupport.cmd</code>. The guide’s
 “dirsetup.exe” is stale text: the installer is
 <code>FileDir_setup.exe</code>, which is what <code>release</code> reads
@@ -1671,7 +1671,7 @@ voices.</li>
 each thing as it is made.</li>
 <li>Homer encoding everywhere; <code>fixEncoding</code> before every
 compile; delete zero-byte files.</li>
-<li>Finish page in three groups; Results box from ticked boxes; OK
+<li>Finish page in three groups; Results box from marked boxes; OK
 listed first.</li>
 <li><code>Elevate.configure</code> for F11.</li>
 <li>Walks in <code>Tutorial_NN_*.inix</code>; four beats; name silence;

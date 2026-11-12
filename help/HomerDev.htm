@@ -387,7 +387,7 @@ see “Asking by voice” below. While it thinks, a soft tick sounds and the
 dialog says every ten seconds how long it has waited. The answer is
 added to the conversation as plain text, focus goes to where it begins,
 and the dialog says how long it took. An answer is also spoken when you
-asked by voice, or when Speak answers is ticked. Control+Period stops
+asked by voice, or when Speak answers is marked. Control+Period stops
 waiting, Control+Shift+R says the last answer again, and Control+Shift+C
 copies it – keys borrowed from The Chat Place, Kelly Ford’s accessible
 companion for Claude Code.</li>
@@ -1843,7 +1843,7 @@ entries were still saying. <code>finish.cmd</code> reads the setup log,
 shows ONE Results box, waits for it to be dismissed, and only then
 starts the program.</p>
 <p>The Results box says: that the program is installed and where; the
-disposition of each checkbox that was ticked, one line each; and where
+disposition of each checkbox that was marked, one line each; and where
 the log is. Nothing about a step that did not run, nothing the wizard
 already said, and every count matching its noun.</p>
 <h2 id="spoken-tutorials">Spoken tutorials</h2>
@@ -2395,10 +2395,10 @@ user’s.</p>
 the switch belongs inside the <code>Log</code> class – one setting, read
 once – and not as an <code>if</code> in every caller.</p>
 <h3 id="finish-page-wording">Finish page wording</h3>
-<p>What each finish-page box says, whether it starts ticked, and the
+<p>What each finish-page box says, whether it starts marked, and the
 order of the boxes are set out in <code>help\FinishPage.md</code>: the
 verb first, a short use in parentheses, a box each for JAWS and NVDA, no
-word the tick already says, the ticked boxes before the unticked ones,
+word the tick already says, the marked boxes before the unmarked ones,
 and a Results box titled “<App> Setup Results”.</p>
 <h2 id="scripts-logs-and-the-release-routine">Scripts, logs, and the
 release routine</h2>
@@ -2574,8 +2574,8 @@ uses a model running on the user’s own machine, so
 <code>installOllama.cmd</code> and <code>installModels.cmd</code> are
 part of the kit and every app that can use AI ships them. The first box
 installs Ollama and the model; the second installs the model alone, for
-somebody who already runs Ollama. Tick the first by default when the
-program cannot do its main job without a model; leave it unticked when
+somebody who already runs Ollama. Mark the first by default when the
+program cannot do its main job without a model; leave it unmarked when
 the model only adds something. An app that calls no model deletes the
 two file lines and the two run lines.</li>
 <li><strong>It knows what is already installed.</strong> The

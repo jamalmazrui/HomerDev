@@ -337,17 +337,17 @@ leaves a manual fetch step. Two hard-won particulars:
 The template `_APP__setup.iss` with `HomerComponents.iss` gives the finish
 page its shape (details in the kit's `help\FinishPage.md`):
 
-1. Install screen reader scripts (ticked, `isFreshInstall`).
-2. Install each component alphabetically (ticked, `homerIs(i,0)`).
-3. Update each component alphabetically (ticked, `homerIs(i,1)`).
-4. Reinstall each component alphabetically (unticked, `homerIs(i,2)`).
-5. Models: Install (ticked), Reinstall (unticked).
-6. Launch the program (ticked; deferred until after the Results box).
-7. Open the user guide (unticked).
+1. Install screen reader scripts (marked, `isFreshInstall`).
+2. Install each component alphabetically (marked, `homerIs(i,0)`).
+3. Update each component alphabetically (marked, `homerIs(i,1)`).
+4. Reinstall each component alphabetically (unmarked, `homerIs(i,2)`).
+5. Models: Install (marked), Reinstall (unmarked).
+6. Launch the program (marked; deferred until after the Results box).
+7. Open the user guide (unmarked).
 
 Script order plus `Check:` visibility does the grouping. The Results box
 reports only what actually ran that session, in the past tense, built from
-the boxes that were ticked (`homerNoteTicked`, `homerOutcomeLine`), never
+the boxes that were marked (`homerNoteTicked`, `homerOutcomeLine`), never
 from a probe made when the wizard opened. Install scripts live in
 `scripts\` and are run from `{app}\scripts`.
 
@@ -362,7 +362,7 @@ Seven installer rules HomerView paid for, 25-26 September:
 
 - **Every screen reader line has its `Check:`.** HomerView's JAWS line had
   `HaveJaws`; its NVDA line had nothing, so a JAWS-only machine was offered
-  an NVDA add-on, ticked, and a message box then warned it would fail. The
+  an NVDA add-on, marked, and a message box then warned it would fail. The
   message existed only to excuse the missing `Check: HaveNvda`.
 - **`Source:` lines are relative** (`Source: "help\HomerView.htm"`), never
   `C:\<App>\...`. Inno resolves them against the script's folder either
@@ -1028,7 +1028,7 @@ have passed since. To bring it current:
   refreshed from the kit, the second DbDo's own). `README.md` becomes
   `ReadMe.md`.
 - **Installer**: install scripts from `scripts\` to `{app}\scripts`; the
-  three-group finish page and the Results box from ticked boxes; the
+  three-group finish page and the Results box from marked boxes; the
   reader scripts (`DbDo_JAWS.zip` unpacked into `scripts\jaws`) installed by
   `installScreenReaderSupport.cmd`.
 - **Walks**: keep `help\Tutorial_NN_*.inix` as the source of every
@@ -1159,7 +1159,7 @@ inputs). Follow the ten steps, with these particulars:
   tutorial call with `-build`, then the JScript.NET compile of
   `FileDirScript.dll` and the C# compile against the kit. `FileDir_setup.iss`
   ships install scripts from `scripts\` to `{app}\scripts`, with the
-  three-group finish page and the Results box from ticked boxes; the JAWS
+  three-group finish page and the Results box from marked boxes; the JAWS
   scripts through `installScreenReaderSupport.cmd`. The guide's
   "dirsetup.exe" is stale text: the installer is `FileDir_setup.exe`, which
   is what `release` reads the version from. The desktop shortcut's
@@ -1212,7 +1212,7 @@ are the fullest current examples of everything above, and its
 - The build fetches what it needs; only the kit's build fetches the voices.
 - One log per run in `logs`; a succinct console that names each thing as it is made.
 - Homer encoding everywhere; `fixEncoding` before every compile; delete zero-byte files.
-- Finish page in three groups; Results box from ticked boxes; OK listed first.
+- Finish page in three groups; Results box from marked boxes; OK listed first.
 - `Elevate.configure` for F11.
 - Walks in `Tutorial_NN_*.inix`; four beats; name silence; name no screen reader; `checkTutorial` first.
 - `check` decides whether `release` may release.

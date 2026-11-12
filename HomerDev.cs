@@ -411,7 +411,7 @@ private static string kitContext()
 // conversation: Claude Code's is named with --session-id at the first question and continued with --resume.
 //
 // ASKED BY VOICE, ANSWERED BY VOICE. An answer is always written into the conversation box; it is also spoken when
-// the question was asked by voice and sent as heard, or when Speak answers is ticked.
+// the question was asked by voice and sent as heard, or when Speak answers is marked.
 //
 // KEYS, after The Chat Place's (Kelly Ford's accessible companion for Claude Code): Control+Period stops waiting,
 // Control+Shift+R says the last answer again, Control+Shift+C copies it. Enter sends, as before.
@@ -523,7 +523,7 @@ private static bool runChat(IWin32Window owner)
     Log.keyValue("Claude Code", sClaude.Length > 0 ? sClaude : "(not installed)");
     if (sModel.Length == 0 && sClaude.Length == 0)
     {
-        MessageBox.Show(owner, "No AI is ready to answer: Ollama is not running or has no model, and Claude Code is not installed. HomerDev's setup program offers Ollama and a model; run it again and leave those boxes ticked.", sAppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        MessageBox.Show(owner, "No AI is ready to answer: Ollama is not running or has no model, and Claude Code is not installed. HomerDev's setup program offers Ollama and a model; run it again and leave those boxes marked.", sAppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
         return false;
     }
     if (sModel.Length > 0) { sContext = kitContext(); Log.keyValue("Chat context characters", "" + sContext.Length); }
@@ -702,7 +702,7 @@ private static bool runChat(IWin32Window owner)
             if (oRecorder != null) { fnFinish(); return; }
             if (Voice.whisperProgram().Length == 0 || Voice.whisperModel().Length == 0)
             {
-                MessageBox.Show(dlg.form, "Asking by voice needs Whisper, which turns speech into text on this computer. HomerDev's setup program offers it: run it again and leave Whisper ticked.", sAppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(dlg.form, "Asking by voice needs Whisper, which turns speech into text on this computer. HomerDev's setup program offers it: run it again and leave Whisper marked.", sAppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
             oRecorder = new VoiceRecorder();

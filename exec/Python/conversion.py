@@ -1426,7 +1426,7 @@ def transcribeTo(sSource, sOut, sTo, sDir):
     if not sFfmpeg: raise RuntimeError("ffmpeg is not installed, and it is what takes the sound out for Whisper")
     sProgram, sModel = whisperProgram(), whisperModel()
     if not sProgram: raise RuntimeError("Whisper is not installed; HomerDev's setup program offers it")
-    if not sModel: raise RuntimeError("Whisper has no speech model; run HomerDev's setup program again and leave Whisper ticked")
+    if not sModel: raise RuntimeError("Whisper has no speech model; run HomerDev's setup program again and leave Whisper marked")
     sWav = os.path.join(sDir, "sound.wav")
     runTool([sFfmpeg, "-nostdin", "-y", "-i", sSource, "-vn", "-ar", "16000", "-ac", "1", "-c:a", "pcm_s16le", sWav], "ffmpeg", 120)
     sText = runTool([sProgram, "-m", sModel, "-f", sWav, "-nt", "-np", "-l", "auto"], "Whisper", 360).strip()

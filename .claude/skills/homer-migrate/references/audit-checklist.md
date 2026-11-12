@@ -67,15 +67,15 @@ Each item, then in brackets what it looked like when wrong.
   script run from `scripts` was installed at the top.]
 - Offers only this app's components, worded and ordered by FinishPage.md,
   with a Results box titled "<App> Setup Results".
-- The Launch box is ticked, leaves a marker, and the program starts after the
-  Results box is closed, with `ExecAsOriginalUser`. [EdSharp's was unticked,
+- The Launch box is marked, leaves a marker, and the program starts after the
+  Results box is closed, with `ExecAsOriginalUser`. [EdSharp's was unmarked,
   so Enter installed it and never opened it; the template's used Exec, which
   starts the program elevated.]
 - The JAWS scripts and NVDA add-on are judged like components (Install,
   Update, Reinstall from a fingerprint and a manifest version), sorted
   alphabetically in their group, and the add-on is installed without starting
   NVDA. [EdSharp and HomerView always said "Install"; NVDA started over JAWS.]
-- The Results box reports only ticked boxes, between the install location and
+- The Results box reports only marked boxes, between the install location and
   the logs folder. [EdSharp's listed every component and key hints.]
 - A folder the installer fills from a wildcard is cleared first with
   [InstallDelete]. [Stale scripts copied into every JAWS settings folder.]

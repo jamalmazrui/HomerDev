@@ -31,7 +31,7 @@ for /f "delims=" %%O in ('where ollama 2^>nul') do if not defined sOllama set "s
 if not defined sOllama if exist "%LOCALAPPDATA%\Programs\Ollama\ollama.exe" set "sOllama=%LOCALAPPDATA%\Programs\Ollama\ollama.exe"
 call "%~dp0installCommon.cmd" log "Ollama: !sOllama!; models wanted:!sModels!"
 if not defined sOllama (
-  echo Ollama is not installed, so no model can be fetched. Tick Ollama on the finish page, or run installOllama.
+  echo Ollama is not installed, so no model can be fetched. Mark Ollama on the finish page, or run installOllama.
   goto :failed
 )
 set "iFailed=0"

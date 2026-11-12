@@ -150,12 +150,12 @@ Type: files; Name: "{localappdata}\HomerDev\connectAI-result.txt"
 FileName: "{app}\scripts\connectAI.cmd"; WorkingDir: "{app}\scripts"; StatusMsg: "Connecting the AI tools to the kit..."; Flags: runhidden waituntilterminated runasoriginaluser skipifdoesntexist
 
 ; FINISH-PAGE ORDER, a HomerDev rule (25 September 2026):
-;   1. Install entries, ticked -- screen reader scripts first, then components
+;   1. Install entries, marked -- screen reader scripts first, then components
 ;      in alphabetical order.
-;   2. Update entries, ticked, alphabetical.
-;   3. Reinstall entries, UNTICKED, alphabetical.
-;   4. Launch, ticked.
-;   5. Open the user guide, unticked.
+;   2. Update entries, marked, alphabetical.
+;   3. Reinstall entries, UNMARKED, alphabetical.
+;   4. Launch, marked.
+;   5. Open the user guide, unmarked.
 ; Inno shows [Run] entries in script order and Check: hides the ones that do not
 ; apply, so three entries per component -- one per verb, each with its own
 ; Check: from Templates\HomerComponents.iss -- group the page by themselves.
@@ -170,7 +170,7 @@ FileName: "{app}\scripts\connectAI.cmd"; WorkingDir: "{app}\scripts"; StatusMsg:
 ; Scripts run DIRECTLY, with "noPause" as their argument -- never through a cmd
 ; wrapper with a "set X=1 &&" prefix, which cmd /s cannot quote correctly.
 
-; ---- 1. Install, ticked --------------------------------------------------------
+; ---- 1. Install, marked --------------------------------------------------------
 ; Alphabetical by name; each worded Install, Update or Reinstall by its state (help\FinishPage.md).
 FileName: "{app}\scripts\installAce.cmd"; \
   Parameters: "noPause"; \
@@ -319,7 +319,7 @@ FileName: "{app}\scripts\installModels.cmd"; \
   Check: homerFinishRuns and isModelInstall; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
-; ---- 2. Update, ticked ---------------------------------------------------------
+; ---- 2. Update, marked ---------------------------------------------------------
 FileName: "{app}\scripts\installAce.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
@@ -460,7 +460,7 @@ FileName: "{app}\scripts\installYtDlp.cmd"; \
   Check: homerFinishRuns and isUpdateYtDlp; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
-; ---- 3. Reinstall, unticked -----------------------------------------------------
+; ---- 3. Reinstall, unmarked -----------------------------------------------------
 FileName: "{app}\scripts\installAce.cmd"; \
   Parameters: "noPause"; \
   WorkingDir: "{app}\scripts"; \
@@ -608,7 +608,7 @@ FileName: "{app}\scripts\installModels.cmd"; \
   Check: homerFinishRuns and isModelReinstall; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
-; ---- 4. Launch, ticked --------------------------------------------------------
+; ---- 4. Launch, marked --------------------------------------------------------
 ; The entry only leaves a marker. The program starts from CurStepChanged(ssDone),
 ; AFTER the Results box has been read and closed -- so the box is not hidden
 ; behind the program's own window. Inno runs postinstall entries before ssDone.
@@ -619,7 +619,7 @@ FileName: "{cmd}"; \
   Description: "Launch {#AppName} (desktop hotkey {#HotKeyDisplay})"; \
   Flags: postinstall runhidden runasoriginaluser; Check: homerFinishRuns
 
-; ---- 5. Open the user guide, unticked -----------------------------------------
+; ---- 5. Open the user guide, unmarked -----------------------------------------
 FileName: "{app}\help\HomerDev.htm"; \
   Description: "Open the user guide (F1 in {#AppName})"; \
   Flags: postinstall shellexec nowait skipifdoesntexist runasoriginaluser unchecked; Check: homerFinishRuns
@@ -639,9 +639,9 @@ Type: filesandordirs; Name: "{localappdata}\{#AppName}\logs"
 //      file, then the exe, then the registry) and words every checkbox;
 //    - reads the version of any previous install, so the screen reader
 //      script entries say Install or Update truthfully;
-//    - records which boxes were ticked when Finish is pressed, and after
+//    - records which boxes were marked when Finish is pressed, and after
 //      the scripts have run, reports what happened to each of THOSE -- one
-//      past-tense line per ticked box, nothing about the rest;
+//      past-tense line per marked box, nothing about the rest;
 //    - keeps the setup log with the program's own logs;
 //    - starts the program only after the Results box has been closed.
 //
@@ -883,7 +883,7 @@ begin
   Result := not RegQueryStringValue(HKLM, 'SYSTEM\CurrentControlSet\Control\Session Manager\Environment', 'HomerDev', sValue) or (Trim(sValue) = '');
 end;
 
-//  ---- the Results box: one line per ticked box, probed after the scripts ran
+//  ---- the Results box: one line per marked box, probed after the scripts ran
 procedure addAction(sText: String);
 begin
   if sText = '' then exit;

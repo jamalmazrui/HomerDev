@@ -14,7 +14,7 @@ exec/conversions.inix
 # that carries the NVDA release number and dies every few months, so the kit carries it, as EdSharp does, and an
 # app's build copies it from here (FileDir does) rather than fetching or keeping a copy of its own.
 exec/nvdaControllerClient.dll
-Templates/
+templates/
 # The suite contract's data (1.73.0): the command manifest and key ownership, read by scripts/checkKeys.
 data/
 

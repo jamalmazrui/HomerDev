@@ -16,12 +16,12 @@ Key=Enter
 Hear=Install Ollama 0.40.3 (runs the local AI model), check box, checked
 
 [step]
-Say=The finish page offers every tool any Homer program uses, each worded by what this computer already has: Install when it is missing, Update when it is old, Reinstall, unticked, when it is current. So Enter alone installs what is missing and updates what is old. Down Arrow hears each box.
+Say=The finish page offers every tool any Homer program uses, each worded by what this computer already has: Install when it is missing, Update when it is old, Reinstall, unmarked, when it is current. So Enter alone installs what is missing and updates what is old. Down Arrow hears each box.
 Key=Down
 Hear=Install Pandoc 3.6 (converts documents between formats), check box, checked
 
 [step]
-Say=I press Enter on Finish. Each ticked tool installs in turn, and then one box says what happened.
+Say=I press Enter on Finish. Each marked tool installs in turn, and then one box says what happened.
 Key=Enter
 Hear=HomerDev Setup Results, dialog
 Hear=HomerDev 1.67.0 is installed. Ollama was updated from 0.40.2 to 0.40.3. Logs are kept in C colon backslash Users backslash Jamal backslash AppData backslash Local backslash HomerDev backslash logs.

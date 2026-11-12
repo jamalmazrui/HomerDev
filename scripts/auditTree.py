@@ -67,15 +67,36 @@ def auditProject(sRoot, oKind):
     return sKind, sRole, lsFindings
 
 
+lsHomerMarks = ["build_release.bat", "LocalFiles.txt", "RepoFiles.txt"]
+
+
+def registeredNames(sKit):
+    """The project names data\\Projects.inix lists, lowercased: one [section] each."""
+    sPath = os.path.join(sKit, "data", "Projects.inix")
+    if not os.path.isfile(sPath): return []
+    sText = io.open(sPath, "rb").read().decode("utf-8-sig", "replace")
+    return [s.strip().lower() for s in re.findall(r"^\[([^\]]+)\]", sText, re.M)]
+
+
 def findProjects(sKit, oKind):
-    """Folders beside the kit that are Homer projects, and the projects Projects.inix names wherever they sit there."""
+    """The Homer projects beside the kit.
+
+    ONLY HOMER PROJECTS (1.205.0). Version 1 asked kind.py about every folder beside the kit, and C:\\HomerDev sits at
+    the top of drive C, beside Windows, Program Files and the rest; its first real run stopped on C:\\Config.Msi,
+    which an account may not read. A folder is audited now when Projects.inix names it, kind.py knows its name as a
+    role (MyBooks, MyPages, AppHelpGuides, PodcastDirectories), or it carries a Homer mark: build_release.bat,
+    RepoFiles.txt or LocalFiles.txt. A folder that cannot be read is skipped and logged, never fatal."""
     sParent = os.path.dirname(sKit)
+    setNames = set(registeredNames(sKit)) | set(oKind.dRolesByName)
     lsFound = []
     for sEntry in sorted(os.listdir(sParent), key=str.lower):
         sPath = os.path.join(sParent, sEntry)
-        if not os.path.isdir(sPath) or sEntry.startswith((".", "$")): continue
-        if oKind.projectKind(sPath)[0] != "unknown" or sEntry.lower() in oKind.dRolesByName: lsFound.append(sPath)
-    return lsFound
+        try:
+            if not os.path.isdir(sPath) or sEntry.startswith((".", "$")) or os.path.normcase(sPath) == os.path.normcase(sKit): continue
+            if sEntry.lower() in setNames or any(os.path.isfile(os.path.join(sPath, s)) for s in lsHomerMarks): lsFound.append(sPath)
+        except OSError as oError:
+            log("SKIPPED %s: %s" % (sPath, oError))
+    return [sKit] + lsFound
 
 
 def main():
@@ -88,14 +109,17 @@ def main():
     sLogPath = os.path.join(sKit, "logs", "HomerDev-auditTree-%s.log" % sStamp)
     sReportPath = os.path.join(sKit, "results", "HomerDev-auditTree-%s.md" % sStamp)
     dState["fLog"] = io.open(sLogPath, "w", encoding="utf-8-sig", newline="\r\n")
-    log("auditTree.py (HomerDev 1.204.0); script %s; Python %s on %s; cwd %s; command line %s" % (
+    log("auditTree.py (HomerDev 1.205.0); script %s; Python %s on %s; cwd %s; command line %s" % (
         os.path.abspath(__file__), platform.python_version(), platform.platform(), os.getcwd(), " ".join(sys.argv)))
     lsRoots = [os.path.abspath(s) for s in sys.argv[1:]] or findProjects(sKit, oKind)
     lsLines = ["# Homer tree audit, %s" % datetime.date.today().strftime("%d %B %Y").lstrip("0"), "",
                "Each project is checked against help\\HomerTree.md. Nothing was changed.", ""]
     iTotal = 0
     for sRoot in lsRoots:
-        sKind, sRole, lsFindings = auditProject(sRoot, oKind)
+        try: sKind, sRole, lsFindings = auditProject(sRoot, oKind)
+        except OSError as oError:
+            sKind, sRole, lsFindings = "unknown", "unknown", ["Could not be read: %s." % oError]
+            log("COULD NOT READ %s: %s" % (sRoot, oError))
         iTotal += len(lsFindings)
         print("%s: %s" % (os.path.basename(sRoot), "conforms" if not lsFindings else "%d finding%s" % (len(lsFindings), "" if len(lsFindings) == 1 else "s")))
         lsLines += ["## %s" % os.path.basename(sRoot), "", "Kind %s, role %s." % (sKind, sRole), ""]

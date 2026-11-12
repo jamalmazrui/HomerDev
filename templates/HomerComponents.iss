@@ -22,9 +22,9 @@
 // about a component is written twice.
 //
 // THE THREE STATES, and what each means for the finish page:
-//   0 absent    "Install X <latest>"                TICKED
-//   1 outdated  "Update X from <old> to <new>"      TICKED
-//   2 current   "Reinstall X <version>"             unticked
+//   0 absent    "Install X <latest>"                MARKED
+//   1 outdated  "Update X from <old> to <new>"      MARKED
+//   2 current   "Reinstall X <version>"             unmarked
 //
 // Pressing Enter therefore installs everything missing and updates everything
 // stale, and reinstalls nothing already current.
@@ -56,7 +56,7 @@ type
 
 var
   gHomer: array of THomerComponent;
-  (* captions of the finish-page boxes that were ticked when Finish was
+  (* captions of the finish-page boxes that were marked when Finish was
      pressed, one per line -- see homerNoteTicked *)
   gHomerTicked: String;
 
@@ -530,7 +530,7 @@ begin
 
   // FOUND OUTSIDE WINGET, ITS VERSION IS STILL READ (15 October 2026): the program
   // found is asked, by its file when there is one, and compared with the newest
-  // release winget offers; older is Update, ticked. Two numbers that cannot be
+  // release winget offers; older is Update, marked. Two numbers that cannot be
   // compared stay Reinstall, and the log says so. installCommon's wingetUpgrade
   // installs the newest release when winget knows no installed copy.
   if (Result = 2) and (gHomer[iAt].sLocal = '') then
@@ -565,7 +565,7 @@ begin
   gHomer[iAt].iState := Result;
   gHomer[iAt].bKnown := True;
   // EVERY VERDICT IS LOGGED (1.43.20). Reinstalling all ten apps on 27
-  // September left no record of why a box was ticked: only EdSharp and DbDo,
+  // September left no record of why a box was marked: only EdSharp and DbDo,
   // with their own probes, said what they found. Now the setup log -- the one
   // written with /LOG, copied to the app's logs folder -- names each
   // component, what was found, and the verb its box was given.
@@ -576,7 +576,7 @@ begin
   else
     // "CURRENT" ONLY WHEN COMPARED (13 October 2026, from an audit): mpv and Whisper were
     // logged "found, current" with no version read at all. Reinstall is still the right
-    // offer, unticked, but the log says what is actually known.
+    // offer, unmarked, but the log says what is actually known.
     if gHomer[iAt].sLocal = '' then
       Log('Component ' + gHomer[iAt].sName + ': found; its version could not be read, so whether a newer one exists is unknown; offered as Reinstall')
     else if gHomer[iAt].sRemote = '' then
@@ -613,7 +613,7 @@ function homerMessageBox(hWnd: Integer; sText, sCaption: String; iType: Cardinal
 
 (* THE DEFAULTS SWITCH. setup.exe /verysilent /defaults installs with no screens
    and takes every default the finish page would: it runs each finish-page entry
-   whose box is ticked by default -- Install and Update yes, Reinstall no, Launch
+   whose box is marked by default -- Install and Update yes, Reinstall no, Launch
    yes, the user guide no -- and writes the Results box to the setup log. /silent
    /defaults does the same with a progress window. The switches are read without
    regard to case.
@@ -625,8 +625,8 @@ function homerMessageBox(hWnd: Integer; sText, sCaption: String; iType: Cardinal
    gone: given alone, /defaults changes nothing, and the log says to add
    /verysilent. Plain /silent and /verysilent still install the program alone and
    run no entry. Each [Run] finish-page entry says Check: homerFinishRuns (and its
-   own test) in place of skipifsilent; Inno itself then runs a ticked entry in a
-   silent install, leaves an unticked one, and evaluates each entry's own Check as
+   own test) in place of skipifsilent; Inno itself then runs a marked entry in a
+   silent install, leaves an unmarked one, and evaluates each entry's own Check as
    the finish page would. *)
 (* ONE SWITCH, ANY SPELLING (kit 1.85.0; any leading punctuation, kit 1.88.7, the author's
    request of 23 October 2026): d, default or defaults, in any case, with or without leading
@@ -660,7 +660,7 @@ function homerStartForDefaults(): Boolean;
    whether a run shows screens, so a run started with screens starts setup again here,
    silently, with the same switches -- /SILENT, so a progress window still shows -- and
    returns True, so this copy steps aside. The new copy is silent and sees /default, so it
-   runs every finish-page entry ticked by default (homerFinishRuns) and logs the Results box.
+   runs every finish-page entry marked by default (homerFinishRuns) and logs the Results box.
    It is already elevated, so Windows does not ask again; /CLOSEAPPLICATIONS closes a running
    copy of the program, which a silent install otherwise stops on without saying why -- the
    likeliest reason the first restart failed on DbDo on 13 October 2026, its AppMutex held.
@@ -694,7 +694,7 @@ function ShouldSkipPage(PageID: Integer): Boolean;
    before any code runs whether a run is silent, so this cannot make the run
    silent; what it can do, from the command line and in Pascal, is skip every
    page Inno allows to be skipped -- each keeps its default, as if Next had been
-   pressed on it. The finish page is kept: it is where the default boxes, ticked,
+   pressed on it. The finish page is kept: it is where the default boxes, marked,
    run when Enter finishes, and skipping it is not something this kit has seen
    work. So /defaults alone is one Enter, not a wizard; /silent and /verysilent
    with /defaults still show nothing. No installer here defines this event
@@ -768,7 +768,7 @@ end;
 
 function homerGroup(iAt: Integer): Integer;
 (* 1 Install, 2 Update, 3 Reinstall -- the order the finish page shows them:
-   the ticked boxes first, then the unticked ones (FinishPage.md; 1.43.25, when
+   the marked boxes first, then the unmarked ones (FinishPage.md; 1.43.25, when
    this said Install, Reinstall, Update against that document). A number rather
    than a sort of the verbs, so rewording a label later cannot quietly change
    the order. *)
@@ -828,9 +828,9 @@ var
   gOllamaListAfterKnown: Boolean;
 
 (* ---- JAWS scripts and NVDA add-on as components (1.43.43) ----------------
-   Each is worded and ticked like any other component: Install when nothing of
+   Each is worded and marked like any other component: Install when nothing of
    this app's is there, Update when what is there differs from what ships,
-   Reinstall (unticked) when it is the same. installScreenReaderSupport.cmd
+   Reinstall (unmarked) when it is the same. installScreenReaderSupport.cmd
    decides, since only it can read a JAWS settings folder or an NVDA add-on;
    the answer is asked once per reader and kept. -1 means the reader is not on
    this computer, or the app ships nothing for it, and every box is hidden. *)
@@ -842,7 +842,7 @@ var
 //  installScreenReaderSupport.cmd. An app whose screen reader support needs more than unpacking and compiling --
 //  HomerView chains its scripts into JAWS's defaults -- names its own script with #define HomerReaderScript before
 //  this include; that script answers the same question in the same form ("state jaws <file>", writing install,
-//  update or reinstall), so every installer's verbs and ticks come from this one function.
+//  update or reinstall), so every installer's verbs and marks come from this one function.
 #ifndef HomerReaderScript
   #define HomerReaderScript "installScreenReaderSupport.cmd"
 #endif
@@ -903,7 +903,7 @@ procedure homerNoteTicked();
 (* Call from NextButtonClick when CurPageID = wpFinished: that is the moment
    the finish page's boxes are settled and the scripts have not yet run. The
    Results box later reports on exactly these, and on nothing else -- a box
-   nobody ticked is not an action taken this session. *)
+   nobody marked is not an action taken this session. *)
 var
   i: Integer;
 begin
@@ -919,7 +919,7 @@ function homerScreenReaderOutcome(): String;
 (* The lines installScreenReaderSupport.cmd wrote this session -- one per JAWS
    version, and one for NVDA -- for the Results box: installed and compiled,
    or NOT installed with the reason (1.43.39). Empty when neither box was
-   ticked. The file is removed once read. *)
+   marked. The file is removed once read. *)
 var
   aLines: TArrayOfString;
   i: Integer;
@@ -964,7 +964,7 @@ begin
 end;
 
 function homerOutcomeLine(iAt: Integer): String;
-(* One Results-box line for a component whose box was ticked; '' when it was
+(* One Results-box line for a component whose box was marked; '' when it was
    not. Says what happened, in the past tense, from a probe made after the
    script ran -- not what was hoped for when the box was drawn. *)
 var
@@ -1032,7 +1032,7 @@ begin
 end;
 
 function homerModelWanted(sModel: String): Boolean;
-// The Check: for a model box -- ticked when the model is missing.
+// The Check: for a model box -- marked when the model is missing.
 begin
   Result := not homerModelPresent(sModel);
 end;
@@ -1066,7 +1066,7 @@ begin
 end;
 
 function homerModelOutcomeLine(sModel, sUse, sSize: String): String;
-(* The Results-box line for a model whose box was ticked; '' when it was not. *)
+(* The Results-box line for a model whose box was marked; '' when it was not. *)
 var
   bBefore, bAfter: Boolean;
 begin

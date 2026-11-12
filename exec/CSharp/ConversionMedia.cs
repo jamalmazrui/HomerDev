@@ -249,7 +249,7 @@ string sExe = Media.magickProgram();
 if (sExe.Length == 0) {
 string sExt = Path.GetExtension(sSource).ToLower();
 sError = "ImageMagick was not found, and it is what reads " + sExt + " files. "
-+ "Install the program again and tick the image tools box. ffmpeg cannot read this format.";
++ "Install the program again and mark the image tools box. ffmpeg cannot read this format.";
 return false;
 }
 StringBuilder sbArgs = new StringBuilder();
@@ -301,7 +301,7 @@ string sWantExt = Path.GetExtension(sTarget).ToLower();
 
 // WHICH TOOL. ImageMagick when either end is a format ffmpeg cannot handle,
 // ffmpeg otherwise. ffmpeg stays the default for the ordinary picture formats
-// because it is already installed and already ticked; ImageMagick is asked for
+// because it is already installed and already marked; ImageMagick is asked for
 // only when it is the only one that can do the job.
 bool bNeedMagick = Array.IndexOf(aMagickSources, sSourceExt) >= 0
 || Array.IndexOf(aMagickSources, sWantExt) >= 0;
@@ -309,7 +309,7 @@ if (bNeedMagick) return convertWithMagick(sSource, sTarget, out sError);
 
 string sExe = Media.ffmpegProgram();
 if (sExe.Length == 0) {
-sError = "ffmpeg was not found, so audio, video and pictures cannot be converted. Install the program again and tick the media tools box.";
+sError = "ffmpeg was not found, so audio, video and pictures cannot be converted. Install the program again and mark the media tools box.";
 return false;
 }
 string sTargetExt = Path.GetExtension(sTarget).ToLower();

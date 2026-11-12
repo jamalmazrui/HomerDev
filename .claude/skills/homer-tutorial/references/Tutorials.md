@@ -941,7 +941,7 @@ Screen reader:
 
 ### Step 3: Down
 
-The finish page offers every tool any Homer program uses, each worded by what this computer already has: Install when it is missing, Update when it is old, Reinstall, unticked, when it is current. So Enter alone installs what is missing and updates what is old. Down Arrow hears each box.
+The finish page offers every tool any Homer program uses, each worded by what this computer already has: Install when it is missing, Update when it is old, Reinstall, unmarked, when it is current. So Enter alone installs what is missing and updates what is old. Down Arrow hears each box.
 
 Screen reader:
 
@@ -949,7 +949,7 @@ Screen reader:
 
 ### Step 4: Enter
 
-I press Enter on Finish. Each ticked tool installs in turn, and then one box says what happened.
+I press Enter on Finish. Each marked tool installs in turn, and then one box says what happened.
 
 Screen reader:
 
@@ -1350,7 +1350,7 @@ Update, not Install: the scripts are there, and a newer set is available. The wo
 
 ### Step 6
 
-The three words, from the kit. Install when the piece is not there. Update when it is there and a newer version is available -- the installer asked winget. Reinstall when it is there and current, unticked unless you want it. You never have to know what is on your machine; the box says.
+The three words, from the kit. Install when the piece is not there. Update when it is there and a newer version is available -- the installer asked winget. Reinstall when it is there and current, unmarked unless you want it. You never have to know what is on your machine; the box says.
 
 ### Step 7: DownArrow
 
@@ -1366,7 +1366,7 @@ mpv is the Homer Player's engine; FileDir and DbDo share it, so one installation
 
 ### Step 9: Space
 
-Ollama runs AI on your own computer. Its models are large, so it is unticked unless you tick it; Spacebar changes a box, and the answer is one word.
+Ollama runs AI on your own computer. Its models are large, so it is unmarked unless you tick it; Spacebar changes a box, and the answer is one word.
 
 Screen reader:
 
@@ -1374,7 +1374,7 @@ Screen reader:
 
 ### Step 10: Enter
 
-Launch is ticked already. Enter presses Finish, and whatever was ticked installs now; a results box then says what was done, one line per piece.
+Launch is marked already. Enter presses Finish, and whatever was marked installs now; a results box then says what was done, one line per piece.
 
 Screen reader:
 
@@ -1394,7 +1394,7 @@ Screen reader scripts are a piece of their own: the kit knows where each reader 
 
 ### Step 14
 
-A planned misstep. Run the installer a second time: every piece already present says so, and Install becomes Reinstall, unticked. Nothing is installed twice.
+A planned misstep. Run the installer a second time: every piece already present says so, and Install becomes Reinstall, unmarked. Nothing is installed twice.
 
 ### Step 15
 

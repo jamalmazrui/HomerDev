@@ -1050,8 +1050,8 @@ public static class LbcHints
     public static string keysFor(Control ctl)
     {
         if (ctl is Button) return "Space or Enter presses it.";
-        if (ctl is CheckedListBox) return "Arrows move, Space ticks or clears, and a letter jumps to an item that starts with it.";
-        if (ctl is CheckBox) return "Space ticks or clears it.";
+        if (ctl is CheckedListBox) return "Arrows move, Space marks or unmarks, and a letter jumps to an item that starts with it.";
+        if (ctl is CheckBox) return "Space marks or unmarks it.";
         if (ctl is RadioButton) return "Arrows choose among the group.";
         if (ctl is ListBox) return "Arrows move, Home and End go to the first and last, a letter jumps, Control+J jumps by name, Control+F filters and F3 finds the next.";
         if (ctl is ComboBox) return "Alt+Down Arrow opens the choices, arrows move among them, and typing chooses one.";

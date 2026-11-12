@@ -102,7 +102,9 @@ def documentStems(sFolder):
     """The distinct document names at the top of a folder, less the standard
     ones every project may carry."""
     dStems = {}
-    for sName in sorted(os.listdir(sFolder)):
+    try: lsNames = sorted(os.listdir(sFolder))
+    except OSError: return []   # a folder this account may not read, such as C:\\Config.Msi, has no documents to count
+    for sName in lsNames:
         sStem, sExt = os.path.splitext(sName)
         if sExt.lower() in (".md", ".htm") and sStem.lower() not in lsStandardDocs:
             dStems.setdefault(sStem.lower(), sStem)
@@ -213,7 +215,9 @@ def publishesPages(sFolder):
     the project is a page project, and pages joins its standard folders."""
     sPages = os.path.join(os.path.abspath(sFolder), "pages")
     if not os.path.isdir(sPages): return False
-    for sName in os.listdir(sPages):
+    try: lsPages = os.listdir(sPages)
+    except OSError: return False
+    for sName in lsPages:
         sPage = os.path.join(sPages, sName)
         if os.path.isdir(sPage) and any(s.lower().endswith(".md") for s in os.listdir(sPage)): return True
     return False

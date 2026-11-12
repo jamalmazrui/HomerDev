@@ -37,7 +37,7 @@ call :logLine "Models wanted: %sModels% (%sModelNote%)"
 
 where ollama >nul 2>&1
 if errorlevel 1 (
-  echo Ollama is not installed. Tick the Ollama box instead, or run installOllama.
+  echo Ollama is not installed. Mark the Ollama box instead, or run installOllama.
   call :logLine "ERROR: ollama not found."
   goto :done
 )

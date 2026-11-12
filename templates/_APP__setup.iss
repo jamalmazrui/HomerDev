@@ -21,17 +21,17 @@
 ;
 ; CHECKBOX ORDER AND DEFAULTS, in the order the user meets them (HomerDev
 ; rule, 25 September 2026; the [Run] section says how it is done):
-;   1. Install entries, TICKED: screen reader scripts first -- a blind user
+;   1. Install entries, MARKED: screen reader scripts first -- a blind user
 ;      installing a Homer tool wants its JAWS scripts and its NVDA add-on --
 ;      then components in alphabetical order.
-;   2. Update entries, TICKED, alphabetical.
-;   3. Reinstall entries, UNTICKED, alphabetical.
-;   4. Launch, TICKED, after the Results box has been read.
-;   5. Open the user guide, UNTICKED: there when wanted, out of the way when not.
+;   2. Update entries, MARKED, alphabetical.
+;   3. Reinstall entries, UNMARKED, alphabetical.
+;   4. Launch, MARKED, after the Results box has been read.
+;   5. Open the user guide, UNMARKED: there when wanted, out of the way when not.
 ;
 ; THE RESULTS BOX COMES BEFORE THE LAUNCH. The Launch entry only leaves a
 ; marker; CurStepChanged(ssDone) shows one Results box -- a past-tense line per
-; box that was ticked, probed after its script ran, and nothing about the rest
+; box that was marked, probed after its script ran, and nothing about the rest
 ; -- and starts the program only after that box is dismissed.
 
 #define AppName       "_APP_"
@@ -233,15 +233,15 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\exec\{#AppExeName}"; WorkingD
 
 [Run]
 ; THE FINISH PAGE (help\FinishPage.md; 1.43.43). Three groups, in this order:
-; Install (ticked), Update (ticked), Reinstall (unticked); within each group,
+; Install (marked), Update (marked), Reinstall (unmarked); within each group,
 ; the components in alphabetical order by name, case-insensitive, the JAWS
 ; scripts and the NVDA add-on among them like any other. Then Launch
-; (ticked) and the user guide (unticked). Inno shows the entries in the order
+; (marked) and the user guide (unmarked). Inno shows the entries in the order
 ; written and hides those whose Check is false, so each component has one
 ; entry per group. AI NOTE FOR CUSTOMIZING: add a component's three entries in
 ; its alphabetical place in each group.
 
-; ---- 1. Install, ticked --------------------------------------------------------
+; ---- 1. Install, marked --------------------------------------------------------
 FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
   Parameters: "noPause jaws"; \
   WorkingDir: "{app}\scripts"; \
@@ -270,7 +270,7 @@ FileName: "{app}\scripts\installModels.cmd"; \
   Check: homerFinishRuns and isModelInstall; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
-; ---- 2. Update, ticked ---------------------------------------------------------
+; ---- 2. Update, marked ---------------------------------------------------------
 FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
   Parameters: "noPause jaws"; \
   WorkingDir: "{app}\scripts"; \
@@ -292,7 +292,7 @@ FileName: "{app}\scripts\installOllama.cmd"; \
   Check: homerFinishRuns and isUpdateOllama; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist
 
-; ---- 3. Reinstall, unticked ----------------------------------------------------
+; ---- 3. Reinstall, unmarked ----------------------------------------------------
 FileName: "{app}\scripts\installScreenReaderSupport.cmd"; \
   Parameters: "noPause jaws"; \
   WorkingDir: "{app}\scripts"; \
@@ -321,7 +321,7 @@ FileName: "{app}\scripts\installModels.cmd"; \
   Check: homerFinishRuns and isModelReinstall; \
   Flags: postinstall runascurrentuser waituntilterminated unchecked skipifdoesntexist
 
-; ---- 4. Launch, ticked --------------------------------------------------------
+; ---- 4. Launch, marked --------------------------------------------------------
 ; The entry only leaves a marker. The program starts from CurStepChanged(ssDone),
 ; AFTER the Results box has been read and closed -- so the box is not hidden
 ; behind the program's own window. Inno runs postinstall entries before ssDone.
@@ -332,7 +332,7 @@ FileName: "{cmd}"; \
   Description: "Launch {#AppName} (desktop hotkey {#HotKeyDisplay})"; \
   Flags: postinstall runhidden runasoriginaluser; Check: homerFinishRuns
 
-; ---- 5. Open the user guide, unticked -----------------------------------------
+; ---- 5. Open the user guide, unmarked -----------------------------------------
 FileName: "{app}\ReadMe.htm"; \
   Description: "Open the user guide (F1 in {#AppName})"; \
   Flags: postinstall shellexec nowait skipifdoesntexist runasoriginaluser unchecked; Check: homerFinishRuns
@@ -353,9 +353,9 @@ Type: files; Name: "{localappdata}\_APP_\*.inix"
 //      file, then the exe, then the registry) and words every checkbox;
 //    - reads the version of any previous install, so the screen reader
 //      script entries say Install or Update truthfully;
-//    - records which boxes were ticked when Finish is pressed, and after
+//    - records which boxes were marked when Finish is pressed, and after
 //      the scripts have run, reports what happened to each of THOSE -- one
-//      past-tense line per ticked box, nothing about the rest;
+//      past-tense line per marked box, nothing about the rest;
 //    - keeps the setup log with the program's own logs;
 //    - starts the program only after the Results box has been closed.
 //
@@ -477,7 +477,7 @@ function labelModel(sParam: String): String;   begin Result := homerModelLabel('
 function isModelInstall(): Boolean;            begin Result := homerModelIs('qwen2.5:7b', False); end;
 function isModelReinstall(): Boolean;          begin Result := homerModelIs('qwen2.5:7b', True); end;
 
-//  ---- the Results box: one line per ticked box, probed after the scripts ran
+//  ---- the Results box: one line per marked box, probed after the scripts ran
 procedure addAction(sText: String);
 begin
   if sText = '' then exit;

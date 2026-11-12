@@ -35,7 +35,7 @@ Say=Update, not Install: the scripts are there, and a newer set is available. Th
 
 [step]
 
-Say=The three words, from the kit. Install when the piece is not there. Update when it is there and a newer version is available -- the installer asked winget. Reinstall when it is there and current, unticked unless you want it. You never have to know what is on your machine; the box says.
+Say=The three words, from the kit. Install when the piece is not there. Update when it is there and a newer version is available -- the installer asked winget. Reinstall when it is there and current, unmarked unless you want it. You never have to know what is on your machine; the box says.
 Key=
 Hear=
 
@@ -52,13 +52,13 @@ Say=mpv is the Homer Player's engine; FileDir and DbDo share it, so one installa
 
 [step]
 
-Say=Ollama runs AI on your own computer. Its models are large, so it is unticked unless you tick it; Spacebar changes a box, and the answer is one word.
+Say=Ollama runs AI on your own computer. Its models are large, so it is unmarked unless you tick it; Spacebar changes a box, and the answer is one word.
 Key=Space
 Hear=checked
 
 [step]
 
-Say=Launch is ticked already. Enter presses Finish, and whatever was ticked installs now; a results box then says what was done, one line per piece.
+Say=Launch is marked already. Enter presses Finish, and whatever was marked installs now; a results box then says what was done, one line per piece.
 Key=Enter
 Hear=DbDo Setup, screen reader scripts: updated. mpv: installed. Ollama: installed.
 
@@ -82,7 +82,7 @@ Hear=
 
 [step]
 
-Say=A planned misstep. Run the installer a second time: every piece already present says so, and Install becomes Reinstall, unticked. Nothing is installed twice.
+Say=A planned misstep. Run the installer a second time: every piece already present says so, and Install becomes Reinstall, unmarked. Nothing is installed twice.
 Key=
 Hear=
 

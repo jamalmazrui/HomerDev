@@ -792,8 +792,8 @@ def finishEntries(sText):
 
 def checkFinishPage():
     r"""THE FINISH PAGE'S RULES (1.43.51; help\FinishPage.md). In every installer
-    script: an Install or Update box is ticked, a Reinstall box never is, and
-    Launch is ticked; every component box says Install, Update or Reinstall;
+    script: an Install or Update box is marked, a Reinstall box never is, and
+    Launch is marked; every component box says Install, Update or Reinstall;
     nothing starts NVDA (opening an .nvda-addon or running nvda.exe), and no
     label says NVDA must be running. EdSharp's and DbDo's installers broke the
     first rule on 30 September after being called migrated."""
@@ -809,7 +809,7 @@ def checkFinishPage():
                     oMatch = re.search(sName + r':\s*("(?:[^"]|"")*"|[^;]+)', sEntry, re.I)
                     return oMatch.group(1).strip().strip('"') if oMatch else ""
                 sCheck = field("Check"); sFlags = field("Flags").lower(); sDesc = field("Description"); sFile = field("Filename")
-                bUnticked = "unchecked" in sFlags
+                bUnmarked = "unchecked" in sFlags
                 oVerb = re.search(r"is(Install|Update|Reinstall)|(?:Needs?)(Install|Update)|(IsCurrent|AreCurrent)|isModel(Install|Reinstall)", sCheck)
                 sVerb = ""
                 if oVerb:
@@ -818,9 +818,9 @@ def checkFinishPage():
                 elif re.match(r"^(Install|Update|Reinstall)\b", sDesc):
                     sVerb = sDesc.split()[0]
                 sWhat = sDesc or sFile
-                if sVerb in ("Install", "Update") and bUnticked: lsBad.append("%s: %s box not ticked: %s" % (sRel, sVerb, sWhat))
-                if sVerb == "Reinstall" and not bUnticked: lsBad.append("%s: Reinstall box ticked: %s" % (sRel, sWhat))
-                if re.search(r"launch", sDesc, re.I) and bUnticked: lsBad.append("%s: Launch box not ticked" % sRel)
+                if sVerb in ("Install", "Update") and bUnmarked: lsBad.append("%s: %s box not marked: %s" % (sRel, sVerb, sWhat))
+                if sVerb == "Reinstall" and not bUnmarked: lsBad.append("%s: Reinstall box marked: %s" % (sRel, sWhat))
+                if re.search(r"launch", sDesc, re.I) and bUnmarked: lsBad.append("%s: Launch box not marked" % sRel)
                 if not sVerb and not re.search(r"launch|open|guide|read|view", sDesc, re.I):
                     lsBad.append("%s: box without Install, Update or Reinstall: %s" % (sRel, sWhat))
                 if re.search(r"nvda-addon|nvda\.exe|GetNvdaPath", sFile, re.I): lsBad.append("%s: box starts NVDA: %s" % (sRel, sFile))
@@ -1456,7 +1456,7 @@ def checkIssComments():
 
 
 # THE HOMER INSTALLER PATTERN, CHECKED (1.65.21, 10 October 2026). Every installer was meant to share one Finish
-# page -- each component's verb (Install, Update, Reinstall) and tick decided by the kit, so pressing Enter installs
+# page -- each component's verb (Install, Update, Reinstall) and mark decided by the kit, so pressing Enter installs
 # what is missing, updates what is stale and starts the app -- and to reuse the folder of an earlier install. The
 # rule lived only in the homer-installer skill, and DbDo, EdSharp and HomerView kept code of their own: DbDo's JAWS
 # box said Update on every new version though its scripts had not changed, and EdSharp asked for the folder again on

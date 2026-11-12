@@ -1,18 +1,18 @@
-﻿# The finish page: what is ticked and why
+﻿# The finish page: what is marked and why
 
 Every Homer installer ends with a list of checkboxes. This says what each kind
-of box is called and whether it starts ticked, so that pressing Enter does the
+of box is called and whether it starts marked, so that pressing Enter does the
 right thing without reading the list.
 
 ## The rule
 
-- **Install** a component or model that is missing — **ticked**
-- **Update** a component whose newer version exists — **ticked**
-- **Reinstall** something already current — **unticked**
-- **Launch** the app — **ticked**
+- **Install** a component or model that is missing — **marked**
+- **Update** a component whose newer version exists — **marked**
+- **Reinstall** something already current — **unmarked**
+- **Launch** the app — **marked**
 - **JAWS scripts** and the **NVDA add-on** are components like any other,
-  with a box each: Install or Update **ticked**, Reinstall **unticked**
-- **Open documentation** (the guide, the ReadMe) — **unticked**
+  with a box each: Install or Update **marked**, Reinstall **unmarked**
+- **Open documentation** (the guide, the ReadMe) — **unmarked**
 
 So Enter installs everything missing, updates everything stale, puts the
 screen-reader scripts in place, and starts the app. It reinstalls nothing that
@@ -30,11 +30,11 @@ trusting the page.
 
 The finish page lists its boxes in this order, always:
 
-1. **Install** boxes, ticked, in alphabetical order.
-2. **Update** boxes, ticked, in alphabetical order.
-3. **Reinstall** boxes, unticked, in alphabetical order.
-4. **Launch the app**, ticked.
-5. **Open the user guide**, unticked.
+1. **Install** boxes, marked, in alphabetical order.
+2. **Update** boxes, marked, in alphabetical order.
+3. **Reinstall** boxes, unmarked, in alphabetical order.
+4. **Launch the app**, marked.
+5. **Open the user guide**, unmarked.
 
 Alphabetical order is by the component's name, ignoring case, and the JAWS
 scripts and the NVDA add-on take their places among the others: "ExifTool,
@@ -51,7 +51,7 @@ it did -- "Updating Ollama to the newest version", then "Ollama was updated"
 or "Ollama was NOT updated; the log has winget's answer."
 
 The kit's `check` enforces the finish page: an Install or Update box not
-ticked, a Reinstall box ticked, an unticked Launch box, a component box
+marked, a Reinstall box marked, an unmarked Launch box, a component box
 without Install, Update or Reinstall, a box that starts NVDA, and a label
 saying NVDA must be running all fail the release.
 
@@ -74,7 +74,7 @@ nvda` answer for the installer:
 - A reader not on the computer, or one the app ships nothing for, gets no box.
 
 `homerReaderLabel`, `homerReaderIs` and `homerReaderState` in
-HomerComponents.iss word and tick the boxes from that answer.
+HomerComponents.iss word and mark the boxes from that answer.
 
 Inno shows `[Run]` entries in the order they are written, and `Check:` hides
 the ones that do not apply. So each component gets three entries -- one per
@@ -146,9 +146,9 @@ summary of what just happened. See `startIfAsked` in any Homer installer.
 It is titled "<App> Setup Results": `homerResultsBox(sBody)` shows it through
 Windows' own MessageBox, since Inno's MsgBox takes no title of its own. The box
 that appears after the finish-page scripts have run reports **one line
-per box that was ticked, and nothing else**. A component nobody asked about
+per box that was marked, and nothing else**. A component nobody asked about
 is not an action taken this session, so it is not mentioned; when nothing was
-ticked, the box says only that the app is installed and where the logs are.
+marked, the box says only that the app is installed and where the logs are.
 
 Each line is in the past tense, from a probe made **after** the script ran:
 "Whisper 1.9.4 was installed", "Ollama was updated from 0.34.3 to 0.34.4",
@@ -161,33 +161,33 @@ What the box holds, learned from EdSharp and HomerView on 29 September 2026:
 
 - **The first line says where the app is**: "EdSharp 5.0.30 is installed in
   C:\Program Files\EdSharp." **The last says where the logs are.** Nothing else
-  but the ticked boxes' outcomes: no key hints, no "components" inventory, no
+  but the marked boxes' outcomes: no key hints, no "components" inventory, no
   reminders, no date line (the box has its own title).
-- **The ticked captions are written down when Finish is pressed**, before any
+- **The marked captions are written down when Finish is pressed**, before any
   step runs, so a separate summary program can report only on them.
 - **An Update says whether it happened.** "Update Python from 3.14.3 to 3.14.7"
   once ran and changed nothing, and the box said "Python: installed, 3.14.3";
   the line must compare the version found with the one offered: "updated to
   3.14.7", or "NOT updated -- still 3.14.3".
-- **At most one blank line in a row**, whatever was ticked.
+- **At most one blank line in a row**, whatever was marked.
 
 ## Launch
 
-The Launch box is ticked, like every Homer app's. Its [Run] entry only writes
+The Launch box is marked, like every Homer app's. Its [Run] entry only writes
 a marker; the app is started when the Results box is closed, so the box is not
 hidden behind the app, and with `ExecAsOriginalUser`, so it runs as the person
 and not with the installer's elevated rights. EdSharp's Launch box was once
-unticked, so pressing Enter installed it and never opened it.
+unmarked, so pressing Enter installed it and never opened it.
 
 The kit does this in three pieces: homerNoteTicked, called from
-NextButtonClick when the page is wpFinished, records the ticked captions
+NextButtonClick when the page is wpFinished, records the marked captions
 before any script runs; homerOutcomeLine(i) and homerModelOutcomeLine(model,
-use, size) each return a line when that box was ticked and an empty string
+use, size) each return a line when that box was marked and an empty string
 when it was not. The app adds each result to the box and skips the empty ones.
 
 ## Installing with every default: /default
 
-`/default` installs exactly as pressing Enter on every screen would, with nothing to press: every page keeps its default, each finish-page entry ticked by default runs, the Results box goes to the setup log instead of waiting for OK, and the program starts when Launch is ticked.
+`/default` installs exactly as pressing Enter on every screen would, with nothing to press: every page keeps its default, each finish-page entry marked by default runs, the Results box goes to the setup log instead of waiting for OK, and the program starts when Launch is marked.
 
 `DbDo_setup.exe /default`
 
@@ -203,7 +203,7 @@ In the `.iss`, each finish-page entry says `Check: homerFinishRuns`, or `Check: 
 
 `homerState` writes one line per component to the setup log: what was found,
 what is available, and whether its box offers Install, Update or Reinstall.
-So a box that was ticked when it should not have been can be explained from
+So a box that was marked when it should not have been can be explained from
 the log alone.
 
 ## Say "Downloading" before a long step

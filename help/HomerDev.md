@@ -182,7 +182,7 @@ The controls, in tab order:
   dialog says every ten seconds how long it has waited. The answer is added to
   the conversation as plain text, focus goes to where it begins, and the dialog
   says how long it took. An answer is also spoken when you asked by voice, or
-  when Speak answers is ticked. Control+Period stops waiting, Control+Shift+R
+  when Speak answers is marked. Control+Period stops waiting, Control+Shift+R
   says the last answer again, and Control+Shift+C copies it -- keys borrowed
   from The Chat Place, Kelly Ford's accessible companion for Claude Code.
 
@@ -1531,7 +1531,7 @@ reads the setup log, shows ONE Results box, waits for it to be dismissed, and
 only then starts the program.
 
 The Results box says: that the program is installed and where; the disposition
-of each checkbox that was ticked, one line each; and where the log is. Nothing
+of each checkbox that was marked, one line each; and where the log is. Nothing
 about a step that did not run, nothing the wizard already said, and every count
 matching its noun.
 
@@ -2053,10 +2053,10 @@ in every caller.
 
 ### Finish page wording
 
-What each finish-page box says, whether it starts ticked, and the order of the
+What each finish-page box says, whether it starts marked, and the order of the
 boxes are set out in `help\FinishPage.md`: the verb first, a short use in
 parentheses, a box each for JAWS and NVDA, no word the tick already says, the
-ticked boxes before the unticked ones, and a Results box titled "<App> Setup
+marked boxes before the unmarked ones, and a Results box titled "<App> Setup
 Results".
 
 ## Scripts, logs, and the release routine
@@ -2217,8 +2217,8 @@ What it settles, so no app has to decide again:
   on the user's own machine, so `installOllama.cmd` and `installModels.cmd` are
   part of the kit and every app that can use AI ships them. The first box
   installs Ollama and the model; the second installs the model alone, for
-  somebody who already runs Ollama. Tick the first by default when the program
-  cannot do its main job without a model; leave it unticked when the model only
+  somebody who already runs Ollama. Mark the first by default when the program
+  cannot do its main job without a model; leave it unmarked when the model only
   adds something. An app that calls no model deletes the two file lines and the
   two run lines.
 - **It knows what is already installed.** The `[Code]` section reads the version

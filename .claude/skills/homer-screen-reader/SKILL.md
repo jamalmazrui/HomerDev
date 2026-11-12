@@ -79,7 +79,7 @@ Every Homer app's scripts handle a key by two choices, in JAWS and NVDA alike. T
   Ship sources only; the installer compiles them with each installed
   version's own `scompile.exe`. `.jsb` files are never pushed to git.
 - The kit's `installScreenReaderSupport.cmd`, run from the finish page's two
-  boxes ("Install JAWS scripts", ticked, then "Install NVDA add-on", ticked),
+  boxes ("Install JAWS scripts", marked, then "Install NVDA add-on", marked),
   unpacks the JAWS scripts into every JAWS version's user settings folder and
   compiles them there with that version's compiler, and hands the add-on to
   NVDA. It runs as the ordinary user, never elevated: JAWS keeps its settings

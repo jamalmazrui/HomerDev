@@ -342,7 +342,7 @@ if (lsTracks == null || lsTracks.Count == 0) { Say.sayForced("0 tracks"); return
 string sMpv = Homer.Media.mpvProgram();
 if (sMpv.Length == 0) {
 showBox("mpv is not installed, so there is nothing to play with.\r\n\r\n"
-+ "Run installMpv in the program's scripts folder, or install the program again and tick the mpv box.",
++ "Run installMpv in the program's scripts folder, or install the program again and mark the mpv box.",
 "Player");
 return;
 }

@@ -43,7 +43,7 @@ import datetime, glob, json, os, platform, re, shutil, subprocess, sys, time, tr
 PlaywrightTimeout, sync_playwright = TimeoutError, None  # set by loadPlaywright() once the log is open, so an import failure is logged
 
 iProcessingMinutes, iSaveWaitSeconds, iSettleSeconds, iSignInMinutes = 20, 45, 20, 15
-sVersion = "2026-11-03 version 48: a manuscript is new only when its book's sources changed, never because its EPUB was rebuilt; --list shows what a run would submit. Before: 2026-11-02 version 47: a book whose setup page KDP locks during a review is reported as in review, not blocked, and a bare run waits for the review to end, trying again every hour for up to 72 hours, then submits it, so a revised manuscript reaches KDP without another run; the Bookshelf reads In Review or Publishing before Live, since a live book with an update pending shows both; was version 46: a tab is acted on only once its address has stopped changing, so a late second Save and Continue that carries KDP past a tab no longer stops the run, and a title the Bookshelf page in view does not show is looked for on every page before its status is called unknown; 2026-10-26 version 45: every accuracy box ticked, the focus kept in the page rather than the address bar, a line every 30 seconds during uploads, and a plain message when the window is touched by hand; version 44: a book that is not ready by its audit is neither listed nor submitted, and kept AI answers no longer stop the Content tab with KeyError 'tools'; version 43: no question before submitting and no pause after each book, so a bare run builds and submits every changed book unattended; version 42: missing metadata is filled in when found -- a book KDP holds with no answers file gets one made from KDP's own record, keeping everything but the manuscript, and kdpUpdate's receipts are adopted where kdpSubmit had none; was 2026-10-15 version 41: a save is confirmed before the next tab is opened directly; the fallback .inix reader reads fences; version 40: with no --book, it builds what changed and submits every book whose manuscript, cover or answers differ from its own receipt; version 39: a book is named with --book whenever more than one is on file; the answers may keep KDP's cover (coverFile = Keep KDP's cover) and its AI-generated content answers (aiContent used = Keep), so a live book's manuscript is replaced without touching what KDP already holds right; was version 38: DRM that cannot be confirmed off blocks Publish; version 37: an upload is judged only by what KDP says after it, praise and recommendations are not problems, and done means KDP names the file just sent; version 36, from the 11:39 run: KDP took 33 seconds to leave the Details tab after the second Save and Continue, the page was still changing when its messages were read, and the third press landed on the Content tab's own Save and Continue, which moved to Pricing and skipped the EPUB upload, then crashed the control dump; now Save and Continue is never pressed again once the page has left its tab, a run whose messages cannot be read waits for the page to settle before deciding, the Content and Pricing steps open their own tab address when the browser is elsewhere, and a control dump interrupted by a navigation is read again; was version 35: before touching KDP, the EPUB is rebuilt with build.py when it is missing or older than the manuscript or its build files (the 6 October edition added Blind Apps passages), so a run always submits the latest text and a failed build stops the run with exit code 2; was version 34, from the 13:42 run of kdpBooks on 5 October, from the 13:42 run of kdpBooks, which finished twelve books and left four at two categories: Add another category does add a chain, but KDP pre-fills the new chain's top menu with the last chain's first step, so the script saw no empty top menu, pressed Add again, found it disabled and gave up; a chain that appears after Add another category is now used for the next path whether or not it is pre-filled, and the save-and-reopen fallback presses Add another category once the picker is open again; the Remove existing categories? dialog was answered with Continue on the four older books and their categories verified; was version 33, from the 10:43 run of kdpBooks, which chose all three categories on nine books but lost them on three older ones and stopped at two on two more: after Save categories, KDP asks Remove existing categories? on a book whose categories predate the picker, and closeNotice pressed that dialog's Close, throwing the choices away, so the dialog is now answered with its continue button and the buttons seen are logged; and when Add another category is disabled after a finished chain (Self-Help > Memory Improvement), the chosen categories are saved and the picker reopened, which gives a fresh chain for the next path; was version 32, from the 09:15 run of kdpBooks, which chose none or one of three categories on seven books: KDP keeps the menus of saved and reset chains on the page, so a path's first step was looked for after the last filled menu and found a sub-menu instead, where a containing name (Art for Arts & Photography) was taken and the real top menu never used; now the top-level menus are found by content, a new path starts in the last empty one (Add another category is pressed again when there is none), a menu is checked to have taken its option, only an exact name is accepted anywhere, and the wait after a pick is for the menu below to show new options or new boxes to appear, up to 10 seconds, with 15 seconds for the placement box; was version 31: no category is ever replaced by General or by an unrelated name; a path KDP does not offer is dropped and reported with the placements KDP offers there, a path whose placement name is already chosen for the book is skipped as a duplicate (Tennis twice, 19:10 run), and General is ticked only when no proposed path can be chosen at all, since KDP needs one category to save; the console names each category by its whole path; was version 30, from the 17:38 run of kdpBooks: a picker menu is used whether or not it is visible, since KDP hides its native menus behind styled drop-downs (version 29 required visibility and found no first step on three books); a Content tab that KDP leaves by itself no longer waits 30 seconds for DRM radios; was version 29, from the 16:46 run of kdpBooks: the picker's placement boxes are read as they are (KDP reuses the same box elements with new labels when a menu changes, so marking them as seen hid every placement and three books were published with one category); a step is looked for only in menus after the one the last step used; a chain that ends without a placement is dropped and its menus reused after Reset, since Add another category is disabled until the chain is complete; the Content tab's accuracy confirmation boxes are ticked when KDP asks (Confirm your answers are accurate and check the box), and that message now stops Save and Continue instead of being pressed through; a navigation aborted by a hand on the browser no longer crashes the run; DRM is left alone when KDP has already moved past the Content tab; was version 28, from the 15:15 run of kdpBooks: the picker's Reset clears only the newest chain of menus, so the saved chains are removed one by one through their Remove links (they had counted toward the three and hidden Add another category on nine books); the DRM consent box is found by its words (version 27 looked for a literal backslash) after waiting for the Content tab to draw; KDP's Categories update notice is closed before Save as Draft, and a button the ordinary click cannot reach is clicked by script; a path ending above a placement takes General or a placement sharing a word with the path, never an unrelated first one (Gun & Firearm Policy was ticked for Communication Policy); was version 27: the category picker uses only its newest menu and waits for the next menu to draw (on 4 October a History step was matched in the top menu and saved History > General instead of Mathematics > History); a step KDP does not offer is replaced by the nearest offered name, then the General placement, then the first placement, so every path ends on a placement and the book keeps three categories, with the paths chosen reported; the DRM No choice also ticks KDP's new consent box (Consent is required when not applying Digital Rights Management); page messages read during a navigation no longer crash the run; was version 26: the Bookshelf row's labels are all read, so Live followed by Updates in review stops the run before the setup page, and an aborted navigation to that page is treated as the same lock rather than a crash (the 16:42 run); was version 25: a live book with updates in review is reported as such and left alone until the update is live; was version 24: publishes unless KDP refused a save or a file failed to upload; everything else unconfirmed is listed to check afterwards; was version 23: the royalty radio selector is quoted (the 15:05 run crashed on it one step before Publish); a submission acknowledged by KDP counts as submitted even when the Bookshelf label cannot be read; was version 22: the accessibility radio is chosen by its label, since KDP briefly gives all four the same value after an upload; the release option and a missing Bookshelf status no longer count as problems; a processed upload is recognized by file name; was version 21: the Draft2Digital section no longer leaks into KDP's ISBN and publisher; saved categories are kept without opening the picker; KDP's spelling notice is not treated as a refusal; was version 20: .inix answers, Homer layout"
+sVersion = "2026-11-03 version 48: a manuscript is new only when its book's sources changed, never because its EPUB was rebuilt; --list shows what a run would submit. Before: 2026-11-02 version 47: a book whose setup page KDP locks during a review is reported as in review, not blocked, and a bare run waits for the review to end, trying again every hour for up to 72 hours, then submits it, so a revised manuscript reaches KDP without another run; the Bookshelf reads In Review or Publishing before Live, since a live book with an update pending shows both; was version 46: a tab is acted on only once its address has stopped changing, so a late second Save and Continue that carries KDP past a tab no longer stops the run, and a title the Bookshelf page in view does not show is looked for on every page before its status is called unknown; 2026-10-26 version 45: every accuracy box marked, the focus kept in the page rather than the address bar, a line every 30 seconds during uploads, and a plain message when the window is touched by hand; version 44: a book that is not ready by its audit is neither listed nor submitted, and kept AI answers no longer stop the Content tab with KeyError 'tools'; version 43: no question before submitting and no pause after each book, so a bare run builds and submits every changed book unattended; version 42: missing metadata is filled in when found -- a book KDP holds with no answers file gets one made from KDP's own record, keeping everything but the manuscript, and kdpUpdate's receipts are adopted where kdpSubmit had none; was 2026-10-15 version 41: a save is confirmed before the next tab is opened directly; the fallback .inix reader reads fences; version 40: with no --book, it builds what changed and submits every book whose manuscript, cover or answers differ from its own receipt; version 39: a book is named with --book whenever more than one is on file; the answers may keep KDP's cover (coverFile = Keep KDP's cover) and its AI-generated content answers (aiContent used = Keep), so a live book's manuscript is replaced without touching what KDP already holds right; was version 38: DRM that cannot be confirmed off blocks Publish; version 37: an upload is judged only by what KDP says after it, praise and recommendations are not problems, and done means KDP names the file just sent; version 36, from the 11:39 run: KDP took 33 seconds to leave the Details tab after the second Save and Continue, the page was still changing when its messages were read, and the third press landed on the Content tab's own Save and Continue, which moved to Pricing and skipped the EPUB upload, then crashed the control dump; now Save and Continue is never pressed again once the page has left its tab, a run whose messages cannot be read waits for the page to settle before deciding, the Content and Pricing steps open their own tab address when the browser is elsewhere, and a control dump interrupted by a navigation is read again; was version 35: before touching KDP, the EPUB is rebuilt with build.py when it is missing or older than the manuscript or its build files (the 6 October edition added Blind Apps passages), so a run always submits the latest text and a failed build stops the run with exit code 2; was version 34, from the 13:42 run of kdpBooks on 5 October, from the 13:42 run of kdpBooks, which finished twelve books and left four at two categories: Add another category does add a chain, but KDP pre-fills the new chain's top menu with the last chain's first step, so the script saw no empty top menu, pressed Add again, found it disabled and gave up; a chain that appears after Add another category is now used for the next path whether or not it is pre-filled, and the save-and-reopen fallback presses Add another category once the picker is open again; the Remove existing categories? dialog was answered with Continue on the four older books and their categories verified; was version 33, from the 10:43 run of kdpBooks, which chose all three categories on nine books but lost them on three older ones and stopped at two on two more: after Save categories, KDP asks Remove existing categories? on a book whose categories predate the picker, and closeNotice pressed that dialog's Close, throwing the choices away, so the dialog is now answered with its continue button and the buttons seen are logged; and when Add another category is disabled after a finished chain (Self-Help > Memory Improvement), the chosen categories are saved and the picker reopened, which gives a fresh chain for the next path; was version 32, from the 09:15 run of kdpBooks, which chose none or one of three categories on seven books: KDP keeps the menus of saved and reset chains on the page, so a path's first step was looked for after the last filled menu and found a sub-menu instead, where a containing name (Art for Arts & Photography) was taken and the real top menu never used; now the top-level menus are found by content, a new path starts in the last empty one (Add another category is pressed again when there is none), a menu is checked to have taken its option, only an exact name is accepted anywhere, and the wait after a pick is for the menu below to show new options or new boxes to appear, up to 10 seconds, with 15 seconds for the placement box; was version 31: no category is ever replaced by General or by an unrelated name; a path KDP does not offer is dropped and reported with the placements KDP offers there, a path whose placement name is already chosen for the book is skipped as a duplicate (Tennis twice, 19:10 run), and General is marked only when no proposed path can be chosen at all, since KDP needs one category to save; the console names each category by its whole path; was version 30, from the 17:38 run of kdpBooks: a picker menu is used whether or not it is visible, since KDP hides its native menus behind styled drop-downs (version 29 required visibility and found no first step on three books); a Content tab that KDP leaves by itself no longer waits 30 seconds for DRM radios; was version 29, from the 16:46 run of kdpBooks: the picker's placement boxes are read as they are (KDP reuses the same box elements with new labels when a menu changes, so marking them as seen hid every placement and three books were published with one category); a step is looked for only in menus after the one the last step used; a chain that ends without a placement is dropped and its menus reused after Reset, since Add another category is disabled until the chain is complete; the Content tab's accuracy confirmation boxes are marked when KDP asks (Confirm your answers are accurate and check the box), and that message now stops Save and Continue instead of being pressed through; a navigation aborted by a hand on the browser no longer crashes the run; DRM is left alone when KDP has already moved past the Content tab; was version 28, from the 15:15 run of kdpBooks: the picker's Reset clears only the newest chain of menus, so the saved chains are removed one by one through their Remove links (they had counted toward the three and hidden Add another category on nine books); the DRM consent box is found by its words (version 27 looked for a literal backslash) after waiting for the Content tab to draw; KDP's Categories update notice is closed before Save as Draft, and a button the ordinary click cannot reach is clicked by script; a path ending above a placement takes General or a placement sharing a word with the path, never an unrelated first one (Gun & Firearm Policy was marked for Communication Policy); was version 27: the category picker uses only its newest menu and waits for the next menu to draw (on 4 October a History step was matched in the top menu and saved History > General instead of Mathematics > History); a step KDP does not offer is replaced by the nearest offered name, then the General placement, then the first placement, so every path ends on a placement and the book keeps three categories, with the paths chosen reported; the DRM No choice also marks KDP's new consent box (Consent is required when not applying Digital Rights Management); page messages read during a navigation no longer crash the run; was version 26: the Bookshelf row's labels are all read, so Live followed by Updates in review stops the run before the setup page, and an aborted navigation to that page is treated as the same lock rather than a crash (the 16:42 run); was version 25: a live book with updates in review is reported as such and left alone until the update is live; was version 24: publishes unless KDP refused a save or a file failed to upload; everything else unconfirmed is listed to check afterwards; was version 23: the royalty radio selector is quoted (the 15:05 run crashed on it one step before Publish); a submission acknowledged by KDP counts as submitted even when the Bookshelf label cannot be read; was version 22: the accessibility radio is chosen by its label, since KDP briefly gives all four the same value after an upload; the release option and a missing Bookshelf status no longer count as problems; a processed upload is recognized by file name; was version 21: the Draft2Digital section no longer leaks into KDP's ISBN and publisher; saved categories are kept without opening the picker; KDP's spelling notice is not treated as a refusal; was version 20: .inix answers, Homer layout"
 lProfileSkip = ["Cache", "Code Cache", "GPUCache", "Service Worker", "DawnCache", "GrShaderCache", "ShaderCache", "blob_storage", "File System", "IndexedDB", "Session Storage", "Storage", "Extensions", "Extension State", "Extension Rules", "optimization_guide_hint_cache_store", "Platform Notifications"]
 lListKeys = ["afterPublishing", "categories", "contributors", "keywords", "priceReasoning", "recommended"]  # .inix keys whose value is a list: one item per line, or comma-separated on one line
 lNestedSections = ["accessibility", "aiContent", "draft2digital", "notes"]  # .inix sections kept as dictionaries under their own name; every other section is flattened into the answers. draft2digital holds another store's answers (its isbn and publisher once overrode KDP's and KDP refused the save)
@@ -616,7 +616,7 @@ sDrmBoxesScript = """() => {
 
 
 def setDrm(page, bNoDrm):
-    """Sets the Content tab's DRM radio and, for No, ticks the consent box KDP added in 2026: on 4 October 2026 Save and Continue answered
+    """Sets the Content tab's DRM radio and, for No, marks the consent box KDP added in 2026: on 4 October 2026 Save and Continue answered
     'Consent is required when not applying Digital Rights Management' on two books. The box is found by its words or by sitting in the
     DRM section; when none is found, every check box on the page is logged so the next version can name it."""
     if "/content" not in page.url:
@@ -645,7 +645,7 @@ def setDrm(page, bNoDrm):
         return True
     for d in lFits:
         if d["checked"]:
-            log("DRM consent already ticked: " + d["text"][:100])
+            log("DRM consent already marked: " + d["text"][:100])
             continue
         oBox = page.locator("input[type=checkbox], [role=checkbox]").nth(d["index"])
         oLabel = oBox.locator("xpath=ancestor::label[1]")
@@ -653,7 +653,7 @@ def setDrm(page, bNoDrm):
         (oLabel.first if oLabel.count() else oBox).click(force=True)
         time.sleep(1)
         bNow = oBox.evaluate("o => o.checked === undefined ? o.getAttribute('aria-checked') === 'true' : o.checked")
-        log("TICKED DRM consent: " + d["text"][:100] + (" (checked)" if bNow else " (NOT checked)"))
+        log("MARKED DRM consent: " + d["text"][:100] + (" (checked)" if bNow else " (NOT checked)"))
         if not bNow: oBox.check(force=True)
     return True
 
@@ -674,7 +674,7 @@ def keepFocusInPage(page):
 
 
 def confirmAnswers(page):
-    """Ticks every unticked 'By clicking this, I confirm that my answers are accurate' box on the Content tab. KDP shows one under the
+    """Marks every unmarked 'By clicking this, I confirm that my answers are accurate' box on the Content tab. KDP shows one under the
     AI-content questions and one under the accessibility questions, and asks for them again after a new upload or a changed answer;
     on 4 October 2026 Save and Continue was refused three times with 'Confirm your answers are accurate and check the box.'"""
     try:
@@ -693,7 +693,7 @@ def confirmAnswers(page):
         log("confirmAnswers could not read the page: " + str(oError).splitlines()[0][:120])
         return False
     if not lIndexes:
-        log("No unticked confirmation box on the Content tab")
+        log("No unmarked confirmation box on the Content tab")
         return False
     say("Confirming that the answers are accurate (" + str(len(lIndexes)) + " box" + ("" if len(lIndexes) == 1 else "es") + ").")
     for iIndex in lIndexes:
@@ -701,7 +701,7 @@ def confirmAnswers(page):
         oBox.scroll_into_view_if_needed()
         oBox.click(force=True)
         time.sleep(1)
-        log("TICKED confirmation box " + str(iIndex) + ": now " + str(oBox.evaluate("o => o.checked === undefined ? o.getAttribute('aria-checked') : o.checked")))
+        log("MARKED confirmation box " + str(iIndex) + ": now " + str(oBox.evaluate("o => o.checked === undefined ? o.getAttribute('aria-checked') : o.checked")))
     return True
 
 
@@ -874,7 +874,7 @@ def saveAndContinue(page, sExpected):
     bSavedSeen = False
     sTitleId = titleIdFrom(page.url)
     keepFocusInPage(page)
-    # A box KDP adds after Save as Draft -- it asks again after a new upload -- is ticked before the button is pressed.
+    # A box KDP adds after Save as Draft -- it asks again after a new upload -- is marked before the button is pressed.
     if "/content" in page.url: confirmAnswers(page)
     for iAttempt in range(1, 4):
         if sBefore.split("/")[-1] not in page.url.split("/")[-1]:
@@ -1339,7 +1339,7 @@ def chooseCategories(page):
     for sOld, sNew in zip(dAnswers["categories"], lPaths):
         if sOld != sNew: log("Category path from the answers corrected to KDP's current name: " + sOld + " -> " + sNew)
     lActual = []
-    bLastTicked = True
+    bLastMarked = True
     for iPath, sPath in enumerate(lPaths):
         lParts = [s.strip() for s in sPath.split(">")]
         if lParts and lParts[0].lower().startswith("kindle"): lParts = lParts[1:]
@@ -1350,7 +1350,7 @@ def chooseCategories(page):
             continue
         dPicker["topsBefore"] = len(topMenus(oModal))
         if iPath > 0:
-            if bLastTicked:  # Add another category is enabled only while the current chain ends on a ticked placement
+            if bLastMarked:  # Add another category is enabled only while the current chain ends on a marked placement
                 if not clickButton(page, "Add another category", ["Add another category"], False):
                     log("Add another category could not be pressed; the picker reports " + pickerCount(oModal) + " with " + str(oModal.locator("select[name^=react-aui]").count()) + " menus")
                     dumpControls(page, "picker without Add another category")
@@ -1413,8 +1413,8 @@ def chooseCategories(page):
         if lChosen and not lastStepWasPlacement(oModal, lChosen[-1]):
             sPlacement = tickPlacement(oModal, " > ".join(lChosen))
             if sPlacement: lChosen.append(sPlacement)
-        bLastTicked = bool(lChosen) and lastStepWasPlacement(oModal, lChosen[-1])
-        if lChosen and not bLastTicked:
+        bLastMarked = bool(lChosen) and lastStepWasPlacement(oModal, lChosen[-1])
+        if lChosen and not bLastMarked:
             unresolved("Category " + sPath, "ended on " + lChosen[-1] + " without a placement, so it counts for nothing; the path is dropped")
             lChosen = []
         sActual = "Kindle eBooks > " + " > ".join(lChosen) if lChosen else ""
@@ -1503,7 +1503,7 @@ def levelBox(oModal, sName):
 
 
 def lastStepWasPlacement(oModal, sPart):
-    """True when the last step chosen was a ticked placement box, not a menu."""
+    """True when the last step chosen was a marked placement box, not a menu."""
     return bool(dPicker.get("lastWasBox"))
 
 
@@ -1512,7 +1512,7 @@ def boxName(oBox):
 
 
 def offeredPlacements(oModal):
-    """The visible, unticked placement check boxes now offered, in page order."""
+    """The visible, unmarked placement check boxes now offered, in page order."""
     lBoxes = oModal.get_by_role("checkbox")
     return [boxName(lBoxes.nth(i)) for i in range(lBoxes.count()) if lBoxes.nth(i).is_visible() and not lBoxes.nth(i).is_checked()]
 
@@ -1528,7 +1528,7 @@ def tickPlacement(oModal, sPath):
     time.sleep(2)
     lNames = [n for n in offeredPlacements(oModal) if n]
     log("  placements offered below " + sPath.split(">")[-1].strip() + ": " + "; ".join(lNames))
-    # No substitute is ticked: a General or a nearby placement is a wasted category (the author's ruling of 4 October 2026).
+    # No substitute is marked: a General or a nearby placement is a wasted category (the author's ruling of 4 October 2026).
     # The path is dropped and reported with what KDP offered there, so the proposal can be corrected from data\kdpCategories.md.
     unresolved("Category " + sPath, "ends on a menu, not a placement, so it was dropped; placements KDP offers there: " + ("; ".join(lNames)[:300] or "none"))
     return ""
@@ -1605,12 +1605,12 @@ def pickCategoryLevel(page, oModal, sPart):
     not offered, or '' when nothing at this level fits."""
     dtEnd = datetime.datetime.now() + datetime.timedelta(seconds=15)
     while datetime.datetime.now() < dtEnd:
-        oBox = levelBox(oModal, sPart) if dPicker.get("steps", 0) else None  # a path's first step is a top menu, never a box; an earlier chain's ticked box with the same name stays visible until the picker is saved
+        oBox = levelBox(oModal, sPart) if dPicker.get("steps", 0) else None  # a path's first step is a top menu, never a box; an earlier chain's marked box with the same name stays visible until the picker is saved
         if oBox is not None:
             dPicker["steps"] = dPicker.get("steps", 0) + 1
             if not oBox.is_checked(): oBox.check(force=True)
             time.sleep(1)
-            log("  ticked placement " + sPart + (" (checked)" if oBox.is_checked() else " (NOT checked)"))
+            log("  marked placement " + sPart + (" (checked)" if oBox.is_checked() else " (NOT checked)"))
             dPicker["lastWasBox"] = oBox.is_checked()
             return sPart if oBox.is_checked() else ""
         lSelects = oModal.locator("select[name^=react-aui]")
@@ -1651,7 +1651,7 @@ def pickCategoryLevel(page, oModal, sPart):
         oBox = levelBox(oModal, sNear)
         oBox.check(force=True)
         time.sleep(1)
-        log("  '" + sPart + "' is not offered; ticked the nearest placement " + sNear + (" (checked)" if oBox.is_checked() else " (NOT checked)"))
+        log("  '" + sPart + "' is not offered; marked the nearest placement " + sNear + (" (checked)" if oBox.is_checked() else " (NOT checked)"))
         dPicker["lastWasBox"] = oBox.is_checked()
         return sNear if oBox.is_checked() else ""
     lSelects = oModal.locator("select[name^=react-aui]")
@@ -2083,10 +2083,10 @@ def fillContent(page):
             unresolved("Accessibility question " + sPart, "answer it in the browser window: the EPUB is all text, navigable by headings, table of contents and landmarks, with a described cover")
     if page.locator("[role=checkbox]").count():
         # EVERY CONFIRMATION BOX (26 October 2026). KDP shows two "I confirm that my answers are accurate" boxes when a new
-        # manuscript is uploaded -- one under the AI questions, one under accessibility -- and this ticked only the first:
+        # manuscript is uploaded -- one under the AI questions, one under accessibility -- and this marked only the first:
         # nine books of 26 October stopped with "Confirm your answers are accurate and check the box". confirmAnswers,
-        # written for exactly this on 4 October, ticks every unticked one; it had never been called.
-        if not confirmAnswers(page): log("No unticked confirmation box was left to tick")
+        # written for exactly this on 4 October, marks every unmarked one; it had never been called.
+        if not confirmAnswers(page): log("No unmarked confirmation box was left to mark")
     else:
         log("No confirmation check box on the page this time (KDP shows it only after a new upload)")
     for sWhat, sSelector, sWanted in [("ISBN", "#data-digital-isbn", d.get("isbn", "")), ("Publisher", "#data-publisher", d.get("publisher", ""))]:
@@ -2137,7 +2137,7 @@ def fillPricing(page):
     if d["kdpSelect"].lower().startswith("do not"):
         if oSelect.count() and oSelect.is_checked():
             oSelect.locator("xpath=ancestor::label[1]").first.click(force=True) if oSelect.locator("xpath=ancestor::label[1]").count() else oSelect.click(force=True)
-            log("KDP Select box was ticked; unticked it (now " + str(oSelect.is_checked()) + ")")
+            log("KDP Select box was marked; unmarked it (now " + str(oSelect.is_checked()) + ")")
         say("KDP Select: not enrolling, as the answers file says.")
     else:
         clickRadio(page, "KDP Select", ["#data-is-select"])

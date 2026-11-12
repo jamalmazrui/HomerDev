@@ -58,9 +58,9 @@ missing or stale.
 - `homerLabel(i)`: "Install X <latest> (use)", "Update X from <old> to <new>
   (use)" or "Reinstall X <version> (use)".
 - `homerNoteTicked()`, from `NextButtonClick` on `wpFinished`, records the
-  ticked captions before any script runs.
+  marked captions before any script runs.
 - `homerOutcomeLine(i)`: after the scripts, a past-tense line from a fresh
-  probe ("Pandoc 3.11 was installed"), or `''` when the box was not ticked.
+  probe ("Pandoc 3.11 was installed"), or `''` when the box was not marked.
 - `homerResultsBox(sBody)`: the Results box, titled "<App> Setup Results".
 - The launch entry only writes a marker; the app starts after the Results box
   is closed, so its window does not talk over the summary.
@@ -95,7 +95,7 @@ October 2026). An app whose screen reader script is its own defines
 `state` mode once: a fingerprint of the JAWS sources against the one kept in
 each JAWS version's settings folder, and the NVDA add-on's manifest version
 against the installed one. A reader not on the computer gets no box. The
-Results box reports each ticked reader through `homerScreenReaderOutcome`.
+Results box reports each marked reader through `homerScreenReaderOutcome`.
 
 ## Detection
 
