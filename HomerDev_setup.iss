@@ -462,140 +462,140 @@ FileName: "{app}\scripts\installYtDlp.cmd"; \
 
 ; ---- 3. Reinstall, unmarked -----------------------------------------------------
 FileName: "{app}\scripts\installAce.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause reinstall"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelAce}"; \
   Check: homerFinishRuns and isReinstallAce; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installAxeWindows.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause reinstall"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelAxeWindows}"; \
   Check: homerFinishRuns and isReinstallAxeWindows; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installEpubCheck.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause reinstall"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelEpubCheck}"; \
   Check: homerFinishRuns and isReinstallEpubCheck; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installExifTool.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause reinstall"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelExifTool}"; \
   Check: homerFinishRuns and isReinstallExifTool; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installFasterWhisper.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause reinstall"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelFasterWhisper}"; \
   Check: homerFinishRuns and isReinstallFasterWhisper; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installFfmpeg.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause reinstall"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelFfmpeg}"; \
   Check: homerFinishRuns and isReinstallFfmpeg; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installGit.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause reinstall"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelGit}"; \
   Check: homerFinishRuns and isReinstallGit; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installGitHubCli.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause reinstall"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelGitHubCli}"; \
   Check: homerFinishRuns and isReinstallGitHubCli; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installImageMagick.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause reinstall"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelImageMagick}"; \
   Check: homerFinishRuns and isReinstallImageMagick; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installJava.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause reinstall"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelJava}"; \
   Check: homerFinishRuns and isReinstallJava; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installMpv.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause reinstall"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelMpv}"; \
   Check: homerFinishRuns and isReinstallMpv; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installNode.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause reinstall"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelNode}"; \
   Check: homerFinishRuns and isReinstallNode; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installOllama.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause reinstall"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelOllama}"; \
   Check: homerFinishRuns and isReinstallOllama; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installPandoc.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause reinstall"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelPandoc}"; \
   Check: homerFinishRuns and isReinstallPandoc; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installPdfTools.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause reinstall"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelPdfTools}"; \
   Check: homerFinishRuns and isReinstallPdfTools; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installPython.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause reinstall"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelPython}"; \
   Check: homerFinishRuns and isReinstallPython; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installPywinauto.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause reinstall"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelPywinauto}"; \
   Check: homerFinishRuns and isReinstallPywinauto; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installTesseract.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause reinstall"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelTesseract}"; \
   Check: homerFinishRuns and isReinstallTesseract; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installWhisper.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause reinstall"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelWhisper}"; \
   Check: homerFinishRuns and isReinstallWhisper; \
   Flags: postinstall runascurrentuser waituntilterminated skipifdoesntexist unchecked
 
 FileName: "{app}\scripts\installYtDlp.cmd"; \
-  Parameters: "noPause"; \
+  Parameters: "noPause reinstall"; \
   WorkingDir: "{app}\scripts"; \
   Description: "{code:labelYtDlp}"; \
   Check: homerFinishRuns and isReinstallYtDlp; \

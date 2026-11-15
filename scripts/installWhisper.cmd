@@ -46,8 +46,11 @@ rem LARGE-V3 TURBO BY DEFAULT (13 October 2026): quantized to five bits it is 54
 rem and hears nearly as well as large-v3 (2.9 GB). A model named on the command line still wins.
 set "model=large-v3-turbo-q5_0"
 set "noPause="
+rem REINSTALL IS A WORD, NOT A MODEL (HomerDev 1.232.0, 15 November 2026): Setup's Reinstall box now passes it, and
+rem any other word is still the model's name. With it the program is fetched again over the copy that is there.
+set "bReinstall="
 for %%A in (%*) do (
-  if /i "%%A"=="noPause" (set "noPause=1") else (set "model=%%A")
+  if /i "%%A"=="noPause" (set "noPause=1") else if /i "%%A"=="reinstall" (set "bReinstall=1") else (set "model=%%A")
 )
 
 rem MACHINE-WIDE, NOT INSIDE AN APP'S FOLDER.
@@ -88,6 +91,8 @@ rem PowerShell below reads this, so the download lands where this script
 rem decided -- not where it assumed.
 set "HOMER_WHISPER_DIR=%whisperDir%"
 if not exist "%whisperDir%\whisper-cli.exe" goto :fetchAll
+if defined bReinstall call "%~dp0installCommon.cmd" log "reinstall: fetching whisper.cpp again over the copy in %whisperDir%"
+if defined bReinstall goto :downloadProgram
 rem AN UPDATE THAT UPDATES (6 November 2026). With the program in place, its download was skipped and only the model
 rem was checked, so the installer's Update -- offered at 10:43 and 10:58 for 1.9.5 over 1.9.4 -- ran and changed nothing.
 rem Now the newest Windows CPU build is fetched, its whisper-cli.exe's own file version compared with the installed one,
@@ -104,6 +109,7 @@ goto :refreshProgram
 
 rem ---- the program ---------------------------------------------------
 if exist "%whisperDir%\whisper-cli.exe" goto :haveProgram
+:downloadProgram
 echo Downloading whisper.cpp. This is a small download.
 echo(
 rem HOW THE DOWNLOAD IS CHOSEN, and why it is not "latest".

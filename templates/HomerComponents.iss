@@ -997,6 +997,16 @@ begin
     else
       Result := sName + ' was not reinstalled. Its log says why.';
   end;
+  // EXPECTED AGAINST ACTUAL, IN SETUP'S OWN LOG (HomerDev 1.232.0, 15 November 2026). The Results box said this, and
+  // the log did not: three Setup logs showed Pandoc "offered as Update" and its script "exit code 0", and nothing to
+  // say Pandoc was still 3.13 afterwards. Each ticked component's outcome is now logged with the version wanted, the
+  // version before and the version found after, and a mismatch is marked, so scripts\auditInstallers can read it.
+  if (iBefore = 1) and ((sAfter = '') or (sAfter = sBefore)) and (iAfter <> 2) then
+    Log('Outcome ' + sName + ': MISMATCH; wanted ' + gHomer[iAt].sRemote + ', before ' + sBefore + ', after ' + sAfter + '; ' + Result)
+  else if (iBefore <> 1) and (iAfter = 0) then
+    Log('Outcome ' + sName + ': MISMATCH; wanted installed, after not found; ' + Result)
+  else
+    Log('Outcome ' + sName + ': as expected; wanted ' + gHomer[iAt].sRemote + ', before ' + sBefore + ', after ' + sAfter + '; ' + Result);
 end;
 
 function homerOllamaList(): String;

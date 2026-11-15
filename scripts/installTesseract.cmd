@@ -1,97 +1,82 @@
 @echo off
-setLocal
-
-rem ---- the log -------------------------------------------------------------
-rem The common half lives in the kit, so a fix reaches every install script in
-rem every Homer app rather than the one being edited. It sets sApp, sLogDir,
-rem log and sQuiet, and writes the environment header.
+rem installTesseract.cmd -- install or update Tesseract, which reads the words on a scanned page in about a second,
+rem where the picture model takes twenty-five, and leaves the model free to describe the page's pictures. Optional:
+rem without it a scanned page is still read, by the picture model alone.
+rem
+rem WHY IT CHANGED. Like installPandoc, this script stopped as soon as tesseract answered on the PATH or sat in
+rem Program Files, so an Update offered by Setup would have done nothing (15 November 2026, found in the audit that
+rem followed Pandoc's). It now updates as every other component does.
+rem
+rem THE SHARED PATTERN (HomerDev 1.232.0, 15 November 2026), as installGitHubCli and the rest have had since 1.69.1.
+rem WHETHER IT IS INSTALLED IS ASKED OF WINGET, by each package id it is known by, never of the PATH, which an older,
+rem unrelated copy can answer for. Installed: winget upgrade of the id found, which installs only something newer.
+rem Missing, or reinstall: winget install of the id found, else the first. Before and after, every copy on the PATH or
+rem in its own folder is logged with its version, and an older copy that comes first on the PATH is named.
+setlocal enabledelayedexpansion
 set "sScript=%~n0"
-set "sCallerDir=%~dp0"
-rem IF THE SHARED HALF IS MISSING, SAY SO. It was left out of the installer
-rem once, and every script that calls it died at this line -- no message, no
-rem log folder, nothing to diagnose from. A missing file must announce itself.
 if not exist "%~dp0installCommon.cmd" (
   echo(
   echo installCommon.cmd is missing from %~dp0
-  echo That file is part of this Homer program. Reinstall, or copy it from
-  echo the program's zip into this folder, and run this again.
+  echo That file is part of this program. Reinstall, or copy it from the
+  echo program's zip into this folder, and run this again.
   echo(
   if not defined noPause pause
   exit /b 1
 )
 call "%~dp0installCommon.cmd" setup "%~f0" %*
 
-
-
-
-:afterLogSetup
-rem installTesseract.cmd -- fetch Tesseract, which reads the words on a scan.
-rem
-rem WHY HOMERSCRIBE USES IT. A scanned page can be read two ways. The picture
-rem model takes about twenty-five seconds a page and can invent a word that
-rem was never there -- fluent, plausible, and wrong. Tesseract takes about a
-rem second, cannot invent anything, and reports how sure it was of every word.
-rem On clean print its accuracy is at least as good.
-rem
-rem So Tesseract reads the words and the model keeps the two jobs it is better
-rem at: describing the pictures, and reading a page Tesseract could not.
-rem
-rem Optional. Without it HomerScribe still reads scanned pages, using the
-rem picture model, which works and is much slower.
-rem
-rem Takes no arguments. Writes a detailed log beside this script.
-
-set "here=%~dp0"
-if "%here:~-1%"=="\" set "here=%here:~0,-1%"
-rem the log path is set above
-
-echo Tesseract install started %date% %time%>> "%log%"
-echo Script: %~f0>> "%log%"
-echo Folder: %here%>> "%log%"
-echo Command line: %0 %*>> "%log%"
-echo(>> "%log%"
-
-where tesseract >nul 2>&1
-if not errorlevel 1 (
-  echo Tesseract is already installed.
-  echo Already on the path>> "%log%"
-  tesseract --version >> "%log%" 2>&1
-  exit /b 0
-)
-if exist "%ProgramFiles%\Tesseract-OCR\tesseract.exe" (
-  echo Tesseract is already installed in Program Files.
-  echo Already in Program Files>> "%log%"
-  exit /b 0
-)
-
+set "bReinstall="
+for %%A in (%*) do if /i "%%A"=="reinstall" set "bReinstall=1"
+set "sWhat=Tesseract"
 where winget >nul 2>&1
 if errorlevel 1 (
-  echo(
-  echo winget was not found, so Tesseract could not be fetched automatically.
-  echo the program will still read scanned pages using the picture model.
-  echo winget not found>> "%log%"
-  exit /b 1
+  call "%~dp0installCommon.cmd" say "winget was not found, so Tesseract cannot be installed or updated automatically."
+  goto :failed
 )
-
-echo Downloading Tesseract. This is about 60 MB and happens once.
-echo Fetching with winget>> "%log%"
-set "sHomerRunLong=winget install --id UB-Mannheim.TesseractOCR --accept-source-agreements --accept-package-agreements --silent"
+call "%~dp0installCommon.cmd" copies tesseract.exe "%ProgramFiles%\Tesseract-OCR\tesseract.exe"
+call "%~dp0installCommon.cmd" log "before: !sHomerCopies!"
+set "sFound="
+for %%I in (UB-Mannheim.TesseractOCR) do if not defined sFound (
+  call "%~dp0installCommon.cmd" wingetHas %%I
+  if not errorlevel 1 set "sFound=%%I"
+)
+call "%~dp0installCommon.cmd" log "installed under: !sFound!"
+if defined sFound if not defined bReinstall goto :update
+rem A REINSTALL REINSTALLS Tesseract IS THERE: the id it is registered under, forced, never a second copy beside it.
+set "sInstallId=UB-Mannheim.TesseractOCR"
+set "sForce="
+if defined sFound set "sInstallId=!sFound!"
+if defined bReinstall set "sForce=--force"
+echo Installing Tesseract. About 60 MB, and nothing is asked of you while it runs.
+set "sHomerRunLong=winget install --id !sInstallId! !sForce! --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity"
 call "%~dp0installCommon.cmd" runLong "Tesseract"
+set "iCode=!ERRORLEVEL!"
+call "%~dp0installCommon.cmd" log "winget install !sInstallId! !sForce! exit code !iCode!"
+if not "!iCode!"=="0" goto :failed
+echo Tesseract is installed.
+goto :after
 
-where tesseract >nul 2>&1
-if not errorlevel 1 goto :ok
-if exist "%ProgramFiles%\Tesseract-OCR\tesseract.exe" goto :ok
+:update
+call "%~dp0installCommon.cmd" wingetUpgrade !sFound! "Tesseract"
+if errorlevel 1 goto :failed
 
+:after
+call "%~dp0installCommon.cmd" copies tesseract.exe "%ProgramFiles%\Tesseract-OCR\tesseract.exe"
+call "%~dp0installCommon.cmd" log "after: !sHomerCopies!"
+if defined sHomerShadow call "%~dp0installCommon.cmd" say "!sHomerShadow!"
+goto :done
+
+:failed
 echo(
-echo Tesseract could not be fetched. The log says what was tried: %log%
-echo the program will still read scanned pages using the picture model.
-echo Install failed>> "%log%"
+echo %sWhat% could not be installed or updated automatically. The log says why:
+echo   %log%
+echo(
+if not defined noPause pause
+endlocal
 exit /b 1
 
-:ok
+:done
 echo(
-echo Tesseract is installed. Scanned pages will be read in about a second each
-echo rather than twenty-five, and the model will describe their pictures.
-echo Installed>> "%log%"
-echo Tesseract install finished %date% %time%>> "%log%"
+if not defined noPause pause
+endlocal
 exit /b 0

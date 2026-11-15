@@ -1,74 +1,81 @@
 @echo off
-setLocal enableDelayedExpansion
-
-rem ---- the log -------------------------------------------------------------
-rem The common half lives in the kit, so a fix reaches every install script in
-rem every Homer app rather than the one being edited. It sets sApp, sLogDir,
-rem log and sQuiet, and writes the environment header.
+rem installExifTool.cmd -- install or update ExifTool, which reads what a recording or photo knows about itself and
+rem writes descriptions into photographs.
+rem
+rem WHY IT CHANGED. This script ran "winget install OliverBetz.ExifTool" whatever was there. Setup knows ExifTool by
+rem two ids, OliverBetz.ExifTool and PhilHarvey.ExifTool, so a copy registered under the second would have been joined
+rem by a second copy rather than updated, and Reinstall was not honored (15 November 2026, the installer audit).
+rem
+rem THE SHARED PATTERN (HomerDev 1.232.0, 15 November 2026), as installGitHubCli and the rest have had since 1.69.1.
+rem WHETHER IT IS INSTALLED IS ASKED OF WINGET, by each package id it is known by, never of the PATH, which an older,
+rem unrelated copy can answer for. Installed: winget upgrade of the id found, which installs only something newer.
+rem Missing, or reinstall: winget install of the id found, else the first. Before and after, every copy on the PATH or
+rem in its own folder is logged with its version, and an older copy that comes first on the PATH is named.
+setlocal enabledelayedexpansion
 set "sScript=%~n0"
-set "sCallerDir=%~dp0"
-rem IF THE SHARED HALF IS MISSING, SAY SO. It was left out of the installer
-rem once, and every script that calls it died at this line -- no message, no
-rem log folder, nothing to diagnose from. A missing file must announce itself.
 if not exist "%~dp0installCommon.cmd" (
   echo(
   echo installCommon.cmd is missing from %~dp0
-  echo That file is part of this Homer program. Reinstall, or copy it from
-  echo the program's zip into this folder, and run this again.
+  echo That file is part of this program. Reinstall, or copy it from the
+  echo program's zip into this folder, and run this again.
   echo(
   if not defined noPause pause
   exit /b 1
 )
 call "%~dp0installCommon.cmd" setup "%~f0" %*
-rem ---- WHY THIS USES WINGET NOW -------------------------------------------
-rem
-rem The single-file exiftool.exe is DEPRECATED. Phil Harvey stopped releasing
-rem it in July 2024, at about version 12.88, so a single file is frozen at
-rem whatever it was then -- missing every camera and format added since.
-rem
-rem It was also the SLOWER arrangement, not the tidier one. The single file was
-rem a self-extracting archive that unpacked its whole Perl runtime into a
-rem temporary folder on EVERY run. That is why antivirus software kept flagging
-rem it, and why the current packaging measurably halved processing time for
-rem people doing many files.
-rem
-rem The exiftool_files folder beside the executable is therefore not clutter:
-rem it is the unpacked runtime, kept where it belongs instead of being rebuilt
-rem every time the program starts.
-rem
-rem Oliver Betz packages that as a proper installer, and winget carries it.
-rem --scope machine puts it where every Homer app can share one copy.
 
-echo Downloading and installing ExifTool, so descriptions can be written into photographs.
-echo(
-
+set "bReinstall="
+for %%A in (%*) do if /i "%%A"=="reinstall" set "bReinstall=1"
+set "sWhat=ExifTool"
 where winget >nul 2>&1
 if errorlevel 1 (
-  echo winget was not found, so ExifTool cannot be fetched automatically.
-  echo the program will still describe pictures; it just cannot write the
-  echo descriptions into them.
-  call "%~dp0installCommon.cmd" log "FAILED: winget is not on this machine"
-  if not defined noPause pause
-  exit /b 1
+  call "%~dp0installCommon.cmd" say "winget was not found, so ExifTool cannot be installed or updated automatically."
+  goto :failed
 )
-
-set "sHomerRunLong=winget install --id OliverBetz.ExifTool --exact --scope machine --accept-package-agreements --accept-source-agreements"
+call "%~dp0installCommon.cmd" copies exiftool.exe "%ProgramFiles%\ExifTool\exiftool.exe" "%LOCALAPPDATA%\Programs\ExifTool\exiftool.exe"
+call "%~dp0installCommon.cmd" log "before: !sHomerCopies!"
+set "sFound="
+for %%I in (OliverBetz.ExifTool PhilHarvey.ExifTool) do if not defined sFound (
+  call "%~dp0installCommon.cmd" wingetHas %%I
+  if not errorlevel 1 set "sFound=%%I"
+)
+call "%~dp0installCommon.cmd" log "installed under: !sFound!"
+if defined sFound if not defined bReinstall goto :update
+rem A REINSTALL REINSTALLS ExifTool IS THERE: the id it is registered under, forced, never a second copy beside it.
+set "sInstallId=OliverBetz.ExifTool"
+set "sForce="
+if defined sFound set "sInstallId=!sFound!"
+if defined bReinstall set "sForce=--force"
+echo Installing ExifTool. About 10 MB, and nothing is asked of you while it runs.
+set "sHomerRunLong=winget install --id !sInstallId! !sForce! --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity"
 call "%~dp0installCommon.cmd" runLong "ExifTool"
+set "iCode=!ERRORLEVEL!"
+call "%~dp0installCommon.cmd" log "winget install !sInstallId! !sForce! exit code !iCode!"
+if not "!iCode!"=="0" goto :failed
+echo ExifTool is installed.
+goto :after
 
-rem THE FILE, NOT THE EXIT CODE.
-set "found="
-for /f "delims=" %%E in ('where exiftool.exe 2^>nul') do if not defined found set "found=%%E"
-if not defined found if exist "%ProgramFiles%\ExifTool\exiftool.exe" set "found=%ProgramFiles%\ExifTool\exiftool.exe"
-if not defined found (
-  echo(
-  echo ExifTool did NOT install. The log has what winget said: %log%
-  call "%~dp0installCommon.cmd" log "FAILED: exiftool.exe not found after winget"
-  if not defined noPause pause
-  exit /b 1
-)
-echo   ExifTool is at %found%
-call "%~dp0installCommon.cmd" log "OK: exiftool.exe at %found%"
+:update
+call "%~dp0installCommon.cmd" wingetUpgrade !sFound! "ExifTool"
+if errorlevel 1 goto :failed
+
+:after
+call "%~dp0installCommon.cmd" copies exiftool.exe "%ProgramFiles%\ExifTool\exiftool.exe" "%LOCALAPPDATA%\Programs\ExifTool\exiftool.exe"
+call "%~dp0installCommon.cmd" log "after: !sHomerCopies!"
+if defined sHomerShadow call "%~dp0installCommon.cmd" say "!sHomerShadow!"
+goto :done
+
+:failed
 echo(
-echo ExifTool is ready.
+echo %sWhat% could not be installed or updated automatically. The log says why:
+echo   %log%
+echo(
 if not defined noPause pause
+endlocal
+exit /b 1
+
+:done
+echo(
+if not defined noPause pause
+endlocal
 exit /b 0
