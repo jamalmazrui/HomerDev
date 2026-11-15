@@ -1899,54 +1899,21 @@ def checkSuiteCommands():
         sKeyFile = os.path.join(sRoot, "configs", "Hotkeys.inix")
     if not os.path.isfile(sKeyFile):
         return finding("suite commands", "skip", "no key file in configs")
-    # [keys <App>] in the catalog names a key an app keeps instead of the suite's, for a reason the catalog gives --
-    # HomerView's Elevate Version is Control+F11, since F11 is Microsoft Edge's full screen (10 November 2026).
-    dCommands, dWords, dKeyExceptions, sSection = {}, {}, {}, ""
-    for sLine in readText(sCatalog).splitlines():
-        sTrim = sLine.strip()
-        if not sTrim or sTrim.startswith(";"): continue
-        if sTrim.startswith("["): sSection = sTrim[1:-1]; continue
-        if "=" not in sTrim: continue
-        sKey, sValue = sTrim.split("=", 1)
-        if sSection.startswith("command "): dCommands.setdefault(sSection[8:], {})[sKey.strip()] = sValue.strip()
-        elif sSection.startswith("words "): dWords.setdefault(sSection[6:], {})[sKey.strip()] = sValue.strip()
-        elif sSection.startswith("keys "): dKeyExceptions.setdefault(sSection[5:], {})[sKey.strip()] = sValue.strip()
-    def normKey(sKey):
-        dRep = {"Ctrl": "Control", "Apostrophe": "'", "OemQuotes": "'", "Semicolon": ";", "Semi-colon": ";", "Backslash": "\\",
-                "Slash": "/", "Grave": "`", "Equals": "=", "Return": "Enter", "Comma": ",", "Period": ".", "SemiColon": ";"}
-        lParts = [dRep.get(s, s) for s in sKey.strip().split("+") if s]
-        lMods = [s for s in ("Control", "Alt", "Shift") if s in lParts]
-        lRest = [re.sub(r"^D(\d)$", r"\1", s) for s in lParts if s not in ("Control", "Alt", "Shift")]
-        return "+".join(lMods + lRest)
-    def render(sName):
-        sText = dCommands[sName].get("description", "")
-        dAll = dict(dWords.get(sApp, {})); dAll["app"] = sApp; dAll.update(dWords.get(sName + "|" + sApp, {}))
-        for sKey, sValue in dAll.items(): sText = sText.replace("{" + sKey + "}", sValue)
-        return sText
-    lBreaks, iShared = [], 0
-    for sLine in readText(sKeyFile).splitlines():
-        if "=" not in sLine or sLine.lstrip().startswith((";", "[")): continue
-        sName, sRest = sLine.split("=", 1)
-        sCanon = sName.strip().replace(sApp, "{app}")
-        if sCanon not in dCommands: continue
-        iShared += 1
-        lParts = sRest.split(",")
-        iAt = 1
-        while iAt < len(lParts) and re.match(r"^\s*(or|through)\b", lParts[iAt]): iAt += 1
-        lKeys = [normKey(s) for sPart in lParts[:iAt] for s in re.split(r"\s+or\s+|^\s*or\s+|^\s*through\s+", sPart.strip()) if s.strip() and s.strip().lower() != "none"]
-        sDescription = ",".join(lParts[iAt:]).strip()
-        sSuiteKey = normKey(dCommands[sCanon].get("key", "").replace("{app}", sApp))
-        sOwnKey = normKey(dKeyExceptions.get(sApp, {}).get(sCanon, ""))
-        if sOwnKey: sSuiteKey = sOwnKey
-        if sSuiteKey and sSuiteKey not in lKeys:
-            lBreaks.append("%s: the suite's key is %s, but %s binds %s" % (sName.strip(), sSuiteKey, sApp, " or ".join(lKeys) or "none"))
-        sWanted = render(sCanon)
-        if sDescription.rstrip(".") != sWanted.rstrip("."):   # a closing period is a matter of each app's style
-            lBreaks.append("%s: says \"%s\", where the suite says \"%s\"" % (sName.strip(), sDescription, sWanted))
+    # THE COMPARISON LIVES IN THE KIT (1.235.0): scripts\\suiteCatalog.py, which the kit's build proves with
+    # testSuiteGate. Besides each shared command's key and sentence, it now fails a command the catalog gives this app
+    # (apps=) that the key file leaves out, and a key file naming no shared command, which used to pass as "0 shared
+    # commands" (the keyboard audit of 15 November, A2). [keys <App>] in the catalog still names a key an app keeps.
+    sKitScripts = os.path.join(sKit, "scripts")
+    if sKitScripts not in sys.path: sys.path.insert(0, sKitScripts)
+    try:
+        import suiteCatalog
+    except Exception as exceptionError:
+        return finding("suite commands", "fail", "the kit's scripts\\suiteCatalog.py could not be loaded: %s" % exceptionError)
+    lBreaks, iShared = suiteCatalog.suiteBreaks(readText(sCatalog), readText(sKeyFile), sApp)
     for sBreak in lBreaks: logLine("SUITE: " + sBreak)
     if lBreaks:
         iDiffer = len(set(s.split(":", 1)[0] for s in lBreaks))   # commands, not breaks: one can differ in key and words
-        return finding("suite commands", "fail", "%d of %d shared commands differ from the suite's catalog; each is in the log" % (iDiffer, iShared))
+        return finding("suite commands", "fail", "%d shared command%s differ from the suite's catalog or are missing; each is in the log" % (iDiffer, "" if iDiffer == 1 else "s"))
     return finding("suite commands", "pass", "%d shared commands, each with the suite's key and sentence" % iShared)
 
 

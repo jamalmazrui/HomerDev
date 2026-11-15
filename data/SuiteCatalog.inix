@@ -4,6 +4,9 @@
 ; one app has them under [words <command>|<app>]; a key an app keeps instead of the suite's, for a reason given, is
 ; under [keys <app>]. check.py's suite commands check fails a release whose key file says otherwise. Change a shared
 ; command here, then in every app's key file, so the suite stays one.
+; APPS (1.235.0, 15 November 2026): apps= names the apps that have a command, as their key files had it that day. The
+; suite commands check fails an app whose key file leaves out a command the catalog gives it, which it never asked
+; about before. Add an app here when it gains the command; take it out only with the command.
 
 [words DbDo]
 thing=record
@@ -45,6 +48,11 @@ whose=text
 targets_files=the current page
 paste_what=text
 
+[keys FileDir]
+; Alt+Shift+I runs Inquire Differences here; Invert Marked moves to it when Inquire Differences has a new key (the
+; keyboard audit of 15 November, A6, and question 6 of its decisions)
+Invert Marked=Control+I
+
 [keys HomerView]
 ; F11 is Microsoft Edge's full screen
 Elevate Version=Control+F11
@@ -52,358 +60,447 @@ Elevate Version=Control+F11
 Copy Log=Alt+Shift+L
 
 [command About]
+apps=DbDo, EdSharp, FileDir
 key=Alt+F1
 description=Say {app}'s version and release date
 
 [command Alternate Menu]
+apps=DbDo, EdSharp, FileDir, HomerView
 key=Alt+F10
 description=Pick any command from one list, in menu, name or key order
 
 [command Announcement]
+apps=EdSharp, FileDir
 key=
 description=Open the announcement of this version
 
 [command Append Clipboard]
+apps=EdSharp, FileDir, HomerView
 key=Control+Shift+'
 description=Add the clipboard text to the end of a file you name
 
 [command Arrange Icons]
+apps=EdSharp, FileDir
 key=Alt+F11
 description=Arrange the open windows
 
 [command Burn to CD]
+apps=EdSharp, FileDir
 key=Alt+Shift+B
 description=Burn {what} to a CD
 
 [command Cascade]
+apps=EdSharp, FileDir
 key=Control+F11
 description=Cascade the open windows
 
 [command Chat with AI]
+apps=EdSharp, FileDir
 key=F12
 description=Ask the AI model on this computer a question
 
 [command Clear Bookmark]
+apps=DbDo, EdSharp
 key=Control+Shift+B
 description=Remove {what}
 
 [command Clear Clipboard]
+apps=EdSharp, FileDir, HomerView
 key=Alt+Shift+'
 description=Empty the clipboard
 
 [command Clear Filter]
+apps=DbDo, FileDir
 key=Control+Shift+F
 description=Show {what}
 
 [command Close All But Current Window]
+apps=DbDo, FileDir
 key=Control+Shift+F4
 description=Close every window but the current one
 
 [command Close Window]
+apps=DbDo, EdSharp, FileDir
 key=Control+F4
 description=Close the current window
 
 [command Complete Mark]
+apps=DbDo, FileDir
 key=Shift+F8
 description=Mark every {thing} from the range's start to the current one
 
 [command Complete Unmark]
+apps=DbDo, FileDir
 key=Alt+Shift+F8
 description=Unmark every {thing} from the range's start to the current one
 
 [command Context Menu]
+apps=DbDo, EdSharp, FileDir
 key=Shift+F10
 description=Open the Windows context menu for {what}
 
 [command Copy]
+apps=EdSharp, FileDir
 key=Control+C
 description=Copy {targets} to the clipboard
 
 [command Copy Append]
+apps=EdSharp, FileDir, HomerView
 key=Alt+C
 description=Add {targets} to the end of the clipboard
 
 [command Copy Log]
+apps=EdSharp, FileDir, HomerView
 key=Control+F12
 description=Copy the session log to the clipboard as a file
 
 [command Current Windows]
+apps=DbDo, EdSharp, FileDir
 key=F4
 description=Switch to a window you pick from the list
 
 [command Cut]
+apps=EdSharp, FileDir
 key=Control+X
 description=Cut {targets} to the clipboard
 
 [command Developer Guide]
+apps=EdSharp, FileDir
 key=
 description=Open the guide for developers
 
 [command Documentation]
+apps=DbDo, EdSharp, FileDir
 key=F1
 description=Open the {app} guide
 
 [command Edit Settings]
+apps=DbDo, EdSharp, FileDir, HomerView
 key=Alt+Shift+E
 description=Edit {app}'s settings file
 
 [command Edit Settings File]
+apps=EdSharp, FileDir
 key=Alt+Shift+F2
 description=Edit {app}'s settings file in your text editor
 
 [command Elevate Version]
+apps=DbDo, EdSharp, FileDir, HomerView
 key=F11
 description=Download and install the latest {app}
 
 [command Environment Variables]
+apps=EdSharp, FileDir
 key=Control+E
 description=Change Windows environment variables for this process, your account or the system
 
 [command Evaluate Expression]
+apps=EdSharp, FileDir
 key=Control+=
 description=Evaluate an expression and {what}
 
 [command Exit {app}]
+apps=DbDo, EdSharp, FileDir
 key=Alt+F4
 description=Close {app}
 
 [command Extract with Regex]
+apps=DbDo, EdSharp, FileDir
 key=Control+Shift+E
 description=Copy every match of a regular expression in {what}
 
 [command File Find]
+apps=EdSharp, FileDir
 key=Alt+Shift+F
 description=Find files by name and content in this folder and below, and {what}
 
 [command Frequently Asked Questions]
+apps=EdSharp, FileDir
 key=
 description=Open the answers to frequently asked questions
 
 [command Go to Special Folder]
+apps=EdSharp, FileDir
 key=Control+Shift+G
 description=Go to a Windows special folder you pick
 
 [command History of Changes]
+apps=DbDo, EdSharp, FileDir, HomerView
 key=Control+Shift+F1
 description=Open the history of {app}'s changes, newest first
 
 [command Hotkey Summary]
+apps=DbDo, EdSharp, FileDir, HomerView
 key=
 description=List every command with its key and description
 
 [command Hotkeys]
+apps=EdSharp, FileDir, HomerView
 key=
 description=Open the list of every command and key
 
 [command Invert Marked]
+apps=DbDo, FileDir
 key=Alt+Shift+I
 description=Mark the unmarked {things} in view and unmark the marked ones
 
 [command Invoke Script]
+apps=DbDo, EdSharp
 key=Alt+V
 description=Pick a script to {what}
 
 [command Jump]
+apps=DbDo, FileDir
 key=Control+J
 description=Go to the next {thing} whose {where} holds the text
 
 [command Key Describer Toggle]
+apps=DbDo, EdSharp, FileDir, HomerView
 key=Control+F1
 description=Turn key describing on or off: a key says its command instead of running it
 
 [command Keywords]
+apps=DbDo, FileDir
 key=Control+K
 description=Go to the next {thing} whose {where} holds the keywords
 
 [command Launch {app}]
+apps=EdSharp, FileDir, HomerView
 key=
 description=Start {app}, or switch to it, from its desktop shortcut
 
 [command License]
+apps=EdSharp, FileDir
 key=
 description=Open the license
 
 [command List Bookmarks]
+apps=DbDo, EdSharp
 key=Alt+B
 description=Go to a {what} you pick from a list
 
 [command Mail Attachment]
+apps=EdSharp, FileDir
 key=Control+Shift+M
 description=Send {targets_files} as email attachments
 
 [command Mail Body]
+apps=EdSharp, FileDir
 key=Control+M
 description=Send the current file's text as the body of an email message
 
 [command Mark All]
+apps=DbDo, FileDir
 key=Control+A
 description=Mark every {thing} in view
 
 [command Mark and Next]
+apps=DbDo, FileDir
 key=Shift+DownArrow
 description=Mark the current {thing} and go to the next
 
 [command Mark and Previous]
+apps=DbDo, FileDir
 key=Shift+UpArrow
 description=Mark the current {thing} and go to the previous
 
 [command Next Marked]
+apps=DbDo, FileDir
 key=Control+DownArrow
 description=Go to the next marked {thing}
 
 [command Next Window]
+apps=DbDo, EdSharp, FileDir
 key=Control+Tab
 description=Switch to the next window
 
 [command Open Command Prompt]
+apps=DbDo, EdSharp, FileDir
 key=Control+\
 description=Open a command prompt in {folder}
 
 [command Open in Explorer]
+apps=DbDo, EdSharp, FileDir
 key=Alt+\
 description=Open {folder} in Windows Explorer
 
 [command Paste]
+apps=EdSharp, FileDir
 key=Control+V
 description=Paste the clipboard {paste_what}
 
 [command Path to Clipboard]
+apps=EdSharp, FileDir
 key=Alt+Shift+P
 description=Copy the full path of {current} to the clipboard
 
 [command Play Tutorials]
+apps=EdSharp, FileDir
 key=Alt+F12
 description=Play the spoken tutorials
 
 [command Previous Marked]
+apps=DbDo, FileDir
 key=Control+UpArrow
 description=Go to the previous marked {thing}
 
 [command Previous Window]
+apps=DbDo, EdSharp, FileDir
 key=Control+Shift+Tab
 description=Switch to the previous window
 
 [command Print]
+apps=DbDo, EdSharp, FileDir
 key=
 description=Print {targets}
 
 [command Properties]
+apps=EdSharp, FileDir
 key=Alt+Enter
 description=Show the Windows properties of {current}
 
 [command ReadMe]
+apps=EdSharp, FileDir, HomerView
 key=Alt+Shift+F1
 description=Open the quick start
 
 [command Rename]
+apps=EdSharp, FileDir
 key=Shift+F2
 description=Rename {current} on disk
 
 [command Replace]
+apps=DbDo, EdSharp
 key=Control+R
 description=Replace text in {where}
 
 [command Replace with Regex]
+apps=DbDo, EdSharp
 key=Control+Shift+R
 description=Replace a regular expression's matches in {where}
 
 [command Reverse Keywords]
+apps=DbDo, FileDir
 key=Control+Shift+K
 description=Go to the previous {thing} whose {where} holds the keywords
 
 [command Save]
+apps=EdSharp
 key=Control+S
 description=Save {what}
 
 [command Save As]
+apps=EdSharp
 key=Control+Shift+S
 description=Save a copy of {what} under another name or format
 
 [command Save Bookmark]
+apps=DbDo, EdSharp
 key=Control+B
 description=Bookmark {what}
 
 [command Save Clipboard]
+apps=EdSharp, FileDir, HomerView
 key=Control+'
 description=Save the clipboard text to a file you name
 
 [command Say Clipboard]
+apps=DbDo, EdSharp, FileDir, HomerView
 key=Alt+'
 description=Say the clipboard text
 
 [command Say Path]
+apps=EdSharp, FileDir
 key=Alt+P
 description=Say the full path of {current}
 
 [command Say Position]
+apps=DbDo, FileDir, HomerView
 key=Alt+Delete
 description=Say the current position: {what}
 
 [command Say Selected]
+apps=EdSharp, FileDir, HomerView
 key=Shift+Space
 description=Say {what}
 
 [command Say Status]
+apps=DbDo, EdSharp, FileDir
 key=Alt+Z
 description=Say {what}
 
 [command Say Time]
+apps=EdSharp, FileDir, HomerView
 key=Alt+;
 description=Say the date and time
 
 [command Say Windows Open]
+apps=DbDo, EdSharp, FileDir
 key=Shift+F4
 description=Say how many windows are open, and their titles
 
 [command Say Yield]
+apps=DbDo, EdSharp, HomerView
 key=Alt+Y
 description=Say how many {what}
 
 [command Search Next]
+apps=DbDo, EdSharp, FileDir, HomerView
 key=F3
 description=Repeat the last {what}, forward
 
 [command Search Previous]
+apps=DbDo, EdSharp, FileDir, HomerView
 key=Shift+F3
 description=Repeat the last {what}, backward
 
 [command SendTo Menu]
+apps=EdSharp, FileDir
 key=Control+F10
 description=Send {targets_files} to a Send To choice you pick
 
 [command Tile Horizontal]
+apps=EdSharp, FileDir
 key=Alt+Shift+F11
 description=Tile the open windows across
 
 [command Tile Vertical]
+apps=EdSharp, FileDir
 key=Shift+F11
 description=Tile the open windows down
 
 [command Tutorials Transcript]
+apps=EdSharp, FileDir
 key=
 description=Open the text of the tutorials
 
 [command Unmark All]
+apps=DbDo, FileDir
 key=Control+Shift+A
 description=Unmark every {thing} in view
 
 [command Unmark and Next]
+apps=DbDo, FileDir
 key=Control+Shift+DownArrow
 description=Unmark the current {thing} and go to the next
 
 [command Unmark and Previous]
+apps=DbDo, FileDir
 key=Control+Shift+UpArrow
 description=Unmark the current {thing} and go to the previous
 
 [command Web Download]
+apps=EdSharp, FileDir, HomerView
 key=Alt+Shift+W
 description=Download files linked from {what}
 
 [command What This Does]
+apps=DbDo, EdSharp, FileDir
 key=Shift+F1
 description=Say what the control with focus does
 
 [command Where Am I]
+apps=DbDo, EdSharp, FileDir
 key=Control+/
 description=Say where you are, what has focus and its keys
 

@@ -38,7 +38,7 @@ lsExpected = [
     "exec/CSharp/Log.cs", "exec/CSharp/Mdi.cs", "exec/CSharp/Media.cs", "exec/CSharp/MediaPlayer.cs", "exec/CSharp/Mpv.cs", "exec/CSharp/Paths.cs",
     "exec/CSharp/Say.cs", "exec/CSharp/Util.cs", "exec/CSharp/Web.cs",
     "exec/CSharp/ConversionPdf.cs", "exec/CSharp/PdfReader.cs",
-    "exec/CSharp/inixVert.cs", "exec/CSharp/Macro.cs", "scripts/testMacro.cmd", "scripts/testMacro.cs", "scripts/testMacro.py", "scripts/auditInstallers.cmd", "scripts/auditInstallers.py",
+    "exec/CSharp/inixVert.cs", "exec/CSharp/Macro.cs", "scripts/testMacro.cmd", "scripts/testMacro.cs", "scripts/testMacro.py", "scripts/auditInstallers.cmd", "scripts/auditInstallers.py", "scripts/suiteCatalog.py", "scripts/testSuiteGate.py",
     "exec/Python/inix.py", "exec/Python/kdpEpub.py", "scripts/buildBooks.cmd", "scripts/buildBooks.py", "scripts/kdpBooks.cmd", "scripts/kdpBooks.py", "scripts/kdpSubmit.cmd", "scripts/kdpSubmit.py", "scripts/kdpUpdate.cmd", "scripts/kdpUpdate.py", "scripts/testKdpUpdate.py", "templates/books/Book_KDP.inix", "templates/books/books.inix", "templates/books/buildBooks.inix", "templates/books/epub.css", "templates/books/tocEpub.lua", ".claude/skills/homer-books/SKILL.md", "exec/Python/lbc.py", "exec/Python/lbcnet.py", "exec/Python/log.py", "exec/Python/media.py",
     "exec/Python/mdi.py", "exec/Python/elevate.py", "exec/Python/paths.py", "exec/Python/say.py", "exec/Python/util.py", "exec/Python/web.py",
     "templates/build_APP_.cmd", "templates/build_APP_Py.cmd",
@@ -2342,6 +2342,23 @@ def main():
             sayLine("The installer's components could not be audited: %s" % oError)
             iSamplesFailed += 1
             lsFailedParts.append("the installer component audit, which could not run")
+        # THE SUITE GATE IS PROVED HERE (1.235.0): scripts\\testSuiteGate feeds scripts\\suiteCatalog small key files that
+        # must pass or fail -- an alias carrying the suite's key, a wrong key, a different sentence, a command left out, a
+        # key file naming none -- and reads the kit's own catalog. The suite commands check every app runs relies on it.
+        try:
+            oDone = subprocess.run([sys.executable, os.path.join(sScriptDir, "scripts", "testSuiteGate.py")], capture_output=True, text=True, timeout=120)
+            for sLine in (oDone.stdout or "").strip().splitlines():
+                if sLine.startswith(("FAIL ", "testSuiteGate")): sayLine(sLine)
+                else: logLine("testSuiteGate: " + sLine)
+            for sLine in (oDone.stderr or "").strip().splitlines(): logLine("testSuiteGate stderr: " + sLine)
+            logLine("testSuiteGate exit %d" % oDone.returncode)
+            if oDone.returncode != 0:
+                iSamplesFailed += 1
+                lsFailedParts.append("the suite gate test")
+        except Exception as oError:
+            sayLine("The suite gate could not be tested: %s" % oError)
+            iSamplesFailed += 1
+            lsFailedParts.append("the suite gate test, which could not run")
         # THE AXE.WINDOWS LIBRARY ONLY (6 November 2026). axeWindow scans one window through the 3.3 MB library; the
         # 107 MB AxeWindowsCLI, fetched here since 1.141.0, has had no use since, and filled %LOCALAPPDATA%\\HomerDev.
         # It is no longer fetched, and a copy left there is removed. Nothing a Homer app runs depends on this folder:

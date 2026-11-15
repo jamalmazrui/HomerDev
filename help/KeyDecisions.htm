@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="pandoc 3.13" />
+  <meta name="generator" content="pandoc 3.14" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>KeyDecisions</title>
   <style>
@@ -35,27 +35,6 @@
       }
       h1 {
         font-size: 1.8em;
-      }
-    }
-    @media print {
-      html {
-        color-scheme: light only;
-      }
-      html, body, pre, code {
-        background-color: transparent;
-      }
-      body, a, a:visited, blockquote {
-        color: black;
-      }
-      pre, code {
-        padding: 0;
-      }
-      p, h2, h3 {
-        orphans: 3;
-        widows: 3;
-      }
-      h2, h3, h4 {
-        page-break-after: avoid;
       }
     }
     p {
@@ -163,6 +142,12 @@
       text-decoration: none;
     }
     span.smallcaps{font-variant: small-caps;}
+    em, em em em, em em em em em {
+      font-style: italic;
+    }
+    em em, em em em em {
+      font-style: normal;
+    }
     div.columns{display: flex; gap: 1.5em;}
     div.column{flex: auto;}
     @media screen {
@@ -179,7 +164,27 @@
       margin: 0 0.8em 0.2em -1.6em;
       vertical-align: middle;
     }
-  </style>
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }  </style>
 </head>
 <body>
 <main>
@@ -494,6 +499,91 @@ command cannot run, giving the true reason after the description; never
 guess a reason; ignore the nameless key a screen reader sends; and
 describe from the app’s own command table. HomerSuite.md states the
 rules; the kit’s KeyMap carries them out.</p>
+<h2 id="rulings-since-19-october-to-confirm-15-november-2026">Rulings
+since 19 October, to confirm (15 November 2026)</h2>
+<p>The keyboard audit of 15 November, by Claude and ChatGPT, found
+several of Jamal’s rulings recorded nowhere in the kit, so an audit
+could not cite them. They are gathered here so the kit is the
+record.</p>
+<p><strong>These are summaries, not quotations.</strong> Each comes from
+Claude’s notes of a conversation, with the date the ruling was given.
+Jamal confirms or corrects each one once. A confirmed line is marked
+<em>confirmed</em>, and a corrected one is rewritten in his words. Until
+then, each line is cited as “summary, to confirm,” and no audit may
+treat it as his exact words.</p>
+<ul>
+<li><strong>18 October, settings.</strong> Editing configuration
+settings is an Edit command on the same E key in every app: Alt+Shift+E.
+Alt+E opens the Edit menu. <em>Summary, to confirm.</em></li>
+<li><strong>18 October, window cycles.</strong> Control+Tab and
+Control+F6 must not duplicate each other. Each is next-in-cycle at a
+different level or in a different way. <em>Summary, to
+confirm.</em></li>
+<li><strong>19 October, Page keys.</strong> Control+PageUp and
+Control+PageDown must not duplicate Control+Tab or an F6-family command.
+They have a unique purpose, or none. <em>Summary, to confirm.</em></li>
+<li><strong>19 October, habits as preferences.</strong> Alt+C for
+appending is not universal, since FileDir uses Shift+A. Such habits are
+preferences, balanced to an optimum under constraints. <em>Summary, to
+confirm.</em> The audit later found that FileDir’s Shift+A appends file
+contents, a different command from Copy Append on Alt+C.</li>
+<li><strong>19 October, one name, one code.</strong> A command with the
+same name, key and description in several apps runs the same HomerDev
+code. <em>Summary, to confirm.</em></li>
+<li><strong>19 October, no lost functionality.</strong> A legacy key may
+be lost, but functionality must not be. A command made menu-only counts
+as lost functionality, so it keeps some key. This is already in The
+Rules Weighed, above.</li>
+<li><strong>5 November, distinct roles.</strong> Every command plays a
+distinct role. Duplicate commands and bindings are dropped or merged,
+keeping the best mnemonic name and key. <em>Summary, to
+confirm.</em></li>
+<li><strong>7 November, descriptions.</strong> Every command description
+is one succinct sentence, parallel with its siblings, that reinforces
+why its key was chosen. <em>Summary, to confirm.</em></li>
+<li><strong>9 November, help and media keys.</strong> These are recorded
+in this page’s 9 November sections:
+<ul>
+<li>Control+P plays media, and Print may be unbound.</li>
+<li>Help keys are fewer and do not overlap.</li>
+<li>Control+Slash is Where Am I, with Alt+Shift+Slash in HomerView.</li>
+<li>A help key’s first press reads everything.</li>
+</ul></li>
+<li><strong>10 November, the suite.</strong> DbDo, EdSharp, FileDir and
+HomerView are the Homer Suite. The same command has the same name,
+description and key in each. Script, not snippet. A command bound to a
+function key or other non-letter key carries no menu letter. There are
+no speech-tweak commands, so their keys are free, among them
+Alt+Shift+F12, once the Extra Speech Log. <em>Summary, to
+confirm.</em></li>
+<li><strong>Say Status.</strong> Claude’s notes give Shift+Z as Say
+Status (“Z is the bottom of the alphabet, like the status bar”). The
+source shows Alt+Z as the route DbDo, EdSharp and FileDir share, with
+DbDo also on Shift+Z. <em>Summary, to confirm;</em> question 5 of the
+audit’s decisions asks which is primary.</li>
+</ul>
+<h2 id="keyless-commands-by-exception-15-november-2026">Keyless
+commands, by exception (15 November 2026)</h2>
+<p>The rule above is that no command becomes menu-only. These live
+commands have no key by a recorded decision. Any other keyless live
+command is reported to Jamal for a decision, not given a key just to
+make a count pass.</p>
+<ul>
+<li><strong>Print.</strong> Unbound by the 9 November ruling that
+Control+P plays media.</li>
+<li><strong>Hotkey Summary and the Hotkeys document.</strong> Unbound by
+the 9 November ruling for fewer, non-overlapping help keys. The
+Alternate Menu (Alt+F10) reaches both.</li>
+<li><strong>Help documents other than the guide, History, ReadMe and
+Tutorials.</strong> By the 10 November ruling: one Help menu item per
+document, with keys only for the most important.</li>
+<li><strong>Planned commands.</strong> A planned command is not live. It
+holds no key until it works. DbDo’s Pick Value was such a stub on
+Control+F2; on 15 November it was built instead, because Tutorial 4
+teaches it.</li>
+</ul>
+<p>Each new exception is added here with its command, app, reason,
+ruling and date, and its other route.</p>
 </main>
 </body>
 </html>

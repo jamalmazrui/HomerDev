@@ -7,6 +7,15 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.235.0 -- 15 November 2026
+
+- **The suite commands gate can no longer pass by leaving things out.** The keyboard audit Claude and ChatGPT agreed on 15 November (A2) found that check.py's suite commands check passed a key file that left shared commands out, and one that named none at all. The comparison now lives in scripts\suiteCatalog.py, which check.py imports. It fails a command the catalog gives an app (the new apps= line on every command in data\SuiteCatalog.inix) that the app's key file leaves out, and a key file naming no shared command. It accepts the suite's key among an app's aliases as well as its first key, so a working second route such as Alt+Z for Say Status counts.
+- **scripts\testSuiteGate.py proves it on every build.** Eight small cases, from a matching key file to an empty one, each logged with what was expected and what happened. The kit's build runs it after the installer audit.
+- **Recorded exceptions.** SuiteCatalog.inix's [keys FileDir] keeps Invert Marked on Control+I until Inquire Differences has a new key (A6), with its reason.
+- **The old manifest follows the apps.** In data\SuiteCommands.inix, EdSharp's Next and Previous Section are on Control+F6 and Control+Shift+F6 (A7); FileDir's Beginning File lists Alt+B or Alt+Home, and Rename F2, Shift+R or Shift+F2; DbDo's Pick Value is current on Control+F2, now that it works.
+- **help\KeyDecisions.md** gains two sections: the rulings since 19 October, each labeled "Summary, to confirm" with its date, since they come from Claude's notes rather than your own words; and the commands kept without a key by exception, with planned commands among them.
+- DbDo and FileDir now need this kit, because their key files rely on the catalog's apps= lines and FileDir's recorded exception.
+
 ## 1.234.0 -- 15 November 2026
 
 - **A trimmed harvest is not a new one.** AppHelpGuides' build at 12:12 set about rebuilding every guide whose harvest had been trimmed, because trimming rewrites request.txt and buildGuide dated a harvest by its newest file. It rebuilt Box and Egnyte, then spent more than a minute on Excel in silence, and was stopped (exit -1073741510, Control+C or a closed window). buildGuide now dates a harvest by request.txt's finished= time, when its pages were gathered, which trimming leaves alone; manifest.txt's date serves a harvest without one. Checking all 111 guides no longer walks every page of every harvest, which took 24 seconds.

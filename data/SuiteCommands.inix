@@ -568,6 +568,7 @@ status=current
 name=Pick Value
 keys=Control+F2
 status=current
+change=built 15 November 2026: it was a stub, and Tutorial 4 teaches it, so it now works rather than losing its key
 
 [DbDo playStream]
 name=Play Stream
@@ -1666,9 +1667,9 @@ status=current
 
 [EdSharp nextSection]
 name=Next Section
-keys=Control+F6 or Control+PageDown
-change=keys changed, was Control+PageDown
-reason=Control+F6 added: the F6 cycle
+keys=Control+F6
+change=keys changed, was Control+PageDown; Control+PageDown retired 15 November 2026
+reason=Control+F6 added: the F6 cycle; the Page keys retired by the keyboard audit's A7
 disposition=accepted
 status=implemented
 
@@ -1837,9 +1838,9 @@ status=implemented
 
 [EdSharp previousSection]
 name=Previous Section
-keys=Control+Shift+F6 or Control+PageUp
-change=renamed from Prior Section, was Control+PageUp
-reason=Control+Shift+F6 added
+keys=Control+Shift+F6
+change=renamed from Prior Section, was Control+PageUp; Control+PageUp retired 15 November 2026
+reason=Control+Shift+F6 added; the Page keys retired by the keyboard audit's A7
 disposition=accepted
 status=implemented
 
@@ -2466,7 +2467,7 @@ status=current
 
 [FileDir beginningFile]
 name=Beginning File
-keys=Alt+B
+keys=Alt+B or Alt+Home
 status=current
 
 [FileDir beginningMarked]
@@ -3245,7 +3246,7 @@ status=current
 
 [FileDir rename]
 name=Rename
-keys=Shift+R or F2
+keys=F2 or Shift+R or Shift+F2
 status=current
 
 [FileDir renameToIdentifyContent]

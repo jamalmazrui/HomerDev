@@ -125,3 +125,37 @@ Each decision is one or two lines in the app's source, named in the comment besi
 ## Key Describer rules (5 November 2026)
 
 Jamal asked that Alt+F4 also turn the Key Describer off, for someone who turned it on by accident and does not know Control+F1, with a second Alt+F4 closing the app, and that this be the rule in every app. With it came what DbDo's describer had taught: describe every key even when its command cannot run, giving the true reason after the description; never guess a reason; ignore the nameless key a screen reader sends; and describe from the app's own command table. HomerSuite.md states the rules; the kit's KeyMap carries them out.
+
+## Rulings since 19 October, to confirm (15 November 2026)
+
+The keyboard audit of 15 November, by Claude and ChatGPT, found several of Jamal's rulings recorded nowhere in the kit, so an audit could not cite them. They are gathered here so the kit is the record.
+
+**These are summaries, not quotations.** Each comes from Claude's notes of a conversation, with the date the ruling was given. Jamal confirms or corrects each one once. A confirmed line is marked *confirmed*, and a corrected one is rewritten in his words. Until then, each line is cited as "summary, to confirm," and no audit may treat it as his exact words.
+
+- **18 October, settings.** Editing configuration settings is an Edit command on the same E key in every app: Alt+Shift+E. Alt+E opens the Edit menu. *Summary, to confirm.*
+- **18 October, window cycles.** Control+Tab and Control+F6 must not duplicate each other. Each is next-in-cycle at a different level or in a different way. *Summary, to confirm.*
+- **19 October, Page keys.** Control+PageUp and Control+PageDown must not duplicate Control+Tab or an F6-family command. They have a unique purpose, or none. *Summary, to confirm.*
+- **19 October, habits as preferences.** Alt+C for appending is not universal, since FileDir uses Shift+A. Such habits are preferences, balanced to an optimum under constraints. *Summary, to confirm.* The audit later found that FileDir's Shift+A appends file contents, a different command from Copy Append on Alt+C.
+- **19 October, one name, one code.** A command with the same name, key and description in several apps runs the same HomerDev code. *Summary, to confirm.*
+- **19 October, no lost functionality.** A legacy key may be lost, but functionality must not be. A command made menu-only counts as lost functionality, so it keeps some key. This is already in The Rules Weighed, above.
+- **5 November, distinct roles.** Every command plays a distinct role. Duplicate commands and bindings are dropped or merged, keeping the best mnemonic name and key. *Summary, to confirm.*
+- **7 November, descriptions.** Every command description is one succinct sentence, parallel with its siblings, that reinforces why its key was chosen. *Summary, to confirm.*
+- **9 November, help and media keys.** These are recorded in this page's 9 November sections:
+  - Control+P plays media, and Print may be unbound.
+  - Help keys are fewer and do not overlap.
+  - Control+Slash is Where Am I, with Alt+Shift+Slash in HomerView.
+  - A help key's first press reads everything.
+- **10 November, the suite.** DbDo, EdSharp, FileDir and HomerView are the Homer Suite. The same command has the same name, description and key in each. Script, not snippet. A command bound to a function key or other non-letter key carries no menu letter. There are no speech-tweak commands, so their keys are free, among them Alt+Shift+F12, once the Extra Speech Log. *Summary, to confirm.*
+- **Say Status.** Claude's notes give Shift+Z as Say Status ("Z is the bottom of the alphabet, like the status bar"). The source shows Alt+Z as the route DbDo, EdSharp and FileDir share, with DbDo also on Shift+Z. *Summary, to confirm;* question 5 of the audit's decisions asks which is primary.
+
+## Keyless commands, by exception (15 November 2026)
+
+The rule above is that no command becomes menu-only. These live commands have no key by a recorded decision. Any other keyless live command is reported to Jamal for a decision, not given a key just to make a count pass.
+
+- **Print.** Unbound by the 9 November ruling that Control+P plays media.
+- **Hotkey Summary and the Hotkeys document.** Unbound by the 9 November ruling for fewer, non-overlapping help keys. The Alternate Menu (Alt+F10) reaches both.
+- **Help documents other than the guide, History, ReadMe and Tutorials.** By the 10 November ruling: one Help menu item per document, with keys only for the most important.
+- **Planned commands.** A planned command is not live. It holds no key until it works. DbDo's Pick Value was such a stub on Control+F2; on 15 November it was built instead, because Tutorial 4 teaches it.
+
+Each new exception is added here with its command, app, reason, ruling and date, and its other route.
+
