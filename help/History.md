@@ -7,6 +7,18 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.234.0 -- 15 November 2026
+
+- **A trimmed harvest is not a new one.** AppHelpGuides' build at 12:12 set about rebuilding every guide whose harvest had been trimmed, because trimming rewrites request.txt and buildGuide dated a harvest by its newest file. It rebuilt Box and Egnyte, then spent more than a minute on Excel in silence, and was stopped (exit -1073741510, Control+C or a closed window). buildGuide now dates a harvest by request.txt's finished= time, when its pages were gathered, which trimming leaves alone; manifest.txt's date serves a harvest without one. Checking all 111 guides no longer walks every page of every harvest, which took 24 seconds.
+- **Never silent for minutes.** buildGuide said nothing until every guide was built. It now says how many guides it is checking, names each guide as it starts, and gives each one's articles, words, gates and seconds as it ends.
+
+## 1.233.0 -- 15 November 2026
+
+- **Google's Docs editors, a guide each.** Google keeps the help for Docs, Sheets, Slides, Forms and Vids in one help centre, and one harvest of it now makes five guides: GoogleDocs (246 articles), GoogleSheets (672, with Google's whole function list), GoogleSlides (124), GoogleVids (40) and GoogleForms (27), which replaces September's, being fuller and current. docsEditorsPlacer files each article under the product whose topic lists it most, following each topic's ref_topic up to its product; Google's older topics, which hang from no product, are named in a table; an article no topic lists goes where the articles linking to it went, or to the product its title names. Articles every editor shares (sharing, Drive, offline work, accessibility, Gemini, getting help) are in the Docs, Sheets and Slides guides alike. Google Pics and Drawings are left out as too thin.
+- **No more platform switchers.** Google heads each platform's part of an article with a row of links to every edition, Android's included, which a screen reader read as a line of links several times an article. readGoogleTopics drops those rows, so Calendar, Chat, Keep, Sites and Tasks were rebuilt too.
+- **Guide, Learning Ally and LibriVox built** from their harvests with the readers written for them on 14 November: 38, 27 and 90 articles.
+- **The plan prefers a harvest that is here.** When two plan entries make the same guide, the first whose harvest is present wins, so Google Forms is built from the Docs editors' harvest while September's entry stays for its record.
+
 ## 1.232.0 -- 15 November 2026
 
 - **Pandoc updates.** Setup offered "Update Pandoc 3.13 to 3.14" on 12 and 15 November and ran installPandoc each time, which stopped at once because an old C:\bin\pandoc.exe, version 2.19.2, answered on the PATH, and exited with success. installPandoc now asks winget, by Pandoc's package id, whether Pandoc is installed, and runs winget upgrade when it is, as GitHub CLI's script has done since 1.69.1. Before and after, it logs every pandoc.exe on the PATH or in Pandoc's folders with its version, and says when an older copy comes first on the PATH. That copy is named, not deleted, since it is yours; the kit's own tools already choose the newest copy.

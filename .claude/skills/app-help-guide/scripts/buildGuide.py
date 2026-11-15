@@ -34,7 +34,7 @@ THE GUIDE FORMAT, THE CATEGORY RULES AND THE GATES are in
 references/guide-format.md.
 """
 
-import html, html.parser, io, json, logging, os, platform, re, shutil, subprocess, sys, time, urllib.parse
+import datetime, html, html.parser, io, json, logging, os, platform, re, shutil, subprocess, sys, time, urllib.parse
 
 iMinCategory = 2
 sBom = "\ufeff"
@@ -1278,10 +1278,12 @@ def googleTopicNames(sFolder):
     return dNames
 
 
-def readGoogleTopics(sFolder):
+def readGoogleTopics(sFolder, fPlace=None):
     """A Google help centre whose articles carry no trail (Calendar, Chat, Keep, Sites, Tasks and the Docs editors,
     gathered November 2026). The article, title and platform are read as readGoogleMeet reads them; the category is
     the topic most links to the article name, by googleTopicNames. An article no topic lists goes to Miscellaneous.
+    fPlace(answer number, title, category), when given, returns the category to file the article under, or "" to
+    leave it out: one harvest can then make several guides, as the Docs editors' does (15 November 2026).
     Returns (category, title, body) like every reader."""
     dNames = googleTopicNames(sFolder)
     dVotes = {}
@@ -1308,6 +1310,9 @@ def readGoogleTopics(sFolder):
         oId = re.search(r"_answer_(\d+)", sName)
         dCount = dVotes.get(oId.group(1), {}) if oId else {}
         sCategory = max(sorted(dCount), key=lambda s: dCount[s]) if dCount else sMiscellaneous
+        if fPlace:
+            sCategory = fPlace(oId.group(1) if oId else "", sTitle, sCategory)
+            if not sCategory: continue
         oPlatform = re.search(r"(?i)Platform_?3D([A-Za-z]+)", sName)
         if oPlatform:
             # The collection's surfaces are Windows, the web, iPhone and iPad and Alexa: Google's Android edition of
@@ -1318,8 +1323,115 @@ def readGoogleTopics(sFolder):
             sTitle = sTitle + " (" + sPlatform + ")"
         elif re.search(r"(?i)\bandroid\b", sTitle) and not re.search(r"(?i)(iphone|ipad|\bios\b|computer|web)", sTitle):
             continue
-        lArticles.append((sCategory, sTitle, toMarkdown(sBody, 0)))
+        # THE PLATFORM SWITCHER IS NOT TEXT (15 November 2026): Google heads each platform's part with a row of links
+        # to every edition, Android's included -- "[Computer](...) [Android phone & tablet](...)[iPhone & iPad](...)"
+        # -- which a screen reader read as a line of links three times an article. The rows are dropped.
+        lBody = [sLine for sLine in toMarkdown(sBody, 0)
+                 if not re.match(r"^\s*(\[(Computer|Android phone & tablet|Android|iPhone & iPad)\]\([^)]*\)\s*)+$", sLine)]
+        lArticles.append((sCategory, sTitle, lBody))
     return lArticles
+
+
+# THE DOCS EDITORS (15 November 2026): Google keeps the help for Docs, Sheets, Slides, Forms and Vids in one centre,
+# support.google.com/docs, and one harvest of it makes a guide for each. Each article goes to the product whose topic
+# lists it most: a topic's product is found by following the ref_topic each topic page gives its subtopics up to
+# Docs, Sheets, Slides, Forms or Vids. Google's older topics hang from none of these, so they are named here from what
+# they hold (the function lists are Sheets', the page-setup topics Docs', the presenting topics Slides'). Topics that
+# serve every editor -- sharing, Drive, offline work, accessibility, Gemini, getting help -- are placed by the product
+# the article's title names, and an article that names none goes into the Docs, Sheets and Slides guides alike, under
+# its own topic, since a reader of any one of them needs it. Google Pics, eight articles about an image maker, is left
+# out as too thin for a guide; so is Drawings, which has no topic of its own.
+dDocsEditorsRoots = {"9046002": "Docs", "9054603": "Sheets", "9052835": "Slides", "9055404": "Forms", "14950067": "Vids",
+                     "17164909": "Pics"}
+dDocsEditorsOlderTopics = {
+    "1240289": "Sheets", "1361467": "Sheets", "1361471": "Sheets", "1361472": "Sheets", "1361474": "Sheets",
+    "15158": "Sheets", "3046366": "Sheets",
+    "1361461": "Docs", "1361462": "Docs", "1361463": "Docs", "1361464": "Docs", "9045752": "Docs", "9045753": "Docs",
+    "9045929": "Docs", "9045930": "Docs", "9045931": "Docs",
+    "1694827": "Slides", "1694924": "Slides", "1694925": "Slides", "1694926": "Slides", "19431": "Slides",
+    "6063584": "Forms", "6063592": "Forms", "6063593": "Forms"}
+lDocsEditorsTitleWords = [
+    ("Docs", r"(?i)\b(google docs|in docs|docs with|a document|documents?\b)"),
+    ("Sheets", r"(?i)\b(google sheets|in sheets|sheets with|spreadsheets?|pivot|formula|function|chart|cells?\b)"),
+    ("Slides", r"(?i)\b(google slides|in slides|slides with|presentations?|presenter|speaker notes|slideshow)"),
+    ("Forms", r"(?i)\b(google forms?|in forms|quiz|form responses|responders?)"),
+    ("Vids", r"(?i)\b(google vids|in vids|vids with|voiceovers?)")]
+
+
+def docsEditorsPlacer(sFolder, sProduct):
+    """fPlace for readGoogleTopics: the category an article of the Docs editors' harvest takes in sProduct's guide."""
+    dNames = googleTopicNames(sFolder)
+    dParent, dVotes, dLinks = {}, {}, {}
+    for sName in sorted(os.listdir(sFolder)):
+        if not sName.endswith(".html"): continue
+        sMarkup = readText(os.path.join(sFolder, sName))
+        for sChild, sParent in re.findall(r'/docs/topic/(\d+)[^"]*?ref_topic=(\d+)', sMarkup):
+            if sChild != sParent: dParent.setdefault(sChild, sParent)
+        for sAnswer, sTopic in re.findall(r'/docs/answer/(\d+)[^"]*?ref_topic=(\d+)', sMarkup):
+            dCount = dVotes.setdefault(sAnswer, {})
+            dCount[sTopic] = dCount.get(sTopic, 0) + 1
+        oFrom = re.search(r"_answer_(\d+)", sName)
+        if oFrom:
+            for sTo in set(re.findall(r'/docs/answer/(\d+)', sMarkup)):
+                if sTo != oFrom.group(1): dLinks.setdefault(sTo, []).append(oFrom.group(1))
+
+    def productOf(sTopic):
+        setSeen = set()
+        while sTopic not in dDocsEditorsRoots and sTopic not in dDocsEditorsOlderTopics and sTopic in dParent and sTopic not in setSeen:
+            setSeen.add(sTopic)
+            sTopic = dParent[sTopic]
+        return dDocsEditorsRoots.get(sTopic) or dDocsEditorsOlderTopics.get(sTopic) or ""
+
+    def votedHome(sAnswer):
+        dProducts = {}
+        for sTopic, iCount in dVotes.get(sAnswer, {}).items():
+            sOne = productOf(sTopic)
+            if sOne: dProducts[sOne] = dProducts.get(sOne, 0) + iCount
+        return max(sorted(dProducts), key=lambda s: dProducts[s]) if dProducts else ""
+
+    def ownTopic(sAnswer, sHome):
+        dOwn = dict((sTopic, iCount) for sTopic, iCount in dVotes.get(sAnswer, {}).items() if productOf(sTopic) == sHome and sTopic in dNames)
+        return dNames[max(sorted(dOwn), key=lambda s: dOwn[s])] if dOwn else ""
+
+    # AN ARTICLE NO TOPIC LISTS AT ALL goes where the articles that link to it went, with their heading: Sheets'
+    # statistics functions (F.DIST.RT, T.INV.2T) are listed by no topic but linked from their siblings. Three rounds
+    # let a chain of such articles settle. An article listed only by shared topics is not moved this way.
+    dHome = {}
+    for sAnswer in dVotes:
+        sHome = votedHome(sAnswer)
+        if sHome: dHome[sAnswer] = (sHome, ownTopic(sAnswer, sHome))
+    for iRound in range(3):
+        for sAnswer, lsFrom in dLinks.items():
+            if sAnswer in dHome or sAnswer in dVotes: continue
+            dLinked = {}
+            for sFrom in lsFrom:
+                if sFrom in dHome: dLinked[dHome[sFrom]] = dLinked.get(dHome[sFrom], 0) + 1
+            if dLinked: dHome[sAnswer] = max(sorted(dLinked), key=lambda t: dLinked[t])
+
+    def place(sAnswer, sTitle, sCategory):
+        # A topic's word first, then a title that names one product ("Collaborate with Gemini in Google Slides"),
+        # then the articles that link to it, and last every one of Docs, Sheets and Slides.
+        sHome, sTopic = dHome.get(sAnswer, ("", "")) if sAnswer in dVotes else ("", "")
+        if not sHome:
+            lsNamed = [sName for sName, sPattern in lDocsEditorsTitleWords if re.search(sPattern, sTitle)]
+            if len(lsNamed) == 1:
+                sHome = lsNamed[0]
+                sLinkedHome, sLinkedTopic = dHome.get(sAnswer, ("", ""))
+                if sLinkedHome == sHome: sTopic = sLinkedTopic
+        if not sHome: sHome, sTopic = dHome.get(sAnswer, ("all", ""))
+        if sHome == "all": return sCategory if sProduct in ("Docs", "Sheets", "Slides") else ""
+        if sHome != sProduct: return ""
+        # The heading is the product's own topic that lists the article most, so a Docs article listed also under
+        # a Slides topic is filed under the Docs topic.
+        return sTopic or sCategory
+    return place
+
+
+def readGoogleDocs(sFolder): return readGoogleTopics(sFolder, docsEditorsPlacer(sFolder, "Docs"))
+def readGoogleSheets(sFolder): return readGoogleTopics(sFolder, docsEditorsPlacer(sFolder, "Sheets"))
+def readGoogleSlides(sFolder): return readGoogleTopics(sFolder, docsEditorsPlacer(sFolder, "Slides"))
+def readGoogleVids(sFolder): return readGoogleTopics(sFolder, docsEditorsPlacer(sFolder, "Vids"))
+def readGoogleFormsEditors(sFolder): return readGoogleTopics(sFolder, docsEditorsPlacer(sFolder, "Forms"))
 
 
 lMpvProgrammer = ["lua scripting", "javascript", "json ipc", "c plugins",
@@ -3725,7 +3837,21 @@ def startLog(sRoot, sCollection, sTask):
 
 
 def newestTime(sFolder):
-    """The latest modification time of any file in a folder, or 0."""
+    """When a harvest was gathered. THE GATHERING, NOT THE FILES (15 November 2026): harvestQueue's --trim rewrites
+    request.txt to note the trimming, so every trimmed harvest looked newer than its guide, and the build of 12:12 that
+    day set about rebuilding all six Microsoft guides in silence until it was stopped. request.txt's finished= time is
+    when the pages were gathered, and trimming leaves it alone; manifest.txt's date serves a harvest without one, and
+    only a harvest with neither is walked file by file, which across the collection took 24 seconds."""
+    dRequest = {}
+    sRequest = os.path.join(sFolder, "request.txt")
+    if os.path.isfile(sRequest):
+        for sLine in readText(sRequest).splitlines():
+            if "=" in sLine: dRequest[sLine.split("=", 1)[0].strip().lower()] = sLine.split("=", 1)[1].strip()
+    if dRequest.get("finished"):
+        try: return time.mktime(datetime.datetime.strptime(dRequest["finished"][:19], "%Y-%m-%d %H:%M:%S").timetuple())
+        except ValueError: pass
+    sManifest = os.path.join(sFolder, "manifest.txt")
+    if os.path.isfile(sManifest): return os.path.getmtime(sManifest)
     nNewest = 0.0
     for sDir, lDirs, lFiles in os.walk(sFolder):
         for sFile in lFiles: nNewest = max(nNewest, os.path.getmtime(os.path.join(sDir, sFile)))
@@ -4016,6 +4142,16 @@ def main():
          "This guide holds Google's own help for Google Sites, gathered from support.google.com on 14 November 2026. It covers making, editing, sharing and publishing a site with Google Sites. Google's help for Sites is short, and so is this guide.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for: Computer, or iPhone and iPad. Google's Android editions are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are Google's own topics: Google no longer puts a trail above each article, so each article is filed under the topic its help centre lists it in."),
         ("Google Tasks", "GoogleTasksHelp", readGoogleTopics, "GoogleTasks.md", "Google Tasks help",
          "This guide holds Google's own help for Google Tasks, gathered from support.google.com on 14 November 2026. It covers tasks and lists in the Tasks app and beside Gmail, Calendar, Chat and the Docs editors. Some of it repeats what the Google Calendar guide says about tasks there.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for: Computer, or iPhone and iPad. Google's Android editions are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are Google's own topics: Google no longer puts a trail above each article, so each article is filed under the topic its help centre lists it in."),
+        ("Google Docs", "GoogleDocsEditorsHelp", readGoogleDocs, "GoogleDocs.md", "Google Docs help",
+         "This guide holds Google's own help for Google Docs, gathered from support.google.com on 14 November 2026. It covers writing and formatting documents, pages and layout, smart chips and building blocks, tabs, citations, tools, sharing and Gemini, on a computer and on an iPhone or iPad. Using Docs with a screen reader or a braille display is under Accessibility and Use a screen reader on your computer.\r\n\r\nGoogle keeps the help for Docs, Sheets, Slides, Forms and Vids in one help centre, and this guide holds the part of it about Docs. Articles that serve every editor alike -- sharing, Google Drive, working offline, accessibility, Gemini and getting help -- are in the Docs, Sheets and Slides guides alike, under their own topics, so a reader of any one of them has them.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for: Computer, or iPhone and iPad. Google's Android editions are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa, and so are its policy and legal notices. The categories are Google's own topics, each article filed under the topic of its own product that lists it most."),
+        ("Google Sheets", "GoogleDocsEditorsHelp", readGoogleSheets, "GoogleSheets.md", "Google Sheets help",
+         "This guide holds Google's own help for Google Sheets, gathered from support.google.com on 14 November 2026. It covers making and formatting spreadsheets, sorting and filtering, pivot tables, charts, connected data, tools and sharing, and it holds Google's whole function list: each function is an article of its own, under its family, such as Math, Statistical, Text, Date and Lookup.\r\n\r\nGoogle keeps the help for Docs, Sheets, Slides, Forms and Vids in one help centre, and this guide holds the part of it about Sheets. Articles that serve every editor alike -- sharing, Google Drive, working offline, accessibility, Gemini and getting help -- are in the Docs, Sheets and Slides guides alike, under their own topics, so a reader of any one of them has them.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for: Computer, or iPhone and iPad. Google's Android editions are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa, and so are its policy and legal notices. The categories are Google's own topics, each article filed under the topic of its own product that lists it most."),
+        ("Google Slides", "GoogleDocsEditorsHelp", readGoogleSlides, "GoogleSlides.md", "Google Slides help",
+         "This guide holds Google's own help for Google Slides, gathered from support.google.com on 14 November 2026. It covers making a presentation, editing and arranging slides, shapes and images, animations, presenting and printing, collaborating and Gemini, on a computer and on an iPhone or iPad.\r\n\r\nGoogle keeps the help for Docs, Sheets, Slides, Forms and Vids in one help centre, and this guide holds the part of it about Slides. Articles that serve every editor alike -- sharing, Google Drive, working offline, accessibility, Gemini and getting help -- are in the Docs, Sheets and Slides guides alike, under their own topics, so a reader of any one of them has them.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for: Computer, or iPhone and iPad. Google's Android editions are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa, and so are its policy and legal notices. The categories are Google's own topics, each article filed under the topic of its own product that lists it most."),
+        ("Google Vids", "GoogleDocsEditorsHelp", readGoogleVids, "GoogleVids.md", "Google Vids help",
+         "This guide holds Google's own help for Google Vids, Google's video maker for work, gathered from support.google.com on 14 November 2026. It covers starting a video, adding scenes, recordings, voiceovers and captions, customizing a video, and making one with Gemini. It is a young product, so this guide is short.\r\n\r\nGoogle keeps the help for Docs, Sheets, Slides, Forms and Vids in one help centre, and this guide holds the part of it about Vids. Google writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for: Computer, or iPhone and iPad. Google's Android editions are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are Google's own topics."),
+        ("Google Forms", "GoogleDocsEditorsHelp", readGoogleFormsEditors, "GoogleForms.md", "Google Forms help",
+         "This guide holds Google's own help for Google Forms, gathered from support.google.com on 14 November 2026, and replaces September's: it is fuller and current. It covers making and editing a form, question types, quizzes, sharing a form, and collecting and viewing responses.\r\n\r\nGoogle keeps the help for Docs, Sheets, Slides, Forms and Vids in one help centre, and this guide holds the part of it about Forms. Google writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for: Computer, or iPhone and iPad. Google's Android editions are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are Google's own topics."),
         ("Box", "BoxHelp", readBox, "Box.md", "Box help",
          "This guide holds Box's own help, gathered from support.box.com on 15 November 2026. Box is an online service for keeping, sharing, signing and working on files with other people. Its help centre has almost 2,900 articles; this guide keeps the 668 written for a person who uses Box on Windows, the web, or an iPhone or iPad, under Box's own product names, with each product's troubleshooting beside its guides. Files, folders and sharing come under Using Box, and every app Box works inside, such as Microsoft Office, Teams, Slack, Google Workspace, Outlook and Zoom, comes under Box with other apps.\r\n\r\nLeft out on purpose: 1,729 release notes and announcements, which are a history of changes rather than help; the administrator's console and the products only an administrator runs, such as Shield, Governance, Shuttle and the developer platform; the integrations with business systems such as Salesforce and NetSuite; and Box's training and certification pages. If you run Box for an organisation, Box's own help centre has those pages."),
         ("Egnyte", "EgnyteHelp", readEgnyte, "Egnyte.md", "Egnyte help",
@@ -4035,6 +4171,10 @@ def main():
     ]
     # ONE ENTRY PER GUIDE (version 2). The plan had grown a second copy of twenty entries, from Org mode to Remote
     # Incident Manager, so those guides were built twice in every run; the first entry for a guide now wins.
+    # A GUIDE MADE FROM A NEWER HARVEST (15 November 2026): Google Forms is now built from the Docs editors' harvest,
+    # and September's GoogleFormsHelp entry stays for its record. The first entry whose harvest is here wins; when none
+    # is here, the first entry, as before.
+    lPlan = sorted(lPlan, key=lambda t: 0 if os.path.isdir(os.path.join(sParent, t[1])) else 1)
     lUnique, setFiles = [], set()
     for tEntry in lPlan:
         if tEntry[3].lower() in setFiles:
@@ -4048,6 +4188,10 @@ def main():
         lPlan = [t for t in lPlan if t[0].lower() in setOnly or os.path.splitext(t[3])[0].lower() in setOnly or t[3].lower() in setOnly]
     lResults = []
     iNoHarvest = iCurrent = 0
+    # NEVER SILENT FOR MINUTES (15 November 2026): Excel's guide takes minutes to build, and this script said nothing
+    # until every guide was done, so a build that was working looked hung and was stopped. Each guide is now named as it
+    # starts and its result said as it ends.
+    print("Checking %d guide%s against their harvests." % (len(lPlan), "" if len(lPlan) == 1 else "s"), flush=True)
     for sProduct, sFolder, functionRead, sFile, sTitle, sPreamble in lPlan:
         sHarvest = os.path.join(sParent, sFolder)
         if not os.path.isdir(sHarvest):
@@ -4062,6 +4206,8 @@ def main():
             iCurrent += 1
             logging.info("%s: %s is newer than its harvest, so it is left as it is", sProduct, sFile)
             continue
+        print("Building %s from %s..." % (sFile, sFolder), flush=True)
+        nStarted = time.time()
         try:
             lArticles = functionRead(sHarvest)
             sPath = os.path.join(sOutput, sFile)
@@ -4071,9 +4217,10 @@ def main():
         except Exception as oError:
             logging.exception("%s failed to build: %s", sProduct, oError)
             lResults.append((sProduct, 0, 0, -1))
-    for sProduct, iArticles, iWords, iFailures in lResults:
-        print("%-20s %4d articles %8d words %s" % (sProduct, iArticles, iWords,
-                                                   "ALL CLEAN" if iFailures == 0 else "%d gate failures" % iFailures))
+        sProduct, iArticles, iWords, iFailures = lResults[-1]
+        print("  %s: %d articles, %d words, %s, %d seconds" % (sProduct, iArticles, iWords,
+              "all clean" if iFailures == 0 else ("failed to build" if iFailures < 0 else "%d gate failures" % iFailures),
+              int(time.time() - nStarted)), flush=True)
     iBuilt = len(lResults)
     print("Guides built: %d; already current: %d; no harvest here: %d." % (iBuilt, iCurrent, iNoHarvest))
     logging.info("SUMMARY: %d built, %d current, %d without a harvest", iBuilt, iCurrent, iNoHarvest)
