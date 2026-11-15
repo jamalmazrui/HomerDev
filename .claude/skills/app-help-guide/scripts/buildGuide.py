@@ -936,6 +936,165 @@ def readGoogleMeet(sFolder):
     return lArticles
 
 
+def readZendeskTree(sFolder):
+    """A Zendesk estate's articles with where each sits: (category, top section, section, title, body markup, url).
+    The top section is the outermost section above the article, followed through parent_section_id, so Box's
+    "Getting Started with Box Drive" is found under "Box Drive". Each article once, by its id."""
+    dSections, dCategories, dArticles = {}, {}, {}
+    lPayloads = []
+    for sName in sorted(os.listdir(sFolder)):
+        if not sName.endswith(".json"): continue
+        dPayload = json.loads(readText(os.path.join(sFolder, sName)))
+        lPayloads.append(dPayload)
+        for dCategory in dPayload.get("categories", []): dCategories[dCategory["id"]] = dCategory["name"]
+        for dSection in dPayload.get("sections", []):
+            dSections[dSection["id"]] = (dSection["name"], dSection.get("category_id"), dSection.get("parent_section_id"))
+    for dPayload in lPayloads:
+        for dArticle in dPayload.get("articles", []):
+            if dArticle.get("draft") or dArticle["id"] in dArticles: continue
+            iSection = dArticle.get("section_id")
+            iTop, setVisited = iSection, set()
+            while iTop in dSections and dSections[iTop][2] in dSections and iTop not in setVisited:
+                setVisited.add(iTop)
+                iTop = dSections[iTop][2]
+            tTop = dSections.get(iTop, ("", None, None))
+            dArticles[dArticle["id"]] = (dCategories.get(tTop[1], ""), tTop[0], dSections.get(iSection, ("",))[0],
+                                         dArticle["title"], dArticle.get("body") or "", dArticle.get("html_url") or "")
+    return list(dArticles.values())
+
+
+def buildFromTree(sFolder, sProduct, fPlace):
+    """Turns a Zendesk tree into articles. fPlace(category, top section, section, title) returns the guide's
+    category for an article, or "" to leave it out; what is left out is counted by its reason in the log."""
+    lArticles, dLeftOut = [], {}
+    for sCategory, sTop, sSection, sTitle, sBody, sUrl in readZendeskTree(sFolder):
+        sPlace = fPlace(sCategory, sTop, sSection, sTitle)
+        if not sPlace:
+            sReason = "%s / %s" % (sCategory, sTop)
+            dLeftOut[sReason] = dLeftOut.get(sReason, 0) + 1
+            continue
+        lArticles.append((sPlace, sTitle, toMarkdown(sBody, 0, sUrl)))
+    logging.info("%s: %d articles kept; %d left out: %s", sProduct, len(lArticles), sum(dLeftOut.values()),
+                 "; ".join("%s %d" % (s, dLeftOut[s]) for s in sorted(dLeftOut)))
+    return lArticles
+
+
+# BOX (15 November 2026): 2,883 articles, of which a person who keeps, shares and signs files in Box needs about a
+# third. Left out, as Bitwarden's administrator half and RIM's change log were: release notes and announcements (1,729
+# articles of version history); the administrator's console and the products only an administrator runs (Admin Tools,
+# Shield, Governance, Compliance, Archive, Shuttle for migrations, the developer Platform and the MCP server); the
+# integrations with business systems (Salesforce, NetSuite, ServiceNow, Workday) and the partner programs; Box's
+# training and certification pages; and the AI agent templates. Categories are Box's own products, its guides and its
+# troubleshooting for each kept together, and every integration a person uses (Office, Teams, Slack, Google, Outlook,
+# Zoom, Adobe, Copilot) is under one heading.
+lBoxLeftOutTops = ["announcements", "release notes", "box admin tools", "box shield", "box governance", "box compliance",
+                   "box archive", "box shuttle", "box platform", "box mcp server", "box for salesforce",
+                   "box for oracle netsuite", "box for servicenow", "box for workday", "box partner programs",
+                   "box security integrations", "virtual environments", "getting started for admins",
+                   "ai agent templates", "how it works", "box certified professional", "box education",
+                   "box guidance services", "box local", "intelligent content certification"]
+
+
+def placeBox(sCategory, sTop, sSection, sTitle):
+    sTopLower = sTop.lower()
+    if sTopLower in lBoxLeftOutTops: return ""
+    if sCategory == "Integrations": return "Box with other apps"
+    if sCategory in ("Account and Billing", "Working with Box Support"): return "Your account, billing and support"
+    if sCategory == "Getting started": return "Getting started"
+    if sCategory == "Learning": return "Learning guides"
+    if sTopLower == "box fundamentals": return "Using Box: files, folders and sharing"
+    if sTopLower == "accessibility": return "Getting started"
+    return sTop
+
+
+def readBox(sFolder):
+    return buildFromTree(sFolder, "Box", placeBox)
+
+
+# EGNYTE (15 November 2026): 1,511 articles in 32 categories, written mostly for the company's administrators. Kept: the
+# web app, the desktop app, the mobile app, the pages for everyday users, the Microsoft and Google integrations, the AI
+# assistant, Document Room, Document Portal, DocuSign, the other integrations a person uses, billing and support. Left
+# out: the announcements (579 release notes, the known issues and the support lifecycle); the administrators' half
+# (Admin Users, Secure and Govern, Reporting, the Migration App, Smart Cache, Storage Sync, External Replication, Data
+# Fabric, FTP server setup, the API, compliance and incident pages); and the industry editions for architects and life
+# sciences. The web app's few administrator topics (encryption keys) go with the administrators.
+lEgnyteKept = {"WebUI": "The web app", "Desktop App": "The desktop app", "Mobile": "The mobile app",
+               "Non-Admin Users": "For everyday users", "Microsoft Integrations": "Egnyte with Microsoft 365",
+               "Google Apps": "Egnyte with Google", "Egnyte's AI Assistant": "The AI assistant",
+               "Document Room": "Document Room and Document Portal", "Document Portal": "Document Room and Document Portal",
+               "DocuSign": "Other integrations", "Integrations": "Other integrations",
+               "Billing": "Billing and support", "Egnyte": "Billing and support"}
+
+
+def placeEgnyte(sCategory, sTop, sSection, sTitle):
+    sPlace = lEgnyteKept.get(sCategory, "")
+    if not sPlace: return ""
+    if sTop in ("Enterprise Key Management (EKM)", "Security & Administration", "Single Sign-On", "Public Cloud"): return ""
+    return sPlace
+
+
+def readEgnyte(sFolder):
+    return buildFromTree(sFolder, "Egnyte", placeEgnyte)
+
+
+def googleTopicNames(sFolder):
+    """Google's topic names by topic number, read from the centre's own pages (14 November 2026). Google no longer
+    puts a trail above an article, so the category is found the way a reader finds it: the front page lists its
+    topics as headings with their articles under them, every link to an article carries the topic it was listed
+    under (ref_topic=), and a topic page's own heading names its topic. Returns {topic number: name}."""
+    dNames = {}
+    for sName in sorted(os.listdir(sFolder)):
+        if not sName.endswith(".html") or "_answer_" in sName: continue
+        sMarkup = readText(os.path.join(sFolder, sName))
+        oTopic = re.search(r"_topic_(\d+)", sName)
+        if oTopic:
+            oHeading = re.search(r"(?is)<h1[^>]*>(.*?)</h1>", sMarkup)
+            if oHeading: dNames.setdefault(oTopic.group(1), stripTags(oHeading.group(1)))
+        sHeading = ""
+        for oMatch in re.finditer(r'(?is)<h3[^>]*>(.*?)</h3>|<a[^>]*href="[^"]*/answer/\d+[^"]*ref_topic=(\d+)[^"]*"', sMarkup):
+            if oMatch.group(1) is not None:
+                sHeading = stripTags(oMatch.group(1))
+            elif sHeading and not oTopic:
+                dNames.setdefault(oMatch.group(2), sHeading)
+    return dNames
+
+
+def readGoogleTopics(sFolder):
+    """A Google help centre whose articles carry no trail (Calendar, Chat, Keep, Sites, Tasks and the Docs editors,
+    gathered November 2026). The article, title and platform are read as readGoogleMeet reads them; the category is
+    the topic most links to the article name, by googleTopicNames. An article no topic lists goes to Miscellaneous.
+    Returns (category, title, body) like every reader."""
+    dNames = googleTopicNames(sFolder)
+    dVotes = {}
+    for sName in sorted(os.listdir(sFolder)):
+        if not sName.endswith(".html"): continue
+        sMarkup = readText(os.path.join(sFolder, sName))
+        for oMatch in re.finditer(r'href="[^"]*/answer/(\d+)[^"]*ref_topic=(\d+)', sMarkup):
+            if oMatch.group(2) in dNames:
+                dCount = dVotes.setdefault(oMatch.group(1), {})
+                dCount[dNames[oMatch.group(2)]] = dCount.get(dNames[oMatch.group(2)], 0) + 1
+    lArticles = []
+    for sName in sorted(os.listdir(sFolder)):
+        if "_answer_" not in sName or not sName.endswith(".html"): continue
+        sMarkup = readText(os.path.join(sFolder, sName))
+        sBody = findBalanced(sMarkup, r'<article[^>]*class="[^"]*article[^"]*"', "article")
+        oTitle = re.search(r"(?is)<h1[^>]*>(.*?)</h1>", sMarkup)
+        if not sBody or not oTitle: continue
+        sTitle = stripTags(oTitle.group(1))
+        if not sTitle: continue
+        sBody = re.sub(r"(?is)<h1[^>]*>.*?</h1>", "", sBody, count=1)
+        oId = re.search(r"_answer_(\d+)", sName)
+        dCount = dVotes.get(oId.group(1), {}) if oId else {}
+        sCategory = max(sorted(dCount), key=lambda s: dCount[s]) if dCount else sMiscellaneous
+        oPlatform = re.search(r"(?i)Platform_?3D([A-Za-z]+)", sName)
+        if oPlatform:
+            sPlatform = {"desktop": "Computer", "android": "Android", "ios": "iPhone and iPad",
+                         "iphone": "iPhone and iPad"}.get(oPlatform.group(1).lower(), oPlatform.group(1))
+            sTitle = sTitle + " (" + sPlatform + ")"
+        lArticles.append((sCategory, sTitle, toMarkdown(sBody, 0)))
+    return lArticles
+
+
 lMpvProgrammer = ["lua scripting", "javascript", "json ipc", "c plugins",
                     "embedding into other programs (libmpv)", "changelog",
                     "using mpv from other programs or scripts", "hooks",
@@ -2934,6 +3093,166 @@ def readAiContentDescriber(sFolder):
 
 
 
+# THE NOVEMBER 2026 LIST (14 November 2026): Guide, Learning Ally and LibriVox, gathered by build_release's harvestQueue.
+
+def pageText(sMarkup):
+    """A page's words, for telling copies apart: its main region without markup, spacing made even."""
+    sMain = findBalanced(sMarkup, r"<main[^>]*>", "main") or sMarkup
+    return re.sub(r"\s+", " ", stripTags(re.sub(r"(?is)<(script|style)[^>]*>.*?</\1>", " ", sMain))).strip()
+
+
+def readGuide(sFolder):
+    """Guide (guideinteraction.com) is a small site of plain pages. Each page's first heading names it, since every
+    page's title is the same tagline. Its support pages are the help; the front page holds the questions people ask;
+    the blog announces each release, which is where Guide says what a version added, so the posts are kept in a
+    category of their own, as Hartgen's announcements were. The blog's index, a list of the posts, is left out."""
+    lArticles, setSeen = [], set()
+    for sName in sorted(os.listdir(sFolder)):
+        if not sName.endswith(".html"): continue
+        oPath = re.match(r"www\.guideinteraction\.com(?:_(support|blog|about|organizations)(?:_(.+))?)?\.html$", sName)
+        if not oPath: continue
+        sArea, sSlug = oPath.group(1) or "", oPath.group(2) or ""
+        if sArea == "blog" and not sSlug: continue
+        sMarkup = readText(os.path.join(sFolder, sName))
+        sMain = findBalanced(sMarkup, r"<main[^>]*>", "main")
+        if not sMain: continue
+        sText = pageText(sMarkup)
+        if sText in setSeen: continue
+        setSeen.add(sText)
+        lHeadings = [stripTags(s) for s in re.findall(r"(?is)<h[12][^>]*>(.*?)</h[12]>", sMain)]
+        if not sArea:
+            # THE FRONT PAGE'S QUESTIONS ARE A MANTINE ACCORDION: each question is the label inside a button, and its
+            # answer the content of the panel after it. Each pair is an article; the page above them is the overview.
+            iFaq = sMain.find("mantine-Accordion-root")
+            sFaq = sMain[iFaq:] if iFaq >= 0 else ""
+            for oMatch in re.finditer(r'(?is)<span[^>]*mantine-Accordion-label[^>]*>(.*?)</span>', sFaq):
+                sAnswer = findBalanced(sFaq[oMatch.end():], r'<div[^>]*mantine-Accordion-content', "div")
+                if sAnswer: lArticles.append(("Questions people ask", stripTags(oMatch.group(1)), toMarkdown(sAnswer, 0, "https://www.guideinteraction.com/")))
+            if iFaq >= 0: sMain = sMain[:sMain.rfind("<h1", 0, iFaq) if sMain.rfind("<h1", 0, iFaq) >= 0 else iFaq]
+            sCategory, sTitle = "About Guide", "What Guide is"
+        elif sArea in ("about", "organizations"):
+            sCategory, sTitle = "About Guide", {"about": "About the company", "organizations": "Guide for organizations"}[sArea]
+        elif sArea == "support" and not sSlug:
+            sCategory, sTitle = "Using Guide", "Support"
+        else:
+            sCategory = "Using Guide" if sArea == "support" else "Releases and news"
+            sTitle = lHeadings[0] if lHeadings else sSlug.replace("-", " ").capitalize()
+        lBody = toMarkdown(sMain, 0, "https://www.guideinteraction.com/")
+        if len(" ".join(lBody).split()) < 40: continue
+        lArticles.append((sCategory, sTitle, lBody))
+    return lArticles
+
+
+def readLearningAlly(sFolder):
+    """Learning Ally's help centre is one page of questions, each a details element whose summary is the question,
+    under group headings (School Resources, Tech Support and others); learningally.org/help and /help/techsupport
+    serve that same page, so it is read once. The integration pages for schools (Clever, ClassLink, Google sign-on,
+    rostering) are articles of their own. The membership page that says "You're all set" confirms a purchase and is
+    not help."""
+    lArticles, setQuestions = [], set()
+    lPages = sorted(s for s in os.listdir(sFolder) if s.endswith(".html"))
+    for sName in lPages:
+        sMarkup = readText(os.path.join(sFolder, sName))
+        sMain = findBalanced(sMarkup, r"<main[^>]*>", "main")
+        if not sMain: continue
+        if '<details class="la-faq__item"' in sMain:
+            sGroup = "Frequently asked questions"
+            for oMatch in re.finditer(r'(?is)<h3[^>]*la-faqhub__group[^>]*>(.*?)</h3>|<details class="la-faq__item">\s*<summary>(.*?)</summary>', sMain):
+                if oMatch.group(1) is not None:
+                    sGroup = stripTags(oMatch.group(1))
+                    continue
+                sQuestion = stripTags(oMatch.group(2))
+                if sQuestion.lower() in setQuestions: continue
+                setQuestions.add(sQuestion.lower())
+                sAnswer = findBalanced(sMain[oMatch.end():], r'<div[^>]*class="la-faq__answer"', "div")
+                if not sAnswer: continue
+                lArticles.append((sGroup, sQuestion, toMarkdown(sAnswer, 0, "https://learningally.org/help/")))
+            continue
+        lHeadings = [stripTags(s) for s in re.findall(r"(?is)<h[12][^>]*>(.*?)</h[12]>", sMain)]
+        sTitle = lHeadings[0] if lHeadings else ""
+        if not sTitle or re.search(r"(?i)you.re all set", sTitle): continue
+        lBody = toMarkdown(sMain, 0, "https://learningally.org/help/")
+        if len(" ".join(lBody).split()) < 40: continue
+        lArticles.append(("Schools and integrations", sTitle, lBody))
+    return lArticles
+
+
+# LibriVox's wiki: what is kept and where. Every page is read through readDocsSite (the article is mw-content-text).
+lLibriVoxLeftOut = [r"^staff picks", r"^great books of the western world", r"^recordings of books on the ambleside",
+                    r"^boy scout", r"^penguin.s great ideas", r"^52 books", r"^exercises in knitting", r"^spotlight on",
+                    r"^featured weekly", r"^archives$", r"^donat", r"^librivox in the news", r"^initial database design",
+                    r"^how to update the mw", r"^torrent todo", r"^review of iriver", r"^anniversary podcast",
+                    r"^any soldier", r"^prison donations", r"^librivox and ebay", r"^main page$", r"^audacity 4$",
+                    r"^audacity$", r"^guides from a sound engineer", r"^how to find a reader", r"^thank you$",
+                    r"^catalog project", r"^cleanup crew", r"^banners and buttons", r"^book resources",
+                    r"^example 1 minute test responses", r"^peegee.s script", r"^kmerline"]
+lLibriVoxCategories = [
+    (r"(?i)(how to listen|how to get librivox|podcast|cd player|digital audio player|bittorrent|torrent|m4b|id3|"
+     r"choosing a|what is id3)", "Listening to LibriVox"),
+    (r"(?i)(proof.?listen|checker)", "Proof-listening"),
+    (r"(?i)(dramatic|play coordinator|voice character)", "Dramatic readings"),
+    (r"(?i)(coordinator|\bbc\b|\bmc\b|catalog|word count|solo project|shepherd|thanking a reader|cd covers|covers)",
+     "Coordinating a recording"),
+    (r"(?i)(audacity|noise|editing|edit |de-essing|amplif|levell|replaygain|peaks|hum|silence|compression|"
+     r"splitting|split with|merging|slowing|cutting audio|audio processing|garageband|editing method|measuring volume)",
+     "Editing audio"),
+    (r"(?i)(record|1-minute test|microphone|vocal booth|equipment|tech specs|pronunciation|accents|software we use|"
+     r"newbie|what if i suck|computer performance|send your recording|volunteer)", "Recording for LibriVox"),
+    (r"(?i)(policy|policies|copyright|public domain|disclaimer|artificial intelligence|forum|language policy|rules|"
+     r"glossary|questions and answers|misc q|faq|librivox|how librivox works|promotional|instructional videos)",
+     "About LibriVox and its rules"),
+]
+
+
+def isEnglishText(sText):
+    """True when a page reads as English. LibriVox's wiki carries its guides in nine languages under their own titles
+    (Anleitung zum Aufnehmen, Guide pour les débutants, 新手录音指南), which no address can tell apart. A page is
+    taken as another language when Chinese, Japanese or Korean characters are a fifth of its letters, or when the
+    commonest words of another language outnumber those of English; a share of English words alone was too strict
+    for pages that are mostly tables or lists, such as Software We Use."""
+    iCjk = len(re.findall(r"[\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]", sText))
+    iLetters = len(re.findall(r"[^\W\d_]", sText))
+    if iLetters and iCjk / float(iLetters) > 0.2: return False
+    lWords = re.findall(r"[^\W\d_']+", sText.lower())
+    setEnglish = {"the", "and", "to", "of", "you", "is", "in", "that", "it", "for", "your", "this", "with", "are", "be"}
+    setOther = {"der", "die", "und", "das", "ist", "nicht", "mit", "le", "la", "les", "et", "des", "est", "une", "pour",
+                "el", "los", "las", "que", "y", "por", "una", "para", "o", "os", "um", "uma", "não", "il", "di", "che",
+                "è", "per", "ang", "mga", "sa", "na", "ng", "de", "het", "een", "en", "van", "je"}
+    iEnglish = sum(1 for s in lWords if s in setEnglish)
+    iOther = sum(1 for s in lWords if s in setOther)
+    return iEnglish >= iOther
+
+
+def readLibriVox(sFolder):
+    """LibriVox's help is its wiki. Pages saved twice, under /index.php/Title and ?title=Title, are read once; pages in
+    other languages, lists of recommended books, archived announcements and the wiki's own housekeeping are left out
+    and counted. Categories come from what each page is about, since the wiki gives these pages no trail."""
+    lArticles, setSeen = [], set()
+    iCopies = iLanguages = iLists = 0
+    for sCategory, sTitle, lBody in readDocsSite(sFolder, None, r"(?i)(action=|oldid=|printable=)"):
+        sTitle = re.sub(r"\s*-\s*Librivox wiki$", "", sTitle).strip()
+        if sTitle.lower() in setSeen:
+            iCopies += 1
+            continue
+        setSeen.add(sTitle.lower())
+        sText = " ".join(lBody)
+        if any(re.search(s, sTitle.lower()) for s in lLibriVoxLeftOut):
+            iLists += 1
+            continue
+        if not isEnglishText(sText) or not isEnglishText(sTitle):
+            iLanguages += 1
+            continue
+        sCategory = sMiscellaneous
+        for sPattern, sLabel in lLibriVoxCategories:
+            if re.search(sPattern, sTitle):
+                sCategory = sLabel
+                break
+        lArticles.append((sCategory, sTitle, lBody))
+    logging.info("LibriVox: %d articles; left out %d copies, %d pages in other languages, %d book lists, archives and housekeeping pages",
+                 len(lArticles), iCopies, iLanguages, iLists)
+    return lArticles
+
+
 # NVDA COACH (12 November 2026): an NVDA add-on, not a web estate. Its course is six chapters of lesson files inside the
 # add-on (globalPlugins\nvdaCoach\lessons\en\*.json), and its own user guide and resources page sit in doc\en.
 
@@ -3454,6 +3773,26 @@ def main():
          "This guide holds the official help for GoodMaps, the free indoor navigation app for iPhone and Android, gathered from the GoodMaps knowledge base on 11 November 2026. The categories are the knowledge base's own sections.\r\n\r\nMost parts of the app have two articles: a short how-to under Getting Started, and a fuller description under Features, often comparing the current app with version 1.0 and ending with a few questions and answers. GoodMaps finds where you are in a building through your phone's camera, so several articles explain how to hold the phone and why the app needs camera access. The help is written for every user, sighted and blind, and in places describes the visual map.\r\n\r\nLeft out on purpose: the pages written for the buildings that host GoodMaps rather than for people using the app. These cover GoodMaps Studio, the tool venues use to manage their maps; the mapping service and the safety of its lidar scanner; a sales page addressed to venues; and a 2023 notice to venue customers about the move to the new app. The screenshots are left out too, because their only descriptions are labels such as \"Check In 1.\" For questions the help does not answer, GoodMaps takes email at support@goodmaps.com."),
         ("AI Content Describer", "AiContentDescriberHelp", readAiContentDescriber, "AiContentDescriber.md", "AI Content Describer help",
          "This guide holds the documentation for AI Content Describer, a free add-on for the NVDA screen reader that asks an AI model to describe whatever is in focus, the navigator object, the whole screen, an image on the clipboard or a picture from your camera, and lets you ask follow-up questions. It was gathered from the add-on's GitHub repository on 11 November 2026.\r\n\r\nThe add-on's whole manual is one long readme, so this guide divides it at the readme's own headings. Setting up a model holds one article for each AI service the add-on supports, from those that need a key you get from the company to models that run on your own computer.\r\n\r\nLeft out on purpose: the parts written for people who change the add-on's code rather than use it -- the readme's sections on building, translating and contributing, and a separate developer document on adding a new AI service. The readme's translations into ten other languages were not gathered."),
+        ("Guide", "GuideHelp", readGuide, "Guide.md", "Guide help",
+         "This guide holds what the makers of Guide publish about it, gathered from guideinteraction.com on 14 November 2026. Guide is a Windows program for people who are blind or have low vision: you tell it, by voice or keyboard, what you want done on the screen, and it describes what is there and clicks, types or plays for you. It is meant to work beside a screen reader such as JAWS or NVDA, not to replace one. It is a paid subscription with a free trial.\r\n\r\nThe site is small, so this guide is too. The support pages are the help itself: settings, voices, keyboard shortcuts, the two assist modes and what to do when Guide cannot act in a program. The questions on Guide's front page are articles of their own. The release posts are kept in their own category, because they are where Guide says what each version added.\r\n\r\nThis is a different product from the recruiting service also called Guide."),
+        ("Learning Ally", "LearningAllyHelp", readLearningAlly, "LearningAlly.md", "Learning Ally help",
+         "This guide holds Learning Ally's own help, gathered from its public help pages on 14 November 2026. Learning Ally is a nonprofit library of human-read audiobooks for students with dyslexia, blindness and other reading barriers, used at home and in schools. Each question on its help page is an article here, under Learning Ally's own headings, and the pages for schools that sign in through Clever, ClassLink or Google have a category of their own.\r\n\r\nThe app guides Learning Ally offers as PDF files were not gathered. Bookshare, another accessible library, has its own guide in this collection."),
+        ("LibriVox", "LibriVoxHelp", readLibriVox, "LibriVox.md", "LibriVox help",
+         "This guide holds LibriVox's own help, gathered from the LibriVox wiki on 14 November 2026. LibriVox is a volunteer project that records books in the public domain and gives the recordings away free. Its help is written for two kinds of people: listeners, who want to find and play the audiobooks, and volunteers, who read, edit, proof-listen and coordinate the recordings. Both are here.\r\n\r\nThe wiki gives its pages no trail, so the categories come from what each page is about. Left out on purpose: the same guides in other languages, yearly lists of staff picks and other reading lists, old announcements, and pages about running the wiki itself. Much of the recording advice is about Audacity, which has its own guide in this collection."),
+        ("Google Calendar", "GoogleCalendarHelp", readGoogleTopics, "GoogleCalendar.md", "Google Calendar help",
+         "This guide holds Google's own help for Google Calendar, gathered from support.google.com on 14 November 2026. It covers calendars, events, appointment schedules, sharing, settings and Tasks in Calendar, on a computer and on a phone. Using Calendar with a screen reader is under Get started.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for — Computer, Android, or iPhone and iPad. The categories are Google's own topics: Google no longer puts a trail above each article, so each article is filed under the topic its help centre lists it in."),
+        ("Google Chat", "GoogleChatHelp", readGoogleTopics, "GoogleChat.md", "Google Chat help",
+         "This guide holds Google's own help for Google Chat, gathered from support.google.com on 14 November 2026. It covers messages, spaces, calls, files and notifications in Chat, on its own and inside Gmail.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for — Computer, Android, or iPhone and iPad. The categories are Google's own topics: Google no longer puts a trail above each article, so each article is filed under the topic its help centre lists it in."),
+        ("Google Keep", "GoogleKeepHelp", readGoogleTopics, "GoogleKeep.md", "Google Keep help",
+         "This guide holds Google's own help for Google Keep, gathered from support.google.com on 14 November 2026. It covers notes, lists, reminders, labels and sharing in Keep.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for — Computer, Android, or iPhone and iPad. The categories are Google's own topics: Google no longer puts a trail above each article, so each article is filed under the topic its help centre lists it in."),
+        ("Google Sites", "GoogleSitesHelp", readGoogleTopics, "GoogleSites.md", "Google Sites help",
+         "This guide holds Google's own help for Google Sites, gathered from support.google.com on 14 November 2026. It covers making, editing, sharing and publishing a site with Google Sites. Google's help for Sites is short, and so is this guide.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for — Computer, Android, or iPhone and iPad. The categories are Google's own topics: Google no longer puts a trail above each article, so each article is filed under the topic its help centre lists it in."),
+        ("Google Tasks", "GoogleTasksHelp", readGoogleTopics, "GoogleTasks.md", "Google Tasks help",
+         "This guide holds Google's own help for Google Tasks, gathered from support.google.com on 14 November 2026. It covers tasks and lists in the Tasks app and beside Gmail, Calendar, Chat and the Docs editors. Some of it repeats what the Google Calendar guide says about tasks there.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for — Computer, Android, or iPhone and iPad. The categories are Google's own topics: Google no longer puts a trail above each article, so each article is filed under the topic its help centre lists it in."),
+        ("Box", "BoxHelp", readBox, "Box.md", "Box help",
+         "This guide holds Box's own help, gathered from support.box.com on 15 November 2026. Box is an online service for keeping, sharing, signing and working on files with other people. Its help centre has almost 2,900 articles; this guide keeps the 680 written for a person who uses Box, under Box's own product names, with each product's troubleshooting beside its guides. Files, folders and sharing come under Using Box, and every app Box works inside, such as Microsoft Office, Teams, Slack, Google Workspace, Outlook and Zoom, comes under Box with other apps.\r\n\r\nLeft out on purpose: 1,729 release notes and announcements, which are a history of changes rather than help; the administrator's console and the products only an administrator runs, such as Shield, Governance, Shuttle and the developer platform; the integrations with business systems such as Salesforce and NetSuite; and Box's training and certification pages. If you run Box for an organisation, Box's own help centre has those pages."),
+        ("Egnyte", "EgnyteHelp", readEgnyte, "Egnyte.md", "Egnyte help",
+         "This guide holds Egnyte's own help, gathered from helpdesk.egnyte.com on 15 November 2026. Egnyte is an online service that businesses use to store, share and work on files. Its help centre has about 1,500 articles, most written for the company administrators who set it up; this guide keeps the 436 written for a person who uses it: the web app, the desktop app, the mobile app, the AI assistant, and Egnyte with Microsoft 365 and Google.\r\n\r\nLeft out on purpose: 607 announcements, release notes and known issues, which are a history of changes rather than help; the administrators' pages, such as users and groups, governance, reporting, migration and the storage appliances; and the editions for architects and life sciences companies. If you run Egnyte for your company, Egnyte's own help centre has those pages."),
     ]
     # ONE ENTRY PER GUIDE (version 2). The plan had grown a second copy of twenty entries, from Org mode to Remote
     # Incident Manager, so those guides were built twice in every run; the first entry for a guide now wins.

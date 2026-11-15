@@ -12,7 +12,8 @@ push are the kit's own, the same as an app's.
 
     role       build                                               release
     books      buildBooks: builds what changed                     kdpSubmit: submits what changed
-    guides     the app-help-guide skill's buildGuide --build       nothing more: the push published the guides
+    guides     harvestQueue: gathers the guides addGuides.inix     nothing more: the push published the guides
+               asks for; then buildGuide --build
     pages      nothing to compile: the pages are Markdown          post: posts each page that changed
     podcasts   fixPages --changed: each changed page's .htm        nothing more: the push published the pages
 
@@ -374,6 +375,17 @@ def build(sRoot, sRole, sKit):
     sScripts = os.path.join(sRoot, "scripts")
     if sRole == "books": return run([sys.executable, os.path.join(sScripts, "buildBooks.py")], sRoot)
     if sRole == "guides":
+        # NEW GUIDES FIRST (1.222.0), as new shows are for the podcasts: a guide named in data\\addGuides.inix and not
+        # yet gathered for the day it was asked is gathered by the kit's harvestQueue, which writes its harvester with
+        # makeHarvester, runs it, and leaves the archive to upload in results. A harvest that fails is reported and
+        # does not stop the cycle; a failing makeHarvester, a crash or Control+C does.
+        sQueue = os.path.join(sKit, ".claude", "skills", "app-help-guide", "scripts", "harvestQueue.py")
+        if os.path.isfile(os.path.join(sRoot, "data", "addGuides.inix")):
+            if not os.path.isfile(sQueue):
+                say("The kit's harvestQueue.py was not found at %s, so no new guide was gathered." % sQueue)
+                return 1
+            iHarvest = run([sys.executable, sQueue, sRoot], sRoot)
+            if iHarvest != 0: return iHarvest
         sBuilder = os.path.join(sKit, ".claude", "skills", "app-help-guide", "scripts", "buildGuide.py")
         if not os.path.isfile(sBuilder):
             say("The kit's buildGuide.py was not found at %s, so no guide was built." % sBuilder)

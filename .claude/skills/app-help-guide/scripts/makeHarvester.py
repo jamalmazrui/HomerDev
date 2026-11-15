@@ -1,4 +1,4 @@
-﻿r"""makeHarvester.py version 2
+﻿r"""makeHarvester.py version 4
 
 Writes a harvester: a standalone Python crawler for ONE product's help estate.
 
@@ -36,6 +36,16 @@ refuses translated editions, sends a Referer naming the site's front page,
 waits between requests, stops at a page ceiling, writes a debugging log in the
 Homer place, saves each page with a manifest, and zips the folder at the end.
 
+EDGE FOR A PAGE DRAWN BY SCRIPT (version 3, 14 November 2026). An estate whose
+block says "sFetch": "edge" is fetched by Microsoft Edge rather than by Python:
+Edge loads each page headless in a profile of its own, lets its script run for
+"iBrowserWait" seconds (30 unless the block says otherwise), and prints the
+finished page. Salesforce help centres need it -- OpenTable's articles arrived
+only at thirty seconds, in September -- and Glassdoor is the first block to use
+it. Such a run also refuses any page nine tenths the same as the first page it
+saved: that is the site's scaffolding arriving without its article. Every other
+block is fetched by Python as before.
+
 THE FENCE FAULTS THAT HAVE COST RUNS are in references/fence-faults.md. Read
 that before writing a new fence.
 """
@@ -59,11 +69,12 @@ Nothing is fetched twice: a page already saved is skipped, so the script
 can be stopped and run again.
 """
 
-import hashlib, html, http.client, io, json, logging, os, platform, re, socket, sys, time, urllib.error, urllib.parse, urllib.request, zipfile
+import hashlib, html, http.client, io, json, logging, os, platform, re, shutil, socket, subprocess, sys, tempfile, time, urllib.error, urllib.parse, urllib.request, zipfile
 
 dDefaultHeaders = {{"Accept": "text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8",
              "Accept-Language": "en-US,en;q=0.9",
              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"}}
+iBrowserWait = {iBrowserWait}
 iMaxPages = {iMaxPages}
 iMaxRepeatLines = 25
 iRetries = 3
@@ -74,11 +85,13 @@ lLanguageCodes = ["af", "am", "ar", "az", "be", "bg", "bn", "bs", "ca", "cs", "c
                     "sw", "ta", "te", "th", "tl", "tr", "uk", "ur", "uz", "vi", "zh", "zu"]
 nDelay = {nDelay}
 nTimeout = 30
+sFetchMode = "{sFetch}"
 sFolderName = "{sFolder}"
 sProduct = "{sProduct}"
 sSubjectPattern = r"{sSubjectPattern}"
 sZipName = "{sZipName}"
 
+g_dBrowser = {{"sProfile": "", "setFirstWords": None}}
 g_dPaths = {{"sLog": ""}}
 g_dRepeatCounts = {{}}
 g_dSeenFingerprints = {{}}
@@ -100,10 +113,78 @@ def hasControlCharacters(sUrl):
     return any(ord(sCharacter) < 32 or ord(sCharacter) == 127 for sCharacter in sUrl)
 
 
+def edgePath():
+    """Microsoft Edge's program, where Windows installs it, else on the PATH; "" when there is none."""
+    for sBase in (os.environ.get("ProgramFiles(x86)", ""), os.environ.get("ProgramFiles", ""), os.environ.get("LOCALAPPDATA", "")):
+        if not sBase: continue
+        sPath = os.path.join(sBase, "Microsoft", "Edge", "Application", "msedge.exe")
+        if os.path.isfile(sPath): return sPath
+    return shutil.which("msedge") or ""
+
+
+def fetchWithEdge(sUrl):
+    """Has Microsoft Edge load one page headless, let its script run for iBrowserWait seconds, and print the finished
+    page. Edge runs in a profile of its own, made for this run, so it never touches the profile of an Edge already
+    open. Returns what fetchAddress returns."""
+    sEdge = edgePath()
+    if not sEdge:
+        logCapped("no edge", "Microsoft Edge was not found, so this page could not be drawn: " + sUrl)
+        return 0, b"", "", sUrl
+    if not g_dBrowser["sProfile"]: g_dBrowser["sProfile"] = tempfile.mkdtemp(prefix="homerHarvest")
+    lCommand = [sEdge, "--headless=new", "--disable-gpu", "--no-first-run", "--disable-extensions",
+                "--user-data-dir=" + g_dBrowser["sProfile"], "--virtual-time-budget=%d" % (iBrowserWait * 1000),
+                "--dump-dom", sUrl]
+    iLimit = iBrowserWait + 90
+    logging.info("Edge: waiting up to %d seconds for %s", iLimit, sUrl)
+    try:
+        oRun = subprocess.run(lCommand, capture_output=True, timeout=iLimit)
+    except subprocess.TimeoutExpired:
+        logging.warning("Edge did not finish %s within %d seconds; not saved", sUrl, iLimit)
+        return 0, b"", "", sUrl
+    except OSError as oError:
+        logging.warning("Edge could not be started for %s: %s", sUrl, oError)
+        return 0, b"", "", sUrl
+    logging.info("Edge: exit %d, %d bytes, for %s", oRun.returncode, len(oRun.stdout), sUrl)
+    if oRun.returncode != 0 or not oRun.stdout.strip(): return 0, b"", "", sUrl
+    return 200, oRun.stdout, "text/html", sUrl
+
+
+def pageWords(binBody):
+    """The distinct words a reader would hear on a page: its text without markup, script or style, lowercased."""
+    sText = binBody.decode("utf-8", "replace")
+    sText = re.sub(r"(?is)<(script|style|noscript)[^>]*>.*?</\1>", " ", sText)
+    sText = html.unescape(re.sub(r"(?s)<[^>]+>", " ", sText)).lower()
+    return set(re.findall(r"[a-z0-9']+", sText))
+
+
+def isPersonCheck(binBody):
+    """True for a page that asks the browser to prove a person is there: Cloudflare's "Just a moment..." challenge."""
+    sHead = binBody[:6000].decode("utf-8", "replace")
+    return bool(re.search(r"(?is)<title[^>]*>\s*(Just a moment|Attention Required|Checking your browser)", sHead)
+                or "cf-challenge" in sHead or "challenge-platform" in sHead)
+
+
+def sameAsFirst(sUrl, binBody):
+    """True when a page drawn by Edge is nine tenths the same words as the first page this run saved: the site's
+    scaffolding arrived without its article (OpenTable, September 2026). The first page is remembered, never refused."""
+    setWords = pageWords(binBody)
+    if g_dBrowser["setFirstWords"] is None:
+        g_dBrowser["setFirstWords"] = setWords
+        return False
+    setFirst = g_dBrowser["setFirstWords"]
+    if not setWords: return True
+    nSame = len(setWords & setFirst) / float(max(len(setWords), len(setFirst)))
+    if nSame > 0.9:
+        logCapped("same as first", "%s is %d%% the same as the first page saved, so it is scaffolding without its article; refused" % (sUrl, int(nSame * 100)))
+        return True
+    return False
+
+
 def fetchAddress(sUrl):
     if hasControlCharacters(sUrl):
         logCapped("unfetchable address", "refused: it carries control characters")
         return 0, b"", "", sUrl
+    if sFetchMode == "edge": return fetchWithEdge(sUrl)
     """Fetches one address, returning status, body bytes, content type and the final address."""
     for iAttempt in range(1, iRetries + 1):
         try:
@@ -144,7 +225,7 @@ def isEnglish(sUrl):
     dQuery = urllib.parse.parse_qs(oParts.query)
     for sField in ("lang", "language", "locale", "setln", "hl"):
         for sValue in dQuery.get(sField, []):
-            if sValue.lower().split("-")[0] not in ("en", ""): return False
+            if sValue.lower().replace("_", "-").split("-")[0] not in ("en", ""): return False
     return True
 
 
@@ -156,7 +237,7 @@ def cleanAddress(sUrl):
     for sField, sValue in urllib.parse.parse_qsl(oParts.query):
         if sField.lower() in ("page", "per_page", "start_page"): lKeep.append((sField, sValue))
         elif sField.lower() in ("cds_mag_code", "cds_page_id", "cds_to_id"): lKeep.append((sField, sValue))
-        elif sField.lower() in ("nodeid",): lKeep.append((sField, sValue))
+        elif sField.lower() in ("nodeid", "title"): lKeep.append((sField, sValue))
         elif sField.lower() in ("co", "answer", "topic", "sjid"): lKeep.append((sField, sValue)) if sField.lower() == "co" else None
     return urllib.parse.urlunsplit((oParts.scheme, oParts.netloc, oParts.path, urllib.parse.urlencode(lKeep), ""))
 
@@ -213,6 +294,7 @@ def gatherEstate(sFolder, lManifest):
             logging.error("SEED REFUSED BY ITS OWN FENCE: %s — the fence pattern is wrong, nothing will be gathered", sSeed)
             print("STOPPING: the seed " + sSeed + " fails this script's own fence. See " + g_dPaths["sLog"])
             return 0
+    iChecks = 0
     while lQueue:
         if iSaved >= iMaxPages:
             logging.warning("SAFETY VALVE: stopped at %d pages with %d addresses still queued", iSaved, len(lQueue))
@@ -242,8 +324,23 @@ def gatherEstate(sFolder, lManifest):
             logging.warning("%s answered %d but does not carry the expected content; kept out. It calls itself '%s' and holds %d words",
                             sUrl, iStatus, sPageTitle[:80], iWords)
             continue
+        if isPersonCheck(binBody):
+            # A CHECK FOR A PERSON (version 4, 15 November 2026): Cloudflare answers "Just a moment..." with a page that
+            # asks the browser to prove a person is there. Glassdoor's help did this to every page Edge drew, and the
+            # run saved four copies of the check. Such a page is never help; five in a row with nothing saved means
+            # the site refuses this crawler, and the run stops and says so rather than spending hours on it.
+            iChecks += 1
+            logCapped("person check", "%s answered with a check for a person (Cloudflare's \"Just a moment\"); not saved" % sUrl)
+            if iChecks >= 5 and iSaved == 0:
+                logging.warning("STOPPED: the first %d pages were all checks for a person, so this site refuses this crawler", iChecks)
+                print("%s: the site answers every page with a check for a person, so nothing can be gathered; stopped." % sProduct, flush=True)
+                break
+            continue
+        if sFetchMode == "edge" and sameAsFirst(sUrl, binBody): continue
         try:
-            if savePage(sFolder, sUrl, binBody, lManifest): iSaved += 1
+            if savePage(sFolder, sUrl, binBody, lManifest):
+                iSaved += 1
+                if iSaved % 25 == 0: print("%s: %d pages saved so far" % (sProduct, iSaved), flush=True)
             if subjectAllows(binBody): lQueue.extend(queueable(findLinks(sUrl, binBody), lSeen, lQueue))
         except Exception as oError:
             logging.exception("one page raised an error and the crawl continues: %s (%s)", sUrl, oError)
@@ -351,11 +448,12 @@ def main():
     logging.getLogger().setLevel(logging.INFO)
     sys.excepthook = lambda oType, oValue, oTrace: logging.error(
         "UNCAUGHT %s: %s", oType.__name__, oValue, exc_info=(oType, oValue, oTrace))
-    logging.info("{sScriptName} (makeHarvester version 2) for %s", sProduct)
+    logging.info("{sScriptName} (makeHarvester version 4) for %s", sProduct)
     logging.info("script %s", os.path.abspath(__file__))
     logging.info("Python %s on %s", platform.python_version(), platform.platform())
     logging.info("working directory %s; command line %s", os.getcwd(), " ".join(sys.argv))
-    logging.info("settings: maxPages %d, delay %.1f, timeout %d, retries %d", iMaxPages, nDelay, nTimeout, iRetries)
+    logging.info("settings: maxPages %d, delay %.1f, timeout %d, retries %d, fetch %s, browser wait %d", iMaxPages, nDelay,
+                 nTimeout, iRetries, sFetchMode, iBrowserWait)
     logging.info("places: pages %s; archive %s; log %s", sFolder, os.path.join(sResults, sZipName), sLogPath)
     print("Gathering %s help. Pages go to %s" % (sProduct, sFolder))
     lManifest = []
@@ -379,6 +477,7 @@ def main():
     except BaseException as oError:
         logging.exception("the manifest could not be written: %s: %s", type(oError).__name__, oError)
         iResult = 1
+    if g_dBrowser["sProfile"]: shutil.rmtree(g_dBrowser["sProfile"], ignore_errors=True)
     for sKind, iCount in sorted(g_dRepeatCounts.items()):
         logging.info("tally: %s occurred %d times", sKind, iCount)
     sZipPath = os.path.join(sResults, sZipName)
@@ -412,6 +511,87 @@ def main():
 
 if __name__ == "__main__": sys.exit(main())
 '''
+
+def microsoftEstate(sProduct, sScriptName, sFolder, sArea, sWhat):
+    """One block for an app Microsoft documents at support.microsoft.com (14 November 2026). Microsoft publishes a
+    site map per product, word_en-us_1.xml and its kin, listed in _sitemaps/sitemapindex.xml, with every article under
+    /en-us/<area>/; and a second map, accessibility_en-us_1.xml, whose /en-us/accessibility/<area>/ articles are the
+    screen reader instructions. The index is the seed, so a second map (_2) is found as well as the first, and the
+    fence keeps only this product's English maps and articles. A crawl from the product's front page reached a
+    dozen Copilot pages in October; the maps list everything. Which versions an article applies to is read when the
+    guide is built, from its Applies To line."""
+    return {
+        "sProduct": sProduct,
+        "sScriptName": sScriptName,
+        "sSystem": "Microsoft's support pages for %s, read from its site maps, with the accessibility articles about it" % sWhat,
+        "sFolder": sFolder,
+        "sZipName": sFolder + ".zip",
+        "iMaxPages": 4000,
+        "nDelay": 1.0,
+        "sSeeds": ('"https://support.microsoft.com/_sitemaps/sitemapindex.xml",\n'
+                   '              "https://support.microsoft.com/_sitemaps/accessibility_en-us_1.xml"'),
+        "sFencePattern": (r"^https://support\.microsoft\.com/(_sitemaps/(sitemapindex|%s_en-us_\d+|accessibility_en-us_\d+)\.xml"
+                          r"|en-us/(%s|accessibility/%s)(/[a-z0-9-]+)*/?)$") % (sArea, sArea, sArea),
+        "sSubjectPattern": "",
+        "sReadyPattern": r"(<sitemapindex|<urlset|supMainContent|<main)",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": "    for oMatch in re.finditer(r'<loc>\\s*([^<]+?)\\s*</loc>', sText, re.I): lFound.append(html.unescape(oMatch.group(1)).strip())",
+    }
+
+
+def googleEstate(sProduct, sScriptName, sFolder, sCentre, lSeedPaths, iMaxPages):
+    """One block for a Google help centre at support.google.com/<centre> (14 November 2026), the shape that gathered
+    Gmail and Meet. Only the centre's front page, its topics and its answers are inside the fence -- not its community
+    threads, which "/<centre>/" alone let in -- and an answer's co= field, which names its platform, is kept."""
+    return {
+        "sProduct": sProduct,
+        "sScriptName": sScriptName,
+        "sSystem": "Google's own help centre at support.google.com/%s" % sCentre,
+        "sFolder": sFolder,
+        "sZipName": sFolder + ".zip",
+        "iMaxPages": iMaxPages,
+        "nDelay": 1.0,
+        "sSeeds": ",\n              ".join('"https://support.google.com/%s/%s"' % (sCentre, sPath) for sPath in lSeedPaths),
+        "sFencePattern": r"^https://support\.google\.com/%s/((answer|topic)/\d+|\?|$)" % sCentre,
+        "sSubjectPattern": "",
+        "sReadyPattern": r"(<article|support\.google\.com|Help)",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": "",
+    }
+
+
+def zendeskEstate(sProduct, sScriptName, sFolder, sHost, iMaxPages):
+    """One block for a Zendesk help centre read by the listing route (14 November 2026): the article, category and
+    section listings name every article with its body, and that is all readZendesk reads.
+
+    LISTINGS ONLY (1.224.0). The first Egnyte run also crawled the centre's web pages, and Zendesk serves each article
+    under two or three addresses (its bare number, its old title, its new one) and each section with a stray
+    subscription.html beside it: 1,200 pages saved and 800 more queued in 36 minutes, none of which the builder reads.
+    The listings are about one fetch per hundred articles."""
+    sHostPattern = sHost.replace(".", "\\.")
+    return {
+        "sProduct": sProduct,
+        "sScriptName": sScriptName,
+        "sSystem": "Zendesk at %s, by the listing route" % sHost,
+        "sFolder": sFolder,
+        "sZipName": sFolder + ".zip",
+        "iMaxPages": iMaxPages,
+        "nDelay": 1.0,
+        "sSeeds": ('"https://%s/api/v2/help_center/en-us/articles.json?per_page=100",\n'
+                   '              "https://%s/api/v2/help_center/en-us/categories.json?per_page=100",\n'
+                   '              "https://%s/api/v2/help_center/en-us/sections.json?per_page=100"') % (sHost, sHost, sHost),
+        "sFencePattern": r"^https://%s/api/v2/help_center/en-us/(articles|categories|sections)\.json" % sHostPattern,
+        "sSubjectPattern": "",
+        "sReadyPattern": r"(hc/en-us/articles/|help center|\"articles\")",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": ('    if sText.lstrip().startswith("{"):\n'
+                        '        try:\n'
+                        '            dPayload = json.loads(sText)\n'
+                        '            if dPayload.get("next_page"): lFound.append(dPayload["next_page"])\n'
+                        '        except Exception as oError:\n'
+                        '            logging.warning("a listing page was not readable as JSON: %s", oError)\n'),
+    }
+
 
 lEstates = [
     {
@@ -3099,6 +3279,130 @@ lEstates = [
         "sOkStatuses": "200, 202",
         "sExtraLinks": "",
     },
+    # THE NOVEMBER 2026 LIST (14 November 2026): the Microsoft 365 apps, two file-sharing services, two audiobook
+    # libraries, an AI assistant for blind Windows users, and Glassdoor. Every address below was seen to answer.
+    # Microsoft 365: one guide per app, desktop on Windows and the web together, as Microsoft writes them; OneDrive
+    # again, since August's guide was a crawl of 207 pages and the site map lists them all.
+    microsoftEstate("Excel", "getExcelHelp.py", "ExcelHelp", "excel", "Excel"),
+    microsoftEstate("OneDrive", "getOneDriveHelp.py", "OneDriveHelp", "onedrive", "OneDrive"),
+    microsoftEstate("Outlook", "getOutlookHelp.py", "OutlookHelp", "outlook", "Outlook"),
+    microsoftEstate("PowerPoint", "getPowerPointHelp.py", "PowerPointHelp", "powerpoint", "PowerPoint"),
+    microsoftEstate("SharePoint", "getSharePointHelp.py", "SharePointHelp", "sharepoint", "SharePoint"),
+    microsoftEstate("Word", "getWordHelp.py", "WordHelp", "word", "Word"),
+    # BOX AND EGNYTE: both Zendesk centres. Box's Developer Resources and its admin courses are kept out when the
+    # guide is built, by section, as Bitwarden's administrator half was; the listing gathers them with the rest.
+    zendeskEstate("Box", "getBoxHelp.py", "BoxHelp", "support.box.com", 2500),
+    zendeskEstate("Egnyte", "getEgnyteHelp.py", "EgnyteHelp", "helpdesk.egnyte.com", 2500),
+    # GOOGLE WORKSPACE (14 November 2026). Docs, Sheets, Slides, Vids and Drawings share one centre, the Docs
+    # Editors help at support.google.com/docs, so one harvest serves a guide for each, split when built by the trail
+    # above each article; Forms, gathered in September through a subject gate, can be rebuilt from it if fuller.
+    # Calendar, Chat, Keep, Sites and Tasks each have a centre of their own. Drive (August), Gmail and Meet are built.
+    googleEstate("Google Docs Editors", "getGoogleDocsEditorsHelp.py", "GoogleDocsEditorsHelp", "docs",
+                 ["?hl=en", "answer/15067819?hl=en", "answer/15082957", "answer/2839737?hl=en"], 6000),
+    googleEstate("Google Calendar", "getGoogleCalendarHelp.py", "GoogleCalendarHelp", "calendar",
+                 ["?hl=en", "answer/168510?hl=en", "answer/2465776"], 1500),
+    googleEstate("Google Chat", "getGoogleChatHelp.py", "GoogleChatHelp", "chat",
+                 ["?hl=en", "answer/9854901", "answer/13985546"], 1500),
+    googleEstate("Google Keep", "getGoogleKeepHelp.py", "GoogleKeepHelp", "keep",
+                 ["?hl=en", "answer/2888240?hl=en", "topic/3316156?hl=en"], 600),
+    googleEstate("Google Sites", "getGoogleSitesHelp.py", "GoogleSitesHelp", "sites",
+                 ["?hl=en", "answer/6372878?hl=en", "answer/98216"], 800),
+    googleEstate("Google Tasks", "getGoogleTasksHelp.py", "GoogleTasksHelp", "tasks",
+                 ["?hl=en", "answer/7675772", "answer/7675838", "answer/9901136"], 300),
+    # GLASSDOOR: a Salesforce help centre (help.glassdoor.com/s/article/..., /s/topic/...), drawn by script in the
+    # page, as OpenTable's was, so Edge fetches it with thirty seconds a page. No language field in the seeds: the
+    # crawler drops it, and a seed must pass its own fence before anything is cleaned.
+    {
+        "sProduct": "Glassdoor",
+        "sScriptName": "getGlassdoorHelp.py",
+        "sSystem": "the Salesforce help centre at help.glassdoor.com, drawn by Microsoft Edge",
+        "sFolder": "GlassdoorHelp",
+        "sZipName": "GlassdoorHelp.zip",
+        "iMaxPages": 400,
+        "nDelay": 1.0,
+        "sFetch": "edge",
+        "iBrowserWait": 30,
+        "sSeeds": ('"https://help.glassdoor.com/s/topic/0TO1E000000EMvWWAW/getting-started",\n'
+                   '              "https://help.glassdoor.com/s/topic/0TO1E000000EMvRWAW/employer-center-basics",\n'
+                   '              "https://help.glassdoor.com/s/article/How-to-link-your-Glassdoor-and-Indeed-accounts"'),
+        "sFencePattern": r"^https://help\.glassdoor\.com/s/(article|topic)/[A-Za-z0-9_%./-]+$",
+        "sSubjectPattern": "",
+        "sReadyPattern": r"Glassdoor",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": "",
+    },
+    # GUIDE: the Windows AI assistant for blind and low-vision people that describes the screen and acts on it
+    # (guideinteraction.com; not guide.co, a recruiting product). Its questions are on its front page; support,
+    # about, organizations and the blog beside it. The installer, terms and privacy pages are outside the fence.
+    {
+        "sProduct": "Guide",
+        "sScriptName": "getGuideHelp.py",
+        "sSystem": "guideinteraction.com: the front page's questions, support, about, organizations and the blog",
+        "sFolder": "GuideHelp",
+        "sZipName": "GuideHelp.zip",
+        "iMaxPages": 80,
+        "nDelay": 1.0,
+        "sSeeds": ('"https://www.guideinteraction.com/",\n'
+                   '              "https://www.guideinteraction.com/support",\n'
+                   '              "https://www.guideinteraction.com/about",\n'
+                   '              "https://www.guideinteraction.com/organizations",\n'
+                   '              "https://www.guideinteraction.com/blog"'),
+        "sFencePattern": r"^https://www\.guideinteraction\.com/((support|about|organizations|blog)(/[a-z0-9-]+)?/?)?$",
+        "sSubjectPattern": "",
+        "sReadyPattern": r"Guide",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": "",
+    },
+    # LEARNING ALLY: public question pages on two hosts, learningally.org/help and go.learningally.org/help, probed
+    # in September (3,185 words on the first). The member sign-in is not needed and not asked for.
+    {
+        "sProduct": "Learning Ally",
+        "sScriptName": "getLearningAllyHelp.py",
+        "sSystem": "the public question pages at learningally.org/help and go.learningally.org/help",
+        "sFolder": "LearningAllyHelp",
+        "sZipName": "LearningAllyHelp.zip",
+        "iMaxPages": 60,
+        "nDelay": 1.0,
+        "sSeeds": ('"https://learningally.org/help/",\n'
+                   '              "https://learningally.org/help/techsupport",\n'
+                   '              "https://learningally.org/Help/Membership",\n'
+                   '              "https://learningally.org/help/integrations-overview",\n'
+                   '              "https://go.learningally.org/help",\n'
+                   '              "https://go.learningally.org/help/services",\n'
+                   '              "https://go.learningally.org/help/getting-started"'),
+        "sFencePattern": r"^https://(go\.|www\.)?learningally\.org/help(/[a-z0-9-]+)?/?$",
+        "sSubjectPattern": "",
+        "sReadyPattern": r"Learning Ally",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": "",
+    },
+    # LIBRIVOX: its help is its wiki -- how LibriVox works, getting its audio and podcasts, and the guides for
+    # volunteers who record, edit and proof-listen. Namespaces (Special:, Talk:, User:), translated home pages and
+    # templates are outside the fence; MediaWiki's ?title= links are kept by cleanAddress (version 3).
+    {
+        "sProduct": "LibriVox",
+        "sScriptName": "getLibriVoxHelp.py",
+        "sSystem": "the LibriVox wiki: listening, getting the audio, and the volunteers' guides",
+        "sFolder": "LibriVoxHelp",
+        "sZipName": "LibriVoxHelp.zip",
+        "iMaxPages": 600,
+        "nDelay": 1.0,
+        "sSeeds": ('"https://wiki.librivox.org/index.php/Main_Page",\n'
+                   '              "https://wiki.librivox.org/index.php/How_LibriVox_Works",\n'
+                   '              "https://wiki.librivox.org/index.php/How_To_Get_LibriVox_Audio_Files",\n'
+                   '              "https://wiki.librivox.org/index.php/Podcasting_and_Streaming_Audio",\n'
+                   '              "https://wiki.librivox.org/index.php/Newbie_Guide_to_Recording",\n'
+                   '              "https://wiki.librivox.org/index.php/How_to_Volunteer",\n'
+                   '              "https://wiki.librivox.org/index.php/Guide_for_Proof-listeners",\n'
+                   '              "https://wiki.librivox.org/index.php/Audacity_FAQ",\n'
+                   '              "https://wiki.librivox.org/index.php/Instructional_Videos"'),
+        "sFencePattern": (r"^https://wiki\.librivox\.org/index\.php(/(?![^?]*(Translation|_Old|Template|%3A))[A-Za-z0-9_%(),.!'-]+"
+                          r"|\?title=(?![^&]*(Translation|_Old|Template|%3A))[A-Za-z0-9_%(),.!'+-]+)$"),
+        "sSubjectPattern": "",
+        "sReadyPattern": r"(mw-content-text|mediawiki)",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": "",
+    },
 ]
 
 
@@ -3106,7 +3410,10 @@ def writeScripts(sOutputFolder):
     """Writes one standalone harvester per estate and returns their paths."""
     lPaths = []
     for dEstate in lEstates:
-        sText = sChassis.format(**dEstate)
+        dFields = dict(dEstate)
+        dFields.setdefault("sFetch", "plain")
+        dFields.setdefault("iBrowserWait", 30)
+        sText = sChassis.format(**dFields)
         sPath = os.path.join(sOutputFolder, dEstate["sScriptName"])
         fHandle = io.open(sPath, "w", encoding="utf-8-sig", newline="\r\n")
         fHandle.write(sText)

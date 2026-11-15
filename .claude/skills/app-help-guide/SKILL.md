@@ -38,9 +38,12 @@ Read `references/fence-faults.md` before writing a fence,
    this estate, and what is excluded — forums, translated editions, developer
    documentation, badge and profile pages, revision histories, the shop. Add the
    block to `makeHarvester.py` and generate the harvester.
-3. **Harvest.** The person with the network runs the harvester from the
-   collection's `scripts` folder and sends back the archive it writes to
-   `results`, which carries the run's log inside. Read the log first: it says
+3. **Harvest.** Add the guide to the collection's `data\addGuides.inix` (a
+   section named for the guide, with `harvester=` and `asked=`). The person with
+   the network runs build_release in the collection: its build gathers every
+   guide not yet gathered for its asked day, through `harvestQueue`, and leaves
+   each archive in `results`, with the run's log inside. They send those back.
+   A harvester can still be run by hand from the collection's `scripts` folder. Read the log first: it says
    what was refused and why, and a run that gathered nothing says so in one line.
 4. **Build.** Write a reader for that publisher's page shape in `buildGuide.py`
    and add the guide to its plan. In the collection, `build` (the first step of
@@ -65,6 +68,13 @@ A collection of guides (C:\AppHelpGuides) keeps the Homer tree (11 November 2026
   the build reads them. Never pushed (LocalFiles.txt).
 - **`results\<Product>Help.zip`:** the archive to upload, with the run's log
   inside. An output that may be moved away; nothing reads it again.
+- **`data\addGuides.inix`:** the guides to gather. Each section is a guide's
+  name, with `harvester=` (the block's script name in makeHarvester) and
+  `asked=` (a day). The build's `harvestQueue` gathers each one not yet gathered
+  for its day, records the day, exit code and page count in the harvest's
+  `request.txt`, and moves an older gathering aside, whole, to
+  `<Folder>-before-<day>`, so a fresh run never resumes over stale pages. A
+  later `asked=` day gathers a guide again. The sections stay as the record.
 - **`logs`:** one log per run, `<Collection>-<task>-yyyyMMdd-HHmmss.log`, in UTF-8
   with a byte order mark and Windows line endings.
 
@@ -77,6 +87,7 @@ to `notes\retired`.
 ## Running the scripts
 
     makeHarvester.cmd [folder] [products]   writes harvesters, by default into the collection's scripts
+    harvestQueue.cmd [collection]           gathers what data\addGuides.inix asks for; the build runs it first
     build                                   in the collection: settle, build changed guides, gate, make .htm
     build GoodMaps                          rebuild one guide, as after its reader changes
     buildGuide.cmd [harvests] [guides] [products] [--changed]   the same build by hand
@@ -174,12 +185,18 @@ beside itself.
 
 ## Estates that need a browser
 
-The generated harvesters fetch with Python alone, so an estate drawn by script
-in the page, or one that refuses Python, waits for a browser road the kit does
-not have yet: Coursera, Dell Command Update's user's guide and Twitch's help
-(Salesforce) so far, and Adobe Connect if its pages keep answering Python with
-HTTP 403. When that road is built, these lessons from the hang of 2 November
-2026 apply. Edge opened on its blank page and nothing followed, because only
+A block with `"sFetch": "edge"` is fetched by Microsoft Edge (makeHarvester
+version 3, 14 November 2026): headless, in a profile made for the run, with
+`--dump-dom` after `"iBrowserWait"` seconds of the page's script (30 by default,
+what OpenTable's Salesforce pages needed). Such a run refuses any page nine
+tenths the same words as the first page it saved -- scaffolding without its
+article -- and says so in the log. Glassdoor is the first block to use it;
+Coursera, Dell Command Update's user's guide and Twitch's help (Salesforce) are
+candidates, and Adobe Connect if its pages keep answering Python with HTTP 403.
+A run at thirty seconds a page is slow: keep its ceiling honest and put it last
+in addGuides.inix. Should a site need clicking rather than waiting, these lessons
+from the hang of 2 November 2026 apply to a fuller browser road.
+Edge opened on its blank page and nothing followed, because only
 the launch had a time limit and the console never said what it was waiting
 for:
 
