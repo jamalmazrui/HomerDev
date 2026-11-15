@@ -38,7 +38,7 @@ lsExpected = [
     "exec/CSharp/Log.cs", "exec/CSharp/Mdi.cs", "exec/CSharp/Media.cs", "exec/CSharp/MediaPlayer.cs", "exec/CSharp/Mpv.cs", "exec/CSharp/Paths.cs",
     "exec/CSharp/Say.cs", "exec/CSharp/Util.cs", "exec/CSharp/Web.cs",
     "exec/CSharp/ConversionPdf.cs", "exec/CSharp/PdfReader.cs",
-    "exec/CSharp/inixVert.cs",
+    "exec/CSharp/inixVert.cs", "exec/CSharp/Macro.cs", "scripts/testMacro.cmd", "scripts/testMacro.cs", "scripts/testMacro.py",
     "exec/Python/inix.py", "exec/Python/kdpEpub.py", "scripts/buildBooks.cmd", "scripts/buildBooks.py", "scripts/kdpBooks.cmd", "scripts/kdpBooks.py", "scripts/kdpSubmit.cmd", "scripts/kdpSubmit.py", "scripts/kdpUpdate.cmd", "scripts/kdpUpdate.py", "scripts/testKdpUpdate.py", "templates/books/Book_KDP.inix", "templates/books/books.inix", "templates/books/buildBooks.inix", "templates/books/epub.css", "templates/books/tocEpub.lua", ".claude/skills/homer-books/SKILL.md", "exec/Python/lbc.py", "exec/Python/lbcnet.py", "exec/Python/log.py", "exec/Python/media.py",
     "exec/Python/mdi.py", "exec/Python/elevate.py", "exec/Python/paths.py", "exec/Python/say.py", "exec/Python/util.py", "exec/Python/web.py",
     "templates/build_APP_.cmd", "templates/build_APP_Py.cmd",
@@ -71,7 +71,7 @@ lsExpected = [
     ".claude/skills/homer-tutorial/SKILL.md", ".claude/skills/podcast-directory/SKILL.md",
     ".claude/skills/convention-walking-guide/SKILL.md",
     ".claude/skills/homer-launch-dialog/SKILL.md", "exec/CSharp/Quality.cs", ".claude/skills/homer-launch-dialog/scripts/checkLaunch.cmd",
-    ".claude/skills/homer-launch-dialog/scripts/checkLaunch.py", "help/LaunchDialog.md",
+    ".claude/skills/homer-launch-dialog/scripts/checkLaunch.py", "help/LaunchDialog.md", "help/Macro.md",
     ".claude/skills/homer-quality/SKILL.md", ".claude/skills/homer-quality/scripts/checkQuality.cmd", ".claude/skills/homer-quality/scripts/checkQuality.py",
     "templates/makeHotkeys.py",
     "templates/LocalFiles.txt",
@@ -2301,6 +2301,28 @@ def main():
             sayLine("The column types could not be checked: %s" % oError)
             iSamplesFailed += 1
             lsFailedParts.append("the column-type check, which could not run")
+        # THE MACRO ENGINE IS PROVED HERE (1.231.0): scripts\\testMacro compiles exec\\CSharp\\Macro.cs at C# 5 with a test
+        # that records, saves, loads and plays six steps and compares expected and actual rows at every step, then
+        # proves that a host claiming success without doing the work is stopped. Its own log is
+        # logs\\HomerDev-testMacro-<time>.log. Tested again when the engine, Inix.cs or the test changed.
+        oCache = kitCache()
+        sPrint = oCache.fingerprint(["exec/CSharp/Inix.cs", "exec/CSharp/Macro.cs", "scripts/testMacro.cs", "scripts/testMacro.py"], [sys.version.split()[0]])
+        try:
+            if oCache.isCurrent("macro test", sPrint, []):
+                unchangedLine("The macro engine", "is unchanged since it last passed; not tested again.")
+            else:
+                oDone = subprocess.run([sys.executable, os.path.join(sScriptDir, "scripts", "testMacro.py")], capture_output=True, text=True, timeout=600)
+                for sLine in (oDone.stdout or "").strip().splitlines(): sayLine(sLine)
+                for sLine in (oDone.stderr or "").strip().splitlines(): logLine("testMacro stderr: " + sLine)
+                logLine("testMacro exit %d" % oDone.returncode)
+                if oDone.returncode == 0: oCache.record("macro test", sPrint, [])
+                else:
+                    iSamplesFailed += 1
+                    lsFailedParts.append("the macro engine test")
+        except Exception as oError:
+            sayLine("The macro engine could not be tested: %s" % oError)
+            iSamplesFailed += 1
+            lsFailedParts.append("the macro engine test, which could not run")
         # THE AXE.WINDOWS LIBRARY ONLY (6 November 2026). axeWindow scans one window through the 3.3 MB library; the
         # 107 MB AxeWindowsCLI, fetched here since 1.141.0, has had no use since, and filled %LOCALAPPDATA%\\HomerDev.
         # It is no longer fetched, and a copy left there is removed. Nothing a Homer app runs depends on this folder:

@@ -1,7 +1,10 @@
-﻿r"""harvestQueue.py version 2 -- gathers the help guides a collection has asked for, as the first part of its build.
+﻿r"""harvestQueue.py version 3 -- gathers the help guides a collection has asked for, as the first part of its build.
 
     harvestQueue <collection>       what the kit's projectCycle runs before buildGuide, in a guides collection
     harvestQueue                    the collection in the current folder, by hand
+    harvestQueue <collection> --trim [Folder ...]
+                                    trims the named harvests' archives now, or every harvest's when none is named;
+                                    a collection's scripts\trimHarvest.cmd runs this for the current folder
 
 WHY (14 November 2026). Gathering a new guide took four steps by hand: ask makeHarvester for the harvester, run it,
 find its archive, upload it. build_release now does the first three, as PodcastDirectories' build adds the shows
@@ -38,6 +41,12 @@ drawings and comments taken out (a script holding JSON data stays): Calendar's b
 either. The pages in data\harvests are never changed, so the guide built on this computer reads them whole. Every
 finished harvest whose archive is not yet trimmed is trimmed on the next build, so archives gathered before this
 version shrink too; request.txt records trimmed= when it is done.
+
+TRIMMING ON DEMAND (version 3, 15 November 2026). The Google Docs editors' archive came to over 500 MB, too large to
+upload, because the build that trims had not yet run on it. --trim trims an archive at once, whatever request.txt
+says: each named folder of data\harvests (GoogleDocsEditorsHelp, or GoogleDocsEditors, or getGoogleDocsEditorsHelp),
+or every folder there when none is named. It writes results\<Folder>.zip and says how large it now is. Nothing is
+gathered and the pages in data\harvests are not changed.
 
 THE LOG is logs\<Collection>-harvestQueue-yyyyMMdd-HHmmss.log, UTF-8 with a byte order mark and Windows line endings:
 the environment, each section and what was decided for it and why, every command with its exit code and time.
@@ -231,8 +240,49 @@ def plan(sRoot, lSections):
     return lToGather
 
 
+def trimNamed(sRoot, lNames):
+    """--trim: writes the trimmed archive of each named harvest, or of every harvest when none is named. A name may be
+    the folder (GoogleDocsEditorsHelp), the guide (GoogleDocsEditors) or the harvester (getGoogleDocsEditorsHelp).
+    Returns 0 when every named harvest was found and trimmed, 1 otherwise."""
+    sHarvests = os.path.join(sRoot, "data", "harvests")
+    if not os.path.isdir(sHarvests):
+        say("There is no data\\harvests folder in %s, so nothing was trimmed." % sRoot)
+        return 1
+    lFolders = sorted(s for s in os.listdir(sHarvests) if os.path.isdir(os.path.join(sHarvests, s)) and "-before-" not in s)
+    if lNames:
+        lChosen, iMissing = [], 0
+        for sName in lNames:
+            sStem = os.path.splitext(os.path.basename(sName.rstrip("\\/")))[0]
+            if sStem.lower().startswith("get"): sStem = sStem[3:]
+            lMatch = [s for s in lFolders if s.lower() in (sStem.lower(), sStem.lower() + "help")]
+            if lMatch: lChosen.append(lMatch[0])
+            else:
+                say("%s: no harvest by that name in data\\harvests." % sName)
+                iMissing += 1
+    else:
+        lChosen, iMissing = lFolders, 0
+    for iNumber, sFolder in enumerate(lChosen, 1):
+        say("%d of %d: trimming %s." % (iNumber, len(lChosen), sFolder))
+        iPages, iBefore, iAfter = writeTrimmedArchive(sRoot, sFolder, "get" + sFolder)
+        sArchive = os.path.join(sRoot, "results", sFolder + ".zip")
+        iZip = os.path.getsize(sArchive)
+        sHarvest = os.path.join(sHarvests, sFolder)
+        dRequest = readRequest(sHarvest)
+        if dRequest:
+            dRequest["trimmed"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            writeRequest(sHarvest, dRequest)
+        log("%s: %d pages, %d bytes to %d; archive %d bytes" % (sFolder, iPages, iBefore, iAfter, iZip))
+        say("  results\\%s.zip is %.1f MB (the pages were %.0f MB, now %.0f MB)." % (sFolder, iZip / 1e6, iBefore / 1e6, iAfter / 1e6))
+    if not lChosen: say("Nothing to trim.")
+    return 1 if iMissing else 0
+
+
 def main():
-    sRoot = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else os.getcwd())
+    lArgs = sys.argv[1:]
+    bTrim = any(s.lower() in ("--trim", "/trim", "-trim") for s in lArgs)
+    lArgs = [s for s in lArgs if s.lower() not in ("--trim", "/trim", "-trim")]
+    sRoot = os.path.abspath(lArgs[0] if lArgs else os.getcwd())
+    lTrimNames = lArgs[1:]
     sCollection = os.path.basename(sRoot.rstrip("\\/")) or "Guides"
     sLogs = os.path.join(sRoot, "logs")
     os.makedirs(sLogs, exist_ok=True)
@@ -245,9 +295,13 @@ def main():
     dState["fLog"] = io.open(sLogPath, "w", encoding="utf-8-sig", newline="\r\n")
     iResult = 0
     try:
-        log("harvestQueue.py version 2; script %s" % os.path.abspath(__file__))
+        log("harvestQueue.py version 3; script %s" % os.path.abspath(__file__))
         log("Python %s at %s on %s" % (platform.python_version(), sys.executable, platform.platform()))
         log("working directory %s; command line %s" % (os.getcwd(), " ".join(sys.argv)))
+        if bTrim:
+            log("settings: collection %s; trim %s" % (sRoot, ", ".join(lTrimNames) or "every harvest"))
+            iResult = trimNamed(sRoot, lTrimNames)
+            return iResult
         sQueue = os.path.join(sRoot, "data", sQueueName)
         log("settings: collection %s; queue %s" % (sRoot, sQueue))
         if not os.path.isfile(sQueue):

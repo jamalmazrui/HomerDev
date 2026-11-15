@@ -969,8 +969,11 @@ def buildFromTree(sFolder, sProduct, fPlace):
     lArticles, dLeftOut = [], {}
     for sCategory, sTop, sSection, sTitle, sBody, sUrl in readZendeskTree(sFolder):
         sPlace = fPlace(sCategory, sTop, sSection, sTitle)
+        sReason = "%s / %s" % (sCategory, sTop)
+        # The collection's surfaces are Windows, the web, iPhone and iPad and Alexa: Android-only articles go.
+        if sPlace and re.search(r"(?i)\bandroid\b", sSection + " " + sTitle) and not re.search(r"(?i)(iphone|ipad|\bios\b)", sTitle):
+            sPlace, sReason = "", "Android only"
         if not sPlace:
-            sReason = "%s / %s" % (sCategory, sTop)
             dLeftOut[sReason] = dLeftOut.get(sReason, 0) + 1
             continue
         lArticles.append((sPlace, sTitle, toMarkdown(sBody, 0, sUrl)))
@@ -1037,6 +1040,222 @@ def readEgnyte(sFolder):
     return buildFromTree(sFolder, "Egnyte", placeEgnyte)
 
 
+# MICROSOFT 365 (15 November 2026): Excel, OneDrive, Outlook, PowerPoint, SharePoint and Word, each gathered from
+# support.microsoft.com's own site map with its accessibility articles. One reader serves all six.
+
+# THE COLLECTION'S SURFACES (15 November 2026): Windows, the web, iPhone and iPad (iOS) and Alexa; never Mac or
+# Android, never legal language, never a developer's programming interface.
+# Products an article can apply to that are outside those surfaces or not the latest version. An article is kept when
+# at least one product it applies to is none of these, or when it names no product at all: "latest versions only".
+sMicrosoftOlder = (r"(?i)(\bmac\b|macos|android|windows phone|\b20(0\d|1\d|2[0-4])\b|"
+                   r"\bserver\b|subscription edition|starter|\bmac\)|for mac|online \(classic\)|sharepoint foundation)")
+# Titles that are legal language or a developer's reference rather than help. Narrow on purpose: "Show the developer
+# tab", "Save a presentation that contains VBA macros" and Word's legal blackline comparison are help for a person
+# using the app, and stay.
+sMicrosoftNotHelp = (r"(?i)(privacy (supplement|statement|notice)|terms of (use|service)|license terms|licensing terms|"
+                     r"transparency (note|documentation)|ai transparency|visual basic for applications|vba macro to|"
+                     r"visual basic project|javascript (api|library)|\bapi\b|\bsdk\b)")
+
+# Topics by words in an article's title, for the articles Microsoft files in no folder of their own. The first match
+# wins, so the narrower topics come first. Each product adds its own topics before these.
+lMicrosoftTopicsCommon = [
+    (r"(?i)\bcopilot\b", "Copilot"),
+    (r"(?i)(accessib|screen reader|narrator|jaws|nvda|alt text|dictat|read aloud|immersive reader|high contrast|"
+     r"keyboard shortcut|keyboard to|braille)", "Accessibility and keyboard"),
+    (r"(?i)(\bshare\b|sharing|co-?author|collaborat|comment|track changes|@mention|permission|invite)", "Sharing and working together"),
+    (r"(?i)(\bprint|\bsave\b|saving|\bpdf\b|file format|open a file|recover|autosave|version history|export|import|convert)",
+     "Files, saving and printing"),
+    (r"(?i)(spelling|grammar|proof|language|translat|editor\b|thesaurus|word count)", "Proofing and language"),
+    (r"(?i)(picture|image|photo|shape|icon|smartart|chart|graphic|video|audio|3d model|drawing|\bink\b|wordart|text box)",
+     "Pictures, charts and media"),
+    (r"(?i)(table\b|tables\b)", "Tables"),
+    (r"(?i)(\bfont|format|style|bullet|numbered list|indent|spacing|theme|color|colour|highlight|border|align)",
+     "Formatting"),
+    (r"(?i)(error|fix|troubleshoot|problem|not working|can.t|cannot|won.t|issue|repair|crash)", "Troubleshooting"),
+    (r"(?i)(setting|option|customi|default|ribbon|toolbar|add-in|template|macro|account|sign in|license|subscri|install|"
+     r"update|what.s new|new in|get started|basics|quick start|learn)", "Getting started and settings"),
+]
+
+dMicrosoftTopics = {
+    "Word": [
+        (r"(?i)field code", "Field codes"),
+        (r"(?i)(track|revision|compare|combine|protect|restrict|signature|password|similarity|readability)",
+         "Reviewing and protecting"),
+        (r"(?i)(mail merge|envelope|label)", "Mail merge, envelopes and labels"),
+        (r"(?i)(citation|bibliograph|footnote|endnote|caption|table of contents|index|cross-reference|equation|"
+         r"\btoc\b|reference)", "References, contents and citations"),
+        (r"(?i)(page|margin|section|header|footer|column|orientation|break|layout|watermark|line number|booklet|"
+         r"brochure|business card|calendar|fax|hyphenat|tab stop)", "Pages and layout"),
+        (r"(?i)(find|replace|bookmark|hyperlink|\blink|copy|paste|clipboard|autocorrect|autotext|text|content control|"
+         r"heading|outline|snippet|annotation|emoji|checkbox|checked box|case of)", "Editing text"),
+    ],
+    "Excel": [
+        (r"(?i)(pivot)", "PivotTables"),
+        (r"(?i)(chart|graph|sparkline)", "Charts"),
+        (r"(?i)(formula|function|calculat|#\w+|reference|\bsum\b|average|lookup|array|lambda|name manager|"
+         r"defined name|operator)", "Formulas"),
+        (r"(?i)(filter|sort|data validation|conditional format|power query|get & transform|import data|"
+         r"data model|what-if|forecast|analy[sz]e|table\b|tables\b|duplicate|flash fill)", "Data and analysis"),
+        (r"(?i)(cell|row|column|worksheet|workbook|sheet|freeze|merge|wrap|number format|date|time)",
+         "Cells, sheets and workbooks"),
+        (r"(?i)(3d maps)", "3D Maps"),
+        (r"(?i)(python|office script|script|vba|visual basic|macro|activex|form control|userform|javascript)",
+         "Python, scripts and macros"),
+        (r"(?i)(connection|external|query|xml|refresh|data type|stock|exchange rate|olap|power bi|access|csv|"
+         r"analysis toolpak|regression|scenario|monte carlo|histogram|drop-down)", "Data and analysis"),
+        (r"(?i)(number|round|multiply|subtract|divide|digit|decimal|percent|square|negative|thousands|fraction|"
+         r"currency|combine|names|text)", "Numbers and text"),
+    ],
+    "Outlook": [
+        (r"(?i)(calendar|meeting|appointment|event|schedul|time zone|availability|room)", "Calendar and meetings"),
+        (r"(?i)(contact|people|address book|contact group|distribution list)", "Contacts and people"),
+        (r"(?i)(task|to do|to-do)", "Tasks"),
+        (r"(?i)(group|delegate|shared mailbox)", "Groups and delegates"),
+        (r"(?i)(new outlook|classic outlook|outlook on the web|web app|\bowa\b|compare outlook|outlook for windows)",
+         "New and classic Outlook"),
+        (r"(?i)(account|pst|ost|imap|pop|exchange|gmail|outlook\.com|sign in|password|profile|data file|"
+         r"mailbox|storage|quota|archive)", "Accounts, mailboxes and data files"),
+        (r"(?i)(rule|junk|spam|phishing|block|sweep|focused inbox|categor|folder|flag|search|clean up)",
+         "Organizing mail"),
+        (r"(?i)(email|e-mail|message|mail|attach|signature|reply|forward|send|recall|read receipt|automatic repl|"
+         r"out of office|inbox)", "Email"),
+    ],
+    "PowerPoint": [
+        (r"(?i)(animat|transition|motion path|morph)", "Animations and transitions"),
+        (r"(?i)(present|slide show|presenter|rehears|record|speaker|live caption|subtitle|broadcast|kiosk|"
+         r"laser|teleprompter)", "Presenting and recording"),
+        (r"(?i)(slide|layout|master|design|section|background|theme|size|orientation|outline|notes)",
+         "Slides and layout"),
+    ],
+    "OneDrive": [
+        (r"(?i)(sync|files on-demand|known folder|back up|backup|sync app|status|icon)", "Syncing and backup"),
+        (r"(?i)(storage|plan|space|quota|subscription|account|sign in|personal vault)", "Accounts, storage and plans"),
+        (r"(?i)(photo|album|memories|camera upload|video)", "Photos"),
+        (r"(?i)(restore|recycle|delete|version|ransomware|recover)", "Deleting and restoring"),
+        (r"(?i)(upload|download|file|folder|move|copy|rename|search|find|preview)", "Files and folders"),
+    ],
+    "SharePoint": [
+        (r"(?i)(list|column|view|field|lookup|formula|calculated|validation)", "Lists"),
+        (r"(?i)(librar|document|check out|check in|version|metadata|file|folder|upload|download)",
+         "Libraries and documents"),
+        (r"(?i)(page|site|news|web part|hub|navigation|theme|branding|template)", "Sites and pages"),
+        (r"(?i)(workflow|power automate|flow|approval|alert|notification|rule)", "Workflows and alerts"),
+    ],
+}
+
+# Folders under an app's address that name a topic outright.
+dMicrosoftFolders = {"training": "Training", "copilot": "Copilot", "functions": "Excel functions",
+                     "get-started": "Getting started and settings", "getstarted": "Getting started and settings",
+                     "mail": "Email", "calendar": "Calendar and meetings", "accessibility": "Accessibility and keyboard",
+                     "sites-pages": "Sites and pages", "libraries": "Libraries and documents",
+                     "functions-data": "Lists", "lists": "Lists", "sharepoint": "Working with SharePoint",
+                     "windows": "Syncing and backup", "contacts": "Contacts and people", "people": "Contacts and people",
+                     "tasks": "Tasks", "troubleshoot": "Troubleshooting"}
+
+
+def microsoftLatestTabs(sBody):
+    """An article written for several platforms shows them as tabs (Windows, macOS, iOS, Android, Web), each a
+    section of its own. The tab list goes, and so does each panel for a Mac or Android; a panel kept for Windows, the
+    web or iPhone and iPad starts with its platform's name as a heading, so a reader knows which one it is."""
+    sBody = re.sub(r'(?is)<ul[^>]*role="tablist"[^>]*>.*?</ul>', "", sBody)
+    sOut, iAt = "", 0
+    for oMatch in re.finditer(r'(?is)<section[^>]*role="tabpanel"[^>]*data-tab="([^"]*)"[^>]*>', sBody):
+        if oMatch.start() < iAt: continue
+        sPanel = findBalanced(sBody[oMatch.start():], r'<section[^>]*>', "section")
+        if not sPanel: continue
+        sOut += sBody[iAt:oMatch.start()]
+        sTab = oMatch.group(1).lower()
+        if not re.search(r"(mac|android)", sTab):
+            sLabel = {"windows": "Windows", "web": "Web", "new-outlook": "New Outlook", "classic-outlook": "Classic Outlook",
+                      "newoutlook": "New Outlook", "classicoutlook": "Classic Outlook", "ios": "iPhone and iPad",
+                      "iphone": "iPhone", "ipad": "iPad", "mobile": "iPhone and iPad"}.get(sTab, sTab.replace("-", " ").capitalize())
+            sOut += "<h1>" + html.escape(sLabel) + "</h1>" + sPanel
+        iAt = oMatch.start() + len(sPanel)
+    return sOut + sBody[iAt:]
+
+
+def readMicrosoftSupport(sFolder, sProduct):
+    """One Microsoft 365 app's guide from its support.microsoft.com harvest.
+
+    WHAT IS KEPT. The latest versions only: an article whose Applies To list names only Mac, mobile or older versions
+    (2024 and before), or a server edition, is left out, as is one Microsoft writes for the administrator (an
+    address with an admin folder). Each article is read once, though Microsoft serves some under two spellings of
+    the same address (/en-us/Excel/ and /en-us/excel/).
+
+    WHERE IT GOES. An article Microsoft files in a folder of its own (functions, training, copilot, mail, calendar,
+    the accessibility articles) takes that folder's topic. The rest, filed under the app alone, are placed by the
+    words in their titles, the app's own topics first and then those every app shares. The Applies To line is kept
+    as the article's first line, so a reader knows which versions it describes."""
+    lArticles, setSeen, setTexts = [], set(), set()
+    iOlder = iAdmin = iCopies = iNotHelp = 0
+    lTopics = dMicrosoftTopics.get(sProduct, []) + lMicrosoftTopicsCommon
+    sArea = sProduct.lower()
+    for sName in sorted(os.listdir(sFolder)):
+        if not sName.endswith(".html") or "_sitemaps_" in sName: continue
+        oPath = re.match(r"(?i)support\.microsoft\.com_en-us_(accessibility_)?" + re.escape(sArea) + r"(?:_(.+))?\.html$", sName)
+        if not oPath or not oPath.group(2): continue
+        lParts = oPath.group(2).lower().split("_")
+        sKey = (oPath.group(1) or "").lower() + "/".join(lParts)
+        if sKey in setSeen:
+            iCopies += 1
+            continue
+        setSeen.add(sKey)
+        if "admin" in lParts[:-1] or lParts[0] == "category":
+            iAdmin += lParts[0] != "category"
+            continue
+        sMarkup = readText(os.path.join(sFolder, sName))
+        oTitle = re.search(r"(?is)<h1[^>]*>(.*?)</h1>", sMarkup)
+        sBody = findBalanced(sMarkup, r'<div[^>]*class="[^"]*learnArticleContent', "div") or \
+                findBalanced(sMarkup, r'<main[^>]*>', "main")
+        if not oTitle or not sBody: continue
+        sTitle = stripTags(oTitle.group(1))
+        lApplies = [stripTags(s) for s in re.findall(r'(?is)<span[^>]*class="appliesToItem"[^>]*>(.*?)</span>', sMarkup)]
+        if lApplies and all(re.search(sMicrosoftOlder, s) for s in lApplies):
+            iOlder += 1
+            continue
+        if re.search(r"(?i)(\bmac\b|android|outlook lite|\b20(0\d|1\d)\b)", sTitle) and \
+           not re.search(r"(?i)(windows|\bweb\b|\bpc\b|\bios\b|iphone|ipad)", sTitle):
+            iOlder += 1
+            continue
+        if re.search(sMicrosoftNotHelp, sTitle):
+            iNotHelp += 1
+            continue
+        sBody = re.sub(r'(?is)<section[^>]*supAppliesToSection.*?</section>', "", sBody)
+        sBody = microsoftLatestTabs(sBody)
+        lBody = toMarkdown(sBody, 0, "https://support.microsoft.com/en-us/" + sArea + "/")
+        sText = " ".join(lBody)
+        if len(sText.split()) < 40 or sText in setTexts:
+            iCopies += sText in setTexts
+            continue
+        setTexts.add(sText)
+        if lApplies: lBody = ["Applies to: " + ", ".join(s for s in lApplies if not re.search(sMicrosoftOlder, s)) + ".", ""] + lBody
+        sCategory = ""
+        if oPath.group(1): sCategory = "Accessibility and keyboard"
+        elif len(lParts) > 1: sCategory = dMicrosoftFolders.get(lParts[0], "")
+        if not sCategory and sProduct == "Excel" and re.search(r"(?i)\bfunctions?$", sTitle): sCategory = "Excel functions"
+        if not sCategory:
+            for sPattern, sLabel in lTopics:
+                if re.search(sPattern, sTitle):
+                    sCategory = sLabel
+                    break
+        lArticles.append((sCategory or sMiscellaneous, sTitle, lBody))
+    # A topic with one or two articles is not worth a heading of its own: they join Miscellaneous.
+    dCounts = {}
+    for sCategory, sTitle, lBody in lArticles: dCounts[sCategory] = dCounts.get(sCategory, 0) + 1
+    lArticles = [(sCategory if dCounts[sCategory] >= 3 else sMiscellaneous, sTitle, lBody) for sCategory, sTitle, lBody in lArticles]
+    logging.info("%s: %d articles; left out %d for older versions, Mac or Android only, %d for administrators, %d legal or "
+                 "developer pages, %d copies", sProduct, len(lArticles), iOlder, iAdmin, iNotHelp, iCopies)
+    return lArticles
+
+
+def readMicrosoftExcel(sFolder): return readMicrosoftSupport(sFolder, "Excel")
+def readMicrosoftOneDrive(sFolder): return readMicrosoftSupport(sFolder, "OneDrive")
+def readMicrosoftOutlook(sFolder): return readMicrosoftSupport(sFolder, "Outlook")
+def readMicrosoftPowerPoint(sFolder): return readMicrosoftSupport(sFolder, "PowerPoint")
+def readMicrosoftSharePoint(sFolder): return readMicrosoftSupport(sFolder, "SharePoint")
+def readMicrosoftWord(sFolder): return readMicrosoftSupport(sFolder, "Word")
+
+
 def googleTopicNames(sFolder):
     """Google's topic names by topic number, read from the centre's own pages (14 November 2026). Google no longer
     puts a trail above an article, so the category is found the way a reader finds it: the front page lists its
@@ -1082,15 +1301,23 @@ def readGoogleTopics(sFolder):
         if not sBody or not oTitle: continue
         sTitle = stripTags(oTitle.group(1))
         if not sTitle: continue
+        # Legal language is not help: Google's policy and notice pages are left out, as Microsoft's are.
+        if re.search(r"(?i)(cookies notification|exceptions for educational|terms of service|privacy (policy|notice)|"
+                     r"program policies|transparency (note|report))", sTitle): continue
         sBody = re.sub(r"(?is)<h1[^>]*>.*?</h1>", "", sBody, count=1)
         oId = re.search(r"_answer_(\d+)", sName)
         dCount = dVotes.get(oId.group(1), {}) if oId else {}
         sCategory = max(sorted(dCount), key=lambda s: dCount[s]) if dCount else sMiscellaneous
         oPlatform = re.search(r"(?i)Platform_?3D([A-Za-z]+)", sName)
         if oPlatform:
-            sPlatform = {"desktop": "Computer", "android": "Android", "ios": "iPhone and iPad",
+            # The collection's surfaces are Windows, the web, iPhone and iPad and Alexa: Google's Android edition of
+            # an article is left out, its Computer and iPhone and iPad editions kept.
+            if oPlatform.group(1).lower() == "android": continue
+            sPlatform = {"desktop": "Computer", "ios": "iPhone and iPad",
                          "iphone": "iPhone and iPad"}.get(oPlatform.group(1).lower(), oPlatform.group(1))
             sTitle = sTitle + " (" + sPlatform + ")"
+        elif re.search(r"(?i)\bandroid\b", sTitle) and not re.search(r"(?i)(iphone|ipad|\bios\b|computer|web)", sTitle):
+            continue
         lArticles.append((sCategory, sTitle, toMarkdown(sBody, 0)))
     return lArticles
 
@@ -3583,9 +3810,9 @@ def main():
         ("mpv", "MpvHelp", readMpv, "Mpv.md", "mpv help",
          "mpv publishes its whole documentation as a single reference manual, and this guide takes that manual apart so it can be read a section at a time: the manual's own parts are the categories and its sections are the articles. Gathered on 20 August 2026 from the stable manual, together with the installation page.\r\n\r\nmpv is driven from the command line and a configuration file, so this guide is technical in places: it describes the options you can pass it, the keys it responds to, and how to write those choices into a configuration file. No programming is assumed anywhere in it.\r\n\r\nThe parts of the manual that do assume programming are deliberately left out — the Lua and JavaScript scripting interfaces, the C plugin headers, the JSON protocol for driving mpv from another program, and the library for embedding it. Those are written for people building software with mpv rather than for people using it. The unreleased master manual is not here either."),
         ("Gmail", "GmailHelp", readGoogleMeet, "Gmail.md", "Gmail help",
-         "This guide holds Google's own help for Gmail, gathered on 9 September 2026. The categories are Google's own topics, taken from the trail above each article.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for — Computer, Android, or iPhone and iPad. A reader on a phone can go straight to the version that matches."),
+         "This guide holds Google's own help for Gmail, gathered on 9 September 2026. The categories are Google's own topics, taken from the trail above each article.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for: Computer, or iPhone and iPad. Google's Android editions are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa. A reader on a phone can go straight to the version that matches."),
         ("Google Meet", "GoogleMeetHelp", readGoogleMeet, "GoogleMeet.md", "Google Meet help",
-         "This guide holds Google's own help for Meet, gathered on 20 August 2026. The categories are Google's own topics, taken from the trail above each article.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for — Computer, Android, or iPhone and iPad. A reader on a phone can go straight to the version that matches."),
+         "This guide holds Google's own help for Meet, gathered on 20 August 2026. The categories are Google's own topics, taken from the trail above each article.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for: Computer, or iPhone and iPad. Google's Android editions are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa. A reader on a phone can go straight to the version that matches."),
         ("Zapier", "ZapierHelp", readZendesk, "Zapier.md", "Zapier help",
          "This guide holds Zapier's own help, gathered on 20 August 2026 from the publisher's own listing, so every article arrived with its title, its section and its body.\r\n\r\nMuch of it is about the services Zapier connects rather than about Zapier itself, and those articles are kept under their own headings rather than left out: a reader wanting to connect one particular application will find it named. The rest covers building and fixing Zaps, tables, interfaces, agents, accounts and billing."),
         ("Stack Overflow", "StackHelp", readStack, "StackOverflow.md", "Stack Overflow help",
@@ -3780,19 +4007,31 @@ def main():
         ("LibriVox", "LibriVoxHelp", readLibriVox, "LibriVox.md", "LibriVox help",
          "This guide holds LibriVox's own help, gathered from the LibriVox wiki on 14 November 2026. LibriVox is a volunteer project that records books in the public domain and gives the recordings away free. Its help is written for two kinds of people: listeners, who want to find and play the audiobooks, and volunteers, who read, edit, proof-listen and coordinate the recordings. Both are here.\r\n\r\nThe wiki gives its pages no trail, so the categories come from what each page is about. Left out on purpose: the same guides in other languages, yearly lists of staff picks and other reading lists, old announcements, and pages about running the wiki itself. Much of the recording advice is about Audacity, which has its own guide in this collection."),
         ("Google Calendar", "GoogleCalendarHelp", readGoogleTopics, "GoogleCalendar.md", "Google Calendar help",
-         "This guide holds Google's own help for Google Calendar, gathered from support.google.com on 14 November 2026. It covers calendars, events, appointment schedules, sharing, settings and Tasks in Calendar, on a computer and on a phone. Using Calendar with a screen reader is under Get started.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for — Computer, Android, or iPhone and iPad. The categories are Google's own topics: Google no longer puts a trail above each article, so each article is filed under the topic its help centre lists it in."),
+         "This guide holds Google's own help for Google Calendar, gathered from support.google.com on 14 November 2026. It covers calendars, events, appointment schedules, sharing, settings and Tasks in Calendar, on a computer and on an iPhone or iPad. Using Calendar with a screen reader is under Get started.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for: Computer, or iPhone and iPad. Google's Android editions are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are Google's own topics: Google no longer puts a trail above each article, so each article is filed under the topic its help centre lists it in."),
         ("Google Chat", "GoogleChatHelp", readGoogleTopics, "GoogleChat.md", "Google Chat help",
-         "This guide holds Google's own help for Google Chat, gathered from support.google.com on 14 November 2026. It covers messages, spaces, calls, files and notifications in Chat, on its own and inside Gmail.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for — Computer, Android, or iPhone and iPad. The categories are Google's own topics: Google no longer puts a trail above each article, so each article is filed under the topic its help centre lists it in."),
+         "This guide holds Google's own help for Google Chat, gathered from support.google.com on 14 November 2026. It covers messages, spaces, calls, files and notifications in Chat, on its own and inside Gmail.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for: Computer, or iPhone and iPad. Google's Android editions are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are Google's own topics: Google no longer puts a trail above each article, so each article is filed under the topic its help centre lists it in."),
         ("Google Keep", "GoogleKeepHelp", readGoogleTopics, "GoogleKeep.md", "Google Keep help",
-         "This guide holds Google's own help for Google Keep, gathered from support.google.com on 14 November 2026. It covers notes, lists, reminders, labels and sharing in Keep.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for — Computer, Android, or iPhone and iPad. The categories are Google's own topics: Google no longer puts a trail above each article, so each article is filed under the topic its help centre lists it in."),
+         "This guide holds Google's own help for Google Keep, gathered from support.google.com on 14 November 2026. It covers notes, lists, reminders, labels and sharing in Keep.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for: Computer, or iPhone and iPad. Google's Android editions are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are Google's own topics: Google no longer puts a trail above each article, so each article is filed under the topic its help centre lists it in."),
         ("Google Sites", "GoogleSitesHelp", readGoogleTopics, "GoogleSites.md", "Google Sites help",
-         "This guide holds Google's own help for Google Sites, gathered from support.google.com on 14 November 2026. It covers making, editing, sharing and publishing a site with Google Sites. Google's help for Sites is short, and so is this guide.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for — Computer, Android, or iPhone and iPad. The categories are Google's own topics: Google no longer puts a trail above each article, so each article is filed under the topic its help centre lists it in."),
+         "This guide holds Google's own help for Google Sites, gathered from support.google.com on 14 November 2026. It covers making, editing, sharing and publishing a site with Google Sites. Google's help for Sites is short, and so is this guide.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for: Computer, or iPhone and iPad. Google's Android editions are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are Google's own topics: Google no longer puts a trail above each article, so each article is filed under the topic its help centre lists it in."),
         ("Google Tasks", "GoogleTasksHelp", readGoogleTopics, "GoogleTasks.md", "Google Tasks help",
-         "This guide holds Google's own help for Google Tasks, gathered from support.google.com on 14 November 2026. It covers tasks and lists in the Tasks app and beside Gmail, Calendar, Chat and the Docs editors. Some of it repeats what the Google Calendar guide says about tasks there.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for — Computer, Android, or iPhone and iPad. The categories are Google's own topics: Google no longer puts a trail above each article, so each article is filed under the topic its help centre lists it in."),
+         "This guide holds Google's own help for Google Tasks, gathered from support.google.com on 14 November 2026. It covers tasks and lists in the Tasks app and beside Gmail, Calendar, Chat and the Docs editors. Some of it repeats what the Google Calendar guide says about tasks there.\r\n\r\nGoogle writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for: Computer, or iPhone and iPad. Google's Android editions are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are Google's own topics: Google no longer puts a trail above each article, so each article is filed under the topic its help centre lists it in."),
         ("Box", "BoxHelp", readBox, "Box.md", "Box help",
-         "This guide holds Box's own help, gathered from support.box.com on 15 November 2026. Box is an online service for keeping, sharing, signing and working on files with other people. Its help centre has almost 2,900 articles; this guide keeps the 680 written for a person who uses Box, under Box's own product names, with each product's troubleshooting beside its guides. Files, folders and sharing come under Using Box, and every app Box works inside, such as Microsoft Office, Teams, Slack, Google Workspace, Outlook and Zoom, comes under Box with other apps.\r\n\r\nLeft out on purpose: 1,729 release notes and announcements, which are a history of changes rather than help; the administrator's console and the products only an administrator runs, such as Shield, Governance, Shuttle and the developer platform; the integrations with business systems such as Salesforce and NetSuite; and Box's training and certification pages. If you run Box for an organisation, Box's own help centre has those pages."),
+         "This guide holds Box's own help, gathered from support.box.com on 15 November 2026. Box is an online service for keeping, sharing, signing and working on files with other people. Its help centre has almost 2,900 articles; this guide keeps the 668 written for a person who uses Box on Windows, the web, or an iPhone or iPad, under Box's own product names, with each product's troubleshooting beside its guides. Files, folders and sharing come under Using Box, and every app Box works inside, such as Microsoft Office, Teams, Slack, Google Workspace, Outlook and Zoom, comes under Box with other apps.\r\n\r\nLeft out on purpose: 1,729 release notes and announcements, which are a history of changes rather than help; the administrator's console and the products only an administrator runs, such as Shield, Governance, Shuttle and the developer platform; the integrations with business systems such as Salesforce and NetSuite; and Box's training and certification pages. If you run Box for an organisation, Box's own help centre has those pages."),
         ("Egnyte", "EgnyteHelp", readEgnyte, "Egnyte.md", "Egnyte help",
-         "This guide holds Egnyte's own help, gathered from helpdesk.egnyte.com on 15 November 2026. Egnyte is an online service that businesses use to store, share and work on files. Its help centre has about 1,500 articles, most written for the company administrators who set it up; this guide keeps the 436 written for a person who uses it: the web app, the desktop app, the mobile app, the AI assistant, and Egnyte with Microsoft 365 and Google.\r\n\r\nLeft out on purpose: 607 announcements, release notes and known issues, which are a history of changes rather than help; the administrators' pages, such as users and groups, governance, reporting, migration and the storage appliances; and the editions for architects and life sciences companies. If you run Egnyte for your company, Egnyte's own help centre has those pages."),
+         "This guide holds Egnyte's own help, gathered from helpdesk.egnyte.com on 15 November 2026. Egnyte is an online service that businesses use to store, share and work on files. Its help centre has about 1,500 articles, most written for the company administrators who set it up; this guide keeps the 421 written for a person who uses it: the web app, the desktop app, the iPhone and iPad app, the AI assistant, and Egnyte with Microsoft 365 and Google.\r\n\r\nLeft out on purpose: 607 announcements, release notes and known issues, which are a history of changes rather than help; the administrators' pages, such as users and groups, governance, reporting, migration and the storage appliances; and the editions for architects and life sciences companies. If you run Egnyte for your company, Egnyte's own help centre has those pages."),
+        ("Excel", "ExcelHelp", readMicrosoftExcel, "Excel.md", "Excel help",
+         "This guide holds Microsoft's own help for Excel, gathered from support.microsoft.com on 14 November 2026. It is the largest guide in this collection: Microsoft documents every Excel function in an article of its own, and they are kept together under Excel functions.\r\n\r\nMicrosoft writes one article for many versions of each app. This guide keeps the latest only, on the surfaces this collection covers: the Microsoft 365 app on Windows, the web version, and the iPhone and iPad apps. An article Microsoft wrote only for a Mac, for Android, or for an older version such as 2016 or 2021 is left out, and so are legal pages and programmers' references. Each article's first line says which versions it applies to, and where an article has a part for each platform, each part is headed with its platform's name. Microsoft files many articles in no topic of their own, so this guide places them by the words in their titles; what fits no topic is under Miscellaneous. The accessibility articles, which include Microsoft's instructions for using the app with a screen reader, are under Accessibility and keyboard."),
+        ("OneDrive", "OneDriveHelp", readMicrosoftOneDrive, "OneDrive.md", "OneDrive help",
+         "This guide holds Microsoft's own help for OneDrive, gathered from support.microsoft.com on 14 November 2026. It replaces the guide gathered in August, which came from a crawl of the site rather than Microsoft's own list of articles.\r\n\r\nMicrosoft writes one article for many versions of each app. This guide keeps the latest only, on the surfaces this collection covers: the Microsoft 365 app on Windows, the web version, and the iPhone and iPad apps. An article Microsoft wrote only for a Mac, for Android, or for an older version such as 2016 or 2021 is left out, and so are legal pages and programmers' references. Each article's first line says which versions it applies to, and where an article has a part for each platform, each part is headed with its platform's name. Microsoft files many articles in no topic of their own, so this guide places them by the words in their titles; what fits no topic is under Miscellaneous. The accessibility articles, which include Microsoft's instructions for using the app with a screen reader, are under Accessibility and keyboard."),
+        ("Outlook", "OutlookHelp", readMicrosoftOutlook, "Outlook.md", "Outlook help",
+         "This guide holds Microsoft's own help for Outlook, gathered from support.microsoft.com on 14 November 2026. It covers both the new Outlook for Windows and classic Outlook, and Outlook on the web, which Microsoft documents side by side.\r\n\r\nMicrosoft writes one article for many versions of each app. This guide keeps the latest only, on the surfaces this collection covers: the Microsoft 365 app on Windows, the web version, and the iPhone and iPad apps. An article Microsoft wrote only for a Mac, for Android, or for an older version such as 2016 or 2021 is left out, and so are legal pages and programmers' references. Each article's first line says which versions it applies to, and where an article has a part for each platform, each part is headed with its platform's name. Microsoft files many articles in no topic of their own, so this guide places them by the words in their titles; what fits no topic is under Miscellaneous. The accessibility articles, which include Microsoft's instructions for using the app with a screen reader, are under Accessibility and keyboard."),
+        ("PowerPoint", "PowerPointHelp", readMicrosoftPowerPoint, "PowerPoint.md", "PowerPoint help",
+         "This guide holds Microsoft's own help for PowerPoint, gathered from support.microsoft.com on 14 November 2026. It covers making slides, animations, presenting and recording, and Copilot in PowerPoint.\r\n\r\nMicrosoft writes one article for many versions of each app. This guide keeps the latest only, on the surfaces this collection covers: the Microsoft 365 app on Windows, the web version, and the iPhone and iPad apps. An article Microsoft wrote only for a Mac, for Android, or for an older version such as 2016 or 2021 is left out, and so are legal pages and programmers' references. Each article's first line says which versions it applies to, and where an article has a part for each platform, each part is headed with its platform's name. Microsoft files many articles in no topic of their own, so this guide places them by the words in their titles; what fits no topic is under Miscellaneous. The accessibility articles, which include Microsoft's instructions for using the app with a screen reader, are under Accessibility and keyboard."),
+        ("SharePoint", "SharePointHelp", readMicrosoftSharePoint, "SharePoint.md", "SharePoint help",
+         "This guide holds Microsoft's own help for SharePoint, gathered from support.microsoft.com on 14 November 2026. It covers sites, pages, lists and document libraries as a person who uses SharePoint meets them. Microsoft's pages for administrators of SharePoint are left out.\r\n\r\nMicrosoft writes one article for many versions of each app. This guide keeps the latest only, on the surfaces this collection covers: the Microsoft 365 app on Windows, the web version, and the iPhone and iPad apps. An article Microsoft wrote only for a Mac, for Android, or for an older version such as 2016 or 2021 is left out, and so are legal pages and programmers' references. Each article's first line says which versions it applies to, and where an article has a part for each platform, each part is headed with its platform's name. Microsoft files many articles in no topic of their own, so this guide places them by the words in their titles; what fits no topic is under Miscellaneous. The accessibility articles, which include Microsoft's instructions for using the app with a screen reader, are under Accessibility and keyboard."),
+        ("Word", "WordHelp", readMicrosoftWord, "Word.md", "Word help",
+         "This guide holds Microsoft's own help for Word, gathered from support.microsoft.com on 14 November 2026. It covers writing, formatting, layout, reviewing, mail merge, references and Word's field codes.\r\n\r\nMicrosoft writes one article for many versions of each app. This guide keeps the latest only, on the surfaces this collection covers: the Microsoft 365 app on Windows, the web version, and the iPhone and iPad apps. An article Microsoft wrote only for a Mac, for Android, or for an older version such as 2016 or 2021 is left out, and so are legal pages and programmers' references. Each article's first line says which versions it applies to, and where an article has a part for each platform, each part is headed with its platform's name. Microsoft files many articles in no topic of their own, so this guide places them by the words in their titles; what fits no topic is under Miscellaneous. The accessibility articles, which include Microsoft's instructions for using the app with a screen reader, are under Accessibility and keyboard."),
     ]
     # ONE ENTRY PER GUIDE (version 2). The plan had grown a second copy of twenty entries, from Org mode to Remote
     # Incident Manager, so those guides were built twice in every run; the first entry for a guide now wins.

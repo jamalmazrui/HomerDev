@@ -232,9 +232,9 @@ own notebook, is in the never-pushed list and stays on your machine.
 
 ## What is in the kit
 
-- `exec\CSharp\` -- sixteen modules in the `Homer` namespace: Elevate
+- `exec\CSharp\` -- seventeen modules in the `Homer` namespace: Elevate
   (permission and updates), Inix (settings and tables), inixVert, KeyMap,
-  KeyName, Lbc (dialogs), Log (the session log), Mdi (multiple-document
+  KeyName, Lbc (dialogs), Log (the session log), Macro (recorded commands), Mdi (multiple-document
   frames), Media, MediaPlayer, Mpv, Ollama (local AI), Paths (the folder
   layout), Say (speech), Util and Web.
 - `exec\Python\` -- the same toolbox for Python and NVDA add-ons: inix, lbc, log,

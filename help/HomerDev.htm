@@ -482,7 +482,7 @@ one-sentence way always works, and running <code>connectAI</code> again
 picks up any new place a tool looks.</p>
 <h2 id="what-is-in-the-kit">What is in the kit</h2>
 <h3 id="csharp">CSharp</h3>
-<p>Seventeen modules, all in the <code>Homer</code> namespace. Add
+<p>Eighteen modules, all in the <code>Homer</code> namespace. Add
 <code>using Homer;</code> and compile the ones you use straight from the
 kit’s <code>exec\CSharp</code>; the build template already does.</p>
 <ul>
@@ -503,6 +503,10 @@ labelled standard controls. The biggest and most used module. Its own
 section is below.</li>
 <li><strong>Log.cs</strong> – the session log every Homer program
 writes.</li>
+<li><strong>Macro.cs</strong> – the macro recorder: an app’s own
+commands recorded, saved as an <code>.inix</code> file and played back,
+with what each step was expected to do checked against what it did. See
+Macro.md.</li>
 <li><strong>Mdi.cs</strong> – the frame and child of a multiple-document
 app.</li>
 <li><strong>Media.cs</strong> – finding and running ExifTool, ffmpeg and

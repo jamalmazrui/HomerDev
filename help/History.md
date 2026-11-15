@@ -7,6 +7,28 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.231.0 -- 15 November 2026
+
+- **A macro recorder, first phase.** exec\CSharp\Macro.cs records an app's own commands, saves them as an .inix file (FileTask = macro, one [step] section per command, with both a CommandId to play by and the Command name a person reads) and plays them back. Only what the app saw succeed is recorded; anything else marks the recording Incomplete, and an incomplete macro does not play. A macro recorded for This View plays only in that view; one recorded for Any View plays anywhere. Fields a version 1 macro does not know are refused rather than ignored. Designed from Claude's plan and ChatGPT's second revision, whose tested engine this adopts. See Macro.md.
+- **Expected against actual, at every step.** Before each step plays, the app says what the step should leave behind; after it, what it did leave. Both are logged with the state before, and a step whose outcome differs stops playback there. auditLines() gives a test the whole trail.
+- **The build proves it.** scripts\testMacro compiles Macro.cs with the .NET Framework's C# 5 compiler, as DbDo, EdSharp and FileDir do, and runs 31 checks against a pretend 12-row view: a six-step recording saved, loaded and played with its audit trail compared line by line; a host that claims success without moving, stopped at its first step; and the refusals (wrong view, failing step, cancel, gap, unknown command, later version, unknown field, duplicate field, another app's macro, a Go To past the last row, an oversized file). Every check is logged in logs\HomerDev-testMacro-<time>.log with what was expected and what happened; the build runs it again only when the engine, Inix.cs or the test changed.
+
+## 1.230.0 -- 15 November 2026
+
+- **Trimming on demand.** The Google Docs editors' archive was over 500 MB, too large to upload, because no build with trimming had run on it yet. harvestQueue version 3 takes --trim: it trims the named harvests' archives at once (by folder, guide or harvester name), or every harvest's when none is named, whatever request.txt says, and reports each archive's new size. The skill's trimHarvest.cmd runs it for the current folder, and a collection keeps a small scripts\trimHarvest.cmd launcher that finds the kit. Keep's archive went from 162 MB of pages to 0.7 MB.
+
+## 1.229.0 -- 15 November 2026
+
+- **Google Chat, Keep, Sites and Tasks built** with readGoogleTopics, checked here from their harvests: 286, 73, 21 and 51 articles. readGoogleTopics now also leaves out Google's legal pages (cookie notices, policy exceptions, terms of service, privacy notices), as readMicrosoftSupport does Microsoft's.
+
+## 1.228.0 -- 15 November 2026
+
+- **The collection's surfaces, applied by the readers.** An app help guide covers Windows, the web, iPhone and iPad (iOS) and Alexa, without legal language or developers' references. readMicrosoftSupport now keeps iPhone and iPad articles and tabs and drops only Mac, Android, server and older versions; sMicrosoftNotHelp drops privacy statements, terms of service, transparency notes and programmers' references (Visual Basic for Applications, JavaScript libraries, APIs), narrowly enough that "Show the developer tab" and Word's legal blackline comparison stay. readGoogleTopics leaves out Google's Android edition of each article, and buildFromTree leaves out Android-only Zendesk articles. Rebuilt: the six Microsoft guides, Google Calendar, Box and Egnyte.
+
+## 1.227.0 -- 15 November 2026
+
+- **Six Microsoft 365 guides, one reader.** readMicrosoftSupport reads a support.microsoft.com harvest for any of Excel, OneDrive, Outlook, PowerPoint, SharePoint and Word. It keeps the latest versions only: an article whose Applies To list names only Mac, mobile, a server edition or a version from 2024 or before is left out, as is one whose title names only those, and the kept versions open each article. Administrators' pages are left out, and an article Microsoft serves under two spellings of its address is read once. An article in a folder of its own (functions, training, copilot, mail, calendar, accessibility) takes that folder's topic; the rest are placed by their titles, the app's own topics before those every app shares, and a topic with fewer than three articles joins Miscellaneous. OneDrive replaces August's crawled guide. An article written for several platforms shows them as tabs; microsoftLatestTabs keeps only the Windows and web panels, each under its platform's name, and drops the Mac, phone and tablet panels.
+
 ## 1.226.0 -- 15 November 2026
 
 - **Box and Egnyte built,** through a shared helper, readZendeskTree, that places each Zendesk article under its outermost section, so a large centre's hundred small sections fold into its products. Both centres are written mostly for administrators and full of release notes, so each reader keeps what a person who uses the service needs and counts in the log what it leaves out and why. Box: 680 of 2,883 articles (1,729 release notes and announcements, the administrator's products and the business-system integrations left out). Egnyte: 436 of 1,511 (607 announcements, the administrators' half and the industry editions left out).

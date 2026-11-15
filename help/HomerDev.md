@@ -277,7 +277,7 @@ looks.
 
 ### CSharp
 
-Seventeen modules, all in the `Homer` namespace. Add `using Homer;` and compile
+Eighteen modules, all in the `Homer` namespace. Add `using Homer;` and compile
 the ones you use straight from the kit's `exec\CSharp`; the build template
 already does.
 
@@ -294,6 +294,9 @@ already does.
 - **Lbc.cs** -- Layout By Code. Dialogs built from labelled standard controls.
   The biggest and most used module. Its own section is below.
 - **Log.cs** -- the session log every Homer program writes.
+- **Macro.cs** -- the macro recorder: an app's own commands recorded, saved as
+  an `.inix` file and played back, with what each step was expected to do
+  checked against what it did. See Macro.md.
 - **Mdi.cs** -- the frame and child of a multiple-document app.
 - **Media.cs** -- finding and running ExifTool, ffmpeg and ffprobe.
 - **MediaPlayer.cs** -- the Homer Player dialog, which plays tracks and
