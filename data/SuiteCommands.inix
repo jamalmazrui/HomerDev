@@ -1288,11 +1288,9 @@ status=implemented
 
 [EdSharp editSettingsFile]
 name=Edit Settings File
-keys=Alt+Shift+F2
-change=renamed from Manual Options, was Alt+Shift+M
-reason=F2 is the edit family, and Alt+Shift pairs it with Edit Settings on Alt+Shift+E; keeps a key, as the 19 October ruling asks
-disposition=accepted
-status=implemented
+keys=
+status=retired
+change=retired 15 November 2026 (the keyboard audit's A4): its files are buttons in Edit Settings, the kit's LbcAsk.settingsDialog
 
 [EdSharp elevateVersion]
 name=Elevate Version
@@ -2644,11 +2642,9 @@ status=implemented
 
 [FileDir editSettingsFile]
 name=Edit Settings File
-keys=Alt+Shift+F2
-change=renamed from Manual Options, was Alt+Shift+M
-reason=as in EdSharp: F2 edits, Alt+Shift pairs it with Edit Settings
-disposition=accepted
-status=implemented
+keys=
+status=retired
+change=retired 15 November 2026 (the keyboard audit's A4): its files are buttons in Edit Settings, the kit's LbcAsk.settingsDialog
 
 [FileDir elevateVersion]
 name=Elevate Version

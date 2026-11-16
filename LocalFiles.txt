@@ -12,6 +12,10 @@ exec/
 # Build, tidy and tutorial logs, one file per run.
 logs/
 
+# What an occasional script makes for Jamal to hear or read, such as scripts\auditionVoices' recordings in
+# results\voiceAudition (1.237.0): outputs only, never pushed, and nothing reads them back.
+results/
+
 # What building the sample programs leaves beside them: rebuilt by build,
 # never pushed, and not strays for tidy to carry off.
 Templates/samples/*.exe

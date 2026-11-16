@@ -7,6 +7,13 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.237.0 -- 15 November 2026
+
+- **One entry to an app's settings (the keyboard audit's A4).** LbcAsk.settingsDialog is the Edit Settings dialog for every Homer app that edits its settings field by field: the fields, then a button for each settings file -- "Settings file", and in EdSharp the current compiler's file -- left of OK, Cancel and Help, so Enter still means OK. EdSharp and FileDir use it, and Edit Settings File (Alt+Shift+F2) retires from the catalog and the manifest. DbDo already lists its file among its Settings buttons, and HomerView opens its file directly.
+- **scripts\auditionVoices** renders candidate screen reader voices for the tutorials side by side, after Jamal found the reader "too grumpy": the same short exchange with today's narrator and each of sixteen readers -- piper john as now and with its natural variation, piper norman, Kokoro's Michael and Adam, five male voices of Kokoro v1.0, and six of Phonon 31m -- one mp3 each and all joined, in results\voiceAudition. Every voice is free to publish beside MIT code; Phonon's non-commercial 40m models are never fetched. LocalFiles.txt keeps results on this disk, never pushed.
+- buildTutorials' comments now say what it does: the reader is piper's john, kept even and quick, and ReaderOnKokoro, not KokoroReader, moves the reader to Kokoro.
+- EdSharp and FileDir need this kit, for the settings dialog.
+
 ## 1.236.0 -- 15 November 2026
 
 - **The keyboard audit's ten open questions are decided** in help\KeyDecisions.md, under the standing rule to decide, justify and keep a rollback. Two answers changed once the keys were checked against data\KeyOwnership.inix: Stop Timer takes Alt+F2, because Control+Shift+F11 is JAWS's system tray; and FileDir keeps Invert Marked on Control+I, because every I and D key Inquire Differences could move to is taken. HomerView keeps Alt+Shift+H for Hotkey Summary, under the 8 November ruling that approved it.

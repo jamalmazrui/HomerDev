@@ -180,11 +180,6 @@ apps=DbDo, EdSharp, FileDir, HomerView
 key=Alt+Shift+E
 description=Edit {app}'s settings file
 
-[command Edit Settings File]
-apps=EdSharp, FileDir
-key=Alt+Shift+F2
-description=Edit {app}'s settings file in your text editor
-
 [command Elevate Version]
 apps=DbDo, EdSharp, FileDir, HomerView
 key=F11

@@ -58,6 +58,7 @@
 # On this disk only, from LocalFiles.txt.
 /exec/*
 logs/
+results/
 Templates/samples/*.exe
 Templates/samples/*.log
 Templates/samples/build/

@@ -6727,6 +6727,43 @@ foreach (TextBox txt in lsFields) sResultList.Add(txt.Text);
 return sResultList;
 } // FieldDialog method
 
+// settingsDialog: Edit Settings, the one entry to an app's settings (kit 1.237.0, 15 November 2026, the keyboard
+// audit's A4, agreed by Claude and ChatGPT). EdSharp and FileDir had two commands, Edit Settings (Alt+Shift+E) for a
+// dialog and Edit Settings File (Alt+Shift+F2) for the file itself, and EdSharp's asked which file. Now the dialog is
+// the entry, and the files are buttons in it: each label in aFileButton -- "Settings &file", or a compiler's file --
+// sits left of OK, Cancel and Help, so Enter and Control+Enter still mean OK and the common case is no slower.
+// Returns the values in order when OK is pressed, and an empty array otherwise; sFileButton is the file button
+// pressed, without its ampersand, or "" when none was. A label containing "Password" gets a masked box, as in
+// fieldDialog. DbDo already offers its file among its own Settings buttons, and HomerView opens its file directly.
+public static string[] settingsDialog(string sTitle, string[] aLabel, string[] aValue, string[] aFileButton, out string sFileButton) {
+List<TextBox> lsFields = new List<TextBox>();
+List<string> lsButtons = new List<string>();
+string sChosen;
+sFileButton = "";
+if (aFileButton != null) foreach (string sButton in aFileButton) lsButtons.Add(sButton);
+lsButtons.Add("OK");
+lsButtons.Add("Cancel");
+using (Homer.LbcDialog dlg = new Homer.LbcDialog(sTitle, ownerForm())) {
+for (int i = 0; i < (aLabel == null ? 0 : aLabel.Length); i++) {
+string sPrompt = fieldLabel(aLabel[i]);
+string sValue = (aValue != null && i < aValue.Length && aValue[i] != null) ? aValue[i] : "";
+TextBox txt = dlg.addInputBox(sPrompt, sValue, null);
+if (sPrompt.Contains("Password")) txt.UseSystemPasswordChar = true;
+lsFields.Add(txt);
+}
+sChosen = (dlg.runWithButtons(lsButtons.ToArray(), true, "OK") ?? "").Replace("&", "");
+if (sChosen == "OK") {
+List<string> lsValues = new List<string>();
+foreach (TextBox txt in lsFields) lsValues.Add(txt.Text);
+Log.info(sTitle + ": OK, " + lsValues.Count + " values");
+return lsValues.ToArray();
+}
+}
+if (sChosen != "" && sChosen != "Cancel" && sChosen != "Help") sFileButton = sChosen;
+Log.info(sTitle + ": " + (sFileButton != "" ? "the " + sFileButton + " button" : "cancelled"));
+return new string[0];
+} // settingsDialog method
+
 public static List<string> listInputDialog(string sTitle, string sListLabel, string[] sValueList, string sInputLabel, string sValue, bool bSorted, int iDefaultIndex) {
 // A choice and a value together -- the units and the number, say. Built on the
 // kit's LbcDialog. Returns two strings, the item chosen and the text typed, or

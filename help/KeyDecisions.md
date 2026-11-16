@@ -176,3 +176,7 @@ Jamal's rule of 19 October says to decide a pending question by best judgment, j
 9. **The rulings summaries above stay labeled "Summary, to confirm."** Only Jamal can confirm his own words.
 10. **The agreed renames wait for Phase 1,** when the command record keeps old names searchable. Timer Toggle is the one rename made now, because the timer change (A15) names it.
 
+## One Edit Settings (15 November 2026, the keyboard audit's A4)
+
+Edit Settings (Alt+Shift+E) is the one entry to an app's settings. In EdSharp and FileDir it is the kit's LbcAsk.settingsDialog: the fields, then a button for each settings file, left of OK, so Enter still saves the fields. Edit Settings File (Alt+Shift+F2) is retired, as A4 allowed once one entry offered the fields, the raw file and EdSharp's compiler file. DbDo's Edit Settings already offers its file among its buttons, and HomerView's opens its file. Alt+Shift+F2 is free in every Homer app.
+
