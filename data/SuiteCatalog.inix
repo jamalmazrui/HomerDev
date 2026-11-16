@@ -49,8 +49,9 @@ targets_files=the current page
 paste_what=text
 
 [keys FileDir]
-; Alt+Shift+I runs Inquire Differences here; Invert Marked moves to it when Inquire Differences has a new key (the
-; keyboard audit of 15 November, A6, and question 6 of its decisions)
+; A RECORDED EXCEPTION (15 November 2026, the keyboard audit's A6 and question 6 of its decisions): Alt+Shift+I runs
+; Inquire Differences here, and every I and D key FileDir could give that command is already taken, so Invert Marked
+; keeps Control+I, the key it has always had. DbDo cannot follow, since its Control+I is Inspect Record.
 Invert Marked=Control+I
 
 [keys HomerView]
@@ -334,6 +335,13 @@ apps=EdSharp, FileDir
 key=Alt+Shift+P
 description=Copy the full path of {current} to the clipboard
 
+[command Play Macro]
+; THE MACRO KEYS ARE THE SUITE'S (15 November 2026, the keyboard audit's A10 and questions 1 and 2): DbDo has the
+; recorder now; an app that gains it takes these keys and words. Alt with F12 plays, beside Play Tutorials.
+apps=DbDo
+key=Alt+Shift+F12
+description=Play the macro you recorded or loaded last
+
 [command Play Tutorials]
 apps=EdSharp, FileDir
 key=Alt+F12
@@ -363,6 +371,13 @@ description=Show the Windows properties of {current}
 apps=EdSharp, FileDir, HomerView
 key=Alt+Shift+F1
 description=Open the quick start
+
+[command Record Macro]
+; Control+Shift+F9: no Homer app, Windows or screen reader claims it, and EdSharp keeps Control+Shift+F12 for Go to
+; Environment (A10, question 1).
+apps=DbDo
+key=Control+Shift+F9
+description=Start recording a macro of {thing} moves, or stop and save it, or stop one that is playing
 
 [command Rename]
 apps=EdSharp, FileDir
@@ -640,7 +655,7 @@ what=the table, the current record, the order and the filter
 what=whether the document is modified, and its encoding on a second press
 
 [words Say Status|FileDir]
-what=the current item's date and size, then the order and filter
+what=the current item's date and size, then the order and filter, and the timer when one is set
 
 [words Say Yield|DbDo]
 what=records are in view

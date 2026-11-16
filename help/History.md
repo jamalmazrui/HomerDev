@@ -7,6 +7,13 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.236.0 -- 15 November 2026
+
+- **The keyboard audit's ten open questions are decided** in help\KeyDecisions.md, under the standing rule to decide, justify and keep a rollback. Two answers changed once the keys were checked against data\KeyOwnership.inix: Stop Timer takes Alt+F2, because Control+Shift+F11 is JAWS's system tray; and FileDir keeps Invert Marked on Control+I, because every I and D key Inquire Differences could move to is taken. HomerView keeps Alt+Shift+H for Hotkey Summary, under the 8 November ruling that approved it.
+- **The catalog has the macro keys.** data\SuiteCatalog.inix gains Record Macro on Control+Shift+F9 and Play Macro on Alt+Shift+F12, for DbDo now and any app that gains the recorder. FileDir's Say Status sentence adds the timer, and its Invert Marked exception is now permanent, with the reason.
+- **The old manifest follows.** In data\SuiteCommands.inix, FileDir's Timer Toggle is on Alt+Shift+Z, Stop Timer on Alt+F2, and Timer has no key. The three Extra Speech Toggle entries are marked retired, as they have been since 10 November; one still held Alt+Shift+Z, which made checkKeys report FileDir's new timer key as a clash.
+- FileDir needs this kit, for its Say Status sentence.
+
 ## 1.235.0 -- 15 November 2026
 
 - **The suite commands gate can no longer pass by leaving things out.** The keyboard audit Claude and ChatGPT agreed on 15 November (A2) found that check.py's suite commands check passed a key file that left shared commands out, and one that named none at all. The comparison now lives in scripts\suiteCatalog.py, which check.py imports. It fails a command the catalog gives an app (the new apps= line on every command in data\SuiteCatalog.inix) that the app's key file leaves out, and a key file naming no shared command. It accepts the suite's key among an app's aliases as well as its first key, so a working second route such as Alt+Z for Say Status counts.

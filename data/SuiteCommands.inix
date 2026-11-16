@@ -301,8 +301,9 @@ status=implemented
 
 [DbDo extraSpeechToggle]
 name=Extra Speech Toggle
-keys=Alt+Shift+Z
-status=current
+keys=
+status=retired
+change=retired 10 November 2026 (no speech-tweak commands); its Alt+Shift+Z noted free 15 November, when FileDir's Timer Toggle took it
 
 [DbDo extractWithRegex]
 name=Extract with Regex
@@ -1346,11 +1347,9 @@ status=implemented
 
 [EdSharp extraSpeechToggle]
 name=Extra Speech Toggle
-keys=Alt+Shift+Z
-change=keys changed, was Control+Shift+X
-reason=decision 4: Z keys are toggles, as in DbDo and FileDir
-disposition=accepted
-status=implemented
+keys=
+status=retired
+change=retired 10 November 2026 (no speech-tweak commands); its Alt+Shift+Z noted free 15 November, when FileDir's Timer Toggle took it
 
 [EdSharp extractWithRegex]
 name=Extract with Regex
@@ -2694,11 +2693,9 @@ status=implemented
 
 [FileDir extraSpeechToggle]
 name=Extra Speech Toggle
-keys=Alt+Shift+Z
-change=keys changed, was Control+Shift+X
-reason=Z toggles, as in DbDo
-disposition=accepted
-status=implemented
+keys=
+status=retired
+change=retired 10 November 2026 (no speech-tweak commands); its Alt+Shift+Z noted free 15 November, when FileDir's Timer Toggle took it
 
 [FileDir extractWithRegex]
 name=Extract with Regex
@@ -3476,14 +3473,16 @@ disposition=accepted
 status=implemented
 
 [FileDir startTimer]
-name=Start Timer
-keys=
+name=Timer Toggle
+keys=Alt+Shift+Z
 status=current
+change=renamed from Start Timer, was Alt+Control+T, 15 November 2026 (A15): Alt+Control is for desktop shortcuts, and Z keys are toggles
 
 [FileDir stopTimer]
 name=Stop Timer
-keys=
+keys=Alt+F2
 status=current
+change=was Alt+Control+S, 15 November 2026 (A15); Control+Shift+F11, the first candidate, is JAWS's system tray
 
 [FileDir system]
 name=System
@@ -3510,6 +3509,7 @@ status=implemented
 name=Timer
 keys=
 status=current
+change=was Alt+Control+Y, 15 November 2026 (A15): Say Status (Alt+Z) says the timer now, so this keeps its menu item without a key
 
 [FileDir toggleMark]
 name=Toggle Mark

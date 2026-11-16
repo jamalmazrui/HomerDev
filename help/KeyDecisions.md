@@ -155,7 +155,24 @@ The rule above is that no command becomes menu-only. These live commands have no
 - **Print.** Unbound by the 9 November ruling that Control+P plays media.
 - **Hotkey Summary and the Hotkeys document.** Unbound by the 9 November ruling for fewer, non-overlapping help keys. The Alternate Menu (Alt+F10) reaches both.
 - **Help documents other than the guide, History, ReadMe and Tutorials.** By the 10 November ruling: one Help menu item per document, with keys only for the most important.
+- **FileDir's Timer.** Its Alt+Control+Y went on 15 November, because Alt+Control is for Windows desktop shortcuts. Say Status (Alt+Z) now says the timer, so the time is still one key away, and Timer keeps its menu item for anyone who looks for it by name.
+- **HomerView's Hotkey Summary keeps Alt+Shift+H.** It is the one app where Hotkey Summary has a key. See question 7 below.
 - **Planned commands.** A planned command is not live. It holds no key until it works. DbDo's Pick Value was such a stub on Control+F2; on 15 November it was built instead, because Tutorial 4 teaches it.
 
 Each new exception is added here with its command, app, reason, ruling and date, and its other route.
+
+## The ten decisions, taken under the standing rule (15 November 2026)
+
+Jamal's rule of 19 October says to decide a pending question by best judgment, justify it, and keep a rollback, rather than wait. Claude put ten questions to him on 15 November and, with no answer yet, decided them as below. Each can be reversed by answering its question; the rollback zip of that day restores every file. Two answers differ from Claude's first recommendation, because checking the keys showed something the static scan had missed.
+
+1. **Record Macro: Control+Shift+F9.** No Homer app, Windows or screen reader claims it. EdSharp keeps Go to Environment on Control+Shift+F12. The F9 family is the readable view, so the key is learned rather than guessed.
+2. **Play Macro: Alt+Shift+F12,** beside Play Tutorials on Alt+F12, so "Alt with F12 plays."
+3. **Timer Toggle: Alt+Shift+Z.** Z keys are toggles. FileDir's Start Timer already started, paused and resumed, so it is named for what it does.
+4. **Stop Timer: Alt+F2.** *Changed from the first recommendation.* Control+Shift+F11 is JAWS's system tray (data\KeyOwnership.inix says never bind it), and checkKeys would have caught it. Alt+F2 is claimed by no Homer app, Windows or screen reader. Control+Shift+F10 was passed over, being next to Shift+F10, the context menu.
+5. **Say Status: Shift+Z first in DbDo, Alt+Z second.** No key moves. Alt+Z is the key all three MDI apps share.
+6. **Invert Marked: FileDir keeps Control+I, as a permanent recorded exception.** *Changed from the first recommendation.* Moving it to Alt+Shift+I needs a new key for Inquire Differences, and FileDir has every I and D key taken: Shift, Alt, Control, Alt+Shift and Control+Shift, with each letter. DbDo cannot move to Control+I either, since that is its Inspect Record.
+7. **HomerView's Hotkey Summary keeps Alt+Shift+H, as a recorded exception.** The audit's A16 would have retired it, but Jamal's 8 November ruling approved Alt+Shift+H for Hotkey Summary, beside JAWS's own Hot Key Help on JAWS+H. His 9 November concern, that Alt+Shift+H fails in a dialog, does not arise in a web page. HomerView also has no menu bar; Alt+Shift+H is how its guide, Developer notes and three tutorials confirm which build is loaded, from the summary's first line. The other three apps leave Hotkey Summary unbound, as before.
+8. **HomerView's Z keys stay a browse-mode family,** a recorded exception: next and previous of the same kind and of a different kind, on keys NVDA leaves free.
+9. **The rulings summaries above stay labeled "Summary, to confirm."** Only Jamal can confirm his own words.
+10. **The agreed renames wait for Phase 1,** when the command record keeps old names searchable. Timer Toggle is the one rename made now, because the timer change (A15) names it.
 
