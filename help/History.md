@@ -7,6 +7,13 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.238.0 -- 15 November 2026
+
+- **The suite's apps say what they really bind (the keyboard audit's Phase 1).** KeyMap.exportKeysPath and KeyMap.exportAndExit let DbDo, EdSharp and FileDir answer "/exportkeys <file>": each builds its main window without showing it, writes every command and key it declared, and ends -- before it becomes a single instance, so a copy already running is never handed the request. Until now only the frame's sample could do this.
+- **check compares that file with the key file.** The new exported keys check runs the built program with /exportkeys and compares, command by command, the keys it binds with the keys configs\<App>.inix or configs\Hotkeys.inix shows: a key shown but not bound is a false alias, a key bound but not shown is hidden, and an empty export is reported. The comparison is suiteCatalog.exportBreaks, and testSuiteGate proves it with four more cases, twelve in all. **It warns this round** rather than failing, since the apps have never been compared with what they bind; once the first findings are read and settled it becomes a failure, as A2 asks.
+- **Evaluate Expression keeps one key and three accurate sentences (A8).** The audit asked for one way of presenting the result, with Insert Result and Copy Result as separate commands, or else accurate sentences that name each app's effect. No key is free for Copy Result in all three apps, and splitting the command would add a keystroke to every use, so each app keeps its effect -- EdSharp inserts the result, FileDir copies it, DbDo says it -- and its sentence names it, as the catalog already does. help\KeyDecisions.md records why.
+- DbDo, EdSharp and FileDir need this kit.
+
 ## 1.237.0 -- 15 November 2026
 
 - **One entry to an app's settings (the keyboard audit's A4).** LbcAsk.settingsDialog is the Edit Settings dialog for every Homer app that edits its settings field by field: the fields, then a button for each settings file -- "Settings file", and in EdSharp the current compiler's file -- left of OK, Cancel and Help, so Enter still means OK. EdSharp and FileDir use it, and Edit Settings File (Alt+Shift+F2) retires from the catalog and the manifest. DbDo already lists its file among its Settings buttons, and HomerView opens its file directly.

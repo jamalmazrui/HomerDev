@@ -180,3 +180,11 @@ Jamal's rule of 19 October says to decide a pending question by best judgment, j
 
 Edit Settings (Alt+Shift+E) is the one entry to an app's settings. In EdSharp and FileDir it is the kit's LbcAsk.settingsDialog: the fields, then a button for each settings file, left of OK, so Enter still saves the fields. Edit Settings File (Alt+Shift+F2) is retired, as A4 allowed once one entry offered the fields, the raw file and EdSharp's compiler file. DbDo's Edit Settings already offers its file among its buttons, and HomerView's opens its file. Alt+Shift+F2 is free in every Homer app.
 
+## Evaluate Expression keeps three effects, each named (15 November 2026, the keyboard audit's A8)
+
+The audit offered two ways: one way of presenting the result, with Insert Result and Copy Result as separate commands; or, if that waits, an accurate sentence naming each app's effect. The second is chosen. Copy Result would need one key in DbDo, EdSharp and FileDir, and no C or R key is free in all three: Control+C, Alt+C and Control+Shift+C copy other things in each, and the Equals keys are taken in EdSharp. Splitting the command would also add a keystroke to every use, in the app where it is used most. So Control+Equals evaluates in each app and does the one thing that app is for -- EdSharp inserts the result below the line, FileDir copies it to the clipboard, DbDo says it -- and the catalog's sentence names that effect.
+
+## What each app binds, compared with what it shows (15 November 2026, Phase 1)
+
+DbDo, EdSharp and FileDir answer "/exportkeys <file>" with every command and key they declare, through the kit's KeyMap. check's exported keys step compares that file with the app's key file at every push. It warns for now, and becomes a failure once its first findings are settled. This is the first part of the command record (A1): the program's own declarations are now what the gates read.
+

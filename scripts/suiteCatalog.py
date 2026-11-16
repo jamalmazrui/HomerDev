@@ -102,3 +102,53 @@ def suiteBreaks(sCatalogText, sKeyFileText, sApp):
     if iShared == 0:
         lBreaks.append("%s's key file names no shared command at all, so nothing could be compared" % sApp)
     return lBreaks, iShared
+
+
+def readExport(sText):
+    """{canonical name: (name, [keys])} from a file a program wrote with /exportkeys (KeyMap.exportInix)."""
+    dCommands, dCurrent = {}, None
+    for sLine in sText.splitlines():
+        sTrim = sLine.strip().lstrip("\ufeff")
+        if sTrim.startswith("["):
+            dCurrent = {} if sTrim.lower().startswith("[command ") else None
+            if dCurrent is not None: dCommands[sTrim] = dCurrent
+            continue
+        if dCurrent is not None and "=" in sTrim and not sTrim.startswith(";"):
+            sKey, sValue = sTrim.split("=", 1)
+            dCurrent[sKey.strip()] = sValue.strip()
+    dResult = {}
+    for d in dCommands.values():
+        sName = d.get("name", "")
+        lKeys = [normKey(s) for s in re.split(r"\s*,\s*|\s+or\s+", d.get("keys", "")) if s.strip()]
+        if sName: dResult[nameKey(sName)] = (sName, lKeys)
+    return dResult
+
+
+def nameKey(sName):
+    """A command's name as both files can be matched on: no ampersand, no ellipsis, no case, letters and digits only."""
+    return re.sub(r"[^a-z0-9]", "", sName.replace("&", "").lower())
+
+
+def exportBreaks(sExportText, sKeyFileText, sApp):
+    """(differences, commands compared) between the keys a program declared (its /exportkeys file) and the keys its key
+    file shows (HomerDev 1.238.0, the keyboard audit's Phase 1 and A2). A key shown but not declared is a false alias:
+    the menu or the Key Describer names a key that does nothing. A key declared but not shown is hidden. A program that
+    declares nothing is reported, since an empty export proves nothing."""
+    dExport = readExport(sExportText)
+    if not dExport: return ["%s exported no commands, so nothing could be compared" % sApp], 0
+    lBreaks, iCompared = [], 0
+    for sCanon, (sName, lShown, sSentence) in readKeyFile(sKeyFileText, sApp).items():
+        sKey = nameKey(sName)
+        if not lShown:
+            continue
+        if sKey not in dExport:
+            lBreaks.append("%s: the key file shows %s, but %s declares no command of that name" % (sName, " or ".join(lShown), sApp))
+            continue
+        iCompared += 1
+        lDeclared = dExport[sKey][1]
+        lFalse = [s for s in lShown if s not in lDeclared]
+        lHidden = [s for s in lDeclared if s not in lShown]
+        if lFalse: lBreaks.append("%s: the key file shows %s, which %s does not bind" % (sName, " or ".join(lFalse), sApp))
+        if lHidden: lBreaks.append("%s: %s binds %s, which the key file does not show" % (sName, sApp, " or ".join(lHidden)))
+    return lBreaks, iCompared
+

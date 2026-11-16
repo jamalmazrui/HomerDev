@@ -960,6 +960,32 @@ public static class KeyMap {
         }
     }
 
+    // exportKeysPath: the file named after /exportkeys on this program's command line, or "" (kit 1.238.0,
+    // 15 November 2026, the keyboard audit's Phase 1). DbDo, EdSharp and FileDir are not on the Homer frame, whose
+    // runOrExport answered /exportkeys for the sample alone, so the suite's own apps could never show what they really
+    // bind. Each now asks this before it becomes a single instance: an export must not be handed to a copy already
+    // running, which would read "/exportkeys" as a file to open.
+    public static string exportKeysPath() {
+        string[] aArgs = Environment.GetCommandLineArgs();
+        for (int i = 1; i < aArgs.Length - 1; i++) {
+            string sSwitch = aArgs[i].ToLowerInvariant();
+            if (sSwitch == "/exportkeys" || sSwitch == "-exportkeys" || sSwitch == "--exportkeys") return aArgs[i + 1];
+        }
+        return "";
+    }
+
+    // exportAndExit: when /exportkeys was given, write every command and key the program declared, as exportInix
+    // does, and end the process -- 0 when the file was written, 1 when not -- before any window is shown. An app calls
+    // it once its menus and keys are declared. Returns false, and does nothing, when no export was asked for.
+    public static bool exportAndExit(string sAppName) {
+        string sPath = exportKeysPath();
+        if (sPath == "") return false;
+        bool bWritten = exportInix(sPath, sAppName);
+        Log.info("Exported " + lsCommandOrder.Count + " commands to " + sPath + (bWritten ? "" : " -- FAILED"));
+        Environment.Exit(bWritten ? 0 : 1);
+        return bWritten;
+    }
+
     // hotkeySummary: command, keys and summary, one per line, sorted by name.
     public static string hotkeySummary() {
         List<Command> lsSorted = new List<Command>();

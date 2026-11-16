@@ -13,6 +13,11 @@ files made for the purpose, against a small catalog, and checks each verdict:
   6. a key file naming no shared command fails;
   7. a key exception the catalog records ([keys <App>]) passes;
   8. the kit's own catalog parses, and every command in it has a key line and a sentence.
+And for the exported keys check (1.238.0), suiteCatalog.exportBreaks against a small export:
+  9. an export that binds what the key file shows passes;
+ 10. a key shown but not bound (a false alias) is found;
+ 11. a key bound but not shown is found;
+ 12. an empty export is found.
 Every check goes to logs\HomerDev-testSuiteGate-<time>.log with what was expected and what happened. The kit's build
 runs it."""
 
@@ -86,7 +91,21 @@ def main():
     bPass = len(dCommands) > 0 and not lsBad
     sayLine("%s the kit's catalog: %d commands%s" % ("PASS" if bPass else "FAIL", len(dCommands), (", without a key line or sentence: " + ", ".join(lsBad)) if lsBad else ", each with a key line and a sentence"))
     if not bPass: iFailed += 1
-    sayLine("testSuiteGate: %d passed, %d failed. Log: %s" % (len(lCases) + 1 - iFailed, iFailed, sLog))
+    # 9 to 12. the exported keys comparison
+    sExport = "[Export]\napp=Demo\n[Command copy]\nname=&Copy\nkeys=Control+C\n[Command sayStatus]\nname=Say Status\nkeys=Shift+Z or Alt+Z\n"
+    lExportCases = [
+        ("an export that binds what is shown passes", sExport, keyFile(["Copy=Control+C, Copy", "Say Status=Shift+Z or Alt+Z, Say"]), 0, ""),
+        ("a key shown but not bound is found", sExport, keyFile(["Copy=Control+C or Control+Insert, Copy", "Say Status=Shift+Z or Alt+Z, Say"]), 1, "does not bind"),
+        ("a key bound but not shown is found", sExport, keyFile(["Copy=Control+C, Copy", "Say Status=Shift+Z, Say"]), 1, "does not show"),
+        ("an empty export is found", "", keyFile(["Copy=Control+C, Copy"]), 1, "exported no commands"),
+    ]
+    for sName, sExportText, sText, iWanted, sWords in lExportCases:
+        lBreaks, iCompared = suiteCatalog.exportBreaks(sExportText, sText, "Demo")
+        bPass = len(lBreaks) == iWanted and (not sWords or any(sWords in s for s in lBreaks))
+        sayLine("%s %s: expected %d difference%s; got %d%s" % ("PASS" if bPass else "FAIL", sName, iWanted, "" if iWanted == 1 else "s",
+                len(lBreaks), (": " + " | ".join(lBreaks)) if lBreaks else ""))
+        if not bPass: iFailed += 1
+    sayLine("testSuiteGate: %d passed, %d failed. Log: %s" % (len(lCases) + 1 + len(lExportCases) - iFailed, iFailed, sLog))
     return 1 if iFailed else 0
 
 
