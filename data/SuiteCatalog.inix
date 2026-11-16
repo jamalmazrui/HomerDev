@@ -54,6 +54,29 @@ paste_what=text
 ; keeps Control+I, the key it has always had. DbDo cannot follow, since its Control+I is Inspect Record.
 Invert Marked=Control+I
 
+[handled EdSharp]
+; HANDLED OUTSIDE THE KIT'S ROUTER (1.239.0, 15 November 2026). check's exported keys step compares the keys a program
+; declares, through /exportkeys, with the keys its key file shows. These commands are real but are not declared to the
+; router, so they are not in the export and are not differences. Each says where it is handled.
+Insert All Users Path=the JAWS script, in a file name box of an Open or Save dialog; elsewhere it passes Control+Shift+I on
+Insert Script Path=the JAWS script, in a file name box of an Open or Save dialog; elsewhere it passes Control+I on
+Next Word=the editing box's own Control+RightArrow
+Previous Word=the editing box's own Control+LeftArrow
+Web Client Utilities=the JAWS script
+
+[handled FileDir]
+; As for EdSharp: real, and handled outside the router, by FileDir's own key code because what the key does depends on
+; the item under the cursor or on the Recycle setting.
+Come up Level=FileDir's key code (Comma), which returns to the folder you left
+Drive Letter=FileDir's key code, Alt with a digit
+Go to Item=FileDir's key code, by the kind of item under the cursor
+Go to Parent Folder=FileDir's key code, by the Recycle setting
+Go to Root Folder=FileDir's key code
+Open Item=FileDir's key code, by the kind of item under the cursor
+Open Parent Folder=FileDir's key code, by the Recycle setting
+Open Root Folder=FileDir's key code
+Parent Folder=FileDir's key code, by the Recycle setting
+
 [keys HomerView]
 ; F11 is Microsoft Edge's full screen
 Elevate Version=Control+F11

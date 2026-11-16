@@ -37,7 +37,18 @@ def normKey(sKey):
     """One spelling for a key: modifiers in the order Control, Alt, Shift, and symbol names as their characters."""
     dRep = {"Ctrl": "Control", "Apostrophe": "'", "OemQuotes": "'", "Semicolon": ";", "Semi-colon": ";", "Backslash": "\\",
             "Slash": "/", "Grave": "`", "Equals": "=", "Return": "Enter", "Comma": ",", "Period": ".", "SemiColon": ";"}
-    lParts = [dRep.get(s, s) for s in sKey.strip().split("+") if s]
+    # MORE SPELLINGS OF ONE KEY (1.239.0): the first /exportkeys runs of EdSharp and FileDir wrote the kit's KeyName
+    # spellings -- GraveAccent, RightBracket, Backspace -- where the key files say Accent, ], BackSpace, and the key files
+    # name some shifted characters by themselves -- Tilde, Question, LeftParen -- where a program binds Shift with the
+    # unshifted key. Both now come to one spelling, so only a real difference is reported.
+    dRep.update({"BackSpace": "Backspace", "Back": "Backspace", "RightBracket": "]", "LeftBracket": "[", "OemCloseBrackets": "]",
+                 "OemOpenBrackets": "[", "GraveAccent": "`", "Accent": "`", "Oemtilde": "`", "Oemplus": "="})
+    dShifted = {"Tilde": "`", "Question": "/", "Exclamation": "1", "At": "2", "RightParen": "0", "LeftParen": "9",
+                "RightBrace": "]", "LeftBrace": "[", "Colon": ";", "Less": ",", "Greater": ".", "Underscore": "-"}
+    lParts = []
+    for sPart in [s for s in sKey.strip().split("+") if s]:
+        if sPart in dShifted: lParts += ["Shift", dShifted[sPart]]
+        else: lParts.append(dRep.get(sPart, sPart))
     lMods = [s for s in ("Control", "Alt", "Shift") if s in lParts]
     lRest = [re.sub(r"^D(\d)$", r"\1", s) for s in lParts if s not in ("Control", "Alt", "Shift")]
     return "+".join(lMods + lRest)
@@ -129,7 +140,23 @@ def nameKey(sName):
     return re.sub(r"[^a-z0-9]", "", sName.replace("&", "").lower())
 
 
-def exportBreaks(sExportText, sKeyFileText, sApp):
+def readHandled(sCatalogText, sApp):
+    """{canonical name: reason} for the commands an app handles outside the kit's router, from the catalog's
+    [handled <App>] section (1.239.0): keys whose meaning depends on the item under the cursor, a text box's own keys,
+    or a screen reader script's. They are not in an /exportkeys file, and are not differences."""
+    dHandled, bIn = {}, False
+    for sLine in sCatalogText.splitlines():
+        sTrim = sLine.strip().lstrip("\ufeff")
+        if sTrim.startswith("["):
+            bIn = sTrim[1:-1].strip().lower() == ("handled " + sApp).lower()
+            continue
+        if bIn and "=" in sTrim and not sTrim.startswith(";"):
+            sName, sReason = sTrim.split("=", 1)
+            dHandled[nameKey(sName)] = sReason.strip()
+    return dHandled
+
+
+def exportBreaks(sExportText, sKeyFileText, sApp, dHandled=None):
     """(differences, commands compared) between the keys a program declared (its /exportkeys file) and the keys its key
     file shows (HomerDev 1.238.0, the keyboard audit's Phase 1 and A2). A key shown but not declared is a false alias:
     the menu or the Key Describer names a key that does nothing. A key declared but not shown is hidden. A program that
@@ -139,6 +166,13 @@ def exportBreaks(sExportText, sKeyFileText, sApp):
     lBreaks, iCompared = [], 0
     for sCanon, (sName, lShown, sSentence) in readKeyFile(sKeyFileText, sApp).items():
         sKey = nameKey(sName)
+        if not lShown or sKey in (dHandled or {}):
+            continue
+        # A desktop shortcut is Windows' key, not the program's, and a key with the reader's own key in it belongs to
+        # the screen reader's script; neither is declared by the program.
+        if sName.startswith("Launch ") and all(("Alt" in s and "Control" in s) for s in lShown):
+            continue
+        lShown = [s for s in lShown if not re.search(r"JAWSKey|JAWS\+|NVDA|Insert\+", s)]
         if not lShown:
             continue
         if sKey not in dExport:

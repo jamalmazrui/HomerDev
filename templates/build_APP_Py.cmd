@@ -125,8 +125,11 @@ rem C:\HomerDev, and the build stopped. The log names every kit considered.
 set "sKitFromEnv=%HomerDev%"
 set "homerDev="
 set "sKitVersion="
-call :considerKit "%sKitFromEnv%"
+rem THE DEVELOPMENT KIT WINS A TIE (HomerDev 1.239.0, 15 November 2026): C:\HomerDev is considered first, so when
+rem the installed kit the HomerDev variable names has the same version, the build uses the one being developed --
+rem whose logs folder can be written, and whose files are the ones just unzipped.
 call :considerKit "C:\HomerDev"
+call :considerKit "%sKitFromEnv%"
 rem FOUND WHEREVER IT IS (1.46.0): only Windows and the folder name HomerDev
 rem are assumed, never a drive or a depth. After the HomerDev variable: the
 rem current folder and every folder above it, then this script's folder and

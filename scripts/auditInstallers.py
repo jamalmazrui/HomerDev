@@ -36,8 +36,9 @@ import datetime, glob, os, platform, re, sys
 
 sScriptDir = os.path.dirname(os.path.abspath(__file__))
 sRoot = os.path.dirname(sScriptDir)
-sLogDir = os.path.join(sRoot, "logs")
-os.makedirs(sLogDir, exist_ok=True)
+if sScriptDir not in sys.path: sys.path.insert(0, sScriptDir)
+from kind import writableLogDir
+sLogDir = writableLogDir(sRoot)   # the kit's logs, or %LOCALAPPDATA%\\HomerDev\\logs for a kit in Program Files (1.239.0)
 sLog = os.path.join(sLogDir, "HomerDev-auditInstallers-%s.log" % datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
 lFindings = []
 

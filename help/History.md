@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.239.0 -- 15 November 2026
+
+- **DbDo's build stopped at the macro test, and the cause was the kit's.** DbDo's build found two kits at 1.238.0 -- the one installed in Program Files, named by the HomerDev variable, and C:\HomerDev -- and took the first. testMacro then tried to write its log in Program Files, which Windows refused, and the build failed with nothing wrong in DbDo. Two fixes: kind.writableLogDir gives testMacro, testSuiteGate and auditInstallers the kit's logs folder when it can be written and %LOCALAPPDATA%\HomerDev\logs when not; and the build templates, with DbDo's, EdSharp's, FileDir's, HomerView's and BatCon's builds, now consider C:\HomerDev first, so a tie goes to the kit being developed.
+- **The first exports, read.** EdSharp's showed 12 differences and FileDir's 28. Most were two spellings of one key -- BackSpace and Backspace, Tilde and Shift+GraveAccent, Question and Shift+/ -- and suiteCatalog.normKey now brings each pair to one spelling. Commands handled outside the kit's router -- by the item under the cursor, by a text box's own keys, or in a JAWS script -- are named, with where each is handled, in the catalog's new [handled EdSharp] and [handled FileDir] sections, and are not differences. A desktop shortcut (Launch) and a key that holds the reader's own key are passed over too. Two findings were real and are fixed in the apps: EdSharp listed a stale Set on Favorite List on Control+L, which Set Favorite holds; and FileDir's Context Menu answers the Applications key but did not say so.
+- **Replayed against tonight's exports, both apps now show no difference.** The check still warns rather than fails until DbDo's first export has been read the same way.
+
 ## 1.238.0 -- 15 November 2026
 
 - **The suite's apps say what they really bind (the keyboard audit's Phase 1).** KeyMap.exportKeysPath and KeyMap.exportAndExit let DbDo, EdSharp and FileDir answer "/exportkeys <file>": each builds its main window without showing it, writes every command and key it declared, and ends -- before it becomes a single instance, so a copy already running is never handed the request. Until now only the frame's sample could do this.
