@@ -327,6 +327,9 @@ public static class SuiteCommands {
         string sLine = o.sName + ", " + (o.sKeys.Length > 0 ? o.sKeys : "no key");
         if (o.sSummary.Length > 0) sLine += ": " + o.sSummary.TrimEnd('.') + ".";
         if (!o.bAvailable) sLine += " Unavailable now.";
+        // A renamed command can still be found by its old name (kit 1.241.0, A11).
+        string sFormer = KeyMap.formerNamesText(o.sName);
+        if (sFormer.Length > 0) sLine += " Formerly " + sFormer + ".";
         return sLine;
     }
 

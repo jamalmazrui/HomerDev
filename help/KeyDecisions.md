@@ -192,3 +192,15 @@ DbDo, EdSharp and FileDir answer "/exportkeys <file>" with every command and key
 
 Since HomerDev 1.240.0, a push stops when the keys DbDo, EdSharp or FileDir binds differ from the keys its key file shows. Keys an app handles outside the kit's router are named in the catalog's [handled <App>] sections, each with where it is handled; adding a line there is a decision, recorded with its reason, not a way round the check.
 
+## The agreed names, and how old names stay findable (15 November 2026, A5 and A11)
+
+- **DbDo:** Copy Append (Alt+C, was Append Cell), Copy Append Record (Alt+Shift+C, was Append Record), Toggle Mark (Control+Space, was Marked Toggle), Say Marked Records (Shift+Space, was Say Records of Marked), Say Marked Records from Current (Alt+Shift+M, was Say Records from Current Marked).
+- **FileDir:** Say List, Say List Marked, Say List Files, Say Yield, Say Yield Marked, Say Yield Files, Say Yield on Drive, Say Yield in Operating System, Say Character Encoding, Show Type Extended, and Append File Contents (Shift+A, was Append to Clipboard).
+- **One key moved.** FileDir's Say Yield takes Alt+Y, the suite's key, and Say Yield Files takes Control+Y, where Yield was. Jamal's 9 November ruling described Alt+Y as the yield of everything "as in FileDir"; now it is, in every app.
+- **Findable.** Each app names a renamed command's former name to the kit's KeyMap, and the Alternate Menu ends its line with "Formerly <name>.".
+- **Retired.** FileDir's Timer, since Say Status says the timer (A15).
+
+## The command record, as built (15 November 2026, A1)
+
+An app's key file is the one authored record of its commands: name, keys and sentence. Every surface is made from it or checked against it at every push -- FileDir's Hotkeys page and built-in table by its makeKeyMap, EdSharp's Hotkeys page by the kit's makeHotkeys, DbDo's Hotkeys page from its menus, HomerView's key file and page from its command table. The catalog records what the suite shares, and /exportkeys proves the program binds what the record shows. SuiteCommands.inix is kept, not retired: it is the record of each key's history -- every change with its date and reason -- and checkKeys' ownership data, and that is the home A1 asked its history to have.
+

@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.241.0 -- 15 November 2026
+
+- **Old names stay findable (the keyboard audit's A11).** KeyMap.addFormerName records what a renamed command used to be called, and the shared Alternate Menu ends its line with "Formerly <name>.", so Control+F or Control+J on the old name still finds it.
+- **The agreed renames, in the catalog.** Copy Append now names DbDo's Alt+C too; Say Yield (Alt+Y) gains FileDir, whose Yield moved there from Control+Y; Say Yield Marked (Shift+Y) and Toggle Mark (Control+Space) are new shared commands for DbDo and FileDir, each with one sentence. The old manifest's FileDir entries follow, and its Timer and Say Timer are retired.
+- **scripts\makeHotkeys** writes an app's help\Hotkeys.md from its key file, in FileDir's three orderings, so the page cannot drift from the program. EdSharp's build runs it; its page had claimed to be generated while being written by hand.
+- **The command record, as decided (A1).** Each app's key file is the one authored record of its commands -- name, keys and sentence -- and every surface comes from it or is checked against it: FileDir's Hotkeys page and built-in table, EdSharp's Hotkeys page, DbDo's Hotkeys page from its menus, HomerView's key file and page from its command table; the catalog holds what is shared; and /exportkeys proves at every push that the program binds what the record shows. The old manifest, SuiteCommands.inix, is kept as the record of each key's history and as checkKeys' ownership data, which is the home its history needed. help\KeyDecisions.md records this.
+- DbDo, EdSharp and FileDir need this kit.
+
 ## 1.240.0 -- 15 November 2026
 
 - **A key shown but not bound now stops a push (the keyboard audit's A2, finished).** The exported keys check fails when the keys DbDo, EdSharp or FileDir binds differ from the keys its key file shows. It warned for one round while the first exports were read: EdSharp and FileDir came out clean at 1.239.0, and DbDo's first export, read now, listed 37 differences and no others. 33 are keys DbDo's grid keyboard model, Windows or the record form handles outside the kit's router -- the virtual cursor, the marking keys, the view keys, Context Menu and Null Value -- and are named, with where each is handled, in the catalog's new [handled DbDo] section. 4 were real: Delete Record also answers Delete, Enter Child Table Enter, Exit Child Table Backspace, and Say Order and Filter NumPadStar, and DbDo's key file did not say so. It does now. Replayed against the 19:14 exports, all three apps show no difference. A program that cannot export at all still only warns.

@@ -135,6 +135,27 @@ public static class KeyMap {
     public static List<string> lsProblems = new List<string>();
 
     // toId: "&Close All But Current Window..." -> "closeAllButCurrentWindow".
+    // FORMER NAMES STAY FINDABLE (kit 1.241.0, 15 November 2026, the keyboard audit's A11): "old names stay
+    // searchable". When a command is renamed, the app names what it used to be called with addFormerName, and the
+    // Alternate Menu ends the command's line with "Formerly <name>.", so Control+F or Control+J on the old name still
+    // finds it. Keyed by the command's id, so a caption's ampersand or ellipsis makes no difference.
+    public static Dictionary<string, List<string>> dFormerNames = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+
+    public static bool addFormerName(string sName, string sFormerName) {
+        string sId = toId(sName);
+        if (!dFormerNames.ContainsKey(sId)) dFormerNames[sId] = new List<string>();
+        if (!dFormerNames[sId].Contains(sFormerName)) dFormerNames[sId].Add(sFormerName);
+        return true;
+    }
+
+    // formerNamesText: "Yield" or "List and List Items", or "" when the command was never renamed.
+    public static string formerNamesText(string sName) {
+        List<string> lsNames;
+        if (!dFormerNames.TryGetValue(toId(sName), out lsNames) || lsNames.Count == 0) return "";
+        if (lsNames.Count == 1) return lsNames[0];
+        return string.Join(", ", lsNames.GetRange(0, lsNames.Count - 1).ToArray()) + " and " + lsNames[lsNames.Count - 1];
+    }
+
     public static string toId(string sName) {
         StringBuilder sbId = new StringBuilder();
         bool bNewWord = false;

@@ -2448,9 +2448,10 @@ disposition=accepted
 status=implemented
 
 [FileDir appendToClipboard]
-name=Append to Clipboard
+name=Append File Contents
 keys=Shift+A
 status=current
+change=renamed 15 November 2026 from Append to Clipboard (A11)
 
 [FileDir arrangeIcons]
 name=Arrange Icons
@@ -2486,9 +2487,10 @@ keys=Control+F11
 status=current
 
 [FileDir characterEncoding]
-name=Character Encoding
+name=Say Character Encoding
 keys=Shift+2
 status=current
+change=renamed 15 November 2026 from Character Encoding (A11)
 
 [FileDir chatAboutFile]
 name=Chat about File
@@ -2869,21 +2871,23 @@ keys=Alt+Control+F
 status=current
 
 [FileDir list]
-name=List
+name=Say List
 keys=Control+L
 status=current
+change=renamed 15 November 2026 from List (A11)
 
 [FileDir listFiles]
-name=List Files
+name=Say List Files
 keys=Alt+L
 status=current
+change=renamed 15 November 2026 from List Files (A11)
 
 [FileDir listMarked]
-name=List Marked
+name=Say List Marked
 keys=Shift+L
-change=renamed from List Tagged, was Shift+L
 disposition=accepted
 status=implemented
+change=renamed 15 November 2026 from List Marked (A11)
 
 [FileDir mailAttachment]
 name=Mail Attachment
@@ -3388,7 +3392,8 @@ status=current
 [FileDir sayTimer]
 name=Say Timer
 keys=
-status=current
+status=retired
+change=retired 15 November 2026 (A15): Say Status (Alt+Z) says the timer
 
 [FileDir sayType]
 name=Say Type
@@ -3504,8 +3509,8 @@ status=implemented
 [FileDir timer]
 name=Timer
 keys=
-status=current
-change=was Alt+Control+Y, 15 November 2026 (A15): Say Status (Alt+Z) says the timer now, so this keeps its menu item without a key
+status=retired
+change=retired 15 November 2026 (A15): Say Status (Alt+Z) says the timer
 
 [FileDir toggleMark]
 name=Toggle Mark
@@ -3521,9 +3526,10 @@ keys=Alt+Shift+F7
 status=current
 
 [FileDir typeExtended]
-name=Type Extended
+name=Show Type Extended
 keys=Control+Shift+T
 status=current
+change=renamed 15 November 2026 from Type Extended (A11)
 
 [FileDir typeOrder]
 name=Type Order
@@ -3629,31 +3635,35 @@ keys=Control+Shift+W
 status=current
 
 [FileDir yield]
-name=Yield
-keys=Control+Y
-status=current
-
-[FileDir yieldFiles]
-name=Yield Files
+name=Say Yield
 keys=Alt+Y
 status=current
+change=renamed 15 November 2026 from Yield (A11), was Control+Y
+
+[FileDir yieldFiles]
+name=Say Yield Files
+keys=Control+Y
+status=current
+change=renamed 15 November 2026 from Yield Files (A11), was Alt+Y
 
 [FileDir yieldInOperatingSystem]
-name=Yield in Operating System
+name=Say Yield in Operating System
 keys=Alt+Shift+Y
 status=current
+change=renamed 15 November 2026 from Yield in Operating System (A11)
 
 [FileDir yieldMarked]
-name=Yield Marked
+name=Say Yield Marked
 keys=Shift+Y
-change=renamed from Yield Tagged, was Shift+Y
 disposition=accepted
 status=implemented
+change=renamed 15 November 2026 from Yield Marked (A11)
 
 [FileDir yieldOnDrive]
-name=Yield on Drive
+name=Say Yield on Drive
 keys=Control+Shift+Y
 status=current
+change=renamed 15 November 2026 from Yield on Drive (A11)
 
 [FileDir zip]
 name=Zip

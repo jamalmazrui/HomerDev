@@ -207,7 +207,7 @@ key=Control+C
 description=Copy {targets} to the clipboard
 
 [command Copy Append]
-apps=EdSharp, FileDir, HomerView
+apps=DbDo, EdSharp, FileDir, HomerView
 key=Alt+C
 description=Add {targets} to the end of the clipboard
 
@@ -511,8 +511,16 @@ key=Shift+F4
 description=Say how many windows are open, and their titles
 
 [command Say Yield]
-apps=DbDo, EdSharp, HomerView
+; FILEDIR JOINS (15 November 2026, the keyboard audit's A11): its Yield became Say Yield on Alt+Y, and Yield Files
+; moved to Control+Y, so Alt+Y says the yield of everything in view in every Homer app.
+apps=DbDo, EdSharp, FileDir, HomerView
 key=Alt+Y
+description=Say how many {what}
+
+[command Say Yield Marked]
+; 15 November 2026 (A11): Shift+Y says the yield of what is marked, in DbDo and FileDir alike.
+apps=DbDo, FileDir
+key=Shift+Y
 description=Say how many {what}
 
 [command Search Next]
@@ -539,6 +547,13 @@ description=Tile the open windows across
 apps=EdSharp, FileDir
 key=Shift+F11
 description=Tile the open windows down
+
+[command Toggle Mark]
+; 15 November 2026 (A11): DbDo's Marked Toggle and FileDir's Toggle Mark, one name and one sentence. FileDir also keeps
+; Space, its list's own key.
+apps=DbDo, FileDir
+key=Control+Space
+description=Mark or unmark the current {thing}
 
 [command Tutorials Transcript]
 apps=EdSharp, FileDir
@@ -718,6 +733,18 @@ what=records are in view
 
 [words Say Yield|EdSharp]
 what=characters, words and lines are in all or the selected text
+
+[words Say Yield|FileDir]
+what=items are in view, and their total size
+
+[words Say Yield Marked|DbDo]
+what=records are marked
+
+[words Say Yield Marked|FileDir]
+what=items are marked, and their total size
+
+[words Copy Append|DbDo]
+targets=the current cell's value
 
 [words Say Yield|HomerView]
 what=characters, words and lines are in all or the selected text
