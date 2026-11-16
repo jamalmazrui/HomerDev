@@ -188,3 +188,7 @@ The audit offered two ways: one way of presenting the result, with Insert Result
 
 DbDo, EdSharp and FileDir answer "/exportkeys <file>" with every command and key they declare, through the kit's KeyMap. check's exported keys step compares that file with the app's key file at every push. It warns for now, and becomes a failure once its first findings are settled. This is the first part of the command record (A1): the program's own declarations are now what the gates read.
 
+## The key comparison blocks a push (15 November 2026, A2)
+
+Since HomerDev 1.240.0, a push stops when the keys DbDo, EdSharp or FileDir binds differ from the keys its key file shows. Keys an app handles outside the kit's router are named in the catalog's [handled <App>] sections, each with where it is handled; adding a line there is a decision, recorded with its reason, not a way round the check.
+

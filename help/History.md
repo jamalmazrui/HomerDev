@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.240.0 -- 15 November 2026
+
+- **A key shown but not bound now stops a push (the keyboard audit's A2, finished).** The exported keys check fails when the keys DbDo, EdSharp or FileDir binds differ from the keys its key file shows. It warned for one round while the first exports were read: EdSharp and FileDir came out clean at 1.239.0, and DbDo's first export, read now, listed 37 differences and no others. 33 are keys DbDo's grid keyboard model, Windows or the record form handles outside the kit's router -- the virtual cursor, the marking keys, the view keys, Context Menu and Null Value -- and are named, with where each is handled, in the catalog's new [handled DbDo] section. 4 were real: Delete Record also answers Delete, Enter Child Table Enter, Exit Child Table Backspace, and Say Order and Filter NumPadStar, and DbDo's key file did not say so. It does now. Replayed against the 19:14 exports, all three apps show no difference. A program that cannot export at all still only warns.
+- testSuiteGate proves a handled command too: 13 cases.
+
 ## 1.239.0 -- 15 November 2026
 
 - **DbDo's build stopped at the macro test, and the cause was the kit's.** DbDo's build found two kits at 1.238.0 -- the one installed in Program Files, named by the HomerDev variable, and C:\HomerDev -- and took the first. testMacro then tried to write its log in Program Files, which Windows refused, and the build failed with nothing wrong in DbDo. Two fixes: kind.writableLogDir gives testMacro, testSuiteGate and auditInstallers the kit's logs folder when it can be written and %LOCALAPPDATA%\HomerDev\logs when not; and the build templates, with DbDo's, EdSharp's, FileDir's, HomerView's and BatCon's builds, now consider C:\HomerDev first, so a tie goes to the kit being developed.

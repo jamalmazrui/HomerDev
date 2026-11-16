@@ -18,6 +18,7 @@ And for the exported keys check (1.238.0), suiteCatalog.exportBreaks against a s
  10. a key shown but not bound (a false alias) is found;
  11. a key bound but not shown is found;
  12. an empty export is found.
+ 13. a command the catalog says is handled outside the router passes though the export lacks it.
 Every check goes to logs\HomerDev-testSuiteGate-<time>.log with what was expected and what happened. The kit's build
 runs it."""
 
@@ -99,9 +100,11 @@ def main():
         ("a key shown but not bound is found", sExport, keyFile(["Copy=Control+C or Control+Insert, Copy", "Say Status=Shift+Z or Alt+Z, Say"]), 1, "does not bind"),
         ("a key bound but not shown is found", sExport, keyFile(["Copy=Control+C, Copy", "Say Status=Shift+Z, Say"]), 1, "does not show"),
         ("an empty export is found", "", keyFile(["Copy=Control+C, Copy"]), 1, "exported no commands"),
+        ("a command handled outside the router passes", sExport, keyFile(["Copy=Control+C, Copy", "Say Status=Shift+Z or Alt+Z, Say", "Cell Down=Control+Alt+DownArrow, Move down"]), 0, ""),
     ]
+    dHandled = suiteCatalog.readHandled("[handled Demo]\nCell Down=the grid's own key code\n", "Demo")
     for sName, sExportText, sText, iWanted, sWords in lExportCases:
-        lBreaks, iCompared = suiteCatalog.exportBreaks(sExportText, sText, "Demo")
+        lBreaks, iCompared = suiteCatalog.exportBreaks(sExportText, sText, "Demo", dHandled)
         bPass = len(lBreaks) == iWanted and (not sWords or any(sWords in s for s in lBreaks))
         sayLine("%s %s: expected %d difference%s; got %d%s" % ("PASS" if bPass else "FAIL", sName, iWanted, "" if iWanted == 1 else "s",
                 len(lBreaks), (": " + " | ".join(lBreaks)) if lBreaks else ""))

@@ -54,6 +54,44 @@ paste_what=text
 ; keeps Control+I, the key it has always had. DbDo cannot follow, since its Control+I is Inspect Record.
 Invert Marked=Control+I
 
+[handled DbDo]
+; As for EdSharp and FileDir (1.240.0): real, and handled outside the router, by DbDo's grid keyboard model of 31
+; October 2026 (DbDo.cs, the grid's ProcessCmdKey and formKeyDown) or by Windows and the record form. Its first
+; export, on 15 November, listed these 33 and nothing else unaccounted for.
+Cell Down=the grid's virtual cursor, in DbDo's grid key code
+Cell Left=the grid's virtual cursor, in DbDo's grid key code
+Cell Right=the grid's virtual cursor, in DbDo's grid key code
+Cell Up=the grid's virtual cursor, in DbDo's grid key code
+Column Bottom=the grid's virtual cursor, in DbDo's grid key code
+Column Top=the grid's virtual cursor, in DbDo's grid key code
+Context Menu=Windows' own Shift+F10, which opens the grid's context menu
+Cursor Column First=the grid's virtual cursor, in DbDo's grid key code
+Cursor Column Last=the grid's virtual cursor, in DbDo's grid key code
+Cursor Grid End=the grid's virtual cursor, in DbDo's grid key code
+Cursor Grid Start=the grid's virtual cursor, in DbDo's grid key code
+Cursor Row End=the grid's virtual cursor, in DbDo's grid key code
+Cursor Row Start=the grid's virtual cursor, in DbDo's grid key code
+First Marked=the grid's marking keys, in DbDo's grid key code
+Last Marked=the grid's marking keys, in DbDo's grid key code
+Mark and Next=the grid's marking keys, in DbDo's grid key code
+Mark and Previous=the grid's marking keys, in DbDo's grid key code
+Mark to First=the grid's marking keys, in DbDo's grid key code
+Mark to Last=the grid's marking keys, in DbDo's grid key code
+Next Marked=the grid's marking keys, in DbDo's grid key code
+Null Value=the record form's own key code
+Previous Marked=the grid's marking keys, in DbDo's grid key code
+Say Cell Coordinates=the grid's virtual cursor, in DbDo's grid key code
+Say Column=the grid's virtual cursor, in DbDo's grid key code
+Say Column Header=the grid's virtual cursor, in DbDo's grid key code
+Say Row=the grid's virtual cursor, in DbDo's grid key code
+Say Row Header=the grid's virtual cursor, in DbDo's grid key code
+Unmark and Next=the grid's marking keys, in DbDo's grid key code
+Unmark and Previous=the grid's marking keys, in DbDo's grid key code
+Unmark to First=the grid's marking keys, in DbDo's grid key code
+Unmark to Last=the grid's marking keys, in DbDo's grid key code
+View Cycle=the window's view keys, in DbDo's key code
+View Cycle Back=the window's view keys, in DbDo's key code
+
 [handled EdSharp]
 ; HANDLED OUTSIDE THE KIT'S ROUTER (1.239.0, 15 November 2026). check's exported keys step compares the keys a program
 ; declares, through /exportkeys, with the keys its key file shows. These commands are real but are not declared to the
