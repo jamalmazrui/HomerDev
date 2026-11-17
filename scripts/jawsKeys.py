@@ -198,3 +198,96 @@ def missing(sRoot, sApp, sKitDir):
     lsKeys = boundKeys(sRoot, allowlist(sKitDir, sApp))
     sText = open(sPath, "rb").read().decode("utf-8-sig", "replace")
     return [k for k in lsKeys if not re.search(r"^%s=" % re.escape(k), sText, re.M | re.I)]
+
+
+# ---- THE AUDIT (17 November 2026) ----
+# JAWS answered two of DbDo's keys with errors in testSay: "unknown script call to TypeCurrentScriptKey" and "not in
+# a table". Both are the kinds of mistake a JAWS scripter checks by hand: a key map line names a script, so that
+# script must be defined -- spelled the same, in the app's own .jss or .jsh, or among JAWS's own scripts -- and a key
+# the app binds must not be left to a JAWS script that works only somewhere else, such as a table cell command. The
+# audit reads JAWS's own default.jkm on this computer, when there is one, to know JAWS's scripts and keys.
+
+# JAWS's scripts that only work in a table, or that move the mouse: left to them, an app's key never reaches the app.
+lsContextScripts = ["downcell", "movetobottomofcolumn", "movetoendofrow", "movetostartofrow", "movetotopofcolumn",
+                    "nextcell", "priorcell", "saycell", "upcell", "leftmousebutton", "mousedown", "mouseleft",
+                    "mouseright", "mouseup", "rightmousebutton"]
+
+
+def jawsDefaultMap():
+    """The newest JAWS default.jkm on this computer, the user's copy first, or ""."""
+    import glob
+    for sBase in (os.environ.get("APPDATA", ""), os.environ.get("ProgramData", "")):
+        if not sBase:
+            continue
+        lsFound = glob.glob(os.path.join(sBase, "Freedom Scientific", "JAWS", "*", "Settings", "enu", "default.jkm"))
+        if lsFound:
+            return sorted(lsFound, key=lambda s: [int(x) if x.isdigit() else 0 for x in re.split(r"[.\\/]", s)])[-1]
+    return ""
+
+
+def canonicalKey(sKey):
+    """A key in one spelling for comparing: modifiers sorted, JAWSKey and Insert as JAWS, lower case."""
+    lsParts = [s.strip().lower() for s in re.split(r"\+(?!$)", sKey.strip()) if s.strip()]
+    lsParts = ["jaws" if s in ("jawskey", "insert") else "control" if s == "ctrl" else s for s in lsParts]
+    return "+".join(sorted(lsParts[:-1]) + lsParts[-1:])
+
+
+def keyMapLines(sPath):
+    """[(section, key, script, line number)] of a .jkm's key lines."""
+    lsLines, sSection = [], ""
+    for iLine, sRaw in enumerate(open(sPath, "rb").read().decode("utf-8-sig", "replace").splitlines(), 1):
+        sLine = sRaw.strip()
+        if sLine.startswith("["):
+            sSection = sLine.lower()
+            continue
+        if not sLine or sLine.startswith(";") or "=" not in sLine or sSection == "[keyboard layouts]":
+            continue
+        sKey, sScript = [s.strip() for s in sLine.split("=", 1)]
+        lsLines.append((sSection, sKey, sScript, iLine))
+    return lsLines
+
+
+def audit(sRoot, sApp, sDefaultMap=""):
+    """Problems in the app's JAWS key maps, each a plain sentence; [] when there are none."""
+    sFolder = os.path.join(sRoot, "scripts", "jaws")
+    if not os.path.isdir(sFolder):
+        return []
+    sDefaultMap = sDefaultMap or jawsDefaultMap()
+    dDefault, setDefaultScripts = {}, set()
+    if sDefaultMap and os.path.isfile(sDefaultMap):
+        for sSection, sKey, sScript, iLine in keyMapLines(sDefaultMap):
+            setDefaultScripts.add(sScript.lower())
+            if sSection in ("[common keys]", "[desktop keys]", "[laptop keys]") and "&" not in sKey:
+                dDefault.setdefault(canonicalKey(sKey), sScript)
+    dDefined = {}
+    for sName in os.listdir(sFolder):
+        if sName.lower().endswith((".jss", ".jsh")):
+            sText = open(os.path.join(sFolder, sName), "rb").read().decode("utf-8-sig", "replace")
+            for sScript in re.findall(r"^\s*Script\s+(\w+)", sText, re.M | re.I):
+                dDefined[sScript.lower()] = sScript
+    lsProblems = []
+    dMapped = {}
+    for sName in sorted(os.listdir(sFolder), key=str.lower):
+        if not sName.lower().endswith(".jkm"):
+            continue
+        for sSection, sKey, sScript, iLine in keyMapLines(os.path.join(sFolder, sName)):
+            if sName.lower() == (sApp + ".jkm").lower():
+                dMapped[canonicalKey(sKey)] = sScript
+            if not re.match(r"^\w+$", sScript):
+                lsProblems.append("%s line %d: %s=%s names no script; a key map line is the key, then the script" % (sName, iLine, sKey, sScript))
+            elif sScript.lower() in dDefined:
+                if dDefined[sScript.lower()] != sScript:
+                    lsProblems.append("%s line %d: %s is spelled %s where it is defined" % (sName, iLine, sScript, dDefined[sScript.lower()]))
+            elif setDefaultScripts and sScript.lower() not in setDefaultScripts:
+                lsProblems.append("%s line %d: %s=%s names a script defined neither in %s's scripts nor among JAWS's own" % (sName, iLine, sKey, sScript, sApp))
+    # The app's keys that JAWS gives to a table or mouse script, and the app's key map does not hand on.
+    sHotkeys = os.path.join(sRoot, "help", "Hotkeys.md")
+    if dDefault and os.path.isfile(sHotkeys):
+        sText = open(sHotkeys, "rb").read().decode("utf-8-sig", "replace")
+        for sKey, sScript in sorted(dDefault.items()):
+            if sScript.lower() not in lsContextScripts or sKey in dMapped:
+                continue
+            sShown = "+".join(s.capitalize() if len(s) > 1 else s.upper() for s in sKey.split("+"))
+            if re.search(r"(?<![\w+])%s(?![\w+])" % re.escape(sShown), sText, re.I):
+                lsProblems.append("%s binds %s, but JAWS gives it to %s, which works only in a table or moves the mouse; hand it on in %s.jkm" % (sApp, sShown, sScript, sApp))
+    return lsProblems

@@ -16,6 +16,19 @@ A Homer app is used with a keyboard and a screen reader. Every rule below
 serves one aim: the person hears each thing once, in the order they meet it,
 and can reach any command by a key they can guess.
 
+**The suite's promise.** DbDo, EdSharp, FileDir and HomerView make one Homer
+Suite, and its selling point is a comprehensive, consistent and coherent
+keyboard interface: whether a person is creating documents with EdSharp,
+navigating folders with FileDir, managing data with DbDo or viewing content
+with HomerView, every command has a key (comprehensive), the same command has
+the same name, key and description everywhere (consistent), and a key's letter
+and family say what it does (coherent). Judge every new key, name, description
+and spoken answer against all four apps, not one. The kit's checks enforce what
+they can: SuiteCatalog.inix for shared commands, checkMenuLetters, checkKeys and
+KeyOwnership.inix for reserved keys, checkDescriptions for wording, jawsKeys'
+audit for JAWS key maps, and the live tests in each app's scripts\tests for what
+a person actually hears.
+
 ## Dialogs (Lbc)
 
 - **Build every dialog from Lbc**, never a designer. **Add order is focus

@@ -893,7 +893,7 @@ status=current
 
 [DbDo saySortAndFilter]
 name=Say Filter and Order
-keys=Shift+8 or NumPadStar
+keys=Shift+8
 change=renamed from Say Order and Filter, 17 November 2026
 reason=the suite's name: FileDir uses it on the same key, and both now say the filter, then the order
 status=implemented

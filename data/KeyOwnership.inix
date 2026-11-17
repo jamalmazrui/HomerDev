@@ -344,7 +344,9 @@ kind=reader laptop
 what=current table cell
 context=laptop layout, inside tables
 interception=JAWS may take it there
-disposition=kept; tested in the DbDo grid and the FileDir list under the laptop layout; allowlisted or moved if taken
+disposition=passed through to the app, wherever it binds the key: DbDo's testSay heard JAWS answer "not in a table" for its Alt+Shift letters (17 November 2026)
+passThrough=yes
+passThroughExcept=HomerView, whose key map is chained into the browsers', where the table keys are JAWS's own
 
 [Key Alt+Shift+Period]
 owner=JAWS
@@ -352,7 +354,9 @@ kind=reader laptop
 what=next table cell
 context=laptop layout, inside tables
 interception=JAWS may take it inside a table, in the laptop layout
-disposition=kept; tested in the DbDo grid and the FileDir list under the laptop layout; allowlisted or moved if taken
+disposition=passed through to the app, wherever it binds the key: DbDo's testSay heard JAWS answer "not in a table" for its Alt+Shift letters (17 November 2026)
+passThrough=yes
+passThroughExcept=HomerView, whose key map is chained into the browsers', where the table keys are JAWS's own
 
 [Key Alt+Shift+M]
 owner=JAWS
@@ -360,7 +364,9 @@ kind=reader laptop
 what=previous table cell
 context=laptop layout, inside tables
 interception=JAWS may take it inside a table, in the laptop layout
-disposition=kept; tested in the DbDo grid and the FileDir list under the laptop layout; allowlisted or moved if taken
+disposition=passed through to the app, wherever it binds the key: DbDo's testSay heard JAWS answer "not in a table" for its Alt+Shift letters (17 November 2026)
+passThrough=yes
+passThroughExcept=HomerView, whose key map is chained into the browsers', where the table keys are JAWS's own
 
 [Key Alt+Shift+N]
 owner=JAWS
@@ -368,7 +374,9 @@ kind=reader laptop
 what=table cell down
 context=laptop layout, inside tables
 interception=JAWS may take it inside a table, in the laptop layout
-disposition=kept; tested in the DbDo grid and the FileDir list under the laptop layout; allowlisted or moved if taken
+disposition=passed through to the app, wherever it binds the key: DbDo's testSay heard JAWS answer "not in a table" for its Alt+Shift letters (17 November 2026)
+passThrough=yes
+passThroughExcept=HomerView, whose key map is chained into the browsers', where the table keys are JAWS's own
 
 [Key Alt+Shift+Y]
 owner=JAWS
@@ -376,7 +384,9 @@ kind=reader laptop
 what=table cell up
 context=laptop layout, inside tables
 interception=JAWS may take it inside a table, in the laptop layout
-disposition=kept; tested in the DbDo grid and the FileDir list under the laptop layout; allowlisted or moved if taken
+disposition=passed through to the app, wherever it binds the key: DbDo's testSay heard JAWS answer "not in a table" for its Alt+Shift letters (17 November 2026)
+passThrough=yes
+passThroughExcept=HomerView, whose key map is chained into the browsers', where the table keys are JAWS's own
 
 [Key F6]
 owner=Browser

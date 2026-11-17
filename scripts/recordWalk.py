@@ -1058,10 +1058,14 @@ def main():
                 # and its words were written down as what JAWS said. The console says so, once, while it still matters.
                 if iNoisySteps == 1: sayLine("Other sound is playing, so what was heard may not be the screen reader. Pause it for a cleaner run.")
             if dStep["sType"]: send_keys(escapeText(dStep["sType"]), with_spaces=True, pause=0.05)
-            if sKeys: send_keys(sKeys, pause=0.05)
+            # A KEY IS A KEY, NOT A CHARACTER (17 November 2026): send_keys sends a plain character with no modifier as a
+            # Unicode packet, not as its key. FileDir's testSay pressed Apostrophe for Say Item Name, JAWS's pass-through
+            # script retyped the packet as Semicolon, and FileDir marked the item instead. Keys go as virtual keys;
+            # only Type= text goes as characters.
+            if sKeys: send_keys(sKeys, pause=0.05, vk_packet=False)
             if sKeys and dStep.get("iPress", 1) >= 2:
                 time.sleep(0.25)   # well inside the 1.2 seconds Homer counts as one double press
-                send_keys(sKeys, pause=0.05)
+                send_keys(sKeys, pause=0.05, vk_packet=False)
             lChunks, nQuiet, nSpoken, nElapsed, bSpoke = [], 0.0, 0.0, 0.0, False
             while True:
                 aChunk = oRecorder.record(numframes=iChunk)

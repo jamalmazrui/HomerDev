@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.246.0 -- 17 November 2026
+
+- **JAWS key maps are audited by tidy.** jawsKeys.audit reads every line of an app's JAWS key maps and reports these problems: a script that is not defined, a script name spelled differently from where it is defined, a line written backward, and a key the app binds that JAWS gives to a table or mouse script. Those scripts work only in a table or move the mouse, so the app never gets the key. It reads JAWS's own default.jkm on the computer to know JAWS's scripts. Its first run found FileDir's mpv.jkm written backward and two keys spelled TypecurrentScriptKey.
+- **JAWS's laptop table keys are handed on** wherever an app binds them: Alt+Shift with Comma, M, N, Period or Y. DbDo's testSay heard JAWS answer "not in a table" for them. KeyOwnership.inix allowlists them, and tidy writes them into each app's key map.
+- **check warns about command descriptions not worded as the suite's.** checkDescriptions flags a description that begins with "Says" rather than "Say", says "current" without "the", uses a slash for "or", has an exclamation mark, or is too long to hear in one breath.
+- **recordWalk presses keys as keys.** Sent as a character, Apostrophe reached FileDir as Semicolon through JAWS, and testSay marked an item instead of saying its name.
+- **The suite's promise is written down.** Homer Suite is a comprehensive, consistent and coherent keyboard interface, whether you are creating documents with EdSharp, navigating folders with FileDir, managing data with DbDo or viewing content with HomerView. HomerSuite.md, KeyDecisions.md and the homer-ui skill now say so.
+
 ## 1.245.0 -- 17 November 2026
 
 - **A key map never names a script that does not exist.** An app's JAWS key map hands its suite keys on to the script TypeCurrentScriptKey, which FileDir and EdSharp define and DbDo did not. So JAWS spelled out "unknown script" for Alt+Delete, and DbDo never heard the key. DbDo's first live test caught it. jawsKeys, run by tidy, now adds a marked script that hands the key on quietly, whenever the app's .jss lacks one.

@@ -4,6 +4,8 @@ Jamal asked for every pending key decision to be settled by best judgment under 
 
 ## The Rules Weighed
 
+Above every rule stands the suite's promise: a comprehensive, consistent and coherent keyboard interface, whether you are creating documents with EdSharp, navigating folders with FileDir, managing data with DbDo or viewing content with HomerView. Each decision below is judged by all four apps, not one.
+
 The rules that decided these cases, in the order they usually won:
 
 - **A key never fights Windows or a screen reader.** The kit's data\KeyOwnership.inix says which keys belong to Windows, JAWS or NVDA, and a Homer app does not take them.

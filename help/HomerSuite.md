@@ -7,6 +7,8 @@ subtitle: "Four desktop apps, one way of working"
 
 Homer Suite is four free Windows apps built for screen reader users, which work the same way. Each one handles a different kind of work: data, documents, files and the web. Learn one, and you know most of how to use the other three.
 
+Whether you are creating documents with EdSharp, navigating folders with FileDir, managing data with DbDo or viewing content with HomerView, the keyboard works one way. The keys are comprehensive, so every command has a key you can reach. They are consistent, so the same command has the same key everywhere. They are coherent, so a key's letter and family tell you what it does.
+
 ## The apps
 
 - **DbDo** manages data. It opens SQLite, Access, Excel, dBASE and delimited text files, and shows each table as a list you move through cell by cell. Its template databases cover radio stations, job leads, books, music and more.
