@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.245.0 -- 17 November 2026
+
+- **A key map never names a script that does not exist.** An app's JAWS key map hands its suite keys on to the script TypeCurrentScriptKey, which FileDir and EdSharp define and DbDo did not. So JAWS spelled out "unknown script" for Alt+Delete, and DbDo never heard the key. DbDo's first live test caught it. jawsKeys, run by tidy, now adds a marked script that hands the key on quietly, whenever the app's .jss lacks one.
+- **runMacro reads the running programs from Windows directly.** With five cycles running at once, tasklist took longer than the 30 seconds allowed, so FileDir's tidy found no screen reader while JAWS was running.
+- **runMacro names JAWS's folders on the line that reads them,** so the check no longer takes the JAWS settings in the Roaming tree for the app's own files. That check had stopped DbDo's and FileDir's pushes.
+- **runMacro's one constant is named as Camel Type names constants now,** without the old c_ prefix, so tidy no longer renames it in each app's copy.
+- **recordWalk says when other sound is playing.** A talk playing elsewhere was written down as what JAWS said. The console now says so once, and the report marks each step it affected. The app's own log is the surer witness there.
+
 ## 1.244.0 -- 17 November 2026
 
 - **Macro scripts:** plain lines in an .inix file with FileTask = macroScript, written in the words of an app's menus and the screen reader's commands, such as "Say Filter and Order", "Say Line" and "Expect speech filter". scripts\runMacro plays one in the real app. It presses each command's key, or runs it from the Alternate Menu when it has none, and takes a reader command's key from JAWS's own key map. It waits for the reader to finish, and checks what was heard, the window in front and the focus. No line says how long to wait. help\Macro.md explains every kind of line.

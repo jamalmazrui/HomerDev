@@ -969,7 +969,7 @@ def main():
         return 1
 
     from pywinauto.keyboard import send_keys
-    iMatched, iChecked = 0, 0
+    iMatched, iChecked, iNoisySteps = 0, 0, 0
     lsReport.extend(["# recordWalk: " + oArgs.app + ", " + os.path.basename(oArgs.walk), "",
                      "Recorded " + datetime.datetime.now().strftime("%d %B %Y at %H:%M") + ". Each step: the key pressed, what the walk expected, "
                      "what was heard, what UI Automation says has focus, and what " + oArgs.app + " itself said.", ""])
@@ -1050,7 +1050,13 @@ def main():
                 nLevel = levelOf(oRecorder.record(numframes=iChunk))
                 nQuiet = nQuiet + nChunkSeconds if nLevel < nSpeechLevel else 0.0
                 nWaited += nChunkSeconds
-            if nWaited >= nMaxSettle: logLine("  still sound after %d s of waiting for quiet; pressed anyway" % nMaxSettle)
+            bNoisy = nWaited >= nMaxSettle
+            if bNoisy:
+                logLine("  still sound after %d s of waiting for quiet; pressed anyway" % nMaxSettle)
+                iNoisySteps += 1
+                # OTHER SOUND IS SAID ONCE (17 November 2026): DbDo's first live test recorded a talk playing elsewhere,
+                # and its words were written down as what JAWS said. The console says so, once, while it still matters.
+                if iNoisySteps == 1: sayLine("Other sound is playing, so what was heard may not be the screen reader. Pause it for a cleaner run.")
             if dStep["sType"]: send_keys(escapeText(dStep["sType"]), with_spaces=True, pause=0.05)
             if sKeys: send_keys(sKeys, pause=0.05)
             if sKeys and dStep.get("iPress", 1) >= 2:
@@ -1160,7 +1166,7 @@ def main():
             iChecked += 1; iMatched += 1 if bFocused else 0
             logLine("  focus wanted %r: %s" % (sWant, "yes" if bFocused else "NO"))
             lsReport.append("- **Focus expected:** " + sWant + " -- " + ("there" if bFocused else "NOT THERE"))
-        lsReport.append("- **Heard:** " + (sHeard or "(nothing written down)"))
+        lsReport.append("- **Heard:** " + (sHeard or "(nothing written down)") + (" -- OTHER SOUND was playing before the key, so this may not be the reader" if bNoisy else ""))
         lsReport.append("- **Focus:** " + sFocus)
         lsReport.append("- **" + oArgs.app + " said:** " + (sApp or "(nothing in its speech log)"))
         if sAxeCli: lsReport.append("- **Axe.Windows:** " + (sAxe or "(no scan)"))
@@ -1169,7 +1175,7 @@ def main():
                         " -- STILL SPEAKING at %d s, so the end is missing" % nMaxListen if bCutOff else ""))
         lsReport.append("")
         logLine("step " + str(iIndex) + " recorded")
-    lsReport.insert(3, "**" + str(iMatched) + " of " + str(iChecked) + " expected lines heard.**")
+    lsReport.insert(3, "**" + str(iMatched) + " of " + str(iChecked) + " expected lines heard.**" + (" Other sound was playing at %d of the steps, so what was heard there may not be the reader; the app's own log is the surer witness." % iNoisySteps if iNoisySteps else ""))
     lsReport.insert(4, "")
     if sAxeCli: lsReport.insert(5, "**Axe.Windows: " + str(iAxeErrors) + (" error" if iAxeErrors == 1 else " errors") + " across the steps; each .a11ytest file opens in Accessibility Insights for Windows.**\n")
     if lsMenuAudit: lsReport[5:5] = lsMenuAudit

@@ -185,23 +185,54 @@ def appCommands(sKeyFile):
 
 # ---- the reader's commands ----
 
+def processNames():
+    """The lower-case program names of every running process, read from Windows directly.
+
+    NOT TASKLIST (17 November 2026): with five build_release cycles running at once, tasklist took more than the 30
+    seconds allowed, so FileDir's tidy read "no screen reader" with JAWS running. A process snapshot takes
+    milliseconds."""
+    import ctypes
+    from ctypes import wintypes
+    class ProcessEntry(ctypes.Structure):
+        _fields_ = [("dwSize", wintypes.DWORD), ("cntUsage", wintypes.DWORD), ("th32ProcessID", wintypes.DWORD),
+                    ("th32DefaultHeapID", ctypes.c_size_t), ("th32ModuleID", wintypes.DWORD), ("cntThreads", wintypes.DWORD),
+                    ("th32ParentProcessID", wintypes.DWORD), ("pcPriClassBase", ctypes.c_long), ("dwFlags", wintypes.DWORD),
+                    ("szExeFile", ctypes.c_wchar * 260)]
+    oKernel = ctypes.windll.kernel32
+    oKernel.CreateToolhelp32Snapshot.restype = wintypes.HANDLE
+    hSnap = oKernel.CreateToolhelp32Snapshot(2, 0)  # TH32CS_SNAPPROCESS
+    setNames = set()
+    if not hSnap or hSnap == wintypes.HANDLE(-1).value: return setNames
+    try:
+        oEntry = ProcessEntry()
+        oEntry.dwSize = ctypes.sizeof(ProcessEntry)
+        bMore = oKernel.Process32FirstW(hSnap, ctypes.byref(oEntry))
+        while bMore:
+            setNames.add(oEntry.szExeFile.lower())
+            bMore = oKernel.Process32NextW(hSnap, ctypes.byref(oEntry))
+    finally:
+        oKernel.CloseHandle(hSnap)
+    return setNames
+
+
 def readerRunning():
     """"jaws", "nvda" or "" -- from the running programs."""
     try:
-        sList = subprocess.run(["tasklist", "/fo", "csv", "/nh"], capture_output=True, text=True, timeout=30).stdout.lower()
-    except Exception:
+        setNames = processNames()
+    except Exception as oError:
+        logLine("the running programs could not be read: %s" % oError)
         return ""
-    if '"jfw.exe"' in sList: return "jaws"
-    if '"nvda.exe"' in sList: return "nvda"
+    if "jfw.exe" in setNames: return "jaws"
+    if "nvda.exe" in setNames: return "nvda"
     return ""
 
 
 def jawsKeyMaps():
     """JAWS's default.jkm files, the newest version's, the user's copy first so a reassigned key is followed."""
     lFound = []
-    for sBase in (os.environ.get("APPDATA", ""), os.environ.get("ProgramData", "")):
-        if not sBase: continue
-        lVersions = sorted(glob.glob(os.path.join(sBase, "Freedom Scientific", "JAWS", "*", "Settings", "enu", "default.jkm")),
+    # JAWS's own folders: the user's settings live in the Roaming tree, which is theirs, not a Homer app's.
+    for sJawsFolder in (os.path.join(os.environ.get("APPDATA", "") or "?", "Freedom Scientific", "JAWS"), os.path.join(os.environ.get("ProgramData", "") or "?", "Freedom Scientific", "JAWS")):
+        lVersions = sorted(glob.glob(os.path.join(sJawsFolder, "*", "Settings", "enu", "default.jkm")),
                            key=lambda s: [int(x) if x.isdigit() else 0 for x in re.split(r"[.\\/]", s)], reverse=True)
         if lVersions: lFound.append(lVersions[0])
     return lFound
@@ -321,11 +352,11 @@ def writeWalk(sPath, lWalk, sMacro, iListen):
 # ---- the app's window ----
 
 def appIsOpen(sApp):
-    """True when a window of <App>.exe is open, whichever copy."""
+    """True when <App>.exe is running, whichever copy."""
     try:
-        sList = subprocess.run(["tasklist", "/fo", "csv", "/nh", "/fi", "imagename eq " + sApp + ".exe"], capture_output=True, text=True, timeout=30).stdout
-        return ('"' + sApp + '.exe"').lower() in sList.lower()
-    except Exception:
+        return (sApp + ".exe").lower() in processNames()
+    except Exception as oError:
+        logLine("the running programs could not be read: %s" % oError)
         return False
 
 
@@ -441,7 +472,7 @@ def liveTests(sProject, fnLog=None, fnSay=None):
             else: lsDue.append((sTest, sKey, sPrint))
         if not lsDue: return lsDone
         if appIsOpen(sApp):
-            fnSay("%s is open, so its %d live test%s wait for a tidy when it is closed." % (sApp, len(lsDue), "" if len(lsDue) == 1 else "s"))
+            fnSay("%s is open, so %s for a tidy when it is closed." % (sApp, "its live test waits" if len(lsDue) == 1 else "its %d live tests wait" % len(lsDue)))
             return lsDone
         if not readerRunning():
             fnSay("No screen reader is running, so %s's live tests wait for a tidy with JAWS or NVDA running." % sApp)

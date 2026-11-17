@@ -21,6 +21,13 @@ build and before every push, so the key map is right without anybody editing it:
     RightBracket: a line beginning "[" is read by JAWS as a new section.
   * The file keeps its own encoding and line endings; it is written only when
     something changed.
+  * THE SCRIPT THE KEY MAP NAMES MUST EXIST (17 November 2026). A .jkm line
+    binds a key to a SCRIPT, and TypeCurrentScriptKey is a JAWS function, not a
+    script. FileDir and EdSharp define a script of that name; DbDo did not, so
+    JAWS answered Alt+Delete by spelling "unknown script TypeCurrentScriptKey"
+    and DbDo never got the key -- found by DbDo's first live test. When the
+    app's <App>.jss has no such script, a marked one that hands the key on
+    quietly is added.
 
 It also answers missing(sRoot, sApp, sKitDir) for the shared check. Camel Type.
 """
@@ -30,6 +37,8 @@ import re
 
 sBlockStart = "; Homer suite pass-through -- written by the kit's tidy from data\\KeyOwnership.inix; do not edit"
 sBlockEnd = "; end of Homer suite pass-through"
+sScriptStart = "; Homer suite pass-through script -- written by the kit's tidy, because the key map names it; do not edit"
+sScriptEnd = "; end of Homer suite pass-through script"
 
 
 def readInixSections(sPath):
@@ -122,24 +131,62 @@ def wantedText(sText, lsKeys):
     return sEol.join(lsLines)
 
 
+def scriptPath(sRoot, sApp):
+    """The app's own <App>.jss, found without regard to case, or ""."""
+    sFolder = os.path.join(sRoot, "scripts", "jaws")
+    if not os.path.isdir(sFolder):
+        return ""
+    for sName in os.listdir(sFolder):
+        if sName.lower() == (sApp + ".jss").lower():
+            return os.path.join(sFolder, sName)
+    return ""
+
+
+def ensureScript(sRoot, sApp):
+    """Adds Script TypeCurrentScriptKey to the app's .jss when its key map names it and no .jss here defines it.
+    Returns what was done, or ""."""
+    sMap, sJss = keyMapPath(sRoot, sApp), scriptPath(sRoot, sApp)
+    if not sMap or not sJss:
+        return ""
+    if not re.search(r"=\s*TypeCurrentScriptKey\s*$", open(sMap, "rb").read().decode("utf-8-sig", "replace"), re.M | re.I):
+        return ""
+    sFolder = os.path.dirname(sJss)
+    for sName in os.listdir(sFolder):
+        if sName.lower().endswith((".jss", ".jsh")):
+            sText = open(os.path.join(sFolder, sName), "rb").read().decode("utf-8-sig", "replace")
+            if re.search(r"^\s*Script\s+TypeCurrentScriptKey\s*\(", sText, re.M | re.I):
+                return ""
+    binData = open(sJss, "rb").read()
+    bBom = binData.startswith(b"\xef\xbb\xbf")
+    sText = binData.decode("utf-8-sig", "replace")
+    sEol = "\r\n" if "\r\n" in sText else "\n"
+    lsBlock = ["", sScriptStart, "; Way: pass quietly. Where: everywhere in " + sApp + ". A key the suite hands on reaches the app.",
+               "Script TypeCurrentScriptKey ()", "TypeCurrentScriptKey ()", "EndScript", sScriptEnd, ""]
+    sNew = sText.rstrip("\r\n") + sEol + sEol.join(lsBlock)
+    open(sJss, "wb").write((b"\xef\xbb\xbf" if bBom else b"") + sNew.encode("utf-8"))
+    return "defined the script TypeCurrentScriptKey in " + os.path.basename(sJss)
+
+
 def ensure(sRoot, sApp, sKitDir):
     """Put the app's key map right. Returns a list of what was done, empty when nothing was needed."""
     sPath = keyMapPath(sRoot, sApp)
     if not sPath:
         return []
     lsKeys = boundKeys(sRoot, allowlist(sKitDir, sApp))
+    sScriptDone = ensureScript(sRoot, sApp)
     binData = open(sPath, "rb").read()
     bBom = binData.startswith(b"\xef\xbb\xbf")
     sText = binData.decode("utf-8-sig", "replace")
     sWanted = wantedText(sText, lsKeys)
     if sWanted == sText:
-        return []
+        return [sScriptDone] if sScriptDone else []
     open(sPath, "wb").write((b"\xef\xbb\xbf" if bBom else b"") + sWanted.encode("utf-8"))
     lsDone = []
     if re.search(r"^(?:[A-Za-z]+\+)*[\[\]]=", sText, re.M):
         lsDone.append("named its bracket keys")
     if lsKeys:
         lsDone.append("passes " + ", ".join(lsKeys) + " to " + sApp)
+    if sScriptDone: lsDone.append(sScriptDone)
     return lsDone or ["updated"]
 
 
