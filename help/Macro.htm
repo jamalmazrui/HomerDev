@@ -192,18 +192,141 @@
 <p class="author">Jamal Mazrui</p>
 </header>
 <main>
-<h1 id="homer-macro-recorder">Homer macro recorder</h1>
+<h1 id="homer-macros">Homer macros</h1>
+<p>Homer has two kinds of macro. Both are <code>.inix</code> files you
+can read and change in EdSharp or any text editor, and neither needs a
+macro editor.</p>
+<ul>
+<li><strong>A macro script</strong> is written by a person, a line to a
+step, in the words of the app’s menus and the screen reader’s commands.
+It is played from outside the app by <code>scripts\runMacro</code>,
+which presses the keys, listens to the screen reader and reads what
+Windows shows. Its header says <code>FileTask = macroScript</code>.</li>
+<li><strong>A recorded macro</strong> is made inside an app by its macro
+recorder, from the commands you run. The app plays it back itself. Its
+header says <code>FileTask = macro</code>.</li>
+</ul>
+<h2 id="macro-scripts">Macro scripts</h2>
+<p>A macro script reads like a list of things to do:</p>
+<pre><code>FileTask = macroScript
+App = FileDir
+Name = Hear the filter and the position
+
+[steps]
+; a line starting with a semicolon is a note
+Say Filter and Order
+Expect speech filter
+Say Position twice
+Press Escape
+Say Line</code></pre>
+<p>The header comes first: FileTask, App, and optionally Name, Note and
+Listen (the most seconds to listen after a key that gets no answer; 6
+when left out). Then <code>[steps]</code> holds one step to a line. A
+step line may hold an equals sign, so <code>Type a=b</code> types
+a=b.</p>
+<h3 id="what-a-line-can-say">What a line can say</h3>
+<p>Each line is matched in this order:</p>
+<ul>
+<li><strong>A command of the app,</strong> by its name on the menus,
+such as <code>Say Filter and Order</code>. It is run by its key. A
+command with no key is run from the Alternate Menu. Add
+<code>twice</code> to press its key twice, for a command’s second
+meaning.</li>
+<li><strong>A screen reader command,</strong> by its script name, with
+or without spaces, such as <code>Say Line</code> or
+<code>SayWindowTitle</code>. Its key is read from JAWS’s own key map, so
+a key you reassigned is followed. Under NVDA, the four everyone knows
+work: Say All, Say Line, Say Window Prompt and Text, and Say Window
+Title.</li>
+<li><strong>Expect focus</strong> text: the control with focus after the
+step before holds this text.</li>
+<li><strong>Expect speech</strong> text: the reader was heard saying
+most of these words after the step before.</li>
+<li><strong>Expect window</strong> text: the title of the window in
+front after the step before holds this text.</li>
+<li><strong>JAWS</strong> script: a JAWS script, when the app has a
+command of the same name.</li>
+<li><strong>Press</strong> key: a key by its Homer name, such as
+<code>Control+Shift+F</code>, <code>Escape</code> or
+<code>Shift+Slash</code>. Add <code>twice</code> to press it twice.</li>
+<li><strong>Run</strong> command: an app command, when a reader command
+has the same name.</li>
+<li><strong>Start</strong> app: says which app the macro plays in. Every
+macro brings its app forward first, so this line is optional.</li>
+<li><strong>Type</strong> text: types the text. Quotation marks around
+it are dropped.</li>
+<li><strong>Wait</strong> seconds: waits before the next step.</li>
+<li><strong>Wait for window</strong> text: the same as Expect
+window.</li>
+</ul>
+<p>A line runMacro does not understand stops the whole macro before any
+key is pressed, and the console names the line.</p>
+<h3 id="what-you-never-have-to-write">What you never have to write</h3>
+<p>No line says how long anything takes. Before each key, runMacro waits
+for the screen reader to fall quiet. After it, runMacro listens until
+the reader has finished, up to fifteen seconds. A window is given five
+more seconds to appear. The app is brought to the front first, and it is
+started if it is not running.</p>
+<h3 id="playing-one">Playing one</h3>
+<ul>
+<li><strong>runMacro</strong> file: plays it. Keep your hands off the
+keyboard. To stop, switch to another window.</li>
+<li><strong>runMacro –check</strong> file: checks every line is
+understood, and presses nothing.</li>
+<li><strong>runMacro –no-hear</strong> file: plays it without writing
+the speech down, so Expect speech is not checked.</li>
+<li><strong>runMacro –keep</strong> file: leaves the app open at the
+end. An app that was open before the macro always stays open.</li>
+</ul>
+<p>The report is
+<code>logs\&lt;App&gt;-recordWalk-&lt;time&gt;.md</code>. For each step,
+it gives the key, what was heard, what had focus, what the app said in
+its own log, and whether each Expect line held. runMacro’s own log is
+<code>logs\&lt;App&gt;-runMacro-&lt;time&gt;.log</code>. The exit code
+is 0 when every Expect line held.</p>
+<h3 id="how-it-works">How it works</h3>
+<p>runMacro turns the macro into a walk, the format tutorials use, and
+the kit’s recordWalk plays it. So a macro, a tutorial and testSay are
+played by one engine, which records the computer’s sound and writes it
+down with a local speech recognizer.</p>
+<h3 id="live-tests-in-tidy">Live tests in tidy</h3>
+<p>An app’s <code>scripts\tests</code> folder holds a few macro scripts
+that are its important live tests. These are not every possible test.
+Tidy plays each one after a build, so a change that breaks what a person
+hears is found by the cycle. A test is played only when all of these are
+true:</p>
+<ul>
+<li><strong>Its fingerprint changed</strong> since its last pass. The
+fingerprint covers the macro, the program, the key file, runMacro and
+recordWalk.</li>
+<li><strong>The app is closed,</strong> so the build just made is the
+one tested, and nothing you have open is touched.</li>
+<li><strong>A screen reader is running.</strong></li>
+</ul>
+<p>Setting <code>HomerLive=0</code> leaves the live tests out. A failed
+live test is reported but never makes tidy fail. Only a pass is
+recorded, so a failed test runs again at the next tidy.</p>
+<h3 id="testsay">testSay</h3>
+<p><code>scripts\testSay</code>, in every app that copies it from the
+kit, writes a macro script of every Say command in the app’s key file
+and plays it. It runs each command once, then twice, then presses
+Escape. Then it turns on the Key Describer and presses each key again,
+so you hear each one described. It gathers the reports, the recordings
+and the app’s own logs in one folder under logs, ready to upload.
+<code>testSay --check</code> writes the macro and checks it without
+pressing anything.</p>
+<h2 id="recorded-macros">Recorded macros</h2>
 <p>The macro recorder lets a person record a sequence of an app’s own
 commands, save it as an <code>.inix</code> file, and play it back later.
 It lives in <code>exec\CSharp\Macro.cs</code>, which an app compiles
 beside <code>Inix.cs</code>. DbDo is the first app to use it, with its
 record-navigation commands; other apps can add it the same way.</p>
-<h2 id="what-a-macro-is">What a macro is</h2>
+<h3 id="what-a-macro-is">What a macro is</h3>
 <p>A macro is a list of the app’s commands, as the person ran them. It
 is not a list of keystrokes or mouse clicks. A command replays the same
 way whatever the window layout, the screen reader or the keyboard, so a
 macro does not break when a dialog moves or a key is reassigned.</p>
-<p>A macro file is an <code>.inix</code> file whose header says
+<p>A recorded macro is an <code>.inix</code> file whose header says
 <code>FileTask = macro</code>. Each command is one <code>[step]</code>
 section:</p>
 <pre><code>FileTask = macro
@@ -235,7 +358,7 @@ view.</li>
 person did something the recorder cannot repeat. Such a macro does not
 play.</li>
 </ul>
-<h2 id="how-an-app-takes-part">How an app takes part</h2>
+<h3 id="how-an-app-takes-part">How an app takes part</h3>
 <p>An app gives the engine an object that implements
 <code>IMacroHost</code>:</p>
 <ul>
@@ -260,7 +383,7 @@ seen a command succeed. A command handler that returns has not proved it
 did anything: Go To can be cancelled, and Next Record can sit on the
 last row. Anything else the person does while recording is reported with
 <code>gap</code>, which marks the macro incomplete.</p>
-<h2 id="expected-against-actual">Expected against actual</h2>
+<h3 id="expected-against-actual">Expected against actual</h3>
 <p>During playback, every step is checked. Before the step runs, the
 engine asks the app what it should leave behind; after it runs, the
 engine asks what it did leave. Both go to the log, side by side, with
@@ -270,15 +393,15 @@ the state before:</p>
 says where and why. <code>auditLines()</code> returns the last
 playback’s steps as <code>commandId|argument|expected|actual</code>, for
 a test to compare with what it meant to happen.</p>
-<h2 id="threads-and-timing">Threads and timing</h2>
+<h3 id="threads-and-timing">Threads and timing</h3>
 <p>A session belongs to the thread of its window. Between steps,
 playback waits 25 milliseconds, only so that Escape and repainting get
 their turn; it does not treat that wait, or Application.Idle, as proof
 that a command finished. A command is finished when execute returns.</p>
-<h2 id="limits">Limits</h2>
+<h3 id="limits">Limits</h3>
 <p>A macro file is at most 2 MiB and 10,000 steps. A value is at most
 32,768 characters.</p>
-<h2 id="how-the-kit-proves-it">How the kit proves it</h2>
+<h3 id="how-the-kit-proves-it">How the kit proves it</h3>
 <p>The kit’s build runs <code>scripts\testMacro</code>, which compiles
 <code>Macro.cs</code> with the .NET Framework’s own C# 5 compiler and
 runs a test against a pretend 12-row view. The test records six steps,

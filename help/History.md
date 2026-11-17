@@ -7,6 +7,17 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.244.0 -- 17 November 2026
+
+- **Macro scripts:** plain lines in an .inix file with FileTask = macroScript, written in the words of an app's menus and the screen reader's commands, such as "Say Filter and Order", "Say Line" and "Expect speech filter". scripts\runMacro plays one in the real app. It presses each command's key, or runs it from the Alternate Menu when it has none, and takes a reader command's key from JAWS's own key map. It waits for the reader to finish, and checks what was heard, the window in front and the focus. No line says how long to wait. help\Macro.md explains every kind of line.
+- **Live tests in tidy.** An app's scripts\tests holds a few macro scripts that tidy plays after a build, when the app is closed and a screen reader is running. A test is played again only when its fingerprint changes. A failure is reported and never fails tidy. HomerLive=0 leaves them out.
+- **testSay for every app,** from DbDo's: every Say command in the app's key file, written as a macro script and played by runMacro.
+- **recordWalk presses Homer's key names,** such as UpArrow, PageDown, Slash and NumPadStar, which it had typed as text. A walk step may now say Window=, Focus= and Pause=, and --exe names the build to start.
+- **testRunMacro** proves on every kit build where they changed that runMacro turns each kind of line into the right keys and refuses what it does not understand, and that recordWalk presses Homer's key names as keys: 29 checks, with no key pressed.
+- **DbDo takes the suite's names** for three commands: Forward Find with Regex and Reverse Find with Regex (Control+F3 and Control+Shift+F3, as in EdSharp and HomerView) and Say Filter and Order (Shift+8, as in FileDir). The manifest records each rename.
+- **Hotkey Summary has no key in DbDo, EdSharp and FileDir,** as ruled on 9 November, and the manifest now says so, where it still gave Alt+Shift+H. HomerView's User Guide has no key either, and Key Describer is Control+F1, as ruled on 10 November.
+- **Homer_Keys.md,** a list of every hotkey of the four apps by key, with each app's commands by name, came from this round. It found the spelling, naming and documentation differences fixed in the apps' entries for this date.
+
 ## 1.243.0 -- 17 November 2026
 
 - **The keymap work is finished: no change in the suite manifest is still proposed.** Of the 21 that were, 13 HomerView renames and key changes had been built without the manifest saying so, and now it does. The other 8 are built: HomerView's Find and Yield say "with Regex", as EdSharp's do; HomerView has Choose Active Browsers in its command table, and two handoffs, Open Saved Page in EdSharp and Show Page Folder in FileDir, under NVDA and JAWS; EdSharp has Say Position (Alt+Delete) and Show in FileDir (Control+Shift+Backslash). The manifest's HomerView Hotkeys and Key Describer Toggle rows now give the keys Jamal ruled.

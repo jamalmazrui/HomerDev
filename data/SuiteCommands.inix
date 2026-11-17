@@ -333,9 +333,11 @@ keys=Control+F
 status=current
 
 [DbDo findRegex]
-name=Find Regex
+name=Forward Find with Regex
 keys=Control+F3
-status=current
+change=renamed from Find Regex, 17 November 2026
+reason=the suite's name: EdSharp and HomerView use it on the same key
+status=implemented
 
 [DbDo firstRecord]
 name=First Record
@@ -373,8 +375,10 @@ status=current
 
 [DbDo hotkeySummary]
 name=Hotkey Summary
-keys=Alt+Shift+H
-status=current
+keys=
+change=keys changed, was Alt+Shift+H; the manifest caught up 17 November 2026
+reason=Alt+Shift+H pressed a dialog's Help button (Alt+H); Where Am I took Control+Slash, and Hotkey Summary stays on the Help menu, as the suite catalog gives it (Jamal's rulings, 9 November 2026)
+status=ruled
 
 [DbDo hotkeys]
 name=Hotkeys
@@ -683,9 +687,11 @@ keys=Alt+Shift+O
 status=current
 
 [DbDo reverseRegexFind]
-name=Reverse Regex Find
+name=Reverse Find with Regex
 keys=Control+Shift+F3
-status=current
+change=renamed from Reverse Find Regex, 17 November 2026
+reason=the suite's name: EdSharp and HomerView use it on the same key
+status=implemented
 
 [DbDo runReport]
 name=Run Report
@@ -886,9 +892,11 @@ keys=Shift+S
 status=current
 
 [DbDo saySortAndFilter]
-name=Say Sort and Filter
+name=Say Filter and Order
 keys=Shift+8 or NumPadStar
-status=current
+change=renamed from Say Order and Filter, 17 November 2026
+reason=the suite's name: FileDir uses it on the same key, and both now say the filter, then the order
+status=implemented
 
 [DbDo sayStatus]
 name=Say Status
@@ -1456,8 +1464,10 @@ status=current
 
 [EdSharp hotkeySummary]
 name=Hotkey Summary
-keys=Alt+Shift+H
-status=current
+keys=
+change=keys changed, was Alt+Shift+H; the manifest caught up 17 November 2026
+reason=Alt+Shift+H pressed a dialog's Help button (Alt+H); Where Am I took Control+Slash, and Hotkey Summary stays on the Help menu, as the suite catalog gives it (Jamal's rulings, 9 November 2026)
+status=ruled
 
 [EdSharp hotkeys]
 name=Hotkeys
@@ -2821,8 +2831,10 @@ status=current
 
 [FileDir hotkeySummary]
 name=Hotkey Summary
-keys=Alt+Shift+H
-status=current
+keys=
+change=keys changed, was Alt+Shift+H; the manifest caught up 17 November 2026
+reason=Alt+Shift+H pressed a dialog's Help button (Alt+H); Where Am I took Control+Slash, and Hotkey Summary stays on the Help menu, as the suite catalog gives it (Jamal's rulings, 9 November 2026)
+status=ruled
 
 [FileDir hotkeys]
 name=Hotkeys

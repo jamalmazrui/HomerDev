@@ -38,7 +38,7 @@ lsExpected = [
     "exec/CSharp/Log.cs", "exec/CSharp/Mdi.cs", "exec/CSharp/Media.cs", "exec/CSharp/MediaPlayer.cs", "exec/CSharp/Mpv.cs", "exec/CSharp/Paths.cs",
     "exec/CSharp/Say.cs", "exec/CSharp/Util.cs", "exec/CSharp/Web.cs",
     "exec/CSharp/ConversionPdf.cs", "exec/CSharp/PdfReader.cs",
-    "exec/CSharp/inixVert.cs", "exec/CSharp/Macro.cs", "scripts/testMacro.cmd", "scripts/testMacro.cs", "scripts/testMacro.py", "scripts/auditInstallers.cmd", "scripts/auditInstallers.py", "scripts/suiteCatalog.py", "scripts/testSuiteGate.py",
+    "exec/CSharp/inixVert.cs", "exec/CSharp/Macro.cs", "scripts/testMacro.cmd", "scripts/testMacro.cs", "scripts/testMacro.py", "scripts/runMacro.cmd", "scripts/runMacro.py", "scripts/testRunMacro.py", "scripts/testSay.cmd", "scripts/testSay.py", "scripts/auditInstallers.cmd", "scripts/auditInstallers.py", "scripts/suiteCatalog.py", "scripts/testSuiteGate.py",
     "exec/Python/inix.py", "exec/Python/kdpEpub.py", "scripts/buildBooks.cmd", "scripts/buildBooks.py", "scripts/kdpBooks.cmd", "scripts/kdpBooks.py", "scripts/kdpSubmit.cmd", "scripts/kdpSubmit.py", "scripts/kdpUpdate.cmd", "scripts/kdpUpdate.py", "scripts/testKdpUpdate.py", "templates/books/Book_KDP.inix", "templates/books/books.inix", "templates/books/buildBooks.inix", "templates/books/epub.css", "templates/books/tocEpub.lua", ".claude/skills/homer-books/SKILL.md", "exec/Python/lbc.py", "exec/Python/lbcnet.py", "exec/Python/log.py", "exec/Python/media.py",
     "exec/Python/mdi.py", "exec/Python/elevate.py", "exec/Python/paths.py", "exec/Python/say.py", "exec/Python/util.py", "exec/Python/web.py",
     "templates/build_APP_.cmd", "templates/build_APP_Py.cmd",
@@ -2323,6 +2323,26 @@ def main():
             sayLine("The macro engine could not be tested: %s" % oError)
             iSamplesFailed += 1
             lsFailedParts.append("the macro engine test, which could not run")
+        # THE MACRO SCRIPT PLAYER IS PROVED HERE (1.244.0): scripts\\testRunMacro checks, without pressing a key, that
+        # runMacro turns each kind of plain line into the right keys, refuses what it does not understand, and that
+        # recordWalk presses Homer's key names as keys. Tested again when runMacro, recordWalk or the test changed.
+        sPrint = oCache.fingerprint(["scripts/runMacro.py", "scripts/recordWalk.py", "scripts/testRunMacro.py"], [sys.version.split()[0]])
+        try:
+            if oCache.isCurrent("macro script test", sPrint, []):
+                unchangedLine("The macro script player", "is unchanged since it last passed; not tested again.")
+            else:
+                oDone = subprocess.run([sys.executable, os.path.join(sScriptDir, "scripts", "testRunMacro.py")], capture_output=True, text=True, timeout=300)
+                for sLine in (oDone.stdout or "").strip().splitlines(): sayLine(sLine)
+                for sLine in (oDone.stderr or "").strip().splitlines(): logLine("testRunMacro stderr: " + sLine)
+                logLine("testRunMacro exit %d" % oDone.returncode)
+                if oDone.returncode == 0: oCache.record("macro script test", sPrint, [])
+                else:
+                    iSamplesFailed += 1
+                    lsFailedParts.append("the macro script player test")
+        except Exception as oError:
+            sayLine("The macro script player could not be tested: %s" % oError)
+            iSamplesFailed += 1
+            lsFailedParts.append("the macro script player test, which could not run")
         # THE INSTALLER'S COMPONENTS ARE AUDITED HERE (1.232.0). Setup offered "Update Pandoc 3.13 to 3.14" three times
         # and ran installPandoc, which stopped because an old pandoc answered on the PATH; nothing said so. Every
         # component Setup adds must have a script that can update an installed copy, does not end in success merely

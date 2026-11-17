@@ -485,6 +485,11 @@ apps=DbDo, FileDir
 key=Shift+F
 description=Say the filter in force
 
+[command Say Filter and Order]
+apps=DbDo, FileDir
+key=Shift+8
+description=Say the filter and the order in force
+
 [command Say Marked]
 apps=DbDo, FileDir
 key=Shift+M
@@ -773,7 +778,7 @@ targets=the current cell's value
 what=characters, words and lines are in all or the selected text
 
 [words Search Next|DbDo]
-what=Keywords, Jump or Find Regex
+what=Keywords, Jump or Find with Regex
 
 [words Search Next|EdSharp]
 what=search
@@ -785,7 +790,7 @@ what=Keywords or Jump
 what=search
 
 [words Search Previous|DbDo]
-what=Keywords, Jump or Find Regex
+what=Keywords, Jump or Find with Regex
 
 [words Search Previous|EdSharp]
 what=search

@@ -65,6 +65,7 @@ sProject = os.getcwd() if (os.path.isdir(os.path.join(os.getcwd(), "scripts"))
     else os.path.dirname(sScriptDir)
 
 sLogPath = ""
+sStartExe = ""
 lsReport = []
 
 
@@ -394,7 +395,7 @@ def readWalk(sPath, bAll=False):
             sLine = sRaw.strip()
             if sLine.startswith(";") or not sLine: continue
             if sLine.lower() == "[step]":
-                dStep = {"sKey": "", "sType": "", "iWait": 0, "iPress": 1, "sSay": "", "lHear": []}
+                dStep = {"sKey": "", "sType": "", "iWait": 0, "iPress": 1, "sSay": "", "lHear": [], "lWindow": [], "lFocus": [], "nPause": 0.0}
                 lSteps.append(dStep)
                 continue
             if sLine.startswith("["):
@@ -407,6 +408,14 @@ def readWalk(sPath, bAll=False):
             elif sName == "type": dStep["sType"] = sValue
             elif sName == "say": dStep["sSay"] = sValue
             elif sName == "hear" and sValue: dStep["lHear"].append(sValue)
+            # WHAT WINDOWS SHOWS, BESIDE WHAT WAS HEARD (17 November 2026, for runMacro): Window= is text the title of
+            # the window in front must hold after the step, Focus= text the focused control's name, role or value
+            # must hold, and Pause= seconds to wait before the key, for a macro's Wait line.
+            elif sName == "window" and sValue: dStep["lWindow"].append(sValue)
+            elif sName == "focus" and sValue: dStep["lFocus"].append(sValue)
+            elif sName == "pause":
+                try: dStep["nPause"] = max(0.0, min(600.0, float(sValue)))
+                except ValueError: logLine("Pause is not a number of seconds: " + sValue)
             elif sName == "press":
                 # PRESS=2 (9 November 2026): the key pressed twice in quick succession, as a person double-presses a
                 # Homer key to have its second meaning -- spell a value, or show a summary in a window.
@@ -485,7 +494,18 @@ dNamedKeys = {"enter": "{ENTER}", "escape": "{ESC}", "esc": "{ESC}", "tab": "{TA
               "backspace": "{BACKSPACE}", "delete": "{DELETE}", "insert": "{INSERT}", "home": "{HOME}", "end": "{END}",
               "page up": "{PGUP}", "page down": "{PGDN}", "up arrow": "{UP}", "down arrow": "{DOWN}",
               "left arrow": "{LEFT}", "right arrow": "{RIGHT}", "up": "{UP}", "down": "{DOWN}", "left": "{LEFT}",
-              "right": "{RIGHT}", "apps": "{APPS}", "applications": "{APPS}"}
+              "right": "{RIGHT}", "apps": "{APPS}", "applications": "{APPS}",
+              # HOMER'S OWN KEY NAMES (17 November 2026): a walk or macro written in the suite's names -- UpArrow,
+              # PageDown, NumPadStar -- was typed as text, since only "up arrow" and "page down" were known.
+              "uparrow": "{UP}", "downarrow": "{DOWN}", "leftarrow": "{LEFT}", "rightarrow": "{RIGHT}",
+              "pageup": "{PGUP}", "pagedown": "{PGDN}", "numpadstar": "{VK_MULTIPLY}", "numpadslash": "{VK_DIVIDE}",
+              "numpadplus": "{VK_ADD}", "numpaddash": "{VK_SUBTRACT}", "numpaddelete": "{VK_DECIMAL}",
+              "numpad0": "{VK_NUMPAD0}", "numpad1": "{VK_NUMPAD1}", "numpad2": "{VK_NUMPAD2}", "numpad3": "{VK_NUMPAD3}",
+              "numpad4": "{VK_NUMPAD4}", "numpad5": "{VK_NUMPAD5}", "numpad6": "{VK_NUMPAD6}", "numpad7": "{VK_NUMPAD7}",
+              "numpad8": "{VK_NUMPAD8}", "numpad9": "{VK_NUMPAD9}"}
+# The punctuation keys by Homer's names (help\KeyNames.md), as the character the key types unshifted.
+dCharKeys = {"apostrophe": "'", "backslash": "\\", "comma": ",", "dash": "-", "equals": "=", "graveaccent": "`",
+             "leftbracket": "[", "period": ".", "rightbracket": "]", "semicolon": ";", "slash": "/"}
 dModifiers = {"control": "^", "ctrl": "^", "alt": "%", "shift": "+"}
 
 
@@ -503,6 +523,7 @@ def keysFor(sKey):
     sLast = lParts[-1]
     sLower = sLast.lower()
     if sLower in dNamedKeys: sMain = dNamedKeys[sLower]
+    elif sLower in dCharKeys: sMain = escapeText(dCharKeys[sLower])
     elif re.match(r"^f([1-9]|1[0-2])$", sLower): sMain = "{" + sLower.upper() + "}"
     elif len(sLast) == 1: sMain = escapeText(sLast.lower())
     else: sMain = escapeText(sLast)
@@ -604,7 +625,8 @@ def bringForward(sApp):
     """The app's main window in front: started first when it is not running. True when it is in front."""
     sExe = sApp + ".exe"
     if not windowsOf(sExe):
-        lPlaces = [os.path.join(os.environ.get("ProgramFiles", r"C:\Program Files"), sApp, "exec", sExe),
+        # --exe FIRST (17 November 2026): a live test in tidy tests the build just made, not the installed copy.
+        lPlaces = ([sStartExe] if sStartExe else []) + [os.path.join(os.environ.get("ProgramFiles", r"C:\Program Files"), sApp, "exec", sExe),
                    os.path.join(os.environ.get("ProgramFiles", r"C:\Program Files"), sApp, sExe),
                    os.path.join(sProject, "exec", sExe)]
         sFound = next((s for s in lPlaces if os.path.isfile(s)), "")
@@ -795,6 +817,7 @@ def main():
     oParser.add_argument("--no-transcribe", action="store_true")
     oParser.add_argument("--speaker", default="")
     oParser.add_argument("--keep", action="store_true")
+    oParser.add_argument("--exe", default="")              # the program to start when the app is not running (runMacro: the project's own build)
     oParser.add_argument("--axe", action="store_true")      # kept for old command lines; scans are on by default
     oParser.add_argument("--no-axe", action="store_true")
     oParser.add_argument("--tutorial", action="store_true")
@@ -802,6 +825,8 @@ def main():
     oParser.add_argument("--items", type=int, default=25)    # with "menus": how many items to walk in each menu and the Alternate Menu
     oArgs = oParser.parse_args([s.lower() if s.startswith("--") else s for s in sys.argv[1:]])
 
+    global sStartExe
+    sStartExe = oArgs.exe
     sLogs = os.path.join(sProject, "logs"); os.makedirs(sLogs, exist_ok=True)
     sLogPath = os.path.join(sLogs, oArgs.app + "-recordWalk-" + sStamp + ".log")
     sReportPath = os.path.join(sLogs, oArgs.app + "-recordWalk-" + sStamp + ".md")
@@ -1003,6 +1028,9 @@ def main():
                 logLine("tutorial voice failed at step " + str(iIndex) + ": " + traceback.format_exc())
                 if not (dStep["sKey"] or dStep["sType"]): continue
         iWait = dStep["iWait"] or oArgs.wait
+        if dStep.get("nPause"):
+            logLine("step " + str(iIndex) + ": pause %.1f s first, as the walk asks" % dStep["nPause"])
+            time.sleep(dStep["nPause"])
         dBefore = speechSizes(oArgs.app)
         sKeys = keysFor(dStep["sKey"]) if dStep["sKey"] else ""
         logLine("step " + str(iIndex) + ": type " + repr(dStep["sType"]) + ", key " + repr(dStep["sKey"]) + " as " + repr(sKeys) + ", listen " + str(iWait) + " s")
@@ -1116,6 +1144,22 @@ def main():
             bHeard = nShare >= nMatchNeeded
             iChecked += 1; iMatched += 1 if bHeard else 0
             lsReport.append("- **Expected:** " + sWant + " -- " + ("heard" if bHeard else "NOT HEARD") + " (" + str(int(nShare * 100)) + "% of its words)")
+        # THE WINDOW AND THE FOCUS (17 November 2026): checked after the listening, when the step has settled; a window
+        # that is slow to open is given up to five more seconds.
+        for sWant in dStep.get("lWindow", []):
+            nUntil = time.time() + 5
+            sTitleAfter = foregroundExe()[1]
+            while sWant.lower() not in sTitleAfter.lower() and time.time() < nUntil:
+                time.sleep(0.25); sTitleAfter = foregroundExe()[1]
+            bShown = sWant.lower() in sTitleAfter.lower()
+            iChecked += 1; iMatched += 1 if bShown else 0
+            logLine("  window wanted %r, in front %r: %s" % (sWant, sTitleAfter, "yes" if bShown else "NO"))
+            lsReport.append("- **Window expected:** " + sWant + " -- " + ("shown" if bShown else "NOT SHOWN; in front: " + (sTitleAfter or "no title")))
+        for sWant in dStep.get("lFocus", []):
+            bFocused = sWant.lower() in sFocus.lower()
+            iChecked += 1; iMatched += 1 if bFocused else 0
+            logLine("  focus wanted %r: %s" % (sWant, "yes" if bFocused else "NO"))
+            lsReport.append("- **Focus expected:** " + sWant + " -- " + ("there" if bFocused else "NOT THERE"))
         lsReport.append("- **Heard:** " + (sHeard or "(nothing written down)"))
         lsReport.append("- **Focus:** " + sFocus)
         lsReport.append("- **" + oArgs.app + " said:** " + (sApp or "(nothing in its speech log)"))
