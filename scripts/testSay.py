@@ -17,11 +17,17 @@ DbDo's testSay pressed Shift+A to Shift+Z; this one takes the Say commands from 
 and Alt+Y are heard too, and a command moved to another key is followed.
 
 BEFORE RUNNING. Open the app on something worth hearing about -- DbDo on a table with records, FileDir on a folder
-with files -- with JAWS running as usual. Then keep your hands off the keyboard. To stop, switch to any other window.
+with files -- with JAWS running as usual; an app that is not running is started from its own build. Then keep your
+hands off the keyboard. To stop, press Control+C in the console, or switch to any other window.
 
-USAGE (from the app's folder or its scripts folder)
+NO ARGUMENT IS NEEDED (17 November 2026). A Homer script with no arguments does the most likely and most complete
+thing. Run from HomerDev, which has no Say commands of its own, testSay used to stop with "No Say command with a key
+matched"; now it tests every Homer app it finds beside the kit, one after another, and says the time it expects first.
 
-    testSay                     every Say command, about a minute for every three
+USAGE (from an app's folder or its scripts folder, or from HomerDev's)
+
+    testSay                     every Say command, about a minute for every three; from HomerDev, every app's in turn
+    testSay --apps DbDo,FileDir from HomerDev, only those apps
     testSay --only F,O,8        only the Say commands on those keys (a single letter or digit is a key)
     testSay --only position     only the Say commands with that word in their names
     testSay --letters ABC       only the Say commands on Shift+A, Shift+B and Shift+C (DbDo's old option)
@@ -133,6 +139,49 @@ def copyInto(lsFiles, sFolder):
     return len(lsFiles)
 
 
+def suiteApps():
+    """The Homer apps beside the kit (or at the drive's root) that have a key file and a scripts folder."""
+    lsFound = []
+    for sParent in (os.path.dirname(sProject), os.path.splitdrive(sProject)[0] + os.sep):
+        for sName in ("DbDo", "EdSharp", "FileDir", "HomerView"):
+            sDir = os.path.join(sParent, sName)
+            if sName not in [os.path.basename(s) for s in lsFound] and os.path.isdir(os.path.join(sDir, "configs")) and os.path.isdir(os.path.join(sDir, "scripts")): lsFound.append(sDir)
+    return lsFound
+
+
+def runSuite(oArgs):
+    """From HomerDev: this script once for each app, in the app's folder, with the same options."""
+    lsApps = suiteApps()
+    if oArgs.apps: lsApps = [s for s in lsApps if os.path.basename(s).lower() in [t.strip().lower() for t in oArgs.apps.split(",")]]
+    logLine("suite run over: " + "; ".join(lsApps))
+    if not lsApps:
+        say("No Homer app was found beside HomerDev, so nothing was pressed.")
+        return 2
+    lsPass = [s for s in sys.argv[1:] if not s.lower().startswith("--apps")]
+    if "--apps" in [s.lower() for s in sys.argv[1:]]:
+        iAt = [s.lower() for s in sys.argv[1:]].index("--apps"); lsPass = sys.argv[1:iAt + 1] + sys.argv[iAt + 3:]
+    iMinutes = 0
+    sRunMacro = findRunMacro()
+    if sRunMacro:
+        sys.path.insert(0, os.path.dirname(sRunMacro))
+        import runMacro as oRunMacro
+        for sDir in lsApps:
+            sName = os.path.basename(sDir)
+            iCount = sum(1 for sCommand, sKey in oRunMacro.appCommands(oRunMacro.keyFileOf(sDir, sName)).values() if sCommand.lower().startswith("say ") and sKey)
+            iMinutes += (iCount * 3 + (0 if oArgs.no_describer else iCount + 2)) * (oArgs.wait + 3) // 60
+    say("testSay from HomerDev: %d app%s, %s, about %d minutes in all. Control+C stops it." % (
+        len(lsApps), "" if len(lsApps) == 1 else "s", ", ".join(os.path.basename(s) for s in lsApps), max(1, iMinutes)))
+    iWorst = 0
+    for sDir in lsApps:
+        lCommand = [sys.executable, os.path.abspath(__file__)] + lsPass
+        logLine("run: " + subprocess.list2cmdline(lCommand) + " in " + sDir)
+        iCode = subprocess.call(lCommand, cwd=sDir)
+        logLine("%s exit code %d" % (os.path.basename(sDir), iCode))
+        iWorst = max(iWorst, iCode)
+    say("testSay from HomerDev finished; each app's results are in its own logs folder.")
+    return iWorst
+
+
 def main():
     oParser = argparse.ArgumentParser(description="Run every Say command of a Homer app, record what the reader says, and gather it under logs.")
     oParser.add_argument("--only", default="")
@@ -140,12 +189,14 @@ def main():
     oParser.add_argument("--no-describer", action="store_true")
     oParser.add_argument("--wait", type=int, default=6)
     oParser.add_argument("--check", action="store_true")
+    oParser.add_argument("--apps", default="")
     oArgs = oParser.parse_args([s.lower() if s.startswith("--") else s for s in sys.argv[1:]])
     sLetters = "".join(s for s in oArgs.letters.upper() if "A" <= s <= "Z")
     logLine("testSay started; script=%s; Python %s; %s; cwd=%s; command line=%s" % (
         os.path.abspath(__file__), sys.version.split()[0], platform.platform(), os.getcwd(), " ".join(sys.argv)))
     logLine("settings: app=%s; project=%s; only=%s; letters=%s; wait=%d; describer=%s; check=%s; folder=%s" % (
         sApp, sProject, oArgs.only or "all", sLetters or "all", oArgs.wait, "no" if oArgs.no_describer else "yes", oArgs.check, sOutDir))
+    if sApp.lower() == "homerdev" or oArgs.apps: return runSuite(oArgs)
     sRunMacro = findRunMacro()
     if not sRunMacro:
         say("runMacro.py was not found in this app's scripts or the kit's, so nothing was pressed.")
@@ -163,6 +214,7 @@ def main():
     if not oArgs.check:
         iSteps = len(lsChosen) * 3 + (0 if oArgs.no_describer else len(lsChosen) + 2)
         iMinutes = max(1, iSteps * (oArgs.wait + 3) // 60)
+        if iMinutes > 10: say("This takes about %d minutes. Control+C stops it." % iMinutes)
         say("testSay: %d Say command%s in %s, %d key%s, about %d minute%s." % (len(lsChosen), "" if len(lsChosen) == 1 else "s", sApp, iSteps, "" if iSteps == 1 else "s", iMinutes, "" if iMinutes == 1 else "s"))
     nStart = time.time()
     logLine("run: " + subprocess.list2cmdline(lCommand) + " in " + sProject)

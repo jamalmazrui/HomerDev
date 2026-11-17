@@ -49,6 +49,7 @@ own default.jkm, the user's copy first, so a reassigned key is followed.
 
 USAGE
 
+    runMacro                             every macro in the app's scripts\tests folder; from HomerDev, every app's
     runMacro path\to\macro.inix          play it, with the app in front; the report says what was heard and seen
     runMacro --check path\to\macro.inix  translate only: say which lines are not understood (exit 1 when any)
     runMacro --no-hear path\macro.inix   play it without writing the speech down (Expect speech is then not checked)
@@ -492,14 +493,32 @@ def liveTests(sProject, fnLog=None, fnSay=None):
     return lsDone
 
 
+def defaultMacros():
+    """NO ARGUMENT IS NEEDED (17 November 2026): with no macro named, the most likely wish is the app's own tests --
+    every .inix in scripts\\tests of the app this is run from, or, from HomerDev, of every Homer app beside it."""
+    sHere = os.getcwd()
+    for sDir in (sHere, os.path.dirname(sHere)):
+        if os.path.isdir(os.path.join(sDir, "scripts")) and os.path.isdir(os.path.join(sDir, "configs")): sHere = sDir; break
+    lsFolders = [sHere]
+    if os.path.basename(os.path.normpath(sHere)).lower() == "homerdev":
+        lsFolders = [os.path.join(os.path.dirname(sHere), s) for s in ("DbDo", "EdSharp", "FileDir", "HomerView")]
+    lsMacros = []
+    for sFolder in lsFolders: lsMacros += sorted(glob.glob(os.path.join(sFolder, "scripts", "tests", "*.inix")))
+    return lsMacros
+
+
 def main():
     oParser = argparse.ArgumentParser(description="Play a Homer macro script in its app, heard through the screen reader.")
-    oParser.add_argument("macro", nargs="+")
+    oParser.add_argument("macro", nargs="*")
     oParser.add_argument("--check", action="store_true")
     oParser.add_argument("--no-hear", action="store_true")
     oParser.add_argument("--keep", action="store_true")
     oArgs = oParser.parse_args([s.lower() if s.startswith("--") else s for s in sys.argv[1:]])
     iWorst = 0
+    if not oArgs.macro:
+        oArgs.macro = defaultMacros()
+        sayLine("No macro was named, so %s found in scripts\\tests %s taken%s." % (countNoun(len(oArgs.macro), "macro"), "is" if len(oArgs.macro) == 1 else "are", "" if oArgs.macro else "; there is nothing to play"))
+        if not oArgs.macro: return 2
     for sMacro in oArgs.macro:
         if not os.path.isfile(sMacro):
             sayLine("No macro at %s." % sMacro); iWorst = max(iWorst, 2); continue

@@ -178,6 +178,28 @@ Jamal's rule of 19 October says to decide a pending question by best judgment, j
 9. **The rulings summaries above stay labeled "Summary, to confirm."** Only Jamal can confirm his own words.
 10. **The agreed renames wait for Phase 1,** when the command record keeps old names searchable. Timer Toggle is the one rename made now, because the timer change (A15) names it.
 
+## Fewer commands, and Marked or Current (17 November 2026)
+
+Jamal asked to drop or combine commands that were new twenty years ago and now only add noise, and to give FileDir and DbDo one way to choose between the marked items and the current one. Each choice is in data\SuiteCommands.inix with the key it replaced; the rollback zip of the day restores every file.
+
+- **Retired:**
+  - Say Time, in all four apps. JAWS and NVDA say the time with Insert+F12, and twice for the date, in every program, so Homer's Alt+Semicolon only repeated them.
+  - FileDir's Batch Mail. It signed in to your mail server with a saved password and sent many messages, which mail providers now refuse or mark as spam. A mail program's own mail merge does the job.
+  - FileDir's Shift+letter and Shift+punctuation aliases that acted or repeated another key: Shift+Period and Shift+Comma (Shift+DownArrow and Control+Shift+DownArrow mark and unmark), Shift+B, Shift+E, Shift+N and Shift+P (Control+Shift+Home and End, Control+DownArrow and UpArrow). Every Shift key in FileDir now says something, or moves as Shift+DownArrow, Shift+Backslash and Shift+Space do.
+- **Keyless, on their menus:** Initial Change, Extension Change, Stamp with Date and Time, Hide, Show, System, General, Short Path to Clipboard and Say Yield in Operating System. They act rarely, or Windows says the same, and their shifted keys broke the rule that a shifted key only says.
+- **Combined:** DbDo's Say Database (Shift+D) now says the database and then its summary, and a second press shows it all in a read-only box, so Database Summary is gone and Alt+D is free.
+- **Moved, so the pairs read alike in every app:**
+  - Import Data: DbDo's Alt+I to Control+Shift+I; Export Data, EdSharp's Export Format and FileDir's Export Type: Alt+Shift+X to Control+Shift+X. I and X, in and out, on the same modifiers, beside Control+Shift+E (Extract with Regex), Control+Shift+R (Replace with Regex) and Control+Shift+Y (Yield with Regex).
+  - Open Template Database: Alt+Shift+D to Alt+D, the simpler key for the friendlier command.
+  - Inspect Record: Control+I to Alt+I; Invert Marked: Alt+Shift+I to Control+I, as in FileDir.
+  - FileDir's Say Yield on Drive: Control+Shift+Y to Alt+Shift+Y, so Control+Shift+Y can be Yield with Regex, new in FileDir, as in EdSharp and HomerView.
+- **Marked or Current.** When a FileDir or DbDo command can act on many items, some are marked in view, and the current one is not marked, a small dialog titled with the command asks: Marked items (with the number), the default, so Enter keeps the batch; Current item; Cancel; and Help. Alt+M and Alt+C, or M and C, choose; Shift+F1 says what each button does, and Control+Slash says where you are. When the current item is marked, or nothing is, there is nothing to ask and the command acts at once, as before.
+- **Kept, and why:**
+  - Control+Shift+F3 stays Reverse Find with Regex, since Shift reverses through the F3 family in every app; Control+F3 is Forward Find with Regex.
+  - Shift+V stays Say Invoke Script, beside Alt+V; Shift+W stays Say Whole Record, W for whole.
+  - The names keep "with Regex" rather than "with Pattern", the word every Homer app and guide already uses.
+  - Edit Settings is Alt+Shift+E in all four apps already.
+
 ## The keymap work finished (17 November 2026)
 
 Jamal asked to complete the Homer keymap work. Nothing in data\SuiteCommands.inix is now proposed.

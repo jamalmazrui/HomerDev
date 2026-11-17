@@ -17,7 +17,7 @@
 //            Window, Control+Shift+F4 Close All But Current Window
 //   Edit     Control+Apostrophe Save Clipboard, Control+Shift+Apostrophe
 //            Append Clipboard, Alt+Shift+Apostrophe Clear Clipboard
-//   Query    Alt+Apostrophe Say Clipboard, Alt+SemiColon Say Time
+//   Query    Alt+Apostrophe Say Clipboard
 //   Misc     Alt+Shift+E Edit Settings, Control+Shift+I Invoke Script
 //   Help     F1 Documentation, Shift+F1 What This Does, Alt+Shift+Slash
 //            Where Am I, Alt+F1 About, Control+F1 Key Describer Toggle,
@@ -776,7 +776,7 @@ public class MdiFrame : LbcForm {
 
         addMenu("&Query");
         addCommand("Say &Clipboard", "Alt+Apostrophe", "Say the text on the clipboard.", sayClipboard).sRepeat = "review";
-        addCommand("Say &Time", "Alt+SemiColon", "Say the time and date.", sayTime).sRepeat = "review";
+        // Say Time is not a suite command (17 November 2026): JAWS+F12 and NVDA+F12 say the time in every program.
 
         addMenu("&Misc");
         addCommand("&Edit Settings...", "Alt+Shift+E", "Change a setting and have it take effect now.", changeSetting);

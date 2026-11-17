@@ -261,6 +261,11 @@ public static class KeyMap {
     // runCommand: the one way a command runs, from a key, a menu, the
     // Alternate Menu or a script. Availability is checked HERE, every time,
     // not only when the menu was last painted.
+    // THE COMMAND NOW RUNNING, BY NAME (17 November 2026): a question a command asks part way through -- Lbc's Marked or
+    // Current -- takes this as its title, so the title confirms which command is running. Set while a command runs from
+    // a key; an app's menu item may set it too, as FileDir's does.
+    public static string sRunningName = "";
+
     public static bool runCommand(Command oCommand) {
         if (oCommand == null) return false;
         string sWhy = oCommand.unavailableReason();
@@ -279,11 +284,13 @@ public static class KeyMap {
             // as a repeat.
             if (oCommand.fRun != null) {
                 bRunningCommand = true;
-                try { return oCommand.fRun(); } finally { bRunningCommand = false; }
+                sRunningName = oCommand.sName;
+                try { return oCommand.fRun(); } finally { bRunningCommand = false; sRunningName = ""; }
             }
             if (oCommand.oItem != null) {
                 bRunningCommand = true;
-                try { oCommand.oItem.PerformClick(); } finally { bRunningCommand = false; }
+                sRunningName = oCommand.sName;
+                try { oCommand.oItem.PerformClick(); } finally { bRunningCommand = false; sRunningName = ""; }
                 return true;
             }
         }

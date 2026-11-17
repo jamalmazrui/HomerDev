@@ -7,6 +7,16 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.247.0 -- 17 November 2026
+
+- **Marked or Current, one dialog for the suite.** LbcAsk.markedOrCurrent asks whether a command should act on the marked items, with their count on the default button, or the current one, titled with the command's name so the title confirms the key just pressed. FileDir and DbDo use it. A button can now carry its own Shift+F1 hint.
+- **KeyMap.sRunningName** holds the name of the command running, so a dialog can be titled with it.
+- **Say Time is retired from the suite,** and from Mdi: JAWS and NVDA say the time with Insert+F12 in every program.
+- **testSay runs with no argument from HomerDev** and tests every Homer app beside the kit, one after another, saying first about how long it will take. It used to stop, saying no Say command matched.
+- **runMacro with no macro named** plays the tests in the app's scripts\tests, or every app's from HomerDev.
+- **testSay, runMacro and recordWalk ship in EdSharp and HomerView too.**
+- **KeyDecisions.md records the day's choices:** what was retired, made keyless, combined and moved, and what was kept and why.
+
 ## 1.246.0 -- 17 November 2026
 
 - **JAWS key maps are audited by tidy.** jawsKeys.audit reads every line of an app's JAWS key maps and reports these problems: a script that is not defined, a script name spelled differently from where it is defined, a line written backward, and a key the app binds that JAWS gives to a table or mouse script. Those scripts work only in a table or move the mouse, so the app never gets the key. It reads JAWS's own default.jkm on the computer to know JAWS's scripts. Its first run found FileDir's mpv.jkm written backward and two keys spelled TypecurrentScriptKey.

@@ -49,10 +49,7 @@ targets_files=the current page
 paste_what=text
 
 [keys FileDir]
-; A RECORDED EXCEPTION (15 November 2026, the keyboard audit's A6 and question 6 of its decisions): Alt+Shift+I runs
-; Inquire Differences here, and every I and D key FileDir could give that command is already taken, so Invert Marked
-; keeps Control+I, the key it has always had. DbDo cannot follow, since its Control+I is Inspect Record.
-Invert Marked=Control+I
+; Invert Marked's exception ended on 17 November 2026: DbDo moved Inspect Record to Alt+I, so both apps invert on Control+I.
 
 [handled DbDo]
 ; As for EdSharp and FileDir (1.240.0): real, and handled outside the router, by DbDo's grid keyboard model of 31
@@ -298,7 +295,7 @@ description=Open the list of every command and key
 
 [command Invert Marked]
 apps=DbDo, FileDir
-key=Alt+Shift+I
+key=Control+I
 description=Mark the unmarked {things} in view and unmark the marked ones
 
 [command Invoke Script]
@@ -519,11 +516,6 @@ description=Say {what}
 apps=DbDo, EdSharp, FileDir
 key=Alt+Z
 description=Say {what}
-
-[command Say Time]
-apps=EdSharp, FileDir, HomerView
-key=Alt+;
-description=Say the date and time
 
 [command Say Windows Open]
 apps=DbDo, EdSharp, FileDir

@@ -856,6 +856,14 @@ public class LbcMenuItem : ToolStripMenuItem
 public static class LbcHints
 {
     private static readonly Dictionary<Control, string[]> dNames = new Dictionary<Control, string[]>();
+    // A HINT GIVEN BY THE CODE (17 November 2026): a button whose name carries a count, such as "Marked items (12)", can
+    // have no line in Hints.inix of its own, so the dialog that makes it gives the hint itself, and Shift+F1 says it.
+    private static readonly Dictionary<Control, string> dOwnHints = new Dictionary<Control, string>();
+    public static void setHint(Control ctl, string sHint)
+    {
+        if (ctl == null || string.IsNullOrEmpty(sHint)) return;
+        lock (dOwnHints) { dOwnHints[ctl] = sHint; }
+    }
     private static readonly HashSet<string> setReported = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
     // The plain name and the kind of each control, kept as Lbc registers it.
@@ -916,6 +924,8 @@ public static class LbcHints
     // first sentence of the tip, then the name and kind.
     public static string sentenceFor(Control ctl, string sTip)
     {
+        string sOwnHint;
+        lock (dOwnHints) { if (ctl != null && dOwnHints.TryGetValue(ctl, out sOwnHint)) return sOwnHint; }
         string sPlain = "", sKind = "";
         string[] aName;
         lock (dNames) { if (ctl != null && dNames.TryGetValue(ctl, out aName)) { sPlain = aName[0]; sKind = aName[1]; } }
@@ -1174,6 +1184,13 @@ public class LbcDialog : IDisposable
     private Dictionary<Control, string> dFocusTips;
     private Dictionary<string, int>     dNameCounts;
     private Dictionary<string, Control> dWidgets;
+    // Hints for runWithButtons' buttons, by plain label (17 November 2026); see hintButton.
+    private Dictionary<string, string> dButtonHints = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+    public void hintButton(string sLabel, string sHint)
+    {
+        if (string.IsNullOrEmpty(sLabel)) return;
+        dButtonHints[sLabel.Replace("&", "")] = sHint ?? "";
+    }
     private Control                     ctlFirstFocusable;
     private Form                        frm;
     private IWin32Window                owner;
@@ -2788,6 +2805,8 @@ public class LbcDialog : IDisposable
                 };
             }
             registerWidget(btn, "Button", sCaptured);
+            string sOwnHint;
+            if (dButtonHints.TryGetValue(sCaptured, out sOwnHint)) LbcHints.setHint(btn, sOwnHint);
             pnlButtonRow.Controls.Add(btn);
             if (i == 0 && sDefaultLabel == null) btnAccept = btn;
             if (sDefaultLabel != null && string.Equals(sCaptured, sDefaultLabel, StringComparison.OrdinalIgnoreCase)) btnAccept = btn;
@@ -6391,6 +6410,36 @@ return sOne;
 }
 return "";
 } // choose method
+
+// markedOrCurrent: the Homer Suite's one question when a command could act on the marked items or on the current one
+// (17 November 2026). Jamal marks files or records for a batch copy, move or zip, meets one he wants to treat on its
+// own, and the command took every marked one because some were marked. Now, when marked ones are in view and the
+// current one is not among them, the command asks:
+//   - The title is the command's name, so the question itself says which command is about to run.
+//   - "Marked items (12)" is the default, so Enter does what the command did before; the count says how many it takes.
+//   - "Current item", or the letter C, takes only the one the cursor is on.
+//   - Cancel and Help, as in every Lbc choice dialog; Shift+F1 says each button's hint and Control+Slash says where you
+//     are, as in every Lbc dialog.
+// When the current one is marked too, nothing is asked: it is one of the batch, and the marked ones are meant. sSingular
+// and sPlural name what is marked -- "item" and "items" in FileDir, "record" and "records" in DbDo. The answer is
+// "marked", "current", or "" for Cancel.
+public static string markedOrCurrent(string sTitle, int iMarked, string sSingular, string sPlural) {
+string sOne = string.IsNullOrEmpty(sSingular) ? "item" : sSingular;
+string sMany = string.IsNullOrEmpty(sPlural) ? sOne + "s" : sPlural;
+string sMarkedLabel = "&Marked " + sMany + " (" + iMarked + ")";
+string sCurrentLabel = "&Current " + sOne;
+string sPressed;
+using (LbcDialog dlg = new LbcDialog(string.IsNullOrEmpty(sTitle) ? "Marked or Current" : sTitle, ownerForm())) {
+dlg.addLabel("The current " + sOne + " is not marked.");
+dlg.hintButton(sMarkedLabel, "Acts on the " + iMarked + " marked " + (iMarked == 1 ? sOne : sMany) + " in view; Enter chooses this.");
+dlg.hintButton(sCurrentLabel, "Acts on the current " + sOne + " only, and leaves the marks as they are; the letter C chooses this.");
+sPressed = dlg.runWithButtons(new string[] { sMarkedLabel, sCurrentLabel, "Cancel" }, true, sMarkedLabel.Replace("&", ""));
+}
+if (!string.IsNullOrEmpty(sPressed) && sPressed.StartsWith("Marked", StringComparison.OrdinalIgnoreCase)) return "marked";
+if (!string.IsNullOrEmpty(sPressed) && sPressed.StartsWith("Current", StringComparison.OrdinalIgnoreCase)) return "current";
+say("Cancel", true);
+return "";
+} // markedOrCurrent method
 
 // message: a message in a box, title first, as EdSharp's and FileDir's Dialog.Show had it (kit 1.190.0, 10 November
 // 2026); show, from FileDir's older layer, takes the text first. With no title, the window is named for the program.

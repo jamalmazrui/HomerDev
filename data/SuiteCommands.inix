@@ -189,8 +189,10 @@ status=current
 
 [DbDo databaseSummary]
 name=Database Summary
-keys=Alt+D
-status=current
+keys=
+change=folded into Say Database (Shift+D), which goes on to the summary; was Alt+D, 17 November 2026
+reason=one key says it all, and a second press shows it in a window; Alt+D went to Open Template Database
+status=retired
 
 [DbDo deleteRecord]
 name=Delete Record
@@ -293,10 +295,9 @@ status=current
 
 [DbDo exportData]
 name=Export Data
-keys=Alt+Shift+X
-change=keys changed, was Alt+X
-reason=X for export, Alt+Shift as in the suite; Alt+X stays the editors' Cut Append
-disposition=accepted
+keys=Control+Shift+X
+change=was Alt+Shift+X, 17 November 2026
+reason=the suite's import and export pair, Control+Shift+I and Control+Shift+X
 status=implemented
 
 [DbDo extraSpeechToggle]
@@ -386,24 +387,32 @@ keys=Control+Shift+F1
 status=current
 
 [DbDo import]
-name=Import
-keys=Alt+I
-status=current
+name=Import Data
+keys=Control+Shift+I
+change=was Alt+I, 17 November 2026
+reason=the suite's import and export pair, Control+Shift+I and Control+Shift+X; Alt+I is Inspect Record
+status=implemented
 
 [DbDo inspectRecord]
 name=Inspect Record
-keys=Control+I
-status=current
+keys=Alt+I
+change=was Control+I, 17 November 2026
+reason=Control+I is Invert Marked in the suite
+status=implemented
 
 [DbDo invertMarked]
 name=Invert Marked
-keys=Alt+Shift+I
-status=current
+keys=Control+I
+change=was Alt+Shift+I, 17 November 2026
+reason=one key in DbDo and FileDir
+status=implemented
 
 [DbDo invokeScript]
 name=Invoke Script
-keys=Control+Shift+I
-status=current
+keys=Alt+V
+change=keys changed, was Control+Shift+I, 9 November 2026; the manifest caught up 17 November 2026
+reason=Alt+V as in EdSharp, beside Say Invoke Script on Shift+V
+status=implemented
 
 [DbDo jumpToNextInitial]
 name=Jump to Next Initial
@@ -549,8 +558,10 @@ reason=it opened a SELECT in a new window exactly as Query (Control+Q) does, und
 
 [DbDo openTemplateDatabase]
 name=Open Template Database
-keys=Alt+Shift+D
-status=current
+keys=Alt+D
+change=was Alt+Shift+D, 17 November 2026
+reason=the friendlier key, freed by Say Database
+status=implemented
 
 [DbDo openUrl]
 name=Open url
@@ -576,9 +587,11 @@ status=current
 change=built 15 November 2026: it was a stub, and Tutorial 4 teaches it, so it now works rather than losing its key
 
 [DbDo playStream]
-name=Play Stream
-keys=Alt+Shift+P
-status=current
+name=Play Media
+keys=Control+P
+change=renamed from Play Stream, 17 November 2026
+reason=the suite's name on Control+P, as in FileDir
+status=implemented
 
 [DbDo playTutorials]
 name=Play Tutorials
@@ -610,8 +623,10 @@ status=current
 
 [DbDo print]
 name=Print
-keys=Control+P
-status=current
+keys=
+change=keys changed, was Control+P; the manifest caught up 17 November 2026
+reason=Control+P plays media, as in FileDir; Print stays on the File menu with no key
+status=ruled
 
 [DbDo query]
 name=Query
@@ -918,11 +933,10 @@ status=current
 
 [DbDo sayTime]
 name=Say Time
-keys=Alt+SemiColon
-change=new
-reason=suite Query key
-disposition=accepted
-status=implemented
+keys=
+change=dropped, was Alt+SemiColon
+reason=JAWS+F12 and NVDA+F12 say the time, and the date when pressed twice, in every program; the suite's own key added nothing (17 November 2026)
+status=retired
 
 [DbDo sayUrl]
 name=Say url
@@ -1337,10 +1351,9 @@ status=current
 
 [EdSharp exportFormat]
 name=Export Format
-keys=Alt+Shift+X
-change=keys changed, was Alt+Shift+E
-reason=X for export; frees Alt+Shift+E
-disposition=accepted
+keys=Control+Shift+X
+change=was Alt+Shift+X, 17 November 2026
+reason=the suite's export key
 status=implemented
 
 [EdSharp extraSpeechLog]
@@ -2142,9 +2155,10 @@ reason=says the style, alignment and baseline that differ from normal, then the 
 
 [EdSharp sayTime]
 name=Say Time
-keys=Alt+SemiColon
-shared=sayTime
-status=current
+keys=
+change=dropped, was Alt+SemiColon
+reason=JAWS+F12 and NVDA+F12 say the time, and the date when pressed twice, in every program; the suite's own key added nothing (17 November 2026)
+status=retired
 
 [EdSharp sayWindowsOpen]
 name=Say Windows Open
@@ -2472,8 +2486,10 @@ status=current
 
 [FileDir batchMail]
 name=Batch Mail
-keys=Control+Shift+B
-status=current
+keys=
+change=dropped, was Control+Shift+B, 17 November 2026
+reason=it sent through SMTP with a stored password, which most mail services no longer accept
+status=retired
 
 [FileDir beginningFile]
 name=Beginning File
@@ -2482,10 +2498,9 @@ status=current
 
 [FileDir beginningMarked]
 name=Beginning Marked
-keys=Shift+B or Control+Shift+Home
-change=renamed from Beginning Tagged, was Shift+B or Control+Home
-reason=Control+Home is the first item, as in DbDo; first marked moves to Control+Shift+Home, as in DbDo
-disposition=accepted with correction: verified against the list control's native behavior
+keys=Control+Shift+Home
+change=Shift+B dropped, 17 November 2026
+reason=Shift+letter says, never acts
 status=implemented
 
 [FileDir burnToCD]
@@ -2676,10 +2691,9 @@ status=current
 
 [FileDir endMarked]
 name=End Marked
-keys=Shift+E or Control+Shift+End
-change=renamed from End Tagged, was Shift+E or Control+End
-reason=Control+End is the last item; last marked moves to Control+Shift+End, as in DbDo
-disposition=accepted with correction: as Beginning Marked
+keys=Control+Shift+End
+change=Shift+E dropped, 17 November 2026
+reason=Shift+letter says, never acts
 status=implemented
 
 [FileDir environmentVariables]
@@ -2699,8 +2713,10 @@ status=current
 
 [FileDir extensionChange]
 name=Extension Change
-keys=Shift+X
-status=current
+keys=
+change=unbound, was Shift+X; on the Navigate menu, 17 November 2026
+reason=Shift+letter says, never acts; rare, as DbDo's Jump to Next Initial
+status=implemented
 
 [FileDir extraSpeechLog]
 name=Extra Speech Log
@@ -2751,8 +2767,10 @@ status=implemented
 
 [FileDir general]
 name=General
-keys=Shift+LeftBracket
-status=current
+keys=
+change=unbound, was Shift+LeftBracket; on the Edit menu, 17 November 2026
+reason=rare now, and an action on the Shift layer
+status=implemented
 
 [FileDir getFTP]
 name=Get FTP
@@ -2815,8 +2833,10 @@ status=current
 
 [FileDir hide]
 name=Hide
-keys=Shift+0
-status=current
+keys=
+change=unbound, was Shift+0; on the Edit menu, 17 November 2026
+reason=rare now, and an action on the Shift layer
+status=implemented
 
 [FileDir historyOfChanges]
 name=History of Changes
@@ -2846,8 +2866,10 @@ status=implemented
 
 [FileDir initialChange]
 name=Initial Change
-keys=Shift+I
-status=current
+keys=
+change=unbound, was Shift+I; on the Navigate menu, 17 November 2026
+reason=Shift+letter says, never acts; as DbDo's Jump to Next Initial
+status=implemented
 
 [FileDir inquireDifferences]
 name=Inquire Differences
@@ -2952,9 +2974,9 @@ status=implemented
 
 [FileDir markAndNext]
 name=Mark and Next
-keys=Shift+Period or Shift+DownArrow
-change=renamed from Tag and Next, was Shift+Period or Shift+DownArrow
-disposition=accepted
+keys=Shift+DownArrow
+change=Shift+Period dropped, 17 November 2026
+reason=Shift+letter says, never acts
 status=implemented
 
 [FileDir markAndPrevious]
@@ -3027,9 +3049,9 @@ status=current
 
 [FileDir nextMarked]
 name=Next Marked
-keys=Shift+N or Control+DownArrow
-change=renamed from Next Tagged, was Shift+N or Control+DownArrow
-disposition=accepted
+keys=Control+DownArrow
+change=Shift+N dropped, 17 November 2026
+reason=Shift+letter says, never acts
 status=implemented
 
 [FileDir nextPart]
@@ -3128,10 +3150,9 @@ status=current
 
 [FileDir outputType]
 name=Export Type
-keys=Alt+Shift+X
-change=renamed from Output Type and keys changed, was Shift+O, 16 November 2026
-reason=renamed Export Type: X for export, the suite's export key, as DbDo's Export Data and EdSharp's Export Format; no Shift+letter acts: Shift letters only say or move (Jamal's phase, 16 November 2026)
-disposition=accepted
+keys=Control+Shift+X
+change=was Alt+Shift+X, 17 November 2026
+reason=the suite's export key
 status=implemented
 
 [FileDir parentFolder]
@@ -3187,9 +3208,9 @@ status=implemented
 
 [FileDir previousMarked]
 name=Previous Marked
-keys=Shift+P or Control+UpArrow
-change=renamed from Previous Tagged, was Shift+P or Control+UpArrow
-disposition=accepted
+keys=Control+UpArrow
+change=Shift+P dropped, 17 November 2026
+reason=Shift+letter says, never acts
 status=implemented
 
 [FileDir previousPart]
@@ -3460,9 +3481,10 @@ status=implemented
 
 [FileDir sayTime]
 name=Say Time
-keys=Alt+SemiColon
-shared=sayTime
-status=current
+keys=
+change=dropped, was Alt+SemiColon
+reason=JAWS+F12 and NVDA+F12 say the time, and the date when pressed twice, in every program; the suite's own key added nothing (17 November 2026)
+status=retired
 
 [FileDir sayTimer]
 name=Say Timer
@@ -3523,13 +3545,17 @@ status=current
 
 [FileDir shortPathToClipboard]
 name=Short Path to Clipboard
-keys=Shift+GraveAccent
-status=current
+keys=
+change=unbound, was Shift+GraveAccent; on the Edit menu, 17 November 2026
+reason=short paths are a DOS-era need
+status=implemented
 
 [FileDir show]
 name=Show
-keys=Shift+9
-status=current
+keys=
+change=unbound, was Shift+9; on the Edit menu, 17 November 2026
+reason=rare now, and an action on the Shift layer
+status=implemented
 
 [FileDir sizeOrder]
 name=Size Order
@@ -3538,8 +3564,10 @@ status=current
 
 [FileDir stampWithDateAndTime]
 name=Stamp with Date and Time
-keys=Shift+1
-status=current
+keys=
+change=unbound, was Shift+1; on the Edit menu, 17 November 2026
+reason=rare now, and an action on the Shift layer
+status=implemented
 
 [FileDir startMarkOrUnmark]
 name=Start Mark or Unmark
@@ -3562,8 +3590,10 @@ change=was Alt+Control+S, 15 November 2026 (A15); Control+Shift+F11, the first c
 
 [FileDir system]
 name=System
-keys=Shift+RightBracket
-status=current
+keys=
+change=unbound, was Shift+RightBracket; on the Edit menu, 17 November 2026
+reason=rare now, and an action on the Shift layer
+status=implemented
 
 [FileDir tileHorizontal]
 name=Tile Horizontal
@@ -3668,10 +3698,9 @@ status=implemented
 
 [FileDir unmarkAndNext]
 name=Unmark and Next
-keys=Shift+Comma or Control+Shift+DownArrow
-change=renamed from Untag and Next; keys changed, was Shift+Comma or Alt+Shift+DownArrow
-reason=the same pair as Unmark and Previous
-disposition=accepted
+keys=Control+Shift+DownArrow
+change=Shift+Comma dropped, 17 November 2026
+reason=Shift+letter says, never acts; DbDo's key
 status=implemented
 
 [FileDir unmarkAndPrevious]
@@ -3732,9 +3761,10 @@ change=renamed 15 November 2026 from Yield Files (A11), was Alt+Y
 
 [FileDir yieldInOperatingSystem]
 name=Say Yield in Operating System
-keys=Alt+Shift+Y
-status=current
-change=renamed 15 November 2026 from Yield in Operating System (A11)
+keys=
+change=unbound, was Alt+Shift+Y; on the Query menu, 17 November 2026
+reason=Windows says its own version; the key went to Say Yield on Drive
+status=implemented
 
 [FileDir yieldMarked]
 name=Say Yield Marked
@@ -3745,9 +3775,10 @@ change=renamed 15 November 2026 from Yield Marked (A11)
 
 [FileDir yieldOnDrive]
 name=Say Yield on Drive
-keys=Control+Shift+Y
-status=current
-change=renamed 15 November 2026 from Yield on Drive (A11)
+keys=Alt+Shift+Y
+change=was Control+Shift+Y, 17 November 2026
+reason=Control+Shift+Y is Yield with Regex in the suite
+status=implemented
 
 [FileDir zip]
 name=Zip
@@ -4182,8 +4213,10 @@ status=current
 
 [HomerView sayTime]
 name=Say Time
-keys=Alt+SemiColon
-status=current
+keys=
+change=dropped, was Alt+SemiColon
+reason=JAWS+F12 and NVDA+F12 say the time, and the date when pressed twice, in every program; the suite's own key added nothing (17 November 2026)
+status=retired
 
 [HomerView sayUrl]
 name=Say url
