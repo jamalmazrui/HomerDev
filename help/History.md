@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.243.0 -- 17 November 2026
+
+- **The keymap work is finished: no change in the suite manifest is still proposed.** Of the 21 that were, 13 HomerView renames and key changes had been built without the manifest saying so, and now it does. The other 8 are built: HomerView's Find and Yield say "with Regex", as EdSharp's do; HomerView has Choose Active Browsers in its command table, and two handoffs, Open Saved Page in EdSharp and Show Page Folder in FileDir, under NVDA and JAWS; EdSharp has Say Position (Alt+Delete) and Show in FileDir (Control+Shift+Backslash). The manifest's HomerView Hotkeys and Key Describer Toggle rows now give the keys Jamal ruled.
+- **The suite catalog gains Show in FileDir** (DbDo and EdSharp, Control+Shift+Backslash) and EdSharp's Say Position, so the check holds them to one name, key and sentence.
+- **openInHomerApp in the kit's Python** (exec\Python\conversion.py), the twin of SuiteCommands.openInHomerApp in C#: it starts another Homer app on a path and returns what to say, so HomerView hands over to EdSharp and FileDir the way DbDo and EdSharp do.
+- **No byte order mark in .gitattributes or .gitignore.** fixEncoding had given each app's .gitattributes one, and git read it as part of the first line, so that comment became a pattern and every git command warned "CRLF, is not a valid attribute name". fixEncoding now writes both without one, taking off a mark already there, and check expects none.
+- DbDo, EdSharp and HomerView need this kit.
+
 ## 1.242.0 -- 16 November 2026
 
 - **Shift+letter only says or moves, in FileDir as in DbDo (Jamal's phase).** The suite catalog gains Say Filter (Shift+F), Say Marked (Shift+M) and Say Order (Shift+O) for DbDo and FileDir, word for word the same, so check holds the two apps together. The suite manifest records FileDir's 14 moved keys, its 5 commands left on the menu with no key, and its 3 new say commands, each with the key it replaced and why. help\KeyDecisions.md has the whole map.

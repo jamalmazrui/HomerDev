@@ -176,6 +176,19 @@ Jamal's rule of 19 October says to decide a pending question by best judgment, j
 9. **The rulings summaries above stay labeled "Summary, to confirm."** Only Jamal can confirm his own words.
 10. **The agreed renames wait for Phase 1,** when the command record keeps old names searchable. Timer Toggle is the one rename made now, because the timer change (A15) names it.
 
+## The keymap work finished (17 November 2026)
+
+Jamal asked to complete the Homer keymap work. Nothing in data\SuiteCommands.inix is now proposed.
+
+- **Built earlier, recorded now:** 13 HomerView renames and key moves (Copy Log, Developer Notes, Check with Equal Access, the four Previous commands, ReadMe, Say url, Search Next and Search Previous, Hotkeys, Key Describer Toggle).
+- **Built now:**
+  - HomerView: Forward Find with Regex, Reverse Find with Regex, Yield with Regex (EdSharp's names), Choose Active Browsers in the command table, Open Saved Page in EdSharp, Show Page Folder in FileDir.
+  - EdSharp: Say Position (Alt+Delete), Show in FileDir (Control+Shift+Backslash).
+- **Two judgments, recorded so they can be argued with:**
+  - EdSharp keeps Say Address (Alt+A) beside Say Position (Alt+Delete). They overlap, but Say Address gives pages when HardPageAddress is on and has been EdSharp's key for years, while Say Position is the suite's command, word for word as in DbDo, FileDir and HomerView, and counts lines in the text rather than wrapped screen lines. Merging them would take Alt+A's page mode or the suite's sentence away.
+  - EdSharp's Show in FileDir takes DbDo's Control+Shift+Backslash rather than staying menu-only, since the suite rule is one name, one key; it completes the Backslash family there too (Alt: Explorer, Control: command prompt).
+- **Found on the way:** 58 of DbDo's command lines sat inside the tsv connection string's backtick fence, so no check saw them and DbDo never loaded their descriptions; they are back in [Hotkeys].
+
 ## Shift+letter only says or moves: FileDir (16 November 2026)
 
 Jamal asked for a new phase: FileDir should use Shift+letter keys as DbDo does, to say information and never to act. His own ideas were Control+Shift+C for Copy to Folder and Control+Shift+M for Move to Folder, with displaced commands moved or, when hardly relevant, left on a menu with no key. Claude proposed a map, Jamal said go, and every choice below is recorded in data\SuiteCommands.inix with the key it replaced. The rollback zip of that day restores every file.

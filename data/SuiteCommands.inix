@@ -2110,9 +2110,9 @@ status=current
 name=Say Position
 keys=Alt+Delete
 change=new
-reason=line, column and percent; JAWS key map passes it through
+reason=line, column and percent, counted in the text, so a wrapped line is one line; Say Address (Alt+A) keeps EdSharp's own address with pages; the JAWS key map passes Alt+Delete through, written by tidy; built 17 November 2026
 disposition=accepted with correction: line and column in the buffer, not wrapped screen lines
-status=proposed
+status=implemented
 
 [EdSharp saySelected]
 name=Say Selected
@@ -2210,11 +2210,11 @@ status=current
 
 [EdSharp showInFileDir]
 name=Show in FileDir
-keys=
+keys=Control+Shift+Backslash
 change=new
-reason=handoff
+reason=handoff, on DbDo's key for the same command: the Backslash keys open the current thing somewhere else (Explorer with Alt, a command prompt with Control, the other Homer app with Control+Shift); built 17 November 2026
 disposition=accepted
-status=proposed
+status=implemented
 
 [EdSharp specialCharacter]
 name=Special Character
@@ -3793,15 +3793,15 @@ keys=
 change=keys changed, was Alt+Shift+E
 reason=frees Alt+Shift+E; Check Accessibility asks which engine
 disposition=accepted
-status=proposed
+status=implemented
 
 [HomerView chooseActiveBrowsers]
 name=Choose Active Browsers
 keys=
 change=new
-reason=which installed browsers HomerView works in, kept in HomerView.inix
+reason=which installed browsers HomerView works in, kept in HomerView.inix; in the command table, Hotkeys and the guide 17 November 2026 (JAWS: activeBrowsers through Edit Settings)
 disposition=accepted
-status=proposed
+status=implemented
 
 [HomerView chooseBrowser]
 name=Choose Browser
@@ -3844,7 +3844,7 @@ keys=Alt+Shift+L
 change=renamed from Log to Clipboard, was Alt+Shift+L
 reason=suite name; Control+F12 belongs to the browser's developer tools
 disposition=accepted
-status=proposed
+status=implemented
 
 [HomerView developerNotes]
 name=Developer Notes
@@ -3852,7 +3852,7 @@ keys=
 change=keys changed, was Control+Shift+F1
 reason=frees Control+Shift+F1
 disposition=accepted
-status=proposed
+status=implemented
 
 [HomerView dismissDialog]
 name=Dismiss Dialog
@@ -3901,8 +3901,9 @@ status=current
 name=Forward Find with Regex
 keys=Control+F3
 change=renamed from Forward Find with Regular Expression, was Control+F3
+reason=EdSharp's name, on the same key; built 17 November 2026
 disposition=accepted
-status=proposed
+status=implemented
 
 [HomerView goToPercent]
 name=Go to Percent
@@ -3931,11 +3932,11 @@ status=current
 
 [HomerView hotkeys]
 name=Hotkeys
-keys=Control+Shift+F1
+keys=
 change=renamed from Hotkey Document, was no key
-reason=suite key
+reason=suite name; the suite's Hotkeys has no key (the catalog), and Alt+Shift+H lists every key; the manifest caught up 17 November 2026
 disposition=accepted
-status=proposed
+status=implemented
 
 [HomerView invokeScript]
 name=Invoke Script
@@ -3954,11 +3955,11 @@ status=current
 
 [HomerView keyDescriberToggle]
 name=Key Describer Toggle
-keys=
+keys=Control+F1
 change=new
-reason=menu only: describes HomerView's own gestures without running them, in the page and the address bar; host-owned gestures are named, not run; Escape or the command again leaves it
+reason=Control+F1 is the Key Describer toggle in every Homer app, HomerView included (Jamal's ruling, 10 November 2026); the manifest caught up 17 November 2026
 disposition=accepted
-status=proposed
+status=implemented
 
 [HomerView launchHomerView]
 name=Launch HomerView
@@ -4024,9 +4025,9 @@ status=current
 name=Open Saved Page in EdSharp
 keys=
 change=new
-reason=menu only: opens an identified saved copy of the page; with none saved, offers saving or extraction first; never converts or overwrites
+reason=menu only: opens an identified saved copy of the page (Main.htm, or Save Page's web page, Markdown or text copy under the page's name); with none saved, offers saving or extraction first; never converts or overwrites; built 17 November 2026 for NVDA and JAWS
 disposition=accepted
-status=proposed
+status=implemented
 
 [HomerView pageFolder]
 name=Page Folder
@@ -4043,28 +4044,28 @@ name=Previous Different Kind
 keys=Alt+Shift+Z
 change=renamed from Prior Different Kind, was Alt+Shift+Z
 disposition=accepted
-status=proposed
+status=implemented
 
 [HomerView previousParagraph]
 name=Previous Paragraph
 keys=Control+UpArrow
 change=renamed from Prior Paragraph, was Control+UpArrow
 disposition=accepted
-status=proposed
+status=implemented
 
 [HomerView previousSameKind]
 name=Previous Same Kind
 keys=Shift+Z
 change=renamed from Prior Same Kind, was Shift+Z
 disposition=accepted
-status=proposed
+status=implemented
 
 [HomerView previousSentence]
 name=Previous Sentence
 keys=Alt+UpArrow
 change=renamed from Prior Sentence, was Alt+UpArrow
 disposition=accepted
-status=proposed
+status=implemented
 
 [HomerView projectAnnouncement]
 name=Project Announcement
@@ -4087,7 +4088,7 @@ keys=Alt+Shift+F1
 change=renamed from Quick Start, was Alt+Shift+F1
 reason=suite name
 disposition=accepted
-status=proposed
+status=implemented
 
 [HomerView recentPages]
 name=Recent Pages
@@ -4118,8 +4119,9 @@ status=current
 name=Reverse Find with Regex
 keys=Control+Shift+F3
 change=renamed from Reverse Find with Regular Expression, was Control+Shift+F3
+reason=EdSharp's name, on the same key; built 17 November 2026
 disposition=accepted
-status=proposed
+status=implemented
 
 [HomerView saveClipboard]
 name=Save Clipboard
@@ -4177,7 +4179,7 @@ keys=Alt+U
 change=renamed from Say Url, was Alt+U
 reason=lower-case url
 disposition=accepted
-status=proposed
+status=implemented
 
 [HomerView sayYield]
 name=Say Yield
@@ -4190,7 +4192,7 @@ keys=F3
 change=renamed from Forward Find Again, was F3
 reason=wording
 disposition=accepted
-status=proposed
+status=implemented
 
 [HomerView searchPrevious]
 name=Search Previous
@@ -4198,7 +4200,7 @@ keys=Shift+F3
 change=renamed from Reverse Find Again, was Shift+F3
 reason=wording
 disposition=accepted
-status=proposed
+status=implemented
 
 [HomerView selectChunk]
 name=Select Chunk
@@ -4219,9 +4221,9 @@ status=current
 name=Show Page Folder in FileDir
 keys=
 change=new
-reason=menu only: the page's saved folder in FileDir; Page Folder keeps opening Explorer
+reason=menu only: the page's saved folder in FileDir; Page Folder keeps opening Explorer; built 17 November 2026 for NVDA and JAWS
 disposition=accepted
-status=proposed
+status=implemented
 
 [HomerView speechSettings]
 name=Speech Settings
@@ -4265,8 +4267,10 @@ status=current
 
 [HomerView userGuide]
 name=User Guide
-keys=Control+F1
-status=current
+keys=
+change=keys changed, was Control+F1, 10 November 2026; the manifest caught up 17 November 2026
+reason=Control+F1 is the Key Describer toggle in every Homer app, HomerView included; the guide is a Help menu item with no key (Jamal's ruling, 10 November 2026)
+status=ruled
 
 [HomerView voiceFaster]
 name=Voice Faster
@@ -4302,5 +4306,7 @@ status=current
 name=Yield with Regex
 keys=Control+Shift+Y
 change=renamed from Yield with Regular Expression, was Control+Shift+Y
+reason=EdSharp's name, on the same key; built 17 November 2026
 disposition=accepted
-status=proposed
+status=implemented
+

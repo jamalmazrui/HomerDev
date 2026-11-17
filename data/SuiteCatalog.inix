@@ -501,7 +501,7 @@ key=Alt+P
 description=Say the full path of {current}
 
 [command Say Position]
-apps=DbDo, FileDir, HomerView
+apps=DbDo, EdSharp, FileDir, HomerView
 key=Alt+Delete
 description=Say the current position: {what}
 
@@ -552,6 +552,11 @@ description=Repeat the last {what}, backward
 apps=EdSharp, FileDir
 key=Control+F10
 description=Send {targets_files} to a Send To choice you pick
+
+[command Show in FileDir]
+apps=DbDo, EdSharp
+key=Control+Shift+Backslash
+description=Show {targets_files} in FileDir
 
 [command Tile Horizontal]
 apps=EdSharp, FileDir
@@ -718,6 +723,9 @@ what=the cursor's place
 
 [words Say Position|DbDo]
 what=the record's number, the count and the percent
+
+[words Say Position|EdSharp]
+what=the line, the column and the percent
 
 [words Say Position|FileDir]
 what=the item's number, the count and the percent
