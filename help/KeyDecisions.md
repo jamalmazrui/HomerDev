@@ -176,6 +176,29 @@ Jamal's rule of 19 October says to decide a pending question by best judgment, j
 9. **The rulings summaries above stay labeled "Summary, to confirm."** Only Jamal can confirm his own words.
 10. **The agreed renames wait for Phase 1,** when the command record keeps old names searchable. Timer Toggle is the one rename made now, because the timer change (A15) names it.
 
+## Shift+letter only says or moves: FileDir (16 November 2026)
+
+Jamal asked for a new phase: FileDir should use Shift+letter keys as DbDo does, to say information and never to act. His own ideas were Control+Shift+C for Copy to Folder and Control+Shift+M for Move to Folder, with displaced commands moved or, when hardly relevant, left on a menu with no key. Claude proposed a map, Jamal said go, and every choice below is recorded in data\SuiteCommands.inix with the key it replaced. The rollback zip of that day restores every file.
+
+**The rule.** A Shift+letter never changes anything on disk, the clipboard or settings. It says something, or it moves focus. A Shift+letter pressed by mistake then costs nothing. Shift+B, Shift+E, Shift+I, Shift+N, Shift+P and Shift+X move, so they stay.
+
+**Moved,** alphabetically:
+
+- **Append File Contents:** Shift+A to Alt+Shift+C, beside Copy Append on Alt+C: the items' text beside the items.
+- **Convert Units:** Shift+3 to Control+3, beside Convert Encoding on Control+2.
+- **Copy Name:** Control+Shift+C to Alt+Shift+N, N for Name, beside Path to Clipboard on Alt+Shift+P.
+- **Copy to Folder:** Shift+C to Control+Shift+C, Jamal's choice.
+- **Export Type,** renamed from Output Type: Shift+O to Alt+Shift+X. X for export is the suite's export key, as DbDo's Export Data and EdSharp's Export Format; the rename lets the key's letter come from the name. The Alternate Menu finds it as "Formerly Output Type."
+- **Move to Folder:** Shift+M to Alt+Shift+M. *Changed from Jamal's first idea.* Control+Shift+M is the suite's Mail Attachment, which EdSharp shares, and EdSharp's Alt+Shift+M is Manual Options, so Mail Attachment could not move in both apps. M for Move keeps the letter.
+- **Quick Shortcut:** Shift+Q to Control+Shift+Q, beside Open Quick Folder (Control+Q) and Quick url (Alt+Shift+Q).
+- **Rename:** loses Shift+R and keeps F2 and Shift+F2.
+- **Unarchive:** Shift+U to Control+U, the fewest modifiers for a command used daily. Unarchive without Subfolders moves from Control+U to Alt+U.
+- **Zip:** Shift+Z to Control+Shift+Z, beside Zip then Delete on Control+Z. Zip List moves from Control+Shift+Z to Alt+Shift+L, L for List.
+
+**Left on the menu with no key:** Folder to Clipboard (Backspace, then Control+C, copies the same folder or archive), FTP Put and Get FTP (FTP is rarely used now), Network Connections (Windows maps drives itself), and Unarchive Test (rarely needed). Jamal allowed this for commands hardly relevant now, which narrows his 19 October principle that a menu-only command counts as lost.
+
+**New say commands,** on the freed letters, as in DbDo: Say Filter (Shift+F), Say Marked (Shift+M) and Say Order (Shift+O). Say Status gains Shift+Z beside Alt+Z, as in DbDo. Shift+A, C, G, Q, R, U and 3 stay free for future say commands.
+
 ## One Edit Settings (15 November 2026, the keyboard audit's A4)
 
 Edit Settings (Alt+Shift+E) is the one entry to an app's settings. In EdSharp and FileDir it is the kit's LbcAsk.settingsDialog: the fields, then a button for each settings file, left of OK, so Enter still saves the fields. Edit Settings File (Alt+Shift+F2) is retired, as A4 allowed once one entry offered the fields, the raw file and EdSharp's compiler file. DbDo's Edit Settings already offers its file among its buttons, and HomerView's opens its file. Alt+Shift+F2 is free in every Homer app.

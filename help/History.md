@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.242.0 -- 16 November 2026
+
+- **Shift+letter only says or moves, in FileDir as in DbDo (Jamal's phase).** The suite catalog gains Say Filter (Shift+F), Say Marked (Shift+M) and Say Order (Shift+O) for DbDo and FileDir, word for word the same, so check holds the two apps together. The suite manifest records FileDir's 14 moved keys, its 5 commands left on the menu with no key, and its 3 new say commands, each with the key it replaced and why. help\KeyDecisions.md has the whole map.
+- **FileDir needs this kit,** since its push checks its new say commands against the catalog.
+
 ## 1.241.0 -- 15 November 2026
 
 - **Old names stay findable (the keyboard audit's A11).** KeyMap.addFormerName records what a renamed command used to be called, and the shared Alternate Menu ends its line with "Formerly <name>.", so Control+F or Control+J on the old name still finds it.

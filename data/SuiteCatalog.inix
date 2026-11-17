@@ -480,6 +480,21 @@ apps=DbDo, EdSharp, FileDir, HomerView
 key=Alt+'
 description=Say the clipboard text
 
+[command Say Filter]
+apps=DbDo, FileDir
+key=Shift+F
+description=Say the filter in force
+
+[command Say Marked]
+apps=DbDo, FileDir
+key=Shift+M
+description=Say whether the current {thing} is marked
+
+[command Say Order]
+apps=DbDo, FileDir
+key=Shift+O
+description=Say the order in force
+
 [command Say Path]
 apps=EdSharp, FileDir
 key=Alt+P

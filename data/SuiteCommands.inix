@@ -2449,9 +2449,11 @@ status=implemented
 
 [FileDir appendToClipboard]
 name=Append File Contents
-keys=Shift+A
-status=current
-change=renamed 15 November 2026 from Append to Clipboard (A11)
+keys=Alt+Shift+C
+change=keys changed, was Shift+A, 16 November 2026
+reason=pairs with Copy Append, Alt+C: the items' text beside the items; no Shift+letter acts: Shift letters only say or move (Jamal's phase, 16 November 2026)
+disposition=accepted
+status=implemented
 
 [FileDir arrangeIcons]
 name=Arrange Icons
@@ -2555,8 +2557,11 @@ status=current
 
 [FileDir convertUnits]
 name=Convert Units
-keys=Shift+3
-status=current
+keys=Control+3
+change=keys changed, was Shift+3, 16 November 2026
+reason=beside Convert Encoding, Control+2; no Shift+letter acts: Shift letters only say or move (Jamal's phase, 16 November 2026)
+disposition=accepted
+status=implemented
 
 [FileDir copy]
 name=Copy
@@ -2576,13 +2581,19 @@ status=current
 
 [FileDir copyName]
 name=Copy Name
-keys=Control+Shift+C
-status=current
+keys=Alt+Shift+N
+change=keys changed, was Control+Shift+C, 16 November 2026
+reason=N for Name, beside Path to Clipboard, Alt+Shift+P; Copy to Folder took Control+Shift+C
+disposition=accepted
+status=implemented
 
 [FileDir copyToFolder]
 name=Copy to Folder
-keys=Shift+C
-status=current
+keys=Control+Shift+C
+change=keys changed, was Shift+C, 16 November 2026
+reason=Jamal's choice; no Shift+letter acts: Shift letters only say or move (Jamal's phase, 16 November 2026)
+disposition=accepted
+status=implemented
 
 [FileDir currentWindows]
 name=Current Windows
@@ -2714,16 +2725,19 @@ status=current
 
 [FileDir folderToClipboard]
 name=Folder to Clipboard
-keys=Alt+Shift+C
-change=keys changed, was Control+Shift+Apostrophe
-reason=C starts Clipboard; freed this round when Edit Settings left it; Alt+Shift is the app-command pattern
+keys=
+change=keys changed, was Alt+Shift+C, 16 November 2026
+reason=menu only: Backspace, then Control+C, copies the same folder or archive; Append File Contents took Alt+Shift+C
 disposition=accepted
 status=implemented
 
 [FileDir ftpPut]
 name=FTP Put
-keys=Shift+F
-status=current
+keys=
+change=keys changed, was Shift+F, 16 November 2026
+reason=menu only: FTP is rarely used now; no Shift+letter acts: Shift letters only say or move (Jamal's phase, 16 November 2026)
+disposition=accepted
+status=implemented
 
 [FileDir general]
 name=General
@@ -2732,8 +2746,11 @@ status=current
 
 [FileDir getFTP]
 name=Get FTP
-keys=Shift+G
-status=current
+keys=
+change=keys changed, was Shift+G, 16 November 2026
+reason=menu only: FTP is rarely used now; no Shift+letter acts: Shift letters only say or move (Jamal's phase, 16 November 2026)
+disposition=accepted
+status=implemented
 
 [FileDir goBack]
 name=Go Back
@@ -2972,13 +2989,19 @@ status=implemented
 
 [FileDir moveToFolder]
 name=Move to Folder
-keys=Shift+M
-status=current
+keys=Alt+Shift+M
+change=keys changed, was Shift+M, 16 November 2026
+reason=M for Move; Control+Shift+M stays the suite's Mail Attachment, as in EdSharp, whose Alt+Shift+M is Manual Options; no Shift+letter acts: Shift letters only say or move (Jamal's phase, 16 November 2026)
+disposition=accepted
+status=implemented
 
 [FileDir networkConnections]
 name=Network Connections
-keys=Alt+Shift+N
-status=current
+keys=
+change=keys changed, was Alt+Shift+N, 16 November 2026
+reason=menu only: Windows maps drives itself; Copy Name took Alt+Shift+N
+disposition=accepted
+status=implemented
 
 [FileDir newFolder]
 name=New Folder
@@ -3092,9 +3115,12 @@ keys=Alt+Shift+O
 status=current
 
 [FileDir outputType]
-name=Output Type
-keys=Shift+O
-status=current
+name=Export Type
+keys=Alt+Shift+X
+change=renamed from Output Type and keys changed, was Shift+O, 16 November 2026
+reason=renamed Export Type: X for export, the suite's export key, as DbDo's Export Data and EdSharp's Export Format; no Shift+letter acts: Shift letters only say or move (Jamal's phase, 16 November 2026)
+disposition=accepted
+status=implemented
 
 [FileDir parentFolder]
 name=Parent Folder
@@ -3134,8 +3160,10 @@ status=current
 
 [FileDir playMedia]
 name=Play Media
-keys=Alt+Shift+L
-status=current
+keys=Control+P
+change=keys changed, was Alt+Shift+L, 9 November 2026; the manifest caught up 16 November 2026
+reason=Control+P plays media in every Homer app (Jamal's ruling, 9 November 2026)
+status=ruled
 
 [FileDir playTutorials]
 name=Play Tutorials
@@ -3183,8 +3211,10 @@ status=current
 
 [FileDir print]
 name=Print
-keys=Control+P
-status=current
+keys=
+change=keys changed, was Control+P, 9 November 2026; the manifest caught up 16 November 2026
+reason=Control+P plays media; Print stays on the Misc menu with no key (Jamal's ruling, 9 November 2026)
+status=ruled
 
 [FileDir properties]
 name=Properties
@@ -3193,8 +3223,11 @@ status=current
 
 [FileDir quickShortcut]
 name=Quick Shortcut
-keys=Shift+Q
-status=current
+keys=Control+Shift+Q
+change=keys changed, was Shift+Q, 16 November 2026
+reason=beside Open Quick Folder, Control+Q, and Quick url, Alt+Shift+Q; no Shift+letter acts: Shift letters only say or move (Jamal's phase, 16 November 2026)
+disposition=accepted
+status=implemented
 
 [FileDir quickUrl]
 name=Quick url
@@ -3243,8 +3276,11 @@ status=current
 
 [FileDir rename]
 name=Rename
-keys=F2 or Shift+R or Shift+F2
-status=current
+keys=F2 or Shift+F2
+change=keys changed, was F2 or Shift+R or Shift+F2, 16 November 2026
+reason=F2 is the suite's rename key; no Shift+letter acts: Shift letters only say or move (Jamal's phase, 16 November 2026)
+disposition=accepted
+status=implemented
 
 [FileDir renameToIdentifyContent]
 name=Rename to Identify Content
@@ -3331,6 +3367,14 @@ name=Say Date
 keys=Shift+D
 status=current
 
+[FileDir sayFilter]
+name=Say Filter
+keys=Shift+F
+change=new, 16 November 2026
+reason=DbDo's say command on the same key; Shift letters only say or move
+disposition=accepted
+status=implemented
+
 [FileDir sayFilterAndOrder]
 name=Say Filter and Order
 keys=Shift+8
@@ -3354,6 +3398,22 @@ reason=says the folder's name, then its full path (19 October 2026), taking in S
 name=Say Item Name
 keys=Apostrophe
 status=current
+
+[FileDir sayMarked]
+name=Say Marked
+keys=Shift+M
+change=new, 16 November 2026
+reason=DbDo's say command on the same key; Shift letters only say or move
+disposition=accepted
+status=implemented
+
+[FileDir sayOrder]
+name=Say Order
+keys=Shift+O
+change=new, 16 November 2026
+reason=DbDo's say command on the same key; Shift letters only say or move
+disposition=accepted
+status=implemented
 
 [FileDir sayPath]
 name=Say Path
@@ -3380,8 +3440,11 @@ status=current
 
 [FileDir sayStatus]
 name=Say Status
-keys=Alt+Z
-status=current
+keys=Alt+Z or Shift+Z
+change=keys changed, was Alt+Z, 16 November 2026
+reason=Shift+Z as a second key, as in DbDo, once Zip left it
+disposition=accepted
+status=implemented
 
 [FileDir sayTime]
 name=Say Time
@@ -3538,8 +3601,11 @@ status=current
 
 [FileDir unarchive]
 name=Unarchive
-keys=Shift+U
-status=current
+keys=Control+U
+change=keys changed, was Shift+U, 16 November 2026
+reason=the fewest modifiers for a command used daily; no Shift+letter acts: Shift letters only say or move (Jamal's phase, 16 November 2026)
+disposition=accepted
+status=implemented
 
 [FileDir unarchivePassword]
 name=Unarchive Password
@@ -3548,8 +3614,11 @@ status=current
 
 [FileDir unarchiveTest]
 name=Unarchive Test
-keys=Alt+U
-status=current
+keys=
+change=keys changed, was Alt+U, 16 November 2026
+reason=menu only: rarely needed; Unarchive without Subfolders took Alt+U
+disposition=accepted
+status=implemented
 
 [FileDir unarchiveToSameName]
 name=Unarchive to Same Name
@@ -3558,8 +3627,11 @@ status=current
 
 [FileDir unarchiveWithoutSubfolders]
 name=Unarchive without Subfolders
-keys=Control+U
-status=current
+keys=Alt+U
+change=keys changed, was Control+U, 16 November 2026
+reason=Unarchive took Control+U
+disposition=accepted
+status=implemented
 
 [FileDir unmark]
 name=Unmark
@@ -3667,14 +3739,19 @@ change=renamed 15 November 2026 from Yield on Drive (A11)
 
 [FileDir zip]
 name=Zip
-keys=Shift+Z
-status=current
+keys=Control+Shift+Z
+change=keys changed, was Shift+Z, 16 November 2026
+reason=beside Zip then Delete, Control+Z; no Shift+letter acts: Shift letters only say or move (Jamal's phase, 16 November 2026)
+disposition=accepted
+status=implemented
 
 [FileDir zipList]
 name=Zip List
-keys=Control+Shift+Z
-status=current
-exception=keeps Redo's key: FileDir has no Undo or Redo, Zip List only makes or updates an archive, and every first-letter key is taken (Jamal, 19 October 2026: a command keeps a key)
+keys=Alt+Shift+L
+change=keys changed, was Control+Shift+Z, 16 November 2026
+reason=L for List; Zip took Control+Shift+Z
+disposition=accepted
+status=implemented
 
 [FileDir zipThenDelete]
 name=Zip then Delete
