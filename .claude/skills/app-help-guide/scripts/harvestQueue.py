@@ -1,4 +1,4 @@
-﻿r"""harvestQueue.py version 3 -- gathers the help guides a collection has asked for, as the first part of its build.
+﻿r"""harvestQueue.py version 4 -- gathers the help guides a collection has asked for, as the first part of its build.
 
     harvestQueue <collection>       what the kit's projectCycle runs before buildGuide, in a guides collection
     harvestQueue                    the collection in the current folder, by hand
@@ -48,6 +48,12 @@ says: each named folder of data\harvests (GoogleDocsEditorsHelp, or GoogleDocsEd
 or every folder there when none is named. It writes results\<Folder>.zip and says how large it now is. Nothing is
 gathered and the pages in data\harvests are not changed.
 
+MORE THAN ONE QUEUE FILE (version 4, 17 November 2026). A guide asked for in a chat arrived as a whole new
+addGuides.inix, which would have replaced the sections already in the collection's copy, the record of every guide
+gathered. Now data\addGuides-<anything>.inix files are read too, after addGuides.inix and in name order, so a delivery
+adds its own file (addGuides-2026-11-17.inix) and never touches the one you have. When two files name the same guide,
+the later asked= day wins, so asking again in a new file gathers again.
+
 THE LOG is logs\<Collection>-harvestQueue-yyyyMMdd-HHmmss.log, UTF-8 with a byte order mark and Windows line endings:
 the environment, each section and what was decided for it and why, every command with its exit code and time.
 """
@@ -88,6 +94,25 @@ def readQueue(sPath):
         sKey, sValue = sTrim.split("=", 1)
         dCurrent[sKey.strip().lower()] = sValue.strip()
     return lSections
+
+
+def readQueues(sData):
+    """Every queue file in data: addGuides.inix first, then addGuides-*.inix in name order. One section per guide;
+    where a guide is named twice, the later asked= day wins. A list of (guide, {key: value}), and the files read."""
+    lsFiles = [os.path.join(sData, sQueueName)] if os.path.isfile(os.path.join(sData, sQueueName)) else []
+    if os.path.isdir(sData):
+        lsFiles += [os.path.join(sData, s) for s in sorted(os.listdir(sData), key=str.lower)
+                    if re.match(r"(?i)^addGuides-.+\.inix$", s)]
+    lSections, dIndex = [], {}
+    for sPath in lsFiles:
+        for sGuide, dValues in readQueue(sPath):
+            sKey = sGuide.lower()
+            if sKey not in dIndex:
+                dIndex[sKey] = len(lSections)
+                lSections.append((sGuide, dValues))
+            elif dValues.get("asked", "") >= lSections[dIndex[sKey]][1].get("asked", ""):
+                lSections[dIndex[sKey]] = (sGuide, dValues)
+    return lSections, lsFiles
 
 
 def readRequest(sHarvest):
@@ -302,12 +327,11 @@ def main():
             log("settings: collection %s; trim %s" % (sRoot, ", ".join(lTrimNames) or "every harvest"))
             iResult = trimNamed(sRoot, lTrimNames)
             return iResult
-        sQueue = os.path.join(sRoot, "data", sQueueName)
-        log("settings: collection %s; queue %s" % (sRoot, sQueue))
-        if not os.path.isfile(sQueue):
+        lSections, lsQueues = readQueues(os.path.join(sRoot, "data"))
+        log("settings: collection %s; queue files %s" % (sRoot, "; ".join(lsQueues) or "none"))
+        if not lsQueues:
             log("no queue file, so nothing to gather")
             return 0
-        lSections = readQueue(sQueue)
         log("queue: %d section%s: %s" % (len(lSections), "" if len(lSections) == 1 else "s", ", ".join(s for s, d in lSections)))
         lToGather = plan(sRoot, lSections)
         if not lToGather:

@@ -36,7 +36,20 @@ true about the product.
   it expecting coverage.
 - **No help at all.** Six small accessibility apps in a fortnight published an
   App Store listing, a privacy policy and nothing else. Say so plainly, and say
-  it is no reflection on the app.
+  it is no reflection on the app. Publications can be the same: MakeUseOf and
+  How-To Geek (both Valnet) have an About page, a Contact form, a newsletter page
+  and a Premium page with no questions on it; Parade has About, Contact and
+  policy pages, and its newspaper insert's delivery questions belong to each
+  newspaper (17 November 2026). Their articles teach skills, but a library of
+  how-to articles is the publication's work, not help for using it. Tom's
+  Guide (Future) is the same: About, Contact, policies, newsletters and a club
+  sign-up, no help. The rule for every how-to site: gather its help for using
+  the site, if it has any, never its articles. A store that also publishes how-to
+  articles is the reverse case: Home Depot's customer service pages are help for
+  shopping there, and its DIY project library stays outside the fence.
+- **Already held under another name.** Every Stack Exchange site serves Stack
+  Overflow's help centre with its own name put in, so the StackOverflow guide
+  covers Stack Exchange, as its preamble says (17 November 2026).
 
 ## The browser fallback
 

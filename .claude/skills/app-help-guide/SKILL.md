@@ -75,6 +75,9 @@ A collection of guides (C:\AppHelpGuides) keeps the Homer tree (11 November 2026
   `request.txt`, and moves an older gathering aside, whole, to
   `<Folder>-before-<day>`, so a fresh run never resumes over stale pages. A
   later `asked=` day gathers a guide again. The sections stay as the record.
+  A delivery adds its own `data\addGuides-<day>.inix` rather than replacing
+  this file: every `addGuides-*.inix` is read after it, and where two name the
+  same guide, the later `asked=` day wins (harvestQueue version 4).
 - **`logs`:** one log per run, `<Collection>-<task>-yyyyMMdd-HHmmss.log`, in UTF-8
   with a byte order mark and Windows line endings.
 

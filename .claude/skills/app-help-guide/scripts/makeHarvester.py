@@ -3293,6 +3293,18 @@ lEstates = [
     # guide is built, by section, as Bitwarden's administrator half was; the listing gathers them with the rest.
     zendeskEstate("Box", "getBoxHelp.py", "BoxHelp", "support.box.com", 2500),
     zendeskEstate("Egnyte", "getEgnyteHelp.py", "EgnyteHelp", "helpdesk.egnyte.com", 2500),
+    # CLUBHOUSE (17 November 2026): a Zendesk centre at support.clubhouse.com, probed before writing: its listings
+    # answer, 116 articles in 38 sections. Its legal sections are gathered with the rest and left out when built.
+    zendeskEstate("Clubhouse", "getClubhouseHelp.py", "ClubhouseHelp", "support.clubhouse.com", 300),
+    # LEARNING, SERVICES AND FUNDING (17 November 2026), each probed first: Patreon's listing counts 431 articles,
+    # GoFundMe's 164, Fiverr's 306 and Ko-fi's 120. Wyzant's centre answers at /hc/en-us with six categories; its
+    # listing refused the probe, so the run's log will say whether it answers a harvester. Legal pages are gathered
+    # with the rest and left out when built.
+    zendeskEstate("Patreon", "getPatreonHelp.py", "PatreonHelp", "support.patreon.com", 600),
+    zendeskEstate("GoFundMe", "getGoFundMeHelp.py", "GoFundMeHelp", "support.gofundme.com", 300),
+    zendeskEstate("Fiverr", "getFiverrHelp.py", "FiverrHelp", "help.fiverr.com", 500),
+    zendeskEstate("Ko-fi", "getKofiHelp.py", "KofiHelp", "help.ko-fi.com", 300),
+    zendeskEstate("Wyzant", "getWyzantHelp.py", "WyzantHelp", "support.wyzant.com", 600),
     # GOOGLE WORKSPACE (14 November 2026). Docs, Sheets, Slides, Vids and Drawings share one centre, the Docs
     # Editors help at support.google.com/docs, so one harvest serves a guide for each, split when built by the trail
     # above each article; Forms, gathered in September through a subject gate, can be rebuilt from it if fuller.
@@ -3309,6 +3321,50 @@ lEstates = [
                  ["?hl=en", "answer/6372878?hl=en", "answer/98216"], 800),
     googleEstate("Google Tasks", "getGoogleTasksHelp.py", "GoogleTasksHelp", "tasks",
                  ["?hl=en", "answer/7675772", "answer/7675838", "answer/9901136"], 300),
+    # KICKSTARTER (17 November 2026): an Intercom centre at help.kickstarter.com/hc/en-us, which counts its own
+    # collections -- basics 54, backers 64, creators 177, creators' educational resources 14 -- so about 309 articles.
+    # Intercom publishes no listing, so the crawl follows the collections to the articles.
+    {
+        "sProduct": "Kickstarter",
+        "sScriptName": "getKickstarterHelp.py",
+        "sSystem": "Intercom at help.kickstarter.com",
+        "sFolder": "KickstarterHelp",
+        "sZipName": "KickstarterHelp.zip",
+        "iMaxPages": 600,
+        "nDelay": 1.0,
+        "sSeeds": '"https://help.kickstarter.com/hc/en-us"',
+        "sFencePattern": r"^https://help\.kickstarter\.com/(hc/)?en(-us)?(/(articles|collections|sections|categories)/[A-Za-z0-9_%-]+)?/?$",
+        "sSubjectPattern": "",
+        "sReadyPattern": r"(intercom|<article|collections/|articles/)",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": "",
+    },
+    # HOME DEPOT (17 November 2026): no help centre, but a customer service hub at /c/customer_service, probed before
+    # writing, that links some fifteen pages: an FAQ of 19 questions, delivery, returns and refunds, tracking and
+    # cancelling an order, the credit card, recalls, protection plans, subscriptions, gift cards, tool and truck rental
+    # and the military discount. The fence names those pages and no others, so the store's catalogue and its thousands
+    # of DIY project articles stay out. Home Depot's site defends itself against plain requests, so Edge draws each page.
+    {
+        "sProduct": "Home Depot",
+        "sScriptName": "getHomeDepotHelp.py",
+        "sSystem": "the customer service pages at homedepot.com/c, drawn by Microsoft Edge",
+        "sFolder": "HomeDepotHelp",
+        "sZipName": "HomeDepotHelp.zip",
+        "iMaxPages": 40,
+        "nDelay": 2.0,
+        "sFetch": "edge",
+        "iBrowserWait": 15,
+        "sSeeds": ('"https://www.homedepot.com/c/customer_service",\n'
+                   '              "https://www.homedepot.com/c/Customer_Support_Answers"'),
+        "sFencePattern": (r"^https://www\.homedepot\.com/(c/(customer_service|Customer_Support_Answers|how-to-track-an-order|"
+                          r"how-to-cancel-an-order|Return_Policy|refund-policy|delivery|credit-center|Product_Recalls|"
+                          r"The_Home_Depot_Protection_Plans|subscription_service|gift-cards|tool_and_truck_rental|military)|"
+                          r"rebate-center/index\.html)/?$"),
+        "sSubjectPattern": "",
+        "sReadyPattern": r"Home Depot",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": "",
+    },
     # GLASSDOOR: a Salesforce help centre (help.glassdoor.com/s/article/..., /s/topic/...), drawn by script in the
     # page, as OpenTable's was, so Edge fetches it with thirty seconds a page. No language field in the seeds: the
     # crawler drops it, and a seed must pass its own fence before anything is cleaned.

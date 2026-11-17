@@ -7,6 +7,22 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.249.0 -- 17 November 2026
+
+- **A walk with other sound playing no longer looks hung.** A talk playing beside DbDo's and FileDir's live tests made each step wait ten seconds for quiet and listen fifteen, nearly a minute a step. Once two steps find other sound, recordWalk stops waiting for quiet and listens only for the step's own wait, and says so.
+- **recordWalk says when the app closes.** DbDo's live test of 14:37 closed during Say Position and again after the Alternate Menu; the walk restarted it each time without saying so. Now the console names the step, the report says so at the top, and the log keeps the end of the app's own session log.
+- **testSay says when the app is already open,** since the copy that is open is the one tested: FileDir's run of 13:30 tested a FileDir opened before its build, so Alt+Shift+Y ran the old command.
+- **testSay leaves out HomerView, and says why:** its Say commands work in its browser window, which belongs to Edge, so both runs waited thirty seconds for a window that never comes. From HomerDev, the suite run tests DbDo, EdSharp and FileDir.
+
+## 1.248.0 -- 17 November 2026
+
+- **A help guide delivery no longer replaces the collection's queue.** harvestQueue reads data\addGuides.inix and then every data\addGuides-<anything>.inix, in name order, so a delivery adds its own file and the record of every guide gathered stays whole. Where two files name the same guide, the later asked= day wins.
+- **Clubhouse joins the app help guides:** a Zendesk centre at support.clubhouse.com, 116 articles, gathered by the listing route. Its legal pages, policies, law enforcement pages, copyright notices and country notices are left out when the guide is built, and its community guidelines are kept.
+- **Home Depot joins them:** its customer service pages -- the FAQ, delivery, returns and refunds, tracking and cancelling an order, the credit card, recalls, protection plans, subscriptions, gift cards, rentals and the military discount -- drawn by Edge, since the site refuses plain requests. The fence names those pages only, so the catalogue and the DIY project library stay out.
+- **Six learning, service and funding sites join them:** Patreon, GoFundMe, Fiverr, Ko-fi and Wyzant, all Zendesk centres read by their listings, and Kickstarter, an Intercom centre crawled from its collections. One shared placer serves the five Zendesk guides: the publisher's own categories, with legal and developer pages left out and community guidelines kept.
+- **Coursera waits:** its help centre is drawn in the browser and lists each article in 18 languages, a few thousand addresses, so gathering it with Edge would take many hours. Its site map is the way in when it is wanted.
+- **Five more asked for, and settled without a harvest:** Stack Exchange is already covered by the StackOverflow guide, since every Stack Exchange site serves the same help centre. MakeUseOf, How-To Geek, Tom's Guide and Parade publish no help, only About, Contact, newsletter and subscription pages, and a how-to site's articles are its work, not help for using it. refusal-rules.md records why.
+
 ## 1.247.0 -- 17 November 2026
 
 - **Marked or Current, one dialog for the suite.** LbcAsk.markedOrCurrent asks whether a command should act on the marked items, with their count on the default button, or the current one, titled with the command's name so the title confirms the key just pressed. FileDir and DbDo use it. A button can now carry its own Shift+F1 hint.

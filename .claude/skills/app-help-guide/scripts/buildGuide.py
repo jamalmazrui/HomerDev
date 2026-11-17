@@ -1040,6 +1040,52 @@ def readEgnyte(sFolder):
     return buildFromTree(sFolder, "Egnyte", placeEgnyte)
 
 
+# CLUBHOUSE (17 November 2026): 116 articles in Clubhouse's own categories. Left out, under the collection's rule
+# against legal language: the Legal category, the law enforcement and government requests, the policies, the copyright
+# notices, the country notices (Germany's Impressum) and the UK and EEA cancellation form. The categories are
+# Clubhouse's own, without the emoji some carry; a section filed in no category goes under its own name.
+lClubhouseLeftOut = ["legal", "law enforcement", "policies", "copyright violation", "country-specific information"]
+
+
+def placeClubhouse(sCategory, sTop, sSection, sTitle):
+    # The community guidelines are the rules of the rooms, in plain words, so they stay beside the policies' other help.
+    if re.search(r"(?i)guidelines", sTitle): return re.sub(r"[^\w&,'\-?: ]", "", sCategory or sTop or "").strip() or sMiscellaneous
+    for sName in (sCategory, sTop, sSection):
+        sPlain = re.sub(r"[^\w&,'\- ]", "", sName or "").strip().lower()
+        if any(sPlain.startswith(s) for s in lClubhouseLeftOut): return ""
+    if re.search(r"(?i)cancellation form|impressum", sTitle): return ""
+    sPlace = re.sub(r"[^\w&,'\-?: ]", "", sCategory or sTop or "").strip()
+    return sPlace.replace("Acitivty", "Activity") or sMiscellaneous
+
+
+def readClubhouse(sFolder):
+    return buildFromTree(sFolder, "Clubhouse", placeClubhouse)
+
+
+# ONE PLACER FOR A PLAIN ZENDESK CENTRE (17 November 2026): Patreon, GoFundMe, Fiverr, Ko-fi and Wyzant. The category
+# is the publisher's own, without emoji; the collection's standing rule leaves out legal language and developer pages,
+# found by the words in the category, section or title. A community's guidelines are its rules in plain words, so
+# they stay.
+sLegalPattern = (r"(?i)(\blegal\b|terms of (use|service)|terms and conditions|privacy (policy|notice)|cookie|"
+                 r"law enforcement|government (agency )?requests|impressum|\bdmca\b|copyright|"
+                 r"\bapi\b|developers?\b)")
+
+
+def plainCategory(sName):
+    return re.sub(r"\s+", " ", re.sub(r"[^\w&,'\-?: ]", "", sName or "")).strip()
+
+
+def placeZendeskPlain(sCategory, sTop, sSection, sTitle):
+    if not re.search(r"(?i)guidelines", sTitle):
+        for sName in (sCategory, sTop, sSection, sTitle):
+            if re.search(sLegalPattern, sName or ""): return ""
+    return plainCategory(sCategory) or plainCategory(sTop) or sMiscellaneous
+
+
+def readZendeskPlain(sFolder):
+    return buildFromTree(sFolder, os.path.basename(sFolder.rstrip("\\/")), placeZendeskPlain)
+
+
 # MICROSOFT 365 (15 November 2026): Excel, OneDrive, Outlook, PowerPoint, SharePoint and Word, each gathered from
 # support.microsoft.com's own site map with its accessibility articles. One reader serves all six.
 
@@ -4154,6 +4200,20 @@ def main():
          "This guide holds Google's own help for Google Forms, gathered from support.google.com on 14 November 2026, and replaces September's: it is fuller and current. It covers making and editing a form, question types, quizzes, sharing a form, and collecting and viewing responses.\r\n\r\nGoogle keeps the help for Docs, Sheets, Slides, Forms and Vids in one help centre, and this guide holds the part of it about Forms. Google writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for: Computer, or iPhone and iPad. Google's Android editions are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are Google's own topics."),
         ("Box", "BoxHelp", readBox, "Box.md", "Box help",
          "This guide holds Box's own help, gathered from support.box.com on 15 November 2026. Box is an online service for keeping, sharing, signing and working on files with other people. Its help centre has almost 2,900 articles; this guide keeps the 668 written for a person who uses Box on Windows, the web, or an iPhone or iPad, under Box's own product names, with each product's troubleshooting beside its guides. Files, folders and sharing come under Using Box, and every app Box works inside, such as Microsoft Office, Teams, Slack, Google Workspace, Outlook and Zoom, comes under Box with other apps.\r\n\r\nLeft out on purpose: 1,729 release notes and announcements, which are a history of changes rather than help; the administrator's console and the products only an administrator runs, such as Shield, Governance, Shuttle and the developer platform; the integrations with business systems such as Salesforce and NetSuite; and Box's training and certification pages. If you run Box for an organisation, Box's own help centre has those pages."),
+        ("Fiverr", "FiverrHelp", readZendeskPlain, "Fiverr.md", "Fiverr help",
+         "This guide holds Fiverr's own help, gathered from help.fiverr.com in November 2026. Fiverr is a marketplace where people hire freelancers for small jobs, from writing and design to voice work and programming. It covers buying, selling, orders, payments and your account, for buyers and freelancers in one estate.\r\n\r\nLeft out on purpose: legal pages such as terms and privacy policies, pages for law enforcement and developers, and Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are the publisher's own."),
+        ("GoFundMe", "GoFundMeHelp", readZendeskPlain, "GoFundMe.md", "GoFundMe help",
+         "This guide holds GoFundMe's own help, gathered from support.gofundme.com in November 2026. GoFundMe is a site for raising money for a person, a cause or a charity. It covers starting and sharing a fundraiser, donating, withdrawing the money, safety and refunds, and fundraising for nonprofits.\r\n\r\nLeft out on purpose: legal pages such as terms and privacy policies, pages for law enforcement and developers, and Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are the publisher's own."),
+        ("Kickstarter", "KickstarterHelp", readUdio, "Kickstarter.md", "Kickstarter help",
+         "This guide holds Kickstarter's own help, gathered from help.kickstarter.com in November 2026. Kickstarter is a site where creators raise money from backers to make a project, such as a book, a game, an album or a gadget. It covers the basics, backing a project, running one as a creator, and Kickstarter's resources for creators. The categories are Kickstarter's own collections.\r\n\r\nLeft out on purpose: Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa."),
+        ("Ko-fi", "KofiHelp", readZendeskPlain, "Kofi.md", "Ko-fi help",
+         "This guide holds Ko-fi's own help, gathered from help.ko-fi.com in November 2026. Ko-fi is a site where creators take tips, memberships, commissions and shop sales from their supporters. It covers getting started, ways to earn, payments, and using Ko-fi with other platforms. Patreon, a similar site, has a guide of its own in this collection.\r\n\r\nLeft out on purpose: legal pages such as terms and privacy policies, pages for law enforcement and developers, and Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are the publisher's own."),
+        ("Patreon", "PatreonHelp", readZendeskPlain, "Patreon.md", "Patreon help",
+         "This guide holds Patreon's own help, gathered from support.patreon.com in November 2026. Patreon is a site where creators earn from members who pay each month for their work. It covers joining and paying as a member, and setting up, earning and getting paid as a creator. Ko-fi, a similar site, has a guide of its own in this collection.\r\n\r\nLeft out on purpose: legal pages such as terms and privacy policies, pages for law enforcement and developers, and Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are the publisher's own."),
+        ("Wyzant", "WyzantHelp", readZendeskPlain, "Wyzant.md", "Wyzant help",
+         "This guide holds Wyzant's own help, gathered from support.wyzant.com in November 2026. Wyzant is a site for finding a private tutor and taking lessons, online or in person. It covers students and parents, tutors, the online learning studio, and Wyzant's programs for schools and colleges.\r\n\r\nLeft out on purpose: legal pages such as terms and privacy policies, pages for law enforcement and developers, and Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are the publisher's own."),
+        ("Clubhouse", "ClubhouseHelp", readClubhouse, "Clubhouse.md", "Clubhouse help",
+         "This guide holds Clubhouse's own help, gathered from support.clubhouse.com in November 2026. Clubhouse is a social app for talking live in rooms, sending voice messages and chats, and building groups called houses. It covers signing up and your profile, the hallway and explore, live rooms, messages, friends and houses, Clubhouse Plus, and trust and safety, for the iPhone and iPad app and the web. Android-only articles are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa.\r\n\r\nLeft out on purpose: Clubhouse's legal pages, its policies, its pages for law enforcement and government requests, its copyright notices and its country notices. The categories are Clubhouse's own."),
         ("Egnyte", "EgnyteHelp", readEgnyte, "Egnyte.md", "Egnyte help",
          "This guide holds Egnyte's own help, gathered from helpdesk.egnyte.com on 15 November 2026. Egnyte is an online service that businesses use to store, share and work on files. Its help centre has about 1,500 articles, most written for the company administrators who set it up; this guide keeps the 421 written for a person who uses it: the web app, the desktop app, the iPhone and iPad app, the AI assistant, and Egnyte with Microsoft 365 and Google.\r\n\r\nLeft out on purpose: 607 announcements, release notes and known issues, which are a history of changes rather than help; the administrators' pages, such as users and groups, governance, reporting, migration and the storage appliances; and the editions for architects and life sciences companies. If you run Egnyte for your company, Egnyte's own help centre has those pages."),
         ("Excel", "ExcelHelp", readMicrosoftExcel, "Excel.md", "Excel help",
