@@ -184,7 +184,7 @@ def auditSetupLog(sPath):
         if sOffer != "Update" or sName in dOutcome: continue
         sScript = dScripts.get(sName, "")
         if sScript not in lsRan:
-            lsUnknown.append("%s was offered as Update and not ticked" % sName)
+            lsUnknown.append("%s was offered as Update and not marked" % sName)
             continue
         sScriptLog = scriptLogAfter(os.path.dirname(sPath), sScript, sStamp)
         sSaid = readText(sScriptLog) if sScriptLog else ""

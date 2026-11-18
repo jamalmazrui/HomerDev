@@ -448,7 +448,9 @@ public static class Say
     // next call try again.
     private static object oJawsApi;
     private static object oSapiVoice;
-    private static bool jawsSay(string sText)
+    private static bool jawsSay(string sText) { return jawsSay(sText, true); }
+
+    private static bool jawsSay(string sText, bool bBraille)
     {
         if (string.IsNullOrEmpty(sText)) return false;
         try
@@ -467,7 +469,7 @@ public static class Say
             // WHAT IS SPOKEN IS ALSO BRAILLED (kit 1.92.3): JAWS's own BrailleMessage function, through the API's
             // RunFunction, flashes the message on the display for three seconds. Unconfirmed on every JAWS
             // version, so a failure here is ignored and never stops the speech.
-            try { oJaws.RunFunction("BrailleMessage(\"" + sText.Replace("\"", "'").Replace("\r", " ").Replace("\n", " ") + "\", 0, 3000)"); } catch { }
+            if (bBraille) try { oJaws.RunFunction("BrailleMessage(\"" + sText.Replace("\"", "'").Replace("\r", " ").Replace("\n", " ") + "\", 0, 3000)"); } catch { }
             return result != null && (bool)result;
         }
         catch
@@ -561,17 +563,40 @@ public static class Say
         catch { return false; }
     }
 
-    private static bool nvdaSay(string sText)
+    private static bool nvdaSay(string sText) { return nvdaSay(sText, true); }
+
+    private static bool nvdaSay(string sText, bool bBraille)
     {
         if (string.IsNullOrEmpty(sText)) return false;
         if (!bNvdaDllPresent) return false;
         try
         {
             bool bSpoken = nvdaController_speakText(sText) == 0;
-            try { nvdaController_brailleMessage(sText); } catch { }
+            if (bBraille) try { nvdaController_brailleMessage(sText); } catch { }
             return bSpoken;
         }
         catch { return false; }
+    }
+
+    // sayQueued: one unit of a long reading (kit 1.251.0, 17 November 2026), for ReadAloud. It goes to the reader's
+    // queue like sayForced, but past the repeat guard -- two records with the same value must both be heard -- without
+    // a log line each, since a reading of fifty thousand values would bury the log (ReadAloud logs the reading
+    // instead), and without a braille flash each, which would replace itself faster than anyone could read it.
+    public static bool sayQueued(string sText)
+    {
+        if (string.IsNullOrEmpty(sText)) return false;
+        if (isJawsRunning() && jawsSay(sText, false)) return true;
+        if (isNvdaRunning() && nvdaSay(sText, false)) return true;
+        sayViaUia(sText);
+        return true;
+    }
+
+    // stopSpeech: silence the screen reader now, its queue included (kit 1.251.0). JAWS's API has StopSpeech and
+    // NVDA's controller client cancelSpeech; Narrator and the rest have nothing to call.
+    public static void stopSpeech()
+    {
+        try { if (isJawsRunning() && oJawsApi != null) { dynamic oJaws = oJawsApi; oJaws.StopSpeech(); } } catch { }
+        try { if (isNvdaRunning()) nvdaController_cancelSpeech(); } catch { }
     }
 
     // ---- Narrator / generic UIA path ----
@@ -1242,6 +1267,149 @@ public static class JawsSettingsInstaller
         }
         catch { }
         return sLocal;
+    }
+}
+
+// =====================================================================
+// READ ALOUD (kit 1.251.0, 17 November 2026): a long reading -- every record in view, every value in a column --
+// spoken one unit at a time, each its own utterance, so a pause falls between values and between records, and stopped
+// the moment a key is pressed.
+//
+// WHY NOT HAND THE READER EVERYTHING AT ONCE. Say.say(parts) queues every part at once, which is right for a few, but
+// a reading of fifty thousand values takes many seconds just to hand over, and whatever is handed over after a key
+// press flushed the reader's queue is spoken anyway: the reading would resume after the user stopped it. So ReadAloud
+// keeps only about fifteen seconds of speech queued ahead, topping it up every fifty milliseconds, and stops topping
+// it up at the first key.
+//
+// HOW A KEY IS NOTICED. Windows' GetLastInputInfo changes with every key or mouse event anywhere. The keys that
+// started the reading (Alt+L) are still down when it starts, so nothing counts until every key is up; after that, any
+// change not explained by the mouse moving is a key, and the reading ends. The screen reader's own handling of that key
+// stops its speech, as it always does; for Control, which says nothing of its own, ReadAloud also tells JAWS or NVDA to
+// stop at once, so the queue is surely empty.
+// =====================================================================
+public static class ReadAloud
+{
+    [StructLayout(LayoutKind.Sequential)]
+    private struct LASTINPUTINFO { public uint cbSize; public uint dwTime; }
+    [DllImport("user32.dll")] private static extern bool GetLastInputInfo(ref LASTINPUTINFO plii);
+    [DllImport("user32.dll")] private static extern short GetAsyncKeyState(int vKey);
+
+    private const int iCharsPerSecond = 50, iLeadMillis = 15000, iPauseMillis = 150, iTickMillis = 50;
+    private const int vkControl = 0x11;
+
+    private static bool bArmed;
+    private static Action<int, bool> fFinished;
+    private static int iSent, iTotal;
+    private static long iQueuedUntil;
+    private static uint iInputBaseline;
+    private static List<string> lsParts;
+    private static Point ptMouse;
+    private static string sName = "";
+    private static System.Windows.Forms.Timer oTimer;
+
+    // bReading: true while a reading is running or its queued speech is still expected.
+    public static bool bReading { get { return oTimer != null; } }
+
+    // start: read the parts, one utterance each, empty ones skipped. sReadingName names it in the log. fDone, when given,
+    // hears how many parts were handed to the reader and whether a key stopped the reading.
+    public static void start(string sReadingName, IEnumerable<string> parts, Action<int, bool> fDone)
+    {
+        stop(false);
+        lsParts = new List<string>();
+        if (parts != null) foreach (string sPart in parts) if (!string.IsNullOrEmpty(sPart)) lsParts.Add(sPart);
+        sName = sReadingName ?? "";
+        fFinished = fDone;
+        iSent = 0;
+        iTotal = lsParts.Count;
+        bArmed = false;
+        iQueuedUntil = Environment.TickCount;
+        try { Log.info("ReadAloud: " + sName + " started, " + iTotal + " parts"); } catch { }
+        if (iTotal == 0) { finish(false); return; }
+        for (int vk = 1; vk < 256; vk++) GetAsyncKeyState(vk);
+        oTimer = new System.Windows.Forms.Timer();
+        oTimer.Interval = iTickMillis;
+        oTimer.Tick += onTick;
+        oTimer.Start();
+        topUp();
+    }
+
+    // stop: end the reading now. bSilence also empties the reader's queue.
+    public static void stop(bool bSilence)
+    {
+        if (oTimer == null) return;
+        if (bSilence) Say.stopSpeech();
+        finish(true);
+    }
+
+    private static uint lastInput()
+    {
+        LASTINPUTINFO oInfo = new LASTINPUTINFO();
+        oInfo.cbSize = (uint)Marshal.SizeOf(typeof(LASTINPUTINFO));
+        return GetLastInputInfo(ref oInfo) ? oInfo.dwTime : 0;
+    }
+
+    private static bool anyKeyDown()
+    {
+        for (int vk = 8; vk < 256; vk++)
+            if ((GetAsyncKeyState(vk) & 0x8000) != 0) return true;
+        return false;
+    }
+
+    private static void onTick(object oSender, EventArgs e)
+    {
+        if (oTimer == null) return;
+        if (!bArmed)
+        {
+            // The keys that started the reading are still down: wait for every key to be up.
+            if (anyKeyDown()) { topUp(); return; }
+            bArmed = true;
+            iInputBaseline = lastInput();
+            ptMouse = Cursor.Position;
+            GetAsyncKeyState(vkControl);
+        }
+        else if (lastInput() != iInputBaseline)
+        {
+            if (Cursor.Position != ptMouse && !anyKeyDown())
+            {
+                // The mouse moved; that is no reason to stop.
+                iInputBaseline = lastInput();
+                ptMouse = Cursor.Position;
+            }
+            else
+            {
+                bool bControl = (GetAsyncKeyState(vkControl) & 0x8001) != 0;
+                try { Log.info("ReadAloud: " + sName + " stopped by a key" + (bControl ? " (Control)" : "") + " after " + iSent + " of " + iTotal + " parts"); } catch { }
+                if (bControl) Say.stopSpeech();
+                finish(true);
+                return;
+            }
+        }
+        topUp();
+        if (iSent >= iTotal && Environment.TickCount - iQueuedUntil > 1000) finish(false);
+    }
+
+    // topUp: hand the reader parts until about fifteen seconds of speech are waiting, by an estimate deliberately on
+    // the fast side, so a fast reader is never left waiting between parts.
+    private static void topUp()
+    {
+        long iNow = Environment.TickCount;
+        if (iQueuedUntil < iNow) iQueuedUntil = iNow;
+        while (iSent < iTotal && iQueuedUntil - iNow < iLeadMillis)
+        {
+            string sPart = lsParts[iSent++];
+            Say.sayQueued(sPart);
+            iQueuedUntil += sPart.Length * 1000 / iCharsPerSecond + iPauseMillis;
+        }
+    }
+
+    private static void finish(bool bStopped)
+    {
+        if (oTimer != null) { oTimer.Stop(); oTimer.Dispose(); oTimer = null; }
+        if (!bStopped) try { Log.info("ReadAloud: " + sName + " finished, " + iSent + " parts"); } catch { }
+        Action<int, bool> fDone = fFinished;
+        fFinished = null;
+        lsParts = null;
+        if (fDone != null) try { fDone(iSent, bStopped); } catch { }
     }
 }
 

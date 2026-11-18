@@ -756,25 +756,61 @@ name=Say Clipboard
 keys=Alt+Apostrophe
 status=current
 
+[DbDo readList]
+name=Read List
+keys=Alt+L
+change=new, 17 November 2026
+reason=Jamal's request: the records in view, value by value, any key stopping it
+status=implemented
+
+[DbDo readListFromCurrent]
+name=Read List from Current
+keys=Control+L
+change=new, 17 November 2026
+reason=Jamal's request: the records in view, value by value, any key stopping it
+status=implemented
+
+[DbDo readListFromCurrentMarked]
+name=Read List from Current Marked
+keys=Control+Shift+L
+change=new, 17 November 2026
+reason=Jamal's request: the records in view, value by value, any key stopping it
+status=implemented
+
+[DbDo readListOfMarked]
+name=Read List of Marked
+keys=Alt+Shift+L or Shift+Space
+change=new, 17 November 2026
+reason=Jamal's request: the records in view, value by value, any key stopping it
+status=implemented
+
 [DbDo sayColumnAsList]
 name=Say Column as List
-keys=Alt+L
-status=current
+keys=
+change=was Alt+L, 17 November 2026
+reason=Read List took Alt+L, reading whole records; a grid showing one column reads that column
+status=implemented
 
 [DbDo sayColumnAsListFromCurrent]
 name=Say Column as List from Current
-keys=Control+L
-status=current
+keys=
+change=was Control+L, 17 November 2026
+reason=Read List from Current took Control+L, reading whole records; a grid showing one column reads that column
+status=implemented
 
 [DbDo sayColumnAsListFromCurrentMarked]
 name=Say Column as List from Current Marked
-keys=Control+Shift+L
-status=current
+keys=
+change=was Control+Shift+L, 17 November 2026
+reason=Read List from Current Marked took Control+Shift+L, reading whole records; a grid showing one column reads that column
+status=implemented
 
 [DbDo sayColumnAsListOfMarked]
 name=Say Column as List of Marked
-keys=Alt+Shift+L
-status=current
+keys=
+change=was Alt+Shift+L, 17 November 2026
+reason=Read List of Marked took Alt+Shift+L, reading whole records; a grid showing one column reads that column
+status=implemented
 
 [DbDo sayDatabase]
 name=Say Database
@@ -831,8 +867,10 @@ status=current
 
 [DbDo sayMarkedRows]
 name=Say Marked Rows
-keys=Shift+Space
-status=current
+keys=
+change=retired into Read List, 17 November 2026; was Shift+Space
+reason=it said each record as one long string; Read List says the same records value by value
+status=retired
 
 [DbDo sayMarkedYield]
 name=Say Marked Yield
@@ -879,8 +917,10 @@ status=current
 
 [DbDo sayRecordsRestMarked]
 name=Say Records Rest Marked
-keys=Alt+Shift+M
-status=current
+keys=
+change=retired into Read List, 17 November 2026; was Alt+Shift+M
+reason=it said each record as one long string; Read List says the same records value by value
+status=retired
 
 [DbDo sayRegexReplace]
 name=Say Regex Replace
@@ -3655,10 +3695,10 @@ keys=Alt+Shift+U
 status=current
 
 [FileDir unarchiveTest]
-name=Unarchive Test
-keys=
-change=keys changed, was Alt+U, 16 November 2026
-reason=menu only: rarely needed; Unarchive without Subfolders took Alt+U
+name=Say Unarchive Test
+keys=Shift+U
+change=renamed from Unarchive Test and given Shift+U, 17 November 2026; was Alt+U before 16 November
+reason=it only says whether an archive unzips, so it joins the Say layer, U as in Unarchive
 disposition=accepted
 status=implemented
 

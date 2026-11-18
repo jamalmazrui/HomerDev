@@ -1366,7 +1366,7 @@ mpv is the Homer Player's engine; FileDir and DbDo share it, so one installation
 
 ### Step 9: Space
 
-Ollama runs AI on your own computer. Its models are large, so it is unmarked unless you tick it; Spacebar changes a box, and the answer is one word.
+Ollama runs AI on your own computer. Its models are large, so it is unmarked unless you mark it; Spacebar changes a box, and the answer is one word.
 
 Screen reader:
 

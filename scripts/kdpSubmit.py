@@ -649,7 +649,7 @@ def setDrm(page, bNoDrm):
             continue
         oBox = page.locator("input[type=checkbox], [role=checkbox]").nth(d["index"])
         oLabel = oBox.locator("xpath=ancestor::label[1]")
-        say("Ticking the DRM consent box.")
+        say("Marking the DRM consent box.")
         (oLabel.first if oLabel.count() else oBox).click(force=True)
         time.sleep(1)
         bNow = oBox.evaluate("o => o.checked === undefined ? o.getAttribute('aria-checked') === 'true' : o.checked")
@@ -1429,7 +1429,7 @@ def chooseCategories(page):
         log("Picker now reports: " + pickerCount(oModal))
     if not lActual and lPaths:
         # KDP needs at least one category to save. Only then is General taken, under the first path's deepest menu that KDP offers.
-        say("None of the proposed paths is offered, and KDP needs one category; ticking General under the first path's menus.")
+        say("None of the proposed paths is offered, and KDP needs one category; marking General under the first path's menus.")
         clearCategories(page, oModal, bRemoveSaved=False)
         lTops = topMenus(oModal)
         dPicker["afterIndex"], dPicker["lastWasBox"], dPicker["steps"] = (lTops[-1] - 1 if lTops else oModal.locator("select[name^=react-aui]").count() - 2), False, 0

@@ -493,12 +493,18 @@ def liveTests(sProject, fnLog=None, fnSay=None):
     return lsDone
 
 
+def projectHere():
+    """The project this is run from: the working folder, or the one above it, when it holds scripts and configs."""
+    sHere = os.getcwd()
+    for sDir in (sHere, os.path.dirname(sHere)):
+        if os.path.isdir(os.path.join(sDir, "scripts")) and os.path.isdir(os.path.join(sDir, "configs")): return sDir
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
 def defaultMacros():
     """NO ARGUMENT IS NEEDED (17 November 2026): with no macro named, the most likely wish is the app's own tests --
     every .inix in scripts\\tests of the app this is run from, or, from HomerDev, of every Homer app beside it."""
-    sHere = os.getcwd()
-    for sDir in (sHere, os.path.dirname(sHere)):
-        if os.path.isdir(os.path.join(sDir, "scripts")) and os.path.isdir(os.path.join(sDir, "configs")): sHere = sDir; break
+    sHere = projectHere()
     lsFolders = [sHere]
     if os.path.basename(os.path.normpath(sHere)).lower() == "homerdev":
         lsFolders = [os.path.join(os.path.dirname(sHere), s) for s in ("DbDo", "EdSharp", "FileDir", "HomerView")]
@@ -516,9 +522,22 @@ def main():
     oArgs = oParser.parse_args([s.lower() if s.startswith("--") else s for s in sys.argv[1:]])
     iWorst = 0
     if not oArgs.macro:
+        # EVERY RUN LOGS, AND NO TESTS IS AN ANSWER, NOT A FAILURE (17 November 2026). In EdSharp, HomerView and
+        # HomerDev, runMacro with no macro named found none, said so only on the console, wrote no log and ended with
+        # code 2, which read as a failure. Now the run has its log from the first line, EdSharp has tests of its own,
+        # and an app with none is told so plainly and ends with code 0.
+        global sLogPath
+        sProject = projectHere()
+        sLogPath = os.path.join(sProject, "logs", os.path.basename(os.path.normpath(sProject)) + "-runMacro-" + sStamp + ".log")
+        os.makedirs(os.path.dirname(sLogPath), exist_ok=True)
+        logLine("runMacro started with no macro named; script=%s; Python %s; %s; cwd=%s; project=%s" % (
+            os.path.abspath(__file__), sys.version.split()[0], platform.platform(), os.getcwd(), sProject))
         oArgs.macro = defaultMacros()
-        sayLine("No macro was named, so %s found in scripts\\tests %s taken%s." % (countNoun(len(oArgs.macro), "macro"), "is" if len(oArgs.macro) == 1 else "are", "" if oArgs.macro else "; there is nothing to play"))
-        if not oArgs.macro: return 2
+        logLine("macros found: " + ("; ".join(oArgs.macro) or "none"))
+        if not oArgs.macro:
+            sayLine("%s has no live tests in scripts\\tests yet, so nothing was played." % os.path.basename(os.path.normpath(sProject)))
+            return 0
+        sayLine("No macro was named, so the %s in scripts\\tests %s %s." % (countNoun(len(oArgs.macro), "live test"), "is" if len(oArgs.macro) == 1 else "are", "checked" if oArgs.check else "played"))
     for sMacro in oArgs.macro:
         if not os.path.isfile(sMacro):
             sayLine("No macro at %s." % sMacro); iWorst = max(iWorst, 2); continue

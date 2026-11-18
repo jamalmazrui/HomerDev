@@ -56,7 +56,7 @@ in the Help box.
 - `addCheckBox` -- a true or false answer.
 - `addRadioButton` -- one of several.
 - `addListBox`, `addPickBox` -- a list to choose one item from.
-- `addCheckListBox` -- a list to tick several items in.
+- `addCheckListBox` -- a list to mark several items in.
 - `addComboBox`, `addComboPickBox`, `addComboEditBox`, `addComboHistoryBox` --
   a combo box; the history form is prefilled with recent answers.
 - `addNumericUpDown` -- a number with arrows.

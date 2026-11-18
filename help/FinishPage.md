@@ -18,10 +18,10 @@ So Enter installs everything missing, updates everything stale, puts the
 screen-reader scripts in place, and starts the app. It reinstalls nothing that
 is already current, and it does not open a browser window on top of the app.
 
-## Why the ticks are the point
+## Why the marks are the point
 
 The label alone is not enough. A person arrowing down a finish page should be
-able to trust that the default is the sensible thing, and only untick what they
+able to trust that the default is the sensible thing, and only unmark what they
 do not want. A box that proposes what has already been done, or that opens a
 document over the program they just installed, teaches the reader to stop
 trusting the page.
@@ -102,7 +102,7 @@ the fewest words, and alike in every Homer installer:
 - **Screen readers get a box each, worded like any component**: "Install JAWS
   scripts", "Update NVDA add-on", "Reinstall JAWS scripts". A condition the box
   depends on may follow in parentheses: "(NVDA must be running)".
-- **No word the tick already says**: not "recommended", not "(current version)"
+- **No word the mark already says**: not "recommended", not "(current version)"
   after Reinstall, not "for <App>" -- it is that app's installer.
 - **Launch and the guide**: "Launch <App> (desktop hotkey Alt+Control+X)" and
   "Open the user guide (F1 in <App>)".

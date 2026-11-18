@@ -10,7 +10,7 @@ The kit is the folder holding `version.txt`, `build.py` and `.claude/skills`; a 
 
 For each project, in this order:
 
-1. **The installer.** Compare `<App>_setup.iss` with the homer-installer skill's pattern: it includes `Templates\HomerComponents.iss`; every finish-page box takes its verb and tick from the kit's functions (`homerAdd`, `homerLabel`, `homerIs`, the screen reader wrappers); no `HomerReaderWrappersInApp`, no `readerState` of its own, no version stamp of its own; `UsePreviousAppDir=yes`, `DisableDirPage=auto` and a fixed `AppId`.
+1. **The installer.** Compare `<App>_setup.iss` with the homer-installer skill's pattern: it includes `Templates\HomerComponents.iss`; every finish-page box takes its verb and mark from the kit's functions (`homerAdd`, `homerLabel`, `homerIs`, the screen reader wrappers); no `HomerReaderWrappersInApp`, no `readerState` of its own, no version stamp of its own; `UsePreviousAppDir=yes`, `DisableDirPage=auto` and a fixed `AppId`.
 2. **The tutorials.** Run `python scripts\checkTutorial.py` in the project when it exists, and read every `help\Tutorial_*.inix` against the homer-tutorial skill: concrete reader lines, the Overview's reminder of three reader keys with Caps Lock, no screen reader named.
 3. **The encoding and documents.** Text files in the Homer encoding (UTF-8 with a byte order mark and CRLF, except the names `KeepEncoding.txt` lists and `.cmd`, `.bat`, `version.txt`, `SKILL.md`); one level-one heading per page built from Markdown; the standard documents present.
 4. **The checks.** When a project has `scripts\check.py`, run it and read its verdicts.

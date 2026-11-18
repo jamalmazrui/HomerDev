@@ -7,6 +7,19 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.252.0 -- 17 November 2026
+
+- **Marked, not ticked, everywhere.** About two hundred lines in the installers, their finish pages, the guides, the tutorials, the skills and the messages still said a checkbox was ticked, six days after the rule; every one says marked now. check.py's new "marked, not ticked" check fails a project whose installer, ReadMe, help pages (History aside), configs or scripts say tick, untick or ticked as a word, so the word cannot return.
+- **runMacro with no macro named no longer looks like a failure.** In EdSharp, HomerView and HomerDev it found no live tests, said so only on the console, wrote no log and ended with code 2. Now every run logs from its first line, an app with no tests is told so plainly and ends with code 0, and EdSharp has a live test of its own. DbDo and FileDir played theirs cleanly, four of four.
+- **A status list of one is still a list.** Wyzant's second harvester stopped at its first page: "(200)" is a number, not a list. makeHarvester now writes every status list with a trailing comma, and all its harvesters compile and pass their fences.
+- **An error with nothing saved is not finished.** harvestQueue marked that empty, failed Wyzant run finished, so the next build would have skipped it. Only a run that saved pages or ended cleanly is finished now.
+- **auditMacros stays in DbDo, and says why:** it audits DbDo's wiring of the kit's macro recorder, and DbDo is the only app that records macros. The recorder itself is tested in the kit by testMacro. When a second app records macros, the audit moves into the kit.
+
+## 1.251.0 -- 17 November 2026
+
+- **Homer.ReadAloud reads a long list aloud and stops at a key.** Each part is its own utterance, so the screen reader pauses between them. It keeps about fifteen seconds of speech queued ahead rather than handing everything over at once, so nothing more reaches the reader once a key is pressed, and Control also silences JAWS or NVDA at once. A key is noticed from Windows' last-input time, once the keys that started the reading are up; moving the mouse does not stop it. DbDo's Read List commands use it first.
+- **Say.sayQueued and Say.stopSpeech** are the two pieces under it: one part to the reader's queue, past the repeat guard and without a log line or braille flash each, and silence now, through JAWS's StopSpeech or NVDA's cancelSpeech.
+
 ## 1.250.0 -- 17 November 2026
 
 - **Six app help guides built from their harvests:** Clubhouse (98 articles), Fiverr (303), GoFundMe (164), Kickstarter (308), Ko-fi (118) and Patreon (422), every gate clean, each page with one level-one heading.

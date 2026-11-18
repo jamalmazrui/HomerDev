@@ -44311,13 +44311,13 @@ JAWS 4.51 and later
 
 #### Description
 
-Returns the tick count of the last keyboard event. This function can be used in conjunction with GetLastMouseMovementTime in cases in which it is necessary to know whether a mouse event or a keyboard event occurred more recently.
+Returns the mark count of the last keyboard event. This function can be used in conjunction with GetLastMouseMovementTime in cases in which it is necessary to know whether a mouse event or a keyboard event occurred more recently.
 
 #### Returns
 
 ##### Type: int
 
-Description: Returns the tick count of the last keyboard event.
+Description: Returns the mark count of the last keyboard event.
 
 #### Parameters
 
@@ -44801,13 +44801,13 @@ JAWS 18.0 and later
 
 #### Description
 
-Returns the tick count of the last mouse movement event. This function can be used in conjunction with GetLastKeyPressTime in cases in which it is necessary to know whether a mouse event or a keyboard event occurred more recently.
+Returns the mark count of the last mouse movement event. This function can be used in conjunction with GetLastKeyPressTime in cases in which it is necessary to know whether a mouse event or a keyboard event occurred more recently.
 
 #### Returns
 
 ##### Type: int
 
-Description: Returns the tick count of the last mouse movement event.
+Description: Returns the mark count of the last mouse movement event.
 
 #### Parameters
 

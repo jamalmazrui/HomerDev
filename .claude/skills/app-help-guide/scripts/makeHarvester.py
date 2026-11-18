@@ -3487,6 +3487,10 @@ def writeScripts(sOutputFolder):
         dFields = dict(dEstate)
         dFields.setdefault("sFetch", "plain")
         dFields.setdefault("iBrowserWait", 30)
+        # A STATUS LIST OF ONE IS STILL A LIST (17 November 2026, the second time): "(200)" is the number 200, not a
+        # tuple, and Wyzant's second harvester stopped at its first page with "argument of type 'int' is not a container".
+        # A trailing comma makes every list a tuple, one value or many.
+        dFields["sOkStatuses"] = dFields.get("sOkStatuses", "200").strip().rstrip(",") + ","
         sText = sChassis.format(**dFields)
         sPath = os.path.join(sOutputFolder, dEstate["sScriptName"])
         fHandle = io.open(sPath, "w", encoding="utf-8-sig", newline="\r\n")

@@ -119,7 +119,7 @@ Intro as the want in plain words, and say which earlier walks it assumes.
 - **2**, usually Install and Launch: download, the installer's pages, the
   finish page with each box's purpose and the three words Install, Update,
   Reinstall, the results box, where things went, the desktop key, F11 for
-  later, one misstep (run while open; a mistaken tick).
+  later, one misstep (run while open; a mistaken mark).
 - **3 to 8**: the other six wants. Each: the want stated, the keys taught in four
   beats, one planned misstep with its recovery, things taught earlier named
   rather than retaught, the recap in two voices, then what you did not have to

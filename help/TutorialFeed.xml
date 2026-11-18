@@ -5,7 +5,7 @@
     <link>Tutorials.htm</link>
     <description>Spoken walks through the Homer Development Kit: what it is, how it builds and releases an app, and what its shared code makes a person hear. Ten walks in the pattern of ten, each three to five minutes.</description>
     <language>en-us</language>
-    <lastBuildDate>Wed, 18 Nov 2026 01:33:17 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 18 Nov 2026 02:38:29 +0000</lastBuildDate>
     <itunes:author>Jamal Mazrui</itunes:author>
     <itunes:explicit>false</itunes:explicit>
     <itunes:category text="Technology"/>
@@ -60,7 +60,7 @@
       <description>A Homer program's installer is downloaded, and your reader is running. Full transcript: Tutorials.htm#0e-5-the-installer-and-its-finish-page</description>
       <link>Tutorials.htm#0e-5-the-installer-and-its-finish-page</link>
       <guid isPermaLink="false">homer-tutorial_5_the_installer_and_its_finish_page</guid>
-      <enclosure url="tutorials/5_The_Installer_and_Its_Finish_Page.mp3" length="1626926" type="audio/mpeg"/>
+      <enclosure url="tutorials/5_The_Installer_and_Its_Finish_Page.mp3" length="1621046" type="audio/mpeg"/>
       <itunes:duration>00:03:41</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
     </item>

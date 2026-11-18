@@ -371,10 +371,14 @@ def main():
             writeRequest(sHarvest, dRequest)
             say("%d of %d: gathering %s help." % (iNumber, len(lToGather), sGuide))
             iCode = runCommand([sys.executable, sScript], sRoot)
-            dRequest["finished"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             dRequest["exit"] = str(iCode)
             iPages = pageCount(sHarvest)
             dRequest["pages"] = str(iPages)
+            # AN ERROR WITH NOTHING SAVED IS NOT FINISHED (17 November 2026). Wyzant's second harvester stopped on its
+            # first page with a fault of mine, and request.txt still said finished, so the next build would have skipped
+            # it as done. Now only a run that saved pages or ended cleanly is finished; the next build tries again.
+            if iCode == 0 or iPages > 0: dRequest["finished"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            else: log("%s: ended with an error and saved nothing, so it is not marked finished; the next build tries again" % sGuide)
             writeRequest(sHarvest, dRequest)
             sNote = "" if iCode == 0 else "; it ended with an error its log names"
             if iPages == 0: sNote += "; no page was saved, and its log says why"

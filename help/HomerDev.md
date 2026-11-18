@@ -178,7 +178,7 @@ The controls, in tab order:
   Code, offered when it is installed, reads the kit itself: it runs in the kit's
   folder in plan mode, so it reads files and changes none, and the dialog is
   one conversation with it. Type a question and press Enter, or ask by voice;
-  see "Asking by voice" below. While it thinks, a soft tick sounds and the
+  see "Asking by voice" below. While it thinks, a soft mark sounds and the
   dialog says every ten seconds how long it has waited. The answer is added to
   the conversation as plain text, focus goes to where it begins, and the dialog
   says how long it took. An answer is also spoken when you asked by voice, or
@@ -196,7 +196,7 @@ half, it stops by itself, with a falling pair of tones; or press Voice again to
 stop sooner, the way Windows+H voice typing works. Escape throws the recording
 away. Whisper then writes what you said into the Question box, the dialog says
 what it heard, and you press Enter to send it, after correcting it if need be.
-Tick **Send when heard** to send it straight away instead.
+Mark **Send when heard** to send it straight away instead.
 
 Nothing leaves the computer. The recording is made with Windows' own audio
 input, written down by Whisper, which HomerDev's setup program offers, and
@@ -618,7 +618,7 @@ in the Help box.
 - `addCheckBox` -- a true or false answer.
 - `addRadioButton` -- one of several.
 - `addListBox`, `addPickBox` -- a list to choose one item from.
-- `addCheckListBox` -- a list to tick several items in.
+- `addCheckListBox` -- a list to mark several items in.
 - `addComboBox`, `addComboPickBox`, `addComboEditBox`, `addComboHistoryBox` --
   a combo box; the history form is prefilled with recent answers.
 - `addNumericUpDown` -- a number with arrows.
@@ -2072,7 +2072,7 @@ in every caller.
 
 What each finish-page box says, whether it starts marked, and the order of the
 boxes are set out in `help\FinishPage.md`: the verb first, a short use in
-parentheses, a box each for JAWS and NVDA, no word the tick already says, the
+parentheses, a box each for JAWS and NVDA, no word the mark already says, the
 marked boxes before the unmarked ones, and a Results box titled "<App> Setup
 Results".
 
@@ -2433,7 +2433,7 @@ A word on scale. The samples use more of Lbc than a fruit basket needs -- a
 combo pick box for the sort order, a check box for the speaking, a report
 window, a status line. That is deliberate: a sample exists to show what is
 there. Your own program should use what it needs and nothing more. The kit is
-meant to be the easy path, not a set of boxes to tick, and a dialog with three
+meant to be the easy path, not a set of boxes to mark, and a dialog with three
 controls in it is a perfectly good Homer dialog.
 
 ### Measuring the difference the skills make

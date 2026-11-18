@@ -2,7 +2,7 @@
 // Build an iCalendar (.ics) file from the CURRENT view of the events table
 // and save it as MySchedule.ics, ready to import into Google Calendar,
 // Outlook, Apple Calendar, or any app that reads calendar files. This is the
-// database counterpart of the web form that lets you tick the sessions you
+// database counterpart of the web form that lets you mark the sessions you
 // want and download a calendar: here you mark the sessions instead.
 //
 // How to use: first shape the view to the events you want to keep. The usual
@@ -11,7 +11,7 @@
 // (or filter to a single day, one track, and so on). Then run this file with
 // Invoke Script. The script reads only the rows in the current view, so your
 // filter is what decides which sessions land in the calendar -- the database
-// equivalent of ticking checkboxes.
+// equivalent of marking checkboxes.
 //
 // A note on the extension: the importable standard is iCalendar, whose files
 // end in .ics (RFC 5545), and that is what every calendar app reads, so this
