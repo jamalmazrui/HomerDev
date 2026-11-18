@@ -16,7 +16,10 @@ true about the product.
    a single-sign-on page.
 4. **The request itself refused.** Every address answers 400. The page exists
    and the host is awake; what is being judged is the connection. Meta, on
-   nine addresses across four hosts.
+   nine addresses across four hosts. Edge is no way round it when the wall
+   judges the browser too: Home Depot gave Edge its customer service hub, a
+   page of 406 words that is only links, and then an "Error Page" of 83 words
+   for every help page after it (17 November 2026). Refused, not retried.
 
 ## The other refusals
 

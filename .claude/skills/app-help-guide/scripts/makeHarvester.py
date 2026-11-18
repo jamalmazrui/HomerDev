@@ -3304,7 +3304,6 @@ lEstates = [
     zendeskEstate("GoFundMe", "getGoFundMeHelp.py", "GoFundMeHelp", "support.gofundme.com", 300),
     zendeskEstate("Fiverr", "getFiverrHelp.py", "FiverrHelp", "help.fiverr.com", 500),
     zendeskEstate("Ko-fi", "getKofiHelp.py", "KofiHelp", "help.ko-fi.com", 300),
-    zendeskEstate("Wyzant", "getWyzantHelp.py", "WyzantHelp", "support.wyzant.com", 600),
     # GOOGLE WORKSPACE (14 November 2026). Docs, Sheets, Slides, Vids and Drawings share one centre, the Docs
     # Editors help at support.google.com/docs, so one harvest serves a guide for each, split when built by the trail
     # above each article; Forms, gathered in September through a subject gate, can be rebuilt from it if fuller.
@@ -3339,11 +3338,30 @@ lEstates = [
         "sOkStatuses": "200, 202",
         "sExtraLinks": "",
     },
+    # WYZANT (17 November 2026, second version). Its Zendesk listings answer 404 -- the centre has them turned off --
+    # though its pages answer, so the crawl walks the categories and sections to the articles, as Zendesk draws them.
+    {
+        "sProduct": "Wyzant",
+        "sScriptName": "getWyzantHelp.py",
+        "sSystem": "Zendesk pages at support.wyzant.com, its listings being turned off",
+        "sFolder": "WyzantHelp",
+        "sZipName": "WyzantHelp.zip",
+        "iMaxPages": 800,
+        "nDelay": 1.0,
+        "sSeeds": '"https://support.wyzant.com/hc/en-us"',
+        "sFencePattern": r"^https://support\.wyzant\.com/hc/en-us(/(categories|sections|articles)/[A-Za-z0-9_%-]+)?/?$",
+        "sSubjectPattern": "",
+        "sReadyPattern": r"(article-body|section-tree|blocks-list|article-list|<h1)",
+        "sOkStatuses": "200",
+        "sExtraLinks": "",
+    },
     # HOME DEPOT (17 November 2026): no help centre, but a customer service hub at /c/customer_service, probed before
     # writing, that links some fifteen pages: an FAQ of 19 questions, delivery, returns and refunds, tracking and
     # cancelling an order, the credit card, recalls, protection plans, subscriptions, gift cards, tool and truck rental
     # and the military discount. The fence names those pages and no others, so the store's catalogue and its thousands
     # of DIY project articles stay out. Home Depot's site defends itself against plain requests, so Edge draws each page.
+    # REFUSED after its first run (17 November 2026): Edge was given the hub, which is only links, and an "Error Page"
+    # for every page after it. Kept as the record; refusal-rules.md says why it is not run again.
     {
         "sProduct": "Home Depot",
         "sScriptName": "getHomeDepotHelp.py",

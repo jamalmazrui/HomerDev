@@ -182,6 +182,9 @@ class markdownParser(html.parser.HTMLParser):
         if sTag in ("ul", "ol"):
             self.flush()
             if self.lListStack: self.lListStack.pop()
+            # A BLANK LINE AFTER A LIST (17 November 2026). Kickstarter's paragraph after a list landed on the line
+            # below the last item, so Markdown made it part of that item. Every guide built from now on gets the gap.
+            if not self.lListStack and self.lLines and self.lLines[-1] != "": self.emit("")
             return True
         if sTag in ("li", "p", "div", "section", "article", "tr", "blockquote", "dt", "dd", "table"):
             self.flush()
@@ -1086,6 +1089,60 @@ def readZendeskPlain(sFolder):
     return buildFromTree(sFolder, os.path.basename(sFolder.rstrip("\\/")), placeZendeskPlain)
 
 
+def readZendeskPages(sFolder):
+    """A Zendesk centre with its listings turned off (Wyzant, 17 November 2026), read from its drawn pages: the title is
+    the article's h1, the body its article-body region, and the trail of links above the title names the category and
+    the section, as Zendesk's own themes draw them. The same placer as the listings route leaves out legal pages."""
+    lArticles, iLeft = [], 0
+    for sName in sorted(os.listdir(sFolder)):
+        if "_articles_" not in sName or not sName.endswith(".html"): continue
+        sMarkup = readText(os.path.join(sFolder, sName))
+        oTitle = re.search(r'(?is)<h1[^>]*class="[^"]*article-title[^"]*"[^>]*>(.*?)</h1>', sMarkup) or re.search(r"(?is)<h1[^>]*>(.*?)</h1>", sMarkup)
+        if not oTitle: continue
+        sTitle = stripTags(oTitle.group(1))
+        sBody = (findBalanced(sMarkup, r'<div[^>]*class="[^"]*\barticle-body\b', "div")
+                 or findBalanced(sMarkup, r'<section[^>]*class="[^"]*\barticle-info\b', "section")
+                 or findBalanced(sMarkup, r"<article[^>]*>", "article"))
+        if not sTitle or not sBody: continue
+        sTrail = findBalanced(sMarkup, r'<ol[^>]*class="[^"]*breadcrumbs', "ol") or ""
+        lsTrail = [stripTags(s) for s in re.findall(r"(?is)<li[^>]*>(.*?)</li>", sTrail)]
+        lsTrail = [s for s in lsTrail if s and s != sTitle]
+        sCategory = lsTrail[1] if len(lsTrail) > 1 else ""
+        sSection = lsTrail[-1] if len(lsTrail) > 2 else ""
+        sPlace = placeZendeskPlain(sCategory, sSection, sSection, sTitle)
+        if not sPlace:
+            iLeft += 1
+            continue
+        lBody = toMarkdown(sBody, 0)
+        if len(" ".join(lBody).split()) < 20: continue
+        lArticles.append((sPlace, sTitle, lBody))
+    logging.info("%s: %d articles read from drawn pages; %d legal pages left out", os.path.basename(sFolder), len(lArticles), iLeft)
+    return lArticles
+
+
+# BY SECTION WHEN THE CATEGORIES ARE AUDIENCES (17 November 2026). Patreon files 422 articles under three categories
+# (creators, members, general) and Fiverr 299 under three (clients, freelancers, Pro clients): three headings over
+# hundreds of articles is no help to someone moving by heading. Their sections are the subjects, so the heading is the
+# audience and the section, "Creators: Going Live". Ko-fi files everything under "All Help Articles", so its sections
+# alone are the headings. Each section's own name is kept, with the stray spaces and tabs some carry removed.
+dAudience = {"creator topics": "Creators", "member topics": "Members", "general topics": "General",
+             "for clients": "Clients", "for freelancers": "Freelancers", "for pro clients": "Pro clients"}
+dSameSection = {"advanced": "Advanced features", "get started with": "Getting started"}
+
+
+def placeZendeskSection(sCategory, sTop, sSection, sTitle):
+    if not placeZendeskPlain(sCategory, sTop, sSection, sTitle): return ""
+    sSub = plainCategory(sTop or sSection)
+    sSub = dSameSection.get(sSub.lower(), sSub)
+    if not sSub: return plainCategory(sCategory) or sMiscellaneous
+    sAudience = dAudience.get(plainCategory(sCategory).lower(), "")
+    return (sAudience + ": " + sSub if sAudience else sSub)
+
+
+def readZendeskSection(sFolder):
+    return buildFromTree(sFolder, os.path.basename(sFolder.rstrip("\\/")), placeZendeskSection)
+
+
 # MICROSOFT 365 (15 November 2026): Excel, OneDrive, Outlook, PowerPoint, SharePoint and Word, each gathered from
 # support.microsoft.com's own site map with its accessibility articles. One reader serves all six.
 
@@ -1879,9 +1936,14 @@ def readUdio(sFolder):
             lNames = [sName2 for sName2 in lNames
                       if sName2 and sName2.lower() not in ("all collections",) and sName2 != sTitle]
             if lNames: sCategory = lNames[-1]
-        sBody = (findBalanced(sMarkup, r'<section[^>]*class="[^"]*section__article', "section")
+        # THE ARTICLE'S OWN BODY FIRST (17 November 2026). Kickstarter's Intercom pages hold the text in an article_body
+        # region; the wider article section also holds the title, the date and the related articles, so each Kickstarter
+        # article began with its own title again as a heading and a date line.
+        sBody = (findBalanced(sMarkup, r'<div[^>]*class="[^"]*\barticle_body\b', "div")
+                 or findBalanced(sMarkup, r'<section[^>]*class="[^"]*section__article', "section")
                  or findBalanced(sMarkup, r"<main[^>]*>", "main"))
         if not sBody: continue
+        sBody = re.sub(r'(?is)<section[^>]*class="[^"]*related_articles.*$', "", sBody)
         lBody = toMarkdown(sBody, 0)
         if len(" ".join(lBody).split()) < 25: continue
         lArticles.append((sCategory, sTitle, lBody))
@@ -4200,17 +4262,17 @@ def main():
          "This guide holds Google's own help for Google Forms, gathered from support.google.com on 14 November 2026, and replaces September's: it is fuller and current. It covers making and editing a form, question types, quizzes, sharing a form, and collecting and viewing responses.\r\n\r\nGoogle keeps the help for Docs, Sheets, Slides, Forms and Vids in one help centre, and this guide holds the part of it about Forms. Google writes the same article once for each device it runs on, so where an article differs by platform the heading says which one it is for: Computer, or iPhone and iPad. Google's Android editions are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are Google's own topics."),
         ("Box", "BoxHelp", readBox, "Box.md", "Box help",
          "This guide holds Box's own help, gathered from support.box.com on 15 November 2026. Box is an online service for keeping, sharing, signing and working on files with other people. Its help centre has almost 2,900 articles; this guide keeps the 668 written for a person who uses Box on Windows, the web, or an iPhone or iPad, under Box's own product names, with each product's troubleshooting beside its guides. Files, folders and sharing come under Using Box, and every app Box works inside, such as Microsoft Office, Teams, Slack, Google Workspace, Outlook and Zoom, comes under Box with other apps.\r\n\r\nLeft out on purpose: 1,729 release notes and announcements, which are a history of changes rather than help; the administrator's console and the products only an administrator runs, such as Shield, Governance, Shuttle and the developer platform; the integrations with business systems such as Salesforce and NetSuite; and Box's training and certification pages. If you run Box for an organisation, Box's own help centre has those pages."),
-        ("Fiverr", "FiverrHelp", readZendeskPlain, "Fiverr.md", "Fiverr help",
-         "This guide holds Fiverr's own help, gathered from help.fiverr.com in November 2026. Fiverr is a marketplace where people hire freelancers for small jobs, from writing and design to voice work and programming. It covers buying, selling, orders, payments and your account, for buyers and freelancers in one estate.\r\n\r\nLeft out on purpose: legal pages such as terms and privacy policies, pages for law enforcement and developers, and Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are the publisher's own."),
+        ("Fiverr", "FiverrHelp", readZendeskSection, "Fiverr.md", "Fiverr help",
+         "This guide holds Fiverr's own help, gathered from help.fiverr.com in November 2026. Fiverr is a marketplace where people hire freelancers for small jobs, from writing and design to voice work and programming. It covers hiring as a client or a Pro client, selling as a freelancer, orders, payments and your account. Each heading names who it is for, then the subject.\r\n\r\nLeft out on purpose: legal pages such as terms and privacy policies, pages for law enforcement and developers, and Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are the publisher's own."),
         ("GoFundMe", "GoFundMeHelp", readZendeskPlain, "GoFundMe.md", "GoFundMe help",
          "This guide holds GoFundMe's own help, gathered from support.gofundme.com in November 2026. GoFundMe is a site for raising money for a person, a cause or a charity. It covers starting and sharing a fundraiser, donating, withdrawing the money, safety and refunds, and fundraising for nonprofits.\r\n\r\nLeft out on purpose: legal pages such as terms and privacy policies, pages for law enforcement and developers, and Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are the publisher's own."),
         ("Kickstarter", "KickstarterHelp", readUdio, "Kickstarter.md", "Kickstarter help",
          "This guide holds Kickstarter's own help, gathered from help.kickstarter.com in November 2026. Kickstarter is a site where creators raise money from backers to make a project, such as a book, a game, an album or a gadget. It covers the basics, backing a project, running one as a creator, and Kickstarter's resources for creators. The categories are Kickstarter's own collections.\r\n\r\nLeft out on purpose: Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa."),
-        ("Ko-fi", "KofiHelp", readZendeskPlain, "Kofi.md", "Ko-fi help",
+        ("Ko-fi", "KofiHelp", readZendeskSection, "Kofi.md", "Ko-fi help",
          "This guide holds Ko-fi's own help, gathered from help.ko-fi.com in November 2026. Ko-fi is a site where creators take tips, memberships, commissions and shop sales from their supporters. It covers getting started, ways to earn, payments, and using Ko-fi with other platforms. Patreon, a similar site, has a guide of its own in this collection.\r\n\r\nLeft out on purpose: legal pages such as terms and privacy policies, pages for law enforcement and developers, and Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are the publisher's own."),
-        ("Patreon", "PatreonHelp", readZendeskPlain, "Patreon.md", "Patreon help",
-         "This guide holds Patreon's own help, gathered from support.patreon.com in November 2026. Patreon is a site where creators earn from members who pay each month for their work. It covers joining and paying as a member, and setting up, earning and getting paid as a creator. Ko-fi, a similar site, has a guide of its own in this collection.\r\n\r\nLeft out on purpose: legal pages such as terms and privacy policies, pages for law enforcement and developers, and Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are the publisher's own."),
-        ("Wyzant", "WyzantHelp", readZendeskPlain, "Wyzant.md", "Wyzant help",
+        ("Patreon", "PatreonHelp", readZendeskSection, "Patreon.md", "Patreon help",
+         "This guide holds Patreon's own help, gathered from support.patreon.com in November 2026. Patreon is a site where creators earn from members who pay each month for their work. It covers joining and paying as a member, and setting up, earning and getting paid as a creator. Each heading names who it is for, then the subject. Ko-fi, a similar site, has a guide of its own in this collection.\r\n\r\nLeft out on purpose: legal pages such as terms and privacy policies, pages for law enforcement and developers, and Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are the publisher's own."),
+        ("Wyzant", "WyzantHelp", readZendeskPages, "Wyzant.md", "Wyzant help",
          "This guide holds Wyzant's own help, gathered from support.wyzant.com in November 2026. Wyzant is a site for finding a private tutor and taking lessons, online or in person. It covers students and parents, tutors, the online learning studio, and Wyzant's programs for schools and colleges.\r\n\r\nLeft out on purpose: legal pages such as terms and privacy policies, pages for law enforcement and developers, and Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are the publisher's own."),
         ("Clubhouse", "ClubhouseHelp", readClubhouse, "Clubhouse.md", "Clubhouse help",
          "This guide holds Clubhouse's own help, gathered from support.clubhouse.com in November 2026. Clubhouse is a social app for talking live in rooms, sending voice messages and chats, and building groups called houses. It covers signing up and your profile, the hallway and explore, live rooms, messages, friends and houses, Clubhouse Plus, and trust and safety, for the iPhone and iPad app and the web. Android-only articles are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa.\r\n\r\nLeft out on purpose: Clubhouse's legal pages, its policies, its pages for law enforcement and government requests, its copyright notices and its country notices. The categories are Clubhouse's own."),

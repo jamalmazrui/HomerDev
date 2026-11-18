@@ -7,6 +7,16 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.250.0 -- 17 November 2026
+
+- **Six app help guides built from their harvests:** Clubhouse (98 articles), Fiverr (303), GoFundMe (164), Kickstarter (308), Ko-fi (118) and Patreon (422), every gate clean, each page with one level-one heading.
+- **Headed by section where the categories are audiences.** Patreon and Fiverr each file hundreds of articles under three audiences, so each heading is the audience and the subject, "Creators: Going Live"; Ko-fi files everything under "All Help Articles", so its sections are its headings.
+- **A blank line after every list.** A paragraph after a list became part of the list's last item, as in Kickstarter's guide; every guide built from now on gets the gap.
+- **Kickstarter's articles start with their text,** not their own title again and a date: the Intercom reader takes the article_body region first.
+- **Wyzant gathered again from its pages.** Its Zendesk listings answer 404, so the first run gathered nothing; the second walks its categories and sections, and a new reader reads Zendesk's drawn pages.
+- **A second try on the same day:** asked= may carry words after the day ("2026-11-17 second try"), so a corrected harvester gathers again rather than being skipped as done.
+- **Home Depot refused:** its site gave Edge the customer service hub, only links, then an error page for every help page. refusal-rules.md records it.
+
 ## 1.249.0 -- 17 November 2026
 
 - **A walk with other sound playing no longer looks hung.** A talk playing beside DbDo's and FileDir's live tests made each step wait ten seconds for quiet and listen fifteen, nearly a minute a step. Once two steps find other sound, recordWalk stops waiting for quiet and listens only for the step's own wait, and says so.

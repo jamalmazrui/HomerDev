@@ -202,7 +202,7 @@ def trimFinished(sRoot, lSections):
 
 def moveAside(sHarvest, sAsked):
     """Moves an older gathering's folder out of the way, whole, and returns where it went."""
-    sBase = "%s-before-%s" % (sHarvest, sAsked.replace("-", ""))
+    sBase = "%s-before-%s" % (sHarvest, re.sub(r"[^0-9A-Za-z]+", "", sAsked))
     sTo, iNext = sBase, 2
     while os.path.exists(sTo):
         sTo = "%s-%d" % (sBase, iNext)
@@ -243,8 +243,10 @@ def plan(sRoot, lSections):
     for sGuide, dKeys in lSections:
         sHarvester = os.path.splitext(dKeys.get("harvester", ""))[0]
         sAsked = dKeys.get("asked", "")
-        if not sHarvester or not re.match(r"^\d{4}-\d{2}-\d{2}$", sAsked):
-            say("%s: skipped, since addGuides.inix needs harvester= and asked=yyyy-mm-dd for it." % sGuide)
+        # A SECOND TRY ON THE SAME DAY (17 November 2026): asked= may carry words after the day, "2026-11-17 second
+        # try", so a harvester corrected the day it ran gathers again rather than being skipped as done.
+        if not sHarvester or not re.match(r"^\d{4}-\d{2}-\d{2}( .+)?$", sAsked):
+            say("%s: skipped, since addGuides.inix needs harvester= and asked=yyyy-mm-dd (words may follow the day) for it." % sGuide)
             continue
         sFolder = sHarvester[3:] if sHarvester.lower().startswith("get") else sHarvester
         sHarvest = os.path.join(sHarvests, sFolder)
