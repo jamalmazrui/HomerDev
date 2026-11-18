@@ -703,6 +703,34 @@ begin
   Result := homerDefaults() and (not WizardSilent) and (PageID <> wpFinished);
 end;
 
+procedure homerKeepSetupLog();
+(* THE SAVED SETUP LOG ENDS WITH THE RESULTS (kit 1.260.0, 18 November 2026). Every installer copies Inno's log into
+   %LOCALAPPDATA%\<App>\logs from CurStepChanged(ssDone), and then builds its Results box, which is when each marked
+   box's "Outcome" line is logged. The copy was made first, so no saved setup log ever held an Outcome line, and an
+   audit could not tell whether a marked action succeeded. The Results box now saves the log again, after the
+   outcomes: over the copy the installer made a moment earlier, the newest <App>-setup-*.log, or as a new one when
+   there is none. *)
+var
+  oFind: TFindRec;
+  sFolder, sNewest: String;
+begin
+  sFolder := ExpandConstant('{localappdata}\{#SetupSetting("AppName")}\logs');
+  if not DirExists(sFolder) then
+    if not ForceDirectories(sFolder) then exit;
+  sNewest := '';
+  if FindFirst(sFolder + '\{#SetupSetting("AppName")}-setup-*.log', oFind) then
+  try
+    repeat
+      if (sNewest = '') or (CompareText(oFind.Name, sNewest) > 0) then sNewest := oFind.Name;
+    until not FindNext(oFind);
+  finally
+    FindClose(oFind);
+  end;
+  if sNewest = '' then sNewest := '{#SetupSetting("AppName")}-setup-' + GetDateTimeString('yyyymmdd-hhnnss', #0, #0) + '.log';
+  Log('Setup log saved as ' + sFolder + '\' + sNewest);
+  CopyFile(ExpandConstant('{log}'), sFolder + '\' + sNewest, False);
+end;
+
 procedure homerResultsBox(sBody: String);
 (* THE RESULTS BOX HAS A TITLE (1.43.20): "<App> Setup Results". Inno's MsgBox
    takes none -- its caption is the wizard's own, so the box a screen reader
@@ -716,8 +744,11 @@ begin
   if WizardSilent then
   begin
     Log('Results (not shown: a silent install): ' + sBody);
+    homerKeepSetupLog();
     exit;
   end;
+  Log('Results: ' + sBody);
+  homerKeepSetupLog();
   homerMessageBox(WizardForm.Handle, sBody,
     '{#SetupSetting("AppName")} Setup Results', MB_OK or $40);  (* $40: the information icon *)
 end;
@@ -908,9 +939,17 @@ var
   i: Integer;
 begin
   gHomerTicked := '';
+  //  EVERY BOX IN THE LOG, MARKED OR NOT (kit 1.260.0, 18 November 2026). An audit of a day's setup logs could not
+  //  say which boxes the person had marked: the log showed what was offered and which scripts ran, never the choice
+  //  between them. Each finish-page box is now logged with its wording and whether it was marked.
   for i := 0 to WizardForm.RunList.Items.Count - 1 do
     if WizardForm.RunList.Checked[i] then
+    begin
       gHomerTicked := gHomerTicked + WizardForm.RunList.ItemCaption[i] + #10;
+      Log('Box marked: ' + WizardForm.RunList.ItemCaption[i]);
+    end
+    else
+      Log('Box not marked: ' + WizardForm.RunList.ItemCaption[i]);
   //  A report left by an earlier install must not be read as this one's.
   DeleteFile(homerScreenReaderFile());
 end;

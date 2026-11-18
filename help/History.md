@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.260.0 -- 18 November 2026
+
+- **A saved setup log now shows which boxes were marked.** An audit of a day's setup logs could tell what each installer offered and which scripts ran, but not what the person chose in between. Every box on the finish page is now logged as "Box marked:" or "Box not marked:" with its wording.
+- **A saved setup log now shows whether each marked action succeeded.** Since 1.232.0 the kit has logged an "Outcome" line for each marked component, comparing the version wanted, the version before and the version after. No saved log ever held one, because every installer copied its log into the app's logs folder just before building the Results box, which is when those lines are written. The Results box now logs its own text and saves the log again, over the copy made a moment earlier, so the saved log ends with the outcomes. No app's installer needs to change; each gets this the next time it is built.
+- **A box that is not offered says why.** BatCon's log read "state jaws: 0 place(s), 0 with ours, 0 current; none" while JAWS was running, which looked as if JAWS was not found. BatCon ships no JAWS scripts, so nothing was looked for, and the line now says so. A program that ships scripts on a computer without the reader says that instead.
+- **PDFs are finished with the Python that holds the PDF tools.** BatCon's acceptance PDF was made, but its title and language were not set: the kit looked for Python 3.13 before 3.14 and found a 3.13 with neither pymupdf nor pypdf, while installPdfTools.cmd had put them into the python on the PATH, 3.14. The kit now uses the PATH's python first, as installPdfTools does, then the known folders newest first.
+- **A PDF that could not be finished is a warning.** The miss was logged as INFO beside "1 file converted, 0 failed", so nothing drew the eye to it. It is logged as WARN now. The conversion still counts, because the PDF itself was made.
+
 ## 1.259.0 -- 18 November 2026
 
 - **The kit compiles again.** An edit of 1.257.0 dropped the opening quotation mark of one string in Say.cs's ReadAloud, so 1.258.0 built no C# at all: not Homer.dll, HomerDev.exe, the samples or the template app, and every C# app's build stopped at the same line. I had no compiler to try it on; every changed line of C# is now checked for an unbalanced quotation mark before it is delivered.

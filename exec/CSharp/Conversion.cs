@@ -1540,10 +1540,16 @@ finally { try { File.Delete(sScript); } catch (Exception) { } }
 
 private static string sPythonCache = null;
 
+// THE PYTHON THE PDF TOOLS WERE INSTALLED INTO (kit 1.260.0, 18 November 2026). This looked for Python 3.13 first
+// and 3.14 last, so on a computer with both, BatCon finished its PDFs with 3.13, which had neither pymupdf nor pypdf:
+// installPdfTools.cmd installs them into the python on the PATH, which was 3.14. The PATH's python comes first now,
+// as it does for installPdfTools; the known folders follow, newest version first, for a Python not on the PATH.
 public static string pythonProgram() {
 if (sPythonCache != null) return sPythonCache;
+sPythonCache = findProgram("python.exe", new string[0]);
+if (sPythonCache != "") return sPythonCache;
 List<string> lsKnown = new List<string>();
-foreach (string sVersion in new string[] { "313", "312", "311", "314" }) {
+foreach (string sVersion in new string[] { "315", "314", "313", "312", "311" }) {
 lsKnown.Add(Environment.ExpandEnvironmentVariables(@"%LOCALAPPDATA%\Programs\Python\Python" + sVersion + @"\python.exe"));
 lsKnown.Add(Environment.ExpandEnvironmentVariables(@"%ProgramFiles%\Python" + sVersion + @"\python.exe"));
 }
@@ -2050,7 +2056,12 @@ else lsFindings.Add("PdfNotFinished: " + sPdfError);
 checkPdfTags(sPath, lsFindings);
 }
 qualityCheck(sPath, lsFindings);
-foreach (string sFinding in lsFindings) Log.info("Quality " + Path.GetFileName(sPath) + ": " + sFinding);
+// A STEP NOT DONE IS A WARNING (kit 1.260.0). A PDF whose title and language could not be set was logged as INFO
+// among the findings, beside "1 file converted, 0 failed", so nothing drew the eye to it.
+foreach (string sFinding in lsFindings) {
+if (sFinding.StartsWith("PdfNotFinished", StringComparison.Ordinal)) Log.warn("Quality " + Path.GetFileName(sPath) + ": " + sFinding);
+else Log.info("Quality " + Path.GetFileName(sPath) + ": " + sFinding);
+}
 return true;
 }
 catch (Exception oError) { Log.warn("Finishing " + Path.GetFileName(sPath) + " for a screen reader failed: " + oError.Message); return false; }
