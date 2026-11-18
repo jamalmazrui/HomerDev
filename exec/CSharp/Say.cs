@@ -1299,10 +1299,11 @@ public static class ReadAloud
 
     private static bool bArmed;
     private static Action<int, bool> fFinished;
-    private static int iSent, iTotal;
+    private static bool bExhausted;
+    private static int iSent;
     private static long iQueuedUntil;
     private static uint iInputBaseline;
-    private static List<string> lsParts;
+    private static IEnumerator<string> oParts;
     private static Point ptMouse;
     private static string sName = "";
     private static System.Windows.Forms.Timer oTimer;
@@ -1312,25 +1313,28 @@ public static class ReadAloud
 
     // start: read the parts, one utterance each, empty ones skipped. sReadingName names it in the log. fDone, when given,
     // hears how many parts were handed to the reader and whether a key stopped the reading.
+    // PARTS ARE TAKEN AS THEY ARE NEEDED (18 November 2026). DbDo's Say Column on a table of 38,000 radio stations
+    // gathered every value before the first was spoken, eight seconds in which Windows called DbDo Not Responding.
+    // The parts are now drawn from the sequence only as the reader's queue runs low, about fifteen seconds ahead, so
+    // an app may pass a lazy sequence (a method that yields) and the first part is spoken at once, however long the list.
     public static void start(string sReadingName, IEnumerable<string> parts, Action<int, bool> fDone)
     {
         stop(false);
-        lsParts = new List<string>();
-        if (parts != null) foreach (string sPart in parts) if (!string.IsNullOrEmpty(sPart)) lsParts.Add(sPart);
         sName = sReadingName ?? "";
         fFinished = fDone;
         iSent = 0;
-        iTotal = lsParts.Count;
         bArmed = false;
+        bExhausted = false;
         iQueuedUntil = Environment.TickCount;
-        try { Log.info("ReadAloud: " + sName + " started, " + iTotal + " parts"); } catch { }
-        if (iTotal == 0) { finish(false); return; }
-        for (int vk = 1; vk < 256; vk++) GetAsyncKeyState(vk);
+        oParts = parts == null ? null : parts.GetEnumerator();
+        try { Log.info("ReadAloud: " + sName + " started"); } catch { }
         oTimer = new System.Windows.Forms.Timer();
+        topUp();
+        if (bExhausted && iSent == 0) { finish(false); return; }
+        for (int vk = 1; vk < 256; vk++) GetAsyncKeyState(vk);
         oTimer.Interval = iTickMillis;
         oTimer.Tick += onTick;
         oTimer.Start();
-        topUp();
     }
 
     // stop: end the reading now. bSilence also empties the reader's queue.
@@ -1378,14 +1382,14 @@ public static class ReadAloud
             else
             {
                 bool bControl = (GetAsyncKeyState(vkControl) & 0x8001) != 0;
-                try { Log.info("ReadAloud: " + sName + " stopped by a key" + (bControl ? " (Control)" : "") + " after " + iSent + " of " + iTotal + " parts"); } catch { }
+                try { Log.info("ReadAloud: " + sName + " stopped by a key" + (bControl ? " (Control)" : "") + " after " + iSent + " parts"); } catch { }
                 if (bControl) Say.stopSpeech();
                 finish(true);
                 return;
             }
         }
         topUp();
-        if (iSent >= iTotal && Environment.TickCount - iQueuedUntil > 1000) finish(false);
+        if (bExhausted && Environment.TickCount - iQueuedUntil > 1000) finish(false);
     }
 
     // topUp: hand the reader parts until about fifteen seconds of speech are waiting, by an estimate deliberately on
@@ -1394,12 +1398,26 @@ public static class ReadAloud
     {
         long iNow = Environment.TickCount;
         if (iQueuedUntil < iNow) iQueuedUntil = iNow;
-        while (iSent < iTotal && iQueuedUntil - iNow < iLeadMillis)
+        while (!bExhausted && iQueuedUntil - iNow < iLeadMillis)
         {
-            string sPart = lsParts[iSent++];
+            string sPart = nextPart();
+            if (sPart == null) { bExhausted = true; break; }
+            iSent++;
             Say.sayQueued(sPart);
             iQueuedUntil += sPart.Length * 1000 / iCharsPerSecond + iPauseMillis;
         }
+    }
+
+    // nextPart: the next part that is not empty, or null at the end. A part that throws ends the reading, logged.
+    private static string nextPart()
+    {
+        if (oParts == null) return null;
+        try
+        {
+            while (oParts.MoveNext()) if (!string.IsNullOrEmpty(oParts.Current)) return oParts.Current;
+        }
+        catch (Exception ex) { try { Log.info("ReadAloud: " + sName + " could not get its next part: " + ex.Message); } catch { } }
+        return null;
     }
 
     private static void finish(bool bStopped)
@@ -1408,7 +1426,7 @@ public static class ReadAloud
         if (!bStopped) try { Log.info("ReadAloud: " + sName + " finished, " + iSent + " parts"); } catch { }
         Action<int, bool> fDone = fFinished;
         fFinished = null;
-        lsParts = null;
+        if (oParts != null) { try { oParts.Dispose(); } catch { } oParts = null; }
         if (fDone != null) try { fDone(iSent, bStopped); } catch { }
     }
 }

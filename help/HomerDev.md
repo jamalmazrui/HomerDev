@@ -730,9 +730,9 @@ driven from a batch file, a scheduled task, or another program. A bare path
 with no switch is a source, because that is what dropping a file on the
 program means.
 
-### Settings are saved when Use configuration is checked
+### Settings are saved when Use configuration is marked
 
-When Use configuration is checked at OK, every field is written to
+When Use configuration is marked at OK, every field is written to
 `%LOCALAPPDATA%\<App>\configs\<App>.inix` and loaded next time; when it is
 not, that file is removed. Default settings, or `-d`, removes it too.
 

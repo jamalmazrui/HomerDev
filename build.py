@@ -785,7 +785,17 @@ def buildHomerDll():
     iCode, sOutput = runCommand([sCsc, "/nologo", "/target:library", "/platform:x64", "/optimize+",
                                  "/out:" + sOut] + lsRefs + lsSources)
     if iCode != 0 or not os.path.isfile(sOut):
-        return "exec\\Homer.dll did not compile; the log has the compiler's messages"
+        # NO STALE HOMER.DLL (1.259.0, 18 November 2026). Kit 1.258.0's Say.cs did not compile, the compiler left the
+        # old Homer.dll in place, and urlCheck's build bundled it and released: its dialog would have called a
+        # LaunchDialog.confirmOutput that old copy lacks. A failed compile now removes it, so a Python app's build
+        # stops at "Homer.dll is missing" until the kit builds cleanly.
+        try:
+            if os.path.isfile(sOut):
+                os.remove(sOut)
+                logLine("Removed exec\\Homer.dll, which no longer matches the kit's C#, so no Python app bundles it")
+        except OSError as oError:
+            logLine("Could not remove the stale exec\\Homer.dll: " + str(oError))
+        return "exec\\Homer.dll did not compile, so the old one was removed; the log has the compiler's messages"
     oCache.record("Homer.dll", sPrint, ["exec/Homer.dll"])
     sayLine("Built exec\\Homer.dll for Python apps (%s)." % ", ".join(lsHomerDllClasses))
     return ""

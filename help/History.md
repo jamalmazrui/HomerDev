@@ -7,6 +7,44 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.259.0 -- 18 November 2026
+
+- **The kit compiles again.** An edit of 1.257.0 dropped the opening quotation mark of one string in Say.cs's ReadAloud, so 1.258.0 built no C# at all: not Homer.dll, HomerDev.exe, the samples or the template app, and every C# app's build stopped at the same line. I had no compiler to try it on; every changed line of C# is now checked for an unbalanced quotation mark before it is delivered.
+- **A failed compile leaves no stale Homer.dll.** The compiler left 1.257.0's Homer.dll in exec, and urlCheck, a Python app, bundled it and released, carrying a Homer.dll without LaunchDialog.confirmOutput. The kit's build now removes Homer.dll when it does not compile, so a Python app's build stops at "Homer.dll is missing" until the kit builds cleanly.
+- **The reader's own keys stay the reader's, checked in every app's own files.** The suite's key gate reads only SuiteCommands.inix, so two hand-written lines in apps' JAWS key maps went unseen: DbDo's handed Alt+Control+PageUp and PageDown to DbDo, so JAWS's temporary voice rate did nothing there, and FileDir's handed on Control+Shift+F11, JAWS's system tray list, for a command that moved to Shift+F11. The new "reader keys" check reads an app's key file and its JAWS key map, and fails a key that Windows or a reader owns everywhere, unless it is approved, and any hand-written line that hands such a key on. KeyOwnership.inix now records both meanings of Alt+Control+PageUp and PageDown: JAWS's voice rate, and NVDA's first and last row of a column, which DbDo keeps for NVDA.
+- **JAWS's scripts on the apps' own keys are handed on everywhere.** JAWS's default key maps of 2024 to 2027, which HomerView's installer keeps for review, show eight keys the apps bind that JAWS answers with a script of its own first: Alt+Enter, Control+A, Control+E, Control+F4, Control+P, Control+Space, F3 and Shift+F3. FileDir and EdSharp handed them on by hand and DbDo did not; KeyOwnership.inix now marks them passThrough, so tidy writes them into every app's key map that binds them. The four versions' maps differ only in one Magic key, so the list holds for all four.
+
+## 1.258.0 -- 18 November 2026
+
+- **Shift+F1 and Control+Slash work in every message.** The author's ruling: "Shift+F1 and Control+Slash should work in every dialog." A Windows message box answers neither, and the six launch apps showed forty-four of them, the kit itself fifteen more: F11's version question, Open in another app, the media player's notices, the conversion alert, and the HomerDev dialog's errors. All are now Lbc dialogs through LbcMessage, which runs on a thread of its own when it is called from one that cannot show a window, as bookFido's messages are, after an await.
+- **Three shared ways to ask.** LbcMessage.showOnTop puts a message in front of every window, for a launch app waiting behind Edge while the person signs in; bookFido, urlCheck, urlFido and HomerScribe each built a hidden, topmost owner of their own. LaunchDialog.confirmOutput offers to make a missing output directory, which BatCon, extCheck, urlCheck and urlFido each did their own way, calling it a folder in one and a directory in another. lbcnet.message gives Python apps LbcMessage.
+- **A dialog's letter comes first in a text box too.** In a launch app's Source paths box, Alt+C appended the line to the clipboard, and said so, before Choose output directory took the key. An Alt+letter that a control of the window shows as its access key now goes to that control alone; Alt+C, Alt+X and Alt+Y keep their text-box meaning where no control claims the letter.
+- **Marked, not checked.** The Results line for kept results said "Check Force replacements"; it says Mark, as Homer says of every checkbox, and so do the kit's guides.
+- **Three new checks.** "Lbc messages" fails an app whose own code calls MessageBox.Show. "help keys" fails an app whose Hotkeys page does not name Elevate Version, What This Does and Where Am I with their keys. "launch words" now also fails a launch app whose help words -f, -u, -v, -d or -h its own way: the 12 November alignment of extCheck, HomerScribe, urlCheck and urlFido never reached their repositories, and nothing failed.
+
+## 1.257.0 -- 18 November 2026
+
+- **ReadAloud takes its parts as it needs them.** DbDo's Say Column as List, on a table of 38,000 records, gathered every value before speaking, and Windows called DbDo Not Responding. Homer.ReadAloud.start now draws from the sequence it is given only while less than about fifteen seconds of speech are waiting, so an app can pass a lazy sequence and the first part is heard at once. A part that cannot be read ends the reading and is logged.
+- **Wyzant's fourth try is gathered, not skipped.** harvestQueue, now version 5, compared the whole asked= text when a guide was queued twice, so "2026-11-17 fourth try" lost to "2026-11-17 third try", since f comes before t. Now only the day is compared, and on the same day the later queue file wins.
+
+## 1.256.0 -- 17 November 2026
+
+- **An expected line may name either of two things.** The first live tests of EdSharp and FileDir failed one step each though the apps spoke rightly: Say Position in a blank EdSharp document says "Top! | Blank", not a column, and in an empty FileDir folder "No items.", not a percent. A macro's Expect speech line may now list alternatives split by a bar, as in `Expect speech column | blank`, and the better match counts. help\Macro.md and runMacro's help say so.
+
+## 1.255.0 -- 17 November 2026
+
+- **Marked or Current asks whenever marked ones are in view.** The first version asked only when the current item was unmarked, so Jamal's Control+Z in FileDir, with folders marked and the cursor on one of them, went straight to the batch, as did every command after Mark All. LbcAsk.markedOrCurrent takes whether the current one is marked and says which: "The current item is one of the marked" or "is not marked". FileDir and DbDo skip the question only when the one marked item is the current one.
+- **The marked-not-ticked check reads only what git tracks.** Its first version read every file in the folder and stopped the pushes of DbDo, EdSharp and FileDir over files git does not hold: DbDo's notes in help\self.md, and stray older copies of summarizeSetup.ps1 and Developer.md at the top of EdSharp and FileDir. Words a person reads in the program, its installer or its pages are all tracked.
+
+## 1.254.0 -- 17 November 2026
+
+- **tidy no longer seems to hang in AppHelpGuides.** Its folder survey read and hashed every file in data\harvests, every page of more than three hundred harvests, looking for strays and duplicates, and said nothing for many minutes after "surveying the folder". A folder named whole in RepoFiles.txt, LocalFiles.txt or the installer (data/harvests/, results/) belongs, all of it, so the survey now passes over it and logs that it did. Any long survey also says how far it has got every ten seconds, and tidy's console lines are written at once rather than held back.
+- **harvestQueue's log names its version, 4,** which it had left at 3.
+
+## 1.253.0 -- 17 November 2026
+
+- **Wyzant's harvester recognizes its help centre.** The third run was turned away at the front page: my guessed Zendesk theme names were not on it, though it held 2,885 words, so it was kept out and nothing was followed. Any page that links to an article, a section or a category now counts, and the page reader falls back to the main region and a navigation trail when the theme's own names are missing.
+
 ## 1.252.0 -- 17 November 2026
 
 - **Marked, not ticked, everywhere.** About two hundred lines in the installers, their finish pages, the guides, the tutorials, the skills and the messages still said a checkbox was ticked, six days after the rule; every one says marked now. check.py's new "marked, not ticked" check fails a project whose installer, ReadMe, help pages (History aside), configs or scripts say tick, untick or ticked as a word, so the word cannot return.

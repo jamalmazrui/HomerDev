@@ -102,7 +102,17 @@ The standard controls have standard tips, the same in every launch app: an app p
 
 ## The same words everywhere (kit 1.221.0)
 
-The same command has the same name, description and binding in every launch app. Browse local source, Choose output directory, Use configuration and View output directory do the same thing everywhere, so an app passes "" for their tips and takes the kit's sentence; Browse local source's is made from what it picks and the folder it opens in. Source paths and Output directory say what that app reads and writes, so their tips are the app's own. On the command line, -f, -u, -v, -d and -h are described by the same sentences in every app's help, LaunchDialog's forceSwitch, useConfigSwitch, viewOutputSwitch, defaultSettingsSwitch and helpSwitch, and -h is always help. The kit's check, "launch words", fails an app that words one of the four controls its own way.
+The same command has the same name, description and binding in every launch app. Browse local source, Choose output directory, Use configuration and View output directory do the same thing everywhere, so an app passes "" for their tips and takes the kit's sentence; Browse local source's is made from what it picks and the folder it opens in. Source paths and Output directory say what that app reads and writes, so their tips are the app's own. On the command line, -f, -u, -v, -d and -h are described by the same sentences in every app's help, LaunchDialog's forceSwitch, useConfigSwitch, viewOutputSwitch, defaultSettingsSwitch and helpSwitch, and -h is always help. The kit's check, "launch words", fails an app that words one of the four controls its own way, and, since kit 1.258.0, one whose code does not name each switch's sentence -- LaunchDialog's constant, or its words.
+
+## Messages (kit 1.258.0)
+
+Every message a launch app shows is an Lbc dialog, so Shift+F1 and Control+Slash work there as in the main dialog, Yes is Alt+Y and No is Alt+N, and Control+Enter and Escape answer as everywhere. A Windows message box answers neither help key, so an app never calls MessageBox.Show; it asks one of these, which take MessageBox.Show's own arguments:
+
+- **LbcMessage.show** (C#), or **lbcnet.message** (Python): any message or question. Called from a thread that is not single-threaded, such as after an await, it runs on a thread of its own.
+- **LbcMessage.showOnTop:** a message in front of every window, for an app waiting behind Microsoft Edge while the person signs in, as bookFido, urlCheck and urlFido do.
+- **LaunchDialog.confirmOutput(app, folder):** at OK, offers to make an output directory that does not exist, Yes by default, in the words of the Output directory box; No, or a failure, returns to the dialog.
+
+The kit's check, "Lbc messages", fails an app whose own code calls MessageBox.Show. "help keys" fails an app whose Hotkeys page does not name Elevate Version (F11), What This Does (Shift+F1) and Where Am I (Control+Slash) in the suite's words.
 
 ## Offering only valid formats (kit 1.220.0)
 
@@ -126,7 +136,7 @@ A launch app that converts, such as BatCon, offers only the target formats every
   is last in alphabetical order. The Help box says where.
 - **Every run ends with a Results box**, titled "<App> Results". Its only
   button is OK, which has the focus, so Enter, Space or Escape closes it. Then
-  the output directory opens, if View output directory is checked, and the app
+  the output directory opens, if View output directory is marked, and the app
   closes. The folder opens after the box rather than before it, so File
   Explorer does not take the focus away from the results. A long report shows
   its first 15 lines and gives the path of a file that holds the rest.

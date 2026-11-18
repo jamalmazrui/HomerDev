@@ -1908,7 +1908,7 @@ private static void alert(string sApp, string sText) {
 Log.warn("Alert: " + sText);
 if (!bAlertBoxes || lsAlerted.Contains(sApp)) return;
 lsAlerted.Add(sApp);
-try { MessageBox.Show(sText, "Alert", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+try { LbcMessage.show(sText, "Alert", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
 catch (Exception) { }
 } // alert method
 

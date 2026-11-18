@@ -387,7 +387,33 @@ their tips are the app’s own. On the command line, -f, -u, -v, -d and -h
 are described by the same sentences in every app’s help, LaunchDialog’s
 forceSwitch, useConfigSwitch, viewOutputSwitch, defaultSettingsSwitch
 and helpSwitch, and -h is always help. The kit’s check, “launch words”,
-fails an app that words one of the four controls its own way.</p>
+fails an app that words one of the four controls its own way, and, since
+kit 1.258.0, one whose code does not name each switch’s sentence –
+LaunchDialog’s constant, or its words.</p>
+<h2 id="messages-kit-1.258.0">Messages (kit 1.258.0)</h2>
+<p>Every message a launch app shows is an Lbc dialog, so Shift+F1 and
+Control+Slash work there as in the main dialog, Yes is Alt+Y and No is
+Alt+N, and Control+Enter and Escape answer as everywhere. A Windows
+message box answers neither help key, so an app never calls
+MessageBox.Show; it asks one of these, which take MessageBox.Show’s own
+arguments:</p>
+<ul>
+<li><strong>LbcMessage.show</strong> (C#), or
+<strong>lbcnet.message</strong> (Python): any message or question.
+Called from a thread that is not single-threaded, such as after an
+await, it runs on a thread of its own.</li>
+<li><strong>LbcMessage.showOnTop:</strong> a message in front of every
+window, for an app waiting behind Microsoft Edge while the person signs
+in, as bookFido, urlCheck and urlFido do.</li>
+<li><strong>LaunchDialog.confirmOutput(app, folder):</strong> at OK,
+offers to make an output directory that does not exist, Yes by default,
+in the words of the Output directory box; No, or a failure, returns to
+the dialog.</li>
+</ul>
+<p>The kit’s check, “Lbc messages”, fails an app whose own code calls
+MessageBox.Show. “help keys” fails an app whose Hotkeys page does not
+name Elevate Version (F11), What This Does (Shift+F1) and Where Am I
+(Control+Slash) in the suite’s words.</p>
 <h2 id="offering-only-valid-formats-kit-1.220.0">Offering only valid
 formats (kit 1.220.0)</h2>
 <p>A launch app that converts, such as BatCon, offers only the target
@@ -419,7 +445,7 @@ where.</li>
 <li><strong>Every run ends with a Results box</strong>, titled “<App>
 Results”. Its only button is OK, which has the focus, so Enter, Space or
 Escape closes it. Then the output directory opens, if View output
-directory is checked, and the app closes. The folder opens after the box
+directory is marked, and the app closes. The folder opens after the box
 rather than before it, so File Explorer does not take the focus away
 from the results. A long report shows its first 15 lines and gives the
 path of a file that holds the rest.</li>

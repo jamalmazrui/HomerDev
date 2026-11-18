@@ -220,7 +220,7 @@ public static class MediaPlayer {
 // outside the kit. (The build failed in DbDo with "Lbc does not exist" the
 // first time it was compiled away from FileDir, 5 October 2026.)
 private static void showBox(string sText, string sTitle) {
-MessageBox.Show(sText, sTitle);
+LbcMessage.show(sText, sTitle);
 }
 
 private static string askSavePath(string sTitle, string sDefaultFile, string sFilter) {

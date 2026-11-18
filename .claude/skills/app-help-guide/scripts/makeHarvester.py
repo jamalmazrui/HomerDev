@@ -3351,7 +3351,10 @@ lEstates = [
         "sSeeds": '"https://support.wyzant.com/hc/en-us"',
         "sFencePattern": r"^https://support\.wyzant\.com/hc/en-us(/(categories|sections|articles)/[A-Za-z0-9_%-]+)?/?$",
         "sSubjectPattern": "",
-        "sReadyPattern": r"(article-body|section-tree|blocks-list|article-list|<h1)",
+        # READY, THIRD VERSION (17 November 2026): the guessed Zendesk theme names were not on Wyzant's front page, a page
+        # of 2,885 words, so it was kept out and nothing was followed. Any page that links to an article, a section or a
+        # category is the help centre's own; the reader settles the article's text once the pages are seen.
+        "sReadyPattern": r"/hc/en-us/(articles|sections|categories)/",
         "sOkStatuses": "200",
         "sExtraLinks": "",
     },

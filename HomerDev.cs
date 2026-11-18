@@ -249,7 +249,7 @@ private static bool openItem(IWin32Window owner, KitItem oItem)
     catch (Exception oError)
     {
         Log.exception(oError);
-        MessageBox.Show(owner, "Could not open " + oItem.sName + ": " + oError.Message, sAppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        LbcMessage.show(owner, "Could not open " + oItem.sName + ": " + oError.Message, sAppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
     }
     return true;
 }
@@ -523,7 +523,7 @@ private static bool runChat(IWin32Window owner)
     Log.keyValue("Claude Code", sClaude.Length > 0 ? sClaude : "(not installed)");
     if (sModel.Length == 0 && sClaude.Length == 0)
     {
-        MessageBox.Show(owner, "No AI is ready to answer: Ollama is not running or has no model, and Claude Code is not installed. HomerDev's setup program offers Ollama and a model; run it again and leave those boxes marked.", sAppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        LbcMessage.show(owner, "No AI is ready to answer: Ollama is not running or has no model, and Claude Code is not installed. HomerDev's setup program offers Ollama and a model; run it again and leave those boxes marked.", sAppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
         return false;
     }
     if (sModel.Length > 0) { sContext = kitContext(); Log.keyValue("Chat context characters", "" + sContext.Length); }
@@ -702,7 +702,7 @@ private static bool runChat(IWin32Window owner)
             if (oRecorder != null) { fnFinish(); return; }
             if (Voice.whisperProgram().Length == 0 || Voice.whisperModel().Length == 0)
             {
-                MessageBox.Show(dlg.form, "Asking by voice needs Whisper, which turns speech into text on this computer. HomerDev's setup program offers it: run it again and leave Whisper marked.", sAppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LbcMessage.show(dlg.form, "Asking by voice needs Whisper, which turns speech into text on this computer. HomerDev's setup program offers it: run it again and leave Whisper marked.", sAppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
             oRecorder = new VoiceRecorder();
@@ -711,7 +711,7 @@ private static bool runChat(IWin32Window owner)
             if (sProblem.Length > 0)
             {
                 oRecorder = null;
-                MessageBox.Show(dlg.form, "Could not listen: " + sProblem + ".", sAppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                LbcMessage.show(dlg.form, "Could not listen: " + sProblem + ".", sAppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
             dlg.setStatusText("Listening; press Voice again or stop talking to finish, Escape to cancel");
@@ -841,7 +841,7 @@ private static void fetchProject(LbcDialog dlg, string[] aProject, bool bRun, Bu
                 {
                     Log.info("Not downloaded: " + sUrl);
                     dlg.setStatusText(aProject[0] + ": not downloaded");
-                    MessageBox.Show(dlg.form, "The " + aProject[0] + " installer could not be downloaded from:\r\n" + sUrl
+                    LbcMessage.show(dlg.form, "The " + aProject[0] + " installer could not be downloaded from:\r\n" + sUrl
                         + "\r\n\r\nCheck the connection, or open the project's releases on GitHub. The log in %LOCALAPPDATA%\\HomerDev\\logs has the details.",
                         sAppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
@@ -921,7 +921,7 @@ private static bool runDialog()
         btnPlay.Click += delegate(object oSender, EventArgs evArgs)
         {
             if (!MediaPlayer.playTutorials(dlg.form, sAppName, Path.Combine(sKit, "help")))
-                MessageBox.Show(dlg.form, "No tutorial is installed in " + Path.Combine(sKit, "help", "tutorials") + ".", sAppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LbcMessage.show(dlg.form, "No tutorial is installed in " + Path.Combine(sKit, "help", "tutorials") + ".", sAppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
         };
         btnSetup.Click += delegate(object oSender, EventArgs evArgs)
         {
@@ -979,7 +979,7 @@ public static int Main(string[] aArguments)
     {
         Log.exception(oError);
         Log.close();
-        MessageBox.Show("HomerDev stopped: " + oError.Message + "\r\nThe log in %LOCALAPPDATA%\\HomerDev\\logs has the details.", sAppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        LbcMessage.show("HomerDev stopped: " + oError.Message + "\r\nThe log in %LOCALAPPDATA%\\HomerDev\\logs has the details.", sAppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
         return 1;
     }
 }

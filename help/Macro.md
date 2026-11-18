@@ -35,7 +35,7 @@ Each line is matched in this order:
 - **A command of the app,** by its name on the menus, such as `Say Filter and Order`. It is run by its key. A command with no key is run from the Alternate Menu. Add `twice` to press its key twice, for a command's second meaning.
 - **A screen reader command,** by its script name, with or without spaces, such as `Say Line` or `SayWindowTitle`. Its key is read from JAWS's own key map, so a key you reassigned is followed. Under NVDA, the four everyone knows work: Say All, Say Line, Say Window Prompt and Text, and Say Window Title.
 - **Expect focus** text: the control with focus after the step before holds this text.
-- **Expect speech** text: the reader was heard saying most of these words after the step before.
+- **Expect speech** text: the reader was heard saying most of these words after the step before. When either of two things may be right, split them with a bar, as in `Expect speech column | blank`; the better match counts.
 - **Expect window** text: the title of the window in front after the step before holds this text.
 - **JAWS** script: a JAWS script, when the app has a command of the same name.
 - **Press** key: a key by its Homer name, such as `Control+Shift+F`, `Escape` or `Shift+Slash`. Add `twice` to press it twice.

@@ -1,4 +1,4 @@
-﻿r"""harvestQueue.py version 4 -- gathers the help guides a collection has asked for, as the first part of its build.
+﻿r"""harvestQueue.py version 5 -- gathers the help guides a collection has asked for, as the first part of its build.
 
     harvestQueue <collection>       what the kit's projectCycle runs before buildGuide, in a guides collection
     harvestQueue                    the collection in the current folder, by hand
@@ -98,7 +98,7 @@ def readQueue(sPath):
 
 def readQueues(sData):
     """Every queue file in data: addGuides.inix first, then addGuides-*.inix in name order. One section per guide;
-    where a guide is named twice, the later asked= day wins. A list of (guide, {key: value}), and the files read."""
+    where a guide is named twice, the later asked= day wins, and on the same day the later file. A list of (guide, {key: value}), and the files read."""
     lsFiles = [os.path.join(sData, sQueueName)] if os.path.isfile(os.path.join(sData, sQueueName)) else []
     if os.path.isdir(sData):
         lsFiles += [os.path.join(sData, s) for s in sorted(os.listdir(sData), key=str.lower)
@@ -110,7 +110,10 @@ def readQueues(sData):
             if sKey not in dIndex:
                 dIndex[sKey] = len(lSections)
                 lSections.append((sGuide, dValues))
-            elif dValues.get("asked", "") >= lSections[dIndex[sKey]][1].get("asked", ""):
+            # THE DAY DECIDES, THEN THE LATER FILE (18 November 2026). The whole asked= text was compared, so
+            # "2026-11-17 fourth try" lost to "2026-11-17 third try", since f comes before t, and Wyzant's fourth
+            # try was skipped as gathered. Now only the day is compared; on the same day the later file wins.
+            elif dValues.get("asked", "")[:10] >= lSections[dIndex[sKey]][1].get("asked", "")[:10]:
                 lSections[dIndex[sKey]] = (sGuide, dValues)
     return lSections, lsFiles
 
@@ -322,7 +325,7 @@ def main():
     dState["fLog"] = io.open(sLogPath, "w", encoding="utf-8-sig", newline="\r\n")
     iResult = 0
     try:
-        log("harvestQueue.py version 3; script %s" % os.path.abspath(__file__))
+        log("harvestQueue.py version 5; script %s" % os.path.abspath(__file__))
         log("Python %s at %s on %s" % (platform.python_version(), sys.executable, platform.platform()))
         log("working directory %s; command line %s" % (os.getcwd(), " ".join(sys.argv)))
         if bTrim:

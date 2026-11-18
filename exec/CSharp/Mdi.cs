@@ -521,7 +521,7 @@ public static class SuiteCommands {
         string sExe = homerProgram(sApp);
         if (sExe.Length == 0) {
             Log.info("Open in " + sApp + ": not installed");
-            MessageBox.Show(owner, sApp + " is not installed on this computer. The HomerDev dialog lists every Homer project and can install it.",
+            LbcMessage.show(owner, sApp + " is not installed on this computer. The HomerDev dialog lists every Homer project and can install it.",
                 sApp, MessageBoxButtons.OK, MessageBoxIcon.Information);
             return false;
         }
@@ -535,7 +535,7 @@ public static class SuiteCommands {
             return true;
         } catch (Exception oError) {
             Log.info("Open in " + sApp + " failed: " + oError.Message);
-            MessageBox.Show(owner, sApp + " could not be started: " + oError.Message, sApp, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            LbcMessage.show(owner, sApp + " could not be started: " + oError.Message, sApp, MessageBoxButtons.OK, MessageBoxIcon.Information);
             return false;
         }
     }

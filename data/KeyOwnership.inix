@@ -103,6 +103,9 @@ what=input method on or off
 context=only with a Chinese input method installed
 interception=the input method may take it
 disposition=allowed, recorded as an input-method exception and tested
+jaws=JAWS answers it with its own script, SelectCurrentItem, before the app (kit 1.259.0, from JAWS's default key maps of 2024 to 2027)
+passThrough=yes
+passThroughExcept=HomerView, whose key map is chained into the browsers', where these keys are JAWS's own
 
 [Key Control+Shift+0]
 owner=Windows
@@ -119,6 +122,9 @@ what=select all
 context=everywhere
 interception=the app receives it
 disposition=bind only to select all, or mark all in a list
+jaws=JAWS answers it with its own script, SelectAll, before the app (kit 1.259.0, from JAWS's default key maps of 2024 to 2027)
+passThrough=yes
+passThroughExcept=HomerView, whose key map is chained into the browsers', where these keys are JAWS's own
 
 [Key Control+C]
 owner=Windows
@@ -175,6 +181,9 @@ what=close window
 context=MDI apps
 interception=the app receives it
 disposition=bind only to close the window
+jaws=JAWS answers it with its own script, CloseDocumentWindow, before the app (kit 1.259.0, from JAWS's default key maps of 2024 to 2027)
+passThrough=yes
+passThroughExcept=HomerView, whose key map is chained into the browsers', where these keys are JAWS's own
 
 [Key Control+Tab]
 owner=Windows
@@ -199,6 +208,9 @@ what=properties
 context=everywhere
 interception=the app receives it
 disposition=bind only to properties
+jaws=JAWS answers it with its own script, AltEnterKey, before the app (kit 1.259.0, from JAWS's default key maps of 2024 to 2027)
+passThrough=yes
+passThroughExcept=HomerView, whose key map is chained into the browsers', where these keys are JAWS's own
 
 [Key Alt+LeftArrow]
 owner=Windows
@@ -243,20 +255,20 @@ passThrough=yes
 passThroughExcept=HomerView, whose key map is chained into the browsers'; its JAWS Say Position script comes in stage 5
 
 [Key Alt+Control+PageUp]
-owner=JAWS
+owner=JAWS and NVDA
 kind=reader global
-what=voice rate faster
+what=JAWS: voice rate faster for the moment; NVDA: the first row of the table's column
 context=everywhere
 interception=JAWS takes it
-disposition=never bind
+disposition=approved only for the first row of a grid's column, NVDA's table meaning (DbDo's Column Top); never handed on in a JAWS key map, so JAWS keeps its voice rate (18 November 2026, from NVDA's command reference)
 
 [Key Alt+Control+PageDown]
-owner=JAWS
+owner=JAWS and NVDA
 kind=reader global
-what=voice rate slower
+what=JAWS: voice rate slower for the moment; NVDA: the last row of the table's column
 context=everywhere
 interception=JAWS takes it
-disposition=never bind
+disposition=approved only for the last row of a grid's column, NVDA's table meaning (DbDo's Column Bottom); never handed on in a JAWS key map, so JAWS keeps its voice rate (18 November 2026, from NVDA's command reference)
 
 [Key Alt+Shift+UpArrow]
 owner=JAWS
@@ -555,3 +567,49 @@ what=first column
 context=in tables NVDA recognizes
 interception=NVDA moves to the first column itself
 disposition=allowed for cell movement inside the app's own grid only, tested
+
+; JAWS'S SCRIPTS ON THE APPS' OWN KEYS (kit 1.259.0, 18 November 2026), from JAWS's own default key maps of 2024 to
+; 2027. Each key means the same in the app as everywhere, but JAWS answers it with a script of its own; FileDir
+; and EdSharp hand each one straight to the app, and DbDo did not. Alt+Enter, Control+A, Control+F4 and Control+Space
+; are above, with passThrough added. Listed here, tidy writes the same line into
+; every app's key map that binds the key, so the app's own speech is the only speech.
+
+[Key Control+E]
+owner=JAWS
+kind=convention
+what=move to a search box, in programs that have one (JAWS script ActivateSearchBox)
+context=everywhere
+interception=JAWS runs its script, which sends the key on and may speak first
+disposition=passed through to the app, wherever it binds the key, as FileDir's and EdSharp's key maps already do
+passThrough=yes
+passThroughExcept=HomerView, whose key map is chained into the browsers', where these keys are JAWS's own
+
+[Key Control+P]
+owner=JAWS
+kind=convention
+what=play, in FSReader (JAWS script FSReaderPlay)
+context=everywhere
+interception=JAWS runs its script, which sends the key on and may speak first
+disposition=passed through to the app, wherever it binds the key, as FileDir's and EdSharp's key maps already do
+passThrough=yes
+passThroughExcept=HomerView, whose key map is chained into the browsers', where these keys are JAWS's own
+
+[Key F3]
+owner=JAWS
+kind=convention
+what=find next, as JAWS announces it in some programs (JAWS script F3Script)
+context=everywhere
+interception=JAWS runs its script, which sends the key on and may speak first
+disposition=passed through to the app, wherever it binds the key, as FileDir's and EdSharp's key maps already do
+passThrough=yes
+passThroughExcept=HomerView, whose key map is chained into the browsers', where these keys are JAWS's own
+
+[Key Shift+F3]
+owner=JAWS
+kind=convention
+what=find previous, as JAWS announces it in some programs (JAWS script ShiftF3Script)
+context=everywhere
+interception=JAWS runs its script, which sends the key on and may speak first
+disposition=passed through to the app, wherever it binds the key, as FileDir's and EdSharp's key maps already do
+passThrough=yes
+passThroughExcept=HomerView, whose key map is chained into the browsers', where these keys are JAWS's own

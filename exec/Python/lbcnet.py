@@ -116,3 +116,32 @@ def keyHandler(fnHandler):
     from System import Boolean, Func
     from System.Windows.Forms import Keys
     return Func[Keys, Boolean](lambda keys: bool(fnHandler(keys)))
+
+def message(sText, sTitle, sButtons="ok", sIcon="information", oOwner=None, bOnTop=False):
+    """A message as an Lbc dialog, as C#'s LbcMessage.show (kit 1.258.0, 18 November 2026), so a Python app's
+    messages answer Shift+F1 and Control+Slash like every other Homer dialog. sButtons is ok, okcancel, yesno or
+    yesnocancel; sIcon is information, question, warning or error. bOnTop puts it in front of every window, for a
+    program waiting behind Microsoft Edge (LbcMessage.showOnTop). Returns the answer in lowercase: ok, cancel, yes or
+    no. Should Homer.dll not load, Windows's own message box asks instead, so no message is lost."""
+    from System.Windows.Forms import DialogResult, MessageBox, MessageBoxButtons, MessageBoxDefaultButton, MessageBoxIcon
+    dButtons = {"ok": MessageBoxButtons.OK, "okcancel": MessageBoxButtons.OKCancel, "yesno": MessageBoxButtons.YesNo,
+                "yesnocancel": MessageBoxButtons.YesNoCancel}
+    dIcons = {"error": MessageBoxIcon.Error, "information": MessageBoxIcon.Information, "question": MessageBoxIcon.Question,
+              "warning": MessageBoxIcon.Warning}
+    oButtons = dButtons.get(str(sButtons).lower(), MessageBoxButtons.OK)
+    oIcon = dIcons.get(str(sIcon).lower(), MessageBoxIcon.Information)
+    oHomerNow = load()
+    oAnswer = None
+    try:
+        if oHomerNow is not None:
+            if bOnTop: oAnswer = oHomerNow.LbcMessage.showOnTop(str(sText), str(sTitle), oButtons, oIcon)
+            else: oAnswer = oHomerNow.LbcMessage.show(oOwner, str(sText), str(sTitle), oButtons, oIcon, MessageBoxDefaultButton.Button1)
+    except Exception as oError:
+        log.warn("LbcMessage could not show %r: %s" % (sTitle, oError))
+        oAnswer = None
+    if oAnswer is None:
+        oAnswer = MessageBox.Show(str(sText), str(sTitle), oButtons, oIcon)
+    dNames = {DialogResult.OK: "ok", DialogResult.Cancel: "cancel", DialogResult.Yes: "yes", DialogResult.No: "no"}
+    sAnswer = dNames.get(oAnswer, "cancel")
+    log.info("message %r answered %s" % (sTitle, sAnswer))
+    return sAnswer

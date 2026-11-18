@@ -1102,9 +1102,11 @@ def readZendeskPages(sFolder):
         sTitle = stripTags(oTitle.group(1))
         sBody = (findBalanced(sMarkup, r'<div[^>]*class="[^"]*\barticle-body\b', "div")
                  or findBalanced(sMarkup, r'<section[^>]*class="[^"]*\barticle-info\b', "section")
-                 or findBalanced(sMarkup, r"<article[^>]*>", "article"))
+                 or findBalanced(sMarkup, r"<article[^>]*>", "article")
+                 or findBalanced(sMarkup, r"<main[^>]*>", "main"))
         if not sTitle or not sBody: continue
-        sTrail = findBalanced(sMarkup, r'<ol[^>]*class="[^"]*breadcrumbs', "ol") or ""
+        sTrail = (findBalanced(sMarkup, r'<ol[^>]*class="[^"]*breadcrumbs', "ol")
+                  or findBalanced(sMarkup, r'<nav[^>]*(aria-label="[^"]*[Bb]readcrumb|class="[^"]*breadcrumb)', "nav") or "")
         lsTrail = [stripTags(s) for s in re.findall(r"(?is)<li[^>]*>(.*?)</li>", sTrail)]
         lsTrail = [s for s in lsTrail if s and s != sTitle]
         sCategory = lsTrail[1] if len(lsTrail) > 1 else ""

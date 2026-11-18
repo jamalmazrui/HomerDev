@@ -27,7 +27,8 @@ Each line is one of these, matched in this order:
     a screen reader command     its script name, with or without spaces, such as Say Line or SayWindowTitle; run by
                                 the key JAWS gives it in its own key map (NVDA's key when NVDA is the reader)
     Expect focus <text>         the control with focus after the step before holds this text
-    Expect speech <text>        the reader was heard saying this after the step before (most of its words)
+    Expect speech <text>        the reader was heard saying this after the step before (most of its words);
+                                either of two, split by a bar: Expect speech column | blank
     Expect window <text>        the window in front after the step before has this in its title
     JAWS <script>               a JAWS script by name, when the app has a command of the same name
     Press <key>                 a key by its Homer name, such as Control+Shift+F or Escape; "twice" presses it twice

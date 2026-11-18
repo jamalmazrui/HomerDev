@@ -150,15 +150,15 @@ namespace Homer
             if (iOutcome == iNotConfigured) return false;
             if (iOutcome == iCheckFailed)
             {
-                MessageBox.Show(oOwner, describe(iOutcome), "Version", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LbcMessage.show(oOwner, describe(iOutcome), "Version", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return false;
             }
-            oAnswer = MessageBox.Show(oOwner, describe(iOutcome) + "\r\n\r\nUpdate to it now?", "Version",
+            oAnswer = LbcMessage.show(oOwner, describe(iOutcome) + "\r\n\r\nUpdate to it now?", "Version",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question,
                 iOutcome == iNewer ? MessageBoxDefaultButton.Button1 : MessageBoxDefaultButton.Button2);
             if (oAnswer != DialogResult.Yes) return false;
             if (update()) return true;
-            MessageBox.Show(oOwner, "The setup program could not be fetched. It is at " + repoUrl + "/releases.", "Version",
+            LbcMessage.show(oOwner, "The setup program could not be fetched. It is at " + repoUrl + "/releases.", "Version",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
             return false;
         }

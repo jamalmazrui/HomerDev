@@ -114,6 +114,12 @@ public class LbcTextBox : TextBox
         int iStart;
         string sLine;
         Keys key = evArgs.KeyData;
+        // THE DIALOG'S ACCESS KEY COMES FIRST HERE TOO (kit 1.258.0, 18 November 2026). In every launch app Alt+C is
+        // Choose output directory, but in the Source paths box it also appended the line to the clipboard, and said
+        // so, before the button took it. An Alt+letter that a control of this window shows as its access key now goes
+        // to that control alone, as LbcForm already rules for app keys; Alt+C, Alt+X and Alt+Y keep their text-box
+        // meaning wherever no control claims the letter.
+        if ((key & Keys.Modifiers) == Keys.Alt && FindForm() != null && LbcForm.ownsMnemonic(FindForm(), (char) (key & Keys.KeyCode))) return;
 
         if ((key == Keys.F4 || key == (Keys.Alt | Keys.Down))
             && lsLookupValues != null && lsLookupValues.Count > 0)
@@ -480,7 +486,7 @@ public class LbcForm : Form
     }
 
     // ownsMnemonic: whether a visible, enabled control under ctlRoot shows chKey as its access key.
-    private static bool ownsMnemonic(Control ctlRoot, char chKey)
+    public static bool ownsMnemonic(Control ctlRoot, char chKey)
     {
         if (!char.IsLetterOrDigit(chKey)) return false;
         foreach (Control ctl in ctlRoot.Controls)
@@ -5423,13 +5429,13 @@ public class LaunchDialog : IDisposable
 
     // keptLine: the Results box's line for results kept because Force
     // replacements was off -- "Skipped 2 files whose results were already
-    // there. Check Force replacements, or use -f, to replace them." Empty for 0.
+    // there. Mark Force replacements, or use -f, to replace them." Empty for 0.
     public static string keptLine(int iCount, string sNoun)
     {
         if (iCount <= 0) return "";
         string sNouns = iCount == 1 ? sNoun : sNoun + "s";
         return "Skipped " + iCount + " " + sNouns + (iCount == 1 ? " whose result was" : " whose results were")
-            + " already there. Check Force replacements, or use -f, to replace " + (iCount == 1 ? "it." : "them.");
+            + " already there. Mark Force replacements, or use -f, to replace " + (iCount == 1 ? "it." : "them.");
     }
 
     // Bands 5 and 6. A null tip leaves that checkbox out, for an app with no
@@ -5644,6 +5650,39 @@ public class LaunchDialog : IDisposable
         return "F11 checks the web for a newer version of " + sAppName + " and offers to install it. It works from any control, though no control shows it.\r\n"
              + "Logging is automatic: every run writes a log in %LOCALAPPDATA%\\" + sAppName + "\\logs, named "
              + sAppName + "-yyyyMMdd-HHmmss.log for the date and time it started, so the newest is last in alphabetical order.";
+    }
+
+    // confirmOutput: offer to make an output directory that does not exist yet, Yes by default; false sends the
+    // person back to the dialog (kit 1.258.0, 18 November 2026). BatCon, extCheck, urlCheck and urlFido each had a
+    // copy, in Windows message boxes that answered neither Shift+F1 nor Control+Slash, and they called the same
+    // thing a folder in one and a directory in another. Now one Lbc question says it the same way in every app, in
+    // the words of the Output directory box.
+    public static bool confirmOutput(string sAppName, string sFolder)
+    {
+        string sCandidate = (sFolder ?? "").Trim();
+        if (sCandidate.Length >= 2 && sCandidate[0] == '"' && sCandidate[sCandidate.Length - 1] == '"')
+            sCandidate = sCandidate.Substring(1, sCandidate.Length - 2).Trim();
+        if (sCandidate.Length == 0) return true;
+        try { if (Directory.Exists(sCandidate)) return true; } catch (Exception) { return true; }
+        if (LbcMessage.show(Form.ActiveForm, "Create the output directory " + sCandidate + "?", sAppName, MessageBoxButtons.YesNo,
+            MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) != DialogResult.Yes)
+        {
+            Log.info("Output directory not created, at the person's answer: " + sCandidate);
+            return false;
+        }
+        try
+        {
+            Directory.CreateDirectory(sCandidate);
+            Log.info("Output directory created: " + sCandidate);
+            return true;
+        }
+        catch (Exception oError)
+        {
+            Log.info("Output directory could not be created: " + sCandidate + ": " + oError.Message);
+            LbcMessage.show(Form.ActiveForm, "Could not create the output directory " + sCandidate + ": " + oError.Message, sAppName,
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return false;
+        }
     }
 
     // finish: the end of every GUI launch -- the Results box, then, once it is
@@ -6281,6 +6320,44 @@ public static class LbcMessage
     public static DialogResult show(IWin32Window owner, string sText, string sTitle, MessageBoxButtons buttons) { return show(owner, sText, sTitle, buttons, MessageBoxIcon.None, MessageBoxDefaultButton.Button1); }
     public static DialogResult show(IWin32Window owner, string sText, string sTitle, MessageBoxButtons buttons, MessageBoxIcon icon) { return show(owner, sText, sTitle, buttons, icon, MessageBoxDefaultButton.Button1); }
 
+    // showOnTop: a message in front of every other window, for a program with no window of its own in front -- a
+    // launch app waiting while the person signs in to a site in Microsoft Edge, or reporting from behind Edge
+    // (kit 1.258.0, 18 November 2026). bookFido, urlCheck, urlFido and HomerScribe each built a hidden, topmost
+    // owner for a Windows message box, which answered neither Shift+F1 nor Control+Slash; now they share this one,
+    // an Lbc dialog like every other. The owner is taken to the front first, so the dialog it owns opens in front
+    // and the screen reader reads it.
+    public static DialogResult showOnTop(string sText, string sTitle, MessageBoxButtons buttons, MessageBoxIcon icon)
+    {
+        if (System.Threading.Thread.CurrentThread.GetApartmentState() != System.Threading.ApartmentState.STA)
+        {
+            DialogResult oAnswer = DialogResult.None;
+            System.Threading.Thread oThread = new System.Threading.Thread(delegate() { oAnswer = showOnTop(sText, sTitle, buttons, icon); });
+            oThread.SetApartmentState(System.Threading.ApartmentState.STA);
+            oThread.IsBackground = true;
+            oThread.Start();
+            oThread.Join();
+            return oAnswer;
+        }
+        Form frmOwner = null;
+        try
+        {
+            frmOwner = new Form();
+            frmOwner.TopMost = true;
+            frmOwner.ShowInTaskbar = false;
+            frmOwner.FormBorderStyle = FormBorderStyle.None;
+            frmOwner.StartPosition = FormStartPosition.CenterScreen;
+            frmOwner.Size = new Size(1, 1);
+            frmOwner.Opacity = 0;
+            frmOwner.Show();
+            try { Util.forceWindow(frmOwner.Handle); } catch (Exception) { }
+            return show(frmOwner, sText, sTitle, buttons, icon, MessageBoxDefaultButton.Button1);
+        }
+        finally
+        {
+            if (frmOwner != null) try { frmOwner.Close(); frmOwner.Dispose(); } catch (Exception) { }
+        }
+    }
+
     // native: THE STANDARD WINDOWS MESSAGE BOX (6 November 2026, at Jamal's request). Its Yes and No answer Y and N, with or
     // without Alt, by Windows itself, with no Homer key routing in the way: FileDir's "Create it?" still lost Alt+Y to
     // the app's Yield Files after kit 1.154.0. Owned by the window in front, so a screen reader reads it as part of the app.
@@ -6293,6 +6370,20 @@ public static class LbcMessage
 
     public static DialogResult show(IWin32Window owner, string sText, string sTitle, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defaultButton)
     {
+        // ON A THREAD OF ITS OWN WHEN NEED BE (kit 1.258.0, 18 November 2026). A dialog needs a single-threaded
+        // apartment; bookFido's messages come after an await, on a pool thread, and the kit's conversion alert can
+        // come from a worker. There the dialog runs on a new STA thread of its own, without an owner, since a window
+        // cannot own one on another thread; the caller waits for the answer as before.
+        if (System.Threading.Thread.CurrentThread.GetApartmentState() != System.Threading.ApartmentState.STA)
+        {
+            DialogResult oAnswer = DialogResult.None;
+            System.Threading.Thread oThread = new System.Threading.Thread(delegate() { oAnswer = show(null, sText, sTitle, buttons, icon, defaultButton); });
+            oThread.SetApartmentState(System.Threading.ApartmentState.STA);
+            oThread.IsBackground = true;
+            oThread.Start();
+            oThread.Join();
+            return oAnswer;
+        }
         string[] aLabels;
         DialogResult[] aResults;
         switch (buttons)
@@ -6420,17 +6511,25 @@ return "";
 //   - "Current item", or the letter C, takes only the one the cursor is on.
 //   - Cancel and Help, as in every Lbc choice dialog; Shift+F1 says each button's hint and Control+Slash says where you
 //     are, as in every Lbc dialog.
-// When the current one is marked too, nothing is asked: it is one of the batch, and the marked ones are meant. sSingular
-// and sPlural name what is marked -- "item" and "items" in FileDir, "record" and "records" in DbDo. The answer is
-// "marked", "current", or "" for Cancel.
+// ASKED WHENEVER ANY ARE MARKED (17 November 2026, evening). The first version asked only when the current one was not
+// marked, and so stayed silent when Jamal pressed Control+Z in FileDir with folders marked and the cursor on one of
+// them, and after Mark All. He wants the question whenever marked ones are in view: Enter still takes the batch, so it
+// costs one key, and the command name in the title confirms what is about to run. It is not asked when the one marked
+// item is the current one, since both buttons would mean the same. bCurrentMarked says which sentence the dialog shows.
+// sSingular and sPlural name what is marked -- "item" and "items" in FileDir, "record" and "records" in DbDo. The
+// answer is "marked", "current", or "" for Cancel.
 public static string markedOrCurrent(string sTitle, int iMarked, string sSingular, string sPlural) {
+return markedOrCurrent(sTitle, iMarked, sSingular, sPlural, false);
+} // markedOrCurrent method
+
+public static string markedOrCurrent(string sTitle, int iMarked, string sSingular, string sPlural, bool bCurrentMarked) {
 string sOne = string.IsNullOrEmpty(sSingular) ? "item" : sSingular;
 string sMany = string.IsNullOrEmpty(sPlural) ? sOne + "s" : sPlural;
 string sMarkedLabel = "&Marked " + sMany + " (" + iMarked + ")";
 string sCurrentLabel = "&Current " + sOne;
 string sPressed;
 using (LbcDialog dlg = new LbcDialog(string.IsNullOrEmpty(sTitle) ? "Marked or Current" : sTitle, ownerForm())) {
-dlg.addLabel("The current " + sOne + " is not marked.");
+dlg.addLabel("The current " + sOne + (bCurrentMarked ? " is one of the marked." : " is not marked."));
 dlg.hintButton(sMarkedLabel, "Acts on the " + iMarked + " marked " + (iMarked == 1 ? sOne : sMany) + " in view; Enter chooses this.");
 dlg.hintButton(sCurrentLabel, "Acts on the current " + sOne + " only, and leaves the marks as they are; the letter C chooses this.");
 sPressed = dlg.runWithButtons(new string[] { sMarkedLabel, sCurrentLabel, "Cancel" }, true, sMarkedLabel.Replace("&", ""));

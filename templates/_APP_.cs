@@ -254,20 +254,11 @@ public static class Program
         return iResult;
     }
 
-    // confirmOutput: offer to make an output directory that does not exist yet, Yes by default.
+    // confirmOutput: offer to make an output directory that does not exist yet, Yes by default -- the kit's question,
+    // an Lbc dialog the same in every launch app, which answers Shift+F1 and Control+Slash.
     private static bool confirmOutput(string sFolder)
     {
-        string sCandidate = (sFolder ?? "").Trim().Trim('"');
-        if (sCandidate == "" || Directory.Exists(sCandidate)) return true;
-        if (MessageBox.Show("Create " + sCandidate + "?", sAppName, MessageBoxButtons.YesNo, MessageBoxIcon.Question,
-            MessageBoxDefaultButton.Button1) != DialogResult.Yes) return false;
-        try { Directory.CreateDirectory(sCandidate); return true; }
-        catch (Exception oError)
-        {
-            MessageBox.Show("Could not create the folder:\r\n" + sCandidate + "\r\n\r\n" + oError.Message, sAppName,
-                MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return false;
-        }
+        return LaunchDialog.confirmOutput(sAppName, sFolder);
     }
 
     // ---- the command line ---------------------------------------------------
