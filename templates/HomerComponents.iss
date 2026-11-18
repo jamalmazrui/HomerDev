@@ -703,6 +703,27 @@ begin
   Result := homerDefaults() and (not WizardSilent) and (PageID <> wpFinished);
 end;
 
+function homerPriorVersion(): String;
+(* THE VERSION ALREADY INSTALLED, FROM THE KEY INNO REALLY WROTE (kit 1.261.0, 18 November 2026). Six installers looked
+   for 'Uninstall\{#SetupSetting("AppId")}_is1'. An AppId written {{GUID} -- Inno's way of putting a brace in a setting
+   -- comes back from SetupSetting with both braces, while Inno names the key with one, so the lookup never found
+   anything: urlCheck 1.12.55 to 1.12.56 and urlFido 1.2.40 to 1.2.41 were each reported as "Installed", never
+   "Updated", on the welcome page and in the Results box. The doubled brace is undone here, and the key is looked for
+   in the 64-bit and 32-bit views and the user's own hive, wherever an earlier install may have put it. Read it once,
+   in InitializeSetup, before this install writes the key. *)
+var
+  sId, sKey, sFound: String;
+begin
+  Result := '';
+  sId := '{#SetupSetting("AppId")}';
+  StringChangeEx(sId, '{{', '{', True);
+  sKey := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\' + sId + '_is1';
+  if IsWin64 and RegQueryStringValue(HKLM64, sKey, 'DisplayVersion', sFound) then Result := sFound
+  else if RegQueryStringValue(HKLM32, sKey, 'DisplayVersion', sFound) then Result := sFound
+  else if RegQueryStringValue(HKCU, sKey, 'DisplayVersion', sFound) then Result := sFound;
+  Log('Installed before this setup: ' + sId + ' ' + Result);
+end;
+
 procedure homerKeepSetupLog();
 (* THE SAVED SETUP LOG ENDS WITH THE RESULTS (kit 1.260.0, 18 November 2026). Every installer copies Inno's log into
    %LOCALAPPDATA%\<App>\logs from CurStepChanged(ssDone), and then builds its Results box, which is when each marked

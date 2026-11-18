@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.261.0 -- 18 November 2026
+
+- **An update is called an update.** urlCheck 1.12.55 to 1.12.56 and urlFido 1.2.40 to 1.2.41 were each reported as "Installed" in the Results box, on the welcome page and on the ready page, because six installers looked for the version already installed under the AppId as written, {{GUID} with a doubled brace, while Inno names the registry key with one. The new homerPriorVersion undoes the doubled brace, looks in the 64-bit and 32-bit views and the user's own hive, and logs what it found. BatCon, bookFido, DbDo, extCheck, urlCheck and urlFido now use it. Only wording was wrong: no installer step depended on it.
+- **Where Am I is Control+Slash in Python dialogs too.** The C# dialogs moved Where Am I from Alt+Shift+Slash to Control+Slash in 1.171.0, but the kit's Python copy, exec\Python\lbc.py, kept the old key, and HomerView's build copies it into its add-on. HomerView's dialogs, and any Python app's, now answer Control+Slash like the rest of Homer.
+
 ## 1.260.0 -- 18 November 2026
 
 - **A saved setup log now shows which boxes were marked.** An audit of a day's setup logs could tell what each installer offered and which scripts ran, but not what the person chose in between. Every box on the finish page is now logged as "Box marked:" or "Box not marked:" with its wording.
