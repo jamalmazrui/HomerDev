@@ -3483,7 +3483,10 @@ lEstates = [
     # PAYMENTS AND BUSINESS TOOLS (19 November 2026), each probed first. Readers for the custom centres are written once
     # their first harvests are seen, as Twitch's was; Mercury's Zendesk listing is read by readZendeskSection.
     #
-    # STRIPE AND LINK: Stripe's own support sites, both drawn on the server, articles at /questions/<slug> and topics
+    # STRIPE AND LINK, DRAWN BY EDGE (20 November 2026): the first plain runs saved 1,367 Stripe pages whose text was the
+    # title alone -- the article arrives later, by script -- so both are drawn by Edge, fifteen seconds a page. Stripe
+    # takes six hours or so; Control+C stops it and the next build resumes.
+    # Stripe's own support sites, articles at /questions/<slug> and topics
     # at /topics/<slug>. Stripe's developer documentation lives at docs.stripe.com, outside the fence, since this
     # collection leaves programming interfaces out. Link is Stripe's saved-checkout service, with a site of its own.
     {
@@ -3493,6 +3496,8 @@ lEstates = [
         "sFolder": "StripeHelp",
         "sZipName": "StripeHelp.zip",
         "iMaxPages": 3000,
+        "sFetch": "edge",
+        "iBrowserWait": 15,
         "nDelay": 1.0,
         "sSeeds": '"https://support.stripe.com/"',
         "sFencePattern": r"^https://support\.stripe\.com/((questions|topics)/[A-Za-z0-9_%-]+)?/?$",
@@ -3511,6 +3516,8 @@ lEstates = [
         "sFolder": "LinkHelp",
         "sZipName": "LinkHelp.zip",
         "iMaxPages": 400,
+        "sFetch": "edge",
+        "iBrowserWait": 15,
         "nDelay": 1.0,
         "sSeeds": ('"https://support.link.com/",\n'
                    '              "https://support.link.com/topics/data-privacy",\n'
@@ -3549,6 +3556,8 @@ lEstates = [
     # HUBSPOT: its knowledge base, knowledge.hubspot.com, categories at /<category> and articles at /<folder>/<slug>,
     # English at the root and sixteen languages under a prefix, all fenced out. It is large -- several thousand
     # articles -- so it comes last in a queue and its ceiling is high; a stopped run resumes where it stopped.
+    # /page/<n> IS FENCED OUT (20 November 2026): the front page's paging gave 1,906 listing pages, half the first harvest,
+    # each a copy of the same list; every article is reached from its category pages without them.
     {
         "sProduct": "HubSpot",
         "sScriptName": "getHubSpotHelp.py",
@@ -3558,7 +3567,7 @@ lEstates = [
         "iMaxPages": 8000,
         "nDelay": 1.0,
         "sSeeds": '"https://knowledge.hubspot.com/"',
-        "sFencePattern": r"^https://knowledge\.hubspot\.com/(?!(es|de|ja|pt|fr|nl|it|pl|sv|fi|zh-tw|da|no|ko|th|zh-cn)(/|$))([a-z0-9-]+(/[a-z0-9-]+)?)?/?$",
+        "sFencePattern": r"^https://knowledge\.hubspot\.com/(?!(es|de|ja|pt|fr|nl|it|pl|sv|fi|zh-tw|da|no|ko|th|zh-cn|page)(/|$))([a-z0-9-]+(/[a-z0-9-]+)?)?/?$",
         "sSubjectPattern": "",
         "sReadyPattern": r"HubSpot",
         "sOkStatuses": "200",

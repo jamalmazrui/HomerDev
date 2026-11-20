@@ -2179,6 +2179,62 @@ def readShopFor(sFolder, bPay):
 def readShop(sFolder): return readShopFor(sFolder, False)
 def readShopPay(sFolder): return readShopFor(sFolder, True)
 
+# HUBSPOT, ONE HARVEST AND FOUR GUIDES (20 November 2026). HubSpot's knowledge base held 1,919 articles and about 1.9
+# million words, too much for one guide a reader can move around in, so it is split by the first step of each
+# article's trail, HubSpot's own top categories, into four of about half a million words each. A top category not named
+# here goes to the account guide and is logged, so a new one is noticed.
+dHubSpotGuides = {"account & setup": "account", "get started": "account", "ai": "account", "partners": "account",
+                  "crm": "crm", "sales": "crm", "service": "crm", "revenue": "crm",
+                  "automation": "data", "data": "data", "reporting & data": "data",
+                  "marketing": "marketing", "content": "marketing"}
+g_dHubSpotCache = {}
+
+
+def readHubSpotAll(sFolder):
+    """Every HubSpot article as (lTrail, sTitle, lBody), read once a build. An article is a two-part address
+    (/workflows/<slug>); its text is the post body HubSpot's page template marks hs_cos_wrapper_post_body, and its
+    trail the cl-breadcrumbs list, less Knowledge Base and the article itself. The /page/<n> listing pages, 1,906 of
+    them in the first harvest, are not articles and are passed over."""
+    if sFolder in g_dHubSpotCache: return g_dHubSpotCache[sFolder]
+    lArticles = []
+    for sName in sorted(os.listdir(sFolder)):
+        if not sName.startswith("knowledge.hubspot.com_") or not sName.endswith(".html"): continue
+        lsParts = sName[len("knowledge.hubspot.com_"):-5].split("_")
+        if len(lsParts) != 2 or lsParts[0] == "page": continue
+        sMarkup = readText(os.path.join(sFolder, sName))
+        oTitle = re.search(r"(?is)<h1[^>]*>(.*?)</h1>", sMarkup)
+        sBody = findBalanced(sMarkup, r'<span[^>]*id="hs_cos_wrapper_post_body"', "span")
+        if not oTitle or not sBody: continue
+        sTitle = stripTags(oTitle.group(1))
+        oTrail = re.search(r'(?is)<ul class="cl-breadcrumbs[^"]*">(.*?)</ul>', sMarkup)
+        lTrail = [stripTags(s) for s in re.findall(r'(?is)<a class="cl-breadcrumbs-link-text"[^>]*>(.*?)</a>', oTrail.group(1))] if oTrail else []
+        lTrail = [s for s in lTrail if s and s.lower() != "knowledge base"]
+        lBody = toMarkdown(sBody, 0, "https://knowledge.hubspot.com/" + "/".join(lsParts))
+        if len(" ".join(lBody).split()) < 25: continue
+        lArticles.append((lTrail, sTitle, lBody))
+    logging.info("HubSpot harvest: %d articles read", len(lArticles))
+    g_dHubSpotCache[sFolder] = lArticles
+    return lArticles
+
+
+def readHubSpotFor(sFolder, sGuide):
+    lArticles = []
+    for lTrail, sTitle, lBody in readHubSpotAll(sFolder):
+        sTop = lTrail[0].lower() if lTrail else ""
+        if sTop not in dHubSpotGuides and sGuide == "account": logging.info("HubSpot: top category %r not named, so in the account guide: %s", sTop, sTitle)
+        if dHubSpotGuides.get(sTop, "account") != sGuide: continue
+        # Android and Mac are outside this collection's surfaces; an article for one alone is left out.
+        if re.search(r"(?i)\bandroid\b", sTitle) and not re.search(r"(?i)\b(ios|iphone|ipad)\b", sTitle): continue
+        lArticles.append((": ".join(lTrail) if lTrail else sMiscellaneous, sTitle, lBody))
+    logging.info("HubSpot %s: %d articles", sGuide, len(lArticles))
+    return lArticles
+
+
+def readHubSpotAccount(sFolder): return readHubSpotFor(sFolder, "account")
+def readHubSpotCrm(sFolder): return readHubSpotFor(sFolder, "crm")
+def readHubSpotData(sFolder): return readHubSpotFor(sFolder, "data")
+def readHubSpotMarketing(sFolder): return readHubSpotFor(sFolder, "marketing")
+
 
 def readSuno(sFolder):
     """Suno's help site: the title is the h1, the body is the page-content region,
@@ -4504,6 +4560,14 @@ def main():
          "This guide holds Shopify's own help for Shop, gathered from help.shop.app in November 2026. Shop is Shopify's shopping and delivery tracking app, on the iPhone and on the web at shop.com. It covers getting started, shopping, tracking deliveries, managing orders, Shop Cash rewards, and reporting a problem.\r\n\r\n Shop and Shop Pay share one help centre, so this collection splits it in two: Shop.md for the Shop app and ShopPay.md for paying with Shop Pay and Shop Pay Installments. Each section opens with Shopify's own overview of it. Shopify's help for store owners is a separate guide, Shopify.md. Android-only articles are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa."),
         ("Shop Pay", "ShopHelp", readShopPay, "ShopPay.md", "Shop Pay help",
          "This guide holds Shopify's own help for Shop Pay, gathered from help.shop.app in November 2026. Shop Pay saves your payment and shipping details so you can check out faster at stores that use Shopify. It covers paying online and in stores, the cards it accepts, its settings and security, and Shop Pay Installments, which splits a purchase into payments.\r\n\r\n Shop and Shop Pay share one help centre, so this collection splits it in two: Shop.md for the Shop app and ShopPay.md for paying with Shop Pay and Shop Pay Installments. Each section opens with Shopify's own overview of it. Shopify's help for store owners is a separate guide, Shopify.md."),
+        ("HubSpot account", "HubSpotHelp", readHubSpotAccount, "HubSpotAccount.md", "HubSpot help: account and setup",
+         "This guide holds HubSpot's own help for setting up and running a HubSpot account, gathered from knowledge.hubspot.com in November 2026: users and permissions, settings, billing, security, integrations, getting started, HubSpot's AI tools, and its partner program.\r\n\r\nHubSpot's knowledge base is too large for one guide, so this collection splits it by HubSpot's own top categories into four: HubSpotAccount.md for account setup, getting started, its AI tools and partners; HubSpotCrm.md for the CRM, sales, service and revenue tools; HubSpotData.md for automation, data and reporting; and HubSpotMarketing.md for marketing and content. The categories are HubSpot's own, from the trail above each article. Android-only articles are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa. HubSpot's developer documentation is a separate site and is not here."),
+        ("HubSpot CRM", "HubSpotHelp", readHubSpotCrm, "HubSpotCrm.md", "HubSpot help: CRM, sales, service and revenue",
+         "This guide holds HubSpot's own help for its customer records and the tools built on them, gathered from knowledge.hubspot.com in November 2026: contacts, companies, deals and tickets, the sales tools, the help desk and other service tools, and payments, quotes and other revenue tools.\r\n\r\nHubSpot's knowledge base is too large for one guide, so this collection splits it by HubSpot's own top categories into four: HubSpotAccount.md for account setup, getting started, its AI tools and partners; HubSpotCrm.md for the CRM, sales, service and revenue tools; HubSpotData.md for automation, data and reporting; and HubSpotMarketing.md for marketing and content. The categories are HubSpot's own, from the trail above each article. Android-only articles are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa. HubSpot's developer documentation is a separate site and is not here."),
+        ("HubSpot data", "HubSpotHelp", readHubSpotData, "HubSpotData.md", "HubSpot help: automation, data and reporting",
+         "This guide holds HubSpot's own help for automating work and understanding data, gathered from knowledge.hubspot.com in November 2026: workflows and sequences, importing, cleaning and syncing data, and reports, dashboards and analytics.\r\n\r\nHubSpot's knowledge base is too large for one guide, so this collection splits it by HubSpot's own top categories into four: HubSpotAccount.md for account setup, getting started, its AI tools and partners; HubSpotCrm.md for the CRM, sales, service and revenue tools; HubSpotData.md for automation, data and reporting; and HubSpotMarketing.md for marketing and content. The categories are HubSpot's own, from the trail above each article. Android-only articles are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa. HubSpot's developer documentation is a separate site and is not here."),
+        ("HubSpot marketing", "HubSpotHelp", readHubSpotMarketing, "HubSpotMarketing.md", "HubSpot help: marketing and content",
+         "This guide holds HubSpot's own help for marketing and content, gathered from knowledge.hubspot.com in November 2026: email, forms, ads, social media, campaigns, and building websites, landing pages and blogs.\r\n\r\nHubSpot's knowledge base is too large for one guide, so this collection splits it by HubSpot's own top categories into four: HubSpotAccount.md for account setup, getting started, its AI tools and partners; HubSpotCrm.md for the CRM, sales, service and revenue tools; HubSpotData.md for automation, data and reporting; and HubSpotMarketing.md for marketing and content. The categories are HubSpot's own, from the trail above each article. Android-only articles are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa. HubSpot's developer documentation is a separate site and is not here."),
         ("Mercury", "MercuryHelp", readZendeskSection, "Mercury.md", "Mercury help",
          "This guide holds Mercury's own help, gathered from support.mercury.com in November 2026. Mercury is a financial technology company that offers business and personal banking through partner banks. The guide covers opening an account, sending and receiving money, cards, statements and documents, and Mercury's other business tools. Each heading names the category, Business or Personal, then the subject.\r\n\r\nLeft out on purpose: legal pages such as terms, privacy policies and disclosures, pages for law enforcement and developers, and Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa."),
         ("Patreon", "PatreonHelp", readZendeskSection, "Patreon.md", "Patreon help",

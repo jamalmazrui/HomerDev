@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.266.0 -- 20 November 2026
+
+- **check fingerprints only what git would push.** A pass was fingerprinted over every file in the project, and push and release read each one in full (HomerVerify=1). AppHelpGuides holds gigabytes of harvested pages that are never pushed, and push's check sat 25 minutes on them, silent, until it was stopped. The pass now covers the files git tracks or would add, from git's own list, and the log gives the count; with no repository, the whole tree as before.
+- **HubSpot has its guides, four of them.** Its knowledge base gave 1,909 articles and about 1.9 million words, split by HubSpot's own top categories: HubSpotAccount.md (478 articles), HubSpotCrm.md (552), HubSpotData.md (205) and HubSpotMarketing.md (553), every gate passed. Its /page/<n> listing pages, 1,906 copies of one list and half the harvest, are now fenced out.
+- **Stripe and Link are drawn by Edge.** The plain runs saved 1,367 Stripe pages holding only their titles, since the article arrives by script. Both now use Edge, fifteen seconds a page, and are asked for again; their readers follow.
+
 ## 1.265.0 -- 20 November 2026
 
 - **Shop and Shop Pay have their guides.** Shopify's help centre at help.shop.app gave 61 pages, which buildGuide splits by section: Shop.md (37 articles in 6 categories) and ShopPay.md (24 articles in 4), each section opening with Shopify's own overview of it.
