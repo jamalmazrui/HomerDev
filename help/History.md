@@ -7,6 +7,21 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.263.0 -- 19 November 2026
+
+- **Twitch has its guide.** The first gathering saved 157 pages, and the new Twitch reader turns them into 141 articles in 12 categories, read from each article's own component and the Breadcrumbs trail above it, with the "On this page" list left out because the headings follow.
+- **A page Edge finished is kept even when Edge crashes on the way out.** Headless Edge exited 39 times in 196 with an access violation after printing the whole Twitch page, and those pages, and the links on them, were thrown away. A page that closes its html element is now kept, and the crash is logged. Twitch is asked for again, so the missing articles come in.
+- **Wyzant is read as the WordPress site it now is.** Its help centre moved off Zendesk, so the old fence kept every page out and the guide failed its gates, which stopped the build. The new block starts from Wyzant's six audience sections and fences out the Spanish topic and the legal pages; the new reader takes each article's category from its section's and topic's own headings. Wyzant is asked for again.
+- **Each Claude article is read once.** Anthropic keeps an article's number when it renames its address, and the old addresses answer with the same page, so 634 files held 433 articles. The number now decides.
+- **The app-help-guide skill's SKILL.md has no byte order mark again.** The 1.262.0 edit wrote one, and the kit's own check refused the build, rightly: a skill file starts with its front matter.
+- **Less administrator material in the Claude guides.** The Team and Enterprise subcollections written for an organization's owners (Admin management, Analytics and usage, Billing, Security and compliance) are left out, and so are titles about allowlists, enterprise configuration and settings for an organization. Data retention practices for Covered Models, which is about your data, is no longer mistaken for an administrator page.
+
+## 1.262.0 -- 19 November 2026
+
+- **Claude's help comes in six guides, one a surface.** The single Claude guide of September mixed the Windows app, the phone apps, Claude Code and administrator pages under 30 headings. makeHarvester has a new Claude block that gathers Anthropic's help centre at support.claude.com, fencing out the programming interface, Amazon Bedrock, identity management, and privacy and legal collections. buildGuide reads that one harvest into ClaudeWeb, ClaudeDesktop (Windows), ClaudeIos (iPhone and iPad), ClaudeCowork, ClaudeCode and ClaudeDuet, each article in one guide only, with Mac-only, Android-only and administrator pages left out and the reason given in every preamble.
+- **A guide replaced by others retires itself.** Once all six Claude guides are built and pass their gates, the build moves Claude.md and Claude.htm to notes\retired and says so. Until then the old guide stays, so a failed harvest never leaves the collection without Claude help.
+- **Twitch can be gathered.** Twitch's help centre is a Salesforce site that sends an empty shell to a plain request, so the new Twitch block fetches it with Microsoft Edge at thirty seconds a page, as Glassdoor's does. Its guide reader is written once the first harvest is uploaded, since no Salesforce page has been read here yet.
+
 ## 1.261.0 -- 18 November 2026
 
 - **An update is called an update.** urlCheck 1.12.55 to 1.12.56 and urlFido 1.2.40 to 1.2.41 were each reported as "Installed" in the Results box, on the welcome page and on the ready page, because six installers looked for the version already installed under the AppId as written, {{GUID} with a doubled brace, while Inno names the registry key with one. The new homerPriorVersion undoes the doubled brace, looks in the 64-bit and 32-bit views and the user's own hive, and logs what it found. BatCon, bookFido, DbDo, extCheck, urlCheck and urlFido now use it. Only wording was wrong: no installer step depended on it.

@@ -1951,6 +1951,186 @@ def readUdio(sFolder):
         lArticles.append((sCategory, sTitle, lBody))
     return lArticles
 
+# CLAUDE, ONE HARVEST AND SIX GUIDES (19 November 2026). Anthropic's help centre is Intercom, as Kickstarter's is, but
+# its collections nest: Claude Mobile apps holds Claude for iOS and Claude for Android, Claude Desktop holds Desktop
+# extensions. So the whole trail is read, not only its last name, and each guide takes the articles whose first
+# collection is its own. The trail comes from the page's schema.org BreadcrumbList, keeping only the steps that are
+# collections, and from the drawn trail above the heading when that data is missing. The harvest is read once per build
+# and kept, since six guides read it.
+g_dClaudeCache = {}
+sClaudeAdmin = (r"(?i)\b(admins?|administrators?|owners?|scim|sso|single sign-on|provision(ing|ed)?|domain (capture|verification)"
+                r"|audit logs?|mdm|group polic(y|ies)|deploy(ing|ment)?|compliance api|retention controls|allowlist(ing)?"
+                r"|enterprise configuration|centralized management|for your (organization|school or district)|organization's)\b")
+# THE OWNERS' SUBCOLLECTIONS (19 November 2026): the first build kept 33 articles under Team and Enterprise plans: Admin
+# management, and more under Analytics and usage, Billing, and Security and compliance -- all written for the people who
+# run an organization's plan. Those four are left out by their trail; Capabilities, Get started and Plan overviews stay.
+sClaudeOwners = r"(?i)team and enterprise plans / (admin management|analytics and usage|billing|security and compliance)"
+sClaudeLeftOut = r"(?i)(api and console|amazon bedrock|bedrock|identity management|privacy and legal)"
+
+
+def readClaudeTrails(sFolder):
+    """Every Claude article in the harvest as (lTrail, sTitle, lBody). A trail is the list of collection names, outermost
+    first; an article in no collection has an empty one."""
+    if sFolder in g_dClaudeCache: return g_dClaudeCache[sFolder]
+    lArticles = []
+    # ONE ARTICLE, ONE ID (19 November 2026): Anthropic renames an article's address and keeps its number, and the old
+    # addresses answer with the same page, so the first gathering saved Get started with Cowork three times, as
+    # 13345190-get-started-with-cowork, -getting-started-with-cowork and -get-started-with-claude-cowork. 634 files held
+    # 433 articles. The number decides: the first file of each is read and the others are logged.
+    setIds = set()
+    for sName in sorted(os.listdir(sFolder)):
+        if "_articles_" not in sName or not sName.endswith(".html"): continue
+        oId = re.search(r"_articles_(\d+)", sName)
+        if oId and oId.group(1) in setIds:
+            logging.info("Claude harvest: %s is another address of article %s, so it is not read again", sName, oId.group(1))
+            continue
+        if oId: setIds.add(oId.group(1))
+        sMarkup = readText(os.path.join(sFolder, sName))
+        oTitle = re.search(r"(?is)<h1[^>]*>(.*?)</h1>", sMarkup)
+        if not oTitle: continue
+        sTitle = stripTags(oTitle.group(1))
+        if not sTitle: continue
+        lTrail = []
+        for oBlock in re.finditer(r'(?is)<script[^>]*type="application/ld\+json"[^>]*>(.*?)</script>', sMarkup):
+            try:
+                vPayload = json.loads(oBlock.group(1))
+            except Exception:
+                continue
+            for dPayload in (vPayload if isinstance(vPayload, list) else [vPayload]):
+                if not isinstance(dPayload, dict) or dPayload.get("@type") != "BreadcrumbList": continue
+                for dItem in dPayload.get("itemListElement", []):
+                    if not isinstance(dItem, dict): continue
+                    vItem = dItem.get("item", "")
+                    sUrl = vItem.get("@id", "") if isinstance(vItem, dict) else str(vItem)
+                    sStep = stripTags(str(dItem.get("name", "") or (vItem.get("name", "") if isinstance(vItem, dict) else "")))
+                    if not sStep or sStep == sTitle or sStep.lower() == "all collections": continue
+                    if sUrl and "/collections/" not in sUrl: continue
+                    if not sUrl and re.search(r"(?i)help cent(er|re)", sStep): continue
+                    lTrail.append(sStep)
+            if lTrail: break
+        if not lTrail:
+            sBefore = sMarkup[:oTitle.start()]
+            for oLink in re.finditer(r'(?is)<a[^>]*href="[^"]*/collections/[^"]*"[^>]*>(.*?)</a>', sBefore[-6000:]):
+                sStep = stripTags(oLink.group(1))
+                if sStep and sStep.lower() != "all collections" and sStep not in lTrail: lTrail.append(sStep)
+        sBody = (findBalanced(sMarkup, r'<div[^>]*class="[^"]*\barticle_body\b', "div")
+                 or findBalanced(sMarkup, r'<section[^>]*class="[^"]*section__article', "section")
+                 or findBalanced(sMarkup, r"<main[^>]*>", "main"))
+        if not sBody: continue
+        sBody = re.sub(r'(?is)<section[^>]*class="[^"]*related_articles.*$', "", sBody)
+        lBody = toMarkdown(sBody, 0)
+        if len(" ".join(lBody).split()) < 25: continue
+        lArticles.append((lTrail, sTitle, lBody))
+    logging.info("Claude harvest: %d articles read from %s", len(lArticles), sFolder)
+    g_dClaudeCache[sFolder] = lArticles
+    return lArticles
+
+
+def claudeSurface(lTrail, sTitle):
+    """Which Claude guide an article belongs in: web, desktop, ios, cowork, code, duet, or "" for none."""
+    sTrail = " / ".join(lTrail)
+    sFirst = lTrail[0].lower() if lTrail else ""
+    if re.search(sClaudeLeftOut, sTrail): return ""
+    # Android and the Mac are outside this collection's surfaces. An article that names one of them in its title or
+    # trail, and not Windows, the iPhone or the iPad as well, is left out.
+    if re.search(r"(?i)\bandroid\b", sTrail + " " + sTitle) and not re.search(r"(?i)\b(ios|iphone|ipad)\b", sTitle): return ""
+    if re.search(r"(?i)\b(mac|macos|macbook)\b", sTrail + " " + sTitle) and not re.search(r"(?i)\bwindows\b", sTitle): return ""
+    if re.search(r"(?i)\bduet\b", sTrail + " " + sTitle): return "duet"
+    if re.search(r"(?i)^claude cowork", sFirst): return "cowork"
+    if re.search(r"(?i)^claude code", sFirst): return "code"
+    if re.search(r"(?i)^claude desktop", sFirst): return "desktop"
+    if re.search(r"(?i)mobile", sFirst): return "ios"
+    return "web"
+
+
+def readClaudeFor(sFolder, sSurface):
+    """The articles of one Claude guide, each placed under its trail below the guide's own collection."""
+    lArticles = []
+    for lTrail, sTitle, lBody in readClaudeTrails(sFolder):
+        if claudeSurface(lTrail, sTitle) != sSurface: continue
+        # Pages written for an organization's administrators are left out of every Claude guide, as the preambles say.
+        if re.search(sClaudeAdmin, sTitle) or re.search(sClaudeOwners, " / ".join(lTrail)):
+            logging.info("Claude %s: left out as administrator material: %s", sSurface, sTitle)
+            continue
+        if sSurface == "web":
+            lSteps = lTrail[1:] if lTrail and lTrail[0].lower() == "claude" and len(lTrail) > 1 else lTrail
+        else:
+            lSteps = lTrail[1:] if len(lTrail) > 1 else lTrail
+        sCategory = ": ".join(lSteps) if lSteps else sMiscellaneous
+        lArticles.append((sCategory, sTitle, lBody))
+    logging.info("Claude %s: %d articles", sSurface, len(lArticles))
+    return lArticles
+
+
+def readClaudeWeb(sFolder): return readClaudeFor(sFolder, "web")
+def readClaudeDesktop(sFolder): return readClaudeFor(sFolder, "desktop")
+def readClaudeIos(sFolder): return readClaudeFor(sFolder, "ios")
+def readClaudeCowork(sFolder): return readClaudeFor(sFolder, "cowork")
+def readClaudeCode(sFolder): return readClaudeFor(sFolder, "code")
+def readClaudeDuet(sFolder): return readClaudeFor(sFolder, "duet")
+
+def readTwitch(sFolder):
+    """TWITCH (19 November 2026). help.twitch.tv is a Salesforce help centre, drawn by Edge. Each article's own
+    component holds the title as h1.articleTitle and the text in an article-body region, with an "On this page" list of
+    its own headings in a category_list block, which is left out since the headings follow. The category is the
+    Breadcrumbs navigation above it, a topic and sometimes a subtopic (Getting Started: Beginner Broadcasting)."""
+    lArticles = []
+    for sName in sorted(os.listdir(sFolder)):
+        if "_s_article_" not in sName or not sName.endswith(".html"): continue
+        sMarkup = readText(os.path.join(sFolder, sName))
+        sBody = findBalanced(sMarkup, r'<div[^>]*class="article-body"', "div")
+        if not sBody: continue
+        oTitle = re.search(r'(?is)<h1[^>]*class="articleTitle"[^>]*>(.*?)</h1>', sBody) or re.search(r"(?is)<h1[^>]*>(.*?)</h1>", sMarkup)
+        sTitle = stripTags(oTitle.group(1)) if oTitle else ""
+        if not sTitle: continue
+        sBody = re.sub(r'(?is)<h1[^>]*class="articleTitle".*?</h1>', "", sBody, count=1)
+        sList = findBalanced(sBody, r'<div[^>]*class="category_list"', "div")
+        if sList: sBody = sBody.replace(sList, "", 1)
+        sCategory = sMiscellaneous
+        oTrail = re.search(r'(?is)<nav[^>]*aria-label="Breadcrumbs".*?</nav>', sMarkup)
+        if oTrail:
+            lsSteps = [html.unescape(s).strip() for s in re.findall(r'<a[^>]*title="([^"]*)"', oTrail.group(0))]
+            lsSteps = [s for s in lsSteps if s and s.lower() != "home"]
+            if lsSteps: sCategory = ": ".join(lsSteps)
+        lBody = toMarkdown(sBody, 0, "https://help.twitch.tv/s/article/" + sName.split("_s_article_", 1)[1][:-5])
+        if len(" ".join(lBody).split()) < 25: continue
+        lArticles.append((sCategory, sTitle, lBody))
+    logging.info("Twitch: %d articles read", len(lArticles))
+    return lArticles
+
+
+def readWyzant(sFolder):
+    """WYZANT, THIRD VERSION (19 November 2026). Wyzant's help is now a WordPress site in three levels: an audience
+    section (students-parents), its topics (student-billing), and their articles (why-was-i-charged-1-00), so a page's
+    level is the number of parts in its address. The category is the section's heading and the topic's, read from their
+    own saved pages. A topic page with no article saved beneath it is read as an article itself, as some contact pages
+    are. The title is the page's h1; the text is WordPress's entry-content region, else the article element, else main."""
+    dHeadings, dPages = {}, {}
+    for sName in sorted(os.listdir(sFolder)):
+        if not sName.startswith("support.wyzant.com_") or not sName.endswith(".html"): continue
+        lsParts = sName[len("support.wyzant.com_"):-5].split("_")
+        sMarkup = readText(os.path.join(sFolder, sName))
+        oTitle = re.search(r"(?is)<h1[^>]*>(.*?)</h1>", sMarkup)
+        dHeadings["/".join(lsParts)] = stripTags(oTitle.group(1)) if oTitle else lsParts[-1].replace("-", " ").title()
+        dPages["/".join(lsParts)] = sMarkup
+    lArticles = []
+    for sPath, sMarkup in sorted(dPages.items()):
+        lsParts = sPath.split("/")
+        if len(lsParts) < 2: continue
+        if len(lsParts) == 2 and any(s.startswith(sPath + "/") for s in dPages): continue
+        sTitle = dHeadings[sPath]
+        sBody = (findBalanced(sMarkup, r'<div[^>]*class="[^"]*\bentry-content\b', "div")
+                 or findBalanced(sMarkup, r"<article[^>]*>", "article")
+                 or findBalanced(sMarkup, r"<main[^>]*>", "main"))
+        if not sBody: continue
+        sBody = re.sub(r"(?is)<h1[^>]*>.*?</h1>", "", sBody, count=1)
+        lBody = [s for s in toMarkdown(sBody, 0, "https://support.wyzant.com/" + sPath + "/") if not re.match(r"(?i)\s*time to read\b", s)]
+        if len(" ".join(lBody).split()) < 25: continue
+        sCategory = ": ".join(dHeadings.get("/".join(lsParts[:i]), lsParts[i - 1]) for i in range(1, len(lsParts)))
+        lArticles.append((sCategory or sMiscellaneous, sTitle, lBody))
+    logging.info("Wyzant: %d articles read from %d pages", len(lArticles), len(dPages))
+    return lArticles
+
 
 def readSuno(sFolder):
     """Suno's help site: the title is the h1, the body is the page-content region,
@@ -4274,7 +4454,9 @@ def main():
          "This guide holds Ko-fi's own help, gathered from help.ko-fi.com in November 2026. Ko-fi is a site where creators take tips, memberships, commissions and shop sales from their supporters. It covers getting started, ways to earn, payments, and using Ko-fi with other platforms. Patreon, a similar site, has a guide of its own in this collection.\r\n\r\nLeft out on purpose: legal pages such as terms and privacy policies, pages for law enforcement and developers, and Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are the publisher's own."),
         ("Patreon", "PatreonHelp", readZendeskSection, "Patreon.md", "Patreon help",
          "This guide holds Patreon's own help, gathered from support.patreon.com in November 2026. Patreon is a site where creators earn from members who pay each month for their work. It covers joining and paying as a member, and setting up, earning and getting paid as a creator. Each heading names who it is for, then the subject. Ko-fi, a similar site, has a guide of its own in this collection.\r\n\r\nLeft out on purpose: legal pages such as terms and privacy policies, pages for law enforcement and developers, and Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are the publisher's own."),
-        ("Wyzant", "WyzantHelp", readZendeskPages, "Wyzant.md", "Wyzant help",
+        ("Twitch", "TwitchHelp", readTwitch, "Twitch.md", "Twitch help",
+         "This guide holds Twitch's own help, gathered from help.twitch.tv in November 2026. Twitch is a live streaming site, best known for games, music and talk shows. Its help is written mostly for people who stream: setting up a channel and a broadcast, chat and moderation, the Affiliate and Partner programs and how they pay, and keeping an account safe. Viewers will find the account, purchase and safety articles most useful.\r\n\r\nTwitch's help centre draws every page with script, so each page was drawn by Microsoft Edge before it was saved, and the gathering followed the links between articles. An article no other article links to may be missing. The categories are Twitch's own, from the trail printed above each article. Legal pages such as terms of service are not part of the help centre and are not here."),
+        ("Wyzant", "WyzantHelp", readWyzant, "Wyzant.md", "Wyzant help",
          "This guide holds Wyzant's own help, gathered from support.wyzant.com in November 2026. Wyzant is a site for finding a private tutor and taking lessons, online or in person. It covers students and parents, tutors, the online learning studio, and Wyzant's programs for schools and colleges.\r\n\r\nLeft out on purpose: legal pages such as terms and privacy policies, pages for law enforcement and developers, and Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are the publisher's own."),
         ("Clubhouse", "ClubhouseHelp", readClubhouse, "Clubhouse.md", "Clubhouse help",
          "This guide holds Clubhouse's own help, gathered from support.clubhouse.com in November 2026. Clubhouse is a social app for talking live in rooms, sending voice messages and chats, and building groups called houses. It covers signing up and your profile, the hallway and explore, live rooms, messages, friends and houses, Clubhouse Plus, and trust and safety, for the iPhone and iPad app and the web. Android-only articles are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa.\r\n\r\nLeft out on purpose: Clubhouse's legal pages, its policies, its pages for law enforcement and government requests, its copyright notices and its country notices. The categories are Clubhouse's own."),
@@ -4292,6 +4474,18 @@ def main():
          "This guide holds Microsoft's own help for SharePoint, gathered from support.microsoft.com on 14 November 2026. It covers sites, pages, lists and document libraries as a person who uses SharePoint meets them. Microsoft's pages for administrators of SharePoint are left out.\r\n\r\nMicrosoft writes one article for many versions of each app. This guide keeps the latest only, on the surfaces this collection covers: the Microsoft 365 app on Windows, the web version, and the iPhone and iPad apps. An article Microsoft wrote only for a Mac, for Android, or for an older version such as 2016 or 2021 is left out, and so are legal pages and programmers' references. Each article's first line says which versions it applies to, and where an article has a part for each platform, each part is headed with its platform's name. Microsoft files many articles in no topic of their own, so this guide places them by the words in their titles; what fits no topic is under Miscellaneous. The accessibility articles, which include Microsoft's instructions for using the app with a screen reader, are under Accessibility and keyboard."),
         ("Word", "WordHelp", readMicrosoftWord, "Word.md", "Word help",
          "This guide holds Microsoft's own help for Word, gathered from support.microsoft.com on 14 November 2026. It covers writing, formatting, layout, reviewing, mail merge, references and Word's field codes.\r\n\r\nMicrosoft writes one article for many versions of each app. This guide keeps the latest only, on the surfaces this collection covers: the Microsoft 365 app on Windows, the web version, and the iPhone and iPad apps. An article Microsoft wrote only for a Mac, for Android, or for an older version such as 2016 or 2021 is left out, and so are legal pages and programmers' references. Each article's first line says which versions it applies to, and where an article has a part for each platform, each part is headed with its platform's name. Microsoft files many articles in no topic of their own, so this guide places them by the words in their titles; what fits no topic is under Miscellaneous. The accessibility articles, which include Microsoft's instructions for using the app with a screen reader, are under Accessibility and keyboard."),
+        ("Claude web", "ClaudeHelp", readClaudeWeb, "ClaudeWeb.md", "Claude help: web, plans and connectors",
+         "This guide holds Anthropic's own help for Claude on the web at claude.ai, gathered from support.claude.com in November 2026. It covers getting started, chats and projects, features such as artifacts, memory and research, settings, usage limits, troubleshooting, the paid plans, connectors to other apps, Claude in Chrome, Claude for Education, and Anthropic's safety rules for users.\r\n\r\nAnthropic writes one help centre for every way of using Claude, so this collection splits it into six guides: ClaudeWeb.md for Claude on the web and in Chrome, with plans, connectors and safety; ClaudeDesktop.md for the Windows app; ClaudeIos.md for the iPhone and iPad app; ClaudeCowork.md for Cowork; ClaudeCode.md for Claude Code; and ClaudeDuet.md for Duet. Each article is in one guide only. Articles written only for a Mac or for Android are left out, since this collection covers Windows, the web and the iPhone and iPad. Also left out are pages for an organization's administrators, and Anthropic's collections on its programming interface and Console, Amazon Bedrock, identity management, and privacy and legal terms. The categories are Anthropic's own, taken from the trail of collections printed above each article."),
+        ("Claude desktop", "ClaudeHelp", readClaudeDesktop, "ClaudeDesktop.md", "Claude help: the Windows desktop app",
+         "This guide holds Anthropic's own help for the Claude desktop app on Windows, gathered from support.claude.com in November 2026. It covers installing and updating the app, its settings and shortcuts, and desktop extensions, which let Claude reach programs and files on your computer.\r\n\r\nAnthropic writes one help centre for every way of using Claude, so this collection splits it into six guides: ClaudeWeb.md for Claude on the web and in Chrome, with plans, connectors and safety; ClaudeDesktop.md for the Windows app; ClaudeIos.md for the iPhone and iPad app; ClaudeCowork.md for Cowork; ClaudeCode.md for Claude Code; and ClaudeDuet.md for Duet. Each article is in one guide only. Articles written only for a Mac or for Android are left out, since this collection covers Windows, the web and the iPhone and iPad. Also left out are pages for an organization's administrators, and Anthropic's collections on its programming interface and Console, Amazon Bedrock, identity management, and privacy and legal terms. The categories are Anthropic's own, taken from the trail of collections printed above each article."),
+        ("Claude iOS", "ClaudeHelp", readClaudeIos, "ClaudeIos.md", "Claude help: the iPhone and iPad app",
+         "This guide holds Anthropic's own help for the Claude app on the iPhone and iPad, gathered from support.claude.com in November 2026. It covers installing the app, signing in, voice mode, and the features the app shares with the web.\r\n\r\nAnthropic writes one help centre for every way of using Claude, so this collection splits it into six guides: ClaudeWeb.md for Claude on the web and in Chrome, with plans, connectors and safety; ClaudeDesktop.md for the Windows app; ClaudeIos.md for the iPhone and iPad app; ClaudeCowork.md for Cowork; ClaudeCode.md for Claude Code; and ClaudeDuet.md for Duet. Each article is in one guide only. Articles written only for a Mac or for Android are left out, since this collection covers Windows, the web and the iPhone and iPad. Also left out are pages for an organization's administrators, and Anthropic's collections on its programming interface and Console, Amazon Bedrock, identity management, and privacy and legal terms. The categories are Anthropic's own, taken from the trail of collections printed above each article."),
+        ("Claude Cowork", "ClaudeHelp", readClaudeCowork, "ClaudeCowork.md", "Claude help: Cowork",
+         "This guide holds Anthropic's own help for Cowork, gathered from support.claude.com in November 2026. Cowork is Claude's way of taking on longer tasks that work with your files and apps and hand back finished work. The guide covers starting a task, connecting folders and apps, scheduled tasks, and what Cowork can and cannot do.\r\n\r\nAnthropic writes one help centre for every way of using Claude, so this collection splits it into six guides: ClaudeWeb.md for Claude on the web and in Chrome, with plans, connectors and safety; ClaudeDesktop.md for the Windows app; ClaudeIos.md for the iPhone and iPad app; ClaudeCowork.md for Cowork; ClaudeCode.md for Claude Code; and ClaudeDuet.md for Duet. Each article is in one guide only. Articles written only for a Mac or for Android are left out, since this collection covers Windows, the web and the iPhone and iPad. Also left out are pages for an organization's administrators, and Anthropic's collections on its programming interface and Console, Amazon Bedrock, identity management, and privacy and legal terms. The categories are Anthropic's own, taken from the trail of collections printed above each article."),
+        ("Claude Code", "ClaudeHelp", readClaudeCode, "ClaudeCode.md", "Claude help: Claude Code",
+         "This guide holds Anthropic's own help for Claude Code, gathered from support.claude.com in November 2026. Claude Code is Anthropic's coding agent, used from a terminal, the web, the desktop app or a phone. The guide covers setting it up with a paid plan, its usage limits, and Anthropic's launch guides. Anthropic's full technical reference for Claude Code lives in its developer documentation, which this guide does not hold.\r\n\r\nAnthropic writes one help centre for every way of using Claude, so this collection splits it into six guides: ClaudeWeb.md for Claude on the web and in Chrome, with plans, connectors and safety; ClaudeDesktop.md for the Windows app; ClaudeIos.md for the iPhone and iPad app; ClaudeCowork.md for Cowork; ClaudeCode.md for Claude Code; and ClaudeDuet.md for Duet. Each article is in one guide only. Articles written only for a Mac or for Android are left out, since this collection covers Windows, the web and the iPhone and iPad. Also left out are pages for an organization's administrators, and Anthropic's collections on its programming interface and Console, Amazon Bedrock, identity management, and privacy and legal terms. The categories are Anthropic's own, taken from the trail of collections printed above each article."),
+        ("Claude Duet", "ClaudeHelp", readClaudeDuet, "ClaudeDuet.md", "Claude help: Duet",
+         "This guide holds Anthropic's own help for Claude Duet, gathered from support.claude.com in November 2026. It covers getting started with Duet and paying through Link by Stripe or Shop Pay. It is short because the source is short.\r\n\r\nAnthropic writes one help centre for every way of using Claude, so this collection splits it into six guides: ClaudeWeb.md for Claude on the web and in Chrome, with plans, connectors and safety; ClaudeDesktop.md for the Windows app; ClaudeIos.md for the iPhone and iPad app; ClaudeCowork.md for Cowork; ClaudeCode.md for Claude Code; and ClaudeDuet.md for Duet. Each article is in one guide only. Articles written only for a Mac or for Android are left out, since this collection covers Windows, the web and the iPhone and iPad. Also left out are pages for an organization's administrators, and Anthropic's collections on its programming interface and Console, Amazon Bedrock, identity management, and privacy and legal terms. The categories are Anthropic's own, taken from the trail of collections printed above each article."),
     ]
     # ONE ENTRY PER GUIDE (version 2). The plan had grown a second copy of twenty entries, from Org mode to Remote
     # Incident Manager, so those guides were built twice in every run; the first entry for a guide now wins.
@@ -4345,6 +4539,24 @@ def main():
         print("  %s: %d articles, %d words, %s, %d seconds" % (sProduct, iArticles, iWords,
               "all clean" if iFailures == 0 else ("failed to build" if iFailures < 0 else "%d gate failures" % iFailures),
               int(time.time() - nStarted)), flush=True)
+    # A GUIDE REPLACED BY OTHERS IS RETIRED BY THE BUILD (19 November 2026). Claude.md, one guide for all of Claude, gave
+    # way that day to six guides, one a surface. Once every guide that replaces it is built and passes its gates, the old
+    # guide and its page move to notes\retired, logged, so the push drops them and nothing is deleted.
+    if bBuild:
+        for sOld, lNew in [("Claude.md", ["ClaudeWeb.md", "ClaudeDesktop.md", "ClaudeIos.md", "ClaudeCowork.md", "ClaudeCode.md", "ClaudeDuet.md"])]:
+            if not os.path.isfile(os.path.join(sOutput, sOld)) and not os.path.isfile(os.path.join(sOutput, os.path.splitext(sOld)[0] + ".htm")): continue
+            lMissing = [s for s in lNew if not os.path.isfile(os.path.join(sOutput, s))]
+            lFailed = [t[0] for t in lResults if t[3] != 0 and any(os.path.splitext(s)[0].lower() == t[0].replace(" ", "").lower() for s in lNew)]
+            if lMissing or lFailed:
+                logging.info("retire %s: waiting, since %s", sOld, "missing " + ", ".join(lMissing) if lMissing else "failed " + ", ".join(lFailed))
+                continue
+            lRetiredNow = []
+            for sName in (sOld, os.path.splitext(sOld)[0] + ".htm"):
+                if os.path.isfile(os.path.join(sOutput, sName)):
+                    moveInto(os.path.join(sOutput, sName), os.path.join(sOutput, "notes", "retired"), lRetiredNow)
+            if lRetiredNow:
+                logging.info("retire %s: replaced by %s; moved %s", sOld, ", ".join(lNew), "; ".join("%s -> %s" % t for t in lRetiredNow))
+                print("Retired %s, replaced by %d guides; it is in notes\\retired." % (sOld, len(lNew)))
     iBuilt = len(lResults)
     print("Guides built: %d; already current: %d; no harvest here: %d." % (iBuilt, iCurrent, iNoHarvest))
     logging.info("SUMMARY: %d built, %d current, %d without a harvest", iBuilt, iCurrent, iNoHarvest)

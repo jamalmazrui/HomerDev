@@ -145,7 +145,13 @@ def fetchWithEdge(sUrl):
         logging.warning("Edge could not be started for %s: %s", sUrl, oError)
         return 0, b"", "", sUrl
     logging.info("Edge: exit %d, %d bytes, for %s", oRun.returncode, len(oRun.stdout), sUrl)
-    if oRun.returncode != 0 or not oRun.stdout.strip(): return 0, b"", "", sUrl
+    # A CRASH AFTER THE PAGE IS PRINTED (19 November 2026): headless Edge on Twitch's Salesforce pages exited 39 times in
+    # 196 with 0xC0000005, an access violation as it shut down, after printing the whole page, 330,000 bytes and more.
+    # Those pages were thrown away, and the links on them never followed. A finished page -- one that closes its html
+    # element -- is kept whatever the exit code, and the crash is counted in the log; the ready pattern still judges it.
+    bFinished = b"</html>" in oRun.stdout[-4096:].lower()
+    if oRun.returncode != 0 and bFinished: logCapped("edge crash after page", "Edge exited %d after printing the whole page, which is kept: %s" % (oRun.returncode, sUrl))
+    if not oRun.stdout.strip() or (oRun.returncode != 0 and not bFinished): return 0, b"", "", sUrl
     return 200, oRun.stdout, "text/html", sUrl
 
 
@@ -3338,23 +3344,29 @@ lEstates = [
         "sOkStatuses": "200, 202",
         "sExtraLinks": "",
     },
-    # WYZANT (17 November 2026, second version). Its Zendesk listings answer 404 -- the centre has them turned off --
-    # though its pages answer, so the crawl walks the categories and sections to the articles, as Zendesk draws them.
+    # WYZANT (19 November 2026, third version). Wyzant's help centre is no longer Zendesk: support.wyzant.com/hc/en-us now
+    # answers with a WordPress site, whose front page links six audience sections (students-parents, tutors,
+    # online-learning-studio, wyzant-for-schools, wyzant-for-higher-ed, policies-and-contact-us), each linking its
+    # topics (students-parents/student-billing), each topic its articles (.../student-billing/why-was-i-charged-1-00/).
+    # The Zendesk fence kept every one of those out, so the run of 19 November saved nothing. The sections are the
+    # seeds; the Spanish topic (en-espanol) and the legal pages (privacy-policy-and-terms-of-use) are fenced out.
     {
         "sProduct": "Wyzant",
         "sScriptName": "getWyzantHelp.py",
-        "sSystem": "Zendesk pages at support.wyzant.com, its listings being turned off",
+        "sSystem": "the WordPress help centre at support.wyzant.com",
         "sFolder": "WyzantHelp",
         "sZipName": "WyzantHelp.zip",
         "iMaxPages": 800,
         "nDelay": 1.0,
-        "sSeeds": '"https://support.wyzant.com/hc/en-us"',
-        "sFencePattern": r"^https://support\.wyzant\.com/hc/en-us(/(categories|sections|articles)/[A-Za-z0-9_%-]+)?/?$",
+        "sSeeds": ('"https://support.wyzant.com/students-parents/",\n'
+                   '              "https://support.wyzant.com/tutors/",\n'
+                   '              "https://support.wyzant.com/online-learning-studio/",\n'
+                   '              "https://support.wyzant.com/wyzant-for-schools/",\n'
+                   '              "https://support.wyzant.com/wyzant-for-higher-ed/",\n'
+                   '              "https://support.wyzant.com/policies-and-contact-us/"'),
+        "sFencePattern": r"^https://support\.wyzant\.com/(?!.*(en-espanol|privacy-policy-and-terms-of-use))(students-parents|tutors|online-learning-studio|wyzant-for-schools|wyzant-for-higher-ed|policies-and-contact-us)(/[a-z0-9-]+){0,2}/?$",
         "sSubjectPattern": "",
-        # READY, THIRD VERSION (17 November 2026): the guessed Zendesk theme names were not on Wyzant's front page, a page
-        # of 2,885 words, so it was kept out and nothing was followed. Any page that links to an article, a section or a
-        # category is the help centre's own; the reader settles the article's text once the pages are seen.
-        "sReadyPattern": r"/hc/en-us/(articles|sections|categories)/",
+        "sReadyPattern": r"Wyzant",
         "sOkStatuses": "200",
         "sExtraLinks": "",
     },
@@ -3405,6 +3417,63 @@ lEstates = [
         "sFencePattern": r"^https://help\.glassdoor\.com/s/(article|topic)/[A-Za-z0-9_%./-]+$",
         "sSubjectPattern": "",
         "sReadyPattern": r"Glassdoor",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": "",
+    },
+    # CLAUDE (19 November 2026). Anthropic's help centre, support.claude.com, is Intercom, drawn on the server, so a plain
+    # fetch reads it. Its collections are walked to the articles, as Kickstarter's are. Four collections are fenced
+    # out because the collection leaves them out: Claude API and Console (5370014), Amazon Bedrock (4078537),
+    # Identity management (17270717), and Privacy and legal (4078534). An article in one of those that another
+    # article links to may still arrive; buildGuide sets it aside by its trail. The fifteen collections held about
+    # 400 articles that day, so 700 pages leaves room for the collection pages and growth.
+    {
+        "sProduct": "Claude",
+        "sScriptName": "getClaudeHelp.py",
+        "sSystem": "Intercom at support.claude.com",
+        "sFolder": "ClaudeHelp",
+        "sZipName": "ClaudeHelp.zip",
+        "iMaxPages": 700,
+        "nDelay": 1.0,
+        "sSeeds": ('"https://support.claude.com/en/",\n'
+                   '              "https://support.claude.com/en/collections/4078531-claude",\n'
+                   '              "https://support.claude.com/en/collections/5953830-pro-max-and-ultra-plans",\n'
+                   '              "https://support.claude.com/en/collections/9387370-team-and-enterprise-plans",\n'
+                   '              "https://support.claude.com/en/collections/19667525-claude-cowork",\n'
+                   '              "https://support.claude.com/en/collections/14445694-claude-code",\n'
+                   '              "https://support.claude.com/en/collections/16163169-claude-desktop",\n'
+                   '              "https://support.claude.com/en/collections/9387080-claude-mobile-apps",\n'
+                   '              "https://support.claude.com/en/collections/15399129-connectors",\n'
+                   '              "https://support.claude.com/en/collections/18031491-claude-in-chrome",\n'
+                   '              "https://support.claude.com/en/collections/12630177-claude-for-education",\n'
+                   '              "https://support.claude.com/en/collections/4078535-safeguards",\n'
+                   '              "https://support.claude.com/en/articles/17631495-get-started-with-claude-duet",\n'
+                   '              "https://support.claude.com/en/articles/17666484-how-to-use-link-by-stripe-with-claude-duet",\n'
+                   '              "https://support.claude.com/en/articles/17666489-how-to-use-shop-pay-with-claude-duet"'),
+        "sFencePattern": r"^https://support\.claude\.com/en(/(articles|collections)/(?!(5370014|4078537|17270717|4078534)-)[A-Za-z0-9_%-]+)?/?$",
+        "sSubjectPattern": "",
+        "sReadyPattern": r"(intercom|<article|collections/|articles/)",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": "",
+    },
+    # TWITCH (19 November 2026). help.twitch.tv is a Salesforce help centre like Glassdoor's: a plain fetch reads about
+    # seven words of an empty shell, so Edge draws each page with thirty seconds a page. The front page and one article
+    # known to answer that day are the seeds; each article's "Trending Articles" and topic links carry the crawl on.
+    # Its reader in buildGuide waits for the first harvest, since no Salesforce page has been read here yet.
+    {
+        "sProduct": "Twitch",
+        "sScriptName": "getTwitchHelp.py",
+        "sSystem": "the Salesforce help centre at help.twitch.tv, drawn by Microsoft Edge",
+        "sFolder": "TwitchHelp",
+        "sZipName": "TwitchHelp.zip",
+        "iMaxPages": 500,
+        "nDelay": 1.0,
+        "sFetch": "edge",
+        "iBrowserWait": 30,
+        "sSeeds": ('"https://help.twitch.tv/s/",\n'
+                   '              "https://help.twitch.tv/s/article/requesting-your-data-from-twitch"'),
+        "sFencePattern": r"^https://help\.twitch\.tv/s/((article|topic)/[A-Za-z0-9_%./-]+)?/?$",
+        "sSubjectPattern": "",
+        "sReadyPattern": r"Twitch",
         "sOkStatuses": "200, 202",
         "sExtraLinks": "",
     },

@@ -193,9 +193,11 @@ version 3, 14 November 2026): headless, in a profile made for the run, with
 `--dump-dom` after `"iBrowserWait"` seconds of the page's script (30 by default,
 what OpenTable's Salesforce pages needed). Such a run refuses any page nine
 tenths the same words as the first page it saved -- scaffolding without its
-article -- and says so in the log. Glassdoor is the first block to use it;
-Coursera, Dell Command Update's user's guide and Twitch's help (Salesforce) are
-candidates, and Adobe Connect if its pages keep answering Python with HTTP 403.
+article -- and says so in the log. Edge sometimes crashes as it shuts down after
+printing the page (exit 0xC0000005, 39 times in 196 on Twitch); a page that closes
+its html element is kept whatever the exit code (1.263.0). Glassdoor is the first block to use it and
+Twitch (19 November 2026) the second, its reader waiting on its first harvest;
+Coursera and Dell Command Update's user's guide are candidates, and Adobe Connect if its pages keep answering Python with HTTP 403.
 A run at thirty seconds a page is slow: keep its ceiling honest and put it last
 in addGuides.inix. Should a site need clicking rather than waiting, these lessons
 from the hang of 2 November 2026 apply to a fuller browser road.
@@ -211,3 +213,16 @@ for:
   waits for and for how long ("Waiting up to 60 seconds for ..."), as the
   Homer rule for browser automation asks. Log every page change.
 - Run one visible-browser harvest at a time.
+
+## One harvest, several guides
+
+A help centre that covers several surfaces of one product may be split into one
+guide a surface, all read from a single harvest. Claude (19 November 2026) is
+the model: `getClaudeHelp` gathers support.claude.com once, and buildGuide's
+`readClaudeTrails` reads every article with its whole trail of Intercom
+collections, once a build. `claudeSurface` then places each article in exactly
+one guide (ClaudeWeb, ClaudeDesktop, ClaudeIos, ClaudeCowork, ClaudeCode,
+ClaudeDuet), dropping Mac-only, Android-only, administrator and left-out
+collections. When the new guides replace an older single guide, name the pair in
+the build loop's retirement list: once every new guide is built and clean, the
+build moves the old guide and its page to notes\retired.
