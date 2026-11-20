@@ -3499,7 +3499,10 @@ lEstates = [
         "sSubjectPattern": "",
         "sReadyPattern": r"Stripe",
         "sOkStatuses": "200",
-        "sExtraLinks": "",
+        "sExtraLinks": ('    # Stripe\'s support sites write their question and topic links into the page\'s data, not as links,\n'
+                        '    # so the first run of 20 November 2026 saved the front page and nothing else.\n'
+                        '    for oFound in re.finditer(r"(?<![A-Za-z0-9_-])/?((?:questions|topics)/[a-z0-9][a-z0-9-]*)", sText):\n'
+                        '        lFound.append("https://support.stripe.com/" + oFound.group(1))\n'),
     },
     {
         "sProduct": "Link",
@@ -3509,12 +3512,19 @@ lEstates = [
         "sZipName": "LinkHelp.zip",
         "iMaxPages": 400,
         "nDelay": 1.0,
-        "sSeeds": '"https://support.link.com/"',
+        "sSeeds": ('"https://support.link.com/",\n'
+                   '              "https://support.link.com/topics/data-privacy",\n'
+                   '              "https://support.link.com/topics/crypto",\n'
+                   '              "https://support.link.com/topics/link-balance",\n'
+                   '              "https://support.link.com/topics/purchase-protections"'),
         "sFencePattern": r"^https://support\.link\.com/((questions|topics)/[A-Za-z0-9_%-]+)?/?$",
         "sSubjectPattern": "",
         "sReadyPattern": r"Link",
         "sOkStatuses": "200",
-        "sExtraLinks": "",
+        "sExtraLinks": ('    # Stripe\'s support sites write their question and topic links into the page\'s data, not as links,\n'
+                        '    # so the first run of 20 November 2026 saved the front page and nothing else.\n'
+                        '    for oFound in re.finditer(r"(?<![A-Za-z0-9_-])/?((?:questions|topics)/[a-z0-9][a-z0-9-]*)", sText):\n'
+                        '        lFound.append("https://support.link.com/" + oFound.group(1))\n'),
     },
     # SHOP AND SHOP PAY: one centre at help.shop.app, Shopify's own, with sections at /en/shop/<section> and articles at
     # /en/shop/<section>/<article>. Shop Pay and Shop Pay Installments are sections of it, so one harvest serves both

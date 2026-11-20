@@ -2146,6 +2146,39 @@ def readerChangedTime(sFile):
     sWhen = dReaderChanged.get(sFile, "")
     return time.mktime(time.strptime(sWhen, "%Y-%m-%d %H:%M")) if sWhen else 0
 
+def readShopFor(sFolder, bPay):
+    """SHOP AND SHOP PAY (20 November 2026). Shopify's help centre at help.shop.app holds both: sections at
+    /en/shop/<section>, articles at /en/shop/<section>/<article>. Each page's text is its article element, whose
+    h1.article-title is the title. A section's own page opens with an overview worth reading, so it comes first in its
+    category, named by its own heading. The Shop Pay guide takes the sections whose names start with shop-pay (Shop
+    Pay, its settings, Installments and their settings); the Shop guide takes the rest."""
+    dHeadings, dPages = {}, {}
+    for sName in sorted(os.listdir(sFolder)):
+        if not sName.startswith("help.shop.app_en_shop_") or not sName.endswith(".html"): continue
+        lsParts = sName[len("help.shop.app_en_shop_"):-5].split("_")
+        sMarkup = readText(os.path.join(sFolder, sName))
+        oTitle = re.search(r'(?is)<h1[^>]*class="article-title"[^>]*>(.*?)</h1>', sMarkup)
+        if oTitle: dHeadings["/".join(lsParts)] = stripTags(oTitle.group(1))
+        dPages["/".join(lsParts)] = sMarkup
+    lArticles = []
+    for sPath, sMarkup in sorted(dPages.items(), key=lambda t: (t[0].split("/")[0], len(t[0].split("/")), t[0])):
+        lsParts = sPath.split("/")
+        if lsParts[0].startswith("shop-pay") != bPay or sPath not in dHeadings: continue
+        sBody = findBalanced(sMarkup, r'<article[^>]*class="article"', "article")
+        if not sBody: continue
+        sBody = re.sub(r'(?is)<h1[^>]*class="article-title".*?</h1>', "", sBody, count=1)
+        lBody = toMarkdown(sBody, 0, "https://help.shop.app/en/shop/" + sPath)
+        if len(" ".join(lBody).split()) < 25: continue
+        sCategory = dHeadings.get(lsParts[0], lsParts[0].replace("-", " ").capitalize())
+        sTitle = dHeadings[sPath] if len(lsParts) > 1 else "Overview: " + dHeadings[sPath]
+        lArticles.append((sCategory, sTitle, lBody))
+    logging.info("%s: %d articles read from %d pages", "Shop Pay" if bPay else "Shop", len(lArticles), len(dPages))
+    return lArticles
+
+
+def readShop(sFolder): return readShopFor(sFolder, False)
+def readShopPay(sFolder): return readShopFor(sFolder, True)
+
 
 def readSuno(sFolder):
     """Suno's help site: the title is the h1, the body is the page-content region,
@@ -4467,6 +4500,10 @@ def main():
          "This guide holds Kickstarter's own help, gathered from help.kickstarter.com in November 2026. Kickstarter is a site where creators raise money from backers to make a project, such as a book, a game, an album or a gadget. It covers the basics, backing a project, running one as a creator, and Kickstarter's resources for creators. The categories are Kickstarter's own collections.\r\n\r\nLeft out on purpose: Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa."),
         ("Ko-fi", "KofiHelp", readZendeskSection, "Kofi.md", "Ko-fi help",
          "This guide holds Ko-fi's own help, gathered from help.ko-fi.com in November 2026. Ko-fi is a site where creators take tips, memberships, commissions and shop sales from their supporters. It covers getting started, ways to earn, payments, and using Ko-fi with other platforms. Patreon, a similar site, has a guide of its own in this collection.\r\n\r\nLeft out on purpose: legal pages such as terms and privacy policies, pages for law enforcement and developers, and Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are the publisher's own."),
+        ("Shop", "ShopHelp", readShop, "Shop.md", "Shop help",
+         "This guide holds Shopify's own help for Shop, gathered from help.shop.app in November 2026. Shop is Shopify's shopping and delivery tracking app, on the iPhone and on the web at shop.com. It covers getting started, shopping, tracking deliveries, managing orders, Shop Cash rewards, and reporting a problem.\r\n\r\n Shop and Shop Pay share one help centre, so this collection splits it in two: Shop.md for the Shop app and ShopPay.md for paying with Shop Pay and Shop Pay Installments. Each section opens with Shopify's own overview of it. Shopify's help for store owners is a separate guide, Shopify.md. Android-only articles are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa."),
+        ("Shop Pay", "ShopHelp", readShopPay, "ShopPay.md", "Shop Pay help",
+         "This guide holds Shopify's own help for Shop Pay, gathered from help.shop.app in November 2026. Shop Pay saves your payment and shipping details so you can check out faster at stores that use Shopify. It covers paying online and in stores, the cards it accepts, its settings and security, and Shop Pay Installments, which splits a purchase into payments.\r\n\r\n Shop and Shop Pay share one help centre, so this collection splits it in two: Shop.md for the Shop app and ShopPay.md for paying with Shop Pay and Shop Pay Installments. Each section opens with Shopify's own overview of it. Shopify's help for store owners is a separate guide, Shopify.md."),
         ("Mercury", "MercuryHelp", readZendeskSection, "Mercury.md", "Mercury help",
          "This guide holds Mercury's own help, gathered from support.mercury.com in November 2026. Mercury is a financial technology company that offers business and personal banking through partner banks. The guide covers opening an account, sending and receiving money, cards, statements and documents, and Mercury's other business tools. Each heading names the category, Business or Personal, then the subject.\r\n\r\nLeft out on purpose: legal pages such as terms, privacy policies and disclosures, pages for law enforcement and developers, and Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa."),
         ("Patreon", "PatreonHelp", readZendeskSection, "Patreon.md", "Patreon help",

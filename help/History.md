@@ -7,6 +7,13 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.265.0 -- 20 November 2026
+
+- **Shop and Shop Pay have their guides.** Shopify's help centre at help.shop.app gave 61 pages, which buildGuide splits by section: Shop.md (37 articles in 6 categories) and ShopPay.md (24 articles in 4), each section opening with Shopify's own overview of it.
+- **Mercury built cleanly on its first run:** 384 articles in 39 categories, read from its Zendesk listing, Business and Personal kept apart.
+- **Stripe and Link find their articles.** Both support sites write their question and topic links into the page's data rather than as links, so the first runs saved only the front page. Their harvesters now find every /questions/ and /topics/ address in a page's text, and Link starts from its four topics too. Both are asked for again; their readers follow their harvests.
+- **HubSpot was on course when stopped:** 1,800 pages saved and 192 queued, the queue shrinking. The next build resumes it over its saved pages.
+
 ## 1.264.1 -- 20 November 2026
 
 - **A held setup program is waited for.** The 19 November build compiled HomerDev_setup.exe cleanly, then stopped with "Access is denied" when swapping it in, because another program held the old one for a moment. The swap is now tried six times, five seconds apart, and if the file is still held the new program waits beside it and the message says so.
