@@ -3310,6 +3310,9 @@ lEstates = [
     zendeskEstate("GoFundMe", "getGoFundMeHelp.py", "GoFundMeHelp", "support.gofundme.com", 300),
     zendeskEstate("Fiverr", "getFiverrHelp.py", "FiverrHelp", "help.fiverr.com", 500),
     zendeskEstate("Ko-fi", "getKofiHelp.py", "KofiHelp", "help.ko-fi.com", 300),
+    # MERCURY (19 November 2026): business and personal banking; its centre at support.mercury.com is Zendesk, with
+    # Business and Personal categories. Legal pages are gathered with the rest and left out when built.
+    zendeskEstate("Mercury", "getMercuryHelp.py", "MercuryHelp", "support.mercury.com", 600),
     # GOOGLE WORKSPACE (14 November 2026). Docs, Sheets, Slides, Vids and Drawings share one centre, the Docs
     # Editors help at support.google.com/docs, so one harvest serves a guide for each, split when built by the trail
     # above each article; Forms, gathered in September through a subject gate, can be rebuilt from it if fuller.
@@ -3475,6 +3478,80 @@ lEstates = [
         "sSubjectPattern": "",
         "sReadyPattern": r"Twitch",
         "sOkStatuses": "200, 202",
+        "sExtraLinks": "",
+    },
+    # PAYMENTS AND BUSINESS TOOLS (19 November 2026), each probed first. Readers for the custom centres are written once
+    # their first harvests are seen, as Twitch's was; Mercury's Zendesk listing is read by readZendeskSection.
+    #
+    # STRIPE AND LINK: Stripe's own support sites, both drawn on the server, articles at /questions/<slug> and topics
+    # at /topics/<slug>. Stripe's developer documentation lives at docs.stripe.com, outside the fence, since this
+    # collection leaves programming interfaces out. Link is Stripe's saved-checkout service, with a site of its own.
+    {
+        "sProduct": "Stripe",
+        "sScriptName": "getStripeHelp.py",
+        "sSystem": "Stripe's support site at support.stripe.com",
+        "sFolder": "StripeHelp",
+        "sZipName": "StripeHelp.zip",
+        "iMaxPages": 3000,
+        "nDelay": 1.0,
+        "sSeeds": '"https://support.stripe.com/"',
+        "sFencePattern": r"^https://support\.stripe\.com/((questions|topics)/[A-Za-z0-9_%-]+)?/?$",
+        "sSubjectPattern": "",
+        "sReadyPattern": r"Stripe",
+        "sOkStatuses": "200",
+        "sExtraLinks": "",
+    },
+    {
+        "sProduct": "Link",
+        "sScriptName": "getLinkHelp.py",
+        "sSystem": "Link's support site at support.link.com",
+        "sFolder": "LinkHelp",
+        "sZipName": "LinkHelp.zip",
+        "iMaxPages": 400,
+        "nDelay": 1.0,
+        "sSeeds": '"https://support.link.com/"',
+        "sFencePattern": r"^https://support\.link\.com/((questions|topics)/[A-Za-z0-9_%-]+)?/?$",
+        "sSubjectPattern": "",
+        "sReadyPattern": r"Link",
+        "sOkStatuses": "200",
+        "sExtraLinks": "",
+    },
+    # SHOP AND SHOP PAY: one centre at help.shop.app, Shopify's own, with sections at /en/shop/<section> and articles at
+    # /en/shop/<section>/<article>. Shop Pay and Shop Pay Installments are sections of it, so one harvest serves both
+    # guides, split when built by section.
+    {
+        "sProduct": "Shop",
+        "sScriptName": "getShopHelp.py",
+        "sSystem": "Shopify's help centre for Shop and Shop Pay at help.shop.app",
+        "sFolder": "ShopHelp",
+        "sZipName": "ShopHelp.zip",
+        "iMaxPages": 500,
+        "nDelay": 1.0,
+        "sSeeds": ('"https://help.shop.app/en/shop",\n'
+                   '              "https://help.shop.app/en/shop/shop-pay",\n'
+                   '              "https://help.shop.app/en/shop/shop-pay-installments"'),
+        "sFencePattern": r"^https://help\.shop\.app/en/shop(/[a-z0-9-]+){0,2}/?$",
+        "sSubjectPattern": "",
+        "sReadyPattern": r"Shop",
+        "sOkStatuses": "200",
+        "sExtraLinks": "",
+    },
+    # HUBSPOT: its knowledge base, knowledge.hubspot.com, categories at /<category> and articles at /<folder>/<slug>,
+    # English at the root and sixteen languages under a prefix, all fenced out. It is large -- several thousand
+    # articles -- so it comes last in a queue and its ceiling is high; a stopped run resumes where it stopped.
+    {
+        "sProduct": "HubSpot",
+        "sScriptName": "getHubSpotHelp.py",
+        "sSystem": "HubSpot's knowledge base at knowledge.hubspot.com",
+        "sFolder": "HubSpotHelp",
+        "sZipName": "HubSpotHelp.zip",
+        "iMaxPages": 8000,
+        "nDelay": 1.0,
+        "sSeeds": '"https://knowledge.hubspot.com/"',
+        "sFencePattern": r"^https://knowledge\.hubspot\.com/(?!(es|de|ja|pt|fr|nl|it|pl|sv|fi|zh-tw|da|no|ko|th|zh-cn)(/|$))([a-z0-9-]+(/[a-z0-9-]+)?)?/?$",
+        "sSubjectPattern": "",
+        "sReadyPattern": r"HubSpot",
+        "sOkStatuses": "200",
         "sExtraLinks": "",
     },
     # GUIDE: the Windows AI assistant for blind and low-vision people that describes the screen and acts on it

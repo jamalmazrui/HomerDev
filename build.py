@@ -1035,7 +1035,23 @@ def buildHomerDevSetup():
     if iCode != 0 or not os.path.isfile(sBuilding):
         if os.path.exists(sBuilding): os.remove(sBuilding)
         return "HomerDev_setup.exe did not compile; the log has Inno Setup's messages, and the last one is kept"
-    os.replace(sBuilding, os.path.join(sScriptDir, "HomerDev_setup.exe"))
+    # A HELD SETUP PROGRAM IS WAITED FOR (1.264.1, 19 November 2026): the swap failed with "Access is denied" once,
+    # after a good compile, because another program -- most likely the virus scanner reading the new file, or an open
+    # Properties window on the old one -- held HomerDev_setup.exe. The swap is now tried six times, five seconds apart,
+    # each try logged; if the file is still held, the new program is kept beside it and the message names both.
+    sSetup = os.path.join(sScriptDir, "HomerDev_setup.exe")
+    for iSwap in range(1, 7):
+        try:
+            os.replace(sBuilding, sSetup)
+            logLine("HomerDev_setup.exe swapped in on try %d" % iSwap)
+            break
+        except PermissionError as oError:
+            logLine("HomerDev_setup.exe swap try %d refused: %s" % (iSwap, oError))
+            if iSwap == 6:
+                return ("HomerDev_setup.exe is held by another program, so the new one waits beside it as "
+                        "HomerDev_setup.building.exe; close what holds it and build again")
+            if iSwap == 1: sayLine("HomerDev_setup.exe is in use by another program; waiting up to thirty seconds for it to be let go.")
+            time.sleep(5)
     oCache.record("HomerDev_setup.exe", oCache.fingerprint(lsInputs), ["HomerDev_setup.exe"])
     sayLine("Built HomerDev_setup.exe, which installs the kit to Program Files.")
     return ""

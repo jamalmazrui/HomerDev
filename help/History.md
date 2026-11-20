@@ -7,6 +7,22 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.264.1 -- 20 November 2026
+
+- **A held setup program is waited for.** The 19 November build compiled HomerDev_setup.exe cleanly, then stopped with "Access is denied" when swapping it in, because another program held the old one for a moment. The swap is now tried six times, five seconds apart, and if the file is still held the new program waits beside it and the message says so.
+- **A guide whose reader changed is rebuilt by the ordinary build.** The six Claude guides were left as they were on 19 November, because their harvest was older than they were, so the duplicate-article and owners'-page fixes never reached them. buildGuide's dReaderChanged now lists when a reader last changed, and a listed guide older than that is rebuilt once, without a command-line name.
+- **Twitch and Wyzant built cleanly from their new harvests:** Twitch 218 articles in 14 categories once Edge's crashes stopped costing pages (301 pages, against 157 before), and Wyzant 154 articles in 21 categories from its WordPress site.
+
+## 1.264.0 -- 19 November 2026
+
+- **Five more help centres can be gathered: HubSpot, Link, Mercury, Shop (with Shop Pay) and Stripe.** Each was probed before its block was written.
+  - **Mercury** is Zendesk, so its listing is gathered and read by the existing Zendesk reader. Business and Personal head their own categories, since both have a Getting Started and a Send Money section.
+  - **Stripe and Link** are Stripe's own support sites, articles at /questions and topics at /topics. Stripe's developer documentation is outside the fence.
+  - **Shop and Shop Pay** share Shopify's centre at help.shop.app; one harvest will serve both guides, split by section.
+  - **HubSpot**'s knowledge base is gathered in English only, its sixteen other languages fenced out. It runs to thousands of articles, so it is the last in the queue.
+  - The readers for Stripe, Link, Shop and HubSpot are written once their first harvests are seen, as Twitch's was.
+- **Shopify** already has a guide in the collection, so it was not gathered again.
+
 ## 1.263.0 -- 19 November 2026
 
 - **Twitch has its guide.** The first gathering saved 157 pages, and the new Twitch reader turns them into 141 articles in 12 categories, read from each article's own component and the Breadcrumbs trail above it, with the "On this page" list left out because the headings follow.

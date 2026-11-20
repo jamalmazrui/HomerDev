@@ -1128,7 +1128,9 @@ def readZendeskPages(sFolder):
 # audience and the section, "Creators: Going Live". Ko-fi files everything under "All Help Articles", so its sections
 # alone are the headings. Each section's own name is kept, with the stray spaces and tabs some carry removed.
 dAudience = {"creator topics": "Creators", "member topics": "Members", "general topics": "General",
-             "for clients": "Clients", "for freelancers": "Freelancers", "for pro clients": "Pro clients"}
+             "for clients": "Clients", "for freelancers": "Freelancers", "for pro clients": "Pro clients",
+             # Mercury (19 November 2026): Business and Personal accounts, each with its own Getting Started and Send Money.
+             "business": "Business", "personal": "Personal", "mercury business": "Business", "mercury personal": "Personal"}
 dSameSection = {"advanced": "Advanced features", "get started with": "Getting started"}
 
 
@@ -2130,6 +2132,19 @@ def readWyzant(sFolder):
         lArticles.append((sCategory or sMiscellaneous, sTitle, lBody))
     logging.info("Wyzant: %d articles read from %d pages", len(lArticles), len(dPages))
     return lArticles
+
+# WHEN EACH READER LAST CHANGED, by guide file, in local time. Add a line when a reader changes in a way that should
+# reach guides already built; the build then rebuilds each listed guide that is older, without being asked.
+dReaderChanged = {
+    "ClaudeWeb.md": "2026-11-20 00:00", "ClaudeDesktop.md": "2026-11-20 00:00", "ClaudeIos.md": "2026-11-20 00:00",
+    "ClaudeCowork.md": "2026-11-20 00:00", "ClaudeCode.md": "2026-11-20 00:00", "ClaudeDuet.md": "2026-11-20 00:00",
+}
+
+
+def readerChangedTime(sFile):
+    """The time a guide's reader last changed, as seconds since the epoch, or 0 when it is not listed."""
+    sWhen = dReaderChanged.get(sFile, "")
+    return time.mktime(time.strptime(sWhen, "%Y-%m-%d %H:%M")) if sWhen else 0
 
 
 def readSuno(sFolder):
@@ -4452,6 +4467,8 @@ def main():
          "This guide holds Kickstarter's own help, gathered from help.kickstarter.com in November 2026. Kickstarter is a site where creators raise money from backers to make a project, such as a book, a game, an album or a gadget. It covers the basics, backing a project, running one as a creator, and Kickstarter's resources for creators. The categories are Kickstarter's own collections.\r\n\r\nLeft out on purpose: Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa."),
         ("Ko-fi", "KofiHelp", readZendeskSection, "Kofi.md", "Ko-fi help",
          "This guide holds Ko-fi's own help, gathered from help.ko-fi.com in November 2026. Ko-fi is a site where creators take tips, memberships, commissions and shop sales from their supporters. It covers getting started, ways to earn, payments, and using Ko-fi with other platforms. Patreon, a similar site, has a guide of its own in this collection.\r\n\r\nLeft out on purpose: legal pages such as terms and privacy policies, pages for law enforcement and developers, and Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are the publisher's own."),
+        ("Mercury", "MercuryHelp", readZendeskSection, "Mercury.md", "Mercury help",
+         "This guide holds Mercury's own help, gathered from support.mercury.com in November 2026. Mercury is a financial technology company that offers business and personal banking through partner banks. The guide covers opening an account, sending and receiving money, cards, statements and documents, and Mercury's other business tools. Each heading names the category, Business or Personal, then the subject.\r\n\r\nLeft out on purpose: legal pages such as terms, privacy policies and disclosures, pages for law enforcement and developers, and Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa."),
         ("Patreon", "PatreonHelp", readZendeskSection, "Patreon.md", "Patreon help",
          "This guide holds Patreon's own help, gathered from support.patreon.com in November 2026. Patreon is a site where creators earn from members who pay each month for their work. It covers joining and paying as a member, and setting up, earning and getting paid as a creator. Each heading names who it is for, then the subject. Ko-fi, a similar site, has a guide of its own in this collection.\r\n\r\nLeft out on purpose: legal pages such as terms and privacy policies, pages for law enforcement and developers, and Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are the publisher's own."),
         ("Twitch", "TwitchHelp", readTwitch, "Twitch.md", "Twitch help",
@@ -4520,7 +4537,14 @@ def main():
         # A GUIDE IS REBUILT ONLY WHEN ITS HARVEST IS NEWER (version 2): the Homer rule that a build does again only
         # what has changed. A guide named on the command line is always rebuilt, which is how a guide whose reader
         # changed is brought up to date: build GoodMaps.
-        if bChanged and not lOnly and os.path.isfile(sGuide) and os.path.getmtime(sGuide) >= newestTime(sHarvest):
+        # A READER THAT CHANGED REBUILDS ITS GUIDES (1.264.1, 20 November 2026): the Claude guides built on 19 November
+        # kept duplicate articles and owners' pages after their reader was fixed, because their harvest was older than
+        # they were, and naming them on a command line is a step outside build_release. dReaderChanged gives the time a
+        # guide's reader last changed; a guide older than that is rebuilt by the ordinary build, once, and logged.
+        nReader = readerChangedTime(sFile)
+        if nReader and os.path.isfile(sGuide) and os.path.getmtime(sGuide) < nReader:
+            logging.info("%s: its reader changed after %s was built, so it is rebuilt", sProduct, sFile)
+        elif bChanged and not lOnly and os.path.isfile(sGuide) and os.path.getmtime(sGuide) >= newestTime(sHarvest):
             iCurrent += 1
             logging.info("%s: %s is newer than its harvest, so it is left as it is", sProduct, sFile)
             continue
