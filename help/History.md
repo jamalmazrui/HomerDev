@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.267.0 -- 20 November 2026
+
+- **A link to a brand-new page stays a link.** fixPages turned a link into plain text when its page was not yet in the folder, even when the same run was about to make that page from its .md. A new directory listed in a ReadMe lost its link on the first build. The pages a run makes from .md files now count as present, so the link stays.
+- **PodcastDirectories has Described Tours,** a guide to 96 free audio-described tours of museums, parks and landmarks, built by Claude and ChatGPT from the Audio Description Project's lists and ACB's convention tour podcast.
+
 ## 1.266.0 -- 20 November 2026
 
 - **check fingerprints only what git would push.** A pass was fingerprinted over every file in the project, and push and release read each one in full (HomerVerify=1). AppHelpGuides holds gigabytes of harvested pages that are never pushed, and push's check sat 25 minutes on them, silent, until it was stopped. The pass now covers the files git tracks or would add, from git's own list, and the log gives the count; with no repository, the whole tree as before.

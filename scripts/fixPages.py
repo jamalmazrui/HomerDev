@@ -26,7 +26,7 @@ THE LOG is logs\\<Collection>-fixPages-<date>-<time>.log in the collection, with
 
 import datetime, importlib.util, io, os, platform, re, shutil, subprocess, sys
 
-sVersion = "2026-11-11 version 5: --changed rebuilds only the pages whose .md is newer; version 4 the kit's finisher"
+sVersion = "2026-11-20 version 6: links to a page made in the same run stay links; version 5: --changed rebuilds only the pages whose .md is newer; version 4 the kit's finisher"
 sLogPath = ""
 
 
@@ -140,6 +140,8 @@ def main(lsArgs):
     setLocal = {s.lower() for s in os.listdir(sFolder)}
     lsMarkdown = [] if bPagesOnly else sorted(s for s in os.listdir(sFolder) if s.lower().endswith(".md"))
     setFromMarkdown = {s[:-3].lower() + ".htm" for s in lsMarkdown}
+    # A page this run will make from its .md is local too, so a link to a brand-new page stays a link (version 6).
+    setLocal |= setFromMarkdown
     lsPages = sorted(s for s in os.listdir(sFolder) if s.lower().endswith(".htm") and s.lower() not in setFromMarkdown)
     if bChangedOnly:
         def isChanged(sName):
