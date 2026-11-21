@@ -278,6 +278,32 @@ def findPagesProject(sRoot, sKit):
     return ""
 
 
+def retireMovedPages(sRoot, sKit):
+    """ONE SOURCE PER PAGE IN A COLLECTION TOO (1.268.0). A page that grew up in a collection, such as DescribedTours in
+    PodcastDirectories, may move to MyPages to become a GitHub Page of its own. Two copies would drift apart, and the
+    collection would keep publishing the older one. So when MyPages holds pages\\<Name>\\<Name>.md, the collection's top-level
+    <Name>.md and <Name>.htm go to notes\\retired, each move logged; push then takes the .htm off GitHub. The collection's
+    ReadMe should link to the page's own address instead. Returns the number of files moved."""
+    sPages = findPagesProject(sRoot, sKit)
+    if not sPages: return 0
+    iMoved = 0
+    for sName in sorted(os.listdir(sRoot)):
+        sStem, sExt = os.path.splitext(sName)
+        if sExt.lower() not in (".md", ".htm") or sStem.lower() == "readme": continue
+        if not os.path.isfile(os.path.join(sPages, "pages", sStem, sStem + ".md")): continue
+        sFolder = os.path.join(sRoot, "notes", "retired")
+        os.makedirs(sFolder, exist_ok=True)
+        sTo, iNext = os.path.join(sFolder, sName), 2
+        while os.path.exists(sTo):
+            sTo = os.path.join(sFolder, "%s-%d%s" % (sStem, iNext, sExt))
+            iNext += 1
+        shutil.move(os.path.join(sRoot, sName), sTo)
+        log("RETIRED %s -> %s: MyPages keeps and posts this page (%s)" % (sName, sTo, os.path.join(sPages, "pages", sStem)))
+        say("Retired %s: MyPages now keeps and posts that page." % sName)
+        iMoved += 1
+    return iMoved
+
+
 def settleBooks(sRoot, sKit):
     """MyBooks keeps the Homer tree (1.212.0), each move logged, nothing deleted that holds work:
 
@@ -393,6 +419,7 @@ def build(sRoot, sRole, sKit):
         return run([sys.executable, sBuilder, "--build", sRoot], sRoot)
     if sRole == "podcasts":
         retireNamed(sRoot, lsPodcastRetired, "the kit's podcast-directory skill does this now")
+        retireMovedPages(sRoot, sKit)
         # NEW SHOWS FIRST (1.209.0): a show listed in data\\addShows.inix without a page is found, fetched and built by
         # the collection's own scripts\\addShows, before the pages are finished. A show Apple's search cannot match is
         # logged by addShows and does not stop the cycle; only its option or crash codes (2, 4) do.

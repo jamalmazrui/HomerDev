@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.268.0 -- 20 November 2026
+
+- **A page that moves to MyPages leaves its collection.** When MyPages holds pages\\<Name>\\<Name>.md, a podcast collection's own <Name>.md and <Name>.htm now go to notes\\retired during the build, each move logged, and push takes the .htm off GitHub. Two copies would drift apart, and the collection would keep publishing the older one. Described Tours is the first: it moved from PodcastDirectories to its own page at jamalmazrui.github.io/DescribedTours.
+
 ## 1.267.0 -- 20 November 2026
 
 - **A link to a brand-new page stays a link.** fixPages turned a link into plain text when its page was not yet in the folder, even when the same run was about to make that page from its .md. A new directory listed in a ReadMe lost its link on the first build. The pages a run makes from .md files now count as present, so the link stays.
