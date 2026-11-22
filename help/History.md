@@ -7,9 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
-## 1.272.0 -- 22 November 2026
+## 1.273.0 -- 22 November 2026
+
+This also holds 1.272.0, which was tagged but never released when the network dropped during its release.
 
 - **Elevate Version checks the download before it runs it.** GitHub lists each release file's size and, for newer releases, its SHA-256 digest. The setup program F11 fetches must match both, or it is deleted and not started, and the log says why. Before, any file that arrived was started. This is an idea from ScanMaster.
+- **check tests the finish page's order.** Each installer's comments said its boxes are in alphabetical order, but nothing checked it: FileDir listed Whisper between ffmpeg and ImageMagick, BatCon listed ffmpeg after PDF tools, and DbDo listed the NVDA add-on before mpv. check now fails an installer whose Install, Update or Reinstall boxes are out of lowercase alphabetical order; an AI model, whose name varies, is left out. All three are fixed.
+- **check fails PDF tools registered under winget's Python.** FileDir still did what HomerDev stopped doing on 3 November, so its PDF tools box offered an Update that installPdfTools could never make. FileDir now uses pip:pymupdf4llm, and FileDir and BatCon ask GitHub for Whisper's newest version.
+- **Every Homer installer calls homerProbeAll.** BatCon, bookFido, extCheck, HomerScribe, urlCheck and urlFido did not yet, and check, since 1.270.0, would have stopped their next push.
 - **A JAWS script that falls back to JAWS's own action keeps its key.** check's reader-keys step failed EdSharp's latex-access scripts on Alt+Control+PageUp and PageDown, though outside a math matrix they run JAWS's own voice-rate scripts. A key map line naming one of the app's scripts that ends in PerformScript is now logged as kept; a line that hands the key on with TypeCurrentScriptKey still fails.
 
 ## 1.271.0 -- 22 November 2026

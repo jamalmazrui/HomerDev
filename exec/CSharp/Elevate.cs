@@ -25,7 +25,7 @@
 // rather than a parser, because those two fields are all that is wanted and a
 // parser is a dependency.
 //
-// THE DOWNLOAD IS CHECKED BEFORE IT RUNS (kit 1.272.0, 22 November 2026, a
+// THE DOWNLOAD IS CHECKED BEFORE IT RUNS (kit 1.273.0, 22 November 2026, a
 // learning from ScanMaster). GitHub lists each asset's size and, for newer
 // releases, its SHA-256 digest. update() compares the file it fetched with
 // both, and a file that does not match is deleted rather than started, so a

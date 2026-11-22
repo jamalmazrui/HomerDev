@@ -61,6 +61,14 @@ put the screen reader support in place, and start the app.
   After Finish, only the Results
   box's second look runs, and it says Confirming. `check` fails an installer
   that never calls it.
+- **List the finish-page boxes in the same order.** Within Install, Update
+  and Reinstall, the [Run] entries go in lowercase alphabetical order of the
+  names the boxes show, the JAWS scripts and the NVDA add-on among the rest,
+  so the boxes and the installs after Finish are heard in the order the
+  checking was. `check` fails a group out of order; an AI model is left out.
+- **Register PDF tools as `pip:pymupdf4llm`** and Whisper as
+  `github:ggml-org/whisper.cpp`, as HomerDev does, so each box compares what
+  its install script actually updates.
 - **Run the kit's `installScreenReaderSupport.cmd`** for the JAWS and NVDA
   boxes. An app whose support needs more, as HomerView chains its scripts
   into JAWS's defaults, names its own script with
