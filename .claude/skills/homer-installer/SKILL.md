@@ -50,6 +50,14 @@ put the screen reader support in place, and start the app.
   never define `HomerReaderWrappersInApp`, and never stamp a version of your
   own: a verb must come from comparing what is installed with what is
   shipped, never from the app's version.
+- **Ask everything before the finish page.** Call the kit's
+  `homerProbeAll(True)` at the end of `CurStepChanged(ssPostInstall)`
+  (`False` when the page has no JAWS or NVDA boxes): it asks the screen
+  readers, every component and the AI models while the progress bar is still
+  up, so each box's Install, Update or Reinstall is known before the page
+  appears and nothing is checked after it. After Finish, only the Results
+  box's second look runs, and it says Confirming. `check` fails an installer
+  that never calls it.
 - **Run the kit's `installScreenReaderSupport.cmd`** for the JAWS and NVDA
   boxes. An app whose support needs more, as HomerView chains its scripts
   into JAWS's defaults, names its own script with

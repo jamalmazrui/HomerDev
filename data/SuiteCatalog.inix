@@ -90,6 +90,11 @@ Unmark to First=the grid's marking keys, in DbDo's grid key code
 Unmark to Last=the grid's marking keys, in DbDo's grid key code
 View Cycle=the window's view keys, in DbDo's key code
 View Cycle Back=the window's view keys, in DbDo's key code
+; TOGGLE MARK'S SPACE (22 November 2026): Control+Space is the menu's key, but Space is handled in the grid's own
+; KeyDown, so a Space within a second of a typed letter can go on to the ListView's type-ahead and a Space on a button
+; or check box is never taken. No export can show it, so the whole command is set aside here; DbDo's auditPatterns
+; still checks both keys against DbDo.cs.
+Toggle Mark=Space in DbDo's grid key code; Control+Space on the menu
 
 [handled EdSharp]
 ; HANDLED OUTSIDE THE KIT'S ROUTER (1.239.0, 15 November 2026). check's exported keys step compares the keys a program
@@ -465,7 +470,10 @@ key=Control+V
 description=Paste the clipboard {paste_what}
 
 [command Path to Clipboard]
-apps=EdSharp, FileDir
+; EDSHARP ALONE SINCE 22 NOVEMBER 2026: FileDir's Control+C puts the current or marked items' full paths on the clipboard
+; as text as well as files, so its Path to Clipboard only repeated Copy and was retired into it (Jamal's ruling: no two
+; commands copy the same paths). EdSharp keeps it, since its Control+C copies the text, not the file's path.
+apps=EdSharp
 key=Alt+Shift+P
 description=Copy the full path of {current} to the clipboard
 

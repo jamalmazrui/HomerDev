@@ -356,6 +356,20 @@ Jamal asked for one way to play and one to record, a Space bar scheme, and a new
 - **Why not Control+Shift+S and G, as Jamal proposed.** Control+Shift+S is Save As in every Homer app. By the suite's own factor, Control is for commands that change data; these change none, and a pick dialog is as much Alt's as Control's. Alt+Shift+S was free once Edit Script moved to Alt+Shift+V, and Alt+Shift+G was Generate from Grid's key, so charts stay where his fingers know them.
 - **Charts without Microsoft Office.** The kit's DataReport draws them with Python: pandas, matplotlib, seaborn and openpyxl, all free and MIT-compatible. A chart is a PNG, an SVG, a web page with the takeaway sentence and the numbers as a table, and an Excel workbook holding a native chart, made without Excel. Excel through COM stays as Drawn by Excel, and as the fallback when Python cannot draw, as Jamal asked. help\AnalysisPlan.md has the comparison of NuGet and PyPI packages.
 
+### The Space bar and the list's own keys, 22 November 2026
+
+Jamal asked that a list's own keys be overridden only with strong reason: a Homer aim no other key meets. Each Space key was weighed against what a Windows list already does with it:
+
+- **Space:** a list with check boxes toggles the box; a list view also uses Space in type-ahead ("new y"). Homer's Toggle Mark is the check-box meaning, and DbDo lets a Space typed within a second of a letter go on to type-ahead, so the list's own use is kept. It is handled in DbDo's grid key code, not as a menu key, so a Space on a button or check box elsewhere is never taken. Kept.
+- **Control+Space:** in a multi-select list it toggles the focused item's selection, the same meaning as Toggle Mark; Homer's lists are single-select, where it does nothing. Kept.
+- **Shift+Space:** in a multi-select list it extends the selection, which a single-select list does not do; Homer uses it to say what is marked. Kept, as the only speech key on Space. (In a text box Shift+Space types a space, and EdSharp's and HomerView's Say Selected take it; that is a text key, outside this ruling, and a reader's own Say Selected key does the same, so it is flagged for review, not changed.)
+- **Alt+Space:** Windows' window menu. Never bound.
+- **Alt+Shift+Space and Control+Shift+Space:** left free, so a stray modifier never does something unexpected.
+
+### Marked or Current, one pattern, 22 November 2026
+
+Every command that can act on several items or one asks the kit's Marked or Current question whenever items are marked. FileDir's commands already asked through list_Helper; DbDo's Delete without Confirmation, Copy Record, Copy Append Record, Copy Visible Cells, Mail Record and Open url now ask too, through scopePositions, and Play Media asks before it looks at the current record. Commands whose unit is the whole view, or one cell, and every Say and Read command do not ask.
+
 ### Rollback
 
 Each change is one or two lines in the app's source, marked "21 November 2026", and one line in its key file; data\SuiteCommands.inix gives what each key was. Rollback.zip of the day holds every file as it was before any of the four rounds. The fourth round's new files -- exec\CSharp\DataReport.cs, scripts\installDataTools.cmd and scripts\testChart -- are listed in Rollback.txt, to delete when rolling back.

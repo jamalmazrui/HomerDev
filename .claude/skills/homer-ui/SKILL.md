@@ -94,6 +94,16 @@ is its hotkey's letter when it has one.
   Control+Home/End go to the first or last item, Control+Up/Down step through
   marked items, Control+PageUp/PageDown move between tables or windows,
   Backspace goes up a level, Alt+Left/Right go back and forward.
+- **Keep a list's own keys unless a Homer goal needs them** (22 November
+  2026). Overriding a key that a Windows list view or list box already
+  answers -- Space, and Space with a modifier, above all -- needs a strong
+  reason: a Homer aim that no other key meets. Space toggles the mark, the
+  meaning Space has in a Windows list with check boxes, and a Space typed
+  within a second of a letter still goes on to the list's type-ahead search.
+  Control+Space toggles the mark too, the meaning it has in a multi-select
+  list (toggle the focused item). Shift+Space says the marked items. Alt+Space
+  is Windows' window menu and is never bound; Alt+Shift+Space and
+  Control+Shift+Space stay free.
 - **Function-key families**: F1 help (F1 guide, Shift+F1 history, Alt+F1
   About, Control+F1 key describer); F2 edit or rename; F3 search and repeat; F4
   pick, say or close windows; F5 refresh; F6 panel focus (Control+Tab and
@@ -109,6 +119,24 @@ is its hotkey's letter when it has one.
   as "JAWS" or "NVDA". Convert with KeyName, never a table of one's own.
 - **One command table (KeyMap)** feeds the menus, the key describer and the
   hotkey list, so they cannot disagree.
+
+- **Batch or single: Marked or Current** (22 November 2026, one pattern). A
+  command that can act on several items or on one -- copy, mail, delete,
+  open, play, convert -- asks the kit's Marked or Current question
+  (LbcAsk.markedOrCurrent; FileDir's list_Helper, DbDo's scopePositions)
+  whenever marked items are in view, unless the one marked item is the
+  current one. Enter takes the marked ones; C takes the current one. Commands
+  whose unit is the whole view (Export, Copy Grid, Read Wide) or one cell do
+  not ask, and Say and Read commands never ask: their Marked forms are keys of
+  their own.
+
+## Windows and titles
+
+- **No version in a title** (22 November 2026). A screen reader says a
+  window's or dialog's title every time it gains the focus, so a version
+  number there is noise. State the version once, succinctly, in the documents,
+  the help screen or About, and Elevate Version (F11). check's "version in
+  title" step fails a title that names it.
 
 ## Speech
 

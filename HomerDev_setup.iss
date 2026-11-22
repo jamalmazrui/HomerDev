@@ -975,6 +975,13 @@ end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
+  if CurStep = ssPostInstall then
+  begin
+  //  EVERY VERB BEFORE THE CHECKBOXES (22 November 2026): the kit's homerProbeAll asks the screen readers and every
+  //  component now, with the progress bar still showing, so the finish page's Install, Update and Reinstall are known
+  //  before it appears and nothing is checked after it.
+  homerProbeAll(False);
+  end;
   if CurStep = ssDone then
   begin
     keepSetupLog();

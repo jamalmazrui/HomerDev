@@ -3385,8 +3385,11 @@ status=implemented
 
 [FileDir pathToClipboard]
 name=Path to Clipboard
-keys=Alt+Shift+P
-status=current
+keys=
+change=retired 22 November 2026 into Copy, its name a former name of Copy; Alt+Shift+P is free in FileDir
+reason=Control+C already puts the current or marked items' full paths on the clipboard as text, with the files; no two commands should copy the same paths
+disposition=ruled
+status=retired
 
 [FileDir playList]
 name=Play List

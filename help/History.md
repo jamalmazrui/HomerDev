@@ -7,6 +7,15 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.270.0 -- 22 November 2026
+
+- **Every verb before the checkboxes.** The installer template's new homerProbeAll asks the screen readers, every component and the AI models at the end of the file copy, with the progress bar's status line and the voice saying what is being checked, so the finish page appears with each Install, Update or Reinstall already decided. The second look after Finish, for the Results box, now says Confirming, not Checking. DbDo, FileDir, EdSharp, HomerView, HomerDev and the app template call it, and check fails an installer that does not.
+- **No version in a title.** HomerDev's dialog was titled with its version, which the screen reader repeated every time the dialog took the focus; the title is now just HomerDev. A new Homer guideline in the homer-ui skill says so, and check's "version in title" step fails a window or dialog title that names the version. The version stays in the documents and Elevate Version (F11).
+- **Marked or Current, one pattern.** The homer-ui skill now states the rule: a command that can act on several items or one asks Marked or Current whenever items are marked.
+- **List keys kept unless a Homer goal needs them.** The homer-ui skill records the Space bar's meanings and why each is kept.
+- **DbDo's Toggle Mark is in the handled list** of the suite catalog, since its Space lives in the grid's own key code.
+- **Path to Clipboard is EdSharp's alone** in the suite catalog: FileDir's repeated its Copy, Control+C, which already puts the paths on the clipboard as text, and was retired.
+
 ## 1.269.0 -- 21 November 2026
 
 - **Charts without Microsoft Office: DataReport.** exec\CSharp\DataReport.cs draws a chart of a table with Python -- pandas, matplotlib, seaborn and openpyxl, all free and MIT-compatible -- into four files: a PNG, an SVG, a web page with the takeaway sentence and the numbers as a table, and an .xlsx with a native Excel chart. Its colors are a validated palette that readers with a color vision difference can tell apart. scripts\installDataTools.cmd installs Python and the packages, and the script installs a missing one itself. The kit's build tests every kind of chart with scripts\testChart, and compiles DataReport with the conversion classes. DbDo's Generate Graphics is the first user.

@@ -886,10 +886,11 @@ private static bool runDialog()
     List<string> lsLines = new List<string>();
     loadItems();
     foreach (KitItem oItem in lsItems) lsLines.Add(oItem.ToString());
-    // THE VERSION IN THE TITLE (11 October 2026): the desktop hotkey opens the copy setup installed, which can lag the
-    // kit -- 1.66.0 was heard after 1.68.0 was released, so neither its progress updates nor its Voice button were
-    // there. The title, which the screen reader says as the dialog opens, now names the version.
-    using (LbcDialog dlg = new LbcDialog(sAppName + " " + sVersion, null))
+    // NO VERSION IN THE TITLE (22 November 2026, now a Homer guideline). From 11 October the title named the version,
+    // so a lagging installed copy could be told from the kit; but the screen reader says the title every time the
+    // dialog gains the focus, and the number was noise. The version is in the help (F1) and Elevate Version (F11),
+    // where someone who wants it asks for it.
+    using (LbcDialog dlg = new LbcDialog(sAppName, null))
     {
         lbItems = dlg.addPickBox("&Kit contents:", lsLines, lsLines.Count > 0 ? lsLines[0] : "",
             "Everything the kit holds, by kind and then by name: documents open in your browser, samples run, and every other file opens in a window you read line by line. Enter opens the one you are on.");
@@ -951,7 +952,7 @@ private static bool runDialog()
         // Enter in the list opens what it is on; the buttons below the list keep their own Enter.
         dlg.form.AcceptButton = btnOpen;
         dlg.setInitialFocus(lbItems);
-        dlg.setStatusText(lsItems.Count + (lsItems.Count == 1 ? " item" : " items") + " and " + lsProjects.Count + (lsProjects.Count == 1 ? " project" : " projects") + " in HomerDev " + sVersion);
+        dlg.setStatusText(lsItems.Count + (lsItems.Count == 1 ? " item" : " items") + " and " + lsProjects.Count + (lsProjects.Count == 1 ? " project" : " projects") + " in HomerDev");
         dlg.runWithButtons(new string[] { "Close" });
     }
     return true;

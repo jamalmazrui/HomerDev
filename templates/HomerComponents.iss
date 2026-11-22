@@ -71,6 +71,7 @@ var
    status is said at most every four seconds, so a quick run says little and a
    slow one keeps saying where it is. The setup log has every status too. *)
 var
+  gHomerConfirming: Boolean;   (* True while homerStateAfter probes: says Confirming, not Checking *)
   gHomerSaidAt: Cardinal;
   gHomerVoice: Variant;
   gHomerVoiceTried: Boolean;
@@ -464,7 +465,8 @@ begin
     exit;
   end;
 
-  homerSay('Checking ' + gHomer[iAt].sName, False);
+  if gHomerConfirming then homerSay('Confirming ' + gHomer[iAt].sName, False)
+  else homerSay('Checking ' + gHomer[iAt].sName, False);
   sRest := gHomer[iAt].sIdList;
   while (Result = 0) and (sRest <> '') do
   begin
@@ -1014,7 +1016,12 @@ begin
     iState := gHomer[iAt].iState; sLocal := gHomer[iAt].sLocal;
     sRemote := gHomer[iAt].sRemote; bKnown := gHomer[iAt].bKnown;
     gHomer[iAt].bKnown := False;
+    //  CONFIRMING, NOT CHECKING (22 November 2026): this probe runs after Finish, to word the Results box from what
+    //  is true now. Jamal heard "Checking Whisper" after the finish page and took it for the installer still deciding
+    //  its verbs; the verbs were decided before the page, so this one says Confirming.
+    gHomerConfirming := True;
     gHomer[iAt].iStateAfter := homerState(iAt);
+    gHomerConfirming := False;
     gHomer[iAt].sLocalAfter := gHomer[iAt].sLocal;
     gHomer[iAt].bKnownAfter := True;
     gHomer[iAt].iState := iState; gHomer[iAt].sLocal := sLocal;
@@ -1151,6 +1158,55 @@ begin
   end else begin
     if bAfter then Result := 'The ' + sUse + ' model ' + sModel + ' was installed.'
     else Result := 'The ' + sUse + ' model ' + sModel + ' was not installed. Its log says why.';
+  end;
+end;
+
+//  ---- every question before the finish page --------------------------------
+procedure homerProbeAll(bReaders: Boolean);
+(* EVERY VERB DECIDED BEFORE THE CHECKBOXES (22 November 2026, a long-standing Homer rule that Jamal restated). Each
+   box on the finish page says Install, Update or Reinstall, and that word can only be right when what is installed
+   was found out before the page appears. Left to the page itself, each component is asked the first time Inno words
+   its box -- in whatever order Inno happens to ask, with the screen reader silent and nothing on screen. Call this
+   at the end of CurStepChanged(ssPostInstall), after the app's files and scripts are in place: it asks the screen
+   readers' state (bReaders True when the page has JAWS and NVDA boxes), then every component, then the AI models when Ollama is one of them, with the progress bar's
+   status line and the spoken status saying what is being checked, so the finish page appears with every answer
+   already known and asks nothing more. EdSharp's warmComponentProbes did this first, for its own probes. After
+   Finish, only homerStateAfter asks again, for the Results box, and it says Confirming. *)
+var
+  i: Integer;
+  bOllama: Boolean;
+begin
+  try
+    WizardForm.StatusLabel.Caption := 'Checking which components are installed ...';
+    WizardForm.ProgressGauge.Style := npbstMarquee;
+    WizardForm.Refresh();
+    homerSay('Checking which components are installed', True);
+    if bReaders then
+    begin
+      WizardForm.StatusLabel.Caption := 'Checking the screen reader support ...';
+      WizardForm.Refresh();
+      homerReaderState('jaws');
+      homerReaderState('nvda');
+    end;
+    bOllama := False;
+    for i := 0 to GetArrayLength(gHomer) - 1 do
+    begin
+      WizardForm.StatusLabel.Caption := 'Checking ' + gHomer[i].sName + ' ...';
+      WizardForm.Refresh();
+      homerState(i);
+      if CompareText(gHomer[i].sName, 'Ollama') = 0 then bOllama := True;
+    end;
+    if bOllama then
+    begin
+      WizardForm.StatusLabel.Caption := 'Checking the AI models ...';
+      WizardForm.Refresh();
+      homerOllamaList();
+    end;
+    WizardForm.ProgressGauge.Style := npbstNormal;
+    WizardForm.StatusLabel.Caption := '';
+    Log('homerProbeAll: every component asked before the finish page, ' + IntToStr(GetArrayLength(gHomer)) + ' in the table');
+  except
+    Log('homerProbeAll: ' + GetExceptionMessage());
   end;
 end;
 
