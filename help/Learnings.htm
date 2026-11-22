@@ -198,7 +198,8 @@ learnings from ScanMaster</h2>
 and editor by another blind developer. Its source is private; this
 reading is of its installed help pages and its public changelog (226
 releases). Each idea is named with what Homer could do with it, in
-alphabetical order. None is built yet.</p>
+alphabetical order. One is built: Elevate Version’s download check, in
+1.272.0.</p>
 <ul>
 <li><strong>Accessibility check before saving.</strong> Review, Check
 Accessibility lists errors, then warnings, then tips, by the rules of
@@ -268,8 +269,9 @@ Updates offers stable, release-candidate and beta channels, opens even
 when current so the channel can change, checks the download’s signature,
 swaps a portable copy in only when complete and puts every file back if
 the new version does not start, and logs to %TEMP%. Homer: Elevate
-Version (F11) could check a hash published with each release before it
-runs an installer.</li>
+Version (F11) checks the size and SHA-256 digest GitHub lists for the
+setup program before it runs it (built in 1.272.0). Channels and
+rollback are not built.</li>
 <li><strong>Version where it is asked for.</strong> About has a Show
 list (version, license, credits and third-party licenses, disclaimer)
 and a Copy Version button; the title does not carry the version. This is

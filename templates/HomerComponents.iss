@@ -1166,45 +1166,85 @@ procedure homerProbeAll(bReaders: Boolean);
 (* EVERY VERB DECIDED BEFORE THE CHECKBOXES (22 November 2026, a long-standing Homer rule that Jamal restated). Each
    box on the finish page says Install, Update or Reinstall, and that word can only be right when what is installed
    was found out before the page appears. Left to the page itself, each component is asked the first time Inno words
-   its box -- in whatever order Inno happens to ask, with the screen reader silent and nothing on screen. Call this
-   at the end of CurStepChanged(ssPostInstall), after the app's files and scripts are in place: it asks the screen
-   readers' state (bReaders True when the page has JAWS and NVDA boxes), then every component, then the AI models when Ollama is one of them, with the progress bar's
-   status line and the spoken status saying what is being checked, so the finish page appears with every answer
-   already known and asks nothing more. EdSharp's warmComponentProbes did this first, for its own probes. After
-   Finish, only homerStateAfter asks again, for the Results box, and it says Confirming. *)
+   its box -- in whatever order Inno happens to ask, with nothing on screen. Call this at the end of
+   CurStepChanged(ssPostInstall), after the app's files and scripts are in place (bReaders True when the page has
+   JAWS and NVDA boxes): it asks the screen readers' state, every component and, when Ollama is one of them, the AI
+   models, with the progress bar's status line and the spoken status saying what is being checked, so the finish
+   page appears with every answer known. EdSharp's warmComponentProbes did this first, for its own probes. After
+   Finish, only homerStateAfter asks again, for the Results box, and it says Confirming.
+
+   IN LOWERCASE ALPHABETICAL ORDER (22 November 2026, Jamal's ruling). DbDo's installer said JAWS, NVDA, then mpv:
+   the readers always went first. Heard in alphabetical order, how far the names have got through the alphabet says
+   how far the checking has got. Every item -- components, the JAWS scripts, the NVDA add-on and the AI models -- is
+   sorted together by its name in lowercase, a leading "the" set aside, and asked in that order. Anything an app
+   already asked (EdSharp asks its own first) is left out, and when nothing is left, nothing is said. *)
 var
-  i: Integer;
+  i, j, iCount: Integer;
   bOllama: Boolean;
+  aKeys, aKinds, aShown: TArrayOfString;
+  sSwap: String;
 begin
   try
-    WizardForm.StatusLabel.Caption := 'Checking which components are installed ...';
-    WizardForm.ProgressGauge.Style := npbstMarquee;
-    WizardForm.Refresh();
-    homerSay('Checking which components are installed', True);
-    if bReaders then
+    iCount := 0;
+    SetArrayLength(aKeys, GetArrayLength(gHomer) + 3);
+    SetArrayLength(aKinds, GetArrayLength(gHomer) + 3);
+    SetArrayLength(aShown, GetArrayLength(gHomer) + 3);
+    if bReaders and (not gHomerJawsRead) then
     begin
-      WizardForm.StatusLabel.Caption := 'Checking the screen reader support ...';
-      WizardForm.Refresh();
-      homerReaderState('jaws');
-      homerReaderState('nvda');
+      aKeys[iCount] := 'jaws scripts'; aKinds[iCount] := 'jaws'; aShown[iCount] := 'the JAWS scripts'; iCount := iCount + 1;
+    end;
+    if bReaders and (not gHomerNvdaRead) then
+    begin
+      aKeys[iCount] := 'nvda add-on'; aKinds[iCount] := 'nvda'; aShown[iCount] := 'the NVDA add-on'; iCount := iCount + 1;
     end;
     bOllama := False;
     for i := 0 to GetArrayLength(gHomer) - 1 do
     begin
-      WizardForm.StatusLabel.Caption := 'Checking ' + gHomer[i].sName + ' ...';
-      WizardForm.Refresh();
-      homerState(i);
       if CompareText(gHomer[i].sName, 'Ollama') = 0 then bOllama := True;
+      if not gHomer[i].bKnown then
+      begin
+        aKeys[iCount] := Lowercase(gHomer[i].sName); aKinds[iCount] := IntToStr(i); aShown[iCount] := gHomer[i].sName;
+        iCount := iCount + 1;
+      end;
     end;
-    if bOllama then
+    if bOllama and (not gOllamaListKnown) then
     begin
-      WizardForm.StatusLabel.Caption := 'Checking the AI models ...';
+      aKeys[iCount] := 'ai models'; aKinds[iCount] := 'models'; aShown[iCount] := 'the AI models'; iCount := iCount + 1;
+    end;
+    if iCount = 0 then
+    begin
+      Log('homerProbeAll: everything was already asked; nothing to check');
+      exit;
+    end;
+    //  Insertion sort, in place, by the lowercase key.
+    for i := 1 to iCount - 1 do
+    begin
+      j := i;
+      while (j > 0) and (CompareStr(aKeys[j - 1], aKeys[j]) > 0) do
+      begin
+        sSwap := aKeys[j - 1]; aKeys[j - 1] := aKeys[j]; aKeys[j] := sSwap;
+        sSwap := aKinds[j - 1]; aKinds[j - 1] := aKinds[j]; aKinds[j] := sSwap;
+        sSwap := aShown[j - 1]; aShown[j - 1] := aShown[j]; aShown[j] := sSwap;
+        j := j - 1;
+      end;
+    end;
+    WizardForm.StatusLabel.Caption := 'Checking which components are installed ...';
+    WizardForm.ProgressGauge.Style := npbstMarquee;
+    WizardForm.Refresh();
+    homerSay('Checking which components are installed', True);
+    for i := 0 to iCount - 1 do
+    begin
+      WizardForm.StatusLabel.Caption := 'Checking ' + aShown[i] + ' ...';
       WizardForm.Refresh();
-      homerOllamaList();
+      Log('homerProbeAll: ' + IntToStr(i + 1) + ' of ' + IntToStr(iCount) + ', ' + aShown[i]);
+      if aKinds[i] = 'jaws' then homerReaderState('jaws')
+      else if aKinds[i] = 'nvda' then homerReaderState('nvda')
+      else if aKinds[i] = 'models' then homerOllamaList()
+      else homerState(StrToInt(aKinds[i]));
     end;
     WizardForm.ProgressGauge.Style := npbstNormal;
     WizardForm.StatusLabel.Caption := '';
-    Log('homerProbeAll: every component asked before the finish page, ' + IntToStr(GetArrayLength(gHomer)) + ' in the table');
+    Log('homerProbeAll: ' + IntToStr(iCount) + ' items asked before the finish page, in alphabetical order');
   except
     Log('homerProbeAll: ' + GetExceptionMessage());
   end;

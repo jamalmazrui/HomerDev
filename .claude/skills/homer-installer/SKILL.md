@@ -55,7 +55,10 @@ put the screen reader support in place, and start the app.
   (`False` when the page has no JAWS or NVDA boxes): it asks the screen
   readers, every component and the AI models while the progress bar is still
   up, so each box's Install, Update or Reinstall is known before the page
-  appears and nothing is checked after it. After Finish, only the Results
+  appears and nothing is checked after it. It asks in lowercase alphabetical
+  order, a leading "the" set aside, so the names heard show the progress; an
+  installer that says its own Checking lines says them in that order too.
+  After Finish, only the Results
   box's second look runs, and it says Confirming. `check` fails an installer
   that never calls it.
 - **Run the kit's `installScreenReaderSupport.cmd`** for the JAWS and NVDA

@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.272.0 -- 22 November 2026
+
+- **Elevate Version checks the download before it runs it.** GitHub lists each release file's size and, for newer releases, its SHA-256 digest. The setup program F11 fetches must match both, or it is deleted and not started, and the log says why. Before, any file that arrived was started. This is an idea from ScanMaster.
+- **A JAWS script that falls back to JAWS's own action keeps its key.** check's reader-keys step failed EdSharp's latex-access scripts on Alt+Control+PageUp and PageDown, though outside a math matrix they run JAWS's own voice-rate scripts. A key map line naming one of the app's scripts that ends in PerformScript is now logged as kept; a line that hands the key on with TypeCurrentScriptKey still fails.
+
 ## 1.271.0 -- 22 November 2026
 
 - **Paths as people have them: Util.localPath.** A typed or pasted path loses its quotes, a file: url becomes the local path with its escapes decoded, %variables% are expanded and forward slashes count as backslashes. LbcAsk.directoryDialog uses it, so every Homer folder box does; a file's path there returns its folder, and LbcAsk.sTypedFile names the file so the program can land on it.

@@ -24,11 +24,19 @@
 // what update() fetches. The JSON is read with two small regular expressions
 // rather than a parser, because those two fields are all that is wanted and a
 // parser is a dependency.
+//
+// THE DOWNLOAD IS CHECKED BEFORE IT RUNS (kit 1.272.0, 22 November 2026, a
+// learning from ScanMaster). GitHub lists each asset's size and, for newer
+// releases, its SHA-256 digest. update() compares the file it fetched with
+// both, and a file that does not match is deleted rather than started, so a
+// cut-off or altered download never runs. A release without a digest is
+// checked by size alone, as before nothing was checked at all.
 
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -45,9 +53,11 @@ namespace Homer
         const int iTimeoutMs = 8000;
         const string sApiFormat = "https://api.github.com/repos/{0}/{1}/releases/latest";
 
+        static long iSetupSizeFound = 0;
         static string sLatestFound = "";
         static string sOwner = "";
         static string sRepo = "";
+        static string sSetupDigestFound = "";
         static string sSetupUrlFound = "";
         static string sThisVersion = "";
 
@@ -72,6 +82,8 @@ namespace Homer
             sThisVersion = (sVersionIn ?? "").Trim();
             sLatestFound = "";
             sSetupUrlFound = "";
+            sSetupDigestFound = "";
+            iSetupSizeFound = 0;
             return isConfigured;
         }
 
@@ -93,6 +105,19 @@ namespace Homer
             oAsset = Regex.Match(sBody, "\"browser_download_url\"\\s*:\\s*\"([^\"]*" + Regex.Escape(sRepo) + "_setup\\.exe)\"", RegexOptions.IgnoreCase);
             sJsonUrl = oAsset.Success ? oAsset.Groups[1].Value : "";
             sSetupUrlFound = sJsonUrl;
+            sSetupDigestFound = "";
+            iSetupSizeFound = 0;
+            if (oAsset.Success)
+            {
+                // The asset's own fields come before its browser_download_url, after the one before it.
+                int iStart = sBody.LastIndexOf("\"browser_download_url\"", Math.Max(0, oAsset.Index - 1), StringComparison.Ordinal);
+                string sAssetText = sBody.Substring(iStart < 0 ? 0 : iStart + 1, oAsset.Index - (iStart < 0 ? 0 : iStart + 1));
+                Match oSize = Regex.Match(sAssetText, "\"size\"\\s*:\\s*(\\d+)");
+                Match oDigest = Regex.Match(sAssetText, "\"digest\"\\s*:\\s*\"sha256:([0-9a-fA-F]{64})\"");
+                long iSize;
+                if (oSize.Success && long.TryParse(oSize.Groups[1].Value, out iSize)) iSetupSizeFound = iSize;
+                if (oDigest.Success) sSetupDigestFound = oDigest.Groups[1].Value.ToLowerInvariant();
+            }
             return isNewer(sLatestFound, sThisVersion) ? iNewer : iCurrent;
         }
 
@@ -133,10 +158,45 @@ namespace Homer
                     oClient.DownloadFile(sSetupUrlFound, sFile);
                 }
                 if (!File.Exists(sFile) || new FileInfo(sFile).Length == 0) return false;
+                if (!matchesRelease(sFile))
+                {
+                    try { File.Delete(sFile); } catch (Exception) { }
+                    return false;
+                }
                 Process.Start(sFile);
                 return true;
             }
             catch { return false; }
+        }
+
+        static bool matchesRelease(string sFile)
+        {
+            // True when the fetched setup program has the size and SHA-256 digest GitHub lists for it; a value
+            // GitHub did not list is not checked. The outcome goes to the log either way.
+            long iLength = new FileInfo(sFile).Length;
+            if (iSetupSizeFound > 0 && iLength != iSetupSizeFound)
+            {
+                Log.info("Elevate: the setup program is " + iLength + " bytes, but the release lists " + iSetupSizeFound + "; not started");
+                return false;
+            }
+            if (sSetupDigestFound == "")
+            {
+                Log.info("Elevate: the release lists no digest; the setup program was checked by size alone");
+                return true;
+            }
+            string sHash;
+            using (SHA256 oSha = SHA256.Create())
+            using (FileStream oStream = File.OpenRead(sFile))
+            {
+                sHash = BitConverter.ToString(oSha.ComputeHash(oStream)).Replace("-", "").ToLowerInvariant();
+            }
+            if (sHash != sSetupDigestFound)
+            {
+                Log.info("Elevate: the setup program's SHA-256 is " + sHash + ", but the release lists " + sSetupDigestFound + "; not started");
+                return false;
+            }
+            Log.info("Elevate: the setup program matches the release's size and SHA-256 digest");
+            return true;
         }
 
         public static bool offer(IWin32Window oOwner)

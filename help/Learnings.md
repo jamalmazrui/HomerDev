@@ -4,7 +4,7 @@
 
 ## 22 November 2026: learnings from ScanMaster
 
-ScanMaster is an MIT-licensed, screen-reader-first document scanner and editor by another blind developer. Its source is private; this reading is of its installed help pages and its public changelog (226 releases). Each idea is named with what Homer could do with it, in alphabetical order. None is built yet.
+ScanMaster is an MIT-licensed, screen-reader-first document scanner and editor by another blind developer. Its source is private; this reading is of its installed help pages and its public changelog (226 releases). Each idea is named with what Homer could do with it, in alphabetical order. One is built: Elevate Version's download check, in 1.272.0.
 
 - **Accessibility check before saving.** Review, Check Accessibility lists errors, then warnings, then tips, by the rules of the format the file is going to become (Word, PDF/UA, EPUB with Ace, DAISY, WCAG); Enter goes to the problem. Homer: the kit's conversions could run such a check before EdSharp's Export Format and BatCon write a file.
 - **Announce when settled, on change, and again while a problem stays.** Camera guidance speaks only once a view has been still a moment, only when what it sees changes, and repeats every few seconds while a problem lasts. Homer: the rule for any watched state -- progress, a long conversion, the installer's checks -- in place of a fixed four-second throttle.
@@ -18,7 +18,7 @@ ScanMaster is an MIT-licensed, screen-reader-first document scanner and editor b
 - **Pronunciation with scopes.** A word's spoken form can be set for all voices, one engine or one voice, the narrowest winning. Homer: the tutorial voices and the kit's Say could share one pronunciation file.
 - **Secrets in password boxes and encrypted at rest.** API keys are typed where a screen reader does not read them aloud, and stored encrypted for the Windows account (a portable copy uses a key in its own folder, and says what that means). Homer: any token a Homer app keeps -- GitHub, AI keys -- belongs in a password box and the Windows data protection API.
 - **Single letters in a read-only view.** Browse Mode makes the document read-only, and H, 1 to 6, T, L, Q and G jump to the next heading, table, list, quote or picture, Shift going back. Homer: DbDo's Inspect Record and EdSharp's read-only views could take the same letters.
-- **Updates that verify and roll back.** Check for Updates offers stable, release-candidate and beta channels, opens even when current so the channel can change, checks the download's signature, swaps a portable copy in only when complete and puts every file back if the new version does not start, and logs to %TEMP%. Homer: Elevate Version (F11) could check a hash published with each release before it runs an installer.
+- **Updates that verify and roll back.** Check for Updates offers stable, release-candidate and beta channels, opens even when current so the channel can change, checks the download's signature, swaps a portable copy in only when complete and puts every file back if the new version does not start, and logs to %TEMP%. Homer: Elevate Version (F11) checks the size and SHA-256 digest GitHub lists for the setup program before it runs it (built in 1.272.0). Channels and rollback are not built.
 - **Version where it is asked for.** About has a Show list (version, license, credits and third-party licenses, disclaimer) and a Copy Version button; the title does not carry the version. This is the Homer guideline of 22 November, with a button worth borrowing.
 
 ## 6 November 2026
