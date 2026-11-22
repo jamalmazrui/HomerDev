@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.271.0 -- 22 November 2026
+
+- **Paths as people have them: Util.localPath.** A typed or pasted path loses its quotes, a file: url becomes the local path with its escapes decoded, %variables% are expanded and forward slashes count as backslashes. LbcAsk.directoryDialog uses it, so every Homer folder box does; a file's path there returns its folder, and LbcAsk.sTypedFile names the file so the program can land on it.
+- **Checked in alphabetical order.** homerProbeAll asks every item -- components, the JAWS scripts, the NVDA add-on and the AI models -- in lowercase alphabetical order, a leading "the" set aside, so how far the names have got through the alphabet says how far the checking has got. DbDo's installer had said JAWS, NVDA, then mpv. When an app has already asked everything, it says nothing. check fails an installer whose own Checking lines are out of order.
+
 ## 1.270.0 -- 22 November 2026
 
 - **Every verb before the checkboxes.** The installer template's new homerProbeAll asks the screen readers, every component and the AI models at the end of the file copy, with the progress bar's status line and the voice saying what is being checked, so the finish page appears with each Install, Update or Reinstall already decided. The second look after Finish, for the Results box, now says Confirming, not Checking. DbDo, FileDir, EdSharp, HomerView, HomerDev and the app template call it, and check fails an installer that does not.

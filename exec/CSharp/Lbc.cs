@@ -7269,7 +7269,13 @@ if (pPath != IntPtr.Zero) Marshal.FreeCoTaskMem(pPath);
 
 // ---- directory dialog (FileDir-specific: Current/Recent/Quick/Special) ----
 
+// sTypedFile: when the last directoryDialog was answered with the path of a file, that file; "" otherwise (kit 1.270.0,
+// 22 November 2026). The dialog returns the file's folder, and a program that opens or goes to it can then land on
+// the file, as FileDir does.
+public static string sTypedFile = "";
+
 public static string directoryDialog(string sTitle, string sLabel, string sValue) {
+sTypedFile = "";
 // A folder: typed, browsed for, or picked from the folders open now, the
 // folders visited recently, the Quick folders, or the special folders. Built
 // on the kit's LbcDialog with runPlain, because five of its buttons do work and
@@ -7342,7 +7348,21 @@ sResult = sDir;
 dlg.close();
 };
 btnOK.Click += delegate(object o, EventArgs e) {
-string sTyped = txt.Text.Trim();
+// ANY PATH AS PEOPLE HAVE IT (22 November 2026, Jamal's request): a file: url from a browser, forward slashes,
+// quotes from Explorer's Copy as Path and %variables% all become a Windows path, through Util.localPath.
+string sTyped = Util.localPath(txt.Text);
+sTypedFile = "";
+// A FILE'S PATH MEANS ITS FOLDER: the folder is returned, and the file, when it exists, is kept in sTypedFile so the
+// program can put the focus on it. A path whose last part has an extension and whose folder exists is taken as a
+// file too, even when the file is gone, rather than offering to create a folder named like a file.
+if (sTyped != "" && !Directory.Exists(sTyped)) {
+string sParent = "";
+try { sParent = Path.GetDirectoryName(sTyped) ?? ""; } catch (Exception) { sParent = ""; }
+if (sParent.Length > 0 && Directory.Exists(sParent) && (File.Exists(sTyped) || Path.HasExtension(sTyped))) {
+if (File.Exists(sTyped)) sTypedFile = sTyped;
+sTyped = sParent;
+}
+}
 if (sTyped != "" && !Directory.Exists(sTyped)) {
 if (sTyped.StartsWith(@"\\")) {
 string sUnmapped = "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z ";

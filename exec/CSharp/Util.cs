@@ -603,6 +603,34 @@ setProperty(oShortcut, "TargetPath", sPath);
 return (string) getProperty(oShortcut, "TargetPath");
 } // getLfn method
 
+// localPath: a path as a person types or pastes it, made a Windows path (kit 1.270.0, 22 November 2026, Jamal's
+// request). He pasted file:///C:/Program%20Files/ScanMaster/help/ from a browser's address bar, and FileDir did not
+// know it for a folder. Now, in every Homer box that takes a path:
+//   - surrounding quotes and spaces go, as Explorer's "Copy as path" leaves quotes;
+//   - a file: url becomes the local path, its %20 and other escapes decoded, and file://server/share a UNC path;
+//   - environment variables such as %USERPROFILE% are expanded;
+//   - forward slashes count as backslashes, so C:/Users/Jamal works, and //server/share is \server\share;
+//   - a trailing slash is dropped, except at a drive's root, and a bare C: means C:\.
+// Anything else is returned as typed, so a relative name still means what it meant.
+public static string localPath(string sTyped) {
+string sPath = (sTyped ?? "").Trim();
+if (sPath.Length >= 2 && sPath.StartsWith("\"") && sPath.EndsWith("\"")) sPath = sPath.Substring(1, sPath.Length - 2).Trim();
+if (sPath.StartsWith("file:", StringComparison.OrdinalIgnoreCase)) {
+try {
+Uri uri = new Uri(sPath);
+if (uri.IsFile || uri.IsUnc) sPath = uri.LocalPath;
+}
+catch (UriFormatException) {
+sPath = Uri.UnescapeDataString(Regex.Replace(sPath, "^file:/*", "", RegexOptions.IgnoreCase));
+}
+}
+if (sPath.IndexOf('%') >= 0) sPath = Environment.ExpandEnvironmentVariables(sPath);
+sPath = sPath.Replace('/', '\\');
+if (sPath.Length == 2 && sPath[1] == ':') sPath += "\\";
+if (sPath.Length > 3 && sPath.EndsWith("\\") && !sPath.EndsWith(":\\")) sPath = sPath.TrimEnd('\\');
+return sPath;
+} // localPath method
+
 [DllImport("kernel32.dll", CharSet = CharSet.Auto, EntryPoint = "GetShortPathName")]
 static extern int getShortPathName(string sPath, StringBuilder sbShort, int iLength);
 
