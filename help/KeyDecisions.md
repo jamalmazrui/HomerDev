@@ -264,3 +264,98 @@ Since HomerDev 1.240.0, a push stops when the keys DbDo, EdSharp or FileDir bind
 
 An app's key file is the one authored record of its commands: name, keys and sentence. Every surface is made from it or checked against it at every push -- FileDir's Hotkeys page and built-in table by its makeKeyMap, EdSharp's Hotkeys page by the kit's makeHotkeys, DbDo's Hotkeys page from its menus, HomerView's key file and page from its command table. The catalog records what the suite shares, and /exportkeys proves the program binds what the record shows. SuiteCommands.inix is kept, not retired: it is the record of each key's history -- every change with its date and reason -- and checkKeys' ownership data, and that is the home A1 asked its history to have.
 
+## Alt says, Control changes (21 November 2026)
+
+Jamal asked to fine-tune the suite's keys by a preference he named: when a letter needs a modifier, which one, Alt or Control? He asked for his instincts to be weighed among the other rules, not to outrank them, and for optimization, not perfection. This section records the factors, the review of DbDo, EdSharp, FileDir and HomerView against them, and what changed in two rounds the same evening. Every change is in data\SuiteCommands.inix with the key it replaced, and the rollback zip of the day restores every file.
+
+### The factors
+
+- **Data:** a command that changes data -- records, files on disk, the text of a document, settings -- prefers Control to Alt.
+- **Groups:** a key that belongs to a group with its own pattern keeps the group's pattern. Extract, Replace and Yield with Regex on Control+Shift+E, R and Y are such a group, and Jamal likes it.
+- **Pick lists:** a command that mainly offers a list to pick from may take Alt or Control equally.
+- **Speech:** a command that only says something prefers Alt to Control. Shift and a letter stays the first place for a one-fact Say command, as in DbDo and FileDir.
+- **Suite:** DbDo and FileDir, the two list apps, have the same commands on the same keys, even where that means relearning, since a new user expects it of a suite.
+- **Typing:** a plain Alt and a letter, with no Shift, should not open a box for typing whatever you like.
+
+These sit beside the older rules: never fight Windows or a screen reader, one command one key across the suite, a letter starts a word of the name, families before letters, and no command loses its key without a reason. "Data" here does not include the clipboard: Copy Append (Alt+C), Cut Append (Alt+X) and the other clipboard commands keep their long-standing keys.
+
+### Wide, lean and yield in DbDo and FileDir
+
+Jamal's design, adjusted in the second round. W is wide, the grid's width: every shown column of a record. L is lean, one column: DbDo's current column, FileDir's item names. W and L are the widest and narrowest letters of the alphabet, which helps them stick. Y is yield, a count.
+
+- **Alt** starts from the first record or item; **Alt+Shift** keeps only the marked ones; **Control** starts from the current one.
+- **Read Wide** (Alt+W), Read Wide Marked (Alt+Shift+W, and Shift+Space as before) and Read Wide from Current (Control+W) are DbDo's former Read List commands, which were on L. FileDir has no W keys, since its list has one column, and Alt+W stays free there.
+- **Read Lean** (Alt+L), Read Lean Marked (Alt+Shift+L) and Read Lean from Current (Control+L) are in both apps. In DbDo they were the Say Column as List commands, with no keys; in FileDir, Say List (Control+L) and Say List Marked (Shift+L). Both apps now read one value or name at a time, through the kit's ReadAloud, and a second press shows them in a window.
+- **Say Yield** (Alt+Y), **Say Yield Marked** (Alt+Shift+Y, was Shift+Y) and **Say Yield from Current** (Control+Y, new) are in both apps. Shift+Y is free in DbDo; in FileDir it now says the yield on the drive.
+- **The fourth form, marked from the current one on, has no key** in any of the three families, in either app. The first round gave it Control+Shift, but Control+Shift+Y is Yield with Regex in every suite app, and FileDir's Control+Shift+L is Play List, which its tutorial 5 teaches. Leaving Control+Shift off all three keeps the families alike, keeps the regex group whole, and leaves Control+Shift with a letter for commands that change things. The three commands are on the menus and in the Alternate Menu.
+- **DbDo gains Yield with Regex** on Control+Shift+Y. It asks what Extract with Regex asks and says how many matches there are, in how many records, so DbDo's regex group is now E, R and Y, as in EdSharp, FileDir and HomerView.
+- **FileDir lets three keys go:** Say List Files (was Alt+L) and Say Yield Files (was Control+Y) keep no key, since marking the files with Alt+Period and pressing Alt+Shift+L or Alt+Shift+Y gives the same answer; Zip List (was Alt+Shift+L) is rarely wanted.
+- **Old names find the new commands** in the Alternate Menu, as "Formerly Say List" and the like.
+
+### No Window menu
+
+Jamal's ruling, so Alt+W is free in DbDo. The menu goes in every MDI app and in the kit's frame, since a menu the suite shares should look the same everywhere.
+
+- **DbDo:** Current Windows, Next Window, Previous Window, Window Toggle, Say Windows Open, Close Window and Close All But Current Window move to the File menu, before Exit DbDo. Open Table moves beside Choose Table.
+- **EdSharp:** Next Window and Previous Window join Current Windows on the File menu; Arrange Icons, Cascade, Tile Horizontal and Tile Vertical go just before Exit EdSharp.
+- **FileDir:** the four layout commands go just before Exit FileDir; Drive A through Drive I (Alt+1 to Alt+9) follow Open Drive and Go to Drive.
+- **The kit's frame (Mdi.cs):** its window commands join the app's File menu, and the app's Exit item is moved after them.
+- **No keys changed.** Each of these commands has a function key, Tab or a digit, so none takes a trigger letter. With no Window menu, Windows' own list of open windows is gone too; F4, Current Windows, lists them.
+
+### Mail: one command
+
+Jamal asked whether both Mail Body and Mail Attachment were needed. No: FileDir's Mail Attachment already put a lone file's text in the body as well as attaching it.
+
+- **Mail, Control+M,** in EdSharp and FileDir. EdSharp puts the text in the body and attaches the file when it is saved on disk. FileDir attaches the current item or the marked ones, and a lone file's text goes in the body too.
+- **Control+Shift+M is free,** in both apps.
+
+### Other moves, by the factors
+
+- **EdSharp, Insert Time:** Alt+Shift+Semicolon to Control+Semicolon. It changes the text, and Control+Semicolon inserts the date in Excel.
+- **EdSharp, Text Contents and Text Combine swap:** Text Contents, which adds a table of contents to the document, takes Control+Shift+T; Text Combine, which makes a new window, takes Alt+Shift+T.
+- **FileDir, Move to Folder:** Alt+Shift+M to Control+Shift+M, beside Copy to Folder on Control+Shift+C. This was Jamal's first choice on 16 November; Mail Attachment held the key then.
+- **FileDir, Paste Copy:** Alt+V to no key, on the Edit menu. After Copy, Paste already copies. Alt+V is now free in FileDir, so it no longer contradicts "Alt+V runs a script" in the rest of the suite.
+- **FileDir, Paste Move:** Alt+Shift+V to Control+Shift+V, beside Paste on Control+V.
+- **FileDir, Reorder Names:** Alt+Shift+K to Control+F2. It renames, so it joins the F2 family on Control; K began no word of its name.
+- **FileDir, Say Yield on Drive:** Alt+Shift+Y to Shift+Y. A Shift+letter only says.
+- **FileDir, Volume Format:** Control+Shift+V to no key, on the Misc menu. Formatting a disk is rare and cannot be undone.
+
+### Kept, and why
+
+These break one of the factors and keep their keys, because another weighs more. Each can be argued with.
+
+- **Clipboard commands on Alt:** Copy Append (Alt+C), Cut Append (Alt+X), Copy Append Record and Append File Contents (Alt+Shift+C), Copy Name (Alt+Shift+N), Path to Clipboard (Alt+Shift+P) and Clear Clipboard (Alt+Shift+Apostrophe). The clipboard is not counted as data, and Alt+C for append is Jamal's long-standing convention.
+- **DbDo, Edit Notes, Edit Tags and Edit url (Alt+Shift+N, T and U):** they change data, but they are one family beside Say Notes, Say Tags and Say url on Shift, and Control+Shift+N is New Copy in every app. Moving two of the three would split the family.
+- **DbDo, Merge Data (Alt+M):** it adds records, but both Control M keys mark and unmark, which change data too and are used far more.
+- **DbDo and FileDir, reading on Control:** Control+W, Control+L and Control+Y only speak. Their family's pattern gives Control the meaning "from the current one", as Control+Home and Control+End mean the ends, and the everyday form is on Alt.
+- **EdSharp, case and item families:** Proper Case (Alt+U) and Swap Case (Alt+Shift+U) beside Upper and Lower Case on Control; Order, Reverse, Keep Unique and Number Items on Alt+Shift. Each family needs more keys than Control can give its letter.
+- **EdSharp, Delete Line, Delete Up, Delete Down and Delete File (Alt+Backspace, Alt+Shift+Backspace, Alt+Shift+Delete, Alt+Shift+D):** the Control delete keys are taken by their siblings and by Windows' delete-word habit.
+- **EdSharp, formatting on Alt+Shift:** Justify, Baseline, Set Selection Font, Set Default Font and Color, Align, PyDent and PyBrace. Their next-and-previous partners use Control, so each pair already splits the modifiers by role.
+- **EdSharp, Save Script (Alt+S) and Save Copy (Alt+Shift+S):** Save Script asks for a name, which the typing factor dislikes on a plain Alt key. It stays beside Invoke Script (Alt+V) and View Script (Alt+Shift+V), the script family every app shares; Control+S and Control+Shift+S are Save and Save As.
+- **EdSharp, Yield Encoding (Alt+Shift+Y), Transform Files (Alt+Equals) and Reset Configuration (Alt+Shift+0):** each changes data on Alt; the Control key of its letter or symbol is taken by a sibling, and Control+Shift+0 belongs to Windows' keyboard layouts.
+- **Every app, Edit Settings (Alt+Shift+E):** Jamal's ruling of 18 October gives it the same key everywhere.
+- **Every app, Evaluate Expression (Control+Equals):** in DbDo it only says the result, but it is one suite command on one key.
+- **Every app with it, Yield with Regex (Control+Shift+Y):** it only says a count, but it is the regex group's Y.
+- **FileDir, Unarchive without Subfolders (Alt+U):** it completes a family whose Control keys are taken.
+- **FileDir and EdSharp, Web Download (Alt+Shift+W) and Burn to CD (Alt+Shift+B):** suite commands that write files, kept on one key in each app.
+- **HomerView, Instruct Page (Alt+I) and Query Web (Alt+Q):** each opens a box for typing on a plain Alt key. Edge and web pages own most Control letters, so HomerView's choices are narrow.
+
+### Key groups, the third round
+
+The same evening Jamal asked for every key pattern group to be named, counted and audited. help\KeyGroups.md is that record: 51 groups (52 after the fourth round added the space bar), from "again" to "z keys", each with what its members should share, what was found and what was done, and counts that scripts\keyGroups writes from the key files. Its fixes: DbDo and FileDir now share their marking, search and Again keys and names (Mark to First and Last, First and Last Marked, Start Mark or Unmark, Reverse Jump, Jump Again, Keywords Again, New Copy); Alt+F8 reads all and Control+F8 copies all in DbDo, as in EdSharp and HomerView; Edit Script is Alt+Shift+V in DbDo and EdSharp; and small words stay small in command names (Close All but Current Window).
+
+### Play, record, Space, statistics and graphics, the fourth round
+
+Jamal asked for one way to play and one to record, a Space bar scheme, and a new look at DbDo's statistics and charts.
+
+- **Play Media, Control+P, plays in the Homer Player in DbDo and FileDir.** FileDir's handed its list to mpv's own window, and it had two more ways to play: Homer Player (Control+Shift+H) and Play List (Control+Shift+L). Homer Player is retired into Play Media, which now finds the marked files, a play list or a document with media links, the clipboard, or the folder. Play List keeps no key; it is on the Misc menu for keeping a list or starting something and walking away.
+- **Record Playback, Control+Shift+P, in both.** Shift adds recording to Play Media, and P begins Playback, so the letter is in the name, as the house rule wants. It opens the player, plays at once and presses the player's Capture stream button, which records to Music, Homer Player.
+- **The freed keys.** FileDir's Path List to Clipboard moved from Control+Shift+P to Control+Shift+L, L for List. Control+Shift+H is free in FileDir.
+- **The Space bar.** Space alone toggles the mark in a list; Shift+Space says the selection or the marked items; Control+Space marks in a list and selects a chunk in text; Alt+Space is Windows' window menu, never bound; Alt+Shift+Space and Control+Shift+Space stay unbound. DbDo gains Space for Toggle Mark, with one guard: a Space typed within a second of a letter belongs to the grid's type-ahead search, so "new y" still finds New York. EdSharp's key file named Alt+Shift+Space for Web Client Utilities, which is a JAWS script on JAWS+Control+Space; the file now names the real key.
+- **Generate Statistics (Alt+Shift+S) and Generate Graphics (Alt+Shift+G) replace Generate from Grid.** Statistics are read; graphics are handed to sighted colleagues as files. So the two are separate commands, but they share one dataset dialog: Which columns, Which records (all in view, marked, or current, which takes the place of the Marked or Current question), Arrange (by column, each column a variable, or by row, each record a series), and Kind; Graphics adds Drawn by. A checkbox in one shared command was weighed and set aside, since the key already makes that choice.
+- **Why not Control+Shift+S and G, as Jamal proposed.** Control+Shift+S is Save As in every Homer app. By the suite's own factor, Control is for commands that change data; these change none, and a pick dialog is as much Alt's as Control's. Alt+Shift+S was free once Edit Script moved to Alt+Shift+V, and Alt+Shift+G was Generate from Grid's key, so charts stay where his fingers know them.
+- **Charts without Microsoft Office.** The kit's DataReport draws them with Python: pandas, matplotlib, seaborn and openpyxl, all free and MIT-compatible. A chart is a PNG, an SVG, a web page with the takeaway sentence and the numbers as a table, and an Excel workbook holding a native chart, made without Excel. Excel through COM stays as Drawn by Excel, and as the fallback when Python cannot draw, as Jamal asked. help\AnalysisPlan.md has the comparison of NuGet and PyPI packages.
+
+### Rollback
+
+Each change is one or two lines in the app's source, marked "21 November 2026", and one line in its key file; data\SuiteCommands.inix gives what each key was. Rollback.zip of the day holds every file as it was before any of the four rounds. The fourth round's new files -- exec\CSharp\DataReport.cs, scripts\installDataTools.cmd and scripts\testChart -- are listed in Rollback.txt, to delete when rolling back.

@@ -7,6 +7,19 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.269.0 -- 21 November 2026
+
+- **Charts without Microsoft Office: DataReport.** exec\CSharp\DataReport.cs draws a chart of a table with Python -- pandas, matplotlib, seaborn and openpyxl, all free and MIT-compatible -- into four files: a PNG, an SVG, a web page with the takeaway sentence and the numbers as a table, and an .xlsx with a native Excel chart. Its colors are a validated palette that readers with a color vision difference can tell apart. scripts\installDataTools.cmd installs Python and the packages, and the script installs a missing one itself. The kit's build tests every kind of chart with scripts\testChart, and compiles DataReport with the conversion classes. DbDo's Generate Graphics is the first user.
+- **One play and one record key.** The catalog gains Play Media (Control+P, in the Homer Player) and Record Playback (Control+Shift+P) for DbDo and FileDir. MediaPlayer.run takes bRecordAtStart, and the Capture stream button's help names it Record Playback.
+- **The Space bar scheme, and a space bar key group.** help\KeyGroups.md has 52 groups, and help\KeyDecisions.md the fourth round: play, record, Space, statistics and graphics.
+- **Alt says, Control changes.** Jamal's preference for choosing a modifier is now part of how a Homer key is chosen: a command that only speaks prefers Alt, one that changes data prefers Control, one that offers a pick list may take either, and a plain Alt and a letter should not open a box for typing. help\KeyDecisions.md records the rule, a review of all four suite apps against it, what moved and what was kept, with reasons.
+- **No Window menu.** The kit's frame puts Current Windows, Next and Previous Window, Say Windows Open and the Close commands on the File menu, before the app's Exit, as DbDo, EdSharp and FileDir now do. Alt+W is free for an app's own command: DbDo reads the grid wide with it.
+- **One Mail command.** The suite catalog's Mail Body and Mail Attachment become Mail, Control+M, in EdSharp and FileDir, which freed Control+Shift+M for FileDir's Move to Folder.
+- **DbDo and FileDir share their L and Y keys** in the catalog: Read Lean (Alt+L), Read Lean Marked (Alt+Shift+L), Read Lean from Current (Control+L), Say Yield Marked (Alt+Shift+Y) and Say Yield from Current (Control+Y), with the marked-from-current forms keyless in both, since Control+Shift+Y stays Yield with Regex across the suite. Each app's words are in [words DbDo] and [words FileDir].
+- **The Hotkeys template's rules** name the Alt and Control preference. HomerSuite.md says it in a line.
+- **help\KeyGroups.md** names every key pattern group of the suite, with the number of keys each app has in it, and audits what each group should share. The fixes it led to are in the apps and in the catalog: the marking, search and Again keys of DbDo and FileDir are one set; Edit Script and New Copy are one name each; Close All but Current Window, with "but" in lower case, is shared by all three MDI apps, as the kit's frame now names it.
+- DbDo, EdSharp and FileDir need this kit.
+
 ## 1.268.0 -- 20 November 2026
 
 - **A page that moves to MyPages leaves its collection.** When MyPages holds pages\\<Name>\\<Name>.md, a podcast collection's own <Name>.md and <Name>.htm now go to notes\\retired during the build, each move logged, and push takes the .htm off GitHub. Two copies would drift apart, and the collection would keep publishing the older one. Described Tours is the first: it moved from PodcastDirectories to its own page at jamalmazrui.github.io/DescribedTours.

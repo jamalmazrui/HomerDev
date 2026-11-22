@@ -112,9 +112,12 @@ keys=
 status=current
 
 [DbDo closeAllButCurrentWindow]
-name=Close All But Current Window
+name=Close All but Current Window
 keys=Control+Shift+F4
-status=current
+change=renamed, 21 November 2026
+reason=small words in lower case in command names (but, from, in, on, to, with, without), the key-group audit of 21 November 2026
+disposition=ruled
+status=implemented
 
 [DbDo closeDatabase]
 name=Close Database
@@ -160,9 +163,12 @@ keys=
 status=current
 
 [DbDo copyGridAsTSVToClipboard]
-name=Copy Grid as TSV to Clipboard
-keys=
-status=current
+name=Copy Grid
+keys=Control+F8
+change=renamed to its menu name and keys changed, was none, 21 November 2026
+reason=the F8 group: Control+F8 copies everything, as Copy All in EdSharp and HomerView
+disposition=ruled
+status=implemented
 
 [DbDo copyLog]
 name=Copy Log
@@ -200,9 +206,12 @@ keys=Control+D or Delete
 status=current
 
 [DbDo deleteWithoutConfirmation]
-name=Delete Without Confirmation
+name=Delete without Confirmation
 keys=Control+Shift+D
-status=current
+change=renamed, 21 November 2026
+reason=small words in lower case in command names (but, from, in, on, to, with, without), the key-group audit of 21 November 2026
+disposition=ruled
+status=implemented
 
 [DbDo describeTable]
 name=Describe Table
@@ -236,9 +245,10 @@ status=current
 
 [DbDo editScript]
 name=Edit Script
-keys=Alt+Shift+S
-change=was Control+Shift+E, 5 November 2026
-reason=S for Script; Control+Shift+E went to Extract with Regex, the suite's key for it
+keys=Alt+Shift+V
+change=keys changed, was Alt+Shift+S, 21 November 2026
+reason=the script group, 21 November 2026: V for scripts, Alt+V to invoke and Alt+Shift+V to edit, one name in DbDo and EdSharp
+disposition=ruled
 status=implemented
 
 [DbDo editTags]
@@ -313,6 +323,14 @@ change=was Control+Shift+X, 5 November 2026
 reason=the suite's key, as EdSharp and FileDir; X began no word of its name, and its menu letter came from inside "Extract"
 status=implemented
 
+[DbDo yieldWithRegex]
+name=Yield with Regex
+keys=Control+Shift+Y
+change=new, 21 November 2026
+reason=the regex family, Control+Shift+E, R and Y, as in EdSharp, FileDir and HomerView: Jamal likes the group, and DbDo lacked its Y
+disposition=ruled
+status=implemented
+
 [DbDo facetColumn]
 name=Facet Column
 keys=
@@ -352,10 +370,26 @@ status=current
 
 [DbDo generateFromGrid]
 name=Generate from Grid
+keys=
+status=retired
+change=the one analysis key, 5 November 2026: Statistics report, Frequency report, Cross-tab report, Markdown table, Excel chart; retired 21 November 2026 into Generate Statistics and Generate Graphics, its name a former name of Generate Graphics
+reason=Statistics from Column, Graphics Column and Frequency by Columns were slices of it on keys of their own; on 21 November 2026 the reports and the charts split, since one is read and the other handed on, over one dataset dialog with Marked or Current inside it
+
+[DbDo generateGraphics]
+name=Generate Graphics
 keys=Alt+Shift+G
+change=new 21 November 2026, from Generate from Grid's charts: the dataset dialog (columns, records, arrange by column or row, kind, drawn by), drawn by the kit's DataReport with Python into a PNG, an SVG, an accessible page and a workbook with a native chart; Excel through COM stays the fallback
+reason=charts for sighted colleagues without Microsoft Office; Alt+Shift rather than Jamal's proposed Control+Shift, since Control+Shift+S is Save As and these change no data; G is Generate from Grid's key, so nothing is relearned
+disposition=ruled
 status=implemented
-change=the one analysis key, 5 November 2026: Statistics report, Frequency report, Cross-tab report, Markdown table, Excel chart
-reason=Statistics from Column, Graphics Column and Frequency by Columns were slices of it on keys of their own
+
+[DbDo generateStatistics]
+name=Generate Statistics
+keys=Alt+Shift+S
+change=new 21 November 2026, from Generate from Grid's reports: the same dataset dialog, kinds Summary, Frequency, Group, Relation and Cross-tab; by row, each record summed up across its number columns
+reason=S for Statistics, free since Edit Script moved to Alt+Shift+V; Alt+Shift, not Control+Shift, as for Generate Graphics
+disposition=ruled
+status=implemented
 
 [DbDo goToRecord]
 name=Go to Record
@@ -593,6 +627,14 @@ change=renamed from Play Stream, 17 November 2026
 reason=the suite's name on Control+P, as in FileDir
 status=implemented
 
+[DbDo recordPlayback]
+name=Record Playback
+keys=Control+Shift+P
+change=new 21 November 2026: Play Media, playing at once and recording what plays, through the Homer Player's stream recording
+reason=one record-media key in the suite; Shift adds recording to Play Media, and P begins Playback, so the letter is in the name
+disposition=ruled
+status=implemented
+
 [DbDo playTutorials]
 name=Play Tutorials
 keys=Alt+F12
@@ -675,9 +717,12 @@ keys=
 status=current
 
 [DbDo repeatGoTo]
-name=Repeat Go To
+name=Go to Record Again
 keys=Alt+G
-status=current
+change=renamed from Repeat Go to, 21 November 2026
+reason=the again group: Alt and a search's letter repeats that search, named "<command> Again", in DbDo, EdSharp, FileDir and HomerView (21 November 2026)
+disposition=ruled
+status=implemented
 
 [DbDo replaceColumn]
 name=Replace
@@ -757,59 +802,67 @@ keys=Alt+Apostrophe
 status=current
 
 [DbDo readList]
-name=Read List
-keys=Alt+L
-change=new, 17 November 2026
-reason=Jamal's request: the records in view, value by value, any key stopping it
+name=Read Wide
+keys=Alt+W or Alt+F8
+change=Alt+F8 added, 21 November 2026
+reason=the marking group of the two list apps, 21 November 2026: one Start, as FileDir had, and Alt+F8 reads everything, as Read All in EdSharp and HomerView
+disposition=ruled
 status=implemented
 
 [DbDo readListFromCurrent]
-name=Read List from Current
-keys=Control+L
-change=new, 17 November 2026
-reason=Jamal's request: the records in view, value by value, any key stopping it
+name=Read Wide from Current
+keys=Control+W
+change=renamed from Read List from Current and keys changed, was Control+L, 21 November 2026
+reason=Jamal's design, 21 November 2026: W for wide, the grid's width; L for lean, the current column (the widest and narrowest letters); Alt from the first record, Control from the current one, Shift for the marked only
+disposition=ruled
 status=implemented
 
 [DbDo readListFromCurrentMarked]
-name=Read List from Current Marked
-keys=Control+Shift+L
-change=new, 17 November 2026
-reason=Jamal's request: the records in view, value by value, any key stopping it
+name=Read Wide Marked from Current
+keys=
+change=renamed from Read List from Current Marked, and keyless since 21 November 2026 (was Control+Shift+L)
+reason=second round, 21 November 2026: Control+Shift is not a reading key; each of the W, L and Y families is Alt, Alt+Shift and Control, since Control+Shift+Y is Yield with Regex in every suite app and FileDir's Control+Shift+L is Play List
+disposition=ruled
 status=implemented
 
 [DbDo readListOfMarked]
-name=Read List of Marked
-keys=Alt+Shift+L or Shift+Space
-change=new, 17 November 2026
-reason=Jamal's request: the records in view, value by value, any key stopping it
+name=Read Wide Marked
+keys=Alt+Shift+W or Shift+Space
+change=renamed from Read List of Marked and keys changed, was Alt+Shift+L or Shift+Space, 21 November 2026
+reason=Jamal's design, 21 November 2026: W for wide, the grid's width; L for lean, the current column (the widest and narrowest letters); Alt from the first record, Control from the current one, Shift for the marked only
+disposition=ruled
 status=implemented
 
 [DbDo sayColumnAsList]
-name=Say Column as List
-keys=
-change=was Alt+L, 17 November 2026
-reason=Read List took Alt+L, reading whole records; a grid showing one column reads that column
+name=Read Lean
+keys=Alt+L
+change=renamed from Say Column as List and keys changed, was none, 21 November 2026
+reason=Jamal's design, 21 November 2026: W for wide, the grid's width; L for lean, the current column (the widest and narrowest letters); Alt from the first record, Control from the current one, Shift for the marked only
+disposition=ruled
 status=implemented
 
 [DbDo sayColumnAsListFromCurrent]
-name=Say Column as List from Current
-keys=
-change=was Control+L, 17 November 2026
-reason=Read List from Current took Control+L, reading whole records; a grid showing one column reads that column
+name=Read Lean from Current
+keys=Control+L
+change=renamed from Say Column as List from Current and keys changed, was none, 21 November 2026
+reason=Jamal's design, 21 November 2026: W for wide, the grid's width; L for lean, the current column (the widest and narrowest letters); Alt from the first record, Control from the current one, Shift for the marked only
+disposition=ruled
 status=implemented
 
 [DbDo sayColumnAsListFromCurrentMarked]
-name=Say Column as List from Current Marked
+name=Read Lean Marked from Current
 keys=
-change=was Control+Shift+L, 17 November 2026
-reason=Read List from Current Marked took Control+Shift+L, reading whole records; a grid showing one column reads that column
+change=renamed from Say Column as List from Current Marked, 21 November 2026; still no key
+reason=second round, 21 November 2026: Control+Shift is not a reading key; each of the W, L and Y families is Alt, Alt+Shift and Control, since Control+Shift+Y is Yield with Regex in every suite app and FileDir's Control+Shift+L is Play List
+disposition=ruled
 status=implemented
 
 [DbDo sayColumnAsListOfMarked]
-name=Say Column as List of Marked
-keys=
-change=was Alt+Shift+L, 17 November 2026
-reason=Read List of Marked took Alt+Shift+L, reading whole records; a grid showing one column reads that column
+name=Read Lean Marked
+keys=Alt+Shift+L
+change=renamed from Say Column as List of Marked and keys changed, was none, 21 November 2026
+reason=Jamal's design, 21 November 2026: W for wide, the grid's width; L for lean, the current column (the widest and narrowest letters); Alt from the first record, Control from the current one, Shift for the marked only
+disposition=ruled
 status=implemented
 
 [DbDo sayDatabase]
@@ -956,9 +1009,9 @@ status=implemented
 [DbDo sayStatus]
 name=Say Status
 keys=Alt+Z or Shift+Z
-change=keys changed, was Shift+Z
-reason=Alt+Z added to match the suite
-disposition=accepted
+change=keys listed with the suite key first, 21 November 2026
+reason=Alt+Z is the suite key, as in FileDir
+disposition=ruled
 status=implemented
 
 [DbDo sayTables]
@@ -992,10 +1045,34 @@ status=current
 
 [DbDo sayYield]
 name=Say Yield
-keys=Alt+Y or Shift+Y
-change=keys changed, was Shift+Y
-reason=Alt+Y added to match the suite
-disposition=accepted
+keys=Alt+Y
+change=keys changed, was Alt+Y or Shift+Y; Shift+Y went to Say Yield Marked on 9 November and is free since 21 November 2026
+reason=the Y family: Alt for all in view
+disposition=ruled
+status=implemented
+
+[DbDo sayYieldFromCurrent]
+name=Say Yield from Current
+keys=Control+Y
+change=new, 21 November 2026
+reason=Jamal's design, 21 November 2026: the Y family parallels W and L; Alt for all in view, Control from the current record, Shift for the marked only
+disposition=ruled
+status=implemented
+
+[DbDo sayYieldMarked]
+name=Say Yield Marked
+keys=Alt+Shift+Y
+change=keys changed, was Shift+Y, 21 November 2026
+reason=Jamal's design, 21 November 2026: the Y family parallels W and L; Alt for all in view, Control from the current record, Shift for the marked only; FileDir moves with it, so the suite key stays one
+disposition=ruled
+status=implemented
+
+[DbDo sayYieldMarkedFromCurrent]
+name=Say Yield Marked from Current
+keys=
+change=new, 21 November 2026, with no key
+reason=second round, 21 November 2026: Control+Shift is not a reading key; each of the W, L and Y families is Alt, Alt+Shift and Control, since Control+Shift+Y is Yield with Regex in every suite app and FileDir's Control+Shift+L is Play List
+disposition=ruled
 status=implemented
 
 [DbDo searchNext]
@@ -1037,14 +1114,20 @@ keys=Control+Shift+GraveAccent
 status=current
 
 [DbDo startMark]
-name=Start Mark
+name=Start Mark or Unmark
 keys=F8
-status=current
+change=renamed from Start Mark, 21 November 2026; it now starts an unmark run too
+reason=the marking group of the two list apps, 21 November 2026: one Start, as FileDir had, and Alt+F8 reads everything, as Read All in EdSharp and HomerView
+disposition=ruled
+status=implemented
 
 [DbDo startUnmark]
 name=Start Unmark
-keys=Alt+F8
-status=current
+keys=
+change=unbound, was Alt+F8, retired into Start Mark or Unmark, 21 November 2026
+reason=the marking group of the two list apps, 21 November 2026: one Start, as FileDir had, and Alt+F8 reads everything, as Read All in EdSharp and HomerView
+disposition=ruled
+status=implemented
 
 [DbDo statisticsFromColumn]
 name=Statistics from Column
@@ -1076,9 +1159,12 @@ keys=
 status=current
 
 [DbDo toggleMarked]
-name=Toggle Marked
-keys=Control+Space
-status=current
+name=Toggle Mark
+keys=Space or Control+Space
+change=Space added 21 November 2026, the Space bar scheme
+reason=Space alone toggles the mark in both list apps, as in FileDir; a Space typed within a second of a letter goes on to type-ahead, so "new y" still finds New York
+disposition=ruled
+status=implemented
 
 [DbDo transferImport]
 name=Transfer Import
@@ -1227,11 +1313,11 @@ keys=Control+Shift+L
 status=current
 
 [EdSharp closeAllButCurrentWindow]
-name=Close All But Current Window
+name=Close All but Current Window
 keys=Control+Shift+F4
-change=renamed from Close All but Current Window, was Control+Shift+F4
-reason=capital B
-disposition=accepted
+change=renamed, 21 November 2026
+reason=small words in lower case in command names (but, from, in, on, to, with, without), the key-group audit of 21 November 2026
+disposition=ruled
 status=implemented
 
 [EdSharp closeWindow]
@@ -1586,8 +1672,11 @@ exception=shares Control+I with Next Indent: it runs only in the Open and Save d
 
 [EdSharp insertTime]
 name=Insert Time
-keys=Alt+Shift+SemiColon
-status=current
+keys=Control+Semicolon
+change=keys changed, was Alt+Shift+Semicolon, 21 November 2026
+reason=Alt says, Control changes: inserting text changes the document, and Control+Semicolon inserts the date in Excel
+disposition=accepted
+status=implemented
 
 [EdSharp invokeScript]
 name=Invoke Script
@@ -1667,13 +1756,19 @@ status=current
 
 [EdSharp mailAttachment]
 name=Mail Attachment
-keys=Control+Shift+M
-status=current
+keys=
+change=merged into Mail (Control+M), 21 November 2026; was Control+Shift+M
+reason=Jamal asked whether both were needed: one Mail puts the text in the body and attaches the saved file, so Control+Shift+M is free for FileDir's Move to Folder
+disposition=ruled
+status=retired
 
 [EdSharp mailBody]
-name=Mail Body
+name=Mail
 keys=Control+M
-status=current
+change=renamed from Mail Body, 21 November 2026; now also attaches the saved file
+reason=one mail command in the suite, as in FileDir
+disposition=ruled
+status=implemented
 
 [EdSharp markdownToPlainText]
 name=Markdown to Plain Text
@@ -2312,13 +2407,19 @@ status=current
 
 [EdSharp textCombine]
 name=Text Combine
-keys=Control+Shift+T
-status=current
+keys=Alt+Shift+T
+change=keys changed, was Control+Shift+T, 21 November 2026
+reason=Alt says, Control changes: Text Combine makes a new window and changes nothing; swapped with Text Contents
+disposition=accepted
+status=implemented
 
 [EdSharp textContents]
 name=Text Contents
-keys=Alt+Shift+T
-status=current
+keys=Control+Shift+T
+change=keys changed, was Alt+Shift+T, 21 November 2026
+reason=Alt says, Control changes: Text Contents adds a table of contents to the document; swapped with Text Combine
+disposition=accepted
+status=implemented
 
 [EdSharp textConvert]
 name=Text Convert
@@ -2405,9 +2506,12 @@ keys=Control+U
 status=current
 
 [EdSharp viewScript]
-name=View Script
+name=Edit Script
 keys=Alt+Shift+V
-status=current
+change=renamed from View Script, 21 November 2026
+reason=the script group, 21 November 2026: V for scripts, Alt+V to invoke and Alt+Shift+V to edit, one name in DbDo and EdSharp
+disposition=ruled
+status=implemented
 
 [EdSharp voiceFaster]
 name=Voice Faster
@@ -2431,8 +2535,11 @@ status=current
 
 [EdSharp webClientUtilities]
 name=Web Client Utilities
-keys=Alt+Shift+Space
-status=current
+keys=JAWS+Control+Space
+change=key file corrected 21 November 2026: it is a JAWS script on JAWS+Control+Space; Alt+Shift+Space was listed but never bound by EdSharp
+reason=the Space bar scheme: Alt+Shift+Space and Control+Shift+Space are left unbound in the suite, and a key file names only keys that work
+disposition=ruled
+status=implemented
 
 [EdSharp webDownload]
 name=Web Download
@@ -2537,10 +2644,11 @@ keys=Alt+B or Alt+Home
 status=current
 
 [FileDir beginningMarked]
-name=Beginning Marked
-keys=Control+Shift+Home
-change=Shift+B dropped, 17 November 2026
-reason=Shift+letter says, never acts
+name=First Marked
+keys=Control+PageUp
+change=renamed from Beginning Marked, keys now Control+PageUp, 21 November 2026
+reason=the marking group, 21 November 2026: FileDir takes DbDo's names and keys, keeping the Windows Shift keys as second keys
+disposition=ruled
 status=implemented
 
 [FileDir burnToCD]
@@ -2581,9 +2689,12 @@ keys=Control+Shift+F
 status=current
 
 [FileDir closeAllButCurrentWindow]
-name=Close All But Current Window
+name=Close All but Current Window
 keys=Control+Shift+F4
-status=current
+change=renamed, 21 November 2026
+reason=small words in lower case in command names (but, from, in, on, to, with, without), the key-group audit of 21 November 2026
+disposition=ruled
+status=implemented
 
 [FileDir closeWindow]
 name=Close Window
@@ -2645,11 +2756,11 @@ shared=copyLog
 status=current
 
 [FileDir copyName]
-name=Copy Name
+name=Name to Clipboard
 keys=Alt+Shift+N
-change=keys changed, was Control+Shift+C, 16 November 2026
-reason=N for Name, beside Path to Clipboard, Alt+Shift+P; Copy to Folder took Control+Shift+C
-disposition=accepted
+change=renamed from Copy Name, 21 November 2026
+reason=the clipboard group names a command that puts a thing on the clipboard "<thing> to Clipboard", as Path to Clipboard beside it
+disposition=ruled
 status=implemented
 
 [FileDir copyToFolder]
@@ -2730,10 +2841,11 @@ keys=F11
 status=current
 
 [FileDir endMarked]
-name=End Marked
-keys=Control+Shift+End
-change=Shift+E dropped, 17 November 2026
-reason=Shift+letter says, never acts
+name=Last Marked
+keys=Control+PageDown
+change=renamed from End Marked, keys now Control+PageDown, 21 November 2026
+reason=the marking group, 21 November 2026: FileDir takes DbDo's names and keys, keeping the Windows Shift keys as second keys
+disposition=ruled
 status=implemented
 
 [FileDir environmentVariables]
@@ -2886,8 +2998,11 @@ status=current
 
 [FileDir homerPlayer]
 name=Homer Player
-keys=Control+Shift+H
-status=current
+keys=
+change=retired 21 November 2026 into Play Media, its name a former name of Play Media; Control+Shift+H is free
+reason=Play Media plays in the Homer Player now, as in DbDo, so Homer Player only repeated it
+disposition=ruled
+status=retired
 
 [FileDir hotkeySummary]
 name=Hotkey Summary
@@ -2936,7 +3051,10 @@ status=current
 [FileDir jumpAgain]
 name=Jump Again
 keys=Alt+J
-status=current
+change=description in the suite's words, 21 November 2026
+reason=the again group: Alt and a search's letter repeats that search, named "<command> Again", in DbDo, EdSharp, FileDir and HomerView (21 November 2026)
+disposition=ruled
+status=implemented
 
 [FileDir keyDescriberToggle]
 name=Key Describer Toggle
@@ -2954,7 +3072,10 @@ status=current
 [FileDir keywordsAgain]
 name=Keywords Again
 keys=Alt+K
-status=current
+change=description in the suite's words, 21 November 2026
+reason=the again group: Alt and a search's letter repeats that search, named "<command> Again", in DbDo, EdSharp, FileDir and HomerView (21 November 2026)
+disposition=ruled
+status=implemented
 
 [FileDir launchFileDir]
 name=Launch FileDir
@@ -2962,33 +3083,60 @@ keys=Alt+Control+F
 status=current
 
 [FileDir list]
-name=Say List
-keys=Control+L
-status=current
-change=renamed 15 November 2026 from List (A11)
+name=Read Lean
+keys=Alt+L or Alt+F8
+change=Alt+F8 added, 21 November 2026
+reason=Alt+F8 reads everything, as Read All in EdSharp and HomerView
+disposition=ruled
+status=implemented
 
 [FileDir listFiles]
 name=Say List Files
-keys=Alt+L
-status=current
-change=renamed 15 November 2026 from List Files (A11)
+keys=
+change=unbound, was Alt+L, 21 November 2026; on the Say menu
+reason=Read Lean took Alt+L; Alt+Period marks the files and Alt+Shift+L reads them
+disposition=ruled
+status=implemented
 
 [FileDir listMarked]
-name=Say List Marked
-keys=Shift+L
-disposition=accepted
+name=Read Lean Marked
+keys=Alt+Shift+L
+change=renamed from Say List Marked and keys changed, was Shift+L, 21 November 2026
+reason=Jamal's ruling, 21 November 2026: DbDo and FileDir have the same commands, as a suite should; L is lean, one column, here the items' names; Alt from the first, Alt+Shift the marked, Control from the current one
+disposition=ruled
 status=implemented
-change=renamed 15 November 2026 from List Marked (A11)
+
+[FileDir readLeanFromCurrent]
+name=Read Lean from Current
+keys=Control+L
+change=new, 21 November 2026
+reason=Jamal's ruling, 21 November 2026: DbDo and FileDir have the same commands, as a suite should; L is lean, one column, here the items' names; Alt from the first, Alt+Shift the marked, Control from the current one
+disposition=ruled
+status=implemented
+
+[FileDir readLeanMarkedFromCurrent]
+name=Read Lean Marked from Current
+keys=
+change=new, 21 November 2026, with no key
+reason=second round, 21 November 2026: Control+Shift is not a reading key; each of the W, L and Y families is Alt, Alt+Shift and Control, since Control+Shift+Y is Yield with Regex in every suite app and FileDir's Control+Shift+L is Play List
+disposition=ruled
+status=implemented
 
 [FileDir mailAttachment]
-name=Mail Attachment
-keys=Control+Shift+M
-status=current
+name=Mail
+keys=Control+M
+change=renamed from Mail Attachment and keys changed, was Control+Shift+M, 21 November 2026
+reason=Mail Attachment already put a lone file's text in the body, so Mail Body only repeated it; one Mail, as in EdSharp, frees Control+Shift+M for Move to Folder
+disposition=ruled
+status=implemented
 
 [FileDir mailBody]
 name=Mail Body
-keys=Control+M
-status=current
+keys=
+change=merged into Mail (Control+M), 21 November 2026; was Control+M
+reason=Mail does what it did, and attaches the file too
+disposition=ruled
+status=retired
 
 [FileDir mark]
 name=Mark
@@ -3041,17 +3189,19 @@ disposition=accepted
 status=implemented
 
 [FileDir markToBottom]
-name=Mark to Bottom
-keys=Shift+End
-change=renamed from Tag to Bottom, was Shift+End
-disposition=accepted
+name=Mark to Last
+keys=Control+Shift+End or Shift+End
+change=renamed from Mark to Bottom, keys now Control+Shift+End or Shift+End, 21 November 2026
+reason=the marking group, 21 November 2026: FileDir takes DbDo's names and keys, keeping the Windows Shift keys as second keys
+disposition=ruled
 status=implemented
 
 [FileDir markToTop]
-name=Mark to Top
-keys=Shift+Home
-change=renamed from Tag to Top, was Shift+Home
-disposition=accepted
+name=Mark to First
+keys=Control+Shift+Home or Shift+Home
+change=renamed from Mark to Top, keys now Control+Shift+Home or Shift+Home, 21 November 2026
+reason=the marking group, 21 November 2026: FileDir takes DbDo's names and keys, keeping the Windows Shift keys as second keys
+disposition=ruled
 status=implemented
 
 [FileDir markWithRegex]
@@ -3063,10 +3213,10 @@ status=implemented
 
 [FileDir moveToFolder]
 name=Move to Folder
-keys=Alt+Shift+M
-change=keys changed, was Shift+M, 16 November 2026
-reason=M for Move; Control+Shift+M stays the suite's Mail Attachment, as in EdSharp, whose Alt+Shift+M is Manual Options; no Shift+letter acts: Shift letters only say or move (Jamal's phase, 16 November 2026)
-disposition=accepted
+keys=Control+Shift+M
+change=keys changed, was Alt+Shift+M, 21 November 2026
+reason=Jamal's choice of 16 November, now possible: Mail freed Control+Shift+M; beside Copy to Folder on Control+Shift+C, and on Control because it changes the disk
+disposition=ruled
 status=implemented
 
 [FileDir networkConnections]
@@ -3083,9 +3233,12 @@ keys=Control+N
 status=current
 
 [FileDir newItemCopy]
-name=New Item Copy
+name=New Copy
 keys=Control+Shift+N
-status=current
+change=renamed from New Item Copy, 21 November 2026
+reason=the new-and-save group: DbDo's name for the same job on the same key
+disposition=ruled
+status=implemented
 
 [FileDir nextMarked]
 name=Next Marked
@@ -3208,18 +3361,27 @@ status=current
 
 [FileDir pasteCopy]
 name=Paste Copy
-keys=Alt+V
-status=current
+keys=
+change=unbound, was Alt+V, 21 November 2026; on the Edit menu
+reason=Alt says, Control changes; after Copy, Paste (Control+V) already copies, so the forced copy is rarely needed
+disposition=accepted
+status=implemented
 
 [FileDir pasteMove]
 name=Paste Move
-keys=Alt+Shift+V
-status=current
+keys=Control+Shift+V
+change=keys changed, was Alt+Shift+V, 21 November 2026
+reason=Alt says, Control changes: a move changes the disk; beside Paste on Control+V
+disposition=accepted
+status=implemented
 
 [FileDir pathListToClipboard]
 name=Path List to Clipboard
-keys=Control+Shift+P
-status=current
+keys=Control+Shift+L
+change=keys changed, was Control+Shift+P, 21 November 2026
+reason=Record Playback takes Control+Shift+P beside Play Media, as in DbDo; L for List
+disposition=ruled
+status=implemented
 
 [FileDir pathToClipboard]
 name=Path to Clipboard
@@ -3228,15 +3390,27 @@ status=current
 
 [FileDir playList]
 name=Play List
-keys=Control+Shift+L
-status=current
+keys=
+change=key removed, was Control+Shift+L, 21 November 2026
+reason=Play Media plays in the Homer Player; Play List, which writes a list and hands it to mpv's own window, stays on the Misc menu for keeping a list or starting something and walking away
+disposition=ruled
+status=implemented
 
 [FileDir playMedia]
 name=Play Media
 keys=Control+P
-change=keys changed, was Alt+Shift+L, 9 November 2026; the manifest caught up 16 November 2026
-reason=Control+P plays media in every Homer app (Jamal's ruling, 9 November 2026)
-status=ruled
+change=keys changed, was Alt+Shift+L, 9 November 2026; the manifest caught up 16 November 2026; plays in the Homer Player from 21 November 2026 (marked files, a play list or linked document, the clipboard, the folder)
+reason=Control+P plays media in every Homer app (Jamal's ruling, 9 November 2026); one player, as in DbDo
+disposition=ruled
+status=implemented
+
+[FileDir recordPlayback]
+name=Record Playback
+keys=Control+Shift+P
+change=new 21 November 2026, as in DbDo
+reason=one record-media key in the suite, beside Play Media
+disposition=ruled
+status=implemented
 
 [FileDir playTutorials]
 name=Play Tutorials
@@ -3374,8 +3548,11 @@ status=current
 
 [FileDir reorderNames]
 name=Reorder Names
-keys=Alt+Shift+K
-status=current
+keys=Control+F2
+change=keys changed, was Alt+Shift+K, 21 November 2026
+reason=it renames files, so it joins the F2 rename family on Control; K began no word of its name
+disposition=accepted
+status=implemented
 
 [FileDir restartWindows]
 name=Restart Windows
@@ -3579,9 +3756,12 @@ keys=Control+F10
 status=current
 
 [FileDir setFilter]
-name=Set Filter
+name=Filter Items
 keys=Control+F
-status=current
+change=renamed from Set Filter, 21 November 2026
+reason=parallel with DbDo's Filter Records on the same key
+disposition=ruled
+status=implemented
 
 [FileDir shortPathToClipboard]
 name=Short Path to Clipboard
@@ -3730,10 +3910,11 @@ disposition=accepted
 status=implemented
 
 [FileDir unmarkAllButCurrent]
-name=Unmark All But Current
+name=Unmark All but Current
 keys=Alt+Comma
-change=renamed from Untag All But Current, was Alt+Comma
-disposition=accepted
+change=renamed, 21 November 2026
+reason=small words in lower case in command names (but, from, in, on, to, with, without), the key-group audit of 21 November 2026
+disposition=ruled
 status=implemented
 
 [FileDir unmarkAndNext]
@@ -3752,23 +3933,28 @@ disposition=accepted
 status=implemented
 
 [FileDir unmarkToBottom]
-name=Unmark to Bottom
-keys=Alt+Shift+End
-change=renamed from Untag to Bottom, was Alt+Shift+End
-disposition=accepted
+name=Unmark to Last
+keys=Alt+Control+Shift+End or Alt+Shift+End
+change=renamed from Unmark to Bottom, keys now Alt+Control+Shift+End or Alt+Shift+End, 21 November 2026
+reason=the marking group, 21 November 2026: FileDir takes DbDo's names and keys, keeping the Windows Shift keys as second keys
+disposition=ruled
 status=implemented
 
 [FileDir unmarkToTop]
-name=Unmark to Top
-keys=Alt+Shift+Home
-change=renamed from Untag to Top, was Alt+Shift+Home
-disposition=accepted
+name=Unmark to First
+keys=Alt+Control+Shift+Home or Alt+Shift+Home
+change=renamed from Unmark to Top, keys now Alt+Control+Shift+Home or Alt+Shift+Home, 21 November 2026
+reason=the marking group, 21 November 2026: FileDir takes DbDo's names and keys, keeping the Windows Shift keys as second keys
+disposition=ruled
 status=implemented
 
 [FileDir volumeFormat]
 name=Volume Format
-keys=Control+Shift+V
-status=current
+keys=
+change=unbound, was Control+Shift+V, 21 November 2026; on the Misc menu
+reason=rare and cannot be undone, so it keeps no key; Paste Move took Control+Shift+V
+disposition=accepted
+status=implemented
 
 [FileDir webDownload]
 name=Web Download
@@ -3795,9 +3981,27 @@ change=renamed 15 November 2026 from Yield (A11), was Control+Y
 
 [FileDir yieldFiles]
 name=Say Yield Files
+keys=
+change=unbound, was Control+Y, 21 November 2026; on the Say menu
+reason=Say Yield from Current took Control+Y, as in DbDo; Alt+Period marks the files and Alt+Shift+Y counts them
+disposition=ruled
+status=implemented
+
+[FileDir yieldFromCurrent]
+name=Say Yield from Current
 keys=Control+Y
-status=current
-change=renamed 15 November 2026 from Yield Files (A11), was Alt+Y
+change=new, 21 November 2026
+reason=Jamal's ruling, 21 November 2026: DbDo and FileDir have the same commands, as a suite should; Alt from the first, Alt+Shift the marked, Control from the current one
+disposition=ruled
+status=implemented
+
+[FileDir yieldMarkedFromCurrent]
+name=Say Yield Marked from Current
+keys=
+change=new, 21 November 2026, with no key
+reason=second round, 21 November 2026: Control+Shift is not a reading key; each of the W, L and Y families is Alt, Alt+Shift and Control, since Control+Shift+Y is Yield with Regex in every suite app and FileDir's Control+Shift+L is Play List
+disposition=ruled
+status=implemented
 
 [FileDir yieldInOperatingSystem]
 name=Say Yield in Operating System
@@ -3808,16 +4012,18 @@ status=implemented
 
 [FileDir yieldMarked]
 name=Say Yield Marked
-keys=Shift+Y
-disposition=accepted
+keys=Alt+Shift+Y
+disposition=ruled
 status=implemented
-change=renamed 15 November 2026 from Yield Marked (A11)
+change=keys changed, was Shift+Y, 21 November 2026; renamed 15 November 2026 from Yield Marked (A11)
+reason=the Y family, as in DbDo: Alt for all in view, Alt+Shift for the marked
 
 [FileDir yieldOnDrive]
 name=Say Yield on Drive
-keys=Alt+Shift+Y
-change=was Control+Shift+Y, 17 November 2026
-reason=Control+Shift+Y is Yield with Regex in the suite
+keys=Shift+Y
+change=keys changed, was Alt+Shift+Y, 21 November 2026
+reason=Say Yield Marked took Alt+Shift+Y; a Shift+letter only says, and Y is for yield
+disposition=accepted
 status=implemented
 
 [FileDir zip]
@@ -3830,10 +4036,10 @@ status=implemented
 
 [FileDir zipList]
 name=Zip List
-keys=Alt+Shift+L
-change=keys changed, was Control+Shift+Z, 16 November 2026
-reason=L for List; Zip took Control+Shift+Z
-disposition=accepted
+keys=
+change=unbound, was Alt+Shift+L, 21 November 2026; on the Misc menu
+reason=Read Lean Marked took Alt+Shift+L; a zip made from a list file is rarely wanted
+disposition=ruled
 status=implemented
 
 [FileDir zipThenDelete]
@@ -4395,3 +4601,28 @@ reason=EdSharp's name, on the same key; built 17 November 2026
 disposition=accepted
 status=implemented
 
+
+
+[FileDir reverseJump]
+name=Reverse Jump
+keys=Control+Shift+J
+change=new, 21 November 2026
+reason=the search group, as in DbDo and as Reverse Keywords beside it
+disposition=ruled
+status=implemented
+
+[DbDo keywordsAgain]
+name=Keywords Again
+keys=Alt+K
+change=new, 21 November 2026
+reason=the again group: Alt and a search's letter repeats that search, named "<command> Again", in DbDo, EdSharp, FileDir and HomerView (21 November 2026); FileDir had it
+disposition=ruled
+status=implemented
+
+[DbDo jumpAgain]
+name=Jump Again
+keys=Alt+J
+change=new, 21 November 2026
+reason=the again group: Alt and a search's letter repeats that search, named "<command> Again", in DbDo, EdSharp, FileDir and HomerView (21 November 2026); FileDir had it
+disposition=ruled
+status=implemented

@@ -38,7 +38,7 @@ lsExpected = [
     "exec/CSharp/Log.cs", "exec/CSharp/Mdi.cs", "exec/CSharp/Media.cs", "exec/CSharp/MediaPlayer.cs", "exec/CSharp/Mpv.cs", "exec/CSharp/Paths.cs",
     "exec/CSharp/Say.cs", "exec/CSharp/Util.cs", "exec/CSharp/Web.cs",
     "exec/CSharp/ConversionPdf.cs", "exec/CSharp/PdfReader.cs",
-    "exec/CSharp/inixVert.cs", "exec/CSharp/Macro.cs", "scripts/testMacro.cmd", "scripts/testMacro.cs", "scripts/testMacro.py", "scripts/runMacro.cmd", "scripts/runMacro.py", "scripts/testRunMacro.py", "scripts/testSay.cmd", "scripts/testSay.py", "scripts/auditInstallers.cmd", "scripts/auditInstallers.py", "scripts/suiteCatalog.py", "scripts/testSuiteGate.py",
+    "exec/CSharp/inixVert.cs", "exec/CSharp/Macro.cs", "exec/CSharp/DataReport.cs", "scripts/installDataTools.cmd", "scripts/testChart.cmd", "scripts/testChart.py", "scripts/testMacro.cmd", "scripts/testMacro.cs", "scripts/testMacro.py", "scripts/runMacro.cmd", "scripts/runMacro.py", "scripts/testRunMacro.py", "scripts/testSay.cmd", "scripts/testSay.py", "scripts/auditInstallers.cmd", "scripts/auditInstallers.py", "scripts/suiteCatalog.py", "scripts/testSuiteGate.py",
     "exec/Python/inix.py", "exec/Python/kdpEpub.py", "scripts/buildBooks.cmd", "scripts/buildBooks.py", "scripts/kdpBooks.cmd", "scripts/kdpBooks.py", "scripts/kdpSubmit.cmd", "scripts/kdpSubmit.py", "scripts/kdpUpdate.cmd", "scripts/kdpUpdate.py", "scripts/testKdpUpdate.py", "templates/books/Book_KDP.inix", "templates/books/books.inix", "templates/books/buildBooks.inix", "templates/books/epub.css", "templates/books/tocEpub.lua", ".claude/skills/homer-books/SKILL.md", "exec/Python/lbc.py", "exec/Python/lbcnet.py", "exec/Python/log.py", "exec/Python/media.py",
     "exec/Python/mdi.py", "exec/Python/elevate.py", "exec/Python/paths.py", "exec/Python/say.py", "exec/Python/util.py", "exec/Python/web.py",
     "templates/build_APP_.cmd", "templates/build_APP_Py.cmd",
@@ -805,7 +805,7 @@ def buildHomerDll():
 # and the conversion test ran the Python twin, so an error in the shared C# surfaced only in the next app's build.
 # They are now compiled as a library, as BatCon compiles them, with Quality, from exec\\CSharp; the PDF reader's
 # two files join when PdfPig is in exec. Nothing is kept: the library is written to the temporary folder.
-lsConversionClasses = ["Conversion", "ConversionMedia", "ConversionPage", "Elevate", "Inix", "KeyName", "Lbc", "Log", "Media",
+lsConversionClasses = ["Conversion", "ConversionMedia", "ConversionPage", "DataReport", "Elevate", "Inix", "KeyName", "Lbc", "Log", "Media",
                        "Paths", "Quality", "Say", "Table", "Util", "Voice", "Web"]
 
 
@@ -2266,6 +2266,27 @@ def main():
             sayLine(sSqliteProblem)
             iSamplesFailed += 1
             lsFailedParts.append("SQLite script")
+        # THE CHART ENGINE IS PROVED HERE (1.269.0, 21 November 2026): scripts\testChart takes the Python out of
+        # DataReport.cs and draws every kind of chart from a made-up table, installing a missing package with pip as a
+        # user's computer would. Tested again only when DataReport.cs, the test or this Python changed.
+        oCache = kitCache()
+        sPrint = oCache.fingerprint(["exec/CSharp/DataReport.cs", "scripts/testChart.py"], [sys.version.split()[0]])
+        try:
+            if oCache.isCurrent("chart test", sPrint, []):
+                unchangedLine("The chart engine", "is unchanged since it last passed; not tested again.")
+            else:
+                oDone = subprocess.run([sys.executable, os.path.join(sScriptDir, "scripts", "testChart.py")], capture_output=True, text=True, timeout=1800)
+                for sLine in (oDone.stdout or "").strip().splitlines(): sayLine(sLine)
+                for sLine in (oDone.stderr or "").strip().splitlines(): logLine("testChart stderr: " + sLine)
+                logLine("testChart exit %d" % oDone.returncode)
+                if oDone.returncode == 0: oCache.record("chart test", sPrint, [])
+                else:
+                    iSamplesFailed += 1
+                    lsFailedParts.append("the chart test")
+        except Exception as oError:
+            sayLine("The chart engine could not be tested: %s" % oError)
+            iSamplesFailed += 1
+            lsFailedParts.append("the chart test, which could not run")
         sTemplateProblem = checkTemplateApp()
         if sTemplateProblem != "":
             sayLine(sTemplateProblem)

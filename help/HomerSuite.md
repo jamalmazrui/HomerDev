@@ -33,6 +33,7 @@ The same command has the same name, the same key and the same one-sentence descr
   - Control+J jumps, Control+K searches by keywords, and F3 repeats the last search.
   - Alt+V runs a script.
   - F11 installs the newest version.
+  - Alt says and Control changes: when a letter needs a modifier, a key that only speaks uses Alt, and a key that changes your data uses Control.
 - **HomerView's exceptions:** HomerView follows these too, except where Microsoft Edge already owns a key. Its guide is a Help menu item with no key, Where Am I is Alt+Shift+Slash, and installing the newest version is Control+F11.
 - **Say keys:** each app answers a question in words, such as how many items there are or where you are. A second press spells a short answer or shows a long one in a window.
 - **Settings:** each app keeps its settings in a plain text file you can read and edit.

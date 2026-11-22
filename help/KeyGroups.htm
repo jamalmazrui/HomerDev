@@ -1,0 +1,1601 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.14" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>KeyGroups</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      color: light-dark(#1a1a1a, #fdfdfd);
+      background-color: #fdfdfd;
+      background-color: light-dark(#fdfdfd, #1a1a1a);
+      color-scheme: light dark;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a, a:visited {
+      color: inherit;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid;
+      border-color: #e6e6e6;
+      border-color: light-dark(#e6e6e6, #4c4c4c);
+      color: #606060;
+      color: light-dark(#606060, #b6b6b6);
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid currentColor;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+    }
+    th {
+      border-top: 1px solid currentColor;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    em, em em em, em em em em em {
+      font-style: italic;
+    }
+    em em, em em em em {
+      font-style: normal;
+    }
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    @media print {
+      html {
+        color-scheme: light only;
+      }
+      html, body, pre, code {
+        background-color: transparent;
+      }
+      body, a, a:visited, blockquote {
+        color: black;
+      }
+      pre, code {
+        padding: 0;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }  </style>
+</head>
+<body>
+<header id="title-block-header">
+<p class="subtitle">Every key pattern group of the Homer Suite, counted
+and audited</p>
+</header>
+<main>
+<h1 id="homer-key-groups">Homer Key Groups</h1>
+<p>Jamal asked on 21 November 2026 for every Homer key pattern group to
+be named, counted and audited. A group is a set of keys that should
+behave alike, because their keys share a shape (all the F8 keys, every
+Alt key that repeats a search) or their commands share a topic (the
+clipboard, local AI). A key can be in more than one group. This page
+names each group and the properties its members should share. It says
+whether the suite practices them, and what changed when they did
+not.</p>
+<p>The counts are at the end of the page. scripts\keyGroups writes them
+from the four apps’ key files, so they stay true as keys change. Run it
+with no arguments after a key change.</p>
+<h2 id="how-to-read-the-audits">How to read the audits</h2>
+<p>Each group has the same three parts.</p>
+<ul>
+<li><strong>Shares:</strong> the properties every member should
+have.</li>
+<li><strong>Found:</strong> where the suite already practices them, and
+where it did not.</li>
+<li><strong>Done or open:</strong> what changed on 21 November 2026, or
+what is left for a decision. Each change is in data\SuiteCommands.inix
+with the key it replaced, and in each app’s History.</li>
+</ul>
+<p>The groups are in lower-case alphabetical order, except the function
+keys, which run from F1 to F12.</p>
+<h2 id="the-audits">The audits</h2>
+<h3 id="again">again</h3>
+<ul>
+<li><strong>Shares:</strong> Alt and a search’s own letter repeats that
+search forward, without asking again; the name is “<command>
+Again”.</li>
+<li><strong>Found:</strong> EdSharp (Go to Percent Again, Jump to Line
+Again), FileDir (Jump Again, Keywords Again) and HomerView (Go to
+Percent Again) followed it. DbDo called its one “Repeat Go to” and had
+no Jump Again or Keywords Again, though it has Jump and Keywords.</li>
+<li><strong>Done:</strong> DbDo’s is now Go to Record Again (Alt+G), and
+DbDo gains Jump Again (Alt+J) and Keywords Again (Alt+K), with FileDir’s
+sentences, now in the catalog. F3 still repeats whichever search came
+last.</li>
+</ul>
+<h3 id="ai-and-online-help">ai and online help</h3>
+<ul>
+<li><strong>Shares:</strong> a command that sends text off the computer
+says so in its description; local and online are told apart.</li>
+<li><strong>Found:</strong> the local AI commands are their own group,
+below. Lookup Term, Translate and HomerView’s Query Web and Consult
+Copilot reach online services, and their descriptions say where.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="apostrophe-clipboard-text">apostrophe, clipboard text</h3>
+<ul>
+<li><strong>Shares:</strong> the Apostrophe key is the clipboard’s text:
+Alt says it, Control saves it to a file, Control+Shift appends it to a
+file, Alt+Shift clears it.</li>
+<li><strong>Found:</strong> all four keys in all four apps, word for
+word. The one exception is FileDir’s plain Apostrophe and
+Shift+Apostrophe, which say the item’s and the folder’s names.</li>
+<li><strong>Open:</strong> none. FileDir’s two plain keys are typed keys
+in a list, where nothing else would use them.</li>
+</ul>
+<h3 id="archives">archives</h3>
+<ul>
+<li><strong>Shares:</strong> U for unarchive and Z for zip; the plain
+Control key is the everyday one.</li>
+<li><strong>Found:</strong> FileDir only. Unarchive (Control+U) and its
+variants are one family; Zip (Control+Shift+Z) and Zip then Delete
+(Control+Z) another.</li>
+<li><strong>Done:</strong> Zip List gave up Alt+Shift+L earlier today,
+for Read Lean Marked.</li>
+</ul>
+<h3 id="back-forward-and-levels">back, forward and levels</h3>
+<ul>
+<li><strong>Shares:</strong> Alt+LeftArrow goes back and Alt+RightArrow
+forward; Backspace goes up a level.</li>
+<li><strong>Found:</strong> DbDo’s child tables and FileDir’s folders
+follow it. EdSharp’s Alt+Left and Alt+Right move by chunk, which is the
+text app’s meaning of a step.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="backslash-open-elsewhere">backslash, open elsewhere</h3>
+<ul>
+<li><strong>Shares:</strong> Backslash opens the current thing somewhere
+else: Alt in Explorer, Control at a command prompt, Control+Shift in the
+other Homer app.</li>
+<li><strong>Found:</strong> all three MDI apps, all three keys.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="bookmarks-and-favorites">bookmarks and favorites</h3>
+<ul>
+<li><strong>Shares:</strong> Control+B saves, Control+Shift+B clears,
+Alt+B lists; Shift+B says, where Shift letters say.</li>
+<li><strong>Found:</strong> DbDo and EdSharp agree. EdSharp’s favorites
+follow the same shape on L (Control+L, Control+Shift+L, Alt+L), though L
+begins no word of Set Favorite.</li>
+<li><strong>Open:</strong> EdSharp’s Set Favorite has a letter from no
+word of its name. A rename such as “List Favorite” would make L honest;
+it waits for Jamal’s word, since favorites are old habits.</li>
+</ul>
+<h3 id="case-lines-and-text-shape">case, lines and text shape</h3>
+<ul>
+<li><strong>Shares:</strong> a command that reshapes text changes data,
+so Control is preferred; families keep their own pattern.</li>
+<li><strong>Found:</strong> EdSharp only. Case is four keys on U, Quote
+and Unquote on Q, Wrap and Unwrap on W, and the format pairs split
+Alt+Shift (set) from Control (move to the next change).</li>
+<li><strong>Done:</strong> Insert Time moved to Control+Semicolon and
+Text Contents to Control+Shift+T earlier today.</li>
+</ul>
+<h3 id="clipboard">clipboard</h3>
+<ul>
+<li><strong>Shares:</strong> Control+C copies and replaces; Alt+C
+appends; Control+X cuts and Alt+X cuts and appends; Control+V pastes. A
+command that puts something on the clipboard is named “Copy <thing>”, or
+“<thing> to Clipboard” when it is a path or name.</li>
+<li><strong>Found:</strong> Copy, Copy Append, Cut and Paste agree
+across the apps. FileDir’s “Copy Name” sat beside “Path to Clipboard”
+with a different shape. HomerView’s Copy Log is Alt+Shift+L, not the
+suite’s Control+F12, because Edge owns Control+F12.</li>
+<li><strong>Done:</strong> FileDir’s Copy Name is Name to Clipboard
+(Alt+Shift+N).</li>
+<li><strong>Open:</strong> FileDir has Cut but not Cut Append (Alt+X is
+free there). Adding it needs a file-list append on the clipboard, which
+no app has yet.</li>
+</ul>
+<h3 id="conversion-and-export">conversion and export</h3>
+<ul>
+<li><strong>Shares:</strong> Control+Shift+X exports and Control+Shift+I
+imports; every conversion runs the kit’s shared code.</li>
+<li><strong>Found:</strong> the keys agree. The names do not: Export
+Data (DbDo), Export Format (EdSharp) and Export Type (FileDir).</li>
+<li><strong>Open:</strong> one name would be better for a suite. Each
+name fits what its app exports, and DbDo’s pairs with Import Data, so
+this waits for Jamal’s choice.</li>
+</ul>
+<h3 id="data-records-and-fields">data records and fields</h3>
+<ul>
+<li><strong>Shares:</strong> DbDo’s own record commands keep the rest of
+the suite’s modifiers.</li>
+<li><strong>Found:</strong> DbDo only. The edit trio Edit Notes, Edit
+Tags and Edit url stays on Alt+Shift beside its Say keys, as recorded in
+KeyDecisions.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="delete">delete</h3>
+<ul>
+<li><strong>Shares:</strong> Control+D deletes the unit; Control+Shift+D
+deletes it harder, without asking or without the recycle bin.</li>
+<li><strong>Found:</strong> DbDo, EdSharp and FileDir all follow it.
+DbDo wrote “Delete Without Confirmation” with a capital W, against the
+suite’s small words.</li>
+<li><strong>Done:</strong> it is Delete without Confirmation.</li>
+</ul>
+<h3 id="editing-basics">editing basics</h3>
+<ul>
+<li><strong>Shares:</strong> Windows’ own editing keys mean what they
+mean everywhere.</li>
+<li><strong>Found:</strong> EdSharp and HomerView follow Windows. The
+list apps give Control+A and Control+Shift+A to Mark All and Unmark All,
+which is their selection.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="f1-help">f1 help</h3>
+<ul>
+<li><strong>Shares:</strong> F1 the guide, Shift+F1 what this does,
+Alt+F1 About, Control+F1 the key describer, Control+Shift+F1 history,
+Alt+Shift+F1 the ReadMe; with them, Control+Slash where am I and Alt+F10
+the Alternate Menu.</li>
+<li><strong>Found:</strong> DbDo, EdSharp and FileDir follow all of it.
+HomerView’s exceptions are recorded: Edge owns F1 and
+Control+Slash.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="f2-edit-and-rename">f2 edit and rename</h3>
+<ul>
+<li><strong>Shares:</strong> F2 edits or renames; Shift+F2 renames on
+disk.</li>
+<li><strong>Found:</strong> DbDo’s Edit Cell and Pick Value
+(Control+F2), and EdSharp’s and FileDir’s Rename. FileDir’s Reorder
+Names joined it on Control+F2 earlier today.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="f3-search-again">f3 search again</h3>
+<ul>
+<li><strong>Shares:</strong> F3 repeats the last search forward and
+Shift+F3 back; Control makes it a regular expression; Alt searches for
+the text at the cursor.</li>
+<li><strong>Found:</strong> all four apps follow it. FileDir has no Find
+with Regex on Control+F3; its regex search is Mark with Regex.</li>
+<li><strong>Open:</strong> whether FileDir needs Find with Regex, or
+Mark with Regex is enough.</li>
+</ul>
+<h3 id="f4-windows">f4 windows</h3>
+<ul>
+<li><strong>Shares:</strong> F4 picks a window, Shift+F4 says them,
+Control+F4 closes one, Control+Shift+F4 closes the others.</li>
+<li><strong>Found:</strong> all three MDI apps, and HomerView for its
+tabs. EdSharp already wrote “Close All but Current Window” with a small
+“but”; DbDo, FileDir, the kit and the catalog wrote “But”, so EdSharp’s
+was left out of the suite’s check.</li>
+<li><strong>Done:</strong> “Close All but Current Window” everywhere,
+and the catalog now checks it in all three apps.</li>
+</ul>
+<h3 id="f5-refresh-and-run">f5 refresh and run</h3>
+<ul>
+<li><strong>Shares:</strong> F5 reads again or runs.</li>
+<li><strong>Found:</strong> DbDo and FileDir refresh; EdSharp runs, and
+its compile family sits around it. HomerView’s one F5 key lists form
+fields, on the key JAWS uses for that.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="f6-panes-sections-and-views">f6 panes, sections and views</h3>
+<ul>
+<li><strong>Shares:</strong> F6 moves among the parts of a window;
+Control+F6 to the next thing of the same level.</li>
+<li><strong>Found:</strong> each app’s parts differ (views, sections,
+panes, folders), and each keeps the shape.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="f7-review-and-language">f7 review and language</h3>
+<ul>
+<li><strong>Shares:</strong> F7 checks spelling; with modifiers, the
+thesaurus, lookups and translation.</li>
+<li><strong>Found:</strong> EdSharp has the full family, and FileDir has
+Translate File on Alt+Shift+F7, as EdSharp’s Translate Language.
+HomerView’s one F7 key lists links, on the key JAWS uses for that.
+EdSharp’s Guard Document and No Guard (Control+F7, Control+Shift+F7)
+make a document read-only, which is not review.</li>
+<li><strong>Open:</strong> Guard Document has no better home in the F
+keys yet; recorded, not moved.</li>
+</ul>
+<h3 id="f8-selection-marking-and-reading-all">f8 selection, marking and
+reading all</h3>
+<ul>
+<li><strong>Shares:</strong> F8 starts a run, Shift+F8 completes it,
+Alt+Shift+F8 completes it the other way; Alt+F8 reads everything and
+Control+F8 copies everything.</li>
+<li><strong>Found:</strong> EdSharp and HomerView read all on Alt+F8 and
+copy all on Control+F8. DbDo had a second start key, Start Unmark, on
+Alt+F8, where FileDir has one Start Mark or Unmark. Neither list app
+read or copied all on F8.</li>
+<li><strong>Done:</strong> DbDo has FileDir’s one Start Mark or Unmark
+(F8), and Start Unmark is retired into it. Alt+F8 reads everything in
+both list apps (Read Wide in DbDo, Read Lean in FileDir). Control+F8 is
+DbDo’s Copy Grid.</li>
+</ul>
+<h3 id="f9-readable-view">f9 readable view</h3>
+<ul>
+<li><strong>Shares:</strong> F9 shows a more readable view.</li>
+<li><strong>Found:</strong> Preview Markdown (Control+F9) and
+HomerView’s Extract Main Content (Shift+F9) fit. Check Markdown, Run
+Code Blocks and Record Macro sit here by earlier decisions.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="f10-menus">f10 menus</h3>
+<ul>
+<li><strong>Shares:</strong> Shift+F10 the context menu, Control+F10
+Send To, Alt+F10 the Alternate Menu.</li>
+<li><strong>Found:</strong> all of it, wherever the app has the
+command.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="f11-version-and-window-layout">f11 version and window
+layout</h3>
+<ul>
+<li><strong>Shares:</strong> F11 installs the newest version; with
+modifiers, the window layouts.</li>
+<li><strong>Found:</strong> all three MDI apps; HomerView uses
+Control+F11, since Edge owns F11. The layouts are now on the File menu,
+with no Window menu.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="f12-ai-logs-media-and-macros">f12 ai, logs, media and
+macros</h3>
+<ul>
+<li><strong>Shares:</strong> F12 asks the local AI, Shift+F12 asks about
+the current thing, Control+F12 copies the log, Alt+F12 plays the
+tutorials, Alt+Shift+F12 plays a macro.</li>
+<li><strong>Found:</strong> all three MDI apps. HomerView leaves F12 to
+Edge.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="filter-and-order">filter and order</h3>
+<ul>
+<li><strong>Shares:</strong> Control+F filters and Control+Shift+F
+clears, in the list apps; Shift+F, Shift+O and Shift+8 say the filter,
+the order and both; Alt orders and Alt+Shift reverses.</li>
+<li><strong>Found:</strong> DbDo said Filter Records and FileDir Set
+Filter.</li>
+<li><strong>Done:</strong> FileDir’s is Filter Items.</li>
+</ul>
+<h3 id="folders-and-windows-tools">folders and windows tools</h3>
+<ul>
+<li><strong>Shares:</strong> FileDir’s folder commands come in Open (new
+window) and Go to (same window) pairs.</li>
+<li><strong>Found:</strong> FileDir follows it throughout.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="go-to-and-open">go to and open</h3>
+<ul>
+<li><strong>Shares:</strong> Control+O opens, in a new window where that
+applies; Control+G goes to, in the same window; Alt+R lists the recent
+ones.</li>
+<li><strong>Found:</strong> all four apps.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="grid-table-keys">grid table keys</h3>
+<ul>
+<li><strong>Shares:</strong> Alt+Control with the arrows, Home, End,
+PageUp and PageDown keep the screen readers’ table meanings.</li>
+<li><strong>Found:</strong> DbDo only, as its grid keyboard model of 31
+October requires.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="home-and-end">home and end</h3>
+<ul>
+<li><strong>Shares:</strong> Home and End go to the ends of a line or
+row; Control adds the ends of the column or list.</li>
+<li><strong>Found:</strong> DbDo, EdSharp and FileDir follow their own
+grids and lines.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="item-lists-in-text">item lists in text</h3>
+<ul>
+<li><strong>Shares:</strong> EdSharp’s list tools are one family on
+Alt+Shift with the first letter of the verb.</li>
+<li><strong>Found:</strong> Order, Reverse, Keep Unique, Number, List
+Different and Query Common Items follow it.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="launch-from-the-desktop">launch from the desktop</h3>
+<ul>
+<li><strong>Shares:</strong> Alt+Control and the app’s letter starts or
+brings forward the app. It is the one sanctioned use of Alt+Control with
+a letter.</li>
+<li><strong>Found:</strong> EdSharp (E), FileDir (F) and HomerView
+(Alt+Control+Shift+H) list theirs. DbDo’s Alt+Control+D is set by its
+installer’s shortcut, and its key file does not list it.</li>
+<li><strong>Open:</strong> listing Launch DbDo in DbDo’s key file needs
+a [handled DbDo] line in the catalog, since the shortcut, not DbDo, owns
+the key.</li>
+</ul>
+<h3 id="local-ai">local ai</h3>
+<ul>
+<li><strong>Shares:</strong> F12 asks the model on this computer a plain
+question; Shift+F12 asks about the current thing; the name is “Chat with
+AI” and “Chat about <thing>”.</li>
+<li><strong>Found:</strong> DbDo, EdSharp and FileDir all follow it,
+with the thing named for each app: Table, Document, File.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="mail-send-and-web">mail, send and web</h3>
+<ul>
+<li><strong>Shares:</strong> one Mail on Control+M; Send To on
+Control+F10; Web Download on Alt+Shift+W; Burn to CD on
+Alt+Shift+B.</li>
+<li><strong>Done:</strong> Mail became one command earlier today. DbDo’s
+Mail Record has no key, since Control+M marks a record there.</li>
+</ul>
+<h3 id="marking">marking</h3>
+<ul>
+<li><strong>Shares:</strong> in the two list apps, the same names and
+keys for the same marking jobs.</li>
+<li><strong>Found:</strong> DbDo and FileDir agreed on Mark All, Toggle
+Mark, Mark and Next, Next and Previous Marked and Invert Marked. They
+disagreed on the ends of a run, with these key sets.
+<ul>
+<li><strong>DbDo:</strong> Mark to First and Last on Control+Shift+Home
+and End, and First and Last Marked on Control+PageUp and PageDown.</li>
+<li><strong>FileDir:</strong> Mark to Top and Bottom on Shift+Home and
+End, and Beginning and End Marked on Control+Shift+Home and End.</li>
+</ul></li>
+<li>The same key did opposite jobs: Control+Shift+Home marked in DbDo
+and moved in FileDir.</li>
+<li><strong>Done:</strong> FileDir takes DbDo’s names and keys, and
+keeps the Windows Shift+Home and End, and Alt+Shift+Home and End, as
+second keys. Both apps now have Mark to First, Mark to Last, Unmark to
+First, Unmark to Last, First Marked and Last Marked, word for word,
+checked by the catalog. FileDir’s “Unmark All But Current” is Unmark All
+but Current.</li>
+</ul>
+<h3 id="media-and-play">media and play</h3>
+<ul>
+<li><strong>Shares:</strong> Control+P plays, in the Homer Player;
+Control+Shift+P plays and records (Record Playback, P for Playback);
+Alt+F12 plays the tutorials.</li>
+<li><strong>Found:</strong> DbDo and FileDir played media on Control+P,
+but FileDir’s Play Media handed the list to mpv’s own window, while its
+Homer Player (Control+Shift+H) and Play List (Control+Shift+L) were two
+more ways to play. Nothing recorded from a key.</li>
+<li><strong>Done (fourth round):</strong> FileDir’s Play Media plays in
+the Homer Player, as DbDo’s does: the marked files, a play list or a
+document with media links, the clipboard, or the folder. Homer Player is
+retired into it, with its name as a former name. Play List keeps no key.
+Record Playback is Control+Shift+P in both, the player’s Capture stream
+button pressed when it opens. Path List to Clipboard moved from
+Control+Shift+P to the freed Control+Shift+L, L for List, and
+Control+Shift+H is free.</li>
+</ul>
+<h3 id="new-and-save">new and save</h3>
+<ul>
+<li><strong>Shares:</strong> Control+N new, Control+Shift+N a new copy
+of the current one; Control+S save, Control+Shift+S save as.</li>
+<li><strong>Found:</strong> DbDo said New Copy and FileDir New Item Copy
+for the same job.</li>
+<li><strong>Done:</strong> FileDir’s is New Copy, now in the
+catalog.</li>
+</ul>
+<h3 id="properties-and-details">properties and details</h3>
+<ul>
+<li><strong>Shares:</strong> Alt+Enter shows properties.</li>
+<li><strong>Found:</strong> EdSharp and FileDir show the file’s, DbDo
+the table’s.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="reading-aloud">reading aloud</h3>
+<ul>
+<li><strong>Shares:</strong> W wide, L lean, Y yield; Alt from the
+first, Alt+Shift the marked, Control from the current one; Alt+F8 reads
+all; any key stops a reading, and a second press shows it in a
+window.</li>
+<li><strong>Done:</strong> earlier today, and Alt+F8 now.</li>
+</ul>
+<h3 id="regex">regex</h3>
+<ul>
+<li><strong>Shares:</strong> Control+Shift+E, R and Y extract, replace
+and yield; Control+F3 finds; every name ends “with Regex”.</li>
+<li><strong>Found:</strong> DbDo lacked Yield with Regex until earlier
+today. FileDir’s R slot is Rename with Regex, which is its replace.</li>
+<li><strong>Open:</strong> see f3, for Find with Regex in FileDir.</li>
+</ul>
+<h3 id="rename">rename</h3>
+<ul>
+<li><strong>Shares:</strong> F2 and Control+R; Control+Shift+R with
+regex.</li>
+<li><strong>Found:</strong> FileDir follows it. Find Duplicates in Tree
+on Alt+Shift+J has a letter from no word of its name.</li>
+<li><strong>Open:</strong> a better key for Find Duplicates in
+Tree.</li>
+</ul>
+<h3 id="repeat-and-next-or-previous">repeat and next or previous</h3>
+<ul>
+<li><strong>Shares:</strong> a Next command’s Previous adds Shift, or
+swaps Down for Up, PageDown for PageUp, Period for Comma.</li>
+<li><strong>Found:</strong> all four apps follow it.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="say-on-alt">say, on alt</h3>
+<ul>
+<li><strong>Shares:</strong> where Shift and a letter types (EdSharp,
+HomerView), Alt and a letter says. In the list apps, Alt says the
+suite’s shared answers: Alt+Y, Alt+Z, Alt+P, Alt+Delete.</li>
+<li><strong>Found:</strong> Say Status was “Shift+Z or Alt+Z” in DbDo
+and “Alt+Z or Shift+Z” in FileDir.</li>
+<li><strong>Done:</strong> both list Alt+Z first, the suite key.</li>
+</ul>
+<h3 id="say-on-shift">say, on shift</h3>
+<ul>
+<li><strong>Shares:</strong> in the list apps, Shift and a letter says
+one fact and never acts; the letter starts the fact’s word.</li>
+<li><strong>Found:</strong> DbDo and FileDir follow it.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="scripts-and-macros">scripts and macros</h3>
+<ul>
+<li><strong>Shares:</strong> V for scripts: Alt+V invokes, Shift+V says
+which, Alt+Shift+V edits.</li>
+<li><strong>Found:</strong> EdSharp’s View Script and DbDo’s Edit Script
+did the same job on different keys (Alt+Shift+V, Alt+Shift+S).</li>
+<li><strong>Done:</strong> both are Edit Script on Alt+Shift+V, in the
+catalog. V is a recorded exception to the first-letter rule, as Invoke
+Script’s Alt+V has been since 9 November.</li>
+</ul>
+<h3 id="search">search</h3>
+<ul>
+<li><strong>Shares:</strong> Control+J jumps by name or field, Control+K
+searches content; Shift reverses each.</li>
+<li><strong>Found:</strong> DbDo had Reverse Jump; FileDir did not.
+Keywords’ sentence said “whose fields holds the keywords” in DbDo.</li>
+<li><strong>Done:</strong> FileDir gains Reverse Jump (Control+Shift+J).
+Keywords and Reverse Keywords now say “with the keywords in its fields”
+and “in its content”, in the catalog.</li>
+</ul>
+<h3 id="settings-and-toggles">settings and toggles</h3>
+<ul>
+<li><strong>Shares:</strong> Alt+Shift+E edits settings everywhere; a
+toggle’s name ends in Toggle.</li>
+<li><strong>Found:</strong> Edit Settings agrees in all four. Toggle
+names do not: Toggle Mark (agreed 15 November) and Toggle Reading begin
+with the word; EdSharp’s Indent Mode and Append from Clipboard are
+toggles without it.</li>
+<li><strong>Open:</strong> one shape for toggle names waits for Jamal’s
+word, since Toggle Mark’s name was agreed.</li>
+</ul>
+<h3 id="space-bar">space bar</h3>
+<ul>
+<li><strong>Shares:</strong> Space alone toggles the mark in a list;
+Shift+Space says the selection, or the marked items; Control+Space marks
+in a list and selects a chunk in text, the Windows habits; Alt+Space is
+the window menu of Windows and is never bound. Alt+Shift+Space and
+Control+Shift+Space are left unbound, so a stray modifier never does
+something unexpected.</li>
+<li><strong>Found:</strong> FileDir toggled with Space and
+Control+Space; DbDo with Control+Space only, though its grid is a list.
+DbDo’s Shift+Space reads the marked records (Read Wide Marked), which is
+what Say Selected says elsewhere. EdSharp’s key file named
+Alt+Shift+Space for Web Client Utilities, which is in fact a JAWS script
+on JAWS+Control+Space; EdSharp never bound the key.</li>
+<li><strong>Done (fourth round):</strong> Space toggles the mark in DbDo
+too. A Space typed within a second of a letter goes on to the grid’s
+type-ahead search instead, so “new y” still finds New York. EdSharp’s
+key file names the real key of Web Client Utilities.</li>
+</ul>
+<h3 id="web-pages">web pages</h3>
+<ul>
+<li><strong>Shares:</strong> HomerView’s own commands avoid every key
+Edge, NVDA and JAWS own.</li>
+<li><strong>Found:</strong> recorded in HomerView’s own notes.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3 id="windows">windows</h3>
+<ul>
+<li><strong>Shares:</strong> the window commands are on the File menu;
+Control+Tab moves among windows.</li>
+<li><strong>Done:</strong> no Window menu, earlier today; small “but” in
+Close All but Current Window.</li>
+</ul>
+<h3 id="yield-counting">yield (counting)</h3>
+<ul>
+<li><strong>Shares:</strong> Y counts: Alt+Y all, Alt+Shift+Y marked,
+Control+Y from the current one; Control+Shift+Y is the regex count.</li>
+<li><strong>Found:</strong> EdSharp’s Yield Encoding (Alt+Shift+Y)
+converts text rather than counting. HomerView’s Yield Structure counts
+the page’s parts, which fits.</li>
+<li><strong>Open:</strong> Yield Encoding’s name says yield for a
+conversion; a better name waits for Jamal’s word.</li>
+</ul>
+<h3 id="z-keys">z keys</h3>
+<ul>
+<li><strong>Shares:</strong> Z is the bottom of the alphabet: Alt+Z says
+status, and Z keys turn things on and off.</li>
+<li><strong>Found:</strong> Alt+Z is Say Status in the three MDI apps.
+Control+Z is Undo in EdSharp and Zip then Delete in FileDir, with no
+undo. The toggles on Z are FileDir’s Timer Toggle and DbDo’s Read Only
+Toggle. HomerView’s Z keys move by kind, a recorded exception.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<!-- key groups start -->
+<h2 id="the-groups-counted">The groups, counted</h2>
+<p>Written by scriptsfrom the four key files, 21 November 2026. Each
+count is key bindings: a command with two keys counts twice, and a
+binding may be in more than one group.</p>
+<ul>
+<li><strong>again</strong> (key shape): 9 – DbDo 3, EdSharp 3, FileDir
+2, HomerView 1</li>
+<li><strong>ai and online help</strong> (topic): 14 – DbDo 2, EdSharp 5,
+FileDir 3, HomerView 4</li>
+<li><strong>apostrophe, clipboard text</strong> (key shape): 16 – DbDo
+4, EdSharp 4, FileDir 4, HomerView 4</li>
+<li><strong>archives</strong> (topic): 8 – FileDir 8</li>
+<li><strong>back, forward and levels</strong> (topic): 13 – DbDo 5,
+FileDir 8</li>
+<li><strong>backslash, open elsewhere</strong> (key shape): 11 – DbDo 3,
+EdSharp 3, FileDir 5</li>
+<li><strong>bookmarks and favorites</strong> (topic): 10 – DbDo 4,
+EdSharp 6</li>
+<li><strong>case, lines and text shape</strong> (topic): 43 – EdSharp
+43</li>
+<li><strong>clipboard</strong> (topic): 55 – DbDo 12, EdSharp 16,
+FileDir 18, HomerView 9</li>
+<li><strong>conversion and export</strong> (topic): 17 – DbDo 2, EdSharp
+8, FileDir 5, HomerView 2</li>
+<li><strong>data records and fields</strong> (topic): 34 – DbDo 34</li>
+<li><strong>delete</strong> (topic): 16 – DbDo 3, EdSharp 8, FileDir
+5</li>
+<li><strong>editing basics</strong> (topic): 17 – DbDo 1, EdSharp 12,
+HomerView 4</li>
+<li><strong>f1 help</strong> (key shape): 30 – DbDo 8, EdSharp 8,
+FileDir 8, HomerView 6</li>
+<li><strong>f2 edit and rename</strong> (key shape): 9 – DbDo 2, EdSharp
+3, FileDir 4</li>
+<li><strong>f3 search again</strong> (key shape): 18 – DbDo 4, EdSharp
+6, FileDir 2, HomerView 6</li>
+<li><strong>f4 windows</strong> (key shape): 19 – DbDo 5, EdSharp 5,
+FileDir 6, HomerView 3</li>
+<li><strong>f5 refresh and run</strong> (key shape): 9 – DbDo 1, EdSharp
+6, FileDir 1, HomerView 1</li>
+<li><strong>f6 panes, sections and views</strong> (key shape): 16 – DbDo
+4, EdSharp 5, FileDir 6, HomerView 1</li>
+<li><strong>f7 review and language</strong> (key shape): 8 – EdSharp 6,
+FileDir 1, HomerView 1</li>
+<li><strong>f8 selection, marking and reading all</strong> (key shape):
+20 – DbDo 5, EdSharp 6, FileDir 4, HomerView 5</li>
+<li><strong>f9 readable view</strong> (key shape): 5 – DbDo 1, EdSharp
+3, HomerView 1</li>
+<li><strong>f10 menus</strong> (key shape): 9 – DbDo 2, EdSharp 3,
+FileDir 3, HomerView 1</li>
+<li><strong>f11 version and window layout</strong> (key shape): 13 –
+DbDo 1, EdSharp 5, FileDir 5, HomerView 2</li>
+<li><strong>f12 ai, logs, media and macros</strong> (key shape): 14 –
+DbDo 5, EdSharp 5, FileDir 4</li>
+<li><strong>filter and order</strong> (topic): 22 – DbDo 9, FileDir
+13</li>
+<li><strong>folders and windows tools</strong> (topic): 38 – DbDo 1,
+EdSharp 3, FileDir 34</li>
+<li><strong>go to and open</strong> (topic): 56 – DbDo 11, EdSharp 17,
+FileDir 23, HomerView 5</li>
+<li><strong>grid table keys</strong> (key shape): 15 – DbDo 15</li>
+<li><strong>home and end</strong> (key shape): 16 – DbDo 8, EdSharp 2,
+FileDir 6</li>
+<li><strong>item lists in text</strong> (topic): 7 – EdSharp 6, FileDir
+1</li>
+<li><strong>launch from the desktop</strong> (key shape): 3 – EdSharp 1,
+FileDir 1, HomerView 1</li>
+<li><strong>local ai</strong> (topic): 6 – DbDo 2, EdSharp 2, FileDir
+2</li>
+<li><strong>mail, send and web</strong> (topic): 12 – EdSharp 5, FileDir
+6, HomerView 1</li>
+<li><strong>marking</strong> (topic): 56 – DbDo 22, FileDir 34</li>
+<li><strong>media and play</strong> (topic): 8 – DbDo 4, EdSharp 1,
+FileDir 3</li>
+<li><strong>new and save</strong> (topic): 13 – DbDo 4, EdSharp 5,
+FileDir 4</li>
+<li><strong>properties and details</strong> (topic): 8 – DbDo 3, EdSharp
+1, FileDir 4</li>
+<li><strong>reading aloud</strong> (topic): 20 – DbDo 8, EdSharp 3,
+FileDir 6, HomerView 3</li>
+<li><strong>regex</strong> (topic): 17 – DbDo 5, EdSharp 5, FileDir 4,
+HomerView 3</li>
+<li><strong>rename</strong> (topic): 7 – EdSharp 1, FileDir 6</li>
+<li><strong>repeat and next or previous</strong> (topic): 48 – DbDo 6,
+EdSharp 24, FileDir 10, HomerView 8</li>
+<li><strong>say, on alt</strong> (key shape): 31 – DbDo 6, EdSharp 11,
+FileDir 7, HomerView 7</li>
+<li><strong>say, on shift</strong> (key shape): 47 – DbDo 25, EdSharp 3,
+FileDir 17, HomerView 2</li>
+<li><strong>scripts and macros</strong> (topic): 23 – DbDo 9, EdSharp
+13, FileDir 1</li>
+<li><strong>search</strong> (topic): 39 – DbDo 8, EdSharp 11, FileDir 8,
+HomerView 12</li>
+<li><strong>settings and toggles</strong> (topic): 21 – DbDo 5, EdSharp
+8, FileDir 6, HomerView 2</li>
+<li><strong>space bar</strong> (key shape): 11 – DbDo 3, EdSharp 3,
+FileDir 3, HomerView 2</li>
+<li><strong>web pages</strong> (topic): 31 – HomerView 31</li>
+<li><strong>windows</strong> (topic): 32 – DbDo 6, EdSharp 10, FileDir
+13, HomerView 3</li>
+<li><strong>yield (counting)</strong> (topic): 15 – DbDo 4, EdSharp 3,
+FileDir 5, HomerView 3</li>
+<li><strong>z keys</strong> (key shape): 15 – DbDo 3, EdSharp 3, FileDir
+5, HomerView 4</li>
+</ul>
+<p>In all, 705 key bindings in 52 groups; 0 in no group.</p>
+<h2 id="appendix-the-members-of-each-group">Appendix: the members of
+each group</h2>
+<h3 id="again-1">again</h3>
+<ul>
+<li><strong>DbDo:</strong> Go to Record Again (Alt+G); Jump Again
+(Alt+J); Keywords Again (Alt+K).</li>
+<li><strong>EdSharp:</strong> Go to Percent Again (Alt+G); Jump to Line
+Again (Alt+J); Open Again (Alt+O).</li>
+<li><strong>FileDir:</strong> Jump Again (Alt+J); Keywords Again
+(Alt+K).</li>
+<li><strong>HomerView:</strong> Go to Percent Again (Alt+G).</li>
+</ul>
+<h3 id="ai-and-online-help-1">ai and online help</h3>
+<ul>
+<li><strong>DbDo:</strong> Chat about Table (Shift+F12); Chat with AI
+(F12).</li>
+<li><strong>EdSharp:</strong> Chat about Document (Shift+F12); Chat with
+AI (F12); Lookup Term (Alt+F7); Thesaurus (Shift+F7); Translate Language
+(Alt+Shift+F7).</li>
+<li><strong>FileDir:</strong> Chat about File (Shift+F12); Chat with AI
+(F12); Translate File (Alt+Shift+F7).</li>
+<li><strong>HomerView:</strong> Consult Copilot (Alt+NVDA+C); Instruct
+Page (Alt+I); Query Web (Alt+NVDA+Q); Query Web (Alt+Q).</li>
+</ul>
+<h3 id="apostrophe-clipboard-text-1">apostrophe, clipboard text</h3>
+<ul>
+<li><strong>DbDo:</strong> Append Clipboard (Control+Shift+‘); Clear
+Clipboard (Alt+Shift+’); Save Clipboard (Control+‘); Say Clipboard
+(Alt+’).</li>
+<li><strong>EdSharp:</strong> Append Clipboard (Control+Shift+‘); Clear
+Clipboard (Alt+Shift+’); Save Clipboard (Control+‘); Say Clipboard
+(Alt+’).</li>
+<li><strong>FileDir:</strong> Append Clipboard (Control+Shift+‘); Clear
+Clipboard (Alt+Shift+’); Save Clipboard (Control+‘); Say Clipboard
+(Alt+’).</li>
+<li><strong>HomerView:</strong> Append Clipboard (Control+Shift+‘);
+Clear Clipboard (Alt+Shift+’); Save Clipboard (Control+‘); Say Clipboard
+(Alt+’).</li>
+</ul>
+<h3 id="archives-1">archives</h3>
+<ul>
+<li><strong>FileDir:</strong> Say Unarchive Test (Shift+U); Unarchive
+(Control+U); Unarchive Password (Alt+Shift+U); Unarchive to Same Name
+(Control+Shift+U); Unarchive without Subfolders (Alt+U); Zip
+(Control+Shift+Z); Zip then Delete (Control+Shift+Delete); Zip then
+Delete (Control+Z).</li>
+</ul>
+<h3 id="back-forward-and-levels-1">back, forward and levels</h3>
+<ul>
+<li><strong>DbDo:</strong> Enter Child Table (Alt+RightArrow); Enter
+Child Table (Enter); Exit Child Table (Alt+LeftArrow); Exit Child Table
+(Backspace); Exit to Root Table (Alt+Home).</li>
+<li><strong>FileDir:</strong> Come up Level (,); Come up Level
+(Backspace); Go Back (Alt+LeftArrow); Go Forward (Alt+RightArrow); Go to
+Parent Folder (,); Go to Parent Folder (Shift+Backspace); Open Parent
+Folder (Backspace); Parent Folder (Backspace).</li>
+</ul>
+<h3 id="backslash-open-elsewhere-1">backslash, open elsewhere</h3>
+<ul>
+<li><strong>DbDo:</strong> Open Command Prompt (Control+); Open in
+Explorer (Alt+); Show in FileDir (Control+Shift+).</li>
+<li><strong>EdSharp:</strong> Open Command Prompt (Control+); Open in
+Explorer (Alt+); Show in FileDir (Control+Shift+).</li>
+<li><strong>FileDir:</strong> Go to Root Folder (Shift+); Open Command
+Prompt (Control+); Open in DbDo (Control+Shift+); Open in Explorer
+(Alt+); Open Root Folder ().</li>
+</ul>
+<h3 id="bookmarks-and-favorites-1">bookmarks and favorites</h3>
+<ul>
+<li><strong>DbDo:</strong> Clear Bookmark (Control+Shift+B); List
+Bookmarks (Alt+B); Save Bookmark (Control+B); Say Bookmark
+(Shift+B).</li>
+<li><strong>EdSharp:</strong> Clear Bookmark (Control+Shift+B); Clear
+Favorite (Control+Shift+L); List Bookmarks (Alt+B); List Favorites
+(Alt+L); Save Bookmark (Control+B); Set Favorite (Control+L).</li>
+</ul>
+<h3 id="case-lines-and-text-shape-1">case, lines and text shape</h3>
+<ul>
+<li><strong>EdSharp:</strong> Align (Alt+Shift+A); Baseline
+(Alt+Shift+6); Calculate Date (Control+Shift+;); Delete Hard Line
+(Control+D); End Tag (Control+Shift+.); Enter New Line (Enter); Evaluate
+Expression (Control+=); Format Code (Control+4); Hard Line Break
+(Control+Shift+H); Indent (Tab); Indent Mode (Alt+Shift+I); Indent New
+Line (Shift+Enter); Indent New Line Previous (Alt+Shift+Enter); Infer
+Indent (Alt+]); Insert Time (Control+;); Join Lines (Control+Shift+J);
+Justify (Alt+Shift+J); Left Brace (Control+Shift+[); Lower Case
+(Control+Shift+U); Next Baseline (Control+6); Next Indent (Control+I);
+Outdent (Shift+Tab); Previous Baseline (Control+Shift+6); Previous
+Indent (Control+Shift+I); Proper Case (Alt+U); PyBrace (Alt+Shift+[);
+PyDent (Alt+[); Quote (Control+Q); Repeat Line (Control+Y); Replace
+Tokens (Control+Shift+=); Right Brace (Control+Shift+]); Say Braces
+(Alt+Shift+]); Say Indentation (Alt+I); Section Break (Control+Enter);
+Set Selection Font (Alt+Shift+Dash); Start Tag (Control+Shift+,); Swap
+Case (Alt+Shift+U); Transform Files (Alt+=); Trim Blanks
+(Control+Shift+Enter); Unquote (Control+Shift+Q); Unwrap
+(Control+Shift+W); Upper Case (Control+U); Word Wrap (Control+W).</li>
+</ul>
+<h3 id="clipboard-1">clipboard</h3>
+<ul>
+<li><strong>DbDo:</strong> Append Clipboard (Control+Shift+‘); Clear
+Clipboard (Alt+Shift+’); Copy Append (Alt+C); Copy Append Record
+(Alt+Shift+C); Copy Cell (Control+C); Copy Grid (Control+F8); Copy Log
+(Control+F12); Copy Record (Control+Shift+C); Evaluate Expression
+(Control+=); Extract with Regex (Control+Shift+E); Save Clipboard
+(Control+‘); Say Clipboard (Alt+’).</li>
+<li><strong>EdSharp:</strong> Append Clipboard (Control+Shift+‘); Append
+from Clipboard (Alt+7); Clear Clipboard (Alt+Shift+’); Copy (Control+C);
+Copy All (Control+F8); Copy Append (Alt+C); Copy Log (Control+F12); Copy
+Rich Text (Control+Shift+C); Cut (Control+X); Cut Append (Alt+X); New
+from Clipboard (Control+Shift+N); Paste (Control+V); Paste File
+(Control+Shift+V); Path to Clipboard (Alt+Shift+P); Save Clipboard
+(Control+‘); Say Clipboard (Alt+’).</li>
+<li><strong>FileDir:</strong> Append Clipboard (Control+Shift+‘); Append
+File Contents (Alt+Shift+C); Clear Clipboard (Alt+Shift+’); Convert
+Units (Control+3); Copy (Control+C); Copy Append (Alt+C); Copy Log
+(Control+F12); Copy to Folder (Control+Shift+C); Cut (Control+X);
+Evaluate Expression (Control+=); Extract with Regex (Control+Shift+E);
+Name to Clipboard (Alt+Shift+N); Paste (Control+V); Paste Move
+(Control+Shift+V); Path List to Clipboard (Control+Shift+L); Path to
+Clipboard (Alt+Shift+P); Save Clipboard (Control+‘); Say Clipboard
+(Alt+’).</li>
+<li><strong>HomerView:</strong> Append Clipboard (Control+Shift+‘);
+Clear Clipboard (Alt+Shift+’); Copy All (Control+F8); Copy Append
+(Alt+C); Copy Line (Control+C); Copy Log (Alt+Shift+L); Page Links to
+Clipboard (Alt+Shift+P); Save Clipboard (Control+‘); Say Clipboard
+(Alt+’).</li>
+</ul>
+<h3 id="conversion-and-export-1">conversion and export</h3>
+<ul>
+<li><strong>DbDo:</strong> Export Data (Control+Shift+X); Import Data
+(Control+Shift+I).</li>
+<li><strong>EdSharp:</strong> Export Format (Control+Shift+X); HTML
+Format (Control+H); Open Other Format (Control+Shift+O); Text Combine
+(Alt+Shift+T); Text Contents (Control+Shift+T); Text Convert
+(Control+T); Translate Language (Alt+Shift+F7); Yield Encoding
+(Alt+Shift+Y).</li>
+<li><strong>FileDir:</strong> Convert Encoding (Control+2); Convert
+Units (Control+3); Export Type (Control+Shift+X); Say Character Encoding
+(Shift+2); Translate File (Alt+Shift+F7).</li>
+<li><strong>HomerView:</strong> Open Document (Control+O); Save Page
+(Control+S).</li>
+</ul>
+<h3 id="data-records-and-fields-1">data records and fields</h3>
+<ul>
+<li><strong>DbDo:</strong> Copy Append Record (Alt+Shift+C); Copy Record
+(Control+Shift+C); Delete Record (Control+D); Delete Record (Delete);
+Edit Cell (F2); Edit Notes (Alt+Shift+N); Edit Record (Control+E); Edit
+Tags (Alt+Shift+T); Edit url (Alt+Shift+U); Filter Records (Control+F);
+Generate Graphics (Alt+Shift+G); Generate Statistics (Alt+Shift+S); Go
+to Record (Control+G); Go to Record Again (Alt+G); Inspect Record
+(Alt+I); Mark Record (Control+M); Merge Data (Alt+M); New Record
+(Control+N); Null Value (Control+Shift+Backspace); Order Records
+(Alt+O); Pick Value (Control+F2); Query (Control+Q); Query History
+(Alt+Shift+Q); Record Macro (Control+Shift+F9); Refresh Records (F5);
+Say Notes (Shift+N); Say Query (Shift+Q); Say Select Columns (Shift+S);
+Say Tags (Shift+T); Say Whole Record (Shift+W); Select Columns (Alt+S);
+Table Properties (Alt+Enter); Table Summary (Alt+T); Unmark Record
+(Control+Shift+M).</li>
+</ul>
+<h3 id="delete-1">delete</h3>
+<ul>
+<li><strong>DbDo:</strong> Delete Record (Control+D); Delete Record
+(Delete); Delete without Confirmation (Control+Shift+D).</li>
+<li><strong>EdSharp:</strong> Delete Down (Alt+Shift+Delete); Delete
+File (Alt+Shift+D); Delete Hard Line (Control+D); Delete Left
+(Control+Shift+Backspace); Delete Line (Alt+Backspace); Delete Paragraph
+(Control+Shift+D); Delete Right (Control+Shift+Delete); Delete Up
+(Alt+Shift+Backspace).</li>
+<li><strong>FileDir:</strong> Delete (Delete); Delete and Recycle
+(Control+Delete); Delete and Recycle File Now (Control+D); Delete File
+Now (Control+Shift+D); Delete without Recycle (Shift+Delete).</li>
+</ul>
+<h3 id="editing-basics-1">editing basics</h3>
+<ul>
+<li><strong>DbDo:</strong> Replace (Control+R).</li>
+<li><strong>EdSharp:</strong> Complete Selection (Shift+F8); Enter New
+Line (Enter); Go to Start of Selection (Alt+Shift+F8); Redo
+(Control+Shift+Z); Replace (Control+R); Reselect (Control+Shift+F8);
+Select All (Control+A); Select Chunk (Control+Space); Special Character
+(F2); Start Selection (F8); Undo (Control+Z); Unselect All
+(Control+Shift+A).</li>
+<li><strong>HomerView:</strong> Complete Selection (Shift+F8); Go to
+Start of Selection (Alt+Shift+F8); Select Chunk (Control+Space); Start
+Selection (F8).</li>
+</ul>
+<h3 id="f1-help-1">f1 help</h3>
+<ul>
+<li><strong>DbDo:</strong> About (Alt+F1); Alternate Menu (Alt+F10);
+Documentation (F1); History of Changes (Control+Shift+F1); Key Describer
+Toggle (Control+F1); ReadMe (Alt+Shift+F1); What This Does (Shift+F1);
+Where Am I (Control+/).</li>
+<li><strong>EdSharp:</strong> About (Alt+F1); Alternate Menu (Alt+F10);
+Documentation (F1); History of Changes (Control+Shift+F1); Key Describer
+Toggle (Control+F1); ReadMe (Alt+Shift+F1); What This Does (Shift+F1);
+Where Am I (Control+/).</li>
+<li><strong>FileDir:</strong> About (Alt+F1); Alternate Menu (Alt+F10);
+Documentation (F1); History of Changes (Control+Shift+F1); Key Describer
+Toggle (Control+F1); ReadMe (Alt+Shift+F1); What This Does (Shift+F1);
+Where Am I (Control+/).</li>
+<li><strong>HomerView:</strong> About HomerView (Alt+F1); Alternate Menu
+(Alt+F10); History of Changes (Control+Shift+F1); Hotkey Summary
+(Alt+Shift+H); Key Describer Toggle (Control+F1); ReadMe
+(Alt+Shift+F1).</li>
+</ul>
+<h3 id="f2-edit-and-rename-1">f2 edit and rename</h3>
+<ul>
+<li><strong>DbDo:</strong> Edit Cell (F2); Pick Value (Control+F2).</li>
+<li><strong>EdSharp:</strong> Rename (Shift+F2); Sample Programs
+(Control+Shift+F2); Special Character (F2).</li>
+<li><strong>FileDir:</strong> Rename (F2); Rename (Shift+F2); Reorder
+Names (Control+F2); Stop Timer (Alt+F2).</li>
+</ul>
+<h3 id="f3-search-again-1">f3 search again</h3>
+<ul>
+<li><strong>DbDo:</strong> Forward Find with Regex (Control+F3); Reverse
+Find with Regex (Control+Shift+F3); Search Next (F3); Search Previous
+(Shift+F3).</li>
+<li><strong>EdSharp:</strong> Forward Find at Cursor (Alt+F3); Forward
+Find with Regex (Control+F3); Reverse Find at Cursor (Alt+Shift+F3);
+Reverse Find with Regex (Control+Shift+F3); Search Next (F3); Search
+Previous (Shift+F3).</li>
+<li><strong>FileDir:</strong> Search Next (F3); Search Previous
+(Shift+F3).</li>
+<li><strong>HomerView:</strong> Forward Find at Cursor (Alt+F3); Forward
+Find with Regex (Control+F3); Reverse Find at Cursor (Alt+Shift+F3);
+Reverse Find with Regex (Control+Shift+F3); Search Next (F3); Search
+Previous (Shift+F3).</li>
+</ul>
+<h3 id="f4-windows-1">f4 windows</h3>
+<ul>
+<li><strong>DbDo:</strong> Close All but Current Window
+(Control+Shift+F4); Close Window (Control+F4); Current Windows (F4);
+Exit DbDo (Alt+F4); Say Windows Open (Shift+F4).</li>
+<li><strong>EdSharp:</strong> Close All but Current Window
+(Control+Shift+F4); Close Window (Control+F4); Current Windows (F4);
+Exit EdSharp (Alt+F4); Say Windows Open (Shift+F4).</li>
+<li><strong>FileDir:</strong> Close All but Current Window
+(Control+Shift+F4); Close Window (Control+F4); Current Windows (F4);
+Exit FileDir (Alt+F4); Restart Windows (Alt+Shift+F4); Say Windows Open
+(Shift+F4).</li>
+<li><strong>HomerView:</strong> Tab Close Others (Control+Shift+F4); Tab
+List (F4); Tab Names (Shift+F4).</li>
+</ul>
+<h3 id="f5-refresh-and-run-1">f5 refresh and run</h3>
+<ul>
+<li><strong>DbDo:</strong> Refresh Records (F5).</li>
+<li><strong>EdSharp:</strong> Compile (Control+F5); Pick Compiler
+(Control+Shift+F5); Prompt Command (Alt+F5); Review Output
+(Alt+Shift+F5); Run (F5); Run at Cursor (Shift+F5).</li>
+<li><strong>FileDir:</strong> Refresh Folder (F5).</li>
+<li><strong>HomerView:</strong> List Form Fields (NVDA+F5).</li>
+</ul>
+<h3 id="f6-panes-sections-and-views-1">f6 panes, sections and views</h3>
+<ul>
+<li><strong>DbDo:</strong> Next Table or View (Control+F6); Previous
+Table or View (Control+Shift+F6); View Cycle (F6); View Cycle Back
+(Shift+F6).</li>
+<li><strong>EdSharp:</strong> Go to Contents (Shift+F6); Go to Section
+(F6); Next Section (Control+F6); Previous Section (Control+Shift+F6);
+Search for Topic (Alt+F6).</li>
+<li><strong>FileDir:</strong> Next Pane (F6); Next Sibling Folder
+(Control+F6); Next Visited Folder (Alt+F6); Previous Pane (Shift+F6);
+Previous Sibling Folder (Control+Shift+F6); Previous Visited Folder
+(Alt+Shift+F6).</li>
+<li><strong>HomerView:</strong> List Headings (NVDA+F6).</li>
+</ul>
+<h3 id="f7-review-and-language-1">f7 review and language</h3>
+<ul>
+<li><strong>EdSharp:</strong> Guard Document (Control+F7); Lookup Term
+(Alt+F7); No Guard (Control+Shift+F7); Spell Check (F7); Thesaurus
+(Shift+F7); Translate Language (Alt+Shift+F7).</li>
+<li><strong>FileDir:</strong> Translate File (Alt+Shift+F7).</li>
+<li><strong>HomerView:</strong> List Links (Shift+NVDA+F7).</li>
+</ul>
+<h3 id="f8-selection-marking-and-reading-all-1">f8 selection, marking
+and reading all</h3>
+<ul>
+<li><strong>DbDo:</strong> Complete Mark (Shift+F8); Complete Unmark
+(Alt+Shift+F8); Copy Grid (Control+F8); Read Wide (Alt+F8); Start Mark
+or Unmark (F8).</li>
+<li><strong>EdSharp:</strong> Complete Selection (Shift+F8); Copy All
+(Control+F8); Go to Start of Selection (Alt+Shift+F8); Read All
+(Alt+F8); Reselect (Control+Shift+F8); Start Selection (F8).</li>
+<li><strong>FileDir:</strong> Complete Mark (Shift+F8); Complete Unmark
+(Alt+Shift+F8); Read Lean (Alt+F8); Start Mark or Unmark (F8).</li>
+<li><strong>HomerView:</strong> Complete Selection (Shift+F8); Copy All
+(Control+F8); Go to Start of Selection (Alt+Shift+F8); Read All
+(Alt+F8); Start Selection (F8).</li>
+</ul>
+<h3 id="f9-readable-view-1">f9 readable view</h3>
+<ul>
+<li><strong>DbDo:</strong> Record Macro (Control+Shift+F9).</li>
+<li><strong>EdSharp:</strong> Check Markdown (Alt+F9); Preview Markdown
+(Control+F9); Run Code Blocks (Alt+Shift+F9).</li>
+<li><strong>HomerView:</strong> Extract Main Content (Shift+F9).</li>
+</ul>
+<h3 id="f10-menus-1">f10 menus</h3>
+<ul>
+<li><strong>DbDo:</strong> Alternate Menu (Alt+F10); Context Menu
+(Shift+F10).</li>
+<li><strong>EdSharp:</strong> Alternate Menu (Alt+F10); Context Menu
+(Shift+F10); SendTo Menu (Control+F10).</li>
+<li><strong>FileDir:</strong> Alternate Menu (Alt+F10); Context Menu
+(Shift+F10); SendTo Menu (Control+F10).</li>
+<li><strong>HomerView:</strong> Alternate Menu (Alt+F10).</li>
+</ul>
+<h3 id="f11-version-and-window-layout-1">f11 version and window
+layout</h3>
+<ul>
+<li><strong>DbDo:</strong> Elevate Version (F11).</li>
+<li><strong>EdSharp:</strong> Arrange Icons (Alt+F11); Cascade
+(Control+F11); Elevate Version (F11); Tile Horizontal (Alt+Shift+F11);
+Tile Vertical (Shift+F11).</li>
+<li><strong>FileDir:</strong> Arrange Icons (Alt+F11); Cascade
+(Control+F11); Elevate Version (F11); Tile Horizontal (Alt+Shift+F11);
+Tile Vertical (Shift+F11).</li>
+<li><strong>HomerView:</strong> Elevate Version (Alt+NVDA+F11); Elevate
+Version (Control+F11).</li>
+</ul>
+<h3 id="f12-ai-logs-media-and-macros-1">f12 ai, logs, media and
+macros</h3>
+<ul>
+<li><strong>DbDo:</strong> Chat about Table (Shift+F12); Chat with AI
+(F12); Copy Log (Control+F12); Play Macro (Alt+Shift+F12); Play
+Tutorials (Alt+F12).</li>
+<li><strong>EdSharp:</strong> Chat about Document (Shift+F12); Chat with
+AI (F12); Copy Log (Control+F12); Go to Environment (Control+Shift+F12);
+Play Tutorials (Alt+F12).</li>
+<li><strong>FileDir:</strong> Chat about File (Shift+F12); Chat with AI
+(F12); Copy Log (Control+F12); Play Tutorials (Alt+F12).</li>
+</ul>
+<h3 id="filter-and-order-1">filter and order</h3>
+<ul>
+<li><strong>DbDo:</strong> Add Column to Order (Alt+A); Add Column to
+Order Descending (Alt+Shift+A); Clear Filter (Control+Shift+F); Filter
+Records (Control+F); Order Records (Alt+O); Reverse Order (Alt+Shift+O);
+Say Filter (Shift+F); Say Filter and Order (Shift+8); Say Order
+(Shift+O).</li>
+<li><strong>FileDir:</strong> Alpha Order (Alt+A); Clear Filter
+(Control+Shift+F); Date Order (Alt+D); Filter Items (Control+F); Reverse
+Alpha Order (Alt+Shift+A); Reverse Date Order (Alt+Shift+D); Reverse
+Size Order (Alt+Shift+S); Reverse Type Order (Alt+Shift+T); Say Filter
+(Shift+F); Say Filter and Order (Shift+8); Say Order (Shift+O); Size
+Order (Alt+S); Type Order (Alt+T).</li>
+</ul>
+<h3 id="folders-and-windows-tools-1">folders and windows tools</h3>
+<ul>
+<li><strong>DbDo:</strong> Context Menu (Shift+F10).</li>
+<li><strong>EdSharp:</strong> Context Menu (Shift+F10); Environment
+Variables (Control+E); SendTo Menu (Control+F10).</li>
+<li><strong>FileDir:</strong> Context Menu (Applications); Context Menu
+(Shift+F10); Copy to Folder (Control+Shift+C); Environment Variables
+(Control+E); Go to Folder (Control+G); Go to Parent Folder (,); Go to
+Parent Folder (Shift+Backspace); Go to Quick Folder (`); Go to Root
+Folder (Shift+); Go to Special Folder (Control+Shift+G); Go to Virtual
+Folder (Alt+Shift+G); Move to Folder (Control+Shift+M); New Folder
+(Control+N); Next Sibling Folder (Control+F6); Next Visited Folder
+(Alt+F6); Open Folder (Control+O); Open Parent Folder (Backspace); Open
+Quick Folder (Control+Q); Open Root Folder (); Open Special Folder
+(Control+Shift+O); Open Virtual Folder (Alt+Shift+O); Parent Folder
+(Backspace); Previous Sibling Folder (Control+Shift+F6); Previous
+Visited Folder (Alt+Shift+F6); Quick Shortcut (Control+Shift+Q); Quick
+url (Alt+Shift+Q); ReadOnly (]); ReadWrite ([); Recycle Bin (Control+B);
+Refresh Folder (.); Refresh Folder (F5); Restart Windows (Alt+Shift+F4);
+SendTo Menu (Control+F10); Windows Control Panel (Control+Shift+W).</li>
+</ul>
+<h3 id="go-to-and-open-1">go to and open</h3>
+<ul>
+<li><strong>DbDo:</strong> Choose Table (Control+T); Go to Record
+(Control+G); Open Cell Value (Control+Enter); Open Command Prompt
+(Control+); Open Database (Control+O); Open Dot Prompt (Control+`); Open
+in Explorer (Alt+); Open Table (Control+Shift+O); Open Template Database
+(Alt+D); Open url (Control+Shift+U); Recent Databases (Alt+R).</li>
+<li><strong>EdSharp:</strong> Choose Folder (Control+0); Go to Contents
+(Shift+F6); Go to Environment (Control+Shift+F12); Go to Part
+(Alt+Shift+G); Go to Percent (Control+G); Go to Section (F6); Go to
+Special Folder (Control+Shift+G); Go to Start of Selection
+(Alt+Shift+F8); Insert All Users Path (Control+Shift+I); Insert Script
+Path (Control+I); List Favorites (Alt+L); Open (Control+O); Open Command
+Prompt (Control+); Open in Explorer (Alt+); Open Other Format
+(Control+Shift+O); Path List (Control+Shift+P); Recent Files
+(Alt+R).</li>
+<li><strong>FileDir:</strong> Drive Letter (Alt+1); Drive Letter
+(Alt+9); Go to Drive (Alt+G); Go to Folder (Control+G); Go to Item
+(Shift+Enter); Go to Parent Folder (,); Go to Parent Folder
+(Shift+Backspace); Go to Quick Folder (`); Go to Root Folder (Shift+);
+Go to Special Folder (Control+Shift+G); Go to Virtual Folder
+(Alt+Shift+G); Open Command Prompt (Control+); Open Drive (Alt+O); Open
+Folder (Control+O); Open in DbDo (Control+Shift+); Open in Explorer
+(Alt+); Open Item (Enter); Open Parent Folder (Backspace); Open Quick
+Folder (Control+Q); Open Root Folder (); Open Special Folder
+(Control+Shift+O); Open Virtual Folder (Alt+Shift+O); Recent Folders
+(Alt+R).</li>
+<li><strong>HomerView:</strong> Choose Browser (Alt+Shift+B); Go to
+Percent (Control+G); Go to Start of Selection (Alt+Shift+F8); Open
+Document (Control+O); Recent Pages (Alt+R).</li>
+</ul>
+<h3 id="grid-table-keys-1">grid table keys</h3>
+<ul>
+<li><strong>DbDo:</strong> Cell Down (Control+Alt+DownArrow); Cell Left
+(Control+Alt+LeftArrow); Cell Right (Control+Alt+RightArrow); Cell Up
+(Control+Alt+UpArrow); Column Bottom (Control+Alt+PageDown); Column Top
+(Control+Alt+PageUp); Cursor Grid End (Control+Alt+End); Cursor Grid
+Start (Control+Alt+Home); Say Cell Coordinates
+(Control+Alt+Shift+NumPad5); Say Column (Control+Alt+Shift+DownArrow);
+Say Column Header (Control+Alt+Shift+UpArrow); Say Row
+(Control+Alt+Shift+RightArrow); Say Row Header
+(Control+Alt+Shift+LeftArrow); Unmark to First (Control+Alt+Shift+Home);
+Unmark to Last (Control+Alt+Shift+End).</li>
+</ul>
+<h3 id="home-and-end-1">home and end</h3>
+<ul>
+<li><strong>DbDo:</strong> Cursor Column First (Control+Home); Cursor
+Column Last (Control+End); Cursor Grid End (Control+Alt+End); Cursor
+Grid Start (Control+Alt+Home); Cursor Row End (End); Cursor Row Start
+(Home); Unmark to First (Control+Alt+Shift+Home); Unmark to Last
+(Control+Alt+Shift+End).</li>
+<li><strong>EdSharp:</strong> End Character (Alt+End); Home Character
+(Alt+Home).</li>
+<li><strong>FileDir:</strong> Beginning File (Alt+B); Beginning File
+(Alt+Home); Unmark to First (Alt+Shift+Home); Unmark to First
+(Control+Alt+Shift+Home); Unmark to Last (Alt+Shift+End); Unmark to Last
+(Control+Alt+Shift+End).</li>
+</ul>
+<h3 id="item-lists-in-text-1">item lists in text</h3>
+<ul>
+<li><strong>EdSharp:</strong> Keep Unique Items (Alt+Shift+K); List
+Different Items (Alt+Shift+L); Number Items (Alt+Shift+N); Order Items
+(Alt+Shift+O); Query Common Items (Alt+Shift+Q); Reverse Items
+(Alt+Shift+R).</li>
+<li><strong>FileDir:</strong> Filter Items (Control+F).</li>
+</ul>
+<h3 id="launch-from-the-desktop-1">launch from the desktop</h3>
+<ul>
+<li><strong>EdSharp:</strong> Launch EdSharp (Control+Alt+E).</li>
+<li><strong>FileDir:</strong> Launch FileDir (Control+Alt+F).</li>
+<li><strong>HomerView:</strong> Launch HomerView
+(Control+Alt+Shift+H).</li>
+</ul>
+<h3 id="local-ai-1">local ai</h3>
+<ul>
+<li><strong>DbDo:</strong> Chat about Table (Shift+F12); Chat with AI
+(F12).</li>
+<li><strong>EdSharp:</strong> Chat about Document (Shift+F12); Chat with
+AI (F12).</li>
+<li><strong>FileDir:</strong> Chat about File (Shift+F12); Chat with AI
+(F12).</li>
+</ul>
+<h3 id="mail-send-and-web-1">mail, send and web</h3>
+<ul>
+<li><strong>EdSharp:</strong> Burn to CD (Alt+Shift+B); Mail
+(Control+M); SendTo Menu (Control+F10); Web Client Utilities
+(Control+JAWS+Space); Web Download (Alt+Shift+W).</li>
+<li><strong>FileDir:</strong> Burn to CD (Alt+Shift+B); Mail
+(Control+M); Send to Text Editor (Control+T); Send to Word Processor
+(Control+W); SendTo Menu (Control+F10); Web Download (Alt+Shift+W).</li>
+<li><strong>HomerView:</strong> Web Download (Alt+Shift+W).</li>
+</ul>
+<h3 id="marking-1">marking</h3>
+<ul>
+<li><strong>DbDo:</strong> Complete Mark (Shift+F8); Complete Unmark
+(Alt+Shift+F8); First Marked (Control+PageUp); Invert Marked
+(Control+I); Last Marked (Control+PageDown); Mark All (Control+A); Mark
+and Next (Shift+DownArrow); Mark and Previous (Shift+UpArrow); Mark
+Record (Control+M); Mark to First (Control+Shift+Home); Mark to Last
+(Control+Shift+End); Next Marked (Control+DownArrow); Previous Marked
+(Control+UpArrow); Start Mark or Unmark (F8); Toggle Mark
+(Control+Space); Toggle Mark (Space); Unmark All (Control+Shift+A);
+Unmark and Next (Control+Shift+DownArrow); Unmark and Previous
+(Control+Shift+UpArrow); Unmark Record (Control+Shift+M); Unmark to
+First (Control+Alt+Shift+Home); Unmark to Last
+(Control+Alt+Shift+End).</li>
+<li><strong>FileDir:</strong> Complete Mark (Shift+F8); Complete Unmark
+(Alt+Shift+F8); First Marked (Control+PageUp); Invert Marked
+(Control+I); Last Marked (Control+PageDown); Mark (;); Mark All
+(Control+A); Mark All Files (Alt+.); Mark and Next (Shift+DownArrow);
+Mark and Previous (Shift+UpArrow); Mark Duplicate Files (Alt+Shift+.);
+Mark Similar Files (Alt+Shift+,); Mark to First (Control+Shift+Home);
+Mark to First (Shift+Home); Mark to Last (Control+Shift+End); Mark to
+Last (Shift+End); Mark with Regex (Control+Shift+.); Next Marked
+(Control+DownArrow); Previous Marked (Control+UpArrow); Restore Marks
+(Control+Shift+S); Save Marks (Control+S); Start Mark or Unmark (F8);
+Toggle Mark (Control+Space); Toggle Mark (Space); Unmark (/); Unmark
+(Alt+Shift+NumPad5); Unmark All (Control+Shift+A); Unmark All but
+Current (Alt+,); Unmark and Next (Control+Shift+DownArrow); Unmark and
+Previous (Control+Shift+UpArrow); Unmark to First (Alt+Shift+Home);
+Unmark to First (Control+Alt+Shift+Home); Unmark to Last
+(Alt+Shift+End); Unmark to Last (Control+Alt+Shift+End).</li>
+</ul>
+<h3 id="media-and-play-1">media and play</h3>
+<ul>
+<li><strong>DbDo:</strong> Play Macro (Alt+Shift+F12); Play Media
+(Control+P); Play Tutorials (Alt+F12); Record Playback
+(Control+Shift+P).</li>
+<li><strong>EdSharp:</strong> Play Tutorials (Alt+F12).</li>
+<li><strong>FileDir:</strong> Play Media (Control+P); Play Tutorials
+(Alt+F12); Record Playback (Control+Shift+P).</li>
+</ul>
+<h3 id="new-and-save-1">new and save</h3>
+<ul>
+<li><strong>DbDo:</strong> New Copy (Control+Shift+N); New Record
+(Control+N); Save (Control+S); Save As (Control+Shift+S).</li>
+<li><strong>EdSharp:</strong> New (Control+N); New from Clipboard
+(Control+Shift+N); Save (Control+S); Save As (Control+Shift+S); Save
+Copy (Alt+Shift+S).</li>
+<li><strong>FileDir:</strong> New Copy (Control+Shift+N); New Folder
+(Control+N); Restore Marks (Control+Shift+S); Save Marks
+(Control+S).</li>
+</ul>
+<h3 id="properties-and-details-1">properties and details</h3>
+<ul>
+<li><strong>DbDo:</strong> Inspect Record (Alt+I); Table Properties
+(Alt+Enter); Table Summary (Alt+T).</li>
+<li><strong>EdSharp:</strong> Properties (Alt+Enter).</li>
+<li><strong>FileDir:</strong> Inquire Differences (Alt+Shift+I); Iterate
+Processes (Alt+I); Properties (Alt+Enter); Show Type Extended
+(Control+Shift+T).</li>
+</ul>
+<h3 id="reading-aloud-1">reading aloud</h3>
+<ul>
+<li><strong>DbDo:</strong> Read Lean (Alt+L); Read Lean from Current
+(Control+L); Read Lean Marked (Alt+Shift+L); Read Wide (Alt+F8); Read
+Wide (Alt+W); Read Wide from Current (Control+W); Read Wide Marked
+(Alt+Shift+W); Read Wide Marked (Shift+Space).</li>
+<li><strong>EdSharp:</strong> Read All (Alt+F8); Say Selected
+(Shift+JAWS+DownArrow); Say Selected (Shift+Space).</li>
+<li><strong>FileDir:</strong> Read Lean (Alt+F8); Read Lean (Alt+L);
+Read Lean from Current (Control+L); Read Lean Marked (Alt+Shift+L); Say
+Selected (Shift+JAWS+DownArrow); Say Selected (Shift+Space).</li>
+<li><strong>HomerView:</strong> Read All (Alt+F8); Say Selected
+(Shift+Space); Toggle Reading (ScrollLock).</li>
+</ul>
+<h3 id="regex-1">regex</h3>
+<ul>
+<li><strong>DbDo:</strong> Extract with Regex (Control+Shift+E); Forward
+Find with Regex (Control+F3); Replace with Regex (Control+Shift+R);
+Reverse Find with Regex (Control+Shift+F3); Yield with Regex
+(Control+Shift+Y).</li>
+<li><strong>EdSharp:</strong> Extract with Regex (Control+Shift+E);
+Forward Find with Regex (Control+F3); Replace with Regex
+(Control+Shift+R); Reverse Find with Regex (Control+Shift+F3); Yield
+with Regex (Control+Shift+Y).</li>
+<li><strong>FileDir:</strong> Extract with Regex (Control+Shift+E); Mark
+with Regex (Control+Shift+.); Rename with Regex (Control+Shift+R); Yield
+with Regex (Control+Shift+Y).</li>
+<li><strong>HomerView:</strong> Forward Find with Regex (Control+F3);
+Reverse Find with Regex (Control+Shift+F3); Yield with Regex
+(Control+Shift+Y).</li>
+</ul>
+<h3 id="rename-1">rename</h3>
+<ul>
+<li><strong>EdSharp:</strong> Rename (Shift+F2).</li>
+<li><strong>FileDir:</strong> Rename (F2); Rename (Shift+F2); Rename to
+Identify Content (Control+Shift+I); Rename with Regex (Control+Shift+R);
+Rename with Wildcards (Control+R); Reorder Names (Control+F2).</li>
+</ul>
+<h3 id="repeat-and-next-or-previous-1">repeat and next or previous</h3>
+<ul>
+<li><strong>DbDo:</strong> Next Marked (Control+DownArrow); Next Table
+or View (Control+F6); Next Window (Control+Tab); Previous Marked
+(Control+UpArrow); Previous Table or View (Control+Shift+F6); Previous
+Window (Control+Shift+Tab).</li>
+<li><strong>EdSharp:</strong> Next Alignment (Control+]); Next Baseline
+(Control+6); Next Chunk (Alt+RightArrow); Next Font (Control+Dash); Next
+Indent (Control+I); Next Paragraph (Control+DownArrow); Next Part
+(Alt+PageDown); Next Section (Control+F6); Next Sentence
+(Alt+DownArrow); Next Style (Alt+.); Next Window (Control+Tab); Next
+Word (Control+RightArrow); Previous Alignment (Control+[); Previous
+Baseline (Control+Shift+6); Previous Chunk (Alt+LeftArrow); Previous
+Font (Control+Shift+Dash); Previous Indent (Control+Shift+I); Previous
+Paragraph (Control+UpArrow); Previous Part (Alt+PageUp); Previous
+Section (Control+Shift+F6); Previous Sentence (Alt+UpArrow); Previous
+Style (Alt+,); Previous Window (Control+Shift+Tab); Previous Word
+(Control+LeftArrow).</li>
+<li><strong>FileDir:</strong> Next Marked (Control+DownArrow); Next Pane
+(F6); Next Sibling Folder (Control+F6); Next Visited Folder (Alt+F6);
+Next Window (Control+Tab); Previous Marked (Control+UpArrow); Previous
+Pane (Shift+F6); Previous Sibling Folder (Control+Shift+F6); Previous
+Visited Folder (Alt+Shift+F6); Previous Window (Control+Shift+Tab).</li>
+<li><strong>HomerView:</strong> Next Different Kind (Alt+Z); Next
+Paragraph (Control+DownArrow); Next Same Kind (Z); Next Sentence
+(Alt+DownArrow); Previous Different Kind (Alt+Shift+Z); Previous
+Paragraph (Control+UpArrow); Previous Same Kind (Shift+Z); Previous
+Sentence (Alt+UpArrow).</li>
+</ul>
+<h3 id="say-on-alt-1">say, on alt</h3>
+<ul>
+<li><strong>DbDo:</strong> Say Clipboard (Alt+’); Say Path (Alt+P); Say
+Position (Alt+Delete); Say Status (Alt+Z); Say Yield (Alt+Y); Say Yield
+Marked (Alt+Shift+Y).</li>
+<li><strong>EdSharp:</strong> Say Address (Alt+A); Say Braces
+(Alt+Shift+]); Say Clipboard (Alt+’); Say Compiler (Alt+0); Say
+Indentation (Alt+I); Say Path (Alt+P); Say Position (Alt+Delete); Say
+Status (Alt+Z); Say Styles (Alt+/); Say Yield (Alt+Y); Topic
+(Alt+T).</li>
+<li><strong>FileDir:</strong> Say Clipboard (Alt+’); Say Path (Alt+P);
+Say Position (Alt+Delete); Say Status (Alt+Z); Say Windows Open
+(Alt+NumPad5); Say Yield (Alt+Y); Say Yield Marked (Alt+Shift+Y).</li>
+<li><strong>HomerView:</strong> Say Address (Alt+A); Say Clipboard
+(Alt+’); Say Metadata (Alt+M); Say Position (Alt+Delete); Say Position
+(Alt+NumPadDelete); Say url (Alt+U); Say Yield (Alt+Y).</li>
+</ul>
+<h3 id="say-on-shift-1">say, on shift</h3>
+<ul>
+<li><strong>DbDo:</strong> Say Added (Shift+A); Say Bookmark (Shift+B);
+Say Cell (Shift+C); Say Database (Shift+D); Say Edited (Shift+E); Say
+Filter (Shift+F); Say Filter and Order (Shift+8); Say Go to (Shift+G);
+Say ID (Shift+I); Say Invoke Script (Shift+V); Say Jump (Shift+J); Say
+Keywords (Shift+K); Say Look (Shift+L); Say Marked (Shift+M); Say Notes
+(Shift+N); Say Order (Shift+O); Say Prime (Shift+P); Say Query
+(Shift+Q); Say Replace Values (Shift+R); Say Select Columns (Shift+S);
+Say Status (Shift+Z); Say Tags (Shift+T); Say url (Shift+U); Say Whole
+Record (Shift+W); Say Windows Open (Shift+F4).</li>
+<li><strong>EdSharp:</strong> Say Chunk (Shift+Backspace); Say Selected
+(Shift+Space); Say Windows Open (Shift+F4).</li>
+<li><strong>FileDir:</strong> Say Character Encoding (Shift+2); Say Date
+(Shift+D); Say Filter (Shift+F); Say Filter and Order (Shift+8); Say
+Folder Name (Shift+‘); Say Item Name (’); Say Marked (Shift+M); Say
+Order (Shift+O); Say Position (Shift+5); Say Selected (Shift+Space); Say
+Size (Shift+S); Say Status (Shift+Z); Say Type (Shift+T); Say Unarchive
+Test (Shift+U); Say What Content (Shift+/); Say Windows Open (Shift+F4);
+Say Yield on Drive (Shift+Y).</li>
+<li><strong>HomerView:</strong> Say Chunk (Shift+Backspace); Say
+Selected (Shift+Space).</li>
+</ul>
+<h3 id="scripts-and-macros-1">scripts and macros</h3>
+<ul>
+<li><strong>DbDo:</strong> Edit Script (Alt+Shift+V); Invoke Script
+(Alt+V); Open Command Prompt (Control+); Open Dot Prompt
+(Control+<code>); Play Macro (Alt+Shift+F12); Record Macro (Control+Shift+F9); Run Report (Alt+Shift+R); Say Invoke Script (Shift+V); Sqlean Console (Control+Shift+</code>).</li>
+<li><strong>EdSharp:</strong> Compile (Control+F5); Edit Script
+(Alt+Shift+V); Go to Environment (Control+Shift+F12); Insert Script Path
+(Control+I); Invoke Script (Alt+V); Open Command Prompt (Control+); Pick
+Compiler (Control+Shift+F5); Prompt Command (Alt+F5); Run (F5); Run at
+Cursor (Shift+F5); Run Code Blocks (Alt+Shift+F9); Save Script (Alt+S);
+Say Compiler (Alt+0).</li>
+<li><strong>FileDir:</strong> Open Command Prompt (Control+).</li>
+</ul>
+<h3 id="search-1">search</h3>
+<ul>
+<li><strong>DbDo:</strong> Forward Find with Regex (Control+F3); Jump
+(Control+J); Keywords (Control+K); Reverse Find with Regex
+(Control+Shift+F3); Reverse Jump (Control+Shift+J); Reverse Keywords
+(Control+Shift+K); Search Next (F3); Search Previous (Shift+F3).</li>
+<li><strong>EdSharp:</strong> File Find (Alt+Shift+F); Forward Find
+(Control+F); Forward Find at Cursor (Alt+F3); Forward Find with Regex
+(Control+F3); Jump to Line (Control+J); Reverse Find (Control+Shift+F);
+Reverse Find at Cursor (Alt+Shift+F3); Reverse Find with Regex
+(Control+Shift+F3); Search for Topic (Alt+F6); Search Next (F3); Search
+Previous (Shift+F3).</li>
+<li><strong>FileDir:</strong> File Find (Alt+Shift+F); Find Duplicates
+in Tree (Alt+Shift+J); Jump (Control+J); Keywords (Control+K); Reverse
+Jump (Control+Shift+J); Reverse Keywords (Control+Shift+K); Search Next
+(F3); Search Previous (Shift+F3).</li>
+<li><strong>HomerView:</strong> Find Contacts (Alt+Shift+C); Forward
+Find (Control+F); Forward Find at Cursor (Alt+F3); Forward Find with
+Regex (Control+F3); Jump to Main (Alt+NVDA+J); Jump to Main (J); Jump to
+Probable Main (Shift+J); Reverse Find (Control+Shift+F); Reverse Find at
+Cursor (Alt+Shift+F3); Reverse Find with Regex (Control+Shift+F3);
+Search Next (F3); Search Previous (Shift+F3).</li>
+</ul>
+<h3 id="settings-and-toggles-1">settings and toggles</h3>
+<ul>
+<li><strong>DbDo:</strong> Edit Settings (Alt+Shift+E); Key Describer
+Toggle (Control+F1); Read Only Toggle (Control+Shift+Z); Toggle Mark
+(Control+Space); Toggle Mark (Space).</li>
+<li><strong>EdSharp:</strong> Append from Clipboard (Alt+7); Edit
+Settings (Alt+Shift+E); Guard Document (Control+F7); Indent Mode
+(Alt+Shift+I); Key Describer Toggle (Control+F1); No Guard
+(Control+Shift+F7); Reset Configuration (Alt+Shift+0); Set Default Font
+and Color (Alt+Shift+=).</li>
+<li><strong>FileDir:</strong> Edit Settings (Alt+Shift+E); Key Describer
+Toggle (Control+F1); Recycle Toggle (Alt+Shift+R); Timer Toggle
+(Alt+Shift+Z); Toggle Mark (Control+Space); Toggle Mark (Space).</li>
+<li><strong>HomerView:</strong> Edit Settings (Alt+Shift+E); Key
+Describer Toggle (Control+F1).</li>
+</ul>
+<h3 id="space-bar-1">space bar</h3>
+<ul>
+<li><strong>DbDo:</strong> Read Wide Marked (Shift+Space); Toggle Mark
+(Control+Space); Toggle Mark (Space).</li>
+<li><strong>EdSharp:</strong> Say Selected (Shift+Space); Select Chunk
+(Control+Space); Web Client Utilities (Control+JAWS+Space).</li>
+<li><strong>FileDir:</strong> Say Selected (Shift+Space); Toggle Mark
+(Control+Space); Toggle Mark (Space).</li>
+<li><strong>HomerView:</strong> Say Selected (Shift+Space); Select Chunk
+(Control+Space).</li>
+</ul>
+<h3 id="web-pages-1">web pages</h3>
+<ul>
+<li><strong>HomerView:</strong> Check Accessibility (Alt+Shift+A);
+Choose Browser (Alt+Shift+B); Dismiss Dialog (Alt+Shift+D); Explore Page
+(Alt+NVDA+E); Explore Page (Y); Extract Main Content (Shift+F9); Find
+Contacts (Alt+Shift+C); Instruct Page (Alt+I); Jump to Main
+(Alt+NVDA+J); Jump to Main (J); Jump to Probable Main (Shift+J); Link
+Target (Alt+L); List Elements (Alt+NVDA+L); List Form Fields (NVDA+F5);
+List Links (Shift+NVDA+F7); List Names (Alt+N); Next Different Kind
+(Alt+Z); Next Same Kind (Z); Page Folder (Alt+Shift+F); Page Links to
+Clipboard (Alt+Shift+P); Previous Different Kind (Alt+Shift+Z); Previous
+Same Kind (Shift+Z); Recent Pages (Alt+R); Save Page (Control+S); Say
+Address (Alt+A); Say Address Anywhere (Alt+NVDA+U); Say Metadata
+(Alt+M); Session Log (Control+Shift+L); Submit Form (Control+Enter); Tab
+Names (Shift+F4); Yield Structure (Alt+Shift+Y).</li>
+</ul>
+<h3 id="windows-1">windows</h3>
+<ul>
+<li><strong>DbDo:</strong> Close All but Current Window
+(Control+Shift+F4); Close Window (Control+F4); Current Windows (F4);
+Next Window (Control+Tab); Previous Window (Control+Shift+Tab); Say
+Windows Open (Shift+F4).</li>
+<li><strong>EdSharp:</strong> Arrange Icons (Alt+F11); Cascade
+(Control+F11); Close All but Current Window (Control+Shift+F4); Close
+Window (Control+F4); Current Windows (F4); Next Window (Control+Tab);
+Previous Window (Control+Shift+Tab); Say Windows Open (Shift+F4); Tile
+Horizontal (Alt+Shift+F11); Tile Vertical (Shift+F11).</li>
+<li><strong>FileDir:</strong> Arrange Icons (Alt+F11); Cascade
+(Control+F11); Close All but Current Window (Control+Shift+F4); Close
+Window (Control+F4); Current Windows (F4); Next Window (Control+Tab);
+Previous Window (Control+Shift+Tab); Restart Windows (Alt+Shift+F4); Say
+Windows Open (Alt+NumPad5); Say Windows Open (Shift+F4); Tile Horizontal
+(Alt+Shift+F11); Tile Vertical (Shift+F11); Windows Control Panel
+(Control+Shift+W).</li>
+<li><strong>HomerView:</strong> Tab Close Others (Control+Shift+F4); Tab
+List (F4); Tab Names (Shift+F4).</li>
+</ul>
+<h3 id="yield-counting-1">yield (counting)</h3>
+<ul>
+<li><strong>DbDo:</strong> Say Yield (Alt+Y); Say Yield from Current
+(Control+Y); Say Yield Marked (Alt+Shift+Y); Yield with Regex
+(Control+Shift+Y).</li>
+<li><strong>EdSharp:</strong> Say Yield (Alt+Y); Yield Encoding
+(Alt+Shift+Y); Yield with Regex (Control+Shift+Y).</li>
+<li><strong>FileDir:</strong> Say Yield (Alt+Y); Say Yield from Current
+(Control+Y); Say Yield Marked (Alt+Shift+Y); Say Yield on Drive
+(Shift+Y); Yield with Regex (Control+Shift+Y).</li>
+<li><strong>HomerView:</strong> Say Yield (Alt+Y); Yield Structure
+(Alt+Shift+Y); Yield with Regex (Control+Shift+Y).</li>
+</ul>
+<h3 id="z-keys-1">z keys</h3>
+<ul>
+<li><strong>DbDo:</strong> Read Only Toggle (Control+Shift+Z); Say
+Status (Alt+Z); Say Status (Shift+Z).</li>
+<li><strong>EdSharp:</strong> Redo (Control+Shift+Z); Say Status
+(Alt+Z); Undo (Control+Z).</li>
+<li><strong>FileDir:</strong> Say Status (Alt+Z); Say Status (Shift+Z);
+Timer Toggle (Alt+Shift+Z); Zip (Control+Shift+Z); Zip then Delete
+(Control+Z).</li>
+<li><strong>HomerView:</strong> Next Different Kind (Alt+Z); Next Same
+Kind (Z); Previous Different Kind (Alt+Shift+Z); Previous Same Kind
+(Shift+Z).</li>
+</ul>
+<!-- key groups end -->
+</main>
+</body>
+</html>

@@ -782,13 +782,18 @@ public class MdiFrame : LbcForm {
         addCommand("&Edit Settings...", "Alt+Shift+E", "Change a setting and have it take effect now.", changeSetting);
         addCommand("&Invoke Script...", "Control+Shift+I", "Pick a script from the scripts folder and run it.", runScript);
 
-        addMenu("&Window");
-        addCommand("&Current Windows...", "F4", "Pick an open window from a list.", delegate() { return MdiWindows.pick(this); });
-        addCommand("&Say Windows Open", "Shift+F4", "Say how many windows are open, and their titles.", delegate() { return MdiWindows.sayOpen(this); }).sRepeat = "review";
-        addCommand("&Next Window", "Control+Tab", "Go to the next window.", delegate() { return MdiWindows.step(this, 1); });
-        addCommand("&Previous Window", "Control+Shift+Tab", "Go to the previous window.", delegate() { return MdiWindows.step(this, -1); });
+        // NO WINDOW MENU (kit 1.269.0, 21 November 2026, Jamal's ruling): the window commands go on the File menu, before
+        // Exit, as in DbDo, EdSharp and FileDir, so Alt+W is free for an app's own command, such as DbDo's Read Wide.
+        // Their keys are function keys and Tab, so they take no trigger letter.
+        addMenu("&File");
+        addSeparator();
+        addCommand("Current Windows...", "F4", "Pick an open window from a list.", delegate() { return MdiWindows.pick(this); });
+        addCommand("Say Windows Open", "Shift+F4", "Say how many windows are open, and their titles.", delegate() { return MdiWindows.sayOpen(this); }).sRepeat = "review";
+        addCommand("Next Window", "Control+Tab", "Go to the next window.", delegate() { return MdiWindows.step(this, 1); });
+        addCommand("Previous Window", "Control+Shift+Tab", "Go to the previous window.", delegate() { return MdiWindows.step(this, -1); });
         addCommand("Close Window", "Control+F4", "Close this window.", delegate() { return MdiWindows.closeCurrent(this); });
-        addCommand("Close &All But Current Window", "Control+Shift+F4", "Close every window but this one.", delegate() { return MdiWindows.closeOthers(this); });
+        addCommand("Close All but Current Window", "Control+Shift+F4", "Close every window but this one.", delegate() { return MdiWindows.closeOthers(this); });
+        moveExitLast(menuNow);
 
         addMenu("&Help");
         addCommand("&Documentation", "F1", "Open the guide.", delegate() { return openHelp(sAppName + ".htm"); }).bNoEcho = true;
@@ -825,6 +830,18 @@ public class MdiFrame : LbcForm {
         foreach (string sProblem in KeyMap.lsProblems) Log.warn("Key map: " + sProblem);
         foreach (string sConflict in KeyMap.lsConflicts) Log.warn("Key claimed twice: " + sConflict);
         exportIfAsked();
+        return true;
+    }
+
+    // moveExitLast: the app's Exit item, when its File menu has one, moved to the end, after the window commands the
+    // frame adds, where Windows programs keep it.
+    private bool moveExitLast(ToolStripMenuItem menu) {
+        if (menu == null) return false;
+        ToolStripItem itemExit = null;
+        foreach (ToolStripItem item in menu.DropDownItems) if (item.Text.Replace("&", "").StartsWith("Exit")) itemExit = item;
+        if (itemExit == null) return false;
+        menu.DropDownItems.Remove(itemExit);
+        menu.DropDownItems.Add(itemExit);
         return true;
     }
 

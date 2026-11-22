@@ -337,6 +337,14 @@ return true;
 // run: open the player on a queue of tracks. Returns when the dialog closes,
 // by which time mpv has stopped and has written down where it had reached.
 public static void run(IWin32Window owner, string sTitle, string sSource, List<MediaTrack> lsTracks) {
+run(owner, sTitle, sSource, lsTracks, false);
+} // run method
+
+// RECORD PLAYBACK (kit 1.269.0, 21 November 2026): the suite's command for keeping a copy of what plays. Control+Shift+P
+// in DbDo and FileDir opens the player as Play Media (Control+P) does, starts the first track at once, and records it
+// to Music, Homer Player, as Alt+Shift+R does inside the player. Shift adds recording to Play Media, and P begins
+// Playback, the word that names what is kept.
+public static void run(IWin32Window owner, string sTitle, string sSource, List<MediaTrack> lsTracks, bool bRecordAtStart) {
 if (lsTracks == null || lsTracks.Count == 0) { Say.sayForced("0 tracks"); return; }
 
 string sMpv = Homer.Media.mpvProgram();
@@ -485,7 +493,7 @@ Button btnStop = dlg.addButton("&Stop playback", "Stop playing and stay exactly 
 // Alt+Shift+R always has, and says which in its name: Capture stream, then Stop
 // capture while a copy is being written. C is the first letter of a word in
 // both names, and no other control claims it.
-Button btnRecord = dlg.addButton("&Capture stream", "Start keeping a copy of the stream as it arrives, in your Music folder under Homer Player, named for the track and the time. Pressed again, as Stop capture, it stops and says how long it ran. Alt+Shift+R does the same from anywhere in the dialog.");
+Button btnRecord = dlg.addButton("&Capture stream", "Record Playback: start keeping a copy of the stream as it arrives, in your Music folder under Homer Player, named for the track and the time. Pressed again, as Stop capture, it stops and says how long it ran. Alt+Shift+R does the same from anywhere in the dialog, and Control+Shift+P in DbDo and FileDir opens the player recording.");
 btnRecordNow = btnRecord; btnStopRecordingNow = null;
 btnRecord.Click += delegate(object o, EventArgs e) { toggleRecording(dlg, oPlayer, lsRef); };
 Button btnDefaults = dlg.addButton("&Default settings", "Forget what this queue has been set to and go back to the built-in settings: one minute, normal speed, the play list's own order.");
@@ -922,6 +930,17 @@ oLoader.setPause(true);
 for (int i = 0; i < lsToLoad.Count; i++) oLoader.loadFile(lsToLoad[i].sTarget, i > 0);
 oLoader.setVolume(iStartVolume);
 oLoader.setSpeed(((double) iStartRate) / 100.0);
+if (!bRecordAtStart) return;
+// Asked to record: play now, and start recording once the stream has had two seconds to arrive.
+oLoader.setPause(false);
+Timer tmrRecord = new Timer();
+tmrRecord.Interval = 2000;
+tmrRecord.Tick += delegate(object oTick, EventArgs eTick) {
+tmrRecord.Stop();
+tmrRecord.Dispose();
+if (sRecordingPath.Length == 0) toggleRecording(dlg, oLoader, lsRef);
+};
+tmrRecord.Start();
 };
 tmrWatch.Start();
 
@@ -1368,7 +1387,7 @@ sb.Append("THE REST\r\n");
 sb.Append("Alt+Shift+C    copy the address of the track\r\n");
 sb.Append("Alt+Shift+L    save the queue as a play list\r\n");
 sb.Append("Alt+Shift+M    write track notes to a Markdown file\r\n");
-sb.Append("Alt+Shift+R    capture the stream, or stop capturing: the Capture stream button does the same\r\n");
+sb.Append("Alt+Shift+R    Record Playback: capture the stream, or stop capturing; the Capture stream button does the same\r\n");
 sb.Append("Alt+Shift+Z    undo the last jump within a track\r\n");
 sb.Append("Escape         close, remembering where each track had reached\r\n\r\n");
 sb.Append("F7 lists the controls; F1 lists them with their descriptions.\r\n");

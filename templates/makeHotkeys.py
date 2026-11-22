@@ -197,6 +197,7 @@ def main():
              "- **Adding Shift reverses.** Control+M marks and Control+Shift+M unmarks; Control+W sets the Where filter and Control+Shift+W clears it.",
              "- **Z is for sleep.** Every Z key is a toggle: it wakes a behavior or puts it to sleep. Control+Z undoes in Windows, and restoring a behavior is the same idea.",
              "- **X is for the sound of \"ex\"**, as in Export.",
+             "- **Alt says, Control changes.** When a letter needs a modifier, a command that only speaks takes Alt and one that changes data takes Control. A command that opens a pick list may take either; a plain Alt and a letter never opens a box for typing.",
              "- **Alt takes the letter when Control already means something in Windows.** Control+O opens and Control+S saves everywhere, so Order is Alt+O and Select Columns is Alt+S.",
              "- **Each function key is a family,** from Windows and Office habits, extended: F1 help, F2 editing, F3 searching, F4 picking, saying or closing open windows, F5 refreshing, F6 moving among parts of the window, F7 review, F8 selection, F9 a more readable view, F10 menus, F11 the version (elevate sounds like eleven), F12 files and AI.",
              "- **Control+Tab moves among DbDo windows,** as it moves among tabs everywhere else.",

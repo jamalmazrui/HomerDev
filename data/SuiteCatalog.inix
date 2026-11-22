@@ -9,6 +9,7 @@
 ; about before. Add an app here when it gains the command; take it out only with the command.
 
 [words DbDo]
+lean=the current column's values
 thing=record
 things=records
 current=the open database
@@ -29,6 +30,7 @@ targets_files=the current file
 paste_what=text at the cursor
 
 [words FileDir]
+lean=the items' names
 thing=item
 things=items
 current=the current item
@@ -173,8 +175,10 @@ apps=DbDo, FileDir
 key=Control+Shift+F
 description=Show {what}
 
-[command Close All But Current Window]
-apps=DbDo, FileDir
+; SMALL WORDS IN LOWER CASE (21 November 2026, key groups): but, from, in, on, to, with and without, as in Go to
+; Folder and Read Lean from Current; EdSharp already said "but", which kept it out of this command.
+[command Close All but Current Window]
+apps=DbDo, EdSharp, FileDir
 key=Control+Shift+F4
 description=Close every window but the current one
 
@@ -182,6 +186,71 @@ description=Close every window but the current one
 apps=DbDo, EdSharp, FileDir
 key=Control+F4
 description=Close the current window
+
+; THE MARKING AND SEARCH GROUPS OF THE TWO LIST APPS (21 November 2026, key groups): FileDir takes DbDo's names and
+; keys for the ends of a marking run and the first and last marked; DbDo takes FileDir's single Start and its Again
+; keys; FileDir gains Reverse Jump.
+[command First Marked]
+apps=DbDo, FileDir
+key=Control+PageUp
+description=Go to the first marked {thing}
+
+[command Jump Again]
+apps=DbDo, FileDir
+key=Alt+J
+description=Repeat Jump forward with the same text
+
+[command Keywords Again]
+apps=DbDo, FileDir
+key=Alt+K
+description=Repeat Keywords forward with the same keywords
+
+[command Last Marked]
+apps=DbDo, FileDir
+key=Control+PageDown
+description=Go to the last marked {thing}
+
+[command Mark to First]
+apps=DbDo, FileDir
+key=Control+Shift+Home
+description=Mark every {thing} from the first to the current one
+
+[command Mark to Last]
+apps=DbDo, FileDir
+key=Control+Shift+End
+description=Mark every {thing} from the current one to the last
+
+[command Reverse Jump]
+apps=DbDo, FileDir
+key=Control+Shift+J
+description=Go to the previous {thing} whose {where} holds the text
+
+[command Start Mark or Unmark]
+apps=DbDo, FileDir
+key=F8
+description=Start marking or unmarking a range at the current {thing}
+
+[command Unmark to First]
+apps=DbDo, FileDir
+key=Alt+Control+Shift+Home
+description=Unmark every {thing} from the first to the current one
+
+[command Unmark to Last]
+apps=DbDo, FileDir
+key=Alt+Control+Shift+End
+description=Unmark every {thing} from the current one to the last
+
+; THE SCRIPT GROUP (21 November 2026, key groups): V for scripts, Alt+V to invoke and Alt+Shift+V to edit, in both apps
+; that run scripts.
+[command New Copy]
+apps=DbDo, FileDir
+key=Control+Shift+N
+description=Add a new {thing} with the current {thing}'s {copied}
+
+[command Edit Script]
+apps=DbDo, EdSharp
+key=Alt+Shift+V
+description=Pick a script to edit
 
 [command Complete Mark]
 apps=DbDo, FileDir
@@ -316,7 +385,7 @@ description=Turn key describing on or off: a key says its command instead of run
 [command Keywords]
 apps=DbDo, FileDir
 key=Control+K
-description=Go to the next {thing} whose {where} holds the keywords
+description=Go to the next {thing} with the keywords in its {where}
 
 [command Launch {app}]
 apps=EdSharp, FileDir, HomerView
@@ -333,15 +402,27 @@ apps=DbDo, EdSharp
 key=Alt+B
 description=Go to a {what} you pick from a list
 
-[command Mail Attachment]
-apps=EdSharp, FileDir
-key=Control+Shift+M
-description=Send {targets_files} as email attachments
+[command Play Media]
+; ONE PLAY COMMAND, IN THE HOMER PLAYER (21 November 2026, the AV group): FileDir's Play Media handed a list to mpv's own
+; window and its Homer Player had Control+Shift+H; now Play Media plays in the Homer Player in both list apps, and
+; Homer Player is retired into it. Play List keeps no key in FileDir; Control+Shift+L went to Path List to Clipboard.
+apps=DbDo, FileDir
+key=Control+P
+description=Play {playwhat} in the Homer Player
 
-[command Mail Body]
+[command Record Playback]
+; RECORD PLAYBACK (21 November 2026, the AV group): Shift adds recording to Play Media, and P begins Playback, so the
+; letter is in the name. It is the Homer Player's Capture stream button, pressed when the player opens.
+apps=DbDo, FileDir
+key=Control+Shift+P
+description=Play as Play Media does, and record what plays to Music, Homer Player
+
+[command Mail]
+; ONE MAIL (21 November 2026): Mail Body and Mail Attachment became Mail on Control+M, which puts the text in the body
+; and attaches the file, so Control+Shift+M is free for FileDir's Move to Folder.
 apps=EdSharp, FileDir
 key=Control+M
-description=Send the current file's text as the body of an email message
+description=Email {mailwhat}
 
 [command Mark All]
 apps=DbDo, FileDir
@@ -450,7 +531,7 @@ description=Replace a regular expression's matches in {where}
 [command Reverse Keywords]
 apps=DbDo, FileDir
 key=Control+Shift+K
-description=Go to the previous {thing} whose {where} holds the keywords
+description=Go to the previous {thing} with the keywords in its {where}
 
 [command Save]
 apps=EdSharp
@@ -529,10 +610,46 @@ apps=DbDo, EdSharp, FileDir, HomerView
 key=Alt+Y
 description=Say how many {what}
 
-[command Say Yield Marked]
-; 15 November 2026 (A11): Shift+Y says the yield of what is marked, in DbDo and FileDir alike.
+;
+; THE L AND Y KEYS OF THE TWO LIST APPS (21 November 2026, Jamal's ruling: DbDo and FileDir have the same commands, as a
+; suite should). L is lean, one column: DbDo's current column, FileDir's names. Alt reads from the first, Alt+Shift the
+; marked, Control from the current one; the marked-from-current form keeps no key, since Control+Shift+Y is Yield
+; with Regex and FileDir's Control+Shift+L is Path List to Clipboard (Play List until 21 November 2026). DbDo's W keys are its own: FileDir's list has one column.
+[command Read Lean]
 apps=DbDo, FileDir
-key=Shift+Y
+key=Alt+L
+description=Read {lean} from the first {thing}
+
+[command Read Lean Marked]
+apps=DbDo, FileDir
+key=Alt+Shift+L
+description=Read {lean} in the marked {things}, from the first
+
+[command Read Lean from Current]
+apps=DbDo, FileDir
+key=Control+L
+description=Read {lean} from the current {thing} on
+
+[command Read Lean Marked from Current]
+apps=DbDo, FileDir
+key=
+description=Read {lean} in the marked {things}, from the current one on
+
+[command Say Yield from Current]
+apps=DbDo, FileDir
+key=Control+Y
+description=Say how many {what}
+
+[command Say Yield Marked from Current]
+apps=DbDo, FileDir
+key=
+description=Say how many {what}
+
+[command Say Yield Marked]
+; 15 November 2026 (A11): the yield of what is marked, in DbDo and FileDir alike. ON ALT+SHIFT+Y since 21 November
+; 2026: the Y family is Alt for all in view, Alt+Shift for the marked, as DbDo's W and L families read.
+apps=DbDo, FileDir
+key=Alt+Shift+Y
 description=Say how many {what}
 
 [command Search Next]
@@ -567,7 +684,8 @@ description=Tile the open windows down
 
 [command Toggle Mark]
 ; 15 November 2026 (A11): DbDo's Marked Toggle and FileDir's Toggle Mark, one name and one sentence. FileDir also keeps
-; Space, its list's own key.
+; Space, its list's own key, and DbDo has it too since 21 November 2026 (the Space bar scheme): a Space on its own
+; marks, and one typed within a second of a letter goes on to type-ahead.
 apps=DbDo, FileDir
 key=Control+Space
 description=Mark or unmark the current {thing}
@@ -670,6 +788,18 @@ where=current field
 [words Jump|FileDir]
 where=name
 
+[words New Copy|DbDo]
+copied=values
+
+[words New Copy|FileDir]
+copied=contents, beside it under its name with a number added
+
+[words Reverse Jump|DbDo]
+where=current field
+
+[words Reverse Jump|FileDir]
+where=name
+
 [words Keywords|DbDo]
 where=fields
 
@@ -765,6 +895,30 @@ what=items are marked, and their total size
 
 [words Copy Append|DbDo]
 targets=the current cell's value
+
+[words Mail|EdSharp]
+mailwhat=the current file, its text in the body and the file attached when it is saved
+
+[words Mail|FileDir]
+mailwhat=the current item or the marked ones as attachments, a lone file's text in the body as well
+
+[words Play Media|DbDo]
+playwhat=the current record's address or the marked records
+
+[words Play Media|FileDir]
+playwhat=the marked files, a play list or linked document, the clipboard, or the folder
+
+[words Say Yield from Current|DbDo]
+what=records there are from the current one on
+
+[words Say Yield from Current|FileDir]
+what=items there are from the current one on, and their total size
+
+[words Say Yield Marked from Current|DbDo]
+what=marked records there are from the current one on
+
+[words Say Yield Marked from Current|FileDir]
+what=marked items there are from the current one on, and their total size
 
 [words Say Yield|HomerView]
 what=characters, words and lines are in all or the selected text
