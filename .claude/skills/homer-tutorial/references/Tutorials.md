@@ -115,8 +115,15 @@ day. A beta tester asked for the reader to be a bit slower, so its speed is
 0.64 on piper's scale (it was 0.56), still ahead of the narrator's 0.80.
 `ReaderScale` in a script's `[global]` section changes it for a series.
 
-**Two engines, one each.** Kokoro speaks the narrator; piper's john speaks
-the reader. Half the lines in a walk are the reader's, and piper speaks a
+**Two engines, one each.** Kokoro speaks the narrator; Phonon 31m's Russell
+speaks the reader (since 22 November 2026, chosen by ear from
+scripts\auditionVoices, reader 16, after piper's john sounded "too grumpy").
+Phonon and its runtime, ptts, are under Apache 2.0 terms, so the audio can be
+published beside MIT code; its non-commercial 40m models are never fetched.
+ptts has no rate setting, so each reader line is sped up by `PhononTempo`,
+1.3, after it is spoken. `ReaderEngine=piper` in `[global]` goes back to
+piper's john, and `PhononReader` names another Phonon voice. When ptts cannot
+be had, john reads. Before Phonon, piper's john read: half the lines in a walk are the reader's, and piper speaks a
 line in a second where Kokoro takes twenty -- on a laptop Kokoro runs at two
 to three times real time, and a long unbroken line, such as a web address
 spelled out as words, far slower, which is what made a build look hung on
@@ -1628,7 +1635,7 @@ How an app reaches the kit. Its build passes the kit's CSharp folder to the comp
 
 ### Step 16
 
-A worked case of the gain. The Homer Player's recording -- Alt plus Shift plus R, a Record button and a Stop recording button -- was written once, in the kit, on 5 October. FileDir had it on its next build, and DbDo on its next, with no change to either program.
+A worked case of the gain. The Homer Player's recording -- Alt plus Shift plus R, or the Capture stream button, which becomes Stop capture while it records -- was written once, in the kit. FileDir had it on its next build, and DbDo on its next, with no change to either program. Control plus Shift plus P, Record Playback, now opens the player recording in both.
 
 ### Step 17
 

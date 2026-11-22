@@ -3645,6 +3645,84 @@ lEstates = [
         "sOkStatuses": "200, 202",
         "sExtraLinks": "",
     },
+    # BLIND TRAVEL AND COMMUNITY APPS (22 November 2026), each probed first, asked for by Jamal.
+    #
+    # CHATTER: the social app of live audio and video rooms that the AI for the Blind group meets on. Its Knowledge Base,
+    # support.chattersocial.io, is Help Scout Docs: articles at /article/<number>-<slug>, categories at
+    # /category/<number>-<slug>, the release notes at /updates. Searches found the articles drawn on the server, with
+    # their steps in the page. The site's robots.txt did not answer the web fetcher here, so the seeds take the front
+    # page, its sitemap, and five articles seen that day; the community guidelines on the main site come too, as the
+    # rules a user meets in a room.
+    {
+        "sProduct": "Chatter",
+        "sScriptName": "getChatterHelp.py",
+        "sSystem": "Help Scout Docs at support.chattersocial.io",
+        "sFolder": "ChatterHelp",
+        "sZipName": "ChatterHelp.zip",
+        "iMaxPages": 300,
+        "nDelay": 1.0,
+        "sSeeds": ('"https://support.chattersocial.io/",\n'
+                   '              "https://support.chattersocial.io/sitemap.xml",\n'
+                   '              "https://support.chattersocial.io/article/5-welcome-to-chatter",\n'
+                   '              "https://support.chattersocial.io/article/14-sign-up",\n'
+                   '              "https://support.chattersocial.io/article/17-host-a-live-room",\n'
+                   '              "https://support.chattersocial.io/article/44-find-and-join-live-rooms",\n'
+                   '              "https://support.chattersocial.io/article/56-feedback-and-support",\n'
+                   '              "https://support.chattersocial.io/updates",\n'
+                   '              "https://chattersocial.io/community-guidelines"'),
+        "sFencePattern": (r"^https://(support\.chattersocial\.io(/((article|category|collection)/[0-9]+-[A-Za-z0-9_%-]+|sitemap\.xml|[Uu]pdates))?"
+                          r"|chattersocial\.io/community-guidelines)/?$"),
+        "sSubjectPattern": "",
+        "sReadyPattern": r"(Chatter Knowledge Base|Community Guidelines|<article)",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": "",
+    },
+    # OORION: finds objects and text around a blind or low vision person with the phone's camera, and guides the way to
+    # them. oorion.fr has no help centre, FAQ or guide; its application page describes each feature in about 800 words
+    # of French ("Chercher un objet", "Chercher un texte", "Ajout d'objets personnels" and the rest). The English
+    # edition the language menu offers did not load from here, so both addresses are seeds. Gathered so the build can
+    # judge on the evidence: too thin for a guide of its own, by refusal-rules, unless the English page adds to it.
+    {
+        "sProduct": "OOrion",
+        "sScriptName": "getOOrionHelp.py",
+        "sSystem": "the application page of oorion.fr, in French and English",
+        "sFolder": "OOrionHelp",
+        "sZipName": "OOrionHelp.zip",
+        "iMaxPages": 12,
+        "nDelay": 1.0,
+        "sFetch": "edge",
+        "iBrowserWait": 10,
+        "sSeeds": ('"https://www.oorion.fr/application",\n'
+                   '              "https://www.oorion.fr/en/application",\n'
+                   '              "https://www.oorion.fr/en"'),
+        "sFencePattern": r"^https://www\.oorion\.fr/(en/?|en/application|application)$",
+        "sSubjectPattern": "",
+        "sReadyPattern": r"(OOrion)",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": "",
+    },
+    # PICCYBOT, WITH PICCYBOT LIVE: describes photos and videos aloud, and PiccyBot Live gives live descriptions through
+    # Meta's smart glasses. piccybot.com is drawn entirely by script -- a plain request reads the title alone -- so Edge
+    # draws it. Whether it holds any help is not yet known: the App Store listing and a long AppleVis thread are not
+    # help, and the app has its own help menu. This first run is the probe the skill asks for; the reader in buildGuide
+    # waits for what it brings back.
+    {
+        "sProduct": "PiccyBot",
+        "sScriptName": "getPiccyBotHelp.py",
+        "sSystem": "piccybot.com, drawn by Microsoft Edge",
+        "sFolder": "PiccyBotHelp",
+        "sZipName": "PiccyBotHelp.zip",
+        "iMaxPages": 60,
+        "nDelay": 1.0,
+        "sFetch": "edge",
+        "iBrowserWait": 15,
+        "sSeeds": '"https://www.piccybot.com/"',
+        "sFencePattern": r"^https://(www\.)?piccybot\.com(/[A-Za-z0-9_%./-]*)?$",
+        "sSubjectPattern": "",
+        "sReadyPattern": r"(PiccyBot)",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": "",
+    },
 ]
 
 

@@ -7,6 +7,15 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.276.0 -- 22 November 2026
+
+- **Three harvesters for apps blind people use in travel, orientation and community,** each probed first. Chatter, the social app of live rooms where the AI for the Blind group meets, has a Help Scout Knowledge Base at support.chattersocial.io; its harvester takes the articles, categories, release notes and the community guidelines. OOrion, which finds objects and text through the camera, has no help centre, only an application page of about 800 words in French; its harvester takes that page and the English edition, drawn by Edge, so the build can judge whether it is too thin for a guide. PiccyBot, whose PiccyBot Live describes live through Meta's glasses, has a site drawn wholly by script, so Edge draws it and this first run is the probe. buildGuide's readers for all three wait for their first harvests.
+
+## 1.275.0 -- 22 November 2026
+
+- **The tutorials' screen reader voice is Phonon 31m's Russell,** reader 16 of auditionVoices, which Jamal chose by ear. buildTutorials speaks each reader line with ptts, Phonon's runtime, under Apache 2.0 terms, and speeds it by 1.3 as the audition did, so the walks sound as the audition sounded. The narrator, Kokoro's af_sarah, is unchanged. The kit's build fetches ptts once into exec, as auditionVoices already had; when it cannot be had, piper's john reads as before, and the log says so. The reader's engine and voice are part of each walk's fingerprint, so every app's walks are spoken again once, which takes a few hours of build time. `ReaderEngine=piper` in a walk's `[global]` goes back to john; `PhononReader` and `PhononTempo` change the voice and pace.
+- **The tutorials say today's keys.** Every app's walks were checked against its key file. DbDo's said Shift+R for what a record leads to, a key that has said the Replace values since 9 November; they now use Shift+W, Say Whole Record, which ends with the related records. DbDo's conclusion named Shift+F1 for the history, which is Control+Shift+F1. HomerView's accessibility walk pressed Alt+Shift+E for IBM Equal Access, a key that is now Edit Settings; Check Accessibility, Alt+Shift+A, now asks which engine, and the walk chooses each in turn. The kit's own player walk named the old Record and Stop recording buttons, now one Capture stream button, and Record Playback.
+
 ## 1.274.0 -- 22 November 2026
 
 - **A new key guideline: the more destructive of two similar commands takes the extra modifier.** It is weighed with the other rules, not above them, and it gives way to Windows' own conventions, such as Shift+Delete for a permanent delete. The homer-ui skill states it. A review of every key in DbDo, EdSharp, FileDir and HomerView that differs from another only by a modifier found one pair the wrong way round: FileDir's Zip is now Control+Z, and Zip then Delete is Control+Shift+Z, beside its other key, Control+Shift+Delete. The manifest records the change, and KeyDecisions.md the whole review.

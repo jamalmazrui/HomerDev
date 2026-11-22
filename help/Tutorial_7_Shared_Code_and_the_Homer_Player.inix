@@ -95,7 +95,7 @@ Hear=
 
 [step]
 
-Say=A worked case of the gain. The Homer Player's recording -- Alt plus Shift plus R, a Record button and a Stop recording button -- was written once, in the kit, on 5 October. FileDir had it on its next build, and DbDo on its next, with no change to either program.
+Say=A worked case of the gain. The Homer Player's recording -- Alt plus Shift plus R, or the Capture stream button, which becomes Stop capture while it records -- was written once, in the kit. FileDir had it on its next build, and DbDo on its next, with no change to either program. Control plus Shift plus P, Record Playback, now opens the player recording in both.
 Key=
 Hear=
 
