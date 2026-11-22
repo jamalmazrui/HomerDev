@@ -114,6 +114,15 @@ is its hotkey's letter when it has one.
 - **The grave accent key is speech**, where an app has speech commands: Alt
   and Alt+Shift for louder and softer, Control and Control+Shift for faster and
   slower, the screen reader key plus Grave for punctuation.
+- **The more destructive of two similar commands takes the extra modifier**
+  (22 November 2026, a guideline weighed among the others, not a strict
+  rule). Where two commands do nearly the same thing and one also removes,
+  overwrites or discards something, the safer one takes the plainer key and
+  the destructive one adds a modifier, usually Shift: Zip on Control+Z and
+  Zip then Delete on Control+Shift+Z; Delete Record with a question on
+  Control+D and without one on Control+Shift+D. It gives way to Windows'
+  own conventions (Shift+Delete deletes for good; Control+Shift+Z is Redo
+  where there is an Undo) and to the suite's shared keys.
 - **Key names** are written as JAWS writes them: modifiers in alphabetical
   order (Alt, Control, Shift, Windows), "Control" spelled out, the reader key
   as "JAWS" or "NVDA". Convert with KeyName, never a table of one's own.

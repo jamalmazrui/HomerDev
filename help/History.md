@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.274.0 -- 22 November 2026
+
+- **A new key guideline: the more destructive of two similar commands takes the extra modifier.** It is weighed with the other rules, not above them, and it gives way to Windows' own conventions, such as Shift+Delete for a permanent delete. The homer-ui skill states it. A review of every key in DbDo, EdSharp, FileDir and HomerView that differs from another only by a modifier found one pair the wrong way round: FileDir's Zip is now Control+Z, and Zip then Delete is Control+Shift+Z, beside its other key, Control+Shift+Delete. The manifest records the change, and KeyDecisions.md the whole review.
+- **An installer no longer checks for screen reader support its app does not ship.** BatCon's installer said "Checking the JAWS scripts" and "Checking the NVDA add-on" though it ships neither. With the kit's installScreenReaderSupport.cmd, a reader whose package (scripts\<App>_JAWS.zip or scripts\<App>.nvda-addon) is not installed is now left out of the checking, silently, with one line in the setup log. An app with its own reader script, as EdSharp and HomerView have, is asked as before.
+- **bookFido's installer calls an update an update,** through homerPriorVersion, as the other launch apps' installers have since 18 November.
+
 ## 1.273.0 -- 22 November 2026
 
 This also holds 1.272.0, which was tagged but never released when the network dropped during its release.

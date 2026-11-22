@@ -4031,10 +4031,11 @@ status=implemented
 
 [FileDir zip]
 name=Zip
-keys=Control+Shift+Z
-change=keys changed, was Shift+Z, 16 November 2026
-reason=beside Zip then Delete, Control+Z; no Shift+letter acts: Shift letters only say or move (Jamal's phase, 16 November 2026)
-disposition=accepted
+keys=Control+Z
+change=keys changed, was Control+Shift+Z, 22 November 2026 (was Shift+Z until 16 November 2026)
+reason=the safer of the two zips takes the plainer key; Zip then Delete, which removes the files, adds Shift (Jamal's guideline, 22 November 2026)
+exception=keeps Undo's key: FileDir has no Undo
+disposition=ruled
 status=implemented
 
 [FileDir zipList]
@@ -4047,11 +4048,11 @@ status=implemented
 
 [FileDir zipThenDelete]
 name=Zip then Delete
-keys=Control+Z or Control+Shift+Delete
-change=Control+Z restored, Control+Shift+Delete kept
-reason=FileDir's list has no Undo for Control+Z to mean, and Jamal missed it (19 October 2026)
-exception=keeps Undo's key: FileDir has no Undo, and the command asks before deleting, so a reflex press costs only Escape
-disposition=accepted
+keys=Control+Shift+Z or Control+Shift+Delete
+change=keys changed, was Control+Z or Control+Shift+Delete, 22 November 2026
+reason=the more destructive of two similar commands takes the extra modifier (Jamal's guideline, 22 November 2026); both keys are now Control+Shift
+exception=keeps Redo's key: FileDir has no Undo or Redo
+disposition=ruled
 status=implemented
 
 [HomerView aboutHomerView]

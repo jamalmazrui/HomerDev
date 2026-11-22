@@ -900,6 +900,32 @@ var
 #ifndef HomerReaderScript
   #define HomerReaderScript "installScreenReaderSupport.cmd"
 #endif
+(* AN APP THAT SHIPS NOTHING FOR A READER IS NOT CHECKED FOR IT (22 November 2026). BatCon's installer said "Checking
+   the JAWS scripts" and "Checking the NVDA add-on" aloud, then found it ships neither, so neither box could appear.
+   With the kit's own installScreenReaderSupport.cmd, an app's JAWS scripts are scripts\<App>_JAWS.zip and its NVDA
+   add-on scripts\<App>.nvda-addon; when that file is not installed, the reader is not offered, logged once and never
+   said. An app that names its own reader script, as HomerView does, is always asked. *)
+function homerShipsReader(sReader: String): Boolean;
+var
+  sPackage: String;
+begin
+  Result := True;
+#ifdef AppName
+  if CompareText('{#HomerReaderScript}', 'installScreenReaderSupport.cmd') <> 0 then exit;
+  // Before the files are copied nothing can be told yet, so the reader is asked as before.
+  if not FileExists(ExpandConstant('{app}\scripts\{#HomerReaderScript}')) then exit;
+  if sReader = 'jaws' then sPackage := ExpandConstant('{app}\scripts\{#AppName}_JAWS.zip')
+  else sPackage := ExpandConstant('{app}\scripts\{#AppName}.nvda-addon');
+  Result := FileExists(sPackage);
+  if not Result then
+  begin
+    Log('Component ' + sReader + ' scripts: {#AppName} ships none (' + sPackage + ' is not installed), so the box is not offered');
+    if sReader = 'jaws' then begin gHomerJawsState := -1; gHomerJawsRead := True; end
+    else begin gHomerNvdaState := -1; gHomerNvdaRead := True; end;
+  end;
+#endif
+end;
+
 function homerReaderState(sReader: String): Integer;
 var
   sFile, sScript: String;
@@ -908,6 +934,7 @@ var
 begin
   if (sReader = 'jaws') and gHomerJawsRead then begin Result := gHomerJawsState; exit; end;
   if (sReader = 'nvda') and gHomerNvdaRead then begin Result := gHomerNvdaState; exit; end;
+  if not homerShipsReader(sReader) then begin Result := -1; exit; end;
   if sReader = 'jaws' then homerSay('Checking the JAWS scripts', False) else homerSay('Checking the NVDA add-on', False);
   Result := -1;
   sScript := ExpandConstant('{app}\scripts\{#HomerReaderScript}');
@@ -1189,11 +1216,11 @@ begin
     SetArrayLength(aKeys, GetArrayLength(gHomer) + 3);
     SetArrayLength(aKinds, GetArrayLength(gHomer) + 3);
     SetArrayLength(aShown, GetArrayLength(gHomer) + 3);
-    if bReaders and (not gHomerJawsRead) then
+    if bReaders and (not gHomerJawsRead) and homerShipsReader('jaws') then
     begin
       aKeys[iCount] := 'jaws scripts'; aKinds[iCount] := 'jaws'; aShown[iCount] := 'the JAWS scripts'; iCount := iCount + 1;
     end;
-    if bReaders and (not gHomerNvdaRead) then
+    if bReaders and (not gHomerNvdaRead) and homerShipsReader('nvda') then
     begin
       aKeys[iCount] := 'nvda add-on'; aKinds[iCount] := 'nvda'; aShown[iCount] := 'the NVDA add-on'; iCount := iCount + 1;
     end;
