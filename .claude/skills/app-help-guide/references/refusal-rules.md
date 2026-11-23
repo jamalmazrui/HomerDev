@@ -36,7 +36,14 @@ true about the product.
   however good the answers. Name the exception if you make one.
 - **Too thin to hold its own name.** MakeMKV's whole site came to 938 words,
   70 of which were a PHP error. A guide that small misleads a reader who opens
-  it expecting coverage.
+  it expecting coverage. OOrion (23 November 2026, third try): oorion.fr has no
+  help centre; its French application page holds about 1,000 words on each
+  feature, but the English edition answered "Oops this page does not exist" to
+  Edge, and the English front page holds 244 words, mostly a description. An
+  English guide would be a few paragraphs, so OOrion is refused until it
+  publishes English help. PiccyBot, the same day, passed: one page, but with
+  setup steps for WhatsApp and Meta's glasses and the plans, about 1,200 words
+  once its welcome, testimonials, honors and donations were left out.
 - **No help at all.** Six small accessibility apps in a fortnight published an
   App Store listing, a privacy policy and nothing else. Say so plainly, and say
   it is no reflection on the app. Publications can be the same: MakeUseOf and

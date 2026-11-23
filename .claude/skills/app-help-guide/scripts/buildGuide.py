@@ -2101,6 +2101,61 @@ def readTwitch(sFolder):
     return lArticles
 
 
+def readPiccyBot(sFolder):
+    """PICCYBOT (23 November 2026). piccybot.com is one page drawn by script, gathered through Edge, and it holds the
+    help there is: how the app works, its features, setting it up on WhatsApp and on Meta's Ray-Ban glasses, and a list
+    of questions. The publisher's level-two headings are the categories and each level-three heading is an article,
+    its level-four headings kept inside it; words before a section's first level-three heading make an article named
+    for the section. Left out, by heading, as not help: the welcome (vision, mission and values, printed twice), what
+    users say, the video showcase, honors, donations, the technology partner and the closing call to download. The
+    questions are left out too: the page draws each answer only when its question is opened, so the harvest holds the
+    questions without their answers, and a question with no answer helps nobody. The preamble says so. A heading's line break is read as a space ("Visual Accessibility Made
+    Simple", which the page draws on two lines)."""
+    lArticles = []
+    sFile = os.path.join(sFolder, "www.piccybot.com.html")
+    if not os.path.isfile(sFile): return lArticles
+    sMarkup = readText(sFile)
+    sMarkup = re.sub(r"(?is)<(script|style|noscript|svg)[^>]*>.*?</\1>", "", sMarkup)
+    sMarkup = re.sub(r"(?i)<br\s*/?>", " ", sMarkup)
+    def headingText(sInner):
+        return re.sub(r"\s+", " ", stripTags(re.sub(r"(?i)</(span|div)>", " </\\1>", sInner))).strip()
+    lH2 = list(re.finditer(r"(?is)<h2[^>]*>(.*?)</h2>", sMarkup))
+    sSkip = (r"(?i)^(welcome to piccybot|what piccybot users say|watch piccybot in action|frequently asked questions"
+             r"|honors and recognitions|donation options|technology partner|start experiencing the visual world today)$")
+    for iSection, oH2 in enumerate(lH2):
+        sCategory = headingText(oH2.group(1))
+        if not sCategory or re.match(sSkip, sCategory): continue
+        iEnd = lH2[iSection + 1].start() if iSection + 1 < len(lH2) else len(sMarkup)
+        sSection = sMarkup[oH2.end():iEnd]
+        oFooter = re.search(r"(?is)<footer\b", sSection)
+        if oFooter: sSection = sSection[:oFooter.start()]
+        lH3 = list(re.finditer(r"(?is)<h3[^>]*>(.*?)</h3>", sSection))
+        # A SECTION OF SHORT ITEMS IS ONE ARTICLE. How PiccyBot Works gives each of its four steps a sentence, and
+        # its features list gives each feature one: as articles of their own they held 10 to 19 words each, and the
+        # build's gate failed the guide for a median article of 19 words. Such a section is read whole, its items
+        # kept as headings inside one article named for the section, which is how the publisher presents them.
+        lItemWords = []
+        for iItem, oItem in enumerate(lH3):
+            iItemEnd = lH3[iItem + 1].start() if iItem + 1 < len(lH3) else len(sSection)
+            lItemWords.append(len(" ".join(toMarkdown(sSection[oItem.end():iItemEnd], 1)).split()))
+        if lH3 and max(lItemWords) < 25:
+            lWhole = toMarkdown(sSection, 1, "https://www.piccybot.com/")
+            if len(" ".join(lWhole).split()) >= 25: lArticles.append((sCategory, sCategory, lWhole))
+            continue
+        sLead = sSection[:lH3[0].start()] if lH3 else sSection
+        lLead = toMarkdown(sLead, 1, "https://www.piccybot.com/")
+        if len(" ".join(lLead).split()) >= 25: lArticles.append((sCategory, sCategory, lLead))
+        for iArticle, oH3 in enumerate(lH3):
+            sTitle = headingText(oH3.group(1))
+            if not sTitle: continue
+            iStop = lH3[iArticle + 1].start() if iArticle + 1 < len(lH3) else len(sSection)
+            lBody = toMarkdown(sSection[oH3.end():iStop], 1, "https://www.piccybot.com/")
+            if len(" ".join(lBody).split()) < 8: continue
+            lArticles.append((sCategory, sTitle, lBody))
+    logging.info("PiccyBot: %d articles read from its one page", len(lArticles))
+    return lArticles
+
+
 def readWyzant(sFolder):
     """WYZANT, THIRD VERSION (19 November 2026). Wyzant's help is now a WordPress site in three levels: an audience
     section (students-parents), its topics (student-billing), and their articles (why-was-i-charged-1-00), so a page's
@@ -4257,6 +4312,72 @@ def kitFolder():
     return os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", ".."))
 
 
+def pruneHarvests(sParent, sOutput, lPlan, lResults):
+    """HARVESTS GO ONCE THEIR GUIDES ARE BUILT (23 November 2026, Jamal's request). data\\harvests held every page
+    every harvester saved, and it takes much room. After a build, a harvest folder is deleted when every guide in the
+    plan read from it is built and passes its gates: built clean in this run, or already current and passing its gates
+    when checked now. Its gathering is first recorded in data\\harvested.inix by the kit's harvestQueue (version 6), so
+    the next build does not gather it again. Every older gathering set aside as <Folder>-before-<day> is deleted too.
+    A harvest still being gathered (request.txt without finished) is kept. A guide whose reader changes later is
+    gathered again by asking for it with a later asked= day; the build says so. Each deletion is logged with its size."""
+    if os.path.basename(os.path.normpath(sParent)).lower() != "harvests" or not os.path.isdir(sParent): return 0
+    sData = os.path.dirname(os.path.normpath(sParent))
+    try:
+        import importlib.util
+        oSpec = importlib.util.spec_from_file_location("harvestQueue", os.path.join(os.path.dirname(os.path.abspath(__file__)), "harvestQueue.py"))
+        oQueue = importlib.util.module_from_spec(oSpec)
+        oSpec.loader.exec_module(oQueue)
+    except Exception as oError:
+        logging.error("prune: harvestQueue could not be loaded, so no harvest was deleted: %s", oError)
+        return 0
+    def folderSize(sDir):
+        iSize = 0
+        for sRoot, lsDirs, lsFiles in os.walk(sDir):
+            for sName in lsFiles:
+                try: iSize += os.path.getsize(os.path.join(sRoot, sName))
+                except OSError: pass
+        return iSize
+    dBuilt = {t[0]: t[3] for t in lResults}
+    dFolderOk = {}
+    for sProduct, sFolder, functionRead, sFile, sTitle, sPreamble in lPlan:
+        sGuide = os.path.join(sOutput, sFile)
+        if sProduct in dBuilt: bOk = dBuilt[sProduct] == 0
+        elif os.path.isfile(sGuide):
+            try:
+                sText = io.open(sGuide, "rb").read().decode("utf-8-sig", "replace").replace("\r\n", "\n")
+                bOk = not runGates(sProduct, sGuide, sText)
+            except Exception: bOk = False
+        else: bOk = False
+        dFolderOk[sFolder] = dFolderOk.get(sFolder, True) and bOk
+    lDeleted, iFreed = [], 0
+    for sFolder in sorted(os.listdir(sParent), key=str.lower):
+        sHarvest = os.path.join(sParent, sFolder)
+        if not os.path.isdir(sHarvest): continue
+        if "-before-" in sFolder: sWhy = "an older gathering set aside"
+        elif dFolderOk.get(sFolder):
+            dRequest = oQueue.readRequest(sHarvest)
+            if dRequest and not dRequest.get("finished"):
+                logging.info("prune: %s kept, since its gathering has not finished", sFolder)
+                continue
+            if dRequest: oQueue.writeRecord(sData, sFolder, dRequest)
+            sWhy = "its guides are built and clean"
+        else: continue
+        iSize = folderSize(sHarvest)
+        try:
+            shutil.rmtree(sHarvest)
+        except Exception as oError:
+            logging.error("prune: %s could not be deleted: %s", sFolder, oError)
+            continue
+        lDeleted.append(sFolder)
+        iFreed += iSize
+        logging.info("prune: deleted %s, %.1f MB, since %s", sFolder, iSize / 1e6, sWhy)
+    if lDeleted:
+        print("Deleted %d harvest%s whose guides are built, freeing %.0f MB; data\\harvested.inix keeps the record." % (
+            len(lDeleted), "" if len(lDeleted) == 1 else "s", iFreed / 1e6), flush=True)
+    logging.info("prune: %d deleted, %.1f MB freed", len(lDeleted), iFreed / 1e6)
+    return len(lDeleted)
+
+
 def main():
     """Builds the guides whose harvests are here, gates each one, and reports what passed."""
     lArgs = sys.argv[1:]
@@ -4576,6 +4697,8 @@ def main():
          "This guide holds Twitch's own help, gathered from help.twitch.tv in November 2026. Twitch is a live streaming site, best known for games, music and talk shows. Its help is written mostly for people who stream: setting up a channel and a broadcast, chat and moderation, the Affiliate and Partner programs and how they pay, and keeping an account safe. Viewers will find the account, purchase and safety articles most useful.\r\n\r\nTwitch's help centre draws every page with script, so each page was drawn by Microsoft Edge before it was saved, and the gathering followed the links between articles. An article no other article links to may be missing. The categories are Twitch's own, from the trail printed above each article. Legal pages such as terms of service are not part of the help centre and are not here."),
         ("Wyzant", "WyzantHelp", readWyzant, "Wyzant.md", "Wyzant help",
          "This guide holds Wyzant's own help, gathered from support.wyzant.com in November 2026. Wyzant is a site for finding a private tutor and taking lessons, online or in person. It covers students and parents, tutors, the online learning studio, and Wyzant's programs for schools and colleges.\r\n\r\nLeft out on purpose: legal pages such as terms and privacy policies, pages for law enforcement and developers, and Android-only articles, as this collection covers Windows, the web, iPhone and iPad, and Alexa. The categories are the publisher's own."),
+        ("PiccyBot", "PiccyBotHelp", readPiccyBot, "PiccyBot.md", "PiccyBot help",
+         "This guide holds PiccyBot's own words about using it, gathered from piccybot.com on 23 November 2026. PiccyBot describes photos and videos aloud on the iPhone and on Android, answers questions about them, and works through WhatsApp, including hands-free with Meta's Ray-Ban glasses. It covers how the app works, its features, setting it up on WhatsApp and the glasses, and what the free and Pro plans include.\r\n\r\nThis is a short guide, because PiccyBot publishes its help on a single page. That page also lists common questions, but it shows each answer only when its question is opened, so the answers did not come with the page and the questions are left out rather than given without answers. Also left out: the welcome, what users say, the video showcase, honors, donations and the technology partner, which are not help. The categories are PiccyBot's own headings."),
         ("Clubhouse", "ClubhouseHelp", readClubhouse, "Clubhouse.md", "Clubhouse help",
          "This guide holds Clubhouse's own help, gathered from support.clubhouse.com in November 2026. Clubhouse is a social app for talking live in rooms, sending voice messages and chats, and building groups called houses. It covers signing up and your profile, the hallway and explore, live rooms, messages, friends and houses, Clubhouse Plus, and trust and safety, for the iPhone and iPad app and the web. Android-only articles are left out, as this collection covers Windows, the web, iPhone and iPad, and Alexa.\r\n\r\nLeft out on purpose: Clubhouse's legal pages, its policies, its pages for law enforcement and government requests, its copyright notices and its country notices. The categories are Clubhouse's own."),
         ("Egnyte", "EgnyteHelp", readEgnyte, "Egnyte.md", "Egnyte help",
@@ -4633,6 +4756,14 @@ def main():
         if not os.path.isdir(sHarvest):
             iNoHarvest += 1
             logging.info("%s: no harvest folder at %s, so it is not built", sProduct, sHarvest)
+            # A READER CHANGED AFTER ITS HARVEST WAS DELETED (23 November 2026): the guide cannot be rebuilt here, so
+            # say how to get it rebuilt rather than leave it silently stale.
+            nGone = readerChangedTime(sFile)
+            sGuideGone = os.path.join(sOutput, sFile)
+            if nGone and os.path.isfile(sGuideGone) and os.path.getmtime(sGuideGone) < nGone:
+                print("%s: its reader changed, but its harvest was deleted after it was built; ask for it again in an "
+                      "addGuides file with a later asked= day to rebuild it." % sFile, flush=True)
+                logging.info("%s: reader changed after its harvest was deleted; it needs a fresh gathering", sProduct)
             continue
         sGuide = os.path.join(sOutput, sFile)
         # A GUIDE IS REBUILT ONLY WHEN ITS HARVEST IS NEWER (version 2): the Homer rule that a build does again only
@@ -4704,6 +4835,7 @@ def main():
             sSaid = [sLine for sLine in (oRun.stdout or "").splitlines() if not re.match(r"\d+ of \d+: ", sLine)]
             for sLine in sSaid: print(sLine)
             if oRun.returncode != 0: iResult = 1
+    if bBuild: pruneHarvests(sParent, sOutput, lPlan, lResults)
     logging.info("RUN ENDED %s", "with failures" if iResult else "cleanly")
     print("Log: " + sLogPath)
     return iResult

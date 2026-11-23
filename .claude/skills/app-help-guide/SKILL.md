@@ -64,8 +64,14 @@ A collection of guides (C:\AppHelpGuides) keeps the Homer tree (11 November 2026
 - **`scripts`:** the harvesters makeHarvester wrote, each `get<Product>Help.py`
   with its `.cmd`.
 - **`data\harvests\<Product>Help`:** the pages a harvester saved, with
-  `manifest.txt`. They stay between runs, because a run resumes over them and
-  the build reads them. Never pushed (LocalFiles.txt).
+  `manifest.txt`. They stay while a run resumes over them and until every
+  guide built from them is built and passes its gates; then the build deletes
+  them, and every older `-before-<day>` copy, to save room (23 November
+  2026). Never pushed (LocalFiles.txt). To rebuild a guide whose harvest is
+  gone, ask for it again with a later `asked=` day.
+- **`data\harvested.inix`:** the record of every finished gathering, one
+  section per harvest folder, kept by harvestQueue version 6 so a deleted
+  harvest still counts as gathered.
 - **`results\<Product>Help.zip`:** the archive to upload, with the run's log
   inside. An output that may be moved away; nothing reads it again.
 - **`data\addGuides.inix`:** the guides to gather. Each section is a guide's

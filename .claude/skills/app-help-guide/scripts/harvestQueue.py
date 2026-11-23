@@ -1,4 +1,4 @@
-﻿r"""harvestQueue.py version 5 -- gathers the help guides a collection has asked for, as the first part of its build.
+﻿r"""harvestQueue.py version 6 -- gathers the help guides a collection has asked for, as the first part of its build.
 
     harvestQueue <collection>       what the kit's projectCycle runs before buildGuide, in a guides collection
     harvestQueue                    the collection in the current folder, by hand
@@ -53,6 +53,14 @@ addGuides.inix, which would have replaced the sections already in the collection
 gathered. Now data\addGuides-<anything>.inix files are read too, after addGuides.inix and in name order, so a delivery
 adds its own file (addGuides-2026-11-17.inix) and never touches the one you have. When two files name the same guide,
 the later asked= day wins, so asking again in a new file gathers again.
+
+THE RECORD OUTLIVES THE PAGES (version 6, 23 November 2026). Jamal asked that the harvests in data\harvests be
+deleted once their guides are built, since they take much room. But request.txt inside each harvest was the only
+record that a guide had been gathered for its day, so deleting a harvest would have made the next build gather it all
+over again. Every finished gathering is now also written to data\harvested.inix, one section per harvest folder with
+the same keys as its request.txt, and a run reads that record when the folder is gone. The first run of this version
+copies every request.txt it finds into the record, so the build's buildGuide may then delete a harvest whose guides are
+all built and clean.
 
 THE LOG is logs\<Collection>-harvestQueue-yyyyMMdd-HHmmss.log, UTF-8 with a byte order mark and Windows line endings:
 the environment, each section and what was decided for it and why, every command with its exit code and time.
@@ -138,6 +146,66 @@ def writeRequest(sHarvest, dRequest):
     return True
 
 
+sRecordName = "harvested.inix"
+
+
+def readRecords(sData):
+    """data\\harvested.inix: {folder: {key: value}}, the record of every finished gathering (version 6)."""
+    dRecords, sCurrent = {}, None
+    sPath = os.path.join(sData, sRecordName)
+    if not os.path.isfile(sPath): return dRecords
+    for sLine in io.open(sPath, "rb").read().decode("utf-8-sig", "replace").splitlines():
+        sLine = sLine.strip()
+        if not sLine or sLine.startswith(";"): continue
+        oSection = re.match(r"^\[(.+)\]$", sLine)
+        if oSection:
+            sCurrent = oSection.group(1).strip()
+            dRecords.setdefault(sCurrent, {})
+        elif sCurrent and "=" in sLine:
+            sKey, sValue = sLine.split("=", 1)
+            dRecords[sCurrent][sKey.strip().lower()] = sValue.strip()
+    return dRecords
+
+
+def writeRecord(sData, sFolder, dRequest):
+    """Records one harvest folder's request in data\\harvested.inix, keeping the others, in folder order: UTF-8 with a
+    byte order mark and Windows line endings."""
+    dRecords = readRecords(sData)
+    dRecords[sFolder] = dict(dRequest)
+    lsLines = ["; The record of every finished gathering, kept by the kit's harvestQueue (version 6). A harvest in",
+               "; data\\harvests may be deleted once its guides are built; this record says it was gathered."]
+    for sName in sorted(dRecords, key=str.lower):
+        lsLines.append("")
+        lsLines.append("[%s]" % sName)
+        for sKey in sorted(dRecords[sName]): lsLines.append("%s=%s" % (sKey, dRecords[sName][sKey]))
+    os.makedirs(sData, exist_ok=True)
+    io.open(os.path.join(sData, sRecordName), "wb").write(b"\xef\xbb\xbf" + ("\r\n".join(lsLines) + "\r\n").encode("utf-8"))
+    return True
+
+
+def requestOrRecord(sData, sHarvest, sFolder):
+    """request.txt in the harvest when it is there; otherwise what data\\harvested.inix recorded for the folder."""
+    if os.path.isdir(sHarvest): return readRequest(sHarvest)
+    return dict(readRecords(sData).get(sFolder, {}))
+
+
+def recordAll(sRoot):
+    """Copies every finished request.txt in data\\harvests into data\\harvested.inix where the record lacks it or differs,
+    so any harvest can be deleted safely. Returns how many were recorded."""
+    sData = os.path.join(sRoot, "data")
+    sHarvests = os.path.join(sData, "harvests")
+    if not os.path.isdir(sHarvests): return 0
+    dRecords = readRecords(sData)
+    iRecorded = 0
+    for sFolder in sorted(os.listdir(sHarvests), key=str.lower):
+        if "-before-" in sFolder or not os.path.isdir(os.path.join(sHarvests, sFolder)): continue
+        dRequest = readRequest(os.path.join(sHarvests, sFolder))
+        if dRequest.get("finished") and dRecords.get(sFolder) != dRequest:
+            writeRecord(sData, sFolder, dRequest)
+            iRecorded += 1
+    return iRecorded
+
+
 def pageCount(sHarvest):
     """How many pages a harvest's manifest names: its lines less the heading line; 0 when it has none."""
     sPath = os.path.join(sHarvest, "manifest.txt")
@@ -193,11 +261,13 @@ def trimFinished(sRoot, lSections):
         if not sHarvester: continue
         sFolder = sHarvester[3:] if sHarvester.lower().startswith("get") else sHarvester
         sHarvest = os.path.join(sRoot, "data", "harvests", sFolder)
+        if not os.path.isdir(sHarvest): continue   # deleted once its guides were built (version 6): nothing to trim
         dRequest = readRequest(sHarvest)
         if not dRequest.get("finished") or dRequest.get("trimmed"): continue
         iPages, iBefore, iAfter = writeTrimmedArchive(sRoot, sFolder, sHarvester)
         dRequest["trimmed"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         writeRequest(sHarvest, dRequest)
+        writeRecord(os.path.join(sRoot, "data"), sFolder, dRequest)
         log("%s: archive trimmed: %d pages, %d bytes to %d" % (sGuide, iPages, iBefore, iAfter))
         say("%s: results\\%s.zip trimmed for upload, %.1f MB of pages to %.1f MB." % (sGuide, sFolder, iBefore / 1e6, iAfter / 1e6))
     return True
@@ -253,7 +323,8 @@ def plan(sRoot, lSections):
             continue
         sFolder = sHarvester[3:] if sHarvester.lower().startswith("get") else sHarvester
         sHarvest = os.path.join(sHarvests, sFolder)
-        dRequest = readRequest(sHarvest)
+        # A HARVEST DELETED AFTER ITS GUIDE WAS BUILT (version 6) is still known to be gathered, from data\harvested.inix.
+        dRequest = requestOrRecord(os.path.join(sRoot, "data"), sHarvest, sFolder)
         if dRequest.get("asked") == sAsked and dRequest.get("finished"):
             log("%s: gathered for %s, finished %s; skipped" % (sGuide, sAsked, dRequest["finished"]))
             continue
@@ -332,6 +403,8 @@ def main():
             log("settings: collection %s; trim %s" % (sRoot, ", ".join(lTrimNames) or "every harvest"))
             iResult = trimNamed(sRoot, lTrimNames)
             return iResult
+        iRecorded = recordAll(sRoot)
+        log("record: %d finished gathering%s copied into data\\%s" % (iRecorded, "" if iRecorded == 1 else "s", sRecordName))
         lSections, lsQueues = readQueues(os.path.join(sRoot, "data"))
         log("settings: collection %s; queue files %s" % (sRoot, "; ".join(lsQueues) or "none"))
         if not lsQueues:
@@ -383,6 +456,7 @@ def main():
             if iCode == 0 or iPages > 0: dRequest["finished"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             else: log("%s: ended with an error and saved nothing, so it is not marked finished; the next build tries again" % sGuide)
             writeRequest(sHarvest, dRequest)
+            if dRequest.get("finished"): writeRecord(os.path.join(sRoot, "data"), sFolder, dRequest)
             sNote = "" if iCode == 0 else "; it ended with an error its log names"
             if iPages == 0: sNote += "; no page was saved, and its log says why"
             lResults.append((sGuide, "results\\%s.zip, %d page%s%s" % (sFolder, iPages, "" if iPages == 1 else "s", sNote)))

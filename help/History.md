@@ -7,6 +7,22 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.280.0 -- 23 November 2026, afternoon
+
+- **Harvests are deleted once their guides are built.** data\harvests held about 18,700 of AppHelpGuides' 20,100 files. After a guides build, buildGuide deletes a harvest when every guide read from it is built and passes its gates, and deletes every older copy set aside as <Folder>-before-<day>; each deletion is logged with its size, and the build says how much room it freed. A harvest still being gathered, or feeding a guide that failed or was never built (Chatter, OOrion, Glassdoor, Home Depot), is kept. A guide whose reader changes after its harvest is gone is named by the build, with how to gather it again.
+- **harvestQueue version 6 keeps the record outside the harvest.** request.txt inside each harvest was the only record that a guide was gathered for its day, so a deleted harvest would have been gathered all over again. Every finished gathering is now also written to data\harvested.inix, the first run copies every request.txt there, and a run reads the record when the folder is gone.
+- **makeHarvester is version 5 again in this copy,** rebuilt from the three harvesters version 5 wrote on 22 November, which it regenerates byte for byte: curl.exe for a host that refuses Python's TLS, and each way of running Edge tried when it prints nothing.
+- **Chatter's fourth try goes through Edge.** Its knowledge base refused Python's and curl's TLS on every address; Edge brings Chromium's. A five-second wait and a ceiling of 150 pages suit a Help Scout base.
+
+## 1.279.0 -- 23 November 2026, afternoon
+
+- **The help guides gain PiccyBot.** buildGuide reads piccybot.com's one page, drawn by Edge: the publisher's level-two headings are the categories and each level-three heading an article, and a section whose items hold a sentence or two each (How PiccyBot Works, its features) is one article with the items as headings inside it, which is how the publisher presents them and what the build's gate for a median article asks. Left out as not help: the welcome, testimonials, the video showcase, honors, donations, the technology partner and the call to download. The page's questions are left out too, because it draws each answer only when its question is opened, and the harvest holds the questions alone; the preamble says so. Nine articles, about 1,200 words, every gate passed.
+- **OOrion is refused, with the evidence,** in the skill's refusal rules: its English application page does not exist, and its English front page is 244 words.
+
+## 1.278.0 -- 23 November 2026, afternoon
+
+- **Lbc has choice buttons that say what they hold.** addChoiceButton puts a choice on a line of its own, as wide as the dialog allows, captioned with the choice and, in parentheses, what it holds, such as "Look columns (name, country)"; a long detail wraps inside the button. It closes the dialog and reports the plain choice, so a caller tests "Look columns" as before, and Shift+F1 finds the hint by that name. Alt and the letter still choose in one keystroke, which is why it is a stack of buttons rather than a list box with an activate button. DbDo's Show Columns and Order Records use it.
+
 ## 1.277.0 -- 23 November 2026
 
 - **The suite manifest has DbDo's new keys and names:** Show Columns on Alt+S (once Select Columns), Say Shown Columns on Shift+S (once Say Select Columns), Merge Data on Alt+Shift+M (once Alt+M), and the new Design Database on Alt+Shift+D. Their entries now carry the identifiers the program's own names give them.

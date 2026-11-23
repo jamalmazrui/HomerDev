@@ -1,5 +1,13 @@
 ﻿r"""makeHarvester.py version 5
 
+VERSION 5 (22 November 2026, restored here on 23 November). Two ways round a closed door, both in the harvester every
+block writes. A host that refuses Python's TLS handshake has the rest of its pages fetched by curl.exe, Windows' own,
+since Chatter's Knowledge Base refused Python 3.14. And Edge, when it prints nothing, is tried each way known --
+msedge.exe and a waiting new_msedge.exe, each with --headless=new and then --headless -- keeping the first that prints a
+page, with what Edge said logged. This file's own copy of version 5 was rebuilt from the harvesters it wrote that day
+(getChatterHelp, getOOrionHelp and getPiccyBotHelp), and regenerates all three byte for byte; only these opening notes
+are written anew.
+
 Writes a harvester: a standalone Python crawler for ONE product's help estate.
 
 HOW TO USE IT. Add a block to the configuration list near the bottom of this
@@ -45,13 +53,6 @@ only at thirty seconds, in September -- and Glassdoor is the first block to use
 it. Such a run also refuses any page nine tenths the same as the first page it
 saved: that is the site's scaffolding arriving without its article. Every other
 block is fetched by Python as before.
-
-TWO OTHER WAYS IN (version 5, 22 November 2026). A host that refuses Python's
-TLS handshake -- Chatter's Knowledge Base did, every time -- is fetched for the
-rest of the run by Windows' own curl.exe, which uses Windows' TLS as Edge does.
-And when Edge prints nothing, the run logs what Edge said and tries again with
-new_msedge.exe (an update waiting for Edge to close) and with the older
---headless switch, keeping whichever way first prints a page.
 
 THE FENCE FAULTS THAT HAVE COST RUNS are in references/fence-faults.md. Read
 that before writing a new fence.
@@ -3737,14 +3738,23 @@ lEstates = [
     # their steps in the page. The site's robots.txt did not answer the web fetcher here, so the seeds take the front
     # page, its sitemap, and five articles seen that day; the community guidelines on the main site come too, as the
     # rules a user meets in a room.
+    # FOURTH TRY THROUGH EDGE (23 November 2026). The third run reached chattersocial.io but not one page of
+    # support.chattersocial.io: Python's TLS ended in "tlsv1 alert internal error" and curl's Windows TLS in
+    # SEC_E_INTERNAL_ERROR, on every address, three times each, so the host refuses the handshakes Windows and
+    # Python offer. Edge brings its own TLS, Chromium's, which browsers reach the knowledge base with, so the block
+    # is now fetched by Edge. Help Scout draws its articles on the server, so a short wait does; the ceiling falls
+    # to 150 pages, as a Help Scout base of this size has fewer than a hundred. If Edge is refused too, the log will
+    # say so on the first address and Chatter is a refusal of the fourth shape: the request itself refused.
     {
         "sProduct": "Chatter",
         "sScriptName": "getChatterHelp.py",
-        "sSystem": "Help Scout Docs at support.chattersocial.io",
+        "sSystem": "Help Scout Docs at support.chattersocial.io, fetched by Microsoft Edge",
         "sFolder": "ChatterHelp",
         "sZipName": "ChatterHelp.zip",
-        "iMaxPages": 300,
+        "iMaxPages": 150,
         "nDelay": 1.0,
+        "sFetch": "edge",
+        "iBrowserWait": 5,
         "sSeeds": ('"https://support.chattersocial.io/",\n'
                    '              "https://support.chattersocial.io/sitemap.xml",\n'
                    '              "https://support.chattersocial.io/article/5-welcome-to-chatter",\n'

@@ -2435,6 +2435,45 @@ public class LbcDialog : IDisposable
         return btn;
     }
 
+    // addChoiceButton: A CHOICE THAT SAYS WHAT IT HOLDS (23 November 2026, for DbDo's column groups). A button on a
+    // line of its own, as wide as the dialog allows, whose caption is the choice and, in parentheses, what it holds:
+    // "Look columns (name, country)". A long detail wraps onto further lines inside the button, so nothing is cut
+    // off. It closes the dialog like a bottom-row button and reports the choice WITHOUT the detail, so callers test
+    // "Look columns" as before, and Shift+F1 finds the choice's hint by that same name. The access key is the
+    // caller's ampersand, so Alt+letter still chooses in one keystroke -- the reason this is a stack of buttons and
+    // not a list box with an activate button, which would take two keys and lose the letters and the hints. The
+    // detail's own ampersands are doubled, so a column named "R&B" is shown, not taken for an access key.
+    public Button addChoiceButton(string sLabel, string sDetail)
+    {
+        Button btn = new Button();
+        string sPlain = (sLabel ?? "").Replace("&", "");
+        btn.Text = (sLabel ?? "") + (string.IsNullOrEmpty(sDetail) ? "" : " (" + sDetail.Replace("&", "&&") + ")");
+        btn.AutoSize = false;
+        btn.TextAlign = ContentAlignment.MiddleLeft;
+        btn.TabIndex = iTabIndex++;
+        btn.UseVisualStyleBackColor = true;
+        btn.Margin = new Padding(0, 0, 0, DefaultRowGap);
+        btn.GotFocus += handleGotFocus;
+        registerWidget(btn, "Button", sPlain);
+        bandTarget().Controls.Add(btn);
+        // Sized once it has its parent's font: as wide as one line of the caption needs, from the dialog's usual
+        // width up to its widest; then as tall as the caption, wrapped at that width, needs.
+        const int iTextInset = 16;
+        int iMaxWidth = DefaultMaxWidth - DefaultPadding * 2 - 24;
+        Size szLine = TextRenderer.MeasureText(btn.Text, btn.Font);
+        int iWidth = Math.Max(innerWidth(), Math.Min(iMaxWidth, szLine.Width + iTextInset));
+        Size szWrapped = TextRenderer.MeasureText(btn.Text, btn.Font, new Size(iWidth - iTextInset, 0), TextFormatFlags.WordBreak);
+        btn.Size = new Size(iWidth, Math.Max(DefaultButtonHeight, szWrapped.Height + 12));
+        btn.Click += delegate(object o, EventArgs e)
+        {
+            sBandResult = sPlain;
+            frm.DialogResult = DialogResult.OK;
+            frm.Close();
+        };
+        if (ctlFirstFocusable == null) ctlFirstFocusable = btn;
+        return btn;
+    }
+
     // addHelpButton: Help as a button in a band rather than in the bottom row.
     // It opens the same Help box as F1 and leaves the dialog standing; with it
     // placed, runWithButtons adds no second Help button (23 October 2026).
