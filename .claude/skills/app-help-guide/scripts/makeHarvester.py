@@ -1,4 +1,4 @@
-﻿r"""makeHarvester.py version 4
+﻿r"""makeHarvester.py version 5
 
 Writes a harvester: a standalone Python crawler for ONE product's help estate.
 
@@ -46,6 +46,13 @@ it. Such a run also refuses any page nine tenths the same as the first page it
 saved: that is the site's scaffolding arriving without its article. Every other
 block is fetched by Python as before.
 
+TWO OTHER WAYS IN (version 5, 22 November 2026). A host that refuses Python's
+TLS handshake -- Chatter's Knowledge Base did, every time -- is fetched for the
+rest of the run by Windows' own curl.exe, which uses Windows' TLS as Edge does.
+And when Edge prints nothing, the run logs what Edge said and tries again with
+new_msedge.exe (an update waiting for Edge to close) and with the older
+--headless switch, keeping whichever way first prints a page.
+
 THE FENCE FAULTS THAT HAVE COST RUNS are in references/fence-faults.md. Read
 that before writing a new fence.
 """
@@ -69,7 +76,7 @@ Nothing is fetched twice: a page already saved is skipped, so the script
 can be stopped and run again.
 """
 
-import hashlib, html, http.client, io, json, logging, os, platform, re, shutil, socket, subprocess, sys, tempfile, time, urllib.error, urllib.parse, urllib.request, zipfile
+import hashlib, html, http.client, io, json, logging, os, platform, re, shutil, socket, ssl, subprocess, sys, tempfile, time, urllib.error, urllib.parse, urllib.request, zipfile
 
 dDefaultHeaders = {{"Accept": "text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8",
              "Accept-Language": "en-US,en;q=0.9",
@@ -91,7 +98,8 @@ sProduct = "{sProduct}"
 sSubjectPattern = r"{sSubjectPattern}"
 sZipName = "{sZipName}"
 
-g_dBrowser = {{"sProfile": "", "setFirstWords": None}}
+g_dBrowser = {{"sProfile": "", "setFirstWords": None, "tWorking": None}}
+g_dCurlHosts = {{}}
 g_dPaths = {{"sLog": ""}}
 g_dRepeatCounts = {{}}
 g_dSeenFingerprints = {{}}
@@ -122,37 +130,107 @@ def edgePath():
     return shutil.which("msedge") or ""
 
 
+def edgePrograms():
+    """The Edge programs to try, in order: msedge.exe, then new_msedge.exe beside it. While an update waits for every
+    Edge window to close -- and HomerView keeps one open -- Edge leaves the new program as new_msedge.exe, and
+    msedge.exe may hand a headless run on to it and exit at once, having printed nothing (22 November 2026)."""
+    sEdge = edgePath()
+    lFound = [sEdge] if sEdge else []
+    if sEdge:
+        sNew = os.path.join(os.path.dirname(sEdge), "new_msedge.exe")
+        if os.path.isfile(sNew): lFound.append(sNew)
+    return lFound
+
+
+def runEdge(sProgram, sHeadless, sUrl, iLimit):
+    """One headless Edge run; returns the finished process, or None when it could not run in time."""
+    lCommand = [sProgram, sHeadless, "--disable-gpu", "--no-first-run", "--no-default-browser-check", "--disable-extensions",
+                "--user-data-dir=" + g_dBrowser["sProfile"], "--virtual-time-budget=%d" % (iBrowserWait * 1000),
+                "--dump-dom", sUrl]
+    try:
+        return subprocess.run(lCommand, capture_output=True, timeout=iLimit)
+    except subprocess.TimeoutExpired:
+        logging.warning("Edge (%s, %s) did not finish %s within %d seconds", os.path.basename(sProgram), sHeadless, sUrl, iLimit)
+    except OSError as oError:
+        logging.warning("Edge (%s) could not be started for %s: %s", sProgram, sUrl, oError)
+    return None
+
+
 def fetchWithEdge(sUrl):
     """Has Microsoft Edge load one page headless, let its script run for iBrowserWait seconds, and print the finished
     page. Edge runs in a profile of its own, made for this run, so it never touches the profile of an Edge already
-    open. Returns what fetchAddress returns."""
-    sEdge = edgePath()
-    if not sEdge:
+    open. Returns what fetchAddress returns.
+
+    WHEN EDGE PRINTS NOTHING (22 November 2026). OOrion's and PiccyBot's first runs had Edge exit 0 in a tenth of a
+    second with nothing printed, for every page, and the log could not say why. Now what Edge wrote to its error
+    stream is logged, and the run tries each way it knows -- msedge.exe and a waiting new_msedge.exe, each with
+    --headless=new and then the older --headless -- and keeps the first that prints a page for the rest of the run."""
+    lPrograms = edgePrograms()
+    if not lPrograms:
         logCapped("no edge", "Microsoft Edge was not found, so this page could not be drawn: " + sUrl)
         return 0, b"", "", sUrl
     if not g_dBrowser["sProfile"]: g_dBrowser["sProfile"] = tempfile.mkdtemp(prefix="homerHarvest")
-    lCommand = [sEdge, "--headless=new", "--disable-gpu", "--no-first-run", "--disable-extensions",
-                "--user-data-dir=" + g_dBrowser["sProfile"], "--virtual-time-budget=%d" % (iBrowserWait * 1000),
-                "--dump-dom", sUrl]
     iLimit = iBrowserWait + 90
-    logging.info("Edge: waiting up to %d seconds for %s", iLimit, sUrl)
-    try:
-        oRun = subprocess.run(lCommand, capture_output=True, timeout=iLimit)
-    except subprocess.TimeoutExpired:
-        logging.warning("Edge did not finish %s within %d seconds; not saved", sUrl, iLimit)
+    lWays = [g_dBrowser["tWorking"]] if g_dBrowser["tWorking"] else [(sProgram, sHeadless) for sProgram in lPrograms for sHeadless in ("--headless=new", "--headless")]
+    for sProgram, sHeadless in lWays:
+        logging.info("Edge (%s, %s): waiting up to %d seconds for %s", os.path.basename(sProgram), sHeadless, iLimit, sUrl)
+        oRun = runEdge(sProgram, sHeadless, sUrl, iLimit)
+        if oRun is None: continue
+        logging.info("Edge: exit %d, %d bytes, for %s", oRun.returncode, len(oRun.stdout), sUrl)
+        # A CRASH AFTER THE PAGE IS PRINTED (19 November 2026): headless Edge on Twitch's Salesforce pages exited 39 times
+        # in 196 with 0xC0000005, an access violation as it shut down, after printing the whole page. A finished page --
+        # one that closes its html element -- is kept whatever the exit code; the ready pattern still judges it.
+        bFinished = b"</html>" in oRun.stdout[-4096:].lower()
+        if oRun.returncode != 0 and bFinished: logCapped("edge crash after page", "Edge exited %d after printing the whole page, which is kept: %s" % (oRun.returncode, sUrl))
+        if oRun.stdout.strip() and (oRun.returncode == 0 or bFinished):
+            if not g_dBrowser["tWorking"]:
+                g_dBrowser["tWorking"] = (sProgram, sHeadless)
+                logging.info("Edge works as %s with %s; the rest of this run uses that", sProgram, sHeadless)
+            return 200, oRun.stdout, "text/html", sUrl
+        sSaid = (oRun.stderr + oRun.stdout).decode("utf-8", "replace").strip().replace("\r", " ").replace("\n", " | ")
+        logCapped("edge printed nothing", "Edge (%s, %s) printed no page; it said: %s" % (os.path.basename(sProgram), sHeadless, sSaid[:600] or "nothing at all"))
+    return 0, b"", "", sUrl
+
+
+def fetchWithCurl(sUrl):
+    """Fetches one address with Windows' own curl.exe, which speaks TLS through Windows itself, as Edge does.
+
+    WHY (22 November 2026). Chatter's Knowledge Base answered every request from Python 3.14 with a TLS "internal
+    error" alert, three times for each of eight addresses, while browsers read it. Python's OpenSSL offers key
+    exchanges some servers refuse at the handshake; curl.exe in Windows uses Schannel. Once a host fails that way, the
+    rest of the run sends it straight to curl. Returns what fetchAddress returns."""
+    sCurl = shutil.which("curl.exe") or os.path.join(os.environ.get("SystemRoot", "C:/Windows"), "System32", "curl.exe")
+    if not os.path.isfile(sCurl):
+        logCapped("no curl", "curl.exe was not found, so this page could not be fetched another way: " + sUrl)
         return 0, b"", "", sUrl
-    except OSError as oError:
-        logging.warning("Edge could not be started for %s: %s", sUrl, oError)
-        return 0, b"", "", sUrl
-    logging.info("Edge: exit %d, %d bytes, for %s", oRun.returncode, len(oRun.stdout), sUrl)
-    # A CRASH AFTER THE PAGE IS PRINTED (19 November 2026): headless Edge on Twitch's Salesforce pages exited 39 times in
-    # 196 with 0xC0000005, an access violation as it shut down, after printing the whole page, 330,000 bytes and more.
-    # Those pages were thrown away, and the links on them never followed. A finished page -- one that closes its html
-    # element -- is kept whatever the exit code, and the crash is counted in the log; the ready pattern still judges it.
-    bFinished = b"</html>" in oRun.stdout[-4096:].lower()
-    if oRun.returncode != 0 and bFinished: logCapped("edge crash after page", "Edge exited %d after printing the whole page, which is kept: %s" % (oRun.returncode, sUrl))
-    if not oRun.stdout.strip() or (oRun.returncode != 0 and not bFinished): return 0, b"", "", sUrl
-    return 200, oRun.stdout, "text/html", sUrl
+    oParts = urllib.parse.urlsplit(sUrl)
+    sOut = os.path.join(tempfile.gettempdir(), "homerHarvest-curl-%d.bin" % os.getpid())
+    lCommand = [sCurl, "-sS", "-L", "--max-time", str(int(nTimeout)), "-A", dDefaultHeaders["User-Agent"],
+                "-H", "Accept-Language: en-US,en;q=0.9", "-H", "Referer: " + oParts.scheme + "://" + oParts.netloc + "/",
+                "-o", sOut, "-w", "%{{http_code}}|%{{content_type}}|%{{url_effective}}", sUrl]
+    for iAttempt in range(1, iRetries + 1):
+        try:
+            oRun = subprocess.run(lCommand, capture_output=True, timeout=nTimeout + 30)
+        except (subprocess.TimeoutExpired, OSError) as oError:
+            logging.warning("curl attempt %d for %s failed: %s", iAttempt, sUrl, oError)
+            time.sleep(nDelay * iAttempt)
+            continue
+        lAnswer = oRun.stdout.decode("utf-8", "replace").strip().split("|", 2)
+        binBody = b""
+        try:
+            with open(sOut, "rb") as fHandle: binBody = fHandle.read()
+            os.remove(sOut)
+        except OSError:
+            pass
+        iStatus = int(lAnswer[0]) if lAnswer and lAnswer[0].isdigit() else 0
+        logging.info("curl: exit %d, status %d, %d bytes, for %s", oRun.returncode, iStatus, len(binBody), sUrl)
+        if oRun.returncode == 0 and iStatus:
+            sType = lAnswer[1].split(";")[0].strip() if len(lAnswer) > 1 else ""
+            sFinal = lAnswer[2] if len(lAnswer) > 2 and lAnswer[2] else sUrl
+            return iStatus, binBody, sType, sFinal
+        logging.warning("curl attempt %d for %s: %s", iAttempt, sUrl, oRun.stderr.decode("utf-8", "replace").strip()[:300])
+        time.sleep(nDelay * iAttempt)
+    return 0, b"", "", sUrl
 
 
 def pageWords(binBody):
@@ -192,6 +270,7 @@ def fetchAddress(sUrl):
         return 0, b"", "", sUrl
     if sFetchMode == "edge": return fetchWithEdge(sUrl)
     """Fetches one address, returning status, body bytes, content type and the final address."""
+    if urllib.parse.urlsplit(sUrl).netloc.lower() in g_dCurlHosts: return fetchWithCurl(sUrl)
     for iAttempt in range(1, iRetries + 1):
         try:
             # Send a Referer naming the site's own front page. A browser always
@@ -213,6 +292,11 @@ def fetchAddress(sUrl):
             if oError.code in (403, 404, 410): return oError.code, binBody, "", sUrl
         except (urllib.error.URLError, http.client.HTTPException, socket.timeout, ConnectionError) as oError:
             logging.warning("attempt %d for %s failed: %s", iAttempt, sUrl, oError)
+            if isinstance(getattr(oError, "reason", None), ssl.SSLError) or isinstance(oError, ssl.SSLError):
+                sHost = urllib.parse.urlsplit(sUrl).netloc.lower()
+                g_dCurlHosts[sHost] = True
+                logging.info("%s refused Python's TLS handshake; it and the rest of its pages go through curl.exe", sHost)
+                return fetchWithCurl(sUrl)
         time.sleep(nDelay * iAttempt)
     return 0, b"", "", sUrl
 
@@ -454,7 +538,7 @@ def main():
     logging.getLogger().setLevel(logging.INFO)
     sys.excepthook = lambda oType, oValue, oTrace: logging.error(
         "UNCAUGHT %s: %s", oType.__name__, oValue, exc_info=(oType, oValue, oTrace))
-    logging.info("{sScriptName} (makeHarvester version 4) for %s", sProduct)
+    logging.info("{sScriptName} (makeHarvester version 5) for %s", sProduct)
     logging.info("script %s", os.path.abspath(__file__))
     logging.info("Python %s on %s", platform.python_version(), platform.platform())
     logging.info("working directory %s; command line %s", os.getcwd(), " ".join(sys.argv))

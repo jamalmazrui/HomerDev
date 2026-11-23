@@ -1288,7 +1288,13 @@ def buildTutorials():
     sayLine("Fetching any voices not yet in exec, and speaking any tutorial without audio ...")
     logLine("RUN: %s -fetch -build (output on the console; its log is in logs)" % sTool)
     try:
-        iCode = subprocess.call(["cmd.exe", "/c", sTool, "-fetch", "-build"])
+        # THIS KIT, NOT THE INSTALLED ONE (22 November 2026). HomerDev's installer sets the HomerDev variable to
+        # C:\Program Files\HomerDev when it is unset, and buildTutorials looks at that variable first. The kit's own
+        # build then took its voices folder there, could not write ptts into Program Files, and its tutorials were
+        # read by piper's john, not Phonon's Russell. An app's build already names its kit (projectCycle); this does too.
+        dEnvironment = dict(os.environ, HomerDev=sScriptDir)
+        logLine("HomerDev for the tutorials: %s" % sScriptDir)
+        iCode = subprocess.call(["cmd.exe", "/c", sTool, "-fetch", "-build"], env=dEnvironment)
     except Exception as oError:
         logLine("RUN FAILED: %s" % oError)
         iCode = 1

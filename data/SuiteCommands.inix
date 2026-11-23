@@ -218,6 +218,13 @@ name=Describe Table
 keys=
 status=current
 
+[DbDo designDatabase]
+name=Design Database
+keys=Alt+Shift+D
+change=new, 23 November 2026
+reason=one place to build or change a database: Add table, Table properties, and DbDo's own defs, files and maps tables in design windows; D for Design and Database, beside Shift+D Say Database and Alt+D Open Template Database
+status=implemented
+
 [DbDo developerGuide]
 name=Developer Guide
 keys=
@@ -500,8 +507,10 @@ status=current
 
 [DbDo mergeData]
 name=Merge Data
-keys=Alt+M
-status=current
+keys=Alt+Shift+M
+change=moved from Alt+M, 23 November 2026
+reason=on Alt+M it ran before the menu letter, so Alt+M could not open the Misc menu, as it does in EdSharp and FileDir
+status=implemented
 
 [DbDo newCopy]
 name=New Copy
@@ -994,10 +1003,12 @@ change=renamed from Say Replacement Value, 5 November 2026
 reason=it says two values, what Replace would find and what it would put there, now with the last setting; hearing first, as Shift+B and Shift+J
 status=implemented
 
-[DbDo saySelectColumns]
-name=Say Select Columns
+[DbDo sayShownColumns]
+name=Say Shown Columns
 keys=Shift+S
-status=current
+change=renamed from Say Select Columns, 23 November 2026
+reason=it answers Show Columns, as Say Order answers Order Records and Say Filter answers Filter Records
+status=implemented
 
 [DbDo saySortAndFilter]
 name=Say Filter and Order
@@ -1085,10 +1096,12 @@ name=Search Previous
 keys=Shift+F3
 status=current
 
-[DbDo selectColumnsToDisplay]
-name=Select Columns to Display
+[DbDo showColumns]
+name=Show Columns
 keys=Alt+S
-status=current
+change=renamed from Select Columns, 23 November 2026
+reason=in Windows and the suite's F8 family, to select is to highlight; the dialog's own list was already Columns shown
+status=implemented
 
 [DbDo showInFileDir]
 name=Show in FileDir

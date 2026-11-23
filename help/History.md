@@ -7,6 +7,13 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.277.0 -- 23 November 2026
+
+- **The suite manifest has DbDo's new keys and names:** Show Columns on Alt+S (once Select Columns), Say Shown Columns on Shift+S (once Say Select Columns), Merge Data on Alt+Shift+M (once Alt+M), and the new Design Database on Alt+Shift+D. Their entries now carry the identifiers the program's own names give them.
+- **The hotkey template explains Say keys by the word after Say.** A Say command's letter was explained as "S for Say", which says nothing, since every Say key is Shift and a letter; now Say Shown Columns reads "S for Shown". Say Status reads that Z is the bottom of the alphabet, as the status bar is the bottom of the window, not that Z is a toggle.
+- **The hotkey template warns of a hotkey on a menu's letter.** Alt and a letter bound to a command runs first, so the menu with that letter underlined cannot open from the keyboard that way. DbDo's Merge Data held Alt+M over the Misc menu. The warning goes to the console and the log, and does not stop a build.
+- **The key groups know Show Columns and Design Database.**
+
 ## 1.276.0 -- 22 November 2026
 
 - **Three harvesters for apps blind people use in travel, orientation and community,** each probed first. Chatter, the social app of live rooms where the AI for the Blind group meets, has a Help Scout Knowledge Base at support.chattersocial.io; its harvester takes the articles, categories, release notes and the community guidelines. OOrion, which finds objects and text through the camera, has no help centre, only an application page of about 800 words in French; its harvester takes that page and the English edition, drawn by Edge, so the build can judge whether it is too thin for a guide. PiccyBot, whose PiccyBot Live describes live through Meta's glasses, has a site drawn wholly by script, so Edge draws it and this first run is the probe. buildGuide's readers for all three wait for their first harvests.
