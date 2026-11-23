@@ -810,6 +810,38 @@ name=Say Clipboard
 keys=Alt+Apostrophe
 status=current
 
+[DbDo readHeaded]
+name=Read Headed
+keys=
+change=added 23 November 2026
+reason=Jamal's design, 23 November 2026: H for headed, Read Wide with the row's number and each column's name before its value; Alt+Shift+H (marked, from the first) and Control+H (from the current record), as W; Alt+H is the Help menu, and Control+Shift is not a reading key (21 November 2026); Alt+Shift+H left Hotkey Summary only for dialogs with a Help button, and reading keys act in the main window
+disposition=ruled
+status=implemented
+
+[DbDo readHeadedFromCurrent]
+name=Read Headed from Current
+keys=Control+H
+change=added 23 November 2026
+reason=Jamal's design, 23 November 2026: H for headed, Read Wide with the row's number and each column's name before its value; Alt+Shift+H (marked, from the first) and Control+H (from the current record), as W; Alt+H is the Help menu, and Control+Shift is not a reading key (21 November 2026); Alt+Shift+H left Hotkey Summary only for dialogs with a Help button, and reading keys act in the main window
+disposition=ruled
+status=implemented
+
+[DbDo readHeadedFromCurrentMarked]
+name=Read Headed Marked from Current
+keys=
+change=added 23 November 2026
+reason=Jamal's design, 23 November 2026: H for headed, Read Wide with the row's number and each column's name before its value; Alt+Shift+H (marked, from the first) and Control+H (from the current record), as W; Alt+H is the Help menu, and Control+Shift is not a reading key (21 November 2026); Alt+Shift+H left Hotkey Summary only for dialogs with a Help button, and reading keys act in the main window
+disposition=ruled
+status=implemented
+
+[DbDo readHeadedOfMarked]
+name=Read Headed Marked
+keys=Alt+Shift+H
+change=added 23 November 2026
+reason=Jamal's design, 23 November 2026: H for headed, Read Wide with the row's number and each column's name before its value; Alt+Shift+H (marked, from the first) and Control+H (from the current record), as W; Alt+H is the Help menu, and Control+Shift is not a reading key (21 November 2026); Alt+Shift+H left Hotkey Summary only for dialogs with a Help button, and reading keys act in the main window
+disposition=ruled
+status=implemented
+
 [DbDo readList]
 name=Read Wide
 keys=Alt+W or Alt+F8
@@ -895,6 +927,14 @@ keys=Shift+G
 change=renamed from Say Goto, was Shift+G
 reason=wording
 disposition=accepted
+status=implemented
+
+[DbDo sayHeader]
+name=Say Header
+keys=Shift+H
+change=added 23 November 2026
+reason=Jamal's design, 23 November 2026: the current column's name, a short form of Alt+Control+Shift+UpArrow
+disposition=ruled
 status=implemented
 
 [DbDo sayId]

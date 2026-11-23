@@ -195,6 +195,34 @@
 <h1 id="history">History</h1>
 <p>Each version is a level-2 heading, newest first, so your screen
 reader’s heading keys move from one version to the next.</p>
+<h2 id="november-2026-night">1.282.0 – 23 November 2026, night</h2>
+<ul>
+<li><strong>SuiteCommands.inix gains DbDo’s Read Headed family and Say
+Header.</strong> Read Headed Marked is on Alt+Shift+H and Read Headed
+from Current on Control+H, as Alt+Shift+W and Control+W; Say Header is
+on Shift+H. Read Headed and Read Headed Marked from Current have no key,
+since Alt+H is the Help menu and Control+Shift is not a reading key.
+KeyDecisions.md says why, beside the wide, lean and yield families.</li>
+</ul>
+<h2 id="november-2026-evening">1.281.0 – 23 November 2026, evening</h2>
+<ul>
+<li><strong>askTable.py answers a question about one table with the
+local AI model, without letting the model write SQL or say a
+number.</strong> The model, through Ollama with JSON output and
+temperature 0, only fills in a plan: an action, a column, filters,
+grouping, order and limit. askTable checks every column and value
+against the table, builds read-only SQL with parameters, and says the
+answer first and then how it understood the question (“5,388 stations
+where country is Germany”). It declines, in a sentence, rather than
+guess. Column names are said with spaces for underscores, years without
+a thousands comma, and an exact match that is far narrower than the
+words found anywhere in the column is pointed out. Follow-ups are sent
+with the previous question and plan, and every turn is kept in an .inix
+history file through the inix module. It runs from the command line
+(–db, –table, –question, –history, –model, –app) or as a module; DbDo’s
+scriptsuses it to measure reliability before any voice command is
+built.</li>
+</ul>
 <h2 id="november-2026-afternoon">1.280.0 – 23 November 2026,
 afternoon</h2>
 <ul>

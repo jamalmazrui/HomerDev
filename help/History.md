@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.282.0 -- 23 November 2026, night
+
+- **SuiteCommands.inix gains DbDo's Read Headed family and Say Header.** Read Headed Marked is on Alt+Shift+H and Read Headed from Current on Control+H, as Alt+Shift+W and Control+W; Say Header is on Shift+H. Read Headed and Read Headed Marked from Current have no key, since Alt+H is the Help menu and Control+Shift is not a reading key. KeyDecisions.md says why, beside the wide, lean and yield families.
+
+## 1.281.0 -- 23 November 2026, evening
+
+- **askTable.py answers a question about one table with the local AI model, without letting the model write SQL or say a number.** The model, through Ollama with JSON output and temperature 0, only fills in a plan: an action, a column, filters, grouping, order and limit. askTable checks every column and value against the table, builds read-only SQL with parameters, and says the answer first and then how it understood the question ("5,388 stations where country is Germany"). It declines, in a sentence, rather than guess. Column names are said with spaces for underscores, years without a thousands comma, and an exact match that is far narrower than the words found anywhere in the column is pointed out. Follow-ups are sent with the previous question and plan, and every turn is kept in an .inix history file through the inix module. It runs from the command line (--db, --table, --question, --history, --model, --app) or as a module; DbDo's scripts\testAsk uses it to measure reliability before any voice command is built.
+
 ## 1.280.0 -- 23 November 2026, afternoon
 
 - **Harvests are deleted once their guides are built.** data\harvests held about 18,700 of AppHelpGuides' 20,100 files. After a guides build, buildGuide deletes a harvest when every guide read from it is built and passes its gates, and deletes every older copy set aside as <Folder>-before-<day>; each deletion is logged with its size, and the build says how much room it freed. A harvest still being gathered, or feeding a guide that failed or was never built (Chatter, OOrion, Glassdoor, Home Depot), is kept. A guide whose reader changes after its harvest is gone is named by the build, with how to gather it again.
