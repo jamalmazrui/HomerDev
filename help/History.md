@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.286.0 -- 24 November 2026, evening
+
+- **No id in a prime.** The homer-db skill now says it: a prime never holds an id -- the table's own, a source's or a link's -- since an id differs for every record or in another database, and a prime is what tells whether a record is already there. The one exception is a table whose records are only a pair of links. checkDb warns about a prime that holds one.
+- **The standard fields after the main ones are now notes, tags, url, then look, prime and marked** (Jamal's ruling), where url came first. The homer-db skill, checkDb, contactPattern and the CSV-to-database conversion all follow it. A table still begins with its id, added and edited.
+- **A database made from a CSV leaves id columns out of its prime,** when any other field is left.
+
 ## 1.285.0 -- 24 November 2026, afternoon
 
 - **A line chart runs over a date column when one is given.** DataReport's line chart drew each number column across the records in their grid order; with the spec's x naming a date column, it now draws them across those dates, in time order, as pandas plots a table over its datetime index. The clock time is kept as written, a time zone after it set aside. The takeaway gives each line's average and its highest and lowest values with their dates, and the description names the span.

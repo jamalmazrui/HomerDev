@@ -3,7 +3,7 @@ name: homer-db
 description: >-
   Designs, creates, reviews and checks SQLite .db files the Homer way, as DbDo
   opens them: plural lower-case table names, an integer key named for the singular, such as book_id, the
-  standard fields added, edited, url, notes, tags, look, prime and marked in
+  standard fields added, edited, notes, tags, url, look, prime and marked in
   their fixed order, DbDo's field types (TEXTLINE, TEXTMEMO, TEXTMARKDOWN,
   TEXTTIME), the defs, maps and views tables, pick lists, a database's own
   folder with its .inix settings, reports and scripts, and a checkDb script
@@ -35,14 +35,18 @@ finding.
 3. The data fields, in the order a person would fill them in.
 4. Foreign keys, named for the table they point at in the singular:
    `job_id` points at `jobs`.
-5. `url TEXTLINE`, where a record can point at something on the web.
-6. `notes TEXTMARKDOWN`, then `tags TEXTMEMO`.
+5. `notes TEXTMARKDOWN`, then `tags TEXTMEMO`.
+6. `url TEXTLINE`, where a record can point at something on the web.
 7. `look TEXT GENERATED ALWAYS AS (...) STORED` -- how the record reads when
    mentioned elsewhere: the identifying fields joined with " | " (space, bar,
    space), so a screen reader pauses between them.
 8. `prime TEXT GENERATED ALWAYS AS (...) STORED` -- the fields that make the
    record unique, joined with "|" alone, guarded by a unique index. Matching,
-   merging and links all compare `prime`, never the id.
+   merging and links all compare `prime`, never the id. So a prime never holds
+   an id: not the table's own, not a source's (a catalog's uuid), not a link's
+   `_id` -- each is a number that differs for every record or in another
+   database, so the prime could never find the record already there. The only
+   exception is a table whose records are nothing but a pair of links.
 9. `marked INTEGER NOT NULL DEFAULT 0`, always last.
 
 A trigger `trg_<table>_edited` sets `edited` when a data field, `notes` or

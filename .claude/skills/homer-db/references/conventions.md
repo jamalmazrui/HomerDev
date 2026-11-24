@@ -17,9 +17,9 @@ For a table `books` with fields `title` and `author`, look and prime on both:
       edited TEXTTIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
       "title" TEXTLINE,
       "author" TEXTLINE,
-      url TEXTLINE,
       notes TEXTMARKDOWN,
       tags TEXTMEMO,
+      url TEXTLINE,
       look TEXT GENERATED ALWAYS AS (rtrim(
         iif("title" IS NOT NULL AND length(CAST("title" AS TEXT))>0, CAST("title" AS TEXT) || ' | ', '') ||
         iif("author" IS NOT NULL AND length(CAST("author" AS TEXT))>0, CAST("author" AS TEXT) || ' | ', ''),
@@ -66,7 +66,7 @@ A foreign key, by contrast, may be declared in the usual way:
 
     defs: def_id, added, edited, src TEXTLINE, tbl TEXTLINE,
              fld TEXTLINE, val TEXTLINE, ordinal INTEGER, descrip TEXTMEMO,
-             url TEXTLINE, notes, tags, look, prime, marked
+             notes, tags, url TEXTLINE, look, prime, marked
              prime: src|tbl|fld|val
     maps:    map_id, added, edited, tbl1 TEXTLINE, prime1 TEXTLINE,
              kind TEXTLINE, tbl2 TEXTLINE, prime2 TEXTLINE,

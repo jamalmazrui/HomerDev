@@ -32,7 +32,7 @@ sPrimeDef = ('"prime" TEXT GENERATED ALWAYS AS (iif(last_name IS NOT NULL AND le
              "iif(enterprise IS NOT NULL AND length(enterprise)>0, enterprise, "
              "iif(length(coalesce(first_name,'')||coalesce(middle_name,''))>0, coalesce(first_name,'')||'|'||coalesce(middle_name,'')||'|', '')))) STORED")
 lsLeading = ["added", "edited"]                 # after the id, as in every Homer table
-lsTrailing = ["url", "notes", "tags"]           # the standard fields; notes is DbDialog's Extra Info
+lsTrailing = ["notes", "tags", "url"]           # the standard fields, in the order of 24 November 2026; notes is DbDialog's Extra Info
 
 
 def columnDefs(sCreate):

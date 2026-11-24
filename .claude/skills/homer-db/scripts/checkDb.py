@@ -111,7 +111,7 @@ def checkDatabase(sPath):
         lsAfter = lsNames[lsNames.index("marked") + 1:] if "marked" in lsNames else []
         if lsNames and lsNames[-1] == "marked" and dCol["marked"][3] == 1:
             note("pass", sSub, "marked is the last column, never null")
-        elif "marked" in lsNames and dCol["marked"][3] == 1 and lsAfter and all(dCol[s][6] == 0 and s not in ("url", "notes", "tags", "look", "prime") for s in lsAfter):
+        elif "marked" in lsNames and dCol["marked"][3] == 1 and lsAfter and all(dCol[s][6] == 0 and s not in ("notes", "tags", "url", "look", "prime") for s in lsAfter):
             note("warn", sSub, "marked is followed by %s, added by an upgrade; a table made from the template ends with marked" % ", ".join(lsAfter))
         else:
             note("fail", sSub, "marked should be the last column, INTEGER NOT NULL DEFAULT 0")
@@ -124,12 +124,12 @@ def checkDatabase(sPath):
         # table had, so a table with no url passed, and twenty-two DbDo template tables had none: Shift+U said "no url
         # field" in RadioTrail. A missing one now fails.
         # DbDo's own maps table links two records and has no url of its own, by DbDo's conventions.
-        lsMissing = [s for s in ("url", "notes", "tags", "look", "prime", "marked") if s not in lsNames and not (s == "url" and sTable == "maps")]
-        if lsMissing: note("fail", sSub, "has no " + ", ".join(lsMissing) + "; every table ends with url, notes, tags, look, prime and marked")
-        lsTail = [s for s in lsNames if s in ("url", "notes", "tags", "look", "prime", "marked")]
-        lsWanted = [s for s in ("url", "notes", "tags", "look", "prime", "marked") if s in lsNames]
+        lsMissing = [s for s in ("notes", "tags", "url", "look", "prime", "marked") if s not in lsNames and not (s == "url" and sTable == "maps")]
+        if lsMissing: note("fail", sSub, "has no " + ", ".join(lsMissing) + "; every table ends with notes, tags, url, look, prime and marked")
+        lsTail = [s for s in lsNames if s in ("notes", "tags", "url", "look", "prime", "marked")]
+        lsWanted = [s for s in ("notes", "tags", "url", "look", "prime", "marked") if s in lsNames]
         if lsNames[-len(lsWanted):] == lsWanted: note("pass", sSub, "ends with " + ", ".join(lsWanted))
-        else: note("warn", sSub, "should end with url, notes, tags, look, prime, marked in that order; ends with " + ", ".join(lsNames[-len(lsWanted):]))
+        else: note("warn", sSub, "should end with notes, tags, url, look, prime, marked in that order (the order of 24 November 2026); ends with " + ", ".join(lsNames[-len(lsWanted):]))
         for oCol in lsCols:
             sType = (oCol[2] or "").upper().split("(")[0].strip()
             if oCol[6] in (2, 3): continue
@@ -142,6 +142,15 @@ def checkDatabase(sPath):
             if lsIdxCols == ["prime"]:
                 bPrimeIdx = True
                 bUnique = bUnique or oIdx[2] == 1
+        # NO ID IN A PRIME (24 November 2026, Jamal's ruling): a prime says whether a record is already here, across
+        # databases; an id -- the table's own, a source's, or a link's -- cannot. A warning, since a table whose records
+        # are only a pair of links (an invoice line) may have nothing else to be known by.
+        oPrimeSql = oCon.execute("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = ?", (sTable,)).fetchone()
+        oPrimeDef = re.search(r'"?prime"?\s+TEXT\s+GENERATED\s+ALWAYS\s+AS\s*\((.*?)\)\s*STORED', oPrimeSql[0] if oPrimeSql else "", re.I | re.S)
+        if oPrimeDef:
+            lsPrimeIds = [m.group(1) or m.group(2) for m in re.finditer(r'CAST\(\s*(?:"([^"]+)"|([A-Za-z_][A-Za-z0-9_]*))\s+AS\s+TEXT\s*\)', oPrimeDef.group(1), re.I)]
+            lsPrimeIds = [s for s in lsPrimeIds if s.lower() == "id" or s.lower().endswith("_id")]
+            if lsPrimeIds: note("warn", sSub, "prime holds the id %s, so it cannot tell whether a record is already here" % ", ".join(lsPrimeIds))
         if bUnique: note("pass", sSub, "prime has a unique index")
         elif bPrimeIdx: note("warn", sSub, "prime is indexed but not unique, so two records could share one identity")
         else: note("warn", sSub, "prime has no index")

@@ -195,6 +195,22 @@
 <h1 id="history">History</h1>
 <p>Each version is a level-2 heading, newest first, so your screen
 reader’s heading keys move from one version to the next.</p>
+<h2 id="november-2026-evening">1.286.0 – 24 November 2026, evening</h2>
+<ul>
+<li><strong>No id in a prime.</strong> The homer-db skill now says it: a
+prime never holds an id – the table’s own, a source’s or a link’s –
+since an id differs for every record or in another database, and a prime
+is what tells whether a record is already there. The one exception is a
+table whose records are only a pair of links. checkDb warns about a
+prime that holds one.</li>
+<li><strong>The standard fields after the main ones are now notes, tags,
+url, then look, prime and marked</strong> (Jamal’s ruling), where url
+came first. The homer-db skill, checkDb, contactPattern and the
+CSV-to-database conversion all follow it. A table still begins with its
+id, added and edited.</li>
+<li><strong>A database made from a CSV leaves id columns out of its
+prime,</strong> when any other field is left.</li>
+</ul>
 <h2 id="november-2026-afternoon">1.285.0 – 24 November 2026,
 afternoon</h2>
 <ul>
@@ -248,7 +264,8 @@ on Shift+H. Read Headed and Read Headed Marked from Current have no key,
 since Alt+H is the Help menu and Control+Shift is not a reading key.
 KeyDecisions.md says why, beside the wide, lean and yield families.</li>
 </ul>
-<h2 id="november-2026-evening">1.281.0 – 23 November 2026, evening</h2>
+<h2 id="november-2026-evening-1">1.281.0 – 23 November 2026,
+evening</h2>
 <ul>
 <li><strong>askTable.py answers a question about one table with the
 local AI model, without letting the model write SQL or say a
