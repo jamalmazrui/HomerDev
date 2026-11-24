@@ -99,6 +99,10 @@ Keys JAWS takes everywhere are handed on by the kit itself: `tidy` writes them i
 
 A list's new row is announced by NVDA's focus event, not by a script, so the pass-only-here script quiets that one announcement; the app speaks the row instead.
 
+## Typing echo is the user's
+
+A script never binds a letter, a digit or Shift with a letter to quiet the reader's typing echo, even where the app answers the key itself, such as a Say command on Shift with a letter (Jamal, 23 November 2026). Typing echo is the user's own setting, and scripting those keys would change it in every text box of the app as well. The echoed letter before the app's answer is the accepted cost.
+
 ## Conventions every script set shares
 
 These hold for every Homer app's scripts, in both readers, alongside the way and scope of each key.

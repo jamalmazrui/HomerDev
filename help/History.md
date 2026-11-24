@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.283.0 -- 23 November 2026, late night
+
+- **askTable.py is retired.** It answered a question about a table with the local AI model, for DbDo's Ask the Table, which was dropped before it was built: too narrow to be worth it. The build deletes the file where it finds it.
+- **Typing echo is the user's.** The homer-screen-reader skill's key-handling reference now says so: a script never binds a letter, a digit or Shift with a letter to quiet the reader's typing echo, even where the app answers the key, because that would change the echo in every text box of the app too.
+
 ## 1.282.0 -- 23 November 2026, night
 
 - **SuiteCommands.inix gains DbDo's Read Headed family and Say Header.** Read Headed Marked is on Alt+Shift+H and Read Headed from Current on Control+H, as Alt+Shift+W and Control+W; Say Header is on Shift+H. Read Headed and Read Headed Marked from Current have no key, since Alt+H is the Help menu and Control+Shift is not a reading key. KeyDecisions.md says why, beside the wide, lean and yield families.
