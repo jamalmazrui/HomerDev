@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.284.0 -- 24 November 2026
+
+- **DataReport.whereThePointsFall** tells a scatter plot as a four by four grid of counts, from BrailleR's WhereXY: each column's range split into four equal parts, one line for each quarter of Y, highest first, counting across the quarters of X, lowest first, then the busiest part. Plain lines, for a text report; DbDo's Relation report ends with it.
+- **The chart script describes each chart kind by kind,** from BrailleR's VI descriptions: the kind, each number axis with its label and the values marked on it, then what is drawn -- a bar chart's bars, a histogram's bars and their width, each box of a whisker plot with its middle, box, whiskers and outliers, a pie's slices, a scatter plot's points with a table of where they fall. The page puts it under "What the chart shows", before the numbers, and the script prints it as description= for the log.
+
 ## 1.283.0 -- 23 November 2026, late night
 
 - **askTable.py is retired.** It answered a question about a table with the local AI model, for DbDo's Ask the Table, which was dropped before it was built: too narrow to be worth it. The build deletes the file where it finds it.

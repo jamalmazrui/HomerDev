@@ -149,6 +149,57 @@ try { File.Delete(sSpec); } catch (Exception) { }
 }
 } // drawChart method
 
+// WHERE THE POINTS FALL (23 November 2026, from BrailleR's WhereXY): a scatter plot as a sighted reader takes it in --
+// not point by point but by where the points cluster -- told as a grid of counts. Each column's range is split into
+// four equal parts, and the lines go from the highest quarter of Y down, each giving the counts across the quarters of
+// X, lowest first; then the busiest cell. Plain lines rather than a table, so a text report reads them in order.
+// Empty when either column has no spread. The chart script gives the same grid on its page, as a table.
+public static string whereThePointsFall(List<double> lX, List<double> lY, string sX, string sY) {
+int iCount = Math.Min(lX.Count, lY.Count);
+if (iCount < 4) return "";
+double nXLow = double.MaxValue, nXHigh = double.MinValue, nYLow = double.MaxValue, nYHigh = double.MinValue;
+for (int i = 0; i < iCount; i++) {
+nXLow = Math.Min(nXLow, lX[i]); nXHigh = Math.Max(nXHigh, lX[i]);
+nYLow = Math.Min(nYLow, lY[i]); nYHigh = Math.Max(nYHigh, lY[i]);
+}
+if (nXHigh <= nXLow || nYHigh <= nYLow) return "";
+int[,] aCounts = new int[4, 4];
+for (int i = 0; i < iCount; i++) aCounts[quarterOf(lY[i], nYLow, nYHigh), quarterOf(lX[i], nXLow, nXHigh)]++;
+StringBuilder sb = new StringBuilder();
+sb.Append("Where the points fall, with ").Append(sX).Append(" and ").Append(sY).Append(" each split into four equal ranges.\r\n");
+sb.Append("Across, ").Append(sX).Append(", lowest first: ");
+for (int iX = 0; iX < 4; iX++) sb.Append(iX > 0 ? "; " : "").Append(rangeText(nXLow, nXHigh, iX));
+sb.Append(".\r\n");
+int iBestY = 0, iBestX = 0;
+for (int iY = 3; iY >= 0; iY--) {
+sb.Append(sY).Append(" ").Append(rangeText(nYLow, nYHigh, iY)).Append(": ");
+for (int iX = 0; iX < 4; iX++) {
+sb.Append(iX > 0 ? ", " : "").Append(aCounts[iY, iX]);
+if (aCounts[iY, iX] > aCounts[iBestY, iBestX]) { iBestY = iY; iBestX = iX; }
+}
+sb.Append("\r\n");
+}
+sb.Append("Most points, ").Append(aCounts[iBestY, iBestX]).Append(" of ").Append(iCount).Append(", are where ").Append(sY).Append(" is ")
+.Append(rangeText(nYLow, nYHigh, iBestY)).Append(" and ").Append(sX).Append(" is ").Append(rangeText(nXLow, nXHigh, iBestX)).Append(".\r\n");
+return sb.ToString();
+} // whereThePointsFall method
+
+private static int quarterOf(double n, double nLow, double nHigh) {
+int i = (int) Math.Floor((n - nLow) / (nHigh - nLow) * 4);
+return i < 0 ? 0 : (i > 3 ? 3 : i);
+} // quarterOf method
+
+private static string rangeText(double nLow, double nHigh, int iQuarter) {
+double nStep = (nHigh - nLow) / 4;
+return shortNumber(nLow + nStep * iQuarter) + " to " + shortNumber(nLow + nStep * (iQuarter + 1));
+} // rangeText method
+
+// shortNumber: a number as it is best heard: whole numbers whole, others to at most two places, no trailing zeros.
+private static string shortNumber(double n) {
+if (Math.Abs(n - Math.Round(n)) < 1e-9) return Math.Round(n).ToString("#,0", System.Globalization.CultureInfo.InvariantCulture);
+return n.ToString("#,0.##", System.Globalization.CultureInfo.InvariantCulture);
+} // shortNumber method
+
 private const string sChartScript = @"# homerChart: a chart of a table, for colleagues who read it by sight, from the Homer kit's DataReport (21 November 2026).
 # Arguments: the records as CSV (UTF-8, a header row), then a spec file of key=value lines: kind, title, arrange, x, y,
 # columns (tab-separated), label, period, base. Writes base.png, base.svg, base.htm (the picture with its description
@@ -381,6 +432,62 @@ elif sKind in ('line', 'rowbar', 'rowline'):
 else:
     raise SystemExit('Unknown chart kind: ' + sKind)
 
+# WHAT THE CHART SHOWS (23 November 2026, from BrailleR's VI descriptions): the kind, each number axis with its label
+# and the values marked on it, then what is drawn, in the words that fit the kind -- a histogram's bars, each box of a
+# whisker plot with its middle, box, whiskers and outliers, a scatter plot's points as a grid of where they fall. The
+# takeaway says what matters; this says what is there, so a blind reader knows what a sighted one is looking at.
+def tickWord(n):
+    s = fmt(n)
+    return s.rstrip('0').rstrip('.') if '.' in s else s
+
+def axisWords(sWhich):
+    nLow, nHigh = oAx.get_xlim() if sWhich == 'x' else oAx.get_ylim()
+    lTicks = [t for t in (oAx.get_xticks() if sWhich == 'x' else oAx.get_yticks()) if min(nLow, nHigh) - 1e-9 <= t <= max(nLow, nHigh) + 1e-9]
+    sLabel = (oAx.get_xlabel() if sWhich == 'x' else oAx.get_ylabel()) or 'the values'
+    if sLabel == 'Value': sLabel = 'the values'
+    return '%s, marked at %s' % (sLabel, ', '.join(tickWord(t) for t in lTicks))
+
+lDescribe, lGridHeads, lGridRows = [], [], []
+if sKind in ('bar', 'pareto'):
+    lDescribe.append('A bar chart of %s, one bar for each value of %s, the longest at the top. The bars run along %s.' % (plural(len(lRows), 'bar'), sX, axisWords('x')))
+elif sKind == 'pie':
+    lDescribe.append('A pie chart of %s, the largest first, going clockwise from the top.' % plural(len(lRows), 'slice'))
+elif sKind == 'histogram':
+    nWidth = lRows[0][1] - lRows[0][0] if lRows else 0
+    lDescribe.append('A histogram of %s of equal width, %s each, from %s to %s.' % (plural(len(lRows), 'bar'), tickWord(nWidth), tickWord(lRows[0][0]), tickWord(lRows[-1][1])))
+    lDescribe.append('Along the bottom: %s. Up the side: %s.' % (axisWords('x'), axisWords('y')))
+elif sKind == 'box':
+    lDescribe.append('A whisker plot of %s, one box each. Along the bottom: %s.' % (plural(len(dNumbers), 'column'), axisWords('x')))
+    for sColumn, l in dNumbers.items():
+        o = pd.Series(l)
+        nQ1, nQ3 = o.quantile(0.25), o.quantile(0.75)
+        nReach = 1.5 * (nQ3 - nQ1)
+        lIn = [n for n in l if nQ1 - nReach <= n <= nQ3 + nReach]
+        iOut = len(l) - len(lIn)
+        lDescribe.append('%s: the middle value is %s; the box runs from %s to %s; the whiskers reach %s and %s; %s beyond them.' % (sColumn,
+            tickWord(o.median()), tickWord(nQ1), tickWord(nQ3), tickWord(min(lIn)), tickWord(max(lIn)), ('1 point lies' if iOut == 1 else '%d points lie' % iOut) if iOut else 'no point lies'))
+elif sKind == 'scatter':
+    lDescribe.append('A scatter plot of %s, with the straight line that fits them best. Along the bottom: %s. Up the side: %s.' % (plural(len(lPairs), 'point'), axisWords('x'), axisWords('y')))
+    lXs, lYs = [a for a, b in lPairs], [b for a, b in lPairs]
+    nXLow, nXHigh, nYLow, nYHigh = min(lXs), max(lXs), min(lYs), max(lYs)
+    if nXHigh > nXLow and nYHigh > nYLow:
+        def quarter(n, nLow, nHigh): return min(3, max(0, int((n - nLow) / (nHigh - nLow) * 4)))
+        def span(nLow, nHigh, i): return tickWord(nLow + (nHigh - nLow) * i / 4) + ' to ' + tickWord(nLow + (nHigh - nLow) * (i + 1) / 4)
+        aGrid = [[0] * 4 for i in range(4)]
+        for a, b in lPairs: aGrid[quarter(b, nYLow, nYHigh)][quarter(a, nXLow, nXHigh)] += 1
+        lGridHeads = [sY + ' \\ ' + sX] + [span(nXLow, nXHigh, i) for i in range(4)]
+        lGridRows = [[span(nYLow, nYHigh, iY)] + aGrid[iY] for iY in range(3, -1, -1)]
+        iBestY, iBestX = max(((y, x) for y in range(4) for x in range(4)), key=lambda t: aGrid[t[0]][t[1]])
+        lDescribe.append('Most points, %d of %d, are where %s is %s and %s is %s; the table after the chart counts the points in each of sixteen parts.' % (
+            aGrid[iBestY][iBestX], len(lPairs), sY, span(nYLow, nYHigh, iBestY), sX, span(nXLow, nXHigh, iBestX)))
+elif sKind == 'datechart':
+    lDescribe.append('A line of %s, one for each period, from %s to %s. Up the side: %s.' % (plural(len(lRows), 'point'), lRows[0][0], lRows[-1][0], axisWords('y')))
+elif sKind in ('line', 'rowbar', 'rowline'):
+    sShape = 'bar chart' if sKind == 'rowbar' else 'line chart'
+    iSeries = len(lRows) if sKind in ('rowbar', 'rowline') or lHeads[0] == 'Record' and dSpec.get('arrange', 'column').lower() == 'row' else len(lHeads) - 1
+    lDescribe.append('A %s of %s. Up the side: %s.' % (sShape, plural(iSeries, 'series', 'series'), axisWords('y')))
+sDescribe = ' '.join(lDescribe)
+
 oAx.set_title(sTitle, loc='left', fontsize=14, color=sInk, pad=12)
 sns.despine(ax=oAx, left=True)
 oFig.tight_layout()
@@ -442,7 +549,14 @@ lPage = ['<!DOCTYPE html>', '<html lang=\'en\'>', '<head>', '<meta charset=\'utf
 if sNote: lPage.append('<p>' + html.escape(sNote) + '</p>')
 lPage += ['<figure>', '<img src=\'' + html.escape(sName) + '.png\' alt=\'' + html.escape(sTitle + '. ' + sSummary + ' The table below has the numbers.', quote=True) + '\'>',
     '<figcaption>' + html.escape(sTitle) + ', drawn from ' + plural(iRecords, 'record') + '. Also as <a href=\'' + html.escape(sName) + '.svg\'>a scalable picture</a> and <a href=\'' + html.escape(sName) + '.xlsx\'>an Excel workbook with the chart</a>.</figcaption>',
-    '</figure>', '<table>', '<caption>The numbers in the chart</caption>', '<thead><tr>' + ''.join('<th scope=\'col\'>' + html.escape(str(s)) + '</th>' for s in lHeads) + '</tr></thead>', '<tbody>']
+    '</figure>']
+if sDescribe: lPage += ['<h2>What the chart shows</h2>', '<p>' + html.escape(sDescribe) + '</p>']
+if lGridRows:
+    lPage += ['<table>', '<caption>Where the points fall: ' + html.escape(sY) + ' down the side, highest first; ' + html.escape(sX) + ' across, lowest first</caption>',
+        '<thead><tr>' + ''.join('<th scope=\'col\'>' + html.escape(str(s)) + '</th>' for s in lGridHeads) + '</tr></thead>', '<tbody>']
+    for lRow in lGridRows: lPage.append('<tr><th scope=\'row\'>' + html.escape(lRow[0]) + '</th>' + ''.join('<td class=\'n\'>' + str(i) + '</td>' for i in lRow[1:]) + '</tr>')
+    lPage += ['</tbody>', '</table>']
+lPage += ['<h2>The numbers</h2>', '<table>', '<caption>The numbers in the chart</caption>', '<thead><tr>' + ''.join('<th scope=\'col\'>' + html.escape(str(s)) + '</th>' for s in lHeads) + '</tr></thead>', '<tbody>']
 for lRow in lRows:
     lCells = []
     for iAt, v in enumerate(lRow):
@@ -453,6 +567,7 @@ for lRow in lRows:
 lPage += ['</tbody>', '</table>', '</main>', '</body>', '</html>']
 open(sBase + '.htm', 'w', encoding='utf-8', newline='\r\n').write('\n'.join(lPage) + '\n')
 print('summary=' + sSummary)
+if sDescribe: print('description=' + sDescribe)
 if sNote: print('note=' + sNote)
 for sExtension in ('htm', 'png', 'svg', 'xlsx'): print(sExtension + '=' + sBase + '.' + sExtension)
 ";
