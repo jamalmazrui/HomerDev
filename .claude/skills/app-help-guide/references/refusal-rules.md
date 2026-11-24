@@ -11,7 +11,12 @@ true about the product.
    site is serving one shell for every path. Tripadvisor, Disney+, Thumbtack,
    YouDescribe.
 2. **Defended by silence.** The host never answers. Adobe and REI both timed
-   out at ninety seconds, twice.
+   out at ninety seconds, twice. Chatter's knowledge base at
+   support.chattersocial.io (Help Scout) never completed a connection in four
+   tries to 23 November 2026: Python and curl failed the secure handshake, and
+   Edge saved only the community guidelines from chattersocial.io, a policy
+   rather than help. Refused until the knowledge base answers; ask again with a
+   later asked= day if it is seen to load in a browser.
 3. **Behind a sign-in.** Vanguard's help; Angi's staff desk, which redirects to
    a single-sign-on page.
 4. **The request itself refused.** Every address answers 400. The page exists

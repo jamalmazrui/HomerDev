@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.287.0 -- 24 November 2026, night
+
+- **Stripe and Link have readers.** Their harvests of 20 November were waiting in data\harvests with nothing to build them. One reader serves both, since both support sites are Stripe's own: the title is the page's heading, the text its article region, and the category the article's first topic, else the topic page that lists it, else the topic its title names. Stripe.md holds 1,125 articles in 55 of Stripe's topics; Link.md holds 88 in 11. Left out of Stripe, and counted in the log: 93 addresses that now answer "Page not found", 86 articles for programmers (the API and Webhooks topics, the move off the Sources API, and titles naming an API), the Legal topic and ten notices of new terms, two for Android alone, one in Portuguese, and 133 copies of articles Stripe serves under a second address.
+- **Chatter is refused for now,** recorded in the skill's refusal rules: its knowledge base at support.chattersocial.io has never completed a connection, by Python, curl or Edge, in four tries, and its community guidelines, the one page that came, are a policy rather than help. OOrion stays refused, as recorded on 23 November.
+
 ## 1.286.0 -- 24 November 2026, evening
 
 - **No id in a prime.** The homer-db skill now says it: a prime never holds an id -- the table's own, a source's or a link's -- since an id differs for every record or in another database, and a prime is what tells whether a record is already there. The one exception is a table whose records are only a pair of links. checkDb warns about a prime that holds one.

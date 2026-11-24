@@ -2156,6 +2156,117 @@ def readPiccyBot(sFolder):
     return lArticles
 
 
+# STRIPE AND LINK (24 November 2026). Both support sites are Stripe's own: an article at /questions/<slug>, its title the
+# page-title heading, its text the cms-support-content main region, and, on Stripe, its topics in the page-topic-list
+# above it, broadest first. A topic page at /topics/<slug> lists its articles as links to /questions/, and is how an
+# article without a topic list of its own -- every Link article, and about one Stripe article in seven -- finds its
+# category. A page whose address no longer answers is Stripe's "Page not found", with no article region, and is
+# skipped. Stripe serves some articles under two addresses; the build's dedupe keeps one copy.
+# LEFT OUT, by the collection's standing rule (no developer programming interfaces, no legal language, no Android):
+# the API, Webhooks and Legal topics, the shutdown of the legacy Sources API (a migration for programmers), any article
+# whose title names an API, any article for Android alone, notices of new terms and the services agreement, and the
+# few articles written in another language for one country. Each is counted in the log.
+lStripeLeftOutTopics = ["api", "webhooks", "legal", "shutdown of the legacy sources api for non-card payment methods"]
+dStripeSameTopic = {"connect (platform)": "Connect"}
+
+
+def readStripeSupport(sFolder, sHost):
+    """Reads a Stripe-run support site (support.stripe.com or support.link.com), as the comment above says."""
+    dManifest = readManifest(sFolder)
+    sPrefix = sHost + "_"
+    def plain(sInner): return re.sub(r"\s+", " ", html.unescape(stripTags(sInner))).strip()
+    dTopicOf = {}
+    for sName in sorted(os.listdir(sFolder)):
+        if not sName.startswith(sPrefix + "topics_") or not sName.endswith(".html"): continue
+        sMarkup = readText(os.path.join(sFolder, sName))
+        # The topic's name is its own heading; Link's page title is only "Link: Help & Support".
+        oHeading = re.search(r"(?is)<h1[^>]*>(.*?)</h1>", sMarkup)
+        oTitle = re.search(r"(?is)<title>(.*?)</title>", sMarkup)
+        sTopic = plain(oHeading.group(1)) if oHeading else ""
+        if not sTopic and oTitle: sTopic = plain(oTitle.group(1)).split(" : ")[0].strip()
+        if not sTopic or re.search(r"(?i)help (&|and) support", sTopic): continue
+        # Link marks its list items as topic_list_item; Stripe lists them plainly, pinned under the topic's text.
+        for oLink in re.finditer(r'(?is)<a\b[^>]*href="(?:https://' + re.escape(sHost) + r')?/questions/([^"?#]+)"', sMarkup):
+            dTopicOf.setdefault(oLink.group(1).strip("/"), sTopic)
+    lArticles = []
+    dLeftOut = {"no article (page not found)": 0, "API, webhooks or legal topic": 0, "title names an API": 0, "Android only": 0,
+                "terms or agreement": 0, "not in English": 0}
+    for sName in sorted(os.listdir(sFolder)):
+        if not sName.startswith(sPrefix + "questions_") or not sName.endswith(".html"): continue
+        sMarkup = readText(os.path.join(sFolder, sName))
+        oMain = re.search(r'(?is)<main[^>]*data-testid="cms-support-content"[^>]*>(.*?)</main>', sMarkup)
+        oTitle = re.search(r'(?is)<h1[^>]*data-testid="page-title"[^>]*>(.*?)</h1>', sMarkup)
+        if not oMain or not oTitle:
+            dLeftOut["no article (page not found)"] += 1
+            continue
+        sTitle = plain(oTitle.group(1))
+        sSlug = sName[len(sPrefix + "questions_"):-5]
+        oTopics = re.search(r'(?is)<ul[^>]*data-testid="page-topic-list"[^>]*>(.*?)</ul>', sMarkup)
+        lsTopics = [plain(s) for s in re.findall(r"(?is)<li[^>]*>(.*?)</li>", oTopics.group(1))] if oTopics else []
+        sCategory = lsTopics[0] if lsTopics else dTopicOf.get(sSlug, "Miscellaneous")
+        sCategory = dStripeSameTopic.get(sCategory.lower(), sCategory)
+        if sCategory.lower() in lStripeLeftOutTopics or any(s.lower() in lStripeLeftOutTopics for s in lsTopics[1:]):
+            dLeftOut["API, webhooks or legal topic"] += 1
+            continue
+        if re.search(r"\bAPIs?\b", sTitle):
+            dLeftOut["title names an API"] += 1
+            continue
+        if re.search(r"(?i)\bandroid\b", sTitle) and not re.search(r"(?i)(iphone|ipad|\bios\b)", sTitle):
+            dLeftOut["Android only"] += 1
+            continue
+        # Legal language that carries no topic: Stripe's notices of new user terms and its services agreement.
+        if re.search(r"(?i)(terms update|services agreement|^cookies$)", sTitle):
+            dLeftOut["terms or agreement"] += 1
+            continue
+        # A few articles are written for one country in its own language, such as Brazil's in Portuguese.
+        lsWords = stripTags(oMain.group(1)).lower().split()
+        if len(lsWords) > 30 and sum(s in ("de", "que", "para", "não", "com", "los", "las", "el", "por", "uma", "um", "é", "se")
+                                     for s in lsWords) / len(lsWords) > 0.08:
+            dLeftOut["not in English"] += 1
+            continue
+        sBody = oMain.group(1)
+        # Each article opens with its summary as a level-three heading and a rule under it; it is the first paragraph.
+        sBody = re.sub(r"(?is)^\s*<h3[^>]*>(.*?)</h3>\s*<hr\s*/?>", r"<p>\1</p>", sBody)
+        sAddress = dManifest.get(sName, "https://" + sHost + "/questions/" + sSlug)
+        lBody = toMarkdown(sBody, 1, sAddress)
+        if len(" ".join(lBody).split()) < 8: continue
+        lArticles.append((sCategory, sTitle, lBody))
+    # AN ARTICLE NO TOPIC CLAIMS goes to the topic its title names, longest name first, so "2024 updates to Canada
+    # verification requirements" joins Verification and "Taxes on Stripe fees for Brazil" joins Taxes on Stripe fees.
+    # Stripe tags about one article in seven with no topic, and its topic pages list only a few pinned articles each.
+    lsNames = sorted({t[0] for t in lArticles if t[0] != "Miscellaneous"}, key=len, reverse=True)
+    dWords = {"pricing": "Pricing", "price": "Pricing", "fee": "Pricing", "tax": "Taxes", "verif": "Verification",
+              "payout": "Payouts", "refund": "Refunds", "dispute": "Disputes", "invoice": "Invoice", "subscription": "Billing",
+              "connected account": "Connect", "platform": "Connect", "card": "Payments", "payment": "Payments",
+              "bank": "Payouts", "account": "Account", "terminal": "Terminal", "reader": "Terminal"}
+    iPlaced = 0
+    for iArticle, (sCategory, sTitle, lBody) in enumerate(lArticles):
+        if sCategory != "Miscellaneous": continue
+        sFound = next((s for s in lsNames if re.search(r"(?i)\b" + re.escape(s) + r"\b", sTitle)), "")
+        if not sFound:
+            sFound = next((sName for sWord, sName in dWords.items() if sName in lsNames and re.search(r"(?i)\b" + re.escape(sWord), sTitle)), "")
+        if sFound:
+            lArticles[iArticle] = (sFound, sTitle, lBody)
+            iPlaced += 1
+    logging.info("%s: %d articles without a topic placed by the topic their title names", sHost, iPlaced)
+    # ONE COPY OF AN ARTICLE SERVED AT TWO ADDRESSES, the one with a topic kept: Link serves two verification articles
+    # under a second slug that no topic lists, and the copy under Verifying your identity is the one a reader looks for.
+    lKept, setSeen = [], set()
+    for tArticle in sorted(lArticles, key=lambda t: t[0] == "Miscellaneous"):
+        sKey = (tArticle[1].lower(), " ".join(" ".join(tArticle[2]).split()))
+        if sKey in setSeen: continue
+        setSeen.add(sKey)
+        lKept.append(tArticle)
+    if len(lKept) < len(lArticles): logging.info("%s: %d copies of an article under a second address left out", sHost, len(lArticles) - len(lKept))
+    lArticles = lKept
+    logging.info("%s: %d articles read; left out: %s", sHost, len(lArticles), "; ".join("%s %d" % t for t in dLeftOut.items()))
+    return lArticles
+
+
+def readStripe(sFolder): return readStripeSupport(sFolder, "support.stripe.com")
+def readLink(sFolder): return readStripeSupport(sFolder, "support.link.com")
+
+
 def readWyzant(sFolder):
     """WYZANT, THIRD VERSION (19 November 2026). Wyzant's help is now a WordPress site in three levels: an audience
     section (students-parents), its topics (student-billing), and their articles (why-was-i-charged-1-00), so a page's
@@ -4727,6 +4838,11 @@ def main():
          "This guide holds Anthropic's own help for Claude Code, gathered from support.claude.com in November 2026. Claude Code is Anthropic's coding agent, used from a terminal, the web, the desktop app or a phone. The guide covers setting it up with a paid plan, its usage limits, and Anthropic's launch guides. Anthropic's full technical reference for Claude Code lives in its developer documentation, which this guide does not hold.\r\n\r\nAnthropic writes one help centre for every way of using Claude, so this collection splits it into six guides: ClaudeWeb.md for Claude on the web and in Chrome, with plans, connectors and safety; ClaudeDesktop.md for the Windows app; ClaudeIos.md for the iPhone and iPad app; ClaudeCowork.md for Cowork; ClaudeCode.md for Claude Code; and ClaudeDuet.md for Duet. Each article is in one guide only. Articles written only for a Mac or for Android are left out, since this collection covers Windows, the web and the iPhone and iPad. Also left out are pages for an organization's administrators, and Anthropic's collections on its programming interface and Console, Amazon Bedrock, identity management, and privacy and legal terms. The categories are Anthropic's own, taken from the trail of collections printed above each article."),
         ("Claude Duet", "ClaudeHelp", readClaudeDuet, "ClaudeDuet.md", "Claude help: Duet",
          "This guide holds Anthropic's own help for Claude Duet, gathered from support.claude.com in November 2026. It covers getting started with Duet and paying through Link by Stripe or Shop Pay. It is short because the source is short.\r\n\r\nAnthropic writes one help centre for every way of using Claude, so this collection splits it into six guides: ClaudeWeb.md for Claude on the web and in Chrome, with plans, connectors and safety; ClaudeDesktop.md for the Windows app; ClaudeIos.md for the iPhone and iPad app; ClaudeCowork.md for Cowork; ClaudeCode.md for Claude Code; and ClaudeDuet.md for Duet. Each article is in one guide only. Articles written only for a Mac or for Android are left out, since this collection covers Windows, the web and the iPhone and iPad. Also left out are pages for an organization's administrators, and Anthropic's collections on its programming interface and Console, Amazon Bedrock, identity management, and privacy and legal terms. The categories are Anthropic's own, taken from the trail of collections printed above each article."),
+        # PAYMENTS (24 November 2026)
+        ("Stripe", "StripeHelp", readStripe, "Stripe.md", "Stripe help",
+         "This guide holds Stripe's own support articles, gathered from support.stripe.com on 20 November 2026. Stripe is a service businesses use to take payments online and in person, send invoices, run subscriptions and get paid out to their bank. The articles are written for the people who run a Stripe account: payments, refunds and disputes, payouts, billing and invoices, taxes and tax forms, verifying a business, Connect for platforms and marketplaces, Terminal card readers, and keeping an account secure. The categories are Stripe's own topics.\r\n\r\nLeft out on purpose: articles for programmers, that is the API and Webhooks topics, the move off Stripe's older Sources API, and any article whose title names an API; legal notices and policy statements; and articles for Android alone, as this collection covers Windows, the web, iPhone and iPad, and Alexa. Stripe's developer documentation is a separate site and is not here. Link, Stripe's checkout for shoppers, has a guide of its own, Link.md."),
+        ("Link", "LinkHelp", readLink, "Link.md", "Link help",
+         "This guide holds the support articles for Link, gathered from support.link.com on 20 November 2026. Link is Stripe's way to save your payment details once and check out quickly at the many online stores that use Stripe. It covers your Link account, paying and purchases, verifying who you are, keeping your data private, the Link card and balance, buying cryptocurrency, and paying through AI agents. The categories are Link's own topics.\r\n\r\nLink is run by Stripe, whose help for businesses is a separate guide, Stripe.md. When a charge on your statement says it was sold through Link, the article on that charge explains who to contact."),
     ]
     # ONE ENTRY PER GUIDE (version 2). The plan had grown a second copy of twenty entries, from Org mode to Remote
     # Incident Manager, so those guides were built twice in every run; the first entry for a guide now wins.
