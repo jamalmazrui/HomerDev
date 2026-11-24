@@ -195,7 +195,26 @@
 <h1 id="history">History</h1>
 <p>Each version is a level-2 heading, newest first, so your screen
 reader’s heading keys move from one version to the next.</p>
-<h2 id="november-2026-night">1.287.0 – 24 November 2026, night</h2>
+<h2 id="november-2026-night">1.287.1 – 24 November 2026, night</h2>
+<ul>
+<li><strong>No secret key is ever published.</strong> GitHub refused
+AppHelpGuides’ push of Stripe.htm, four times, because Stripe’s help
+shows sample secret keys (sk_test_ and twenty-four letters and digits)
+and GitHub’s push protection blocks any page holding one. buildGuide now
+cuts every string shaped like a secret key, token or access key to its
+prefix with “(key left out)”: Stripe’s secret, restricted and webhook
+keys, GitHub tokens, AWS access keys, Slack tokens and Google API keys.
+Five came out of Stripe.md. Since Stripe’s harvest was already deleted,
+the build also mends every guide already in the collection, and fixPages
+makes its page again.</li>
+<li><strong>A refused commit no longer blocks every later push.</strong>
+The commit GitHub refused stayed in the history, so every later push
+carried it and was refused too. push now folds commits that never
+reached GitHub into the next commit, made from the files as they are,
+with git reset –soft, which keeps every file. Nothing already on GitHub
+is rewritten.</li>
+</ul>
+<h2 id="november-2026-night-1">1.287.0 – 24 November 2026, night</h2>
 <ul>
 <li><strong>Stripe and Link have readers.</strong> Their harvests of 20
 November were waiting in datawith nothing to build them. One reader
@@ -275,7 +294,7 @@ letter, a digit or Shift with a letter to quiet the reader’s typing
 echo, even where the app answers the key, because that would change the
 echo in every text box of the app too.</li>
 </ul>
-<h2 id="november-2026-night-1">1.282.0 – 23 November 2026, night</h2>
+<h2 id="november-2026-night-2">1.282.0 – 23 November 2026, night</h2>
 <ul>
 <li><strong>SuiteCommands.inix gains DbDo’s Read Headed family and Say
 Header.</strong> Read Headed Marked is on Alt+Shift+H and Read Headed

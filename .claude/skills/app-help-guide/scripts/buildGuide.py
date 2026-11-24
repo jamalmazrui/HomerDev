@@ -3538,6 +3538,52 @@ def uniqueSubheadings(lLines, sArticleAnchor, setArticleAnchors):
     return lOut
 
 
+# SECRETS ARE NEVER PUBLISHED, EVEN AN EXAMPLE (1.287.1, 24 November 2026). Stripe's help shows sample keys such as
+# sk_test_ followed by twenty-four letters and digits, and GitHub's push protection refused the whole push of
+# Stripe.htm as holding a "Stripe Test API Secret Key", five times. A help guide needs the shape of a key, never its
+# letters, so every string shaped like a secret key, token or access key is cut to its prefix with "(key left out)".
+# The patterns are the well-known ones GitHub scans for: Stripe secret and restricted keys, GitHub tokens, AWS access
+# keys, Slack tokens and Google API keys. A publishable Stripe key (pk_) is meant to be public and stays.
+lSecretPatterns = [
+    (r"\b((?:sk|rk)_(?:test|live)_)[A-Za-z0-9]{8,}", "Stripe key"),
+    (r"\b(whsec_)[A-Za-z0-9]{16,}", "Stripe webhook secret"),
+    (r"\b(gh[pousr]_)[A-Za-z0-9]{30,}", "GitHub token"),
+    (r"\b(github_pat_)[A-Za-z0-9_]{30,}", "GitHub token"),
+    (r"\b(AKIA)[0-9A-Z]{16}\b", "AWS access key"),
+    (r"\b(xox[abposr]-)[A-Za-z0-9-]{10,}", "Slack token"),
+    (r"\b(AIza)[0-9A-Za-z_-]{35}", "Google API key"),
+]
+
+
+def maskSecrets(sText):
+    """Returns the text with every secret-shaped string cut to its prefix, and how many were cut."""
+    iCut = 0
+    for sPattern, sKind in lSecretPatterns:
+        sText, iCount = re.subn(sPattern, lambda oMatch: oMatch.group(1) + "(key left out)", sText)
+        iCut += iCount
+    return sText, iCut
+
+
+def maskSecretsInGuides(sOutput):
+    """Masks secret-shaped strings in every guide already in the collection, so a guide whose harvest is gone is
+    mended too; a guide changed here is newer than its page, so fixPages --changed makes its page again. Returns the
+    guides changed."""
+    lChanged = []
+    for sName in sorted(os.listdir(sOutput)):
+        if not sName.lower().endswith(".md"): continue
+        sPath = os.path.join(sOutput, sName)
+        try: sText = io.open(sPath, "r", encoding=sEncoding, newline="").read()
+        except Exception as oError:
+            logging.error("secrets: could not read %s: %s", sName, oError)
+            continue
+        sMasked, iCut = maskSecrets(sText)
+        if not iCut: continue
+        io.open(sPath, "w", encoding=sEncoding, newline="").write(sMasked)
+        logging.info("secrets: %s: %d secret-shaped string%s cut to the prefix", sName, iCut, "" if iCut == 1 else "s")
+        lChanged.append(sName)
+    return lChanged
+
+
 def buildGuide(sProduct, sTitle, sPreamble, lArticles, sOutputPath):
     """Writes one guide and returns its text."""
     # Disambiguate BEFORE folding small categories, not after: folding moves
@@ -3577,6 +3623,8 @@ def buildGuide(sProduct, sTitle, sPreamble, lArticles, sOutputPath):
     lFlat = []
     for sLine in dropLitter(lLines): lFlat.extend(sLine.replace("\r\n", "\n").split("\n"))
     sText = sNewLine.join(lFlat) + sNewLine
+    sText, iSecrets = maskSecrets(sText)
+    if iSecrets: logging.info("%s: %d secret-shaped string%s cut to the prefix, so no key is published", sProduct, iSecrets, "" if iSecrets == 1 else "s")
     fHandle = io.open(sOutputPath, "w", encoding=sEncoding, newline="")
     fHandle.write(sText)
     fHandle.close()
@@ -4934,6 +4982,9 @@ def main():
     logging.info("SUMMARY: %d built, %d current, %d without a harvest", iBuilt, iCurrent, iNoHarvest)
     iResult = 1 if any(t[3] != 0 for t in lResults) else 0
     if iResult: print("A guide failed its gates or its build, so this run fails; the log names the failures.")
+    if bBuild:
+        lMasked = maskSecretsInGuides(sOutput)
+        if lMasked: print("Cut secret-shaped keys from %s, so the push is not refused." % ", ".join(lMasked))
     # THE .htm OF EVERY CHANGED GUIDE (version 2): the kit's fixPages, which gives each page one level-one heading,
     # its language, a main landmark and working links, and reports what it could not settle.
     if bBuild:

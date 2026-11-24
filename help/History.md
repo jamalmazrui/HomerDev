@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.287.1 -- 24 November 2026, night
+
+- **No secret key is ever published.** GitHub refused AppHelpGuides' push of Stripe.htm, four times, because Stripe's help shows sample secret keys (sk_test_ and twenty-four letters and digits) and GitHub's push protection blocks any page holding one. buildGuide now cuts every string shaped like a secret key, token or access key to its prefix with "(key left out)": Stripe's secret, restricted and webhook keys, GitHub tokens, AWS access keys, Slack tokens and Google API keys. Five came out of Stripe.md. Since Stripe's harvest was already deleted, the build also mends every guide already in the collection, and fixPages makes its page again.
+- **A refused commit no longer blocks every later push.** The commit GitHub refused stayed in the history, so every later push carried it and was refused too. push now folds commits that never reached GitHub into the next commit, made from the files as they are, with git reset --soft, which keeps every file. Nothing already on GitHub is rewritten.
+
 ## 1.287.0 -- 24 November 2026, night
 
 - **Stripe and Link have readers.** Their harvests of 20 November were waiting in data\harvests with nothing to build them. One reader serves both, since both support sites are Stripe's own: the title is the page's heading, the text its article region, and the category the article's first topic, else the topic page that lists it, else the topic its title names. Stripe.md holds 1,125 articles in 55 of Stripe's topics; Link.md holds 88 in 11. Left out of Stripe, and counted in the log: 93 addresses that now answer "Page not found", 86 articles for programmers (the API and Webhooks topics, the move off the Sources API, and titles naming an API), the Legal topic and ten notices of new terms, two for Android alone, one in Portuguese, and 133 copies of articles Stripe serves under a second address.
