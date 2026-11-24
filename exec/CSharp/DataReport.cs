@@ -413,6 +413,30 @@ elif sKind in ('line', 'rowbar', 'rowline'):
         sSummary = 'For %s, %s is highest at %s and %s lowest at %s.' % (lFirst[0], sHigh[0], fmt(sHigh[1]), sLow[0], fmt(sLow[1]))
         if len(lRows) > 1: sSummary = 'Compares %s across %s. ' % (plural(len(lRows), 'record'), plural(len(lUse), 'column')) + sSummary
         if len(dfAll) > iMostSeries: sNote = 'Only the first %d of %s are drawn, since more lines cannot be told apart.' % (iMostSeries, plural(len(dfAll), 'record'))
+    elif sX and sX in dfAll.columns:
+        # OVER A DATE (23 November 2026, pandas' air_quality.plot() over its datetime index): each number column a line
+        # across the dates of sX, in time order. The clock time is kept as written, a time zone after it set aside.
+        lUse = [s for s in lUse if s != sX and s != sLabel and any(number(v) is not None for v in dfAll[s])][:iMostSeries]
+        if not lUse: raise SystemExit('No shown column holds numbers')
+        oWhen = pd.to_datetime(dfAll[sX].str.strip().str[:19], errors='coerce')
+        dfTime = dfAll.assign(_when=oWhen).dropna(subset=['_when']).sort_values('_when')
+        if dfTime.empty: raise SystemExit('No record holds a date in ' + sX)
+        lHeads = [sX] + lUse
+        sWhenFormat = '%Y-%m-%d' if (dfTime['_when'].dt.hour == 0).all() and (dfTime['_when'].dt.minute == 0).all() else '%Y-%m-%d %H:%M'
+        for _, oRow in dfTime.iterrows(): lRows.append([oRow['_when'].strftime(sWhenFormat)] + [number(oRow[s]) for s in lUse])
+        for iAt, sColumn in enumerate(lUse):
+            oAx.plot(list(dfTime['_when']), [l[iAt + 1] for l in lRows], color=lPalette[iAt], linewidth=1.5, label=sColumn)
+        oAx.set_xlabel(sX)
+        plt.setp(oAx.get_xticklabels(), rotation=45, ha='right')
+        if len(lUse) > 1: oAx.legend(frameon=False, loc='upper left', bbox_to_anchor=(1.01, 1))
+        lParts = []
+        for iAt, sColumn in enumerate(lUse):
+            lHave = [(l[0], l[iAt + 1]) for l in lRows if l[iAt + 1] is not None]
+            if not lHave: continue
+            lHigh, lLow = max(lHave, key=lambda t: t[1]), min(lHave, key=lambda t: t[1])
+            lParts.append('%s averages %s, highest %s on %s and lowest %s on %s' % (sColumn, fmt(sum(t[1] for t in lHave) / len(lHave)), fmt(lHigh[1]), lHigh[0], fmt(lLow[1]), lLow[0]))
+        sSummary = 'From %s to %s, ' % (lRows[0][0], lRows[-1][0]) + '; '.join(lParts) + '.'
+        sNative = 'line'
     else:
         # BY COLUMN: each number column a series, the records along the bottom in the grid's order.
         lUse = [s for s in lUse if s != sLabel and any(number(v) is not None for v in dfAll[s])][:iMostSeries]
@@ -485,7 +509,11 @@ elif sKind == 'datechart':
 elif sKind in ('line', 'rowbar', 'rowline'):
     sShape = 'bar chart' if sKind == 'rowbar' else 'line chart'
     iSeries = len(lRows) if sKind in ('rowbar', 'rowline') or lHeads[0] == 'Record' and dSpec.get('arrange', 'column').lower() == 'row' else len(lHeads) - 1
-    lDescribe.append('A %s of %s. Up the side: %s.' % (sShape, plural(iSeries, 'series', 'series'), axisWords('y')))
+    if sKind == 'line' and lHeads and lHeads[0] == sX and sX:
+        lDescribe.append('A line chart of %s over %s, %s from %s to %s. Up the side: %s.' % (plural(len(lHeads) - 1, 'series', 'series'), sX,
+            plural(len(lRows), 'point'), lRows[0][0], lRows[-1][0], axisWords('y')))
+    else:
+        lDescribe.append('A %s of %s. Up the side: %s.' % (sShape, plural(iSeries, 'series', 'series'), axisWords('y')))
 sDescribe = ' '.join(lDescribe)
 
 oAx.set_title(sTitle, loc='left', fontsize=14, color=sInk, pad=12)

@@ -63,6 +63,13 @@ name=Backup Database
 keys=
 status=current
 
+[DbDo calculateColumn]
+name=Calculate Column
+keys=
+change=added 24 November 2026, from the pandas tutorials: a new column from a formula over the others
+reason=used now and then, so it takes no key; the Alternate Menu finds it
+status=implemented
+
 [DbDo chatAboutTable]
 name=Chat about Table
 keys=Shift+F12
@@ -724,6 +731,13 @@ status=implemented
 name=Related Records
 keys=
 status=current
+
+[DbDo renameColumn]
+name=Rename Column
+keys=
+change=added 24 November 2026, from the pandas tutorials: pandas' rename
+reason=used now and then, so it takes no key; the Alternate Menu finds it
+status=implemented
 
 [DbDo repeatGoTo]
 name=Go to Record Again

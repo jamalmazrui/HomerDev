@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.285.0 -- 24 November 2026, afternoon
+
+- **A line chart runs over a date column when one is given.** DataReport's line chart drew each number column across the records in their grid order; with the spec's x naming a date column, it now draws them across those dates, in time order, as pandas plots a table over its datetime index. The clock time is kept as written, a time zone after it set aside. The takeaway gives each line's average and its highest and lowest values with their dates, and the description names the span.
+- **SuiteCommands.inix gains DbDo's Calculate Column and Rename Column,** both keyless in the Edit menu.
+
 ## 1.284.0 -- 24 November 2026
 
 - **DataReport.whereThePointsFall** tells a scatter plot as a four by four grid of counts, from BrailleR's WhereXY: each column's range split into four equal parts, one line for each quarter of Y, highest first, counting across the quarters of X, lowest first, then the busiest part. Plain lines, for a text report; DbDo's Relation report ends with it.
