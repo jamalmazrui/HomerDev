@@ -6,6 +6,7 @@ Every Homer app that ships screen reader scripts handles each key it cares about
 
 **The way: what the script does with the key.** In alphabetical order:
 
+- **Answer with the app's key.** A screen reader's own key asks a question the app answers better in one place, such as JAWS+F or NVDA+F asking the font in DbDo's grid of records. The script sends the app's key for that answer, Say Field Type, and the reader's own command runs everywhere else. Always only here.
 - **Capture.** The script does the work, and the app never sees the key. HomerView's commands work this way, through its own bridge program or Python code.
 - **Pass quietly.** The key goes to the app, and the reader says nothing; the app speaks. DbDo's chords work this way. It is the most common way.
 - **Pass, then speak.** The key goes to the app, then the reader speaks, such as reading the new line.
@@ -25,7 +26,38 @@ Write both in a comment above each script: `Way: pass quietly. Where: only here,
 
 ## JAWS
 
-A key map line must name a Script, never a Function. JAWS speaks a list's or edit's new line from its own scripts (`SayNextLine`, `SayPriorLine`, `JAWSPageDown`, `JAWSPageUp`), not from an event unless the app's .jcf sets `MSAAMode=2`, so replacing the script is enough to keep it quiet.
+A key map line must name a Script, never a Function.
+
+**JAWS reads a list's new row from its events, not only its scripts** (24 November 2026). This reference used to say replacing the arrow script was enough to keep JAWS quiet. It was not: DbDo said the cell on Alt+Down Arrow, then JAWS read the whole record, because moving the selection fires the list's ActiveItemChangedEvent however the move was made. That is also why DbDo's plain arrows read the row with no SayLine of their own. So a key the app answers itself in a list marks a short quiet time, and the app's ActiveItemChangedEvent skips the row announcement inside it, calling the default for everything else, as the JAWS manual's own example does. A plain arrow clears the mark.
+
+    Globals int iAppQuietTick
+
+    Void Function quietAppRow ()
+    Let iAppQuietTick = GetTickCount ()
+    EndFunction
+
+    Int Function appRowIsQuiet ()
+    Var
+        int iAge
+    If iAppQuietTick == 0 Then
+    Return 0
+    EndIf
+    Let iAge = GetTickCount () - iAppQuietTick
+    If iAge < 0 || iAge > 700 Then
+    Let iAppQuietTick = 0
+    Return 0
+    EndIf
+    Return 1
+    EndFunction
+
+    Void Function ActiveItemChangedEvent (handle hCurrent, int iCurrentObject, int iCurrentChild, handle hPrior, int iPriorObject, int iPriorChild)
+    If appRowIsQuiet () && inAppList () Then
+    Return
+    EndIf
+    ActiveItemChangedEvent (hCurrent, iCurrentObject, iCurrentChild, hPrior, iPriorObject, iPriorChild)
+    EndFunction
+
+Define a function before the first one that calls it, and use 0 and 1 rather than TRUE and FALSE, which come from a header a Homer script does not include.
 
     ; Way: pass quietly. Where: everywhere.
     Script passAppKey ()
@@ -66,6 +98,16 @@ A key map line must name a Script, never a Function. JAWS speaks a list's or edi
     TypeCurrentScriptKey ()
     EndScript
 
+    ; Way: answer with the app's key. Where: only here; elsewhere JAWS's own script. JAWS's script is replaced by
+    ; name, so no key map line is needed and the key works in every layout.
+    Script SayFont ()
+    If inAppList () && IsPCCursor () Then
+    TypeKey ("Alt+Shift+F")
+    Else
+    PerformScript SayFont ()
+    EndIf
+    EndScript
+
 Keys JAWS takes everywhere are handed on by the kit itself: `tidy` writes them into a marked block of `scripts\jaws\<App>.jkm` from the reviewed allowlist in `data\KeyOwnership.inix`.
 
 ## NVDA
@@ -92,12 +134,27 @@ Keys JAWS takes everywhere are handed on by the kit itself: `tidy` writes them i
         if keys.windowClassIs(obj, "SysListView32"):
             clsList.insert(0, AppList)
 
+    # Way: answer with the app's key. Where: only here, on the list's overlay class; elsewhere NVDA's own command.
+    @scriptHandler.script(description="In the app's list, say the current field's type.", gesture="kb:nvda+f")
+    def script_sayAppFieldType(self, gesture):
+        keys.answerWithKey("alt+shift+f")
+
     # Way: capture. Where: only here; elsewhere the key passes on (a global plugin's getScript).
     def getScript(self, gesture):
         functionScript = super().getScript(gesture)
         return keys.onlyHere(functionScript, self.focusIsMine()) if functionScript else None
 
 A list's new row is announced by NVDA's focus event, not by a script, so the pass-only-here script quiets that one announcement; the app speaks the row instead.
+
+## The readers' own keys the suite answers
+
+A reader's key keeps its meaning wherever the app has nothing better to say. Where the reader's answer means nothing in an app's main view -- a font in a grid of records, a pixel position in a list -- the app answers instead, in that view only. The same key gets the same kind of answer in every app (24 November 2026):
+
+- **Address, JAWS+A.** DbDo: the cell's column name, record and column numbers. EdSharp: Say Address, with the page. FileDir: the folder's name and path, as JAWS reads File Explorer's address bar. The key map names `Insert+A`, not `JAWSKey+A`, so a laptop's CapsLock+A stays Say All. NVDA has no address key, and NVDA+A is Say All on a laptop, so it is left alone.
+- **Font, JAWS+F and NVDA+F.** DbDo: the field's declared type. FileDir: the item's type. EdSharp keeps the reader's answer, since a document has a font.
+- **Position, JAWS+Number Pad Delete and NVDA+Number Pad Delete.** Each app's Say Position, as Alt+Delete.
+- **Tables.** DbDo's grid takes JAWS's Say Current Cell and NVDA's table reading keys (NVDA+Alt+Control with an arrow) and answers them by its own table model.
+- **Everything else** stays the reader's: Tab, title, current line, status line, Say All. HomerView answers none of these, since its browser's keys already mean what they say there, and JAWS+A must keep reading Edge's address bar.
 
 ## Typing echo is the user's
 

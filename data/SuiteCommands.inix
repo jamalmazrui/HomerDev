@@ -859,7 +859,10 @@ status=current
 [DbDo sayCell]
 name=Say Cell
 keys=Shift+C
-status=current
+change=says the cell's value alone, 24 November 2026
+reason=Jamal, 24 November 2026: "Make Shift+C only say the cell value, since Shift+H can say the header"
+disposition=ruled
+status=implemented
 
 [DbDo sayClipboard]
 name=Say Clipboard
@@ -990,6 +993,14 @@ name=Say Header
 keys=Shift+H
 change=added 23 November 2026
 reason=Jamal's design, 23 November 2026: the current column's name, a short form of Alt+Control+Shift+UpArrow
+disposition=ruled
+status=implemented
+
+[DbDo sayFieldType]
+name=Say Field Type
+keys=Alt+Shift+F
+change=added 24 November 2026
+reason=Jamal, 24 November 2026: JAWS+F and NVDA+F, the font, should say the type of data in the current column; DbDo's scripts send this key in the grid. F begins Field; Alt is the speech-only modifier; DbDo has no File Find, which is Alt+Shift+F in EdSharp and FileDir, as Control+Shift+M is Merge Data in DbDo and Move to Folder in FileDir
 disposition=ruled
 status=implemented
 

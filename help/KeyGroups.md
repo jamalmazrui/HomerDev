@@ -353,7 +353,7 @@ Written by scripts\keyGroups from the four key files, 24 November 2026. Each cou
 - **data records and fields** (topic): 35 -- DbDo 35
 - **delete** (topic): 16 -- DbDo 3, EdSharp 8, FileDir 5
 - **editing basics** (topic): 17 -- DbDo 1, EdSharp 12, HomerView 4
-- **f1 help** (key shape): 30 -- DbDo 8, EdSharp 8, FileDir 8, HomerView 6
+- **f1 help** (key shape): 29 -- DbDo 8, EdSharp 8, FileDir 8, HomerView 5
 - **f2 edit and rename** (key shape): 9 -- DbDo 2, EdSharp 3, FileDir 4
 - **f3 search again** (key shape): 18 -- DbDo 4, EdSharp 6, FileDir 2, HomerView 6
 - **f4 windows** (key shape): 19 -- DbDo 5, EdSharp 5, FileDir 6, HomerView 3
@@ -382,7 +382,7 @@ Written by scripts\keyGroups from the four key files, 24 November 2026. Each cou
 - **regex** (topic): 17 -- DbDo 5, EdSharp 5, FileDir 4, HomerView 3
 - **rename** (topic): 7 -- EdSharp 1, FileDir 6
 - **repeat and next or previous** (topic): 46 -- DbDo 4, EdSharp 24, FileDir 10, HomerView 8
-- **say, on alt** (key shape): 31 -- DbDo 6, EdSharp 11, FileDir 7, HomerView 7
+- **say, on alt** (key shape): 32 -- DbDo 7, EdSharp 11, FileDir 7, HomerView 7
 - **say, on shift** (key shape): 48 -- DbDo 26, EdSharp 3, FileDir 17, HomerView 2
 - **scripts and macros** (topic): 23 -- DbDo 9, EdSharp 13, FileDir 1
 - **search** (topic): 39 -- DbDo 8, EdSharp 11, FileDir 8, HomerView 12
@@ -477,7 +477,7 @@ In all, 713 key bindings in 52 groups; 0 in no group.
 - **DbDo:** About (Alt+F1); Alternate Menu (Alt+F10); Documentation (F1); History of Changes (Control+Shift+F1); Key Describer Toggle (Control+F1); ReadMe (Alt+Shift+F1); What This Does (Shift+F1); Where Am I (Control+/).
 - **EdSharp:** About (Alt+F1); Alternate Menu (Alt+F10); Documentation (F1); History of Changes (Control+Shift+F1); Key Describer Toggle (Control+F1); ReadMe (Alt+Shift+F1); What This Does (Shift+F1); Where Am I (Control+/).
 - **FileDir:** About (Alt+F1); Alternate Menu (Alt+F10); Documentation (F1); History of Changes (Control+Shift+F1); Key Describer Toggle (Control+F1); ReadMe (Alt+Shift+F1); What This Does (Shift+F1); Where Am I (Control+/).
-- **HomerView:** About HomerView (Alt+F1); Alternate Menu (Alt+F10); History of Changes (Control+Shift+F1); Hotkey Summary (Alt+Shift+H); Key Describer Toggle (Control+F1); ReadMe (Alt+Shift+F1).
+- **HomerView:** About HomerView (Alt+F1); Alternate Menu (Alt+F10); History of Changes (Control+Shift+F1); Key Describer Toggle (Control+F1); ReadMe (Alt+Shift+F1).
 
 ### f2 edit and rename
 
@@ -655,7 +655,7 @@ In all, 713 key bindings in 52 groups; 0 in no group.
 
 ### say, on alt
 
-- **DbDo:** Say Clipboard (Alt+'); Say Path (Alt+P); Say Position (Alt+Delete); Say Status (Alt+Z); Say Yield (Alt+Y); Say Yield Marked (Alt+Shift+Y).
+- **DbDo:** Say Clipboard (Alt+'); Say Field Type (Alt+Shift+F); Say Path (Alt+P); Say Position (Alt+Delete); Say Status (Alt+Z); Say Yield (Alt+Y); Say Yield Marked (Alt+Shift+Y).
 - **EdSharp:** Say Address (Alt+A); Say Braces (Alt+Shift+]); Say Clipboard (Alt+'); Say Compiler (Alt+0); Say Indentation (Alt+I); Say Path (Alt+P); Say Position (Alt+Delete); Say Status (Alt+Z); Say Styles (Alt+/); Say Yield (Alt+Y); Topic (Alt+T).
 - **FileDir:** Say Clipboard (Alt+'); Say Path (Alt+P); Say Position (Alt+Delete); Say Status (Alt+Z); Say Windows Open (Alt+NumPad5); Say Yield (Alt+Y); Say Yield Marked (Alt+Shift+Y).
 - **HomerView:** Say Address (Alt+A); Say Clipboard (Alt+'); Say Metadata (Alt+M); Say Position (Alt+Delete); Say Position (Alt+NumPadDelete); Say url (Alt+U); Say Yield (Alt+Y).

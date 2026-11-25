@@ -195,6 +195,34 @@
 <h1 id="history">History</h1>
 <p>Each version is a level-2 heading, newest first, so your screen
 reader’s heading keys move from one version to the next.</p>
+<h2 id="november-2026-late-night">1.290.0 – 24 November 2026, late
+night</h2>
+<ul>
+<li><strong>A screen reader’s own key can be answered by the
+app.</strong> keys.py gains answerWithKey, which sends the app’s key for
+a question the app answers better where the script is bound: in DbDo’s
+grid, NVDA+F, the font, sends Say Field Type. The key-handling reference
+names it as a fifth way, “answer with the app’s key”, always only here,
+with the reader’s own command everywhere else. In JAWS the same is done
+by overriding the reader’s script by name, such as SayFont, so the key a
+person has for it, in either layout, is the key that works.</li>
+<li><strong>The reference no longer says JAWS reads a list’s rows only
+from its arrow scripts.</strong> It reads them from its events too:
+Jamal heard DbDo’s Alt+Down Arrow say the cell, then JAWS read the
+record. A key the app answers itself in a list now marks a short quiet
+time, and the app’s ActiveItemChangedEvent skips the row announcement
+inside it, as DbDo’s scripts do.</li>
+<li><strong>The suite’s answers to the readers’ keys.</strong> The
+reference lists which reader keys the apps answer, and where: JAWS+A
+says the address (DbDo the cell’s, EdSharp the line’s and page’s,
+FileDir the folder’s path); JAWS+Number Pad Delete and NVDA+Number Pad
+Delete the position; JAWS+F and NVDA+F the type of a field or an item.
+NVDA+A is left alone, since on a laptop it is Say All, and HomerView
+answers none, since its browser’s keys already mean what they say
+there.</li>
+<li><strong>SuiteCommands.inix</strong> adds DbDo’s Say Field Type
+(Alt+Shift+F) and records Say Cell’s change to the value alone.</li>
+</ul>
 <h2 id="november-2026-night">1.289.1 – 24 November 2026, night</h2>
 <ul>
 <li><strong>Conversion.cs comes again, whole.</strong> EdSharp and
@@ -372,7 +400,7 @@ plot’s points with a table of where they fall. The page puts it under
 “What the chart shows”, before the numbers, and the script prints it as
 description= for the log.</li>
 </ul>
-<h2 id="november-2026-late-night">1.283.0 – 23 November 2026, late
+<h2 id="november-2026-late-night-1">1.283.0 – 23 November 2026, late
 night</h2>
 <ul>
 <li><strong>askTable.py is retired.</strong> It answered a question

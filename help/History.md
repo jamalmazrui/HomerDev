@@ -7,6 +7,13 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.290.0 -- 24 November 2026, late night
+
+- **A screen reader's own key can be answered by the app.** keys.py gains answerWithKey, which sends the app's key for a question the app answers better where the script is bound: in DbDo's grid, NVDA+F, the font, sends Say Field Type. The key-handling reference names it as a fifth way, "answer with the app's key", always only here, with the reader's own command everywhere else. In JAWS the same is done by overriding the reader's script by name, such as SayFont, so the key a person has for it, in either layout, is the key that works.
+- **The reference no longer says JAWS reads a list's rows only from its arrow scripts.** It reads them from its events too: Jamal heard DbDo's Alt+Down Arrow say the cell, then JAWS read the record. A key the app answers itself in a list now marks a short quiet time, and the app's ActiveItemChangedEvent skips the row announcement inside it, as DbDo's scripts do.
+- **The suite's answers to the readers' keys.** The reference lists which reader keys the apps answer, and where: JAWS+A says the address (DbDo the cell's, EdSharp the line's and page's, FileDir the folder's path); JAWS+Number Pad Delete and NVDA+Number Pad Delete the position; JAWS+F and NVDA+F the type of a field or an item. NVDA+A is left alone, since on a laptop it is Say All, and HomerView answers none, since its browser's keys already mean what they say there.
+- **SuiteCommands.inix** adds DbDo's Say Field Type (Alt+Shift+F) and records Say Cell's change to the value alone.
+
 ## 1.289.1 -- 24 November 2026, night
 
 - **Conversion.cs comes again, whole.** EdSharp and FileDir stopped compiling on this computer: Conversion had no clipboardMarkdown and no toSpeech, which 1.288.0 added. The 1.288.0 kit zip never reached C:\HomerDev, so its Conversion.cs was missing, while version.txt, from 1.289.0, said the kit was new enough. This version carries the file again, and EdSharp and FileDir now ask for 1.289.1, so a kit without it is named before anything compiles.
