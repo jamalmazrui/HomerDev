@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.291.2 -- 25 November 2026
+
+- **SuiteCommands follows DbDo's table-level Import and Export.** Import Data and Export Data describe new-table and merge choices; Merge Data is retired, hidden with no key; Open Database says how each kind of file opens.
+
 ## 1.291.1 -- 24 November 2026, late night
 
 - **SuiteCommands.inix spells DbDo's Say id one way,** as the menu walk asked, and CommandEcho.md follows.

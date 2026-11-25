@@ -339,7 +339,7 @@ status=current
 name=Export Data
 keys=Control+Shift+X
 change=was Alt+Shift+X, 17 November 2026
-reason=the suite's import and export pair, Control+Shift+I and Control+Shift+X
+reason=the suite's import and export pair, Control+Shift+I and Control+Shift+X; since 25 November 2026 a DbDo database is also a target, taking the view as a new table or merged into one of its tables
 status=implemented
 
 [DbDo extraSpeechToggle]
@@ -470,7 +470,7 @@ status=current
 name=Import Data
 keys=Control+Shift+I
 change=was Alt+I, 17 November 2026; renamed Open Other Format on Control+Shift+O for a few hours on 24 November 2026, then restored
-reason=the suite's import and export pair, Control+Shift+I and Control+Shift+X (Jamal); Import makes a new DbDo database, while Open Database edits a file in its own format; Alt+I is Inspect Record
+reason=the suite's import and export pair, Control+Shift+I and Control+Shift+X (Jamal); since 25 November 2026 Import brings one table of a file into the open database, as a new table or merged into the current table with Source values or Target values final, and Open Database opens a file as a database; Alt+I is Inspect Record
 status=implemented
 
 [DbDo inspectRecord]
@@ -550,10 +550,10 @@ status=implemented
 
 [DbDo mergeData]
 name=Merge Data
-keys=Control+Shift+M
-change=was Alt+Shift+M, 24 November 2026 (Alt+M until 23 November 2026)
-reason=merging changes data, which prefers Control; Control+Shift+M was freed when Semicolon and Slash became the marking keys; EdSharp's Merge File takes the same key
-status=implemented
+keys=None
+change=hidden with no key, 25 November 2026 (Control+Shift+M from 24 November 2026; Alt+Shift+M and Alt+M before)
+reason=Import Data merges a file's table into the current table from every format Merge Data read and more, so one command does what two did; still in the Alternate Menu
+status=retired
 
 [DbDo newCopy]
 name=New Copy
@@ -615,6 +615,7 @@ status=implemented
 [DbDo openDatabase]
 name=Open Database
 keys=Control+O
+reason=opens any supported file as a database (25 November 2026): databases as themselves, a workbook or CSV as a working copy that Control+S writes back, an .xls or .dbf as itself through the 64-bit Access Database Engine or, without it, as a converted copy after saying why; Control+Shift+O stays Open Template Database
 status=current
 
 [DbDo openDotPrompt]
