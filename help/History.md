@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.291.3 -- 25 November 2026, midday
+
+- **SuiteCommands records DbDo's new reading keys.** Read Bookmarked Records (Alt+B), Read Jump Matches (Alt+J) and Read Keywords Matches (Alt+K) are new; List Bookmarks, Jump Again and Keywords Again move to Alt+Shift+B, Alt+Shift+J and Alt+Shift+K. FileDir keeps Jump Again and Keywords Again on Alt+J and Alt+K for now.
+
 ## 1.291.2 -- 25 November 2026
 
 - **SuiteCommands follows DbDo's table-level Import and Export.** Import Data and Export Data describe new-table and merge choices; Merge Data is retired, hidden with no key; Open Database says how each kind of file opens.

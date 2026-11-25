@@ -526,8 +526,10 @@ status=current
 
 [DbDo listBookmarks]
 name=List Bookmarks
-keys=Alt+B
-status=current
+keys=Alt+Shift+B
+change=was Alt+B, 25 November 2026
+reason=Alt+B reads the bookmarked records (Read Bookmarked Records), beside Alt+J and Alt+K
+status=implemented
 
 [DbDo mailRecord]
 name=Mail Record
@@ -4750,18 +4752,39 @@ reason=the search group, as in DbDo and as Reverse Keywords beside it
 disposition=ruled
 status=implemented
 
+[DbDo readBookmarkedRecords]
+name=Read Bookmarked Records
+keys=Alt+B
+change=new, 25 November 2026
+reason=Jamal's request: Alt with a search's letter reads, wide and from the first record, the records that search finds, without moving focus or changing the filter; pairs with Shift+B, Say Bookmark
+status=implemented
+
+[DbDo readJumpMatches]
+name=Read Jump Matches
+keys=Alt+J
+change=new, 25 November 2026
+reason=Jamal's request, as Read Bookmarked Records; pairs with Shift+J, Say Jump
+status=implemented
+
+[DbDo readKeywordsMatches]
+name=Read Keywords Matches
+keys=Alt+K
+change=new, 25 November 2026
+reason=Jamal's request, as Read Bookmarked Records; pairs with Shift+K, Say Keywords
+status=implemented
+
 [DbDo keywordsAgain]
 name=Keywords Again
-keys=Alt+K
-change=new, 21 November 2026
+keys=Alt+Shift+K
+change=new on Alt+K, 21 November 2026; Alt+Shift+K from 25 November 2026, when Alt+K became Read Keywords Matches at Jamal's request; a departure from the again group, which FileDir keeps
 reason=the again group: Alt and a search's letter repeats that search, named "<command> Again", in DbDo, EdSharp, FileDir and HomerView (21 November 2026); FileDir had it
 disposition=ruled
 status=implemented
 
 [DbDo jumpAgain]
 name=Jump Again
-keys=Alt+J
-change=new, 21 November 2026
+keys=Alt+Shift+J
+change=new on Alt+J, 21 November 2026; Alt+Shift+J from 25 November 2026, when Alt+J became Read Jump Matches at Jamal's request; a departure from the again group, which FileDir keeps
 reason=the again group: Alt and a search's letter repeats that search, named "<command> Again", in DbDo, EdSharp, FileDir and HomerView (21 November 2026); FileDir had it
 disposition=ruled
 status=implemented
