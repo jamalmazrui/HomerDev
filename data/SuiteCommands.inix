@@ -1005,9 +1005,12 @@ disposition=ruled
 status=implemented
 
 [DbDo sayId]
-name=Say Id
+name=Say id
 keys=Shift+I
-status=current
+change=renamed from Say Id (menu) and Say ID (key file), 24 November 2026
+reason=one spelling, in the house style that writes DbDo's own field names in lowercase, as Say url and Edit url do; the menu walk of 24 November heard Say Id while the key file said Say ID
+disposition=ruled
+status=implemented
 
 [DbDo sayJump]
 name=Say Jump

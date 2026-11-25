@@ -7,6 +7,12 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.291.1 -- 24 November 2026, late night
+
+- **SuiteCommands.inix spells DbDo's Say id one way,** as the menu walk asked, and CommandEcho.md follows.
+
+- **The key-handling reference is checked against JAWS's own key map.** Jamal's logs carried JAWS 2026's default.jkm, which showed two errors in 1.290.0's list of reader keys the apps answer. In JAWS's laptop layout, Insert+A and JAWSKey+A are Say All, so an app's JAWS+A belongs in its key map's [Desktop Keys] section. And JAWS's Say Active Cursor is Alt+Delete, which every Homer key map already hands to the app; JAWS+Number Pad Delete is Route Virtual to PC and is left alone.
+
 ## 1.291.0 -- 24 November 2026, late night
 
 - **Shows to add can come in a file of their own.** A podcast collection's cycle now merges data\addShows-<anything>.inix into data\addShows.inix before it looks for new shows: each section the main file lacks is appended with its comments, keeping the file's BOM and CRLF; a section already listed is left as it was. The merged file then goes to notes\retired. This lets a delivery add shows without the current addShows.inix in hand, which a whole new file would have replaced, dropping the shows already listed. Tested on a scratch collection: one show appended, one already listed left alone, and the file retired.

@@ -150,9 +150,9 @@ A list's new row is announced by NVDA's focus event, not by a script, so the pas
 
 A reader's key keeps its meaning wherever the app has nothing better to say. Where the reader's answer means nothing in an app's main view -- a font in a grid of records, a pixel position in a list -- the app answers instead, in that view only. The same key gets the same kind of answer in every app (24 November 2026):
 
-- **Address, JAWS+A.** DbDo: the cell's column name, record and column numbers. EdSharp: Say Address, with the page. FileDir: the folder's name and path, as JAWS reads File Explorer's address bar. The key map names `Insert+A`, not `JAWSKey+A`, so a laptop's CapsLock+A stays Say All. NVDA has no address key, and NVDA+A is Say All on a laptop, so it is left alone.
+- **Address, JAWS+A.** DbDo: the cell's column name, record and column numbers. EdSharp: Say Address, with the page. FileDir: the folder's name and path, as JAWS reads File Explorer's address bar. The binding sits in the key map's `[Desktop Keys]` section, since in JAWS's laptop layout Insert+A and JAWSKey+A are Say All (JAWS 2026's default.jkm). NVDA has no address key, and NVDA+A is Say All on a laptop, so it is left alone.
 - **Font, JAWS+F and NVDA+F.** DbDo: the field's declared type. FileDir: the item's type. EdSharp keeps the reader's answer, since a document has a font.
-- **Position, JAWS+Number Pad Delete and NVDA+Number Pad Delete.** Each app's Say Position, as Alt+Delete.
+- **Position, Alt+Delete and NVDA+Number Pad Delete.** Alt+Delete is JAWS's own Say Active Cursor, which every Homer key map already hands to the app; JAWS+Number Pad Delete is JAWS's Route Virtual to PC, and is left alone. Each app's Say Position, as Alt+Delete.
 - **Tables.** DbDo's grid takes JAWS's Say Current Cell and NVDA's table reading keys (NVDA+Alt+Control with an arrow) and answers them by its own table model.
 - **Everything else** stays the reader's: Tab, title, current line, status line, Say All. HomerView answers none of these, since its browser's keys already mean what they say there, and JAWS+A must keep reading Edge's address bar.
 

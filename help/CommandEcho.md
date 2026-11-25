@@ -196,7 +196,7 @@ A command's name is spoken as it starts if and only if nothing else would tell y
 - Say Edited (Shift+E)
 - Say Filter (Shift+F)
 - Say Goto (Shift+G)
-- Say Id (Shift+I)
+- Say id (Shift+I)
 - Say Jump (Shift+J)
 - Say Keywords (Shift+K)
 - Say Look (Shift+L)
