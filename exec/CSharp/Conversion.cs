@@ -404,6 +404,168 @@ return sText;
 finally { try { File.Delete(sTemp); } catch (Exception) { } }
 } // toText method
 
+// ------- speech: text a screen reader speaks, with no markup at all (kit 1.288.0) -------
+//
+// WHY. FileDir's ? key (Say What Content) spoke a Markdown file exactly as written, so a person
+// heard pound signs, asterisks, dashes and table bars, and a workbook's text came as a pipe table.
+// Jamal's rule of 24 November 2026: what goes to the screen reader is plain text, not even light
+// markup like Markdown. Source code, settings, data and other plain files are spoken as they are,
+// since their characters are their content; a marked-up document -- Markdown, reStructuredText,
+// LaTeX -- goes through Pandoc's plain writer where Pandoc is present, and every result is then
+// cleared of what markup remains: headings' pound signs, list bullets, quote marks, table borders
+// and bars, emphasis, code ticks, links' addresses, attributes and tags. A numbered list keeps its
+// numbers, which are content; a table's cells are separated by tabs, which a screen reader passes
+// over as a pause.
+
+private static readonly string[] aMarkupSources = { ".md", ".markdown", ".rst", ".tex" };
+
+// toSpeech: the text of a file as a screen reader should speak it, by the quickest route.
+public static string toSpeech(string sPath, out string sError) {
+sError = "";
+if (!File.Exists(sPath)) { sError = "the file was not found"; return ""; }
+string sExt = Path.GetExtension(sPath).ToLowerInvariant();
+if (Array.IndexOf(aMarkupSources, sExt) >= 0) {
+if (havePandoc()) {
+string sTemp = tempPath(sPath, ".txt");
+try {
+string sPandocError;
+if (pandoc(sPath, sTemp, out sPandocError)) return plainForSpeech(Util.file2String(sTemp));
+Log.info("Pandoc could not make plain text of " + Path.GetFileName(sPath) + ": " + sPandocError + "; clearing the markup without it");
+}
+finally { try { File.Delete(sTemp); } catch (Exception) { } }
+}
+try { return plainForSpeech(Util.file2String(sPath)); }
+catch (Exception ex) { sError = ex.Message; return ""; }
+}
+string sText = toText(sPath, out sError);
+if (sText.Length == 0) return "";
+// A plain file by its extension or its bytes is its own content, spoken as it is.
+if (Array.IndexOf(aPlainSources, sExt) >= 0 || (!hasAnyRoute(sPath) && recognize(sPath).bText)) return sText;
+return plainForSpeech(sText);
+} // toSpeech method
+
+// plainForSpeech: text with any Markdown or plain-writer markup taken out, line by line, with
+// fenced code and front matter kept as they are written.
+public static string plainForSpeech(string sText) {
+if (sText == null) return "";
+string[] aLines = sText.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n');
+List<string> lOut = new List<string>();
+bool bFence = false, bFront = false;
+for (int i = 0; i < aLines.Length; i++) {
+string sLine = aLines[i];
+string sTrim = sLine.Trim();
+if (i == 0 && sTrim == "---") { bFront = true; continue; }
+if (bFront) {
+if (sTrim == "---" || sTrim == "...") { bFront = false; continue; }
+lOut.Add(sLine);
+continue;
+}
+if (sTrim.StartsWith("```") || sTrim.StartsWith("~~~")) { bFence = !bFence; continue; }
+if (bFence) { lOut.Add(sLine); continue; }
+if (sTrim.StartsWith(":::")) continue;
+if (Regex.IsMatch(sTrim, @"^\[[^\]]+\]:\s*\S+\s*$")) continue;
+if (Regex.IsMatch(sTrim, @"^<!--.*-->$")) continue;
+if (Regex.IsMatch(sTrim, @"^[\s\-=+_*:|]+$") && Regex.IsMatch(sTrim, @"[-=_*]{3,}")) continue;
+if (sTrim.Length > 1 && sTrim.StartsWith("|") && sTrim.EndsWith("|")) {
+string[] aCells = sTrim.Trim('|').Split('|');
+for (int j = 0; j < aCells.Length; j++) aCells[j] = aCells[j].Trim();
+sLine = string.Join("\t", aCells);
+}
+sLine = Regex.Replace(sLine, @"^\s{0,3}#{1,6}\s+", "");
+sLine = Regex.Replace(sLine, @"\s+#+\s*$", "");
+sLine = Regex.Replace(sLine, @"^(\s*)>\s?", "${1}");
+sLine = Regex.Replace(sLine, @"^(\s*)[-*+]\s+\[[xX]\]\s+", "${1}Done: ");
+sLine = Regex.Replace(sLine, @"^(\s*)[-*+]\s+\[ \]\s+", "${1}To do: ");
+sLine = Regex.Replace(sLine, @"^(\s*)[-*+•]\s+", "${1}");
+lOut.Add(plainInline(sLine));
+}
+string s = string.Join("\n", lOut.ToArray());
+s = Regex.Replace(s, @"<!--.*?-->", "", RegexOptions.Singleline);
+s = Regex.Replace(s, @"[ \t]+\n", "\n");
+s = Regex.Replace(s, @"\n{3,}", "\n\n");
+return s.Trim('\n').Replace("\n", "\r\n");
+} // plainForSpeech method
+
+// plainInline: one line with its inline markup taken out.
+private static string plainInline(string s) {
+s = Regex.Replace(s, @"!\[([^\]]*)\]\([^)]*\)", "${1}");
+s = Regex.Replace(s, @"\[([^\]]+)\]\([^)]*\)", "${1}");
+s = Regex.Replace(s, @"\[([^\]]+)\]\[[^\]]*\]", "${1}");
+s = Regex.Replace(s, @"<(https?://[^>\s]+)>", "${1}");
+s = Regex.Replace(s, @"\[\^(\w+)\]:\s*", "Note ${1}: ");
+s = Regex.Replace(s, @"\[\^(\w+)\]", "");
+s = Regex.Replace(s, @"\{[#.][^}\n]*\}", "");
+s = Regex.Replace(s, @"</?[A-Za-z][A-Za-z0-9]*(\s[^<>]*)?/?>", "");
+s = Regex.Replace(s, @"(\*\*|__)(?=\S)(.+?)(?<=\S)\1", "${2}");
+s = Regex.Replace(s, @"(?<![\w*])\*(?=\S)(.+?)(?<=\S)\*(?![\w*])", "${1}");
+s = Regex.Replace(s, @"(?<![\w_])_(?=\S)(.+?)(?<=\S)_(?![\w_])", "${1}");
+s = Regex.Replace(s, @"~~(?=\S)(.+?)(?<=\S)~~", "${1}");
+s = Regex.Replace(s, @"`+([^`\n]+?)`+", "${1}");
+s = Regex.Replace(s, @"\\([\\`*_{}\[\]()#+\-.!|~<>])", "${1}");
+return s;
+} // plainInline method
+
+// ------- the clipboard's rich text as Markdown (kit 1.288.0) -------
+//
+// WHY. Copying from a web page or Word puts HTML (and rich text) on the clipboard beside plain
+// text. A plain paste keeps only the words; this keeps headings, lists, links, emphasis and tables
+// as clean Markdown, through Pandoc. EdSharp's Paste as Markdown (Control+Shift+V) is the first
+// caller; HomerView's Copy as Markdown can use htmlToMarkdown the same way.
+// The Markdown is Pandoc's, without its divs, spans, attributes and raw HTML, which a web page
+// carries plenty of and a writer has no use for.
+private const string sCleanMarkdown = "markdown-raw_html-native_divs-native_spans-fenced_divs-bracketed_spans-header_attributes-link_attributes-inline_code_attributes-fenced_code_attributes";
+
+// clipboardMarkdown: "" with no error when the clipboard holds no HTML or rich text.
+public static string clipboardMarkdown(out string sError) {
+sError = "";
+string sHtml = "", sRtf = "";
+try {
+if (Clipboard.ContainsText(TextDataFormat.Html)) sHtml = htmlFragment(Clipboard.GetText(TextDataFormat.Html));
+if (sHtml.Trim().Length == 0 && Clipboard.ContainsText(TextDataFormat.Rtf)) sRtf = Clipboard.GetText(TextDataFormat.Rtf);
+}
+catch (Exception ex) { sError = "the clipboard could not be read: " + ex.Message; return ""; }
+if (sHtml.Trim().Length > 0) return htmlToMarkdown(sHtml, out sError);
+if (sRtf.Trim().Length > 0) return richToMarkdown(sRtf, ".rtf", out sError);
+return "";
+} // clipboardMarkdown method
+
+// htmlFragment: the copied part of the clipboard's HTML format, which wraps the fragment in a
+// header of byte offsets and StartFragment and EndFragment comments.
+public static string htmlFragment(string sClip) {
+if (sClip == null) return "";
+int iStart = sClip.IndexOf("<!--StartFragment-->", StringComparison.OrdinalIgnoreCase);
+int iEnd = sClip.IndexOf("<!--EndFragment-->", StringComparison.OrdinalIgnoreCase);
+if (iStart >= 0 && iEnd > iStart) return sClip.Substring(iStart + 20, iEnd - iStart - 20);
+int iHtml = sClip.IndexOf("<html", StringComparison.OrdinalIgnoreCase);
+return iHtml >= 0 ? sClip.Substring(iHtml) : sClip;
+} // htmlFragment method
+
+// htmlToMarkdown: HTML as clean Markdown, one line per paragraph.
+public static string htmlToMarkdown(string sHtml, out string sError) {
+return richToMarkdown("<html><head><meta charset=\"utf-8\"></head><body>" + sHtml + "</body></html>", ".htm", out sError);
+} // htmlToMarkdown method
+
+private static string richToMarkdown(string sContent, string sExt, out string sError) {
+sError = "";
+string sExe = pandocPath();
+if (sExe == "") { sError = "Pandoc is not installed"; return ""; }
+string sSource = Path.Combine(Path.GetTempPath(), "HomerClip_" + Guid.NewGuid().ToString("N").Substring(0, 8) + sExt);
+string sTarget = Path.ChangeExtension(sSource, ".md");
+try {
+File.WriteAllText(sSource, sContent, new UTF8Encoding(sExt != ".rtf"));
+string sOut;
+string sArgs = Util.stringQuote(sSource) + " -f " + (sExt == ".rtf" ? "rtf" : "html") + " -t " + sCleanMarkdown + " --wrap=none -o " + Util.stringQuote(sTarget);
+if (!run(sExe, sArgs, out sOut, out sError)) return "";
+string sMd = Util.file2String(sTarget);
+sMd = Regex.Replace(sMd.Replace("\r\n", "\n"), @"\n{3,}", "\n\n").Trim('\n');
+return sMd.Replace("\n", "\r\n");
+}
+finally {
+try { File.Delete(sSource); } catch (Exception) { }
+try { File.Delete(sTarget); } catch (Exception) { }
+}
+} // richToMarkdown method
+
 // toPlainText: the earlier name, kept for FileDir's callers.
 public static string toPlainText(string sPath, out string sError) {
 return toText(sPath, out sError);

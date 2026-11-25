@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.289.1 -- 24 November 2026, night
+
+- **Conversion.cs comes again, whole.** EdSharp and FileDir stopped compiling on this computer: Conversion had no clipboardMarkdown and no toSpeech, which 1.288.0 added. The 1.288.0 kit zip never reached C:\HomerDev, so its Conversion.cs was missing, while version.txt, from 1.289.0, said the kit was new enough. This version carries the file again, and EdSharp and FileDir now ask for 1.289.1, so a kit without it is named before anything compiles.
+- **A version number cannot see a missing file.** kitNeeded checks version.txt only, so a skipped kit zip passes it. When an app fails on a kit method that its History says exists, unzip the kit's latest zip again, or ask for every kit file changed since the last one built.
+
 ## 1.289.0 -- 24 November 2026, late evening
 
 - **The suite's keymap follows the day's key rulings.** In SuiteCommands.inix:
