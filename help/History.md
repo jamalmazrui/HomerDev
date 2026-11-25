@@ -7,6 +7,21 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.291.6 -- 25 November 2026, late afternoon
+
+- **Homer.Util.goToTarget reads a Go to entry the one Homer way:** 42 goes to position 42; +5 and -5 move 5; %50 goes halfway through the count; +%10 and -%10 move a tenth of it. A trailing percent (50%, +10%) reads the same. Every answer stays within 1 and the count, and an entry of another form returns 0 with the reason, so a program may read it another way. DbDo's Go to Record uses it first; any program with a numbered list can.
+- **The repeat commands retire for F3.** DbDo's Go to Record Again, EdSharp's Jump to Line Again and Go to Percent Again, and FileDir's Jump Again and Keywords Again leave the catalog and SuiteCommands records them retired: F3 and Shift+F3 repeat the last search or go in each program. DbDo's and EdSharp's Search Next and Search Previous name what they now repeat.
+
+## 1.291.5 -- 25 November 2026, afternoon
+
+- **The suite catalog follows the menu review.** Arrange Icons, Cascade, Tile Horizontal, Tile Vertical and Burn to CD leave the catalog: EdSharp and FileDir retire them, freeing Alt+Shift+B and four F11 keys. Jump Again and Keywords Again are FileDir's alone, since DbDo retires them for F3; DbDo's exception keeps only List Bookmarks on Alt+Shift+B.
+- **SuiteCommands records the retirements** in DbDo, EdSharp and FileDir, DbDo's Initial Change (renamed from Jump to Next Initial), and DbDo's Read Jump Matches Marked and Read Keywords Matches Marked on Alt+Shift+J and Alt+Shift+K.
+- **A retired command is hidden, not just unbound.** The Alternate Menu lists only what the menus show, so a hidden command is out of reach except by a key; SuiteCommands no longer says Merge Data is still in the Alternate Menu.
+
+## 1.291.4 -- 25 November 2026, early afternoon
+
+- **The suite catalog lets DbDo keep its three Shift keys.** A new [keys DbDo] section names Jump Again (Alt+Shift+J), Keywords Again (Alt+Shift+K) and List Bookmarks (Alt+Shift+B), so DbDo's push gate passes while Alt+J, Alt+K and Alt+B read what those searches find. FileDir and EdSharp keep the catalog's keys.
+
 ## 1.291.3 -- 25 November 2026, midday
 
 - **SuiteCommands records DbDo's new reading keys.** Read Bookmarked Records (Alt+B), Read Jump Matches (Alt+J) and Read Keywords Matches (Alt+K) are new; List Bookmarks, Jump Again and Keywords Again move to Alt+Shift+B, Alt+Shift+J and Alt+Shift+K. FileDir keeps Jump Again and Keywords Again on Alt+J and Alt+K for now.

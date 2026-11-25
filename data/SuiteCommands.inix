@@ -495,9 +495,11 @@ reason=Alt+V as in EdSharp, beside Say Invoke Script on Shift+V
 status=implemented
 
 [DbDo jumpToNextInitial]
-name=Jump to Next Initial
+name=Initial Change
 keys=
-status=current
+status=implemented
+change=renamed from Jump to Next Initial and moved to the Navigate menu, 25 November 2026; uses the column under the cursor instead of asking
+reason=FileDir's name for the same move, on the same menu
 
 [DbDo jumpToRecord]
 name=Jump to Record
@@ -554,7 +556,7 @@ status=implemented
 name=Merge Data
 keys=None
 change=hidden with no key, 25 November 2026 (Control+Shift+M from 24 November 2026; Alt+Shift+M and Alt+M before)
-reason=Import Data merges a file's table into the current table from every format Merge Data read and more, so one command does what two did; still in the Alternate Menu
+reason=Import Data merges a file's table into the current table from every format Merge Data read and more, so one command does what two did; hidden, so not in the Alternate Menu either
 status=retired
 
 [DbDo newCopy]
@@ -599,7 +601,9 @@ status=current
 [DbDo openAsManagedCopy]
 name=Open as Managed Copy
 keys=
-status=current
+status=retired
+change=retired 25 November 2026, the menu review
+reason=Open Database makes a working copy of every file that is not a database, and Save As copies a database
 
 [DbDo openCellValue]
 name=Open Cell Value
@@ -786,11 +790,11 @@ status=implemented
 
 [DbDo repeatGoTo]
 name=Go to Record Again
-keys=Alt+G
-change=renamed from Repeat Go to, 21 November 2026
-reason=the again group: Alt and a search's letter repeats that search, named "<command> Again", in DbDo, EdSharp, FileDir and HomerView (21 November 2026)
+keys=
+change=retired 25 November 2026, late afternoon, Jamal: "retire Alt+G and Alt+J for repeating a go-to or jump. Instead, use the F3 and Shift+F3 mechanism."
+reason=F3 and Shift+F3 repeat a Go to Record, both the same way; Alt+G is free; the entry grammar is the kit's Homer.Util.goToTarget
 disposition=ruled
-status=implemented
+status=retired
 
 [DbDo replaceColumn]
 name=Replace
@@ -1141,7 +1145,9 @@ status=implemented
 [DbDo sayTables]
 name=Say Tables
 keys=
-status=current
+status=retired
+change=retired 25 November 2026, the menu review
+reason=said the tables visited, the history behind Next and Previous Visited Table, which Open Table retired; Shift+F4 and Shift+D say the tables
 
 [DbDo sayTags]
 name=Say Tags
@@ -1327,8 +1333,10 @@ status=current
 [DbDo windowToggle]
 name=Window Toggle
 keys=
-status=current
+status=retired
 note=Shift+W was tried and withdrawn 5 November 2026: Control+Tab and Control+Shift+Tab already move between two windows
+change=retired 25 November 2026, the menu review
+reason=Control+Tab, Control+Shift+Tab and F4 move among windows; hidden, so not in the Alternate Menu; code kept for a rollback
 
 [DbDo addColumnToOrder]
 name=Add Column to Order
@@ -1381,8 +1389,10 @@ status=current
 
 [EdSharp arrangeIcons]
 name=Arrange Icons
-keys=Alt+F11
-status=current
+keys=
+status=retired
+change=retired 25 November 2026, the menu review
+reason=arranges windows on a screen the reader does not see, with every window maximized, and held an F11 key, the version family; on no menu, code kept
 
 [EdSharp baseline]
 name=Baseline
@@ -1391,8 +1401,10 @@ status=current
 
 [EdSharp burnToCD]
 name=Burn to CD
-keys=Alt+Shift+B
-status=current
+keys=
+status=retired
+change=retired 25 November 2026, the menu review; Alt+Shift+B is free
+reason=writing a disc is rare work now, and File Explorer does it; on no menu, code kept
 
 [EdSharp calculateDate]
 name=Calculate Date
@@ -1401,8 +1413,10 @@ status=current
 
 [EdSharp cascade]
 name=Cascade
-keys=Control+F11
-status=current
+keys=
+status=retired
+change=retired 25 November 2026, the menu review
+reason=arranges windows on a screen the reader does not see, with every window maximized, and held an F11 key, the version family; on no menu, code kept
 
 [EdSharp chatAboutDocument]
 name=Chat about Document
@@ -1687,8 +1701,10 @@ status=current
 
 [EdSharp goToPercentAgain]
 name=Go to Percent Again
-keys=Alt+G
-status=current
+keys=
+status=retired
+change=retired 25 November 2026, late afternoon, Jamal: "retire Alt+G and Alt+J for repeating a go-to or jump. Instead, use the F3 and Shift+F3 mechanism."
+reason=F3 and Shift+F3 repeat Go to Percent when it came after the last search; Alt+G is free
 
 [EdSharp goToSection]
 name=Go to Section
@@ -1823,8 +1839,10 @@ status=current
 
 [EdSharp jumpToLineAgain]
 name=Jump to Line Again
-keys=Alt+J
-status=current
+keys=
+status=retired
+change=retired 25 November 2026, late afternoon, Jamal: "retire Alt+G and Alt+J for repeating a go-to or jump. Instead, use the F3 and Shift+F3 mechanism."
+reason=F3 and Shift+F3 repeat Jump to Line when it came after the last search; Alt+J is free
 
 [EdSharp justify]
 name=Justify
@@ -2570,19 +2588,19 @@ status=current
 
 [EdSharp tileHorizontal]
 name=Tile Horizontal
-keys=Alt+Shift+F11
-change=keys changed, was Alt+Shift+F11
-reason=kept, since its pair now has a free key
+keys=
+change=retired 25 November 2026, the menu review
+reason=arranges windows on a screen the reader does not see, with every window maximized, and held an F11 key, the version family; on no menu, code kept
 disposition=accepted
-status=implemented
+status=retired
 
 [EdSharp tileVertical]
 name=Tile Vertical
-keys=Shift+F11
-change=keys changed, was Control+Shift+F11
-reason=free in every app, beside Tile Horizontal (Alt+Shift+F11) and Cascade (Control+F11)
+keys=
+change=retired 25 November 2026, the menu review
+reason=arranges windows on a screen the reader does not see, with every window maximized, and held an F11 key, the version family; on no menu, code kept
 disposition=accepted
-status=implemented
+status=retired
 
 [EdSharp toggleIndentation]
 name=Toggle Indentation
@@ -2765,8 +2783,10 @@ status=implemented
 
 [FileDir arrangeIcons]
 name=Arrange Icons
-keys=Alt+F11
-status=current
+keys=
+status=retired
+change=retired 25 November 2026, the menu review
+reason=arranges windows on a screen the reader does not see, with every window maximized, and held an F11 key, the version family; on no menu, code kept
 
 [FileDir batchMail]
 name=Batch Mail
@@ -2790,13 +2810,17 @@ status=implemented
 
 [FileDir burnToCD]
 name=Burn to CD
-keys=Alt+Shift+B
-status=current
+keys=
+status=retired
+change=retired 25 November 2026, the menu review; Alt+Shift+B is free
+reason=writing a disc is rare work now, and File Explorer does it; on no menu, code kept
 
 [FileDir cascade]
 name=Cascade
-keys=Control+F11
-status=current
+keys=
+status=retired
+change=retired 25 November 2026, the menu review
+reason=arranges windows on a screen the reader does not see, with every window maximized, and held an F11 key, the version family; on no menu, code kept
 
 [FileDir characterEncoding]
 name=Say Character Encoding
@@ -3187,11 +3211,11 @@ status=current
 
 [FileDir jumpAgain]
 name=Jump Again
-keys=Alt+J
-change=description in the suite's words, 21 November 2026
-reason=the again group: Alt and a search's letter repeats that search, named "<command> Again", in DbDo, EdSharp, FileDir and HomerView (21 November 2026)
+keys=
+change=retired 25 November 2026, late afternoon, Jamal: "retire Alt+G and Alt+J for repeating a go-to or jump. Instead, use the F3 and Shift+F3 mechanism."
+reason=F3 and Shift+F3 already repeat the last Jump; Alt+J is free, as in DbDo
 disposition=ruled
-status=implemented
+status=retired
 
 [FileDir keyDescriberToggle]
 name=Key Describer Toggle
@@ -3208,11 +3232,11 @@ status=current
 
 [FileDir keywordsAgain]
 name=Keywords Again
-keys=Alt+K
-change=description in the suite's words, 21 November 2026
-reason=the again group: Alt and a search's letter repeats that search, named "<command> Again", in DbDo, EdSharp, FileDir and HomerView (21 November 2026)
+keys=
+change=retired 25 November 2026, late afternoon, Jamal: "retire Alt+G and Alt+J for repeating a go-to or jump. Instead, use the F3 and Shift+F3 mechanism."
+reason=F3 and Shift+F3 already repeat the last Keywords; Alt+K is free, as in DbDo
 disposition=ruled
-status=implemented
+status=retired
 
 [FileDir launchFileDir]
 name=Launch FileDir
@@ -3957,19 +3981,19 @@ status=implemented
 
 [FileDir tileHorizontal]
 name=Tile Horizontal
-keys=Alt+Shift+F11
-change=keys changed, was Alt+Shift+F11
-reason=as in EdSharp
+keys=
+change=retired 25 November 2026, the menu review
+reason=arranges windows on a screen the reader does not see, with every window maximized, and held an F11 key, the version family; on no menu, code kept
 disposition=accepted
-status=implemented
+status=retired
 
 [FileDir tileVertical]
 name=Tile Vertical
-keys=Shift+F11
-change=keys changed, was Control+Shift+F11
-reason=as in EdSharp: free in every app, beside Cascade (Control+F11)
+keys=
+change=retired 25 November 2026, the menu review
+reason=arranges windows on a screen the reader does not see, with every window maximized, and held an F11 key, the version family; on no menu, code kept
 disposition=accepted
-status=implemented
+status=retired
 
 [FileDir timer]
 name=Timer
@@ -4773,18 +4797,33 @@ change=new, 25 November 2026
 reason=Jamal's request, as Read Bookmarked Records; pairs with Shift+K, Say Keywords
 status=implemented
 
+[DbDo readJumpMatchesMarked]
+name=Read Jump Matches Marked
+keys=Alt+Shift+J
+change=new, 25 November 2026
+reason=Jamal's request: Shift added for marked records only, as Alt+Shift+W, L, H and Y
+status=implemented
+
+[DbDo readKeywordsMatchesMarked]
+name=Read Keywords Matches Marked
+keys=Alt+Shift+K
+change=new, 25 November 2026
+reason=as Read Jump Matches Marked; pairs with Read Keywords Matches on Alt+K
+status=implemented
+
 [DbDo keywordsAgain]
 name=Keywords Again
-keys=Alt+Shift+K
-change=new on Alt+K, 21 November 2026; Alt+Shift+K from 25 November 2026, when Alt+K became Read Keywords Matches at Jamal's request; a departure from the again group, which FileDir keeps
-reason=the again group: Alt and a search's letter repeats that search, named "<command> Again", in DbDo, EdSharp, FileDir and HomerView (21 November 2026); FileDir had it
+keys=
+change=retired 25 November 2026, the afternoon of the day it moved to Alt+Shift
+reason=F3 repeats the last Jump or Keywords; Alt+Shift+J and Alt+Shift+K read the marked matches, as Jamal asked for if they were free
 disposition=ruled
-status=implemented
+status=retired
 
 [DbDo jumpAgain]
 name=Jump Again
-keys=Alt+Shift+J
-change=new on Alt+J, 21 November 2026; Alt+Shift+J from 25 November 2026, when Alt+J became Read Jump Matches at Jamal's request; a departure from the again group, which FileDir keeps
-reason=the again group: Alt and a search's letter repeats that search, named "<command> Again", in DbDo, EdSharp, FileDir and HomerView (21 November 2026); FileDir had it
+keys=
+change=retired 25 November 2026, the afternoon of the day it moved to Alt+Shift
+reason=F3 repeats the last Jump or Keywords; Alt+Shift+J and Alt+Shift+K read the marked matches, as Jamal asked for if they were free
 disposition=ruled
+status=retired
 status=implemented

@@ -1144,6 +1144,41 @@ textStatistics.iReadingMinutes = (textStatistics.iWords + iWordsPerMinute - 1) /
 return textStatistics;
 } // measureText method
 
+// GO TO, ONE GRAMMAR (1.291.6, 25 November 2026, Jamal: "an integer goes to that absolute position in the rowset. If a +
+// or - sign precedes an integer, then focus moves forward or backward by that increment. If a % precedes an integer, focus
+// moves approximately to that percentage of the filter count. If a + or - precedes a % which precedes an integer, then
+// focus is moved forward or backward by that percent of the filter count."). goToTarget turns such an entry into a
+// position from 1 to iCount, given the current one:
+//   42     position 42                 +5 / -5     5 forward or back
+//   %50    halfway through             +%10 / -%10 10 percent of the count forward or back
+// A trailing % (50%, +10%) is read the same way, as DbDo always took it. A percent rounds to the nearest position, and
+// every answer is held between 1 and iCount. It returns 0, with sError saying why, for an entry that is not of this
+// form, so a caller may read it another way (DbDo's Go to Record then looks for a column by name). Any Homer program
+// with a numbered list -- records, lines, items -- can take its Go to entry through this one reading.
+public static int goToTarget(string sEntry, int iCurrent, int iCount, out string sError) {
+sError = "";
+string sText = (sEntry ?? "").Replace(" ", "");
+if (iCount <= 0) { sError = "nothing to go to"; return 0; }
+if (sText.Length == 0) { sError = "no entry"; return 0; }
+int iSign = 0;
+if (sText[0] == '+') iSign = 1;
+else if (sText[0] == '-') iSign = -1;
+if (iSign != 0) sText = sText.Substring(1);
+bool bPercent = false;
+if (sText.StartsWith("%")) { bPercent = true; sText = sText.Substring(1); }
+else if (sText.EndsWith("%")) { bPercent = true; sText = sText.Substring(0, sText.Length - 1); }
+double nNumber;
+if (sText.Length == 0 || !double.TryParse(sText, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out nNumber) || nNumber < 0) {
+sError = "not a number, +number, -number, %number, +%number or -%number";
+return 0;
+}
+int iAmount = bPercent ? (int) Math.Round(iCount * nNumber / 100.0, MidpointRounding.AwayFromZero) : (int) Math.Round(nNumber, MidpointRounding.AwayFromZero);
+int iTarget = iSign == 0 ? iAmount : iCurrent + iSign * iAmount;
+if (iTarget < 1) iTarget = 1;
+if (iTarget > iCount) iTarget = iCount;
+return iTarget;
+} // goToTarget method
+
 } // class Util
 
 // HomerList: a list of strings with the operations Homer apps do on lines and names -- find, keep or remove what

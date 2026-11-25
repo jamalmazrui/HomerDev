@@ -125,6 +125,13 @@ Open Parent Folder=FileDir's key code, by the Recycle setting
 Open Root Folder=FileDir's key code
 Parent Folder=FileDir's key code, by the Recycle setting
 
+[keys DbDo]
+; THE READING KEYS (25 November 2026, Jamal's request): Alt+B, Alt+J and Alt+K read, wide and from the first record,
+; the records a bookmark, Jump or Keywords picks out, without moving focus or changing the filter, and Alt+Shift+J and
+; Alt+Shift+K the marked ones among them. List Bookmarks keeps Alt+Shift+B, the only way to go to a bookmark. DbDo's
+; Jump Again and Keywords Again are retired (F3 repeats either), so those two commands are FileDir's alone.
+List Bookmarks=Alt+Shift+B
+
 [keys HomerView]
 ; F11 is Microsoft Edge's full screen
 Elevate Version=Control+F11
@@ -150,21 +157,6 @@ description=Open the announcement of this version
 apps=EdSharp, FileDir, HomerView
 key=Control+Shift+'
 description=Add the clipboard text to the end of a file you name
-
-[command Arrange Icons]
-apps=EdSharp, FileDir
-key=Alt+F11
-description=Arrange the open windows
-
-[command Burn to CD]
-apps=EdSharp, FileDir
-key=Alt+Shift+B
-description=Burn {what} to a CD
-
-[command Cascade]
-apps=EdSharp, FileDir
-key=Control+F11
-description=Cascade the open windows
 
 [command Chat with AI]
 apps=EdSharp, FileDir
@@ -205,16 +197,6 @@ description=Close the current window
 apps=DbDo, FileDir
 key=Control+PageUp
 description=Go to the first marked {thing}
-
-[command Jump Again]
-apps=DbDo, FileDir
-key=Alt+J
-description=Repeat Jump forward with the same text
-
-[command Keywords Again]
-apps=DbDo, FileDir
-key=Alt+K
-description=Repeat Keywords forward with the same keywords
 
 [command Last Marked]
 apps=DbDo, FileDir
@@ -687,16 +669,6 @@ apps=DbDo, EdSharp
 key=Control+Shift+Backslash
 description=Show {targets_files} in FileDir
 
-[command Tile Horizontal]
-apps=EdSharp, FileDir
-key=Alt+Shift+F11
-description=Tile the open windows across
-
-[command Tile Vertical]
-apps=EdSharp, FileDir
-key=Shift+F11
-description=Tile the open windows down
-
 [command Toggle Mark]
 ; 15 November 2026 (A11): DbDo's Marked Toggle and FileDir's Toggle Mark, one name and one sentence. FileDir also keeps
 ; Space, its list's own key, and DbDo has it too since 21 November 2026 (the Space bar scheme): a Space on its own
@@ -939,10 +911,10 @@ what=marked items there are from the current one on, and their total size
 what=characters, words and lines are in all or the selected text
 
 [words Search Next|DbDo]
-what=Keywords, Jump or Find with Regex
+what=Go to, Keywords, Jump or Find with Regex
 
 [words Search Next|EdSharp]
-what=search
+what=search, Jump to Line or Go to Percent
 
 [words Search Next|FileDir]
 what=Keywords or Jump
@@ -951,10 +923,10 @@ what=Keywords or Jump
 what=search
 
 [words Search Previous|DbDo]
-what=Keywords, Jump or Find with Regex
+what=Go to, Keywords, Jump or Find with Regex
 
 [words Search Previous|EdSharp]
-what=search
+what=search, Jump to Line or Go to Percent
 
 [words Search Previous|FileDir]
 what=Keywords or Jump
