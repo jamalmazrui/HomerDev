@@ -3,7 +3,7 @@ title: "Homer Command Echo"
 author: "Jamal Mazrui"
 ---
 
-This page records, for every menu command in the HomerDev frame, DbDo, EdSharp and FileDir, whether it says its own name as it starts. It was made on 19 October 2026 by applying the suite's rule to each command's menu caption, and is meant for review. A command in the wrong group is corrected in its app's code, or, on the frame, with bNoEcho.
+This page records, for every menu command in the HomerDev frame, DbDo, EdSharp and FileDir, whether it says its own name as it starts. The keys shown are as of its making unless corrected since; each app's Hotkeys.md has today's keys. It was made on 19 October 2026 by applying the suite's rule to each command's menu caption, and is meant for review. A command in the wrong group is corrected in its app's code, or, on the frame, with bNoEcho.
 
 ## The Rule
 
@@ -45,7 +45,7 @@ A command's name is spoken as it starts if and only if nothing else would tell y
 - Delete Without Confirmation (Control+Shift+D)
 - Invert Marked (Alt+Shift+I)
 - Mark All (Control+A)
-- Mark Record (Control+M)
+- Mark Record (SemiColon)
 - Refresh View (F5)
 - Reverse Order (Alt+Shift+O)
 - Save (Control+S)
@@ -53,15 +53,13 @@ A command's name is spoken as it starts if and only if nothing else would tell y
 - Start Mark (F8)
 - Start Unmark (Alt+F8)
 - Unmark All (Control+Shift+A)
-- Unmark Record (Control+Shift+M)
+- Unmark Record (Slash)
 
 ### DbDo: Dialog
 
 - Add Table
 - Alternate Menu (Alt+F10)
 - Backup Database
-- Choose Table (Control+T)
-- Choose View
 - Choose Visible Columns
 - Compare Database
 - Current Windows (F4)
@@ -86,22 +84,21 @@ A command's name is spoken as it starts if and only if nothing else would tell y
 - Generate from Grid (Alt+Shift+G)
 - Go to Record (Control+G)
 - Graphics Column (Control+Shift+G)
-- Import (Alt+I)
-- Invoke Script (Control+Shift+I)
+- Import Data (Control+Shift+I)
+- Invoke Script (Alt+V)
 - Jump to Next Initial
 - Jump to Record (Control+J)
 - Keywords (Control+K)
 - List Bookmarks (Alt+B)
-- Merge Data (Alt+M)
+- Merge Data (Control+Shift+M)
 - New Copy (Control+Shift+N)
 - New Database
 - New Record (Control+N)
 - Open as Managed Copy
 - Open Cell Value (Control+Enter)
 - Open Database (Control+O)
-- Open Table (Control+Shift+O)
-- Open Table in New Window (Control+Shift+T)
-- Open Template Database (Alt+Shift+D)
+- Open Table (Control+T)
+- Open Template Database (Control+Shift+O)
 - Order Records (Alt+O)
 - Print (Control+P)
 - Query (Control+Q)
@@ -129,7 +126,7 @@ A command's name is spoken as it starts if and only if nothing else would tell y
 - History of Changes (Shift+F1)
 - Hotkey Summary (Alt+Shift+H)
 - Hotkeys (Control+Shift+F1)
-- Inspect Record (Control+I)
+- Inspect Record (Alt+I)
 - License
 - Mail Record
 - Pick Value (Control+F2)
@@ -384,10 +381,10 @@ A command's name is spoken as it starts if and only if nothing else would tell y
 - List Favorites (Alt+L)
 - Mail Attachment (Control+Shift+M)
 - Mail Body (Control+M)
+- Merge File (Alt+Shift+M)
 - Number Items (Alt+Shift+N)
 - Open (Control+O)
 - Open Other Format (Control+Shift+O)
-- Paste File (Control+Shift+V)
 - Recent Files (Alt+R)
 - Rename (Alt+Shift+R)
 - Replace (Control+R)

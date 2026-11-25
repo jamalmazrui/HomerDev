@@ -338,7 +338,7 @@ The groups are in lower-case alphabetical order, except the function keys, which
 
 ## The groups, counted
 
-Written by scripts\keyGroups from the four key files, 21 November 2026. Each count is key bindings: a command with two keys counts twice, and a binding may be in more than one group.
+Written by scripts\keyGroups from the four key files, 24 November 2026. Each count is key bindings: a command with two keys counts twice, and a binding may be in more than one group.
 
 - **again** (key shape): 9 -- DbDo 3, EdSharp 3, FileDir 2, HomerView 1
 - **ai and online help** (topic): 14 -- DbDo 2, EdSharp 5, FileDir 3, HomerView 4
@@ -348,9 +348,9 @@ Written by scripts\keyGroups from the four key files, 21 November 2026. Each cou
 - **backslash, open elsewhere** (key shape): 11 -- DbDo 3, EdSharp 3, FileDir 5
 - **bookmarks and favorites** (topic): 10 -- DbDo 4, EdSharp 6
 - **case, lines and text shape** (topic): 43 -- EdSharp 43
-- **clipboard** (topic): 55 -- DbDo 12, EdSharp 16, FileDir 18, HomerView 9
+- **clipboard** (topic): 55 -- DbDo 12, EdSharp 17, FileDir 17, HomerView 9
 - **conversion and export** (topic): 17 -- DbDo 2, EdSharp 8, FileDir 5, HomerView 2
-- **data records and fields** (topic): 34 -- DbDo 34
+- **data records and fields** (topic): 35 -- DbDo 35
 - **delete** (topic): 16 -- DbDo 3, EdSharp 8, FileDir 5
 - **editing basics** (topic): 17 -- DbDo 1, EdSharp 12, HomerView 4
 - **f1 help** (key shape): 30 -- DbDo 8, EdSharp 8, FileDir 8, HomerView 6
@@ -358,7 +358,7 @@ Written by scripts\keyGroups from the four key files, 21 November 2026. Each cou
 - **f3 search again** (key shape): 18 -- DbDo 4, EdSharp 6, FileDir 2, HomerView 6
 - **f4 windows** (key shape): 19 -- DbDo 5, EdSharp 5, FileDir 6, HomerView 3
 - **f5 refresh and run** (key shape): 9 -- DbDo 1, EdSharp 6, FileDir 1, HomerView 1
-- **f6 panes, sections and views** (key shape): 16 -- DbDo 4, EdSharp 5, FileDir 6, HomerView 1
+- **f6 panes, sections and views** (key shape): 14 -- DbDo 2, EdSharp 5, FileDir 6, HomerView 1
 - **f7 review and language** (key shape): 8 -- EdSharp 6, FileDir 1, HomerView 1
 - **f8 selection, marking and reading all** (key shape): 20 -- DbDo 5, EdSharp 6, FileDir 4, HomerView 5
 - **f9 readable view** (key shape): 5 -- DbDo 1, EdSharp 3, HomerView 1
@@ -367,23 +367,23 @@ Written by scripts\keyGroups from the four key files, 21 November 2026. Each cou
 - **f12 ai, logs, media and macros** (key shape): 14 -- DbDo 5, EdSharp 5, FileDir 4
 - **filter and order** (topic): 22 -- DbDo 9, FileDir 13
 - **folders and windows tools** (topic): 38 -- DbDo 1, EdSharp 3, FileDir 34
-- **go to and open** (topic): 56 -- DbDo 11, EdSharp 17, FileDir 23, HomerView 5
-- **grid table keys** (key shape): 15 -- DbDo 15
+- **go to and open** (topic): 55 -- DbDo 10, EdSharp 17, FileDir 23, HomerView 5
+- **grid table keys** (key shape): 17 -- DbDo 17
 - **home and end** (key shape): 16 -- DbDo 8, EdSharp 2, FileDir 6
 - **item lists in text** (topic): 7 -- EdSharp 6, FileDir 1
 - **launch from the desktop** (key shape): 3 -- EdSharp 1, FileDir 1, HomerView 1
 - **local ai** (topic): 6 -- DbDo 2, EdSharp 2, FileDir 2
-- **mail, send and web** (topic): 12 -- EdSharp 5, FileDir 6, HomerView 1
-- **marking** (topic): 56 -- DbDo 22, FileDir 34
+- **mail, send and web** (topic): 13 -- DbDo 1, EdSharp 5, FileDir 6, HomerView 1
+- **marking** (topic): 60 -- DbDo 24, FileDir 36
 - **media and play** (topic): 8 -- DbDo 4, EdSharp 1, FileDir 3
 - **new and save** (topic): 13 -- DbDo 4, EdSharp 5, FileDir 4
 - **properties and details** (topic): 8 -- DbDo 3, EdSharp 1, FileDir 4
-- **reading aloud** (topic): 20 -- DbDo 8, EdSharp 3, FileDir 6, HomerView 3
+- **reading aloud** (topic): 22 -- DbDo 10, EdSharp 3, FileDir 6, HomerView 3
 - **regex** (topic): 17 -- DbDo 5, EdSharp 5, FileDir 4, HomerView 3
 - **rename** (topic): 7 -- EdSharp 1, FileDir 6
-- **repeat and next or previous** (topic): 48 -- DbDo 6, EdSharp 24, FileDir 10, HomerView 8
+- **repeat and next or previous** (topic): 46 -- DbDo 4, EdSharp 24, FileDir 10, HomerView 8
 - **say, on alt** (key shape): 31 -- DbDo 6, EdSharp 11, FileDir 7, HomerView 7
-- **say, on shift** (key shape): 47 -- DbDo 25, EdSharp 3, FileDir 17, HomerView 2
+- **say, on shift** (key shape): 48 -- DbDo 26, EdSharp 3, FileDir 17, HomerView 2
 - **scripts and macros** (topic): 23 -- DbDo 9, EdSharp 13, FileDir 1
 - **search** (topic): 39 -- DbDo 8, EdSharp 11, FileDir 8, HomerView 12
 - **settings and toggles** (topic): 21 -- DbDo 5, EdSharp 8, FileDir 6, HomerView 2
@@ -393,7 +393,7 @@ Written by scripts\keyGroups from the four key files, 21 November 2026. Each cou
 - **yield (counting)** (topic): 15 -- DbDo 4, EdSharp 3, FileDir 5, HomerView 3
 - **z keys** (key shape): 15 -- DbDo 3, EdSharp 3, FileDir 5, HomerView 4
 
-In all, 705 key bindings in 52 groups; 0 in no group.
+In all, 713 key bindings in 52 groups; 0 in no group.
 
 ## Appendix: the members of each group
 
@@ -420,7 +420,7 @@ In all, 705 key bindings in 52 groups; 0 in no group.
 
 ### archives
 
-- **FileDir:** Say Unarchive Test (Shift+U); Unarchive (Control+U); Unarchive Password (Alt+Shift+U); Unarchive to Same Name (Control+Shift+U); Unarchive without Subfolders (Alt+U); Zip (Control+Shift+Z); Zip then Delete (Control+Shift+Delete); Zip then Delete (Control+Z).
+- **FileDir:** Say Unarchive Test (Shift+U); Unarchive (Control+U); Unarchive Password (Alt+Shift+U); Unarchive to Same Name (Control+Shift+U); Unarchive without Subfolders (Alt+U); Zip (Control+Z); Zip then Delete (Control+Shift+Delete); Zip then Delete (Control+Shift+Z).
 
 ### back, forward and levels
 
@@ -445,8 +445,8 @@ In all, 705 key bindings in 52 groups; 0 in no group.
 ### clipboard
 
 - **DbDo:** Append Clipboard (Control+Shift+'); Clear Clipboard (Alt+Shift+'); Copy Append (Alt+C); Copy Append Record (Alt+Shift+C); Copy Cell (Control+C); Copy Grid (Control+F8); Copy Log (Control+F12); Copy Record (Control+Shift+C); Evaluate Expression (Control+=); Extract with Regex (Control+Shift+E); Save Clipboard (Control+'); Say Clipboard (Alt+').
-- **EdSharp:** Append Clipboard (Control+Shift+'); Append from Clipboard (Alt+7); Clear Clipboard (Alt+Shift+'); Copy (Control+C); Copy All (Control+F8); Copy Append (Alt+C); Copy Log (Control+F12); Copy Rich Text (Control+Shift+C); Cut (Control+X); Cut Append (Alt+X); New from Clipboard (Control+Shift+N); Paste (Control+V); Paste File (Control+Shift+V); Path to Clipboard (Alt+Shift+P); Save Clipboard (Control+'); Say Clipboard (Alt+').
-- **FileDir:** Append Clipboard (Control+Shift+'); Append File Contents (Alt+Shift+C); Clear Clipboard (Alt+Shift+'); Convert Units (Control+3); Copy (Control+C); Copy Append (Alt+C); Copy Log (Control+F12); Copy to Folder (Control+Shift+C); Cut (Control+X); Evaluate Expression (Control+=); Extract with Regex (Control+Shift+E); Name to Clipboard (Alt+Shift+N); Paste (Control+V); Paste Move (Control+Shift+V); Path List to Clipboard (Control+Shift+L); Path to Clipboard (Alt+Shift+P); Save Clipboard (Control+'); Say Clipboard (Alt+').
+- **EdSharp:** Append Clipboard (Control+Shift+'); Append from Clipboard (Alt+7); Clear Clipboard (Alt+Shift+'); Copy (Control+C); Copy All (Control+F8); Copy Append (Alt+C); Copy Log (Control+F12); Copy Rich Text (Control+Shift+C); Cut (Control+X); Cut Append (Alt+X); Merge File (Control+Shift+M); New from Clipboard (Control+Shift+N); Paste (Control+V); Paste as Markdown (Control+Shift+V); Path to Clipboard (Alt+Shift+P); Save Clipboard (Control+'); Say Clipboard (Alt+').
+- **FileDir:** Append Clipboard (Control+Shift+'); Append File Contents (Alt+Shift+C); Clear Clipboard (Alt+Shift+'); Convert Units (Control+3); Copy (Control+C); Copy Append (Alt+C); Copy Log (Control+F12); Copy to Folder (Control+Shift+C); Cut (Control+X); Evaluate Expression (Control+=); Extract with Regex (Control+Shift+E); Name to Clipboard (Alt+Shift+N); Paste (Control+V); Paste Move (Control+Shift+V); Path List to Clipboard (Control+Shift+L); Save Clipboard (Control+'); Say Clipboard (Alt+').
 - **HomerView:** Append Clipboard (Control+Shift+'); Clear Clipboard (Alt+Shift+'); Copy All (Control+F8); Copy Append (Alt+C); Copy Line (Control+C); Copy Log (Alt+Shift+L); Page Links to Clipboard (Alt+Shift+P); Save Clipboard (Control+'); Say Clipboard (Alt+').
 
 ### conversion and export
@@ -458,7 +458,7 @@ In all, 705 key bindings in 52 groups; 0 in no group.
 
 ### data records and fields
 
-- **DbDo:** Copy Append Record (Alt+Shift+C); Copy Record (Control+Shift+C); Delete Record (Control+D); Delete Record (Delete); Edit Cell (F2); Edit Notes (Alt+Shift+N); Edit Record (Control+E); Edit Tags (Alt+Shift+T); Edit url (Alt+Shift+U); Filter Records (Control+F); Generate Graphics (Alt+Shift+G); Generate Statistics (Alt+Shift+S); Go to Record (Control+G); Go to Record Again (Alt+G); Inspect Record (Alt+I); Mark Record (Control+M); Merge Data (Alt+M); New Record (Control+N); Null Value (Control+Shift+Backspace); Order Records (Alt+O); Pick Value (Control+F2); Query (Control+Q); Query History (Alt+Shift+Q); Record Macro (Control+Shift+F9); Refresh Records (F5); Say Notes (Shift+N); Say Query (Shift+Q); Say Select Columns (Shift+S); Say Tags (Shift+T); Say Whole Record (Shift+W); Select Columns (Alt+S); Table Properties (Alt+Enter); Table Summary (Alt+T); Unmark Record (Control+Shift+M).
+- **DbDo:** Copy Append Record (Alt+Shift+C); Copy Record (Control+Shift+C); Delete Record (Control+D); Delete Record (Delete); Design Database (Alt+Shift+D); Edit Cell (F2); Edit Notes (Alt+Shift+N); Edit Record (Control+E); Edit Tags (Alt+Shift+T); Edit url (Alt+Shift+U); Filter Records (Control+F); Generate Graphics (Alt+Shift+G); Generate Statistics (Alt+Shift+S); Go to Record (Control+G); Go to Record Again (Alt+G); Inspect Record (Alt+I); Mail Record (Control+M); Mark Record (;); Merge Data (Control+Shift+M); New Record (Control+N); Null Value (Control+Shift+Backspace); Order Records (Alt+O); Pick Value (Control+F2); Query (Control+Q); Query History (Alt+Shift+Q); Record Macro (Control+Shift+F9); Refresh Records (F5); Say Notes (Shift+N); Say Query (Shift+Q); Say Tags (Shift+T); Say Whole Record (Shift+W); Show Columns (Alt+S); Table Properties (Alt+Enter); Table Summary (Alt+T); Unmark Record (/).
 
 ### delete
 
@@ -508,7 +508,7 @@ In all, 705 key bindings in 52 groups; 0 in no group.
 
 ### f6 panes, sections and views
 
-- **DbDo:** Next Table or View (Control+F6); Previous Table or View (Control+Shift+F6); View Cycle (F6); View Cycle Back (Shift+F6).
+- **DbDo:** View Cycle (F6); View Cycle Back (Shift+F6).
 - **EdSharp:** Go to Contents (Shift+F6); Go to Section (F6); Next Section (Control+F6); Previous Section (Control+Shift+F6); Search for Topic (Alt+F6).
 - **FileDir:** Next Pane (F6); Next Sibling Folder (Control+F6); Next Visited Folder (Alt+F6); Previous Pane (Shift+F6); Previous Sibling Folder (Control+Shift+F6); Previous Visited Folder (Alt+Shift+F6).
 - **HomerView:** List Headings (NVDA+F6).
@@ -565,14 +565,14 @@ In all, 705 key bindings in 52 groups; 0 in no group.
 
 ### go to and open
 
-- **DbDo:** Choose Table (Control+T); Go to Record (Control+G); Open Cell Value (Control+Enter); Open Command Prompt (Control+\); Open Database (Control+O); Open Dot Prompt (Control+`); Open in Explorer (Alt+\); Open Table (Control+Shift+O); Open Template Database (Alt+D); Open url (Control+Shift+U); Recent Databases (Alt+R).
+- **DbDo:** Go to Record (Control+G); Open Cell Value (Control+Enter); Open Command Prompt (Control+\); Open Database (Control+O); Open Dot Prompt (Control+`); Open in Explorer (Alt+\); Open Table (Control+T); Open Template Database (Control+Shift+O); Open url (Control+Shift+U); Recent Databases (Alt+R).
 - **EdSharp:** Choose Folder (Control+0); Go to Contents (Shift+F6); Go to Environment (Control+Shift+F12); Go to Part (Alt+Shift+G); Go to Percent (Control+G); Go to Section (F6); Go to Special Folder (Control+Shift+G); Go to Start of Selection (Alt+Shift+F8); Insert All Users Path (Control+Shift+I); Insert Script Path (Control+I); List Favorites (Alt+L); Open (Control+O); Open Command Prompt (Control+\); Open in Explorer (Alt+\); Open Other Format (Control+Shift+O); Path List (Control+Shift+P); Recent Files (Alt+R).
 - **FileDir:** Drive Letter (Alt+1); Drive Letter (Alt+9); Go to Drive (Alt+G); Go to Folder (Control+G); Go to Item (Shift+Enter); Go to Parent Folder (,); Go to Parent Folder (Shift+Backspace); Go to Quick Folder (`); Go to Root Folder (Shift+\); Go to Special Folder (Control+Shift+G); Go to Virtual Folder (Alt+Shift+G); Open Command Prompt (Control+\); Open Drive (Alt+O); Open Folder (Control+O); Open in DbDo (Control+Shift+\); Open in Explorer (Alt+\); Open Item (Enter); Open Parent Folder (Backspace); Open Quick Folder (Control+Q); Open Root Folder (\); Open Special Folder (Control+Shift+O); Open Virtual Folder (Alt+Shift+O); Recent Folders (Alt+R).
 - **HomerView:** Choose Browser (Alt+Shift+B); Go to Percent (Control+G); Go to Start of Selection (Alt+Shift+F8); Open Document (Control+O); Recent Pages (Alt+R).
 
 ### grid table keys
 
-- **DbDo:** Cell Down (Control+Alt+DownArrow); Cell Left (Control+Alt+LeftArrow); Cell Right (Control+Alt+RightArrow); Cell Up (Control+Alt+UpArrow); Column Bottom (Control+Alt+PageDown); Column Top (Control+Alt+PageUp); Cursor Grid End (Control+Alt+End); Cursor Grid Start (Control+Alt+Home); Say Cell Coordinates (Control+Alt+Shift+NumPad5); Say Column (Control+Alt+Shift+DownArrow); Say Column Header (Control+Alt+Shift+UpArrow); Say Row (Control+Alt+Shift+RightArrow); Say Row Header (Control+Alt+Shift+LeftArrow); Unmark to First (Control+Alt+Shift+Home); Unmark to Last (Control+Alt+Shift+End).
+- **DbDo:** Cell Down (Control+Alt+DownArrow); Cell Left (Control+Alt+LeftArrow); Cell Right (Control+Alt+RightArrow); Cell Up (Control+Alt+UpArrow); Cell Value Down (Alt+DownArrow); Cell Value Up (Alt+UpArrow); Column Bottom (Control+Alt+PageDown); Column Top (Control+Alt+PageUp); Cursor Grid End (Control+Alt+End); Cursor Grid Start (Control+Alt+Home); Say Cell Coordinates (Control+Alt+Shift+NumPad5); Say Column (Control+Alt+Shift+DownArrow); Say Column Header (Control+Alt+Shift+UpArrow); Say Row (Control+Alt+Shift+RightArrow); Say Row Header (Control+Alt+Shift+LeftArrow); Unmark to First (Control+Alt+Shift+Home); Unmark to Last (Control+Alt+Shift+End).
 
 ### home and end
 
@@ -599,14 +599,15 @@ In all, 705 key bindings in 52 groups; 0 in no group.
 
 ### mail, send and web
 
+- **DbDo:** Mail Record (Control+M).
 - **EdSharp:** Burn to CD (Alt+Shift+B); Mail (Control+M); SendTo Menu (Control+F10); Web Client Utilities (Control+JAWS+Space); Web Download (Alt+Shift+W).
 - **FileDir:** Burn to CD (Alt+Shift+B); Mail (Control+M); Send to Text Editor (Control+T); Send to Word Processor (Control+W); SendTo Menu (Control+F10); Web Download (Alt+Shift+W).
 - **HomerView:** Web Download (Alt+Shift+W).
 
 ### marking
 
-- **DbDo:** Complete Mark (Shift+F8); Complete Unmark (Alt+Shift+F8); First Marked (Control+PageUp); Invert Marked (Control+I); Last Marked (Control+PageDown); Mark All (Control+A); Mark and Next (Shift+DownArrow); Mark and Previous (Shift+UpArrow); Mark Record (Control+M); Mark to First (Control+Shift+Home); Mark to Last (Control+Shift+End); Next Marked (Control+DownArrow); Previous Marked (Control+UpArrow); Start Mark or Unmark (F8); Toggle Mark (Control+Space); Toggle Mark (Space); Unmark All (Control+Shift+A); Unmark and Next (Control+Shift+DownArrow); Unmark and Previous (Control+Shift+UpArrow); Unmark Record (Control+Shift+M); Unmark to First (Control+Alt+Shift+Home); Unmark to Last (Control+Alt+Shift+End).
-- **FileDir:** Complete Mark (Shift+F8); Complete Unmark (Alt+Shift+F8); First Marked (Control+PageUp); Invert Marked (Control+I); Last Marked (Control+PageDown); Mark (;); Mark All (Control+A); Mark All Files (Alt+.); Mark and Next (Shift+DownArrow); Mark and Previous (Shift+UpArrow); Mark Duplicate Files (Alt+Shift+.); Mark Similar Files (Alt+Shift+,); Mark to First (Control+Shift+Home); Mark to First (Shift+Home); Mark to Last (Control+Shift+End); Mark to Last (Shift+End); Mark with Regex (Control+Shift+.); Next Marked (Control+DownArrow); Previous Marked (Control+UpArrow); Restore Marks (Control+Shift+S); Save Marks (Control+S); Start Mark or Unmark (F8); Toggle Mark (Control+Space); Toggle Mark (Space); Unmark (/); Unmark (Alt+Shift+NumPad5); Unmark All (Control+Shift+A); Unmark All but Current (Alt+,); Unmark and Next (Control+Shift+DownArrow); Unmark and Previous (Control+Shift+UpArrow); Unmark to First (Alt+Shift+Home); Unmark to First (Control+Alt+Shift+Home); Unmark to Last (Alt+Shift+End); Unmark to Last (Control+Alt+Shift+End).
+- **DbDo:** Complete Mark (Shift+F8); Complete Unmark (Alt+Shift+F8); First Marked (Control+PageUp); Invert Marked (Control+I); Last Marked (Control+PageDown); Mark All (Control+A); Mark and Next (Shift+.); Mark and Next (Shift+DownArrow); Mark and Previous (Shift+UpArrow); Mark Record (;); Mark to First (Control+Shift+Home); Mark to Last (Control+Shift+End); Next Marked (Control+DownArrow); Previous Marked (Control+UpArrow); Start Mark or Unmark (F8); Toggle Mark (Control+Space); Toggle Mark (Space); Unmark All (Control+Shift+A); Unmark and Next (Control+Shift+DownArrow); Unmark and Next (Shift+,); Unmark and Previous (Control+Shift+UpArrow); Unmark Record (/); Unmark to First (Control+Alt+Shift+Home); Unmark to Last (Control+Alt+Shift+End).
+- **FileDir:** Complete Mark (Shift+F8); Complete Unmark (Alt+Shift+F8); First Marked (Control+PageUp); Invert Marked (Control+I); Last Marked (Control+PageDown); Mark (;); Mark All (Control+A); Mark All Files (Alt+.); Mark and Next (Shift+.); Mark and Next (Shift+DownArrow); Mark and Previous (Shift+UpArrow); Mark Duplicate Files (Alt+Shift+.); Mark Similar Files (Alt+Shift+,); Mark to First (Control+Shift+Home); Mark to First (Shift+Home); Mark to Last (Control+Shift+End); Mark to Last (Shift+End); Mark with Regex (Control+Shift+.); Next Marked (Control+DownArrow); Previous Marked (Control+UpArrow); Restore Marks (Control+Shift+S); Save Marks (Control+S); Start Mark or Unmark (F8); Toggle Mark (Control+Space); Toggle Mark (Space); Unmark (/); Unmark (Alt+Shift+NumPad5); Unmark All (Control+Shift+A); Unmark All but Current (Alt+,); Unmark and Next (Control+Shift+DownArrow); Unmark and Next (Shift+,); Unmark and Previous (Control+Shift+UpArrow); Unmark to First (Alt+Shift+Home); Unmark to First (Control+Alt+Shift+Home); Unmark to Last (Alt+Shift+End); Unmark to Last (Control+Alt+Shift+End).
 
 ### media and play
 
@@ -628,7 +629,7 @@ In all, 705 key bindings in 52 groups; 0 in no group.
 
 ### reading aloud
 
-- **DbDo:** Read Lean (Alt+L); Read Lean from Current (Control+L); Read Lean Marked (Alt+Shift+L); Read Wide (Alt+F8); Read Wide (Alt+W); Read Wide from Current (Control+W); Read Wide Marked (Alt+Shift+W); Read Wide Marked (Shift+Space).
+- **DbDo:** Read Headed from Current (Control+H); Read Headed Marked (Alt+Shift+H); Read Lean (Alt+L); Read Lean from Current (Control+L); Read Lean Marked (Alt+Shift+L); Read Wide (Alt+F8); Read Wide (Alt+W); Read Wide from Current (Control+W); Read Wide Marked (Alt+Shift+W); Read Wide Marked (Shift+Space).
 - **EdSharp:** Read All (Alt+F8); Say Selected (Shift+JAWS+DownArrow); Say Selected (Shift+Space).
 - **FileDir:** Read Lean (Alt+F8); Read Lean (Alt+L); Read Lean from Current (Control+L); Read Lean Marked (Alt+Shift+L); Say Selected (Shift+JAWS+DownArrow); Say Selected (Shift+Space).
 - **HomerView:** Read All (Alt+F8); Say Selected (Shift+Space); Toggle Reading (ScrollLock).
@@ -647,7 +648,7 @@ In all, 705 key bindings in 52 groups; 0 in no group.
 
 ### repeat and next or previous
 
-- **DbDo:** Next Marked (Control+DownArrow); Next Table or View (Control+F6); Next Window (Control+Tab); Previous Marked (Control+UpArrow); Previous Table or View (Control+Shift+F6); Previous Window (Control+Shift+Tab).
+- **DbDo:** Next Marked (Control+DownArrow); Next Window (Control+Tab); Previous Marked (Control+UpArrow); Previous Window (Control+Shift+Tab).
 - **EdSharp:** Next Alignment (Control+]); Next Baseline (Control+6); Next Chunk (Alt+RightArrow); Next Font (Control+Dash); Next Indent (Control+I); Next Paragraph (Control+DownArrow); Next Part (Alt+PageDown); Next Section (Control+F6); Next Sentence (Alt+DownArrow); Next Style (Alt+.); Next Window (Control+Tab); Next Word (Control+RightArrow); Previous Alignment (Control+[); Previous Baseline (Control+Shift+6); Previous Chunk (Alt+LeftArrow); Previous Font (Control+Shift+Dash); Previous Indent (Control+Shift+I); Previous Paragraph (Control+UpArrow); Previous Part (Alt+PageUp); Previous Section (Control+Shift+F6); Previous Sentence (Alt+UpArrow); Previous Style (Alt+,); Previous Window (Control+Shift+Tab); Previous Word (Control+LeftArrow).
 - **FileDir:** Next Marked (Control+DownArrow); Next Pane (F6); Next Sibling Folder (Control+F6); Next Visited Folder (Alt+F6); Next Window (Control+Tab); Previous Marked (Control+UpArrow); Previous Pane (Shift+F6); Previous Sibling Folder (Control+Shift+F6); Previous Visited Folder (Alt+Shift+F6); Previous Window (Control+Shift+Tab).
 - **HomerView:** Next Different Kind (Alt+Z); Next Paragraph (Control+DownArrow); Next Same Kind (Z); Next Sentence (Alt+DownArrow); Previous Different Kind (Alt+Shift+Z); Previous Paragraph (Control+UpArrow); Previous Same Kind (Shift+Z); Previous Sentence (Alt+UpArrow).
@@ -661,7 +662,7 @@ In all, 705 key bindings in 52 groups; 0 in no group.
 
 ### say, on shift
 
-- **DbDo:** Say Added (Shift+A); Say Bookmark (Shift+B); Say Cell (Shift+C); Say Database (Shift+D); Say Edited (Shift+E); Say Filter (Shift+F); Say Filter and Order (Shift+8); Say Go to (Shift+G); Say ID (Shift+I); Say Invoke Script (Shift+V); Say Jump (Shift+J); Say Keywords (Shift+K); Say Look (Shift+L); Say Marked (Shift+M); Say Notes (Shift+N); Say Order (Shift+O); Say Prime (Shift+P); Say Query (Shift+Q); Say Replace Values (Shift+R); Say Select Columns (Shift+S); Say Status (Shift+Z); Say Tags (Shift+T); Say url (Shift+U); Say Whole Record (Shift+W); Say Windows Open (Shift+F4).
+- **DbDo:** Say Added (Shift+A); Say Bookmark (Shift+B); Say Cell (Shift+C); Say Database (Shift+D); Say Edited (Shift+E); Say Filter (Shift+F); Say Filter and Order (Shift+8); Say Go to (Shift+G); Say Header (Shift+H); Say ID (Shift+I); Say Invoke Script (Shift+V); Say Jump (Shift+J); Say Keywords (Shift+K); Say Look (Shift+L); Say Marked (Shift+M); Say Notes (Shift+N); Say Order (Shift+O); Say Prime (Shift+P); Say Query (Shift+Q); Say Replace Values (Shift+R); Say Shown Columns (Shift+S); Say Status (Shift+Z); Say Tags (Shift+T); Say url (Shift+U); Say Whole Record (Shift+W); Say Windows Open (Shift+F4).
 - **EdSharp:** Say Chunk (Shift+Backspace); Say Selected (Shift+Space); Say Windows Open (Shift+F4).
 - **FileDir:** Say Character Encoding (Shift+2); Say Date (Shift+D); Say Filter (Shift+F); Say Filter and Order (Shift+8); Say Folder Name (Shift+'); Say Item Name ('); Say Marked (Shift+M); Say Order (Shift+O); Say Position (Shift+5); Say Selected (Shift+Space); Say Size (Shift+S); Say Status (Shift+Z); Say Type (Shift+T); Say Unarchive Test (Shift+U); Say What Content (Shift+/); Say Windows Open (Shift+F4); Say Yield on Drive (Shift+Y).
 - **HomerView:** Say Chunk (Shift+Backspace); Say Selected (Shift+Space).
@@ -715,7 +716,7 @@ In all, 705 key bindings in 52 groups; 0 in no group.
 
 - **DbDo:** Read Only Toggle (Control+Shift+Z); Say Status (Alt+Z); Say Status (Shift+Z).
 - **EdSharp:** Redo (Control+Shift+Z); Say Status (Alt+Z); Undo (Control+Z).
-- **FileDir:** Say Status (Alt+Z); Say Status (Shift+Z); Timer Toggle (Alt+Shift+Z); Zip (Control+Shift+Z); Zip then Delete (Control+Z).
+- **FileDir:** Say Status (Alt+Z); Say Status (Shift+Z); Timer Toggle (Alt+Shift+Z); Zip (Control+Z); Zip then Delete (Control+Shift+Z).
 - **HomerView:** Next Different Kind (Alt+Z); Next Same Kind (Z); Previous Different Kind (Alt+Shift+Z); Previous Same Kind (Shift+Z).
 
 <!-- key groups end -->

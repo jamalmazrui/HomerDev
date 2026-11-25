@@ -61,6 +61,8 @@ Cell Down=the grid's virtual cursor, in DbDo's grid key code
 Cell Left=the grid's virtual cursor, in DbDo's grid key code
 Cell Right=the grid's virtual cursor, in DbDo's grid key code
 Cell Up=the grid's virtual cursor, in DbDo's grid key code
+Cell Value Down=the grid's virtual cursor, in DbDo's grid key code (24 November 2026: Alt+DownArrow says the cell alone)
+Cell Value Up=the grid's virtual cursor, in DbDo's grid key code (24 November 2026: Alt+UpArrow says the cell alone)
 Column Bottom=the grid's virtual cursor, in DbDo's grid key code
 Column Top=the grid's virtual cursor, in DbDo's grid key code
 Context Menu=Windows' own Shift+F10, which opens the grid's context menu
@@ -95,6 +97,10 @@ View Cycle Back=the window's view keys, in DbDo's key code
 ; or check box is never taken. No export can show it, so the whole command is set aside here; DbDo's auditPatterns
 ; still checks both keys against DbDo.cs.
 Toggle Mark=Space in DbDo's grid key code; Control+Space on the menu
+; SEMICOLON AND SLASH (24 November 2026): the suite's Mark and Unmark keys, taken in DbDo's grid KeyDown under Space's
+; type-ahead rule, so a semicolon or slash typed in a text box is never taken; set aside for the same reason as Toggle Mark.
+Mark Record=SemiColon in DbDo's grid key code
+Unmark Record=Slash in DbDo's grid key code
 
 [handled EdSharp]
 ; HANDLED OUTSIDE THE KIT'S ROUTER (1.239.0, 15 November 2026). check's exported keys step compares the keys a program
@@ -425,6 +431,7 @@ description=Play as Play Media does, and record what plays to Music, Homer Playe
 [command Mail]
 ; ONE MAIL (21 November 2026): Mail Body and Mail Attachment became Mail on Control+M, which puts the text in the body
 ; and attaches the file, so Control+Shift+M is free for FileDir's Move to Folder.
+; CONTROL+M IS MAIL IN EVERY HOMER APP (24 November 2026, Jamal), DbDo's Mail Record included.
 apps=EdSharp, FileDir
 key=Control+M
 description=Email {mailwhat}

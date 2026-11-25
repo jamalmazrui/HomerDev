@@ -195,7 +195,82 @@
 <h1 id="history">History</h1>
 <p>Each version is a level-2 heading, newest first, so your screen
 reader’s heading keys move from one version to the next.</p>
-<h2 id="november-2026-night">1.287.1 – 24 November 2026, night</h2>
+<h2 id="november-2026-late-evening">1.289.0 – 24 November 2026, late
+evening</h2>
+<ul>
+<li><strong>The suite’s keymap follows the day’s key rulings.</strong>
+In SuiteCommands.inix:
+<ul>
+<li>Semicolon marks and Slash unmarks in every Homer app that marks,
+DbDo and FileDir alike, and &gt; and &lt; (Shift+Period and Shift+Comma)
+mark or unmark and move to the next item in both.</li>
+<li>Control+M is Mail in every Homer app, DbDo’s Mail Record
+included.</li>
+<li>Control+Shift+M is Merge Data in DbDo and Merge File in EdSharp, and
+stays Move to Folder in FileDir.</li>
+<li>DbDo’s Open Table moves to Control+T and lists views too; Choose
+Table, Choose View and Control+F6’s Next and Previous Table or View are
+retired.</li>
+<li>DbDo’s Open Template Database moves to Control+Shift+O, a variation
+of Open, and Import Data stays on Control+Shift+I beside Export on
+Control+Shift+X.</li>
+<li>DbDo’s Alt+DownArrow and Alt+UpArrow are Cell Value Down and Up,
+which say the cell alone.</li>
+<li>FileDir’s FTP Put and Get FTP are retired. Each entry says what
+changed and why.</li>
+</ul></li>
+<li><strong>The catalog sets aside DbDo’s grid keys.</strong>
+SuiteCatalog.inix’s handled list adds Mark Record’s SemiColon, Unmark
+Record’s Slash and the two Cell Value commands, which DbDo takes in its
+grid’s own key code, as it already did for Toggle Mark’s Space.</li>
+<li><strong>keyGroups places every binding.</strong> Cell Value Down and
+Up join the grid table keys, EdSharp’s Merge File the clipboard group,
+and DbDo’s Read Headed commands the reading group, so no binding is left
+in no group. KeyGroups.md and CommandEcho.md are brought up to
+date.</li>
+</ul>
+<h2 id="november-2026-evening">1.288.0 – 24 November 2026, evening</h2>
+<ul>
+<li><strong>Speech gets plain words, never markup.</strong> New
+Conversion.toSpeech gives a file’s text as a screen reader should speak
+it, by the quickest route. A Markdown, reStructuredText or LaTeX
+document goes through Pandoc’s plain writer, and every result is cleared
+of the markup left: pound signs, list bullets, quote marks, table
+borders and bars, emphasis, code ticks, link addresses, attributes and
+tags. A numbered list keeps its numbers, and a table’s cells are
+separated by tabs. Source code, settings and data are spoken exactly as
+written. FileDir’s Say What Content is the first user;
+Conversion.plainForSpeech is there for any other.</li>
+<li><strong>The clipboard’s rich text as Markdown.</strong> New
+Conversion.clipboardMarkdown reads the clipboard’s web format, else its
+rich text, and has Pandoc write clean Markdown, without the divs, spans,
+attributes and raw HTML web pages carry. Conversion.htmlToMarkdown does
+the same for any HTML. EdSharp’s Paste as Markdown (Control+Shift+V) is
+the first user.</li>
+<li><strong>The keymap:</strong> EdSharp’s Paste as Markdown takes
+Control+Shift+V, and Paste File becomes Merge File on Alt+Shift+M,
+matching DbDo’s Merge Data.</li>
+</ul>
+<h2 id="november-2026-night">1.287.2 – 24 November 2026, night</h2>
+<ul>
+<li><strong>A link inside a link is now settled.</strong> Cutting the
+sample keys made fixPages finish Quarto’s page again, and it left one
+site-relative link there, so the AppHelpGuides build failed. The
+finisher read each link from its start to the first closing tag it met,
+so a link nested in another was taken as part of the outer one and never
+checked. It now settles the innermost links first, then each one left,
+as before. fixPages also names, in its log, any site-relative link it
+still leaves.</li>
+<li><strong>346 false gate failures are gone from every AppHelpGuides
+build.</strong> The check that decides whether a harvest can be deleted
+read each guide with its Windows line endings turned into bare line
+feeds, but the gates split a guide at Windows line endings. So each
+guide read as one long line, its contents seemed to run to the end of
+the file, and it failed a gate it had passed when built. The check now
+reads the guide as written. Harvests kept only because of this are
+deleted at the next build, as the rule says.</li>
+</ul>
+<h2 id="november-2026-night-1">1.287.1 – 24 November 2026, night</h2>
 <ul>
 <li><strong>No secret key is ever published.</strong> GitHub refused
 AppHelpGuides’ push of Stripe.htm, four times, because Stripe’s help
@@ -214,7 +289,7 @@ reached GitHub into the next commit, made from the files as they are,
 with git reset –soft, which keeps every file. Nothing already on GitHub
 is rewritten.</li>
 </ul>
-<h2 id="november-2026-night-1">1.287.0 – 24 November 2026, night</h2>
+<h2 id="november-2026-night-2">1.287.0 – 24 November 2026, night</h2>
 <ul>
 <li><strong>Stripe and Link have readers.</strong> Their harvests of 20
 November were waiting in datawith nothing to build them. One reader
@@ -234,7 +309,8 @@ completed a connection, by Python, curl or Edge, in four tries, and its
 community guidelines, the one page that came, are a policy rather than
 help. OOrion stays refused, as recorded on 23 November.</li>
 </ul>
-<h2 id="november-2026-evening">1.286.0 – 24 November 2026, evening</h2>
+<h2 id="november-2026-evening-1">1.286.0 – 24 November 2026,
+evening</h2>
 <ul>
 <li><strong>No id in a prime.</strong> The homer-db skill now says it: a
 prime never holds an id – the table’s own, a source’s or a link’s –
@@ -294,7 +370,7 @@ letter, a digit or Shift with a letter to quiet the reader’s typing
 echo, even where the app answers the key, because that would change the
 echo in every text box of the app too.</li>
 </ul>
-<h2 id="november-2026-night-2">1.282.0 – 23 November 2026, night</h2>
+<h2 id="november-2026-night-3">1.282.0 – 23 November 2026, night</h2>
 <ul>
 <li><strong>SuiteCommands.inix gains DbDo’s Read Headed family and Say
 Header.</strong> Read Headed Marked is on Alt+Shift+H and Read Headed
@@ -303,7 +379,7 @@ on Shift+H. Read Headed and Read Headed Marked from Current have no key,
 since Alt+H is the Help menu and Control+Shift is not a reading key.
 KeyDecisions.md says why, beside the wide, lean and yield families.</li>
 </ul>
-<h2 id="november-2026-evening-1">1.281.0 – 23 November 2026,
+<h2 id="november-2026-evening-2">1.281.0 – 23 November 2026,
 evening</h2>
 <ul>
 <li><strong>askTable.py answers a question about one table with the

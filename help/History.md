@@ -7,6 +7,31 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.289.0 -- 24 November 2026, late evening
+
+- **The suite's keymap follows the day's key rulings.** In SuiteCommands.inix:
+  - Semicolon marks and Slash unmarks in every Homer app that marks, DbDo and FileDir alike, and > and < (Shift+Period and Shift+Comma) mark or unmark and move to the next item in both.
+  - Control+M is Mail in every Homer app, DbDo's Mail Record included.
+  - Control+Shift+M is Merge Data in DbDo and Merge File in EdSharp, and stays Move to Folder in FileDir.
+  - DbDo's Open Table moves to Control+T and lists views too; Choose Table, Choose View and Control+F6's Next and Previous Table or View are retired.
+  - DbDo's Open Template Database moves to Control+Shift+O, a variation of Open, and Import Data stays on Control+Shift+I beside Export on Control+Shift+X.
+  - DbDo's Alt+DownArrow and Alt+UpArrow are Cell Value Down and Up, which say the cell alone.
+  - FileDir's FTP Put and Get FTP are retired.
+  Each entry says what changed and why.
+- **The catalog sets aside DbDo's grid keys.** SuiteCatalog.inix's handled list adds Mark Record's SemiColon, Unmark Record's Slash and the two Cell Value commands, which DbDo takes in its grid's own key code, as it already did for Toggle Mark's Space.
+- **keyGroups places every binding.** Cell Value Down and Up join the grid table keys, EdSharp's Merge File the clipboard group, and DbDo's Read Headed commands the reading group, so no binding is left in no group. KeyGroups.md and CommandEcho.md are brought up to date.
+
+## 1.288.0 -- 24 November 2026, evening
+
+- **Speech gets plain words, never markup.** New Conversion.toSpeech gives a file's text as a screen reader should speak it, by the quickest route. A Markdown, reStructuredText or LaTeX document goes through Pandoc's plain writer, and every result is cleared of the markup left: pound signs, list bullets, quote marks, table borders and bars, emphasis, code ticks, link addresses, attributes and tags. A numbered list keeps its numbers, and a table's cells are separated by tabs. Source code, settings and data are spoken exactly as written. FileDir's Say What Content is the first user; Conversion.plainForSpeech is there for any other.
+- **The clipboard's rich text as Markdown.** New Conversion.clipboardMarkdown reads the clipboard's web format, else its rich text, and has Pandoc write clean Markdown, without the divs, spans, attributes and raw HTML web pages carry. Conversion.htmlToMarkdown does the same for any HTML. EdSharp's Paste as Markdown (Control+Shift+V) is the first user.
+- **The keymap:** EdSharp's Paste as Markdown takes Control+Shift+V, and Paste File becomes Merge File on Alt+Shift+M, matching DbDo's Merge Data.
+
+## 1.287.2 -- 24 November 2026, night
+
+- **A link inside a link is now settled.** Cutting the sample keys made fixPages finish Quarto's page again, and it left one site-relative link there, so the AppHelpGuides build failed. The finisher read each link from its start to the first closing tag it met, so a link nested in another was taken as part of the outer one and never checked. It now settles the innermost links first, then each one left, as before. fixPages also names, in its log, any site-relative link it still leaves.
+- **346 false gate failures are gone from every AppHelpGuides build.** The check that decides whether a harvest can be deleted read each guide with its Windows line endings turned into bare line feeds, but the gates split a guide at Windows line endings. So each guide read as one long line, its contents seemed to run to the end of the file, and it failed a gate it had passed when built. The check now reads the guide as written. Harvests kept only because of this are deleted at the next build, as the rule says.
+
 ## 1.287.1 -- 24 November 2026, night
 
 - **No secret key is ever published.** GitHub refused AppHelpGuides' push of Stripe.htm, four times, because Stripe's help shows sample secret keys (sk_test_ and twenty-four letters and digits) and GitHub's push protection blocks any page holding one. buildGuide now cuts every string shaped like a secret key, token or access key to its prefix with "(key left out)": Stripe's secret, restricted and webhook keys, GitHub tokens, AWS access keys, Slack tokens and Google API keys. Five came out of Stripe.md. Since Stripe's harvest was already deleted, the build also mends every guide already in the collection, and fixPages makes its page again.

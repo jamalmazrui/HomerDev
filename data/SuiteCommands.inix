@@ -70,6 +70,20 @@ change=added 24 November 2026, from the pandas tutorials: a new column from a fo
 reason=used now and then, so it takes no key; the Alternate Menu finds it
 status=implemented
 
+[DbDo cellValueDown]
+name=Cell Value Down
+keys=Alt+DownArrow
+change=split from Cell Down, 24 November 2026; Cell Down keeps Alt+Control+DownArrow
+reason=Alt+DownArrow read the record's look before the cell; Jamal wanted only the cell, so each pair has its own role
+status=implemented
+
+[DbDo cellValueUp]
+name=Cell Value Up
+keys=Alt+UpArrow
+change=split from Cell Up, 24 November 2026; Cell Up keeps Alt+Control+UpArrow
+reason=as Cell Value Down
+status=implemented
+
 [DbDo chatAboutTable]
 name=Chat about Table
 keys=Shift+F12
@@ -82,13 +96,17 @@ status=current
 
 [DbDo chooseTable]
 name=Choose Table
-keys=Control+T
-status=current
+keys=
+change=retired 24 November 2026, was Control+T; hidden, keyless, still found by name
+reason=no need for two commands that open a table, one in the same window and one in a new one (Jamal); Open Table takes Control+T
+status=implemented
 
 [DbDo chooseView]
 name=Choose View
 keys=
-status=current
+change=off the menu 24 November 2026; hidden, still found by name
+reason=Open Table lists views beside tables and opens either in a new window; Control+F6 still moves a window among them
+status=implemented
 
 [DbDo chooseVisibleColumns]
 name=Choose Visible Columns
@@ -337,6 +355,20 @@ change=was Control+Shift+X, 5 November 2026
 reason=the suite's key, as EdSharp and FileDir; X began no word of its name, and its menu letter came from inside "Extract"
 status=implemented
 
+[DbDo markAndNext]
+name=Mark and Next
+keys=Shift+DownArrow or Shift+Period
+change=Shift+Period (>) restored, 24 November 2026 (retired in DbDo 1.0.74 for the type-ahead search)
+reason=an efficiency gain from the home row (Jamal); within a second of a typed letter or digit it still goes to the type-ahead search, as Space does
+status=implemented
+
+[DbDo unmarkAndNext]
+name=Unmark and Next
+keys=Control+Shift+DownArrow or Shift+Comma
+change=Shift+Comma (<) restored, 24 November 2026
+reason=as Mark and Next, and FileDir's key
+status=implemented
+
 [DbDo yieldWithRegex]
 name=Yield with Regex
 keys=Control+Shift+Y
@@ -437,8 +469,8 @@ status=current
 [DbDo import]
 name=Import Data
 keys=Control+Shift+I
-change=was Alt+I, 17 November 2026
-reason=the suite's import and export pair, Control+Shift+I and Control+Shift+X; Alt+I is Inspect Record
+change=was Alt+I, 17 November 2026; renamed Open Other Format on Control+Shift+O for a few hours on 24 November 2026, then restored
+reason=the suite's import and export pair, Control+Shift+I and Control+Shift+X (Jamal); Import makes a new DbDo database, while Open Database edits a file in its own format; Alt+I is Inspect Record
 status=implemented
 
 [DbDo inspectRecord]
@@ -499,8 +531,10 @@ status=current
 
 [DbDo mailRecord]
 name=Mail Record
-keys=
-status=current
+keys=Control+M
+change=keyless until 24 November 2026
+reason=Control+M is Mail in every Homer app, as in EdSharp and FileDir; it asks Marked or Current
+status=implemented
 
 [DbDo markAll]
 name=Mark All
@@ -509,14 +543,16 @@ status=current
 
 [DbDo markRecord]
 name=Mark Record
-keys=Control+M
-status=current
+keys=SemiColon
+change=was Control+M, 24 November 2026; taken in the grid's key code, under Space's type-ahead rule
+reason=Semicolon and Slash are the marking keys of every Homer app that marks, as in FileDir (Jamal); Control+M is Mail
+status=implemented
 
 [DbDo mergeData]
 name=Merge Data
-keys=Alt+Shift+M
-change=moved from Alt+M, 23 November 2026
-reason=on Alt+M it ran before the menu letter, so Alt+M could not open the Misc menu, as it does in EdSharp and FileDir
+keys=Control+Shift+M
+change=was Alt+Shift+M, 24 November 2026 (Alt+M until 23 November 2026)
+reason=merging changes data, which prefers Control; Control+Shift+M was freed when Semicolon and Slash became the marking keys; EdSharp's Merge File takes the same key
 status=implemented
 
 [DbDo newCopy]
@@ -541,8 +577,10 @@ status=current
 
 [DbDo nextTableOrView]
 name=Next Table or View
-keys=Control+F6
-status=current
+keys=
+change=retired 24 November 2026, was Control+F6; hidden, still found by name
+reason=it switched the current window to another table, the job of the retired Choose Table; Control+T opens a table or view in a window of its own and Control+Tab moves among windows, so Control+F6 had no distinct role (Jamal: distinguish or do not use)
+status=implemented
 
 [DbDo nextVisitedTable]
 name=Next Visited Table
@@ -596,8 +634,10 @@ status=current
 
 [DbDo openTable]
 name=Open Table
-keys=Control+Shift+O
-status=current
+keys=Control+T
+change=was Control+Shift+O, 24 November 2026; lists views too, and goes to the window a table is already in
+reason=T for Table; it opens and never cycles (Jamal); Choose Table retired, and Control+Shift+O went to Open Template Database
+status=implemented
 
 [DbDo openTableInNewWindow]
 name=Open Table in New Window
@@ -608,9 +648,9 @@ reason=it opened a SELECT in a new window exactly as Query (Control+Q) does, und
 
 [DbDo openTemplateDatabase]
 name=Open Template Database
-keys=Alt+D
-change=was Alt+Shift+D, 17 November 2026
-reason=the friendlier key, freed by Say Database
+keys=Control+Shift+O
+change=was Alt+D, 24 November 2026 (Alt+Shift+D until 17 November 2026)
+reason=Control+Shift+O is a variation of Control+O (Jamal): the templates are DbDo's special databases, as FileDir's Open Special Folder on the same key opens Windows' special folders
 status=implemented
 
 [DbDo openUrl]
@@ -664,8 +704,10 @@ status=current
 
 [DbDo previousTableOrView]
 name=Previous Table or View
-keys=Control+Shift+F6
-status=current
+keys=
+change=retired 24 November 2026, was Control+Shift+F6; hidden, still found by name
+reason=as Next Table or View
+status=implemented
 
 [DbDo previousVisitedTable]
 name=Previous Visited Table
@@ -1250,8 +1292,10 @@ status=current
 
 [DbDo unmarkRecord]
 name=Unmark Record
-keys=Control+Shift+M
-status=current
+keys=Slash
+change=was Control+Shift+M, 24 November 2026; taken in the grid's key code, under Space's type-ahead rule
+reason=as Mark Record; Control+Shift+M is Merge Data
+status=implemented
 
 [DbDo updateFromTemplate]
 name=Update from Template
@@ -1842,6 +1886,13 @@ name=Markdown to Plain Text
 keys=
 status=current
 
+[EdSharp mergeFile]
+name=Merge File
+keys=Control+Shift+M
+change=renamed from Paste File and moved from Control+Shift+V, 24 November 2026; Alt+Shift+M for a day
+reason=inserts another file at the cursor; Control+Shift+M and the word merge match DbDo's Merge Data; merging changes the document, which prefers Control
+status=implemented
+
 [EdSharp new]
 name=New
 keys=Control+N
@@ -1971,10 +2022,12 @@ name=Paste
 keys=Control+V
 status=current
 
-[EdSharp pasteFile]
-name=Paste File
+[EdSharp pasteAsMarkdown]
+name=Paste as Markdown
 keys=Control+Shift+V
-status=current
+change=new, 24 November 2026; Control+Shift+V was Paste File
+reason=the clipboard's rich text as Markdown, beside Paste on Control+V and the partner of Copy Rich Text on Control+Shift+C; Control+Shift+V is the suite's stronger paste, as FileDir's Paste Move
+status=implemented
 
 [EdSharp pathList]
 name=Path List
@@ -2979,8 +3032,8 @@ status=implemented
 [FileDir ftpPut]
 name=FTP Put
 keys=
-change=keys changed, was Shift+F, 16 November 2026
-reason=menu only: FTP is rarely used now; no Shift+letter acts: Shift letters only say or move (Jamal's phase, 16 November 2026)
+change=retired 24 November 2026 (menu only since 16 November 2026, was Shift+F)
+reason=unused (Jamal); the kit's Homer.Util.getFtpDir stays
 disposition=accepted
 status=implemented
 
@@ -2994,8 +3047,8 @@ status=implemented
 [FileDir getFTP]
 name=Get FTP
 keys=
-change=keys changed, was Shift+G, 16 November 2026
-reason=menu only: FTP is rarely used now; no Shift+letter acts: Shift letters only say or move (Jamal's phase, 16 November 2026)
+change=retired 24 November 2026 (menu only since 16 November 2026, was Shift+G)
+reason=unused (Jamal); the kit's Homer.Util.getFtpDir stays
 disposition=accepted
 status=implemented
 
@@ -3193,7 +3246,7 @@ status=implemented
 name=Mail
 keys=Control+M
 change=renamed from Mail Attachment and keys changed, was Control+Shift+M, 21 November 2026
-reason=Mail Attachment already put a lone file's text in the body, so Mail Body only repeated it; one Mail, as in EdSharp, frees Control+Shift+M for Move to Folder
+reason=Mail Attachment already put a lone file's text in the body, so Mail Body only repeated it; one Mail, as in EdSharp, frees Control+Shift+M for Move to Folder; 24 November 2026: Control+M is Mail in every Homer app (Jamal)
 disposition=ruled
 status=implemented
 
@@ -3209,7 +3262,7 @@ status=retired
 name=Mark
 keys=SemiColon
 change=renamed from Tag, was SemiColon or Shift+NumPad5
-reason=Shift+NumPad5 is a JAWS key
+reason=Shift+NumPad5 is a JAWS key; Semicolon and Slash are the marking keys of every Homer app that marks (24 November 2026)
 disposition=accepted
 status=implemented
 
@@ -3229,9 +3282,9 @@ status=implemented
 
 [FileDir markAndNext]
 name=Mark and Next
-keys=Shift+DownArrow
-change=Shift+Period dropped, 17 November 2026
-reason=Shift+letter says, never acts
+keys=Shift+DownArrow or Shift+Period
+change=Shift+Period (>) restored, 24 November 2026 (dropped 17 November 2026)
+reason=an efficiency gain from the home row (Jamal); the Shift+letter rule is about letters, and > is punctuation
 status=implemented
 
 [FileDir markAndPrevious]
@@ -3989,9 +4042,9 @@ status=implemented
 
 [FileDir unmarkAndNext]
 name=Unmark and Next
-keys=Control+Shift+DownArrow
-change=Shift+Comma dropped, 17 November 2026
-reason=Shift+letter says, never acts; DbDo's key
+keys=Control+Shift+DownArrow or Shift+Comma
+change=Shift+Comma (<) restored, 24 November 2026 (dropped 17 November 2026)
+reason=an efficiency gain from the home row (Jamal); the Shift+letter rule is about letters, and < is punctuation; DbDo has it too
 status=implemented
 
 [FileDir unmarkAndPrevious]

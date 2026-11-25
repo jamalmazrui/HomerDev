@@ -4503,7 +4503,11 @@ def pruneHarvests(sParent, sOutput, lPlan, lResults):
         if sProduct in dBuilt: bOk = dBuilt[sProduct] == 0
         elif os.path.isfile(sGuide):
             try:
-                sText = io.open(sGuide, "rb").read().decode("utf-8-sig", "replace").replace("\r\n", "\n")
+                # AS WRITTEN, LINE ENDINGS AND ALL (1.287.2): the gates split a guide at its Windows line endings, as
+                # buildGuide writes it. This check turned them into bare line feeds first, so every guide read as one
+                # line, its contents ran to the end of the file, and 346 guides failed a gate here that they had
+                # passed when built -- in every build's log, and keeping their harvests from being deleted.
+                sText = io.open(sGuide, "rb").read().decode("utf-8-sig", "replace")
                 bOk = not runGates(sProduct, sGuide, sText)
             except Exception: bOk = False
         else: bOk = False

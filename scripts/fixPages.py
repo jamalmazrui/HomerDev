@@ -114,8 +114,11 @@ def residue(sHtml, setLocal):
     setIds = set(re.findall(r'\sid="([^"]+)"', sHtml))
     iFragments = sum(1 for s in re.findall(r'href="#([^"]*)"', sHtml) if s not in setIds)
     iDuplicates = len(re.findall(r'\sid="([^"]+)"', sHtml)) - len(setIds)
-    iRelative = sum(1 for s in re.findall(r'<a\b[^>]*\bhref="([^"#][^"]*)"', sHtml)
-                    if not re.match(r"(?i)(https?:|mailto:|tel:|ftp:|data:|javascript:)", s) and s.split("#")[0].split("?")[0].lower() not in setLocal)
+    lsRelative = [s for s in re.findall(r'<a\b[^>]*\bhref="([^"#][^"]*)"', sHtml)
+                  if not re.match(r"(?i)(https?:|mailto:|tel:|ftp:|data:|javascript:)", s) and s.split("#")[0].split("?")[0].lower() not in setLocal]
+    iRelative = len(lsRelative)
+    # Named in the log, so a link the rules left can be found without opening the page (1.287.2).
+    for s in lsRelative[:5]: log("  site-relative link left: " + s)
     return {k: v for k, v in (("in-page links to nothing", iFragments), ("repeated IDs", iDuplicates), ("site-relative links", iRelative)) if v}
 
 
