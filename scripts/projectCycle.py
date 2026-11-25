@@ -232,6 +232,52 @@ def retireNamed(sRoot, lsNames, sWhy):
     return iMoved
 
 
+def mergePendingShows(sRoot):
+    """SHOWS TO ADD MAY ARRIVE IN A FILE OF THEIR OWN (1.291.0, 24 November 2026). A delivery that adds shows without
+    the collection's current data\\addShows.inix in hand cannot send a whole new one, which would drop the shows
+    already listed. It sends data\\addShows-<anything>.inix instead, and the cycle appends each of its sections that
+    addShows.inix lacks, with the comments before them, keeping the file's UTF-8 BOM and CRLF. A section already there,
+    by name in any case, is left as it was and logged. The merged file goes to notes\\retired, so it is merged once."""
+    import glob
+    sData = os.path.join(sRoot, "data")
+    sMain = os.path.join(sData, "addShows.inix")
+    lsPending = sorted((s for s in glob.glob(os.path.join(sData, "addShows-*.inix"))), key=str.lower)
+    if not lsPending: return 0
+    sMainText = io.open(sMain, "rb").read().decode("utf-8-sig", "replace").replace("\r\n", "\n") if os.path.isfile(sMain) else ""
+    setHave = set(s.lower() for s in re.findall(r"(?m)^\[([^\]]+)\]", sMainText))
+    iAdded = 0
+    for sPending in lsPending:
+        sText = io.open(sPending, "rb").read().decode("utf-8-sig", "replace").replace("\r\n", "\n")
+        # Each piece is a section with the comment lines just before it; the first piece is the file's opening note.
+        lsPieces = re.split(r"(?m)^(?=(?:;[^\n]*\n)*\[[^\]]+\])", sText)
+        lsKeep = []
+        for sPiece in lsPieces:
+            oName = re.search(r"(?m)^\[([^\]]+)\]", sPiece)
+            if not oName:
+                if sPiece.strip(): lsKeep.append(sPiece.strip("\n"))
+                continue
+            if oName.group(1).lower() in setHave:
+                log("SHOW ALREADY LISTED, left as it was: [%s] from %s" % (oName.group(1), sPending))
+                continue
+            setHave.add(oName.group(1).lower())
+            lsKeep.append(sPiece.strip("\n"))
+            log("SHOW ADDED to addShows.inix: [%s] from %s" % (oName.group(1), sPending))
+            iAdded += 1
+        if any(re.search(r"(?m)^\[", s) for s in lsKeep):
+            sMainText = sMainText.rstrip("\n") + "\n\n" + "\n\n".join(lsKeep) + "\n"
+            io.open(sMain, "wb").write(b"\xef\xbb\xbf" + sMainText.replace("\n", "\r\n").encode("utf-8"))
+        sFolder = os.path.join(sRoot, "notes", "retired")
+        os.makedirs(sFolder, exist_ok=True)
+        sTo, iNext = os.path.join(sFolder, os.path.basename(sPending)), 2
+        while os.path.exists(sTo):
+            sTo = os.path.join(sFolder, "%s-%d.inix" % (os.path.splitext(os.path.basename(sPending))[0], iNext))
+            iNext += 1
+        shutil.move(sPending, sTo)
+        log("MERGED %s into %s, then moved it to %s" % (sPending, sMain, sTo))
+    if iAdded: say("Added %d show%s to data\\addShows.inix." % (iAdded, "" if iAdded == 1 else "s"))
+    return iAdded
+
+
 def showsToAdd(sRoot):
     """The sections of data\\addShows.inix whose page, <Section>.md, is not at the top yet."""
     sPath = os.path.join(sRoot, "data", "addShows.inix")
@@ -423,6 +469,7 @@ def build(sRoot, sRole, sKit):
         # NEW SHOWS FIRST (1.209.0): a show listed in data\\addShows.inix without a page is found, fetched and built by
         # the collection's own scripts\\addShows, before the pages are finished. A show Apple's search cannot match is
         # logged by addShows and does not stop the cycle; only its option or crash codes (2, 4) do.
+        mergePendingShows(sRoot)
         lsNew = showsToAdd(sRoot)
         sAdd = os.path.join(sScripts, "addShows.py")
         if lsNew and os.path.isfile(sAdd):

@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.291.0 -- 24 November 2026, late night
+
+- **Shows to add can come in a file of their own.** A podcast collection's cycle now merges data\addShows-<anything>.inix into data\addShows.inix before it looks for new shows: each section the main file lacks is appended with its comments, keeping the file's BOM and CRLF; a section already listed is left as it was. The merged file then goes to notes\retired. This lets a delivery add shows without the current addShows.inix in hand, which a whole new file would have replaced, dropping the shows already listed. Tested on a scratch collection: one show appended, one already listed left alone, and the file retired.
+
 ## 1.290.0 -- 24 November 2026, late night
 
 - **A screen reader's own key can be answered by the app.** keys.py gains answerWithKey, which sends the app's key for a question the app answers better where the script is bound: in DbDo's grid, NVDA+F, the font, sends Say Field Type. The key-handling reference names it as a fifth way, "answer with the app's key", always only here, with the reader's own command everywhere else. In JAWS the same is done by overriding the reader's script by name, such as SayFont, so the key a person has for it, in either layout, is the key that works.

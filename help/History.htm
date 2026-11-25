@@ -195,7 +195,20 @@
 <h1 id="history">History</h1>
 <p>Each version is a level-2 heading, newest first, so your screen
 reader’s heading keys move from one version to the next.</p>
-<h2 id="november-2026-late-night">1.290.0 – 24 November 2026, late
+<h2 id="november-2026-late-night">1.291.0 – 24 November 2026, late
+night</h2>
+<ul>
+<li><strong>Shows to add can come in a file of their own.</strong> A
+podcast collection’s cycle now merges data-<anything>.inix into
+data.inix before it looks for new shows: each section the main file
+lacks is appended with its comments, keeping the file’s BOM and CRLF; a
+section already listed is left as it was. The merged file then goes to
+notes. This lets a delivery add shows without the current addShows.inix
+in hand, which a whole new file would have replaced, dropping the shows
+already listed. Tested on a scratch collection: one show appended, one
+already listed left alone, and the file retired.</li>
+</ul>
+<h2 id="november-2026-late-night-1">1.290.0 – 24 November 2026, late
 night</h2>
 <ul>
 <li><strong>A screen reader’s own key can be answered by the
@@ -400,7 +413,7 @@ plot’s points with a table of where they fall. The page puts it under
 “What the chart shows”, before the numbers, and the script prints it as
 description= for the log.</li>
 </ul>
-<h2 id="november-2026-late-night-1">1.283.0 – 23 November 2026, late
+<h2 id="november-2026-late-night-2">1.283.0 – 23 November 2026, late
 night</h2>
 <ul>
 <li><strong>askTable.py is retired.</strong> It answered a question
