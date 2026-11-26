@@ -93,10 +93,19 @@ class Cache:
         return self.dManifest.get(sUrl, {})
 
     def body(self, sUrl):
-        """The kept body of an address, or None."""
-        sFile = self.known(sUrl).get("file", "")
+        """The kept body of an address, or None. A DAMAGED COPY IS NO COPY (26 November 2026, from ChatGPT's plan for
+        BrailleMonitor: "retry unconditionally when a 304 refers to missing or damaged cached bytes"). A kept file
+        whose bytes no longer match the hash the manifest recorded is set aside, so the address is fetched afresh,
+        without If-None-Match, rather than a 304 confirming bytes that are gone or changed."""
+        dEntry = self.known(sUrl)
+        sFile = dEntry.get("file", "")
         sPath = os.path.join(self.sFiles, sFile) if sFile else ""
-        return io.open(sPath, "rb").read() if sPath and os.path.isfile(sPath) else None
+        if not (sPath and os.path.isfile(sPath)): return None
+        binBody = io.open(sPath, "rb").read()
+        if dEntry.get("hash") and hashlib.sha256(binBody).hexdigest() != dEntry["hash"]:
+            self.fLog("FETCH damaged %s: the kept file %s no longer matches its recorded hash, so it is fetched afresh" % (sUrl, sFile))
+            return None
+        return binBody
 
     def wait(self):
         """Keeps nDelay seconds between requests to the server."""

@@ -815,7 +815,7 @@ than guessed at. Folders are in the order you meet them.
 - **KeyMap.cs** -- the command-to-key registry behind the alternate menu, the key describer and the hotkey document
 - **KeyName.cs** -- key names as JAWS writes them, and the conversions to Windows, .NET, wxPython and Inno forms
 - **Lbc.cs** -- Layout By Code: every dialog, every control, add order as focus order, the status line, the list search, the line chords
-- **Log.cs** -- the session log: one file per run, named for when it began, with the environment and every error
+- **Log.cs** -- the session log: one file per run, named for when it began, with the environment and every error; watchUi logs any freeze of the window with its call stack
 - **Mdi.cs** -- the frame and child of a multiple-document app, with the window, job, settings and help commands built in
 - **Paths.cs** -- the folder layout: the two trees, the nine folders, and the shipped-default-then-user-copy pattern
 - **Say.cs** -- speech that reaches JAWS, NVDA and Narrator without the program knowing which is running

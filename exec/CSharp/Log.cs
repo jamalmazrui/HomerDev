@@ -68,6 +68,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using Microsoft.Win32;
 
 namespace Homer {
@@ -181,6 +182,111 @@ public static class Log
         {
             return false;
         }
+    }
+
+    // ------- the window that stops answering -------
+
+    // A STALL IS LOGGED WITH WHERE IT STOOD (26 November 2026). Jamal opened BrailleMonitor.db in DbDo, and moving
+    // down a row or across a cell sometimes froze for 14 to 18 seconds; Windows said "DbDo.exe is not responding".
+    // The session log showed the keys and the gaps between them, but nothing of what DbDo was doing in a gap, and a
+    // guess fixed in code costs a cycle when it is wrong. watchUi, called once on the window's thread before its
+    // message loop, starts a quiet background thread that asks the window's thread four times a second to note the
+    // time. When the window has not answered for iStallMs, the log gets a WARN line with how long, and the window
+    // thread's own call stack at that moment -- the method it is stuck in -- again every five seconds while it lasts
+    // (three at most), and a line when it ends with its whole length. Asking costs nothing a person can notice; the
+    // stack is read by pausing the window thread for an instant, which .NET Framework allows though it calls it
+    // obsolete, and is done only during a stall, which is already a pause. Any program in the kit can call it.
+    private static Thread oUiThread;
+    private static int iUiBeat;
+    private static int iUiAsked;
+
+    public static bool watchUi(int iStallMs)
+    {
+        try
+        {
+            SynchronizationContext oContext = SynchronizationContext.Current;
+            if (oContext == null) { info("stall watch not started: this thread has no window context"); return false; }
+            oUiThread = Thread.CurrentThread;
+            iUiBeat = Environment.TickCount;
+            Thread oWatch = new Thread(delegate()
+            {
+                bool bStalled = false;
+                int iStallStart = 0, iStacks = 0, iNextStack = 0;
+                while (fLog != null)
+                {
+                    Thread.Sleep(250);
+                    if (Interlocked.CompareExchange(ref iUiAsked, 1, 0) == 0)
+                    {
+                        try { oContext.Post(delegate(object o) { Interlocked.Exchange(ref iUiBeat, Environment.TickCount); Interlocked.Exchange(ref iUiAsked, 0); }, null); }
+                        catch { Interlocked.Exchange(ref iUiAsked, 0); }
+                    }
+                    int iAge = unchecked(Environment.TickCount - Interlocked.CompareExchange(ref iUiBeat, 0, 0));
+                    if (!bStalled && iAge >= iStallMs)
+                    {
+                        bStalled = true; iStallStart = unchecked(Environment.TickCount - iAge); iStacks = 1; iNextStack = Environment.TickCount + 5000;
+                        level("WARN", "ui stall began ms=" + iAge + " thread=" + oUiThread.ManagedThreadId + "\n" + uiStack());
+                    }
+                    else if (bStalled && iAge >= iStallMs && iStacks < 3 && unchecked(Environment.TickCount - iNextStack) >= 0)
+                    {
+                        iStacks++; iNextStack = Environment.TickCount + 5000;
+                        level("WARN", "ui stall continues ms=" + unchecked(Environment.TickCount - iStallStart) + "\n" + uiStack());
+                    }
+                    else if (bStalled && iAge < iStallMs)
+                    {
+                        bStalled = false;
+                        level("WARN", "ui stall ended ms=" + unchecked(Environment.TickCount - iStallStart - iAge));
+                    }
+                }
+            });
+            oWatch.IsBackground = true;
+            oWatch.Name = "Homer stall watch";
+            oWatch.Start();
+            info("stall watch started stallMs=" + iStallMs);
+            return true;
+        }
+        catch (Exception oError)
+        {
+            warn("stall watch not started: " + oError.Message);
+            return false;
+        }
+    }
+
+    // uiStack: the window thread's managed call stack, innermost first, twenty frames at most.
+    private static string uiStack()
+    {
+        StringBuilder oOut = new StringBuilder();
+        try
+        {
+            // The trace is read on a helper thread, and the window thread is resumed after one second whatever
+            // happens: if reading ever waited on something the paused thread holds, the window must not stay paused.
+            StackTrace oTrace = null;
+#pragma warning disable 618
+            oUiThread.Suspend();
+            try
+            {
+                Thread oReader = new Thread(delegate() { try { oTrace = new StackTrace(oUiThread, false); } catch { } });
+                oReader.IsBackground = true;
+                oReader.Start();
+                oReader.Join(1000);
+            }
+            finally { oUiThread.Resume(); }
+#pragma warning restore 618
+            if (oTrace == null) return "(the stack could not be read within a second)\n";
+            int iShown = 0;
+            foreach (StackFrame oFrame in oTrace.GetFrames() ?? new StackFrame[0])
+            {
+                MethodBase oMethod = oFrame.GetMethod();
+                if (oMethod == null) continue;
+                oOut.Append("at ").Append(oMethod.DeclaringType == null ? "" : oMethod.DeclaringType.FullName + ".").Append(oMethod.Name).Append("\n");
+                if (++iShown >= 20) break;
+            }
+            if (iShown == 0) oOut.Append("(no managed frames: the window thread is in native code, such as a COM or driver call)\n");
+        }
+        catch (Exception oError)
+        {
+            oOut.Append("(the stack could not be read: " + oError.Message + ")\n");
+        }
+        return oOut.ToString();
     }
 
     // ------- writing -------

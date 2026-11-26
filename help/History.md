@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.297.0 -- 26 November 2026, night
+
+- **A program's freezes are logged with where it stood.** The new `Homer.Log.watchUi(iStallMs)`, called once on a program's window thread before its message loop, starts a quiet background thread that asks the window four times a second to note the time. When the window has not answered for iStallMs, the log gets a WARN line saying how long, with the window thread's call stack at that moment; again every five seconds while the freeze lasts, three stacks at most; and a line with its whole length when it ends. The stack is read by pausing the window thread for an instant, on a helper thread given one second, so the watch can never leave the window paused. DbDo calls it first, after BrailleMonitor froze it for 14 to 18 seconds with nothing in the log to say why.
+
+## 1.296.1 -- 26 November 2026, afternoon
+
+- **homerFetch fetches a damaged copy afresh.** A kept file whose bytes no longer match the hash its manifest recorded is set aside and logged, and the address is fetched without If-None-Match, so a 304 can never confirm bytes that are gone or changed. A lesson from ChatGPT's plan for BrailleMonitor.
+
 ## 1.296.0 -- 26 November 2026, late afternoon
 
 - **yt-dlp's update now reaches the copy Setup checks.** 1.295.0's `yt-dlp -U` updated a copy, but the one first on the path -- a nightly build in C:\bin -- while Setup reads the version winget has on record for its own copy, which only winget changes, so the outcome still said MISMATCH. installCommon's wingetUpgrade now leaves the refused upgrade as a request file in TEMP, and Setup's kit code (HomerComponents.iss) runs every such request as the person who started Setup, which winget accepts, just before it confirms the outcomes; each is logged. The copy on the path still updates itself.

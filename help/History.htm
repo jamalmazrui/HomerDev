@@ -195,6 +195,30 @@
 <h1 id="history">History</h1>
 <p>Each version is a level-2 heading, newest first, so your screen
 reader’s heading keys move from one version to the next.</p>
+<h2 id="november-2026-night">1.297.0 – 26 November 2026, night</h2>
+<ul>
+<li><strong>A program’s freezes are logged with where it stood.</strong>
+The new <code>Homer.Log.watchUi(iStallMs)</code>, called once on a
+program’s window thread before its message loop, starts a quiet
+background thread that asks the window four times a second to note the
+time. When the window has not answered for iStallMs, the log gets a WARN
+line saying how long, with the window thread’s call stack at that
+moment; again every five seconds while the freeze lasts, three stacks at
+most; and a line with its whole length when it ends. The stack is read
+by pausing the window thread for an instant, on a helper thread given
+one second, so the watch can never leave the window paused. DbDo calls
+it first, after BrailleMonitor froze it for 14 to 18 seconds with
+nothing in the log to say why.</li>
+</ul>
+<h2 id="november-2026-afternoon">1.296.1 – 26 November 2026,
+afternoon</h2>
+<ul>
+<li><strong>homerFetch fetches a damaged copy afresh.</strong> A kept
+file whose bytes no longer match the hash its manifest recorded is set
+aside and logged, and the address is fetched without If-None-Match, so a
+304 can never confirm bytes that are gone or changed. A lesson from
+ChatGPT’s plan for BrailleMonitor.</li>
+</ul>
 <h2 id="november-2026-late-afternoon">1.296.0 – 26 November 2026, late
 afternoon</h2>
 <ul>
@@ -248,7 +272,7 @@ installPdfTools now upgrades both (eager), skips pip’s cache, tries the
 user’s own folder when the first write is refused, logs
 <code>pip show</code> of both, and reports a failure as one.</li>
 </ul>
-<h2 id="november-2026-afternoon">1.294.0 – 26 November 2026,
+<h2 id="november-2026-afternoon-1">1.294.0 – 26 November 2026,
 afternoon</h2>
 <ul>
 <li><strong>The Homer pattern is named, and broadened.</strong> The
@@ -296,7 +320,7 @@ apart from the program, such as a database too large for the installer.
 Like the shipped templates folder, it is read and never created by the
 program. DbDo is the first to read it.</li>
 </ul>
-<h2 id="november-2026-night">1.293.0 – 25 November 2026, night</h2>
+<h2 id="november-2026-night-1">1.293.0 – 25 November 2026, night</h2>
 <ul>
 <li><strong>SuiteCommands.offerHomerApps asks where a file goes
 next,</strong> the same way in every Homer program: the Homer programs
@@ -350,7 +374,7 @@ SuiteCommands records them retired: F3 and Shift+F3 repeat the last
 search or go in each program. DbDo’s and EdSharp’s Search Next and
 Search Previous name what they now repeat.</li>
 </ul>
-<h2 id="november-2026-afternoon-1">1.291.5 – 25 November 2026,
+<h2 id="november-2026-afternoon-2">1.291.5 – 25 November 2026,
 afternoon</h2>
 <ul>
 <li><strong>The suite catalog follows the menu review.</strong> Arrange
@@ -447,7 +471,7 @@ there.</li>
 <li><strong>SuiteCommands.inix</strong> adds DbDo’s Say Field Type
 (Alt+Shift+F) and records Say Cell’s change to the value alone.</li>
 </ul>
-<h2 id="november-2026-night-1">1.289.1 – 24 November 2026, night</h2>
+<h2 id="november-2026-night-2">1.289.1 – 24 November 2026, night</h2>
 <ul>
 <li><strong>Conversion.cs comes again, whole.</strong> EdSharp and
 FileDir stopped compiling on this computer: Conversion had no
@@ -519,7 +543,7 @@ the first user.</li>
 Control+Shift+V, and Paste File becomes Merge File on Alt+Shift+M,
 matching DbDo’s Merge Data.</li>
 </ul>
-<h2 id="november-2026-night-2">1.287.2 – 24 November 2026, night</h2>
+<h2 id="november-2026-night-3">1.287.2 – 24 November 2026, night</h2>
 <ul>
 <li><strong>A link inside a link is now settled.</strong> Cutting the
 sample keys made fixPages finish Quarto’s page again, and it left one
@@ -538,7 +562,7 @@ the file, and it failed a gate it had passed when built. The check now
 reads the guide as written. Harvests kept only because of this are
 deleted at the next build, as the rule says.</li>
 </ul>
-<h2 id="november-2026-night-3">1.287.1 – 24 November 2026, night</h2>
+<h2 id="november-2026-night-4">1.287.1 – 24 November 2026, night</h2>
 <ul>
 <li><strong>No secret key is ever published.</strong> GitHub refused
 AppHelpGuides’ push of Stripe.htm, four times, because Stripe’s help
@@ -557,7 +581,7 @@ reached GitHub into the next commit, made from the files as they are,
 with git reset –soft, which keeps every file. Nothing already on GitHub
 is rewritten.</li>
 </ul>
-<h2 id="november-2026-night-4">1.287.0 – 24 November 2026, night</h2>
+<h2 id="november-2026-night-5">1.287.0 – 24 November 2026, night</h2>
 <ul>
 <li><strong>Stripe and Link have readers.</strong> Their harvests of 20
 November were waiting in datawith nothing to build them. One reader
@@ -594,7 +618,7 @@ id, added and edited.</li>
 <li><strong>A database made from a CSV leaves id columns out of its
 prime,</strong> when any other field is left.</li>
 </ul>
-<h2 id="november-2026-afternoon-2">1.285.0 – 24 November 2026,
+<h2 id="november-2026-afternoon-3">1.285.0 – 24 November 2026,
 afternoon</h2>
 <ul>
 <li><strong>A line chart runs over a date column when one is
@@ -638,7 +662,7 @@ letter, a digit or Shift with a letter to quiet the reader’s typing
 echo, even where the app answers the key, because that would change the
 echo in every text box of the app too.</li>
 </ul>
-<h2 id="november-2026-night-5">1.282.0 – 23 November 2026, night</h2>
+<h2 id="november-2026-night-6">1.282.0 – 23 November 2026, night</h2>
 <ul>
 <li><strong>SuiteCommands.inix gains DbDo’s Read Headed family and Say
 Header.</strong> Read Headed Marked is on Alt+Shift+H and Read Headed
@@ -667,7 +691,7 @@ history file through the inix module. It runs from the command line
 scriptsuses it to measure reliability before any voice command is
 built.</li>
 </ul>
-<h2 id="november-2026-afternoon-3">1.280.0 – 23 November 2026,
+<h2 id="november-2026-afternoon-4">1.280.0 – 23 November 2026,
 afternoon</h2>
 <ul>
 <li><strong>Harvests are deleted once their guides are built.</strong>
@@ -694,7 +718,7 @@ knowledge base refused Python’s and curl’s TLS on every address; Edge
 brings Chromium’s. A five-second wait and a ceiling of 150 pages suit a
 Help Scout base.</li>
 </ul>
-<h2 id="november-2026-afternoon-4">1.279.0 – 23 November 2026,
+<h2 id="november-2026-afternoon-5">1.279.0 – 23 November 2026,
 afternoon</h2>
 <ul>
 <li><strong>The help guides gain PiccyBot.</strong> buildGuide reads
@@ -713,7 +737,7 @@ holds the questions alone; the preamble says so. Nine articles, about
 skill’s refusal rules: its English application page does not exist, and
 its English front page is 244 words.</li>
 </ul>
-<h2 id="november-2026-afternoon-5">1.278.0 – 23 November 2026,
+<h2 id="november-2026-afternoon-6">1.278.0 – 23 November 2026,
 afternoon</h2>
 <ul>
 <li><strong>Lbc has choice buttons that say what they hold.</strong>
