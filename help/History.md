@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.292.0 -- 25 November 2026, evening
+
+- **scripts\homerFetch.py fetches politely and keeps the last good copy,** for any Homer script that gathers from the web. It asks again with the server's ETag and Last-Modified, so an unchanged file costs a 304 and is read from the cache; it waits between requests, times out and retries; it stores each body under its SHA-256 hash, so a changed file never overwrites the copy before it; and it records every address in manifest.inix. bTrustKept lets an old item that will not change be read from the cache without asking. DbDo's makeBrailleForum is the first to use it.
+- **scripts\homerFts.py gives an SQLite table a full-text index that keeps itself current.** It makes an FTS5 index that reads its text from the table, not a second copy, with three triggers for add, edit and delete; the edit trigger fires only when an indexed field changes, so marking a record costs nothing. It can also rebuild, optimize and check the index against its table, and test whether an SQLite has FTS5 at all. Accents are folded by default, and English stemming is one setting away.
+
 ## 1.291.6 -- 25 November 2026, late afternoon
 
 - **Homer.Util.goToTarget reads a Go to entry the one Homer way:** 42 goes to position 42; +5 and -5 move 5; %50 goes halfway through the count; +%10 and -%10 move a tenth of it. A trailing percent (50%, +10%) reads the same. Every answer stays within 1 and the count, and an entry of another form returns 0 with the reason, so a program may read it another way. DbDo's Go to Record uses it first; any program with a numbered list can.

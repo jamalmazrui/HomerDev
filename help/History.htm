@@ -195,6 +195,26 @@
 <h1 id="history">History</h1>
 <p>Each version is a level-2 heading, newest first, so your screen
 reader’s heading keys move from one version to the next.</p>
+<h2 id="november-2026-evening">1.292.0 – 25 November 2026, evening</h2>
+<ul>
+<li><strong>scripts.py fetches politely and keeps the last good
+copy,</strong> for any Homer script that gathers from the web. It asks
+again with the server’s ETag and Last-Modified, so an unchanged file
+costs a 304 and is read from the cache; it waits between requests, times
+out and retries; it stores each body under its SHA-256 hash, so a
+changed file never overwrites the copy before it; and it records every
+address in manifest.inix. bTrustKept lets an old item that will not
+change be read from the cache without asking. DbDo’s makeBrailleForum is
+the first to use it.</li>
+<li><strong>scripts.py gives an SQLite table a full-text index that
+keeps itself current.</strong> It makes an FTS5 index that reads its
+text from the table, not a second copy, with three triggers for add,
+edit and delete; the edit trigger fires only when an indexed field
+changes, so marking a record costs nothing. It can also rebuild,
+optimize and check the index against its table, and test whether an
+SQLite has FTS5 at all. Accents are folded by default, and English
+stemming is one setting away.</li>
+</ul>
 <h2 id="november-2026-late-afternoon">1.291.6 – 25 November 2026, late
 afternoon</h2>
 <ul>
@@ -358,7 +378,8 @@ and DbDo’s Read Headed commands the reading group, so no binding is left
 in no group. KeyGroups.md and CommandEcho.md are brought up to
 date.</li>
 </ul>
-<h2 id="november-2026-evening">1.288.0 – 24 November 2026, evening</h2>
+<h2 id="november-2026-evening-1">1.288.0 – 24 November 2026,
+evening</h2>
 <ul>
 <li><strong>Speech gets plain words, never markup.</strong> New
 Conversion.toSpeech gives a file’s text as a screen reader should speak
@@ -438,7 +459,7 @@ completed a connection, by Python, curl or Edge, in four tries, and its
 community guidelines, the one page that came, are a policy rather than
 help. OOrion stays refused, as recorded on 23 November.</li>
 </ul>
-<h2 id="november-2026-evening-1">1.286.0 – 24 November 2026,
+<h2 id="november-2026-evening-2">1.286.0 – 24 November 2026,
 evening</h2>
 <ul>
 <li><strong>No id in a prime.</strong> The homer-db skill now says it: a
@@ -508,7 +529,7 @@ on Shift+H. Read Headed and Read Headed Marked from Current have no key,
 since Alt+H is the Help menu and Control+Shift is not a reading key.
 KeyDecisions.md says why, beside the wide, lean and yield families.</li>
 </ul>
-<h2 id="november-2026-evening-2">1.281.0 – 23 November 2026,
+<h2 id="november-2026-evening-3">1.281.0 – 23 November 2026,
 evening</h2>
 <ul>
 <li><strong>askTable.py answers a question about one table with the
