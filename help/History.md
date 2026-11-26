@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.293.1 -- 25 November 2026, nearly midnight
+
+- **Paths.userTemplates names %LOCALAPPDATA%\<App>\templates,** templates installed for a person apart from the program, such as a database too large for the installer. Like the shipped templates folder, it is read and never created by the program. DbDo is the first to read it.
+
 ## 1.293.0 -- 25 November 2026, night
 
 - **SuiteCommands.offerHomerApps asks where a file goes next,** the same way in every Homer program: the Homer programs that suit it (a folder FileDir, a database, workbook or data table DbDo, Markdown, text, code or settings EdSharp, CSV both), the asking program's own answers such as Windows default app, and Show in FileDir for a file. Only installed programs are offered, never the one asking, so a person without the suite is never asked. homerAppsFor gives the list alone. DbDo's Export Data and Open Cell Value and EdSharp's opening of a database or workbook use it first.

@@ -161,6 +161,11 @@ public static class Paths
     public static string shippedHelp() { return Path.Combine(installedFolder, "help"); }
     public static string shippedScripts() { return Path.Combine(installedFolder, "scripts"); }
         public static string shippedTemplates() { return Path.Combine(installedFolder, "templates"); }
+    // userTemplates: %LOCALAPPDATA%\<App>\templates, templates installed for this person apart from the program
+    // (1.293.1, 25 November 2026) -- a database too large to ship in the installer, such as DbDo's BrailleForum, put
+    // here by a build on the developer's computer or, later, by a download. The program treats them as it treats the
+    // shipped ones: it reads them and never writes them, and, like the shipped folder, it is not created here.
+    public static string userTemplates() { return Path.Combine(userFolder, "templates"); }
 
     private static string madeUnder(string sParent, string sChild)
     {
