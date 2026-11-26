@@ -8,6 +8,11 @@ description: >-
   reviewing any Homer program, script or build helper, or when asked about
   Camel Type, Hungarian prefixes, the kit's Log, Say, Lbc, Inix, Web, Paths or
   KeyMap, or how Homer files are encoded.
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Building Apps
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # Homer code

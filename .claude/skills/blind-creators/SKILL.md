@@ -10,6 +10,11 @@ description: >-
   consolidated Blind Creators listing; to audit a directory file for format
   and link problems; or to bump and package a new release — even if they only
   forward an email or name an app and ask "is this person worth listing."
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Data and Directories
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # Blind Creators Directories

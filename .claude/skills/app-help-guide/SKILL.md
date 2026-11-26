@@ -9,6 +9,11 @@ description: >-
   judge whether a product has help worth gathering, to clean publisher furniture
   out of an existing guide, or to decide whether an estate should be refused —
   even if they only name an app and say "add this one."
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Documents, Books and Media
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # App Help Guide

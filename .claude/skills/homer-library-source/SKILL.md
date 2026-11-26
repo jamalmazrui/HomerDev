@@ -12,6 +12,11 @@ description: >-
   asks to add a library, a reading service or a store to bookFido, to catalog
   books from somewhere new, or to harvest a site or file into a catalog the way
   bookFido does.
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Data and Directories
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # Adding a library source

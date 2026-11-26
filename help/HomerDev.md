@@ -2547,7 +2547,19 @@ guidance for skills and the Homer rules together:
   characters must be the `---` of its front matter (KeepEncoding.txt says so);
   every other file follows the Homer encoding.
 - **Packing**: `build` zips each skill into `exec\skills\<name>.zip`
-  for claude.ai.
+  for claude.ai, with the same packer as the Homer Skills page.
+- **License and group**: each SKILL.md says `license: MIT`, and under
+  `metadata` its author, its group (Building Apps; Data and Directories;
+  Documents, Books and Media) and its source. The group places it on the
+  Homer Skills page.
+- **Found by many agents**: `scripts\connectAI`, run by HomerDev's setup,
+  links every skill into the folders of Claude Code, Codex, GitHub Copilot,
+  Gemini CLI, Antigravity and Grok Build that it finds, and always into
+  `%USERPROFILE%\.agents\skills`, which most other agents read.
+  `scripts\skillsPage` writes the [Homer Skills page](https://JamalMazrui.github.io/HomerSkills/):
+  each skill with a zip for Claude or ChatGPT, one zip of all, an Agent
+  Skills discovery index and an llms.txt. MyPages' post runs it before each
+  post, so the page always shows the current skills.
 
 Two documents in the help folder look beyond the kit's own skills.
 [Accessibility Skills for AI Agents](https://github.com/JamalMazrui/A11ySkills), in its own repository, gathers 175 published

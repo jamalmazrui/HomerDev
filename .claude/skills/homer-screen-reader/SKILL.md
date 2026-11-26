@@ -9,6 +9,11 @@ description: >-
   adding or fixing JAWS scripts or an NVDA add-on, choosing a reader key,
   making a command work under both readers, or diagnosing why scripts do not
   load, compile or answer.
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Building Apps
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # Screen reader scripting

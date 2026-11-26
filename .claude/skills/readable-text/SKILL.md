@@ -1,6 +1,11 @@
 ---
 name: readable-text
 description: Edit machine-formatted or mechanically extracted text into readable, faithful human prose. Use for raw captions, transcripts, OCR output, hard-wrapped text, JSON/XML text records, escaped strings, and text exports when the user asks to clean up, reflow, or improve readability. Preserve source coverage and uncertainty; do not substitute a summary or invent missing content.
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Documents, Books and Media
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # Readable Text

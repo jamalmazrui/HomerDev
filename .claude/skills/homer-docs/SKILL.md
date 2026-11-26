@@ -8,6 +8,11 @@ description: >-
   link and key-naming conventions. Use when writing or revising any Homer
   document, a History entry, a Hotkeys list, release notes or a ReadMe, or when
   checking documents before a release.
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Documents, Books and Media
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # Homer documents

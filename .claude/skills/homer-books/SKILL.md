@@ -13,6 +13,11 @@ description: >-
   book, ebook, EPUB or Kindle title; asks about KDP, a book's catalog entry,
   its audit, its AI disclosure or its cover; or starts a new book project,
   even if they do not name the kit's tools.
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Documents, Books and Media
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # Homer book publishing

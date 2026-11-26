@@ -51,12 +51,24 @@ goto :done
 
 :update
 echo Python is installed. Making sure the PDF reader is current.
-set "sHomerRunLong=python -m pip install --upgrade pymupdf4llm"
+rem THREE REASONS IT SOMETIMES DID NOT UPDATE (26 November 2026). A failed pip still ended "goto :done" with exit 0, so
+rem Setup heard success; --upgrade alone leaves PyMuPDF, the engine pymupdf4llm drives, at whatever version it had; and
+rem a Python installed for all users cannot take a package from a window that is not elevated. Now the engine is
+rem upgraded with the reader (eager), pip's cache is not trusted for what is newest, a refused write is tried again
+rem in the user's own folder, and a failure is reported as one.
+set "sHomerRunLong=python -m pip install --upgrade --upgrade-strategy eager --no-cache-dir --disable-pip-version-check pymupdf4llm"
 call "%~dp0installCommon.cmd" runLong "the PDF tools"
 set "iCode=%ERRORLEVEL%"
-call "%~dp0installCommon.cmd" log "pip install pymupdf4llm exit code %iCode%"
-if "%iCode%"=="0" echo The PDF reader is current.
-if not "%iCode%"=="0" echo The PDF reader could not be updated; the log says why.
+call "%~dp0installCommon.cmd" log "pip install --upgrade pymupdf4llm exit code %iCode%"
+if "%iCode%"=="0" goto :updated
+set "sHomerRunLong=python -m pip install --user --upgrade --upgrade-strategy eager --no-cache-dir --disable-pip-version-check pymupdf4llm"
+call "%~dp0installCommon.cmd" runLong "the PDF tools"
+set "iCode=%ERRORLEVEL%"
+call "%~dp0installCommon.cmd" log "pip install --user --upgrade pymupdf4llm exit code %iCode%"
+if not "%iCode%"=="0" goto :failed
+:updated
+python -m pip show pymupdf4llm pymupdf >> "%log%" 2>&1
+echo The PDF reader is current.
 rem PYTHON IS NOT THIS COMPONENT'S TO UPDATE (13 October 2026). It upgraded Python 3.13 by name, which on a machine
 rem with another Python found nothing and said Python was the newest; told the truth, it would have failed the PDF
 rem tools' update for a Python they do not own. Python has its own component, installPython; this updates the reader.

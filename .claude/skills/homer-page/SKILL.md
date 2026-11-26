@@ -13,6 +13,11 @@ description: >-
   only say "postPage", "post it" or "put it online". Use it too when writing
   or changing the entries of a directory page (a lesson, presentation or
   episode, its description, links, fields, length or statistics).
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Data and Directories
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # Homer page

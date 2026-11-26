@@ -8,6 +8,11 @@ description: >-
   dialog, a command line and a multiple-document (MDI) app. Use when building
   or changing a dialog, menu or key binding, choosing a hotkey, deciding what
   the app should speak, or reviewing a Homer app's interface for accessibility.
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Building Apps
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # Homer user interface

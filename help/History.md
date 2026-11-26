@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.295.0 -- 26 November 2026, evening
+
+- **More agents find the skills.** connectAI, which setup runs, now also connects GitHub Copilot (its personal instructions and skills folders) and Grok Build (its skills folder), and always fills the shared `.agents\skills` folder of the Agent Skills standard, which Codex, Copilot, Gemini CLI, Grok Build, Cursor and many other agents read, whether or not any of them is installed yet.
+- **The Homer Skills page.** The new scripts\skillsPage makes a one-page directory of every skill from the skills themselves: groups, numbers, how each agent takes a skill, a zip of each skill for Claude or ChatGPT, one zip of all, an Agent Skills discovery index with a .tar.gz of each skill, and an llms.txt. MyPages' post runs it before each post. The archives are made the same way every time, so the page changes only when a skill does. The build packs exec\skills with the same packer.
+- **Every skill names its license and group.** Each SKILL.md now says `license: MIT`, and under `metadata` its author, group and source, as the standard allows.
+- **yt-dlp updates from setup again.** Setup runs as administrator, and winget will not upgrade a package that was installed for one user from there (-1978335107, "not permitted from an administrator context"), so yt-dlp stayed at 2026.10.26 through every update. installCommon's wingetUpgrade now returns 2 for that case, and installYtDlp lets yt-dlp update itself with `yt-dlp -U`, logging each copy before and after.
+- **The PDF tools update for real.** A failed pip update still ended with success, so setup was told all was well; PyMuPDF, the engine under pymupdf4llm, was never upgraded; and a Python installed for all users refused a write from a window that was not elevated. installPdfTools now upgrades both (eager), skips pip's cache, tries the user's own folder when the first write is refused, logs `pip show` of both, and reports a failure as one.
+
 ## 1.294.0 -- 26 November 2026, afternoon
 
 - **The Homer pattern is named, and broadened.** The search syntax every Homer program shares is now called the Homer pattern, the parallel of a regex pattern, in help\HomerSearch.md and every program's guide. It gains near everywhere: `"guide dog"~5` finds the words with at most five between them, as Lucene writes it. Where a caller names its fields, as DbDo does, it gains four parts that reuse the filter form's symbols: `%brail` letters anywhere, `title:convention` a whole word in one field, `title%conv` letters in one field, and `title=Here and There` the field exactly. A field part needs a real field name, so 50% and x=y stay text, and a program without fields reads them all as text, as before.

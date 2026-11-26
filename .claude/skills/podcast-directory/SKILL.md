@@ -9,6 +9,11 @@ description: >-
   into a file; turn a podcast feed or Apple Podcasts link into a browsable list;
   or add a show to a PodcastDirectories-style collection, even if they do not say
   the word "directory."
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Data and Directories
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # Podcast Directory Builder

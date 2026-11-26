@@ -1,6 +1,7 @@
 ﻿"""connectAI.py -- tell the AI command-line tools on this computer where the Homer Development Kit is, once.
 
-    connectAI              connect every AI tool found: Claude Code, OpenAI Codex, Gemini CLI and Antigravity
+    connectAI              connect every AI tool found: Claude Code, OpenAI Codex, GitHub Copilot, Gemini CLI and
+                           Antigravity, and Grok Build; and fill the shared .agents\\skills folder that many others read
     connectAI --remove     take back out everything connectAI put in
     connectAI --check      say what is connected, and change nothing
 
@@ -12,11 +13,20 @@ alone writes, and links each of the kit's skills into each personal skills folde
 is always the kit's current one, never a copy that drifts. Only tools whose folder exists in the user profile are
 touched. A skill folder of the person's own with the same name is never replaced; the log names it.
 
-WHERE EACH TOOL LOOKS (checked 11 October 2026; these move, and the kit's AGENTS.md is the fallback):
+WHERE EACH TOOL LOOKS (checked 11 October 2026, Copilot and Grok added 26 November 2026; these move, and the kit's
+AGENTS.md is the fallback):
+    agents    skills %USERPROFILE%\\.agents\\skills, always -- the shared personal folder of the Agent Skills standard,
+              read by Codex, GitHub Copilot, Gemini CLI, Grok Build, Cursor and a growing list of others
     claude    instructions %USERPROFILE%\\.claude\\CLAUDE.md;  skills %USERPROFILE%\\.claude\\skills
     codex     instructions %USERPROFILE%\\.codex\\AGENTS.md;   skills %USERPROFILE%\\.agents\\skills, %USERPROFILE%\\.codex\\skills
+    copilot   instructions %USERPROFILE%\\.copilot\\copilot-instructions.md; skills %USERPROFILE%\\.copilot\\skills
     gemini    instructions %USERPROFILE%\\.gemini\\GEMINI.md;  skills %USERPROFILE%\\.gemini\\config\\skills,
               %USERPROFILE%\\.gemini\\antigravity\\skills, %USERPROFILE%\\.agents\\skills (Antigravity and Gemini CLI)
+    grok      skills %USERPROFILE%\\.grok\\skills (Grok Build reads AGENTS.md in a project; no personal file is written)
+
+THE SHARED FOLDER ALWAYS (26 November 2026). Jamal asked that the kit's skills be found by more agents. Most agents now
+read %USERPROFILE%\\.agents\\skills, so it is filled whether or not any tool's own folder exists: an agent installed
+later finds the skills there with no second run.
 
 THE LOG goes to <kit>\\logs when the kit's folder can be written, else %LOCALAPPDATA%\\HomerDev\\logs (the installed
 kit in Program Files is read-only to a person), as HomerDev-connectAI-<stamp>.log.
@@ -26,11 +36,17 @@ import datetime, os, platform, shutil, stat, subprocess, sys
 
 sBegin = "<!-- HomerDev begin: written by the Homer Development Kit's connectAI; connectAI --remove takes it out -->"
 sEnd = "<!-- HomerDev end -->"
-dTools = {  # tool: (profile folder, instruction file, [skills folders]) -- all relative to the user profile
+dTools = {  # tool: (profile folder, instruction file, [skills folders]) -- all relative to the user profile; a profile
+    # folder of "" means always, and an instruction file of "" means none is written
+    "agents": ("", "", [".agents\\skills"]),
     "claude": (".claude", ".claude\\CLAUDE.md", [".claude\\skills"]),
     "codex": (".codex", ".codex\\AGENTS.md", [".agents\\skills", ".codex\\skills"]),
+    "copilot": (".copilot", ".copilot\\copilot-instructions.md", [".copilot\\skills"]),
     "gemini": (".gemini", ".gemini\\GEMINI.md", [".gemini\\config\\skills", ".gemini\\antigravity\\skills", ".agents\\skills"]),
+    "grok": (".grok", "", [".grok\\skills"]),
 }
+dToolNames = {"agents": "the shared agents folder", "claude": "Claude Code", "codex": "Codex", "copilot": "GitHub Copilot",
+              "gemini": "Gemini CLI with Antigravity", "grok": "Grok Build"}
 
 lsLog = []
 sLogPath = ""
@@ -211,15 +227,17 @@ def main(lsArgs):
     lsDoneFolders = set()
     for sTool in sorted(dTools):
         sProfile, sInstructions, lsSkillDirs = dTools[sTool]
-        if not os.path.isdir(inProfile(sHome, sProfile)):
+        if sProfile and not os.path.isdir(inProfile(sHome, sProfile)):
             logLine("%s: no %s folder in the profile, so it is not installed or never run; skipped" % (sTool, sProfile)); continue
-        iFound += 1
+        if sProfile: iFound += 1
         # A TOOL IS CONNECTED WHEN ITS LINKS ARE (12 October 2026, from an audit): it was listed the moment its profile
         # folder was found, before a single link was tried, so a run whose links all failed still said "connected".
-        sToolName = {"claude": "Claude Code", "codex": "Codex", "gemini": "Gemini CLI with Antigravity"}.get(sTool, sTool)
+        sToolName = dToolNames.get(sTool, sTool)
         dFailed[sToolName] = 0
-        sFile = inProfile(sHome, sInstructions)
-        if bCheck:
+        sFile = inProfile(sHome, sInstructions) if sInstructions else ""
+        if not sFile:
+            pass
+        elif bCheck:
             bHas = os.path.isfile(sFile) and sBegin in open(sFile, "rb").read().decode("utf-8-sig", errors="replace")
             say("%s: %s %s the kit's pointer." % (sTool, sFile, "holds" if bHas else "does not hold"))
         else:
@@ -280,8 +298,8 @@ def main(lsArgs):
             with open(os.path.join(sDir, "connectAI-result.txt"), "w", encoding="utf-8") as oFile: oFile.write(sLine)
         except Exception as oError: logLine("result line not written: %s" % oError)
     if iFound == 0:
-        say("No AI command-line tool was found: none of .claude, .codex or .gemini is in %s. Run a tool once, then this again." % sHome)
-        writeResult("AI tools: none found -- no Claude Code, Codex or Gemini in this profile. Run one once, then scripts\\connectAI in the kit's folder.")
+        say("No AI command-line tool was found: none of .claude, .codex, .copilot, .gemini or .grok is in %s. The skills are in %s, which most agents read; run a tool once, then this again." % (sHome, inProfile(sHome, ".agents\\skills")))
+        writeResult("AI tools: none found -- no Claude Code, Codex, Copilot, Gemini or Grok in this profile; the skills are in .agents\\skills for any agent. Run one once, then scripts\\connectAI in the kit's folder.")
         return 0
     lsConnected = [s for s in dFailed if dFailed[s] == 0]
     lsPartly = ["%s (%d skill link%s failed)" % (s, dFailed[s], "" if dFailed[s] == 1 else "s") for s in dFailed if dFailed[s]]

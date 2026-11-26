@@ -121,6 +121,14 @@ rem winget upgrade answers such a copy with "no installed package found" (-19783
 rem installed in its default machine-wide folder instead, and the result is reported like any other.
 rem Labels rather than a parenthesized block, so the exit code is read when it is set whether or not the calling
 rem script turned on delayed expansion.
+rem USER SCOPE, ADMINISTRATOR CONTEXT (26 November 2026). Setup runs elevated, and winget refuses to upgrade a package a
+rem user installed for himself alone: "The requested operation is not permitted from an administrator context on
+rem packages installed within the user scope" (-1978335107). yt-dlp stayed at 2026.10.26 through every update for this.
+rem Exit code 2 tells the calling script so, and a script whose program can update itself (yt-dlp -U) does that.
+if "%iHomerUpgrade%"=="-1978335107" (
+  >> "%log%" echo %date% %time% winget will not upgrade %~2 from an administrator context, because it was installed for one user; exit code 2 for the calling script
+  exit /b 2
+)
 if not "%iHomerUpgrade%"=="-1978335212" exit /b 1
 >> "%log%" echo %date% %time% winget knows no installed %~2, so the newest release is installed instead
 set "sHomerRunLong=winget install --id %~2 --exact --silent --accept-source-agreements --accept-package-agreements --disable-interactivity"

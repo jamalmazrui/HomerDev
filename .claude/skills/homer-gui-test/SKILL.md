@@ -12,6 +12,11 @@ description: >-
   tutorial's Hear lines, find unnamed or unreachable controls, or record a
   session for a tutorial. Not for checking a document file (use homer-quality) or
   writing a tutorial script (use homer-tutorial, which these runs confirm).
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Building Apps
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # Testing an app the way a screen reader user meets it

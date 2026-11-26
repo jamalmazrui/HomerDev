@@ -12,6 +12,11 @@ description: >-
   field, build a Trail template, write SQL or a script against a DbDo
   database, import data into one, or asks why DbDo does not see or speak
   something in a .db file -- even if they only say "a table for my books".
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Data and Directories
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # Homer databases

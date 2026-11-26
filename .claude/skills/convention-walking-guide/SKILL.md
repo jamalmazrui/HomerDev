@@ -1,6 +1,11 @@
 ---
 name: convention-walking-guide
 description: Research and write evidence-based convention walking, travel, and hotel orientation guides for blind white cane and guide dog users. Use for national or state conventions, conference venues, floor-plan interpretation, route updates, or attendee navigation instructions, including free mobile orientation tools supported by blind users' experience.
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Documents, Books and Media
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # Convention Walking Guide

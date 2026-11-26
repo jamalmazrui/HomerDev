@@ -10,6 +10,11 @@ description: >-
   DbDo database like JobTrail. Use when asked to create, scaffold or begin a
   new Homer app, tool or program, or to turn an idea into a working Homer
   project.
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Building Apps
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # A new Homer app

@@ -195,6 +195,40 @@
 <h1 id="history">History</h1>
 <p>Each version is a level-2 heading, newest first, so your screen
 reader’s heading keys move from one version to the next.</p>
+<h2 id="november-2026-evening">1.295.0 – 26 November 2026, evening</h2>
+<ul>
+<li><strong>More agents find the skills.</strong> connectAI, which setup
+runs, now also connects GitHub Copilot (its personal instructions and
+skills folders) and Grok Build (its skills folder), and always fills the
+shared <code>.agents\skills</code> folder of the Agent Skills standard,
+which Codex, Copilot, Gemini CLI, Grok Build, Cursor and many other
+agents read, whether or not any of them is installed yet.</li>
+<li><strong>The Homer Skills page.</strong> The new scriptsmakes a
+one-page directory of every skill from the skills themselves: groups,
+numbers, how each agent takes a skill, a zip of each skill for Claude or
+ChatGPT, one zip of all, an Agent Skills discovery index with a .tar.gz
+of each skill, and an llms.txt. MyPages’ post runs it before each post.
+The archives are made the same way every time, so the page changes only
+when a skill does. The build packs execwith the same packer.</li>
+<li><strong>Every skill names its license and group.</strong> Each
+SKILL.md now says <code>license: MIT</code>, and under
+<code>metadata</code> its author, group and source, as the standard
+allows.</li>
+<li><strong>yt-dlp updates from setup again.</strong> Setup runs as
+administrator, and winget will not upgrade a package that was installed
+for one user from there (-1978335107, “not permitted from an
+administrator context”), so yt-dlp stayed at 2026.10.26 through every
+update. installCommon’s wingetUpgrade now returns 2 for that case, and
+installYtDlp lets yt-dlp update itself with <code>yt-dlp -U</code>,
+logging each copy before and after.</li>
+<li><strong>The PDF tools update for real.</strong> A failed pip update
+still ended with success, so setup was told all was well; PyMuPDF, the
+engine under pymupdf4llm, was never upgraded; and a Python installed for
+all users refused a write from a window that was not elevated.
+installPdfTools now upgrades both (eager), skips pip’s cache, tries the
+user’s own folder when the first write is refused, logs
+<code>pip show</code> of both, and reports a failure as one.</li>
+</ul>
 <h2 id="november-2026-afternoon">1.294.0 – 26 November 2026,
 afternoon</h2>
 <ul>
@@ -259,7 +293,8 @@ index and its shadow tables are SQLite’s bookkeeping, with no id, prime
 or marked to check; DbDo’s BrailleForum push failed on 27 findings about
 them.</li>
 </ul>
-<h2 id="november-2026-evening">1.292.0 – 25 November 2026, evening</h2>
+<h2 id="november-2026-evening-1">1.292.0 – 25 November 2026,
+evening</h2>
 <ul>
 <li><strong>scripts.py fetches politely and keeps the last good
 copy,</strong> for any Homer script that gathers from the web. It asks
@@ -442,7 +477,7 @@ and DbDo’s Read Headed commands the reading group, so no binding is left
 in no group. KeyGroups.md and CommandEcho.md are brought up to
 date.</li>
 </ul>
-<h2 id="november-2026-evening-1">1.288.0 – 24 November 2026,
+<h2 id="november-2026-evening-2">1.288.0 – 24 November 2026,
 evening</h2>
 <ul>
 <li><strong>Speech gets plain words, never markup.</strong> New
@@ -523,7 +558,7 @@ completed a connection, by Python, curl or Edge, in four tries, and its
 community guidelines, the one page that came, are a policy rather than
 help. OOrion stays refused, as recorded on 23 November.</li>
 </ul>
-<h2 id="november-2026-evening-2">1.286.0 – 24 November 2026,
+<h2 id="november-2026-evening-3">1.286.0 – 24 November 2026,
 evening</h2>
 <ul>
 <li><strong>No id in a prime.</strong> The homer-db skill now says it: a
@@ -593,7 +628,7 @@ on Shift+H. Read Headed and Read Headed Marked from Current have no key,
 since Alt+H is the Help menu and Control+Shift is not a reading key.
 KeyDecisions.md says why, beside the wide, lean and yield families.</li>
 </ul>
-<h2 id="november-2026-evening-3">1.281.0 – 23 November 2026,
+<h2 id="november-2026-evening-4">1.281.0 – 23 November 2026,
 evening</h2>
 <ul>
 <li><strong>askTable.py answers a question about one table with the

@@ -7,6 +7,11 @@ description: >-
   single-dialog app, in C# or Python, through the kit's Elevate class. Use when
   an app needs an update check, when F11 or "Elevate Version" misbehaves, or
   when the Help box or Help menu should report the version.
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Building Apps
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # Elevate Version

@@ -12,6 +12,11 @@ description: >-
   navigate or share the agenda of a convention, conference, summit, expo,
   workshop series or annual meeting, or asks for an accessible schedule,
   personal itinerary or speaker directory of one.
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Data and Directories
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # Convention database

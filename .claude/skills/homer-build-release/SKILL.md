@@ -7,6 +7,11 @@ description: >-
   temp.zip) and says "continue", asks why a build, tidy, push, release or a check inside them
   failed, asks whether an app is released or which version is latest, or asks
   what to run next for an app in C:\_APP_ or C:\HomerDev.
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Building Apps
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # Homer build and release

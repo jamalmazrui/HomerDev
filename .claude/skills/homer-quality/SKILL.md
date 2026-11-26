@@ -10,6 +10,11 @@ description: >-
   audited, asks why a screen reader reads a file badly, or wants a file a Homer
   app made verified before sending it. Not for an app's own documents (use
   homer-docs) or a Kindle book's full audit (use homer-books).
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Documents, Books and Media
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # Checking a document's quality

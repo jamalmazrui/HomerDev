@@ -1223,7 +1223,6 @@ def packSkills():
     acting, scripts\\ with a .cmd beside every script. claude.ai takes a skill
     as a zip holding that one folder, so the build makes one per skill.
     Returns the number packed."""
-    import zipfile
     sSkills = os.path.join(sScriptDir, ".claude", "skills")
     sOut = os.path.join(sScriptDir, "exec", "skills")
     if not os.path.isdir(sSkills): return 0
@@ -1233,13 +1232,11 @@ def packSkills():
         sFolder = os.path.join(sSkills, sName)
         if not os.path.isfile(os.path.join(sFolder, "SKILL.md")): continue
         sZip = os.path.join(sOut, sName + ".zip")
-        with zipfile.ZipFile(sZip, "w", zipfile.ZIP_DEFLATED) as oZip:
-            for sDir, lsDirs, lsFiles in os.walk(sFolder):
-                lsDirs[:] = [s for s in lsDirs if s != "__pycache__"]
-                for sFile in sorted(lsFiles):
-                    if sFile.lower().endswith(".htm"): continue
-                    sPath = os.path.join(sDir, sFile)
-                    oZip.write(sPath, os.path.relpath(sPath, sSkills))
+        # ONE WAY TO PACK A SKILL (26 November 2026): scripts\skillsPage.py packs the same zips for the Homer Skills
+        # page, with fixed dates so the same skill gives the same bytes; the build uses it rather than a second packer.
+        sys.path.insert(0, os.path.join(sScriptDir, "scripts"))
+        import skillsPage
+        skillsPage.packSkill(sSkills, sName, sZip)
         logLine("skill packed name=%s zip=%s" % (sName, logValue(sZip)))
         iPacked += 1
     return iPacked

@@ -9,6 +9,11 @@ description: >-
   -- and Results box. Use when making a new launch app, changing one's dialog,
   switches, progress, Results box or logging, or checking that one still
   follows the pattern.
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Building Apps
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # Homer launch dialog

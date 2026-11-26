@@ -11,6 +11,11 @@ description: >-
   to convert, export or import a file, change a file's format, make the .htm of
   a .md, add a conversion to an app or to the route table, or work out why a
   conversion took the way it did.
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Documents, Books and Media
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # Converting files

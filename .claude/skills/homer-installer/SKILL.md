@@ -8,6 +8,11 @@ description: >-
   logging. Use when creating or changing a _APP__setup.iss, when a finish-page
   box is worded, marked or ordered wrongly, when a component is detected wrongly
   or reinstalled needlessly, or when an install script misbehaves.
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Building Apps
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # Homer installers

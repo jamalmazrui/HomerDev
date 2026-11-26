@@ -8,6 +8,11 @@ description: >-
   files that change. Use when asked to migrate, convert, port or modernize an
   app to HomerDev, to audit an app against the kit, or to find out why an app
   that once built no longer builds after a kit change.
+license: MIT
+metadata:
+  author: Jamal Mazrui
+  group: Building Apps
+  source: https://github.com/JamalMazrui/HomerDev
 ---
 
 # Bringing an app onto the kit
