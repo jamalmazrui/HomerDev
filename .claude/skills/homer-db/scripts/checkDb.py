@@ -79,8 +79,15 @@ def checkDatabase(sPath):
     lsFindings = []
     def note(sVerdict, sSubject, sEvidence): lsFindings.append((sVerdict, sSubject, sEvidence))
     oCon = sqlite3.connect("file:%s?mode=ro" % sPath.replace("\\", "/"), uri=True)
-    lsTables = [r[0] for r in oCon.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
-                if not isSystemTable(r[0])]
+    # A FULL-TEXT INDEX IS NOT A TABLE (HomerDev 1.292.1, 25 November 2026). An SQLite FTS5 index, such as BrailleForum's
+    # articles_fts made by the kit's homerFts, is a virtual table with four shadow tables (_config, _data, _docsize, _idx).
+    # They are SQLite's bookkeeping, with no id, prime or marked to check; DbDo hides them and checkTemplates skips them.
+    # The first BrailleForum push failed here, on 27 findings about them.
+    lRows = oCon.execute("SELECT name, COALESCE(sql, '') FROM sqlite_master WHERE type='table' ORDER BY name").fetchall()
+    lsVirtual = [sName for sName, sSql in lRows if sSql.lstrip().upper().startswith("CREATE VIRTUAL")]
+    lsTables = [sName for sName, sSql in lRows if not isSystemTable(sName) and sName not in lsVirtual
+                and not any(sName.startswith(sVirtual + "_") for sVirtual in lsVirtual)]
+    if lsVirtual: note("pass", ", ".join(lsVirtual), "a full-text or other virtual table, with its shadow tables, is SQLite's own and not checked as a table")
     lsTriggers = [r[0].lower() for r in oCon.execute("SELECT name FROM sqlite_master WHERE type='trigger'")]
     lsUser = [s for s in lsTables if s.lower() not in lsOwnTables]
     dPrimes = {}

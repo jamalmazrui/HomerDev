@@ -540,6 +540,82 @@ public static class SuiteCommands {
         }
     }
 
+    // ---- carrying on in another Homer app (kit 1.293.0, 25 November 2026) ----
+    //
+    // JAMAL'S QUESTION: which commands "warrant a subdialog with a choice that includes transfer of the file format or
+    // data situation ... to another app of the Homer Suite, e.g., EdSharp to edit a .md file; FileDir to navigate a
+    // folder; or DbDo to manage a dataset." The answer was a few: where a command makes or reaches a file outside its own
+    // app's domain and would otherwise hand it to Windows or Notepad -- DbDo's Export Data and Open Cell Value, and
+    // EdSharp opening a database or workbook. They all ask the same question here, so it reads alike in every app.
+    //
+    // WHAT FITS WHAT. A folder is FileDir's. A database, workbook or data table is DbDo's. Text a person reads or edits
+    // -- Markdown, plain text, settings, code, a web page's source -- is EdSharp's. CSV and TSV are both DbDo's and
+    // EdSharp's: rows to manage, or text to edit. Only apps installed on this computer are offered, and never the app
+    // asking, so a person without the suite is never asked at all.
+
+    private static readonly string[] asDataExtensions = { ".accdb", ".csv", ".db", ".db3", ".dbf", ".mdb", ".sqlite", ".sqlite3", ".tsv", ".xls", ".xlsm", ".xlsx" };
+    private static readonly string[] asTextExtensions = { ".bat", ".cmd", ".cs", ".css", ".csv", ".htm", ".html", ".inix", ".ini", ".js", ".json",
+        ".log", ".markdown", ".md", ".ps1", ".py", ".sql", ".tsv", ".txt", ".xml", ".yaml", ".yml" };
+
+    // homerAppsFor: the Homer apps that suit a path, best first, without sThisApp and without those not installed.
+    public static List<string> homerAppsFor(string sPath, string sThisApp) {
+        List<string> lsApps = new List<string>();
+        if (string.IsNullOrEmpty(sPath)) return lsApps;
+        string sExt = "";
+        try { sExt = System.IO.Path.GetExtension(sPath).ToLowerInvariant(); } catch (Exception) { }
+        if (System.IO.Directory.Exists(sPath)) lsApps.Add("FileDir");
+        else {
+            bool bData = Array.IndexOf(asDataExtensions, sExt) >= 0, bText = Array.IndexOf(asTextExtensions, sExt) >= 0;
+            if (bData) lsApps.Add("DbDo");
+            if (bText) lsApps.Add("EdSharp");
+        }
+        lsApps.RemoveAll(sApp => string.Equals(sApp, sThisApp, StringComparison.OrdinalIgnoreCase) || homerProgram(sApp).Length == 0);
+        return lsApps;
+    }
+
+    // offerHomerApps: one question -- where to carry on with a file or folder -- with the Homer apps that suit it, the
+    // caller's own answers (asOwn, such as "&Windows default app" or "&Text here"), and Show in FileDir for a file when
+    // FileDir is installed and the caller is not FileDir. sDefault names the answer Enter takes; empty means the first
+    // Homer app. A Homer app chosen is started on the path here. Returns:
+    //   null      when no Homer app suits the path or is installed, so nothing was asked: the caller does what it did
+    //             before, and a person without the suite sees no change;
+    //   ""        for Cancel;
+    //   "homer"   when a Homer app was started;
+    //   one of asOwn, as the caller wrote it, for the caller to carry out.
+    // Each button's verb says what happens: "Open in DbDo", "Edit in EdSharp", "Show in FileDir" (a file, selected in its
+    // folder) or "Open in FileDir" (a folder). Their trigger letters are the apps' own first letters, D, E and F, which
+    // are the first letters of words in the captions, as the house rule asks.
+    public static string offerHomerApps(IWin32Window owner, string sTitle, string sLead, string sPath, string sThisApp, string[] asOwn, string sDefault) {
+        List<string> lsApps = homerAppsFor(sPath, sThisApp);
+        bool bFolder = System.IO.Directory.Exists(sPath);
+        bool bShowInFileDir = !bFolder && !string.Equals(sThisApp, "FileDir", StringComparison.OrdinalIgnoreCase) && homerProgram("FileDir").Length > 0;
+        if (lsApps.Count == 0) { Log.info(sTitle + ": no other Homer app suits " + sPath + ", so nothing was asked"); return null; }
+        Dictionary<string, string> dAppByButton = new Dictionary<string, string>();
+        List<string> lsButtons = new List<string>();
+        foreach (string sApp in lsApps) {
+            string sButton = sApp == "FileDir" ? "Open in &FileDir" : (sApp == "EdSharp" ? "Edit in &EdSharp" : "Open in &" + sApp);
+            lsButtons.Add(sButton);
+            dAppByButton[sButton] = sApp;
+        }
+        if (asOwn != null) lsButtons.AddRange(asOwn);
+        if (bShowInFileDir) { lsButtons.Add("Show in &FileDir"); dAppByButton["Show in &FileDir"] = "FileDir"; }
+        int iDefault = 0;
+        if (!string.IsNullOrEmpty(sDefault)) { int iAt = lsButtons.IndexOf(sDefault); if (iAt >= 0) iDefault = iAt; }
+        string sName = "";
+        try { sName = System.IO.Path.GetFileName(sPath.TrimEnd('\\', '/')); } catch (Exception) { }
+        string sText = (string.IsNullOrEmpty(sLead) ? "" : sLead.TrimEnd() + " ") + "Where should " + (string.IsNullOrEmpty(sName) ? "it" : sName) + " go next?";
+        Log.info(sTitle + ": offering " + string.Join(", ", lsButtons.ToArray()).Replace("&", "") + " for " + sPath);
+        string sPressed = LbcAsk.choose(sTitle, sText, lsButtons.ToArray(), iDefault);
+        if (string.IsNullOrEmpty(sPressed) || sPressed.Replace("&", "") == "Cancel") { Log.info(sTitle + ": cancelled"); return ""; }
+        string sAppChosen;
+        if (dAppByButton.TryGetValue(sPressed, out sAppChosen)) {
+            openInHomerApp(owner, sAppChosen, sPath);
+            return "homer";
+        }
+        Log.info(sTitle + ": " + sPressed.Replace("&", ""));
+        return sPressed;
+    }
+
     public static bool copyLog(string sLogPath) {
         if (string.IsNullOrEmpty(sLogPath) || !System.IO.File.Exists(sLogPath)) {
             Say.sayForced("There is no log for this session");

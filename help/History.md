@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.293.0 -- 25 November 2026, night
+
+- **SuiteCommands.offerHomerApps asks where a file goes next,** the same way in every Homer program: the Homer programs that suit it (a folder FileDir, a database, workbook or data table DbDo, Markdown, text, code or settings EdSharp, CSV both), the asking program's own answers such as Windows default app, and Show in FileDir for a file. Only installed programs are offered, never the one asking, so a person without the suite is never asked. homerAppsFor gives the list alone. DbDo's Export Data and Open Cell Value and EdSharp's opening of a database or workbook use it first.
+- **checkDb leaves a full-text index alone.** An FTS5 index and its shadow tables are SQLite's bookkeeping, with no id, prime or marked to check; DbDo's BrailleForum push failed on 27 findings about them.
+
 ## 1.292.0 -- 25 November 2026, evening
 
 - **scripts\homerFetch.py fetches politely and keeps the last good copy,** for any Homer script that gathers from the web. It asks again with the server's ETag and Last-Modified, so an unchanged file costs a 304 and is read from the cache; it waits between requests, times out and retries; it stores each body under its SHA-256 hash, so a changed file never overwrites the copy before it; and it records every address in manifest.inix. bTrustKept lets an old item that will not change be read from the cache without asking. DbDo's makeBrailleForum is the first to use it.
