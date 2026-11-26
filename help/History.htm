@@ -195,6 +195,45 @@
 <h1 id="history">History</h1>
 <p>Each version is a level-2 heading, newest first, so your screen
 reader’s heading keys move from one version to the next.</p>
+<h2 id="november-2026-afternoon">1.294.0 – 26 November 2026,
+afternoon</h2>
+<ul>
+<li><strong>The Homer pattern is named, and broadened.</strong> The
+search syntax every Homer program shares is now called the Homer
+pattern, the parallel of a regex pattern, in help.md and every program’s
+guide. It gains near everywhere: <code>"guide dog"~5</code> finds the
+words with at most five between them, as Lucene writes it. Where a
+caller names its fields, as DbDo does, it gains four parts that reuse
+the filter form’s symbols: <code>%brail</code> letters anywhere,
+<code>title:convention</code> a whole word in one field,
+<code>title%conv</code> letters in one field, and
+<code>title=Here and There</code> the field exactly. A field part needs
+a real field name, so 50% and x=y stay text, and a program without
+fields reads them all as text, as before.</li>
+<li><strong>New in Search:</strong>
+<code>parse(sPattern, lsFields)</code>; <code>isMatchRecord</code>, a
+record’s fields tested term by term; <code>termMatchAs</code>,
+<code>wordMatch</code> and <code>nearMatch</code>, one term by its kind;
+<code>ftsTerm</code>, one term for an SQLite full-text index, or “” when
+the index cannot say it; <code>likeBody</code>; and
+<code>FieldSyntax</code>, the field parts’ reminder. A colon no longer
+marks a search as FTS5’s own language, since title: is now a Homer
+pattern’s.</li>
+</ul>
+<h2 id="november-2026-noon">1.293.2 – 26 November 2026, noon</h2>
+<ul>
+<li><strong>Search.toFullText writes a Homer search for a full-text
+index.</strong> The pattern a person already types for Keywords –
+<code>&amp;</code> both, <code>|</code> either, <code>!</code> not,
+quotes, and a star at the end of a word – becomes SQLite FTS5’s AND, OR,
+NOT, phrase and prefix, so full-text search needs no new syntax. What
+FTS5 cannot say, a star inside a word or a search of only <code>!</code>
+terms, comes back with the reason, for the caller to search the Homer
+way instead. <strong>Search.isFullTextSyntax</strong> tells a search
+already written in FTS5’s own language – NEAR, a column name, a
+parenthesis, or AND, OR or NOT in capitals – so it passes through as
+typed. DbDo’s Full-text match is the first to use them.</li>
+</ul>
 <h2 id="november-2026-nearly-midnight">1.293.1 – 25 November 2026,
 nearly midnight</h2>
 <ul>
@@ -257,7 +296,7 @@ SuiteCommands records them retired: F3 and Shift+F3 repeat the last
 search or go in each program. DbDo’s and EdSharp’s Search Next and
 Search Previous name what they now repeat.</li>
 </ul>
-<h2 id="november-2026-afternoon">1.291.5 – 25 November 2026,
+<h2 id="november-2026-afternoon-1">1.291.5 – 25 November 2026,
 afternoon</h2>
 <ul>
 <li><strong>The suite catalog follows the menu review.</strong> Arrange
@@ -501,7 +540,7 @@ id, added and edited.</li>
 <li><strong>A database made from a CSV leaves id columns out of its
 prime,</strong> when any other field is left.</li>
 </ul>
-<h2 id="november-2026-afternoon-1">1.285.0 – 24 November 2026,
+<h2 id="november-2026-afternoon-2">1.285.0 – 24 November 2026,
 afternoon</h2>
 <ul>
 <li><strong>A line chart runs over a date column when one is
@@ -574,7 +613,7 @@ history file through the inix module. It runs from the command line
 scriptsuses it to measure reliability before any voice command is
 built.</li>
 </ul>
-<h2 id="november-2026-afternoon-2">1.280.0 – 23 November 2026,
+<h2 id="november-2026-afternoon-3">1.280.0 – 23 November 2026,
 afternoon</h2>
 <ul>
 <li><strong>Harvests are deleted once their guides are built.</strong>
@@ -601,7 +640,7 @@ knowledge base refused Python’s and curl’s TLS on every address; Edge
 brings Chromium’s. A five-second wait and a ceiling of 150 pages suit a
 Help Scout base.</li>
 </ul>
-<h2 id="november-2026-afternoon-3">1.279.0 – 23 November 2026,
+<h2 id="november-2026-afternoon-4">1.279.0 – 23 November 2026,
 afternoon</h2>
 <ul>
 <li><strong>The help guides gain PiccyBot.</strong> buildGuide reads
@@ -620,7 +659,7 @@ holds the questions alone; the preamble says so. Nine articles, about
 skill’s refusal rules: its English application page does not exist, and
 its English front page is 244 words.</li>
 </ul>
-<h2 id="november-2026-afternoon-4">1.278.0 – 23 November 2026,
+<h2 id="november-2026-afternoon-5">1.278.0 – 23 November 2026,
 afternoon</h2>
 <ul>
 <li><strong>Lbc has choice buttons that say what they hold.</strong>

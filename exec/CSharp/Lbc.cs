@@ -6192,8 +6192,12 @@ public class LaunchProgress : IDisposable
 // ============================================================================
 public static class Search
 {
-    // The syntax in one line, for prompts and help.
-    public const string Syntax = "& both, | either, ! not, * any characters, ? one character, \"quotes\" exact";
+    // THE HOMER PATTERN (named 26 November 2026, the parallel of a regex pattern): the search syntax every Homer
+    // program shares. The syntax in one line, for prompts and help.
+    public const string Syntax = "& both, | either, ! not, * any characters, ? one character, \"quotes\" exact, \"words\"~n near";
+    // FieldSyntax: what a Homer pattern adds where there are fields, as in a DbDo table (26 November 2026). Each reuses a
+    // symbol of DbDo's filter form: % contains, = is.
+    public const string FieldSyntax = "% letters anywhere, field: whole word, field% letters, field= exactly";
 
     // A term: its text, with * and ? outside quotes held as the two marker
     // characters below so a quoted * stays a star.
@@ -6202,6 +6206,20 @@ public static class Search
         public string sText = "";
         public bool bNot = false;
         public bool bWild = false;
+        // THE HOMER PATTERN'S FIELD AND NEAR PARTS (1.294.0, 26 November 2026, Jamal: broaden the syntax with simple,
+        // intuitive extensions, reusing the filter form's symbols). Each is set only as the parse finds it:
+        //   sField, cFieldOp   title:word (':' the whole word), title%conv ('%' letters anywhere in the field),
+        //                      title=Letters to the Editor ('=' exactly); recognized only when the caller names its
+        //                      fields and the word before the symbol is one, so 50% or x=y stays text;
+        //   bLetters           %brail: letters anywhere in any field, even inside words -- what a term already means
+        //                      in Keywords, and what makes a full-text search check letters rather than whole words;
+        //                      recognized, like the fields, only where there are fields;
+        //   iNear              "guide uber"~10: the words within that many words of each other, Lucene's spelling of
+        //                      FTS5's NEAR; a quoted term followed by ~ and a number.
+        public string sField = "";
+        public char cFieldOp = '\0';
+        public bool bLetters = false;
+        public int iNear = 0;
     }
 
     private const char cAny = '\u0001';
@@ -6212,10 +6230,20 @@ public static class Search
     // match (&). An empty pattern gives no alternatives.
     public static List<List<Term>> parse(string sPattern)
     {
+        return parse(sPattern, null);
+    }
+
+    // parse with fields: lsFields names the fields a caller can search, so field: field% and field= and a leading %
+    // are read as the Homer pattern's field parts; null, as for a file name or a document, reads them as text.
+    public static List<List<Term>> parse(string sPattern, ICollection<string> lsFields)
+    {
         List<List<Term>> llAlternatives = new List<List<Term>>();
         List<Term> lTerms = new List<Term>();
         StringBuilder sb = new StringBuilder();
-        bool bInQuotes = false, bNot = false, bStarted = false, bWild = false;
+        bool bInQuotes = false, bNot = false, bStarted = false, bWild = false, bQuoted = false, bLetters = false;
+        string sField = "";
+        char cFieldOp = '\0';
+        int iNear = 0;
         string s = sPattern ?? "";
         for (int i = 0; i <= s.Length; i++)
         {
@@ -6226,7 +6254,26 @@ public static class Search
                 if (c == '"') bInQuotes = false; else sb.Append(c);
                 continue;
             }
-            if (!bEnd && c == '"') { bInQuotes = true; bStarted = true; continue; }
+            if (!bEnd && c == '"') { bInQuotes = true; bStarted = true; bQuoted = true; continue; }
+            // "words"~n: near, after a quoted term.
+            if (!bEnd && c == '~' && bQuoted && i + 1 < s.Length && char.IsDigit(s[i + 1]))
+            {
+                int iTo = i + 1;
+                while (iTo < s.Length && char.IsDigit(s[iTo])) iTo++;
+                int.TryParse(s.Substring(i + 1, iTo - i - 1), out iNear);
+                i = iTo - 1;
+                continue;
+            }
+            // field: field% field= and a leading %, where the caller has fields.
+            if (!bEnd && lsFields != null && sField.Length == 0 && !bQuoted && (c == ':' || c == '%' || c == '='))
+            {
+                string sHead = sb.ToString().Trim(' ', '\t');
+                string sMatched = null;
+                if (sHead.Length > 0 && !bWild)
+                    foreach (string sCandidate in lsFields) if (string.Equals(sCandidate, sHead, StringComparison.OrdinalIgnoreCase)) { sMatched = sCandidate; break; }
+                if (sMatched != null) { sField = sMatched; cFieldOp = c; sb.Length = 0; bStarted = false; continue; }
+                if (c == '%' && sHead.Length == 0 && !bLetters) { bLetters = true; continue; }
+            }
             if (bEnd || c == '&' || c == '|')
             {
                 string sTerm = sb.ToString();
@@ -6239,9 +6286,10 @@ public static class Search
                 {
                     Term t = new Term();
                     t.sText = sTrim; t.bNot = bNot; t.bWild = bWild;
+                    t.sField = sField; t.cFieldOp = cFieldOp; t.bLetters = bLetters; t.iNear = iNear;
                     lTerms.Add(t);
                 }
-                sb.Length = 0; bNot = false; bStarted = false; bWild = false;
+                sb.Length = 0; bNot = false; bStarted = false; bWild = false; bQuoted = false; bLetters = false; sField = ""; cFieldOp = '\0'; iNear = 0;
                 if (bEnd || c == '|')
                 {
                     if (lTerms.Count > 0) llAlternatives.Add(lTerms);
@@ -6283,13 +6331,152 @@ public static class Search
             bool bAll = true;
             foreach (Term t in lTerms)
             {
-                bool bHit = termMatch(sTarget, t, bName, bCaseSensitive);
+                bool bHit = termMatchAs(sTarget, t, bName, bCaseSensitive);
                 if (t.bNot) bHit = !bHit;
                 if (!bHit) { bAll = false; break; }
             }
             if (bAll) return true;
         }
         return false;
+    }
+
+    // isMatchRecord: a record's fields against a pattern parsed with those fields (26 November 2026). A term with a
+    // field is tested on that field alone, by its symbol; a term without one on the whole record as one text, each
+    // field on its own line, as Keywords has always read it.
+    public static bool isMatchRecord(IDictionary<string, string> dValues, List<List<Term>> llAlternatives, bool bCaseSensitive)
+    {
+        if (llAlternatives == null || llAlternatives.Count == 0) return true;
+        StringBuilder sbAll = new StringBuilder();
+        Dictionary<string, string> dByName = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (KeyValuePair<string, string> kv in dValues) { sbAll.Append(kv.Value ?? "").Append('\n'); dByName[kv.Key] = kv.Value ?? ""; }
+        string sAll = sbAll.ToString();
+        foreach (List<Term> lTerms in llAlternatives)
+        {
+            bool bAll = true;
+            foreach (Term t in lTerms)
+            {
+                string sValue;
+                bool bHit = t.sField.Length > 0
+                    ? termMatchAs(dByName.TryGetValue(t.sField, out sValue) ? sValue : "", t, false, bCaseSensitive)
+                    : termMatchAs(sAll, t, false, bCaseSensitive);
+                if (t.bNot) bHit = !bHit;
+                if (!bHit) { bAll = false; break; }
+            }
+            if (bAll) return true;
+        }
+        return false;
+    }
+
+    // termMatchAs: one term by its own kind, before any ! is applied: near, a whole word (field:), exactly (field=),
+    // or else as termMatch has always matched -- letters anywhere in a text, the whole of a name for a wildcard.
+    public static bool termMatchAs(string sTarget, Term t, bool bName, bool bCaseSensitive)
+    {
+        if (t.iNear > 0) return nearMatch(sTarget, t, bCaseSensitive);
+        if (t.cFieldOp == ':') return wordMatch(sTarget, t, bCaseSensitive);
+        if (t.cFieldOp == '=')
+            return t.bWild ? termMatch(sTarget, t, true, bCaseSensitive)
+                           : string.Equals((sTarget ?? "").Trim(), t.sText, bCaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
+        if (t.cFieldOp == '%' || t.bLetters) return termMatch(sTarget, t, false, bCaseSensitive);
+        return termMatch(sTarget, t, bName, bCaseSensitive);
+    }
+
+    // wordMatch: the term as whole words, so art finds art and not start; a star stays inside the word (conv* finds
+    // convention), a question mark one letter.
+    public static bool wordMatch(string sTarget, Term t, bool bCaseSensitive)
+    {
+        string sKey = "W" + (bCaseSensitive ? "C" : "I") + t.sText;
+        Regex rx;
+        if (!dRegexCache.TryGetValue(sKey, out rx))
+        {
+            StringBuilder sb = new StringBuilder(@"(?<!\w)");
+            foreach (char c in t.sText)
+            {
+                if (c == cAny) sb.Append(@"\w*");
+                else if (c == cOne) sb.Append(@"\w");
+                else sb.Append(Regex.Escape(c.ToString()));
+            }
+            sb.Append(@"(?!\w)");
+            RegexOptions opts = RegexOptions.CultureInvariant;
+            if (!bCaseSensitive) opts |= RegexOptions.IgnoreCase;
+            rx = new Regex(sb.ToString(), opts);
+            if (dRegexCache.Count > 500) dRegexCache.Clear();
+            dRegexCache[sKey] = rx;
+        }
+        return rx.IsMatch(sTarget ?? "");
+    }
+
+    // nearMatch: "a b c"~n -- every word of the term within the text, at most n other words between the first and
+    // the last, as FTS5's NEAR counts; a star at a word's end takes any word starting so.
+    public static bool nearMatch(string sTarget, Term t, bool bCaseSensitive)
+    {
+        string[] asWanted = t.sText.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+        if (asWanted.Length == 0) return false;
+        StringComparison cmp = bCaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+        List<int[]> lHits = new List<int[]>();   // {position, which wanted word}
+        int iPos = 0;
+        foreach (Match m in Regex.Matches(sTarget ?? "", @"\w+"))
+        {
+            for (int k = 0; k < asWanted.Length; k++)
+            {
+                string sWord = asWanted[k];
+                bool bPrefix = sWord.Length > 0 && sWord[sWord.Length - 1] == cAny;
+                string sStem = sWord.TrimEnd(cAny);
+                if (bPrefix ? m.Value.StartsWith(sStem, cmp) : string.Equals(m.Value, sStem, cmp)) lHits.Add(new int[] { iPos, k });
+            }
+            iPos++;
+        }
+        // The narrowest stretch holding every wanted word.
+        int[] aCounts = new int[asWanted.Length];
+        int iHave = 0, iLeft = 0;
+        for (int iRight = 0; iRight < lHits.Count; iRight++)
+        {
+            if (aCounts[lHits[iRight][1]]++ == 0) iHave++;
+            while (iHave == asWanted.Length)
+            {
+                if (lHits[iRight][0] - lHits[iLeft][0] - (asWanted.Length - 1) <= t.iNear) return true;
+                if (--aCounts[lHits[iLeft][1]] == 0) iHave--;
+                iLeft++;
+            }
+        }
+        return false;
+    }
+
+    // ftsTerm: one term as SQLite FTS5 writes it, or "" when the full-text index cannot say it -- letters inside words
+    // (% and field%), exactly (field=), a wildcard before a word's end, or a field the index does not hold -- so the
+    // caller tests that term on its fields instead (26 November 2026). lsIndexColumns: the index's columns.
+    public static string ftsTerm(Term t, ICollection<string> lsIndexColumns)
+    {
+        if (t.bLetters || t.cFieldOp == '%' || t.cFieldOp == '=') return "";
+        string sColumn = "";
+        if (t.cFieldOp == ':')
+        {
+            if (lsIndexColumns == null) return "";
+            foreach (string sCandidate in lsIndexColumns) if (string.Equals(sCandidate, t.sField, StringComparison.OrdinalIgnoreCase)) sColumn = sCandidate;
+            if (sColumn.Length == 0) return "";
+        }
+        string sText = t.sText;
+        string sQuery;
+        if (t.iNear > 0)
+        {
+            List<string> lsWords = new List<string>();
+            foreach (string sWord in sText.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                string sStem = sWord.TrimEnd(cAny);
+                if (sStem.IndexOf(cAny) >= 0 || sStem.IndexOf(cOne) >= 0 || sStem.Length == 0) return "";
+                lsWords.Add("\"" + sStem.Replace("\"", "\"\"") + "\"" + (sStem.Length < sWord.Length ? "*" : ""));
+            }
+            sQuery = "NEAR(" + string.Join(" ", lsWords.ToArray()) + ", " + t.iNear + ")";
+        }
+        else
+        {
+            bool bPrefix = false;
+            while (sText.Length > 0 && sText[sText.Length - 1] == cAny) { sText = sText.Substring(0, sText.Length - 1); bPrefix = true; }
+            if (sText.IndexOf(cAny) >= 0 || sText.IndexOf(cOne) >= 0) return "";
+            sText = sText.Trim();
+            if (sText.Length == 0) return "";
+            sQuery = "\"" + sText.Replace("\"", "\"\"") + "\"" + (bPrefix ? "*" : "");
+        }
+        return sColumn.Length > 0 ? sColumn + " : " + sQuery : sQuery;
     }
 
     // termMatch: one term, before any ! is applied.
@@ -6334,10 +6521,82 @@ public static class Search
         return (bName && t.bWild) ? sb.ToString() : "%" + sb.ToString() + "%";
     }
 
+    // FULL-TEXT SEARCH IN THE HOMER SYNTAX (1.293.2, 26 November 2026, Jamal: "translate the existing keyword syntax of
+    // & * | into the appropriate FTS syntax, so the user only has to use more syntax if they want other functionality,
+    // but they still benefit from FTS"). A database with an SQLite FTS5 index, such as DbDo's BrailleForum, is searched
+    // with the pattern a person already types for Keywords:
+    //     guide dog            the words together, as typed: the FTS5 phrase "guide dog"
+    //     guide dog & uber     both: "guide dog" AND "uber"
+    //     uber | lyft          either: "uber" OR "lyft"
+    //     braille & !display   leaving out: "braille" NOT "display"
+    //     advoca*              any word that starts so: "advoca"*
+    // & before | groups as written, as in every Homer search. What FTS5 cannot say is refused with the reason, for the
+    // caller to search the Homer way instead: a star or ? inside or before a word (FTS5 matches word starts only), and
+    // a search of nothing but ! terms. A pattern already written in FTS5's own language -- AND, OR, NOT or NEAR in
+    // capitals, a parenthesis, a column: or a ^ -- is left as it is (isFullTextSyntax), so the extra powers stay one
+    // step away. Matching is by whole words, not letters inside them: the difference full-text search makes.
+
+    // isFullTextSyntax: whether a pattern is written in FTS5's own language rather than the Homer syntax.
+    public static bool isFullTextSyntax(string sPattern)
+    {
+        string s = sPattern ?? "";
+        // A colon is no longer FTS5's alone (26 November 2026): title: is a Homer pattern's field. A parenthesis, a ^ or an
+        // operator in capitals still means the index's own language.
+        if (s.IndexOfAny(new char[] { '(', ')', '^' }) >= 0) return true;
+        return Regex.IsMatch(s, @"(^|[\s""])(AND|OR|NOT|NEAR)($|[\s""(])");
+    }
+
+    // toFullText: a Homer pattern as an FTS5 query, or "" with sProblem saying why it cannot be one.
+    public static string toFullText(string sPattern, out string sProblem)
+    {
+        sProblem = "";
+        List<List<Term>> llAlternatives = parse(sPattern);
+        if (llAlternatives.Count == 0) { sProblem = "there is nothing to search for"; return ""; }
+        List<string> lsAlternatives = new List<string>();
+        foreach (List<Term> lTerms in llAlternatives)
+        {
+            List<string> lsWith = new List<string>(), lsWithout = new List<string>();
+            foreach (Term t in lTerms)
+            {
+                string sText = t.sText;
+                bool bPrefix = false;
+                while (sText.Length > 0 && sText[sText.Length - 1] == cAny) { sText = sText.Substring(0, sText.Length - 1); bPrefix = true; }
+                if (sText.IndexOf(cAny) >= 0 || sText.IndexOf(cOne) >= 0)
+                { sProblem = plainText(t) + " has a star or question mark inside or before a word, and full-text search matches only the starts of words"; return ""; }
+                sText = sText.Trim();
+                if (sText.Length == 0) { sProblem = plainText(t) + " has no letters to search for"; return ""; }
+                string sFts = "\"" + sText.Replace("\"", "\"\"") + "\"" + (bPrefix ? "*" : "");
+                if (t.bNot) lsWithout.Add(sFts); else lsWith.Add(sFts);
+            }
+            if (lsWith.Count == 0) { sProblem = "a search made only of ! terms says what to leave out but not what to find"; return ""; }
+            string sAlternative = string.Join(" AND ", lsWith.ToArray());
+            foreach (string sOut in lsWithout) sAlternative += " NOT " + sOut;
+            lsAlternatives.Add(llAlternatives.Count > 1 ? "(" + sAlternative + ")" : sAlternative);
+        }
+        return string.Join(" OR ", lsAlternatives.ToArray());
+    }
+
+    // likeBody: a term as the inside of a SQL LIKE pattern, with \ as its escape and no % added at either end, for a
+    // caller that places it itself, as DbDo does between spaces for a whole word (field:).
+    public static string likeBody(Term t)
+    {
+        StringBuilder sb = new StringBuilder();
+        foreach (char c in t.sText)
+        {
+            if (c == cAny) sb.Append('%');
+            else if (c == cOne) sb.Append('_');
+            else if (c == '\\' || c == '%' || c == '_') sb.Append('\\').Append(c);
+            else sb.Append(c);
+        }
+        return sb.ToString();
+    }
+
     // plainText: a term as the person typed it, for messages and logs.
     public static string plainText(Term t)
     {
-        return (t.bNot ? "!" : "") + t.sText.Replace(cAny, '*').Replace(cOne, '?');
+        string sText = t.sText.Replace(cAny, '*').Replace(cOne, '?');
+        if (t.iNear > 0) sText = "\"" + sText + "\"~" + t.iNear;
+        return (t.bNot ? "!" : "") + (t.sField.Length > 0 ? t.sField + t.cFieldOp : (t.bLetters ? "%" : "")) + sText;
     }
 }
 

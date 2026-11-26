@@ -7,6 +7,15 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.294.0 -- 26 November 2026, afternoon
+
+- **The Homer pattern is named, and broadened.** The search syntax every Homer program shares is now called the Homer pattern, the parallel of a regex pattern, in help\HomerSearch.md and every program's guide. It gains near everywhere: `"guide dog"~5` finds the words with at most five between them, as Lucene writes it. Where a caller names its fields, as DbDo does, it gains four parts that reuse the filter form's symbols: `%brail` letters anywhere, `title:convention` a whole word in one field, `title%conv` letters in one field, and `title=Here and There` the field exactly. A field part needs a real field name, so 50% and x=y stay text, and a program without fields reads them all as text, as before.
+- **New in Search:** `parse(sPattern, lsFields)`; `isMatchRecord`, a record's fields tested term by term; `termMatchAs`, `wordMatch` and `nearMatch`, one term by its kind; `ftsTerm`, one term for an SQLite full-text index, or "" when the index cannot say it; `likeBody`; and `FieldSyntax`, the field parts' reminder. A colon no longer marks a search as FTS5's own language, since title: is now a Homer pattern's.
+
+## 1.293.2 -- 26 November 2026, noon
+
+- **Search.toFullText writes a Homer search for a full-text index.** The pattern a person already types for Keywords -- `&` both, `|` either, `!` not, quotes, and a star at the end of a word -- becomes SQLite FTS5's AND, OR, NOT, phrase and prefix, so full-text search needs no new syntax. What FTS5 cannot say, a star inside a word or a search of only `!` terms, comes back with the reason, for the caller to search the Homer way instead. **Search.isFullTextSyntax** tells a search already written in FTS5's own language -- NEAR, a column name, a parenthesis, or AND, OR or NOT in capitals -- so it passes through as typed. DbDo's Full-text match is the first to use them.
+
 ## 1.293.1 -- 25 November 2026, nearly midnight
 
 - **Paths.userTemplates names %LOCALAPPDATA%\<App>\templates,** templates installed for a person apart from the program, such as a database too large for the installer. Like the shipped templates folder, it is read and never created by the program. DbDo is the first to read it.
