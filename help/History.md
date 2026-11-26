@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.296.0 -- 26 November 2026, late afternoon
+
+- **yt-dlp's update now reaches the copy Setup checks.** 1.295.0's `yt-dlp -U` updated a copy, but the one first on the path -- a nightly build in C:\bin -- while Setup reads the version winget has on record for its own copy, which only winget changes, so the outcome still said MISMATCH. installCommon's wingetUpgrade now leaves the refused upgrade as a request file in TEMP, and Setup's kit code (HomerComponents.iss) runs every such request as the person who started Setup, which winget accepts, just before it confirms the outcomes; each is logged. The copy on the path still updates itself.
+
 ## 1.295.0 -- 26 November 2026, evening
 
 - **More agents find the skills.** connectAI, which setup runs, now also connects GitHub Copilot (its personal instructions and skills folders) and Grok Build (its skills folder), and always fills the shared `.agents\skills` folder of the Agent Skills standard, which Codex, Copilot, Gemini CLI, Grok Build, Cursor and many other agents read, whether or not any of them is installed yet.

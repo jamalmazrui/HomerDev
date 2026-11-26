@@ -72,6 +72,7 @@ var
    slow one keeps saying where it is. The setup log has every status too. *)
 var
   gHomerConfirming: Boolean;   (* True while homerStateAfter probes: says Confirming, not Checking *)
+  gHomerAsUserDone: Boolean;   (* True once the requests to run as the signed-in user have been run *)
   gHomerSaidAt: Cardinal;
   gHomerVoice: Variant;
   gHomerVoiceTried: Boolean;
@@ -1029,6 +1030,35 @@ begin
   Result := Pos(#10 + sCaption + #10, #10 + gHomerTicked) > 0;
 end;
 
+procedure homerRunAsUserRequests();
+(* AS THE SIGNED-IN USER (26 November 2026). Setup runs elevated, and winget refuses there to upgrade a package one
+   user installed for themselves; yt-dlp stayed at 2026.10.26 through every update for that. installCommon then
+   writes the upgrade as %TEMP%\homerAsUser-<id>.cmd, and here, once, before the outcomes are confirmed, each such
+   file is run as the person who started Setup, which winget accepts, and then deleted. Every one is logged. *)
+var
+  oFind: TFindRec;
+  sDir, sFile: String;
+  iCode: Integer;
+begin
+  if gHomerAsUserDone then exit;
+  gHomerAsUserDone := True;
+  sDir := AddBackslash(GetEnv('TEMP'));
+  if FindFirst(sDir + 'homerAsUser-*.cmd', oFind) then
+  try
+    repeat
+      sFile := sDir + oFind.Name;
+      homerSay('Finishing an update as you', False);
+      if ExecAsOriginalUser(ExpandConstant('{cmd}'), '/c ""' + sFile + '""', '', SW_HIDE, ewWaitUntilTerminated, iCode) then
+        Log('As the signed-in user: ' + oFind.Name + ' exit code ' + IntToStr(iCode))
+      else
+        Log('As the signed-in user: ' + oFind.Name + ' could not be started: ' + SysErrorMessage(iCode));
+      DeleteFile(sFile);
+    until not FindNext(oFind);
+  finally
+    FindClose(oFind);
+  end;
+end;
+
 function homerStateAfter(iAt: Integer): Integer;
 (* The state probed again NOW, after the scripts have run. The first probe is
    kept untouched, because the checkbox wording and the outcome wording both
@@ -1038,6 +1068,7 @@ var
   sLocal, sRemote: String;
   bKnown: Boolean;
 begin
+  homerRunAsUserRequests();
   if not gHomer[iAt].bKnownAfter then
   begin
     iState := gHomer[iAt].iState; sLocal := gHomer[iAt].sLocal;

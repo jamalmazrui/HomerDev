@@ -44,12 +44,13 @@ if not "%iCode%"=="0" goto :failed
 goto :done
 
 :selfUpdate
-rem YT-DLP UPDATES ITSELF (26 November 2026). winget would not touch a copy installed for one user while Setup runs as
-rem administrator, so yt-dlp's own updater replaces the program where it is, with the newest release from its
-rem publisher. Each copy on the path is logged before and after, so the log says which one was updated.
+rem YT-DLP UPDATES ITSELF TOO (26 November 2026). winget would not touch a copy installed for one user while Setup runs as
+rem administrator; installCommon has left that upgrade for Setup to run as the signed-in user. Meanwhile the copy a
+rem program actually runs -- the first on the PATH, which on Jamal's computer was a nightly build in C:\bin, not
+rem winget's -- is brought up to date by yt-dlp's own updater. Each copy is logged before and after.
 call "%~dp0installCommon.cmd" copies yt-dlp.exe
 call "%~dp0installCommon.cmd" log "Before: %sHomerCopies%"
-echo winget cannot update this copy of yt-dlp from Setup, so yt-dlp is updating itself.
+echo Setup will have winget update its copy of yt-dlp as you when it finishes; the copy on your path updates itself now.
 set "sHomerRunLong=yt-dlp -U"
 call "%~dp0installCommon.cmd" runLong "yt-dlp"
 set "iCode=%ERRORLEVEL%"
