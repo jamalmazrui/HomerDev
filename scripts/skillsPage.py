@@ -209,6 +209,20 @@ def anchor(sText):
     return re.sub(r"[^a-z0-9]+", "-", sText.lower()).strip("-")
 
 
+def subtitleOf(lSkills):
+    """The directory subtitle every Homer directory carries: "A Directory of <count> ..."."""
+    return "A Directory of %s for AI Agents from the Homer Development Kit" % countNoun(len(lSkills), "Skill")
+
+
+def configText(lSkills):
+    """_config.yml as MyPages' post writes one for every other page -- the subtitle as the site's description, so it
+    heads the page and follows the title in the browser's title bar -- plus the .well-known folder, which GitHub Pages
+    skips unless told. WHY (26 November 2026): the first version wrote only a theme and a title, so the published page
+    showed the long description where every other directory shows "A Directory of <count> ..."."""
+    return ("title: Homer Skills\ndescription: %s\nauthor: Jamal Mazrui\ntheme: jekyll-theme-cayman\nmarkdown: kramdown\n"
+            "kramdown:\n  input: GFM\n  toc_levels: 2..3\ninclude:\n  - .well-known\n" % subtitleOf(lSkills))
+
+
 def pageText(lSkills, dSizes):
     """The Markdown of the page. Links are reference-style, so no address is read aloud in the body."""
     lsGroups = sorted({d["group"] for d in lSkills}, key=str.lower)
@@ -222,7 +236,7 @@ def pageText(lSkills, dSizes):
     sTree = sRepo + "/tree/main/.claude/skills/"
     lsOut = ["---",
              'title: "Homer Skills"',
-             'subtitle: "A Directory of %s for AI Agents from the Homer Development Kit"' % countNoun(len(lSkills), "Skill"),
+             'subtitle: "%s"' % subtitleOf(lSkills),
              'description: "Free skills that teach AI agents to build accessible Windows programs, documents, books, databases, installers and spoken tutorials for screen reader users, each ready to download for Claude, ChatGPT, Codex, Copilot, Gemini, Grok and other agents."',
              'author: "Jamal Mazrui"',
              "lang: en-US",
@@ -363,7 +377,7 @@ def build(sKit, sOut):
     iWritten += writeIfChanged(os.path.join(sOut, sPage + ".md"), b"\xef\xbb\xbf" + text(pageText(lSkills, dSizes)))
     iWritten += writeIfChanged(os.path.join(sOut, ".well-known", "agent-skills", "index.json"), indexJson(lSkills, dDigests).encode("utf-8"))
     iWritten += writeIfChanged(os.path.join(sOut, "llms.txt"), text(llmsText(lSkills)))
-    iWritten += writeIfChanged(os.path.join(sOut, "_config.yml"), text("theme: jekyll-theme-cayman\ntitle: Homer Skills\ninclude:\n  - .well-known\n"))
+    iWritten += writeIfChanged(os.path.join(sOut, "_config.yml"), text(configText(lSkills)))
     for d in lSkills:
         logLine("SKILL %s: group %s, %d files, zip %s" % (d["name"], d["group"], d["files"], sizeText(dSizes[d["name"]])))
     return iWritten, len(lSkills)

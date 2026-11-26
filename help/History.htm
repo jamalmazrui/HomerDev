@@ -207,6 +207,12 @@ the refused upgrade as a request file in TEMP, and Setup’s kit code
 (HomerComponents.iss) runs every such request as the person who started
 Setup, which winget accepts, just before it confirms the outcomes; each
 is logged. The copy on the path still updates itself.</li>
+<li><strong>The Homer Skills page carries the directory
+subtitle.</strong> skillsPage wrote its own _config.yml with only a
+theme and a title, so the published page showed the long description
+where every other directory shows “A Directory of <count> …”. It now
+writes the same _config.yml as MyPages’ post, with the subtitle as the
+site’s description, keeping the .well-known folder.</li>
 </ul>
 <h2 id="november-2026-evening">1.295.0 – 26 November 2026, evening</h2>
 <ul>

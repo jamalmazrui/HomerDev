@@ -10,6 +10,7 @@ Each version is a level-2 heading, newest first, so your screen reader's heading
 ## 1.296.0 -- 26 November 2026, late afternoon
 
 - **yt-dlp's update now reaches the copy Setup checks.** 1.295.0's `yt-dlp -U` updated a copy, but the one first on the path -- a nightly build in C:\bin -- while Setup reads the version winget has on record for its own copy, which only winget changes, so the outcome still said MISMATCH. installCommon's wingetUpgrade now leaves the refused upgrade as a request file in TEMP, and Setup's kit code (HomerComponents.iss) runs every such request as the person who started Setup, which winget accepts, just before it confirms the outcomes; each is logged. The copy on the path still updates itself.
+- **The Homer Skills page carries the directory subtitle.** skillsPage wrote its own _config.yml with only a theme and a title, so the published page showed the long description where every other directory shows "A Directory of <count> ...". It now writes the same _config.yml as MyPages' post, with the subtitle as the site's description, keeping the .well-known folder.
 
 ## 1.295.0 -- 26 November 2026, evening
 
