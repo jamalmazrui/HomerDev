@@ -7,6 +7,11 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.298.0 -- 26 November 2026, late night
+
+- **Many settings saved in one write.** The new `InixCodec.writeValues(sPath, triples)` reads an .inix file once, sets every { section, key, value } with writeValue's own rules, and writes the file once. Each writeValue had read and replaced the whole file, so a program saving hundreds of keys rewrote it hundreds of times. The stall watch's first report showed what that cost: DbDo frozen in ReplaceFile for 2 to 17 seconds whenever a row move or a filter changed the view, while it saved about 2,000 keys one file rewrite at a time.
+- **A setting that is already saved is not written again.** writeValue and writeValues leave the file untouched when no line would change, and removing a key that is not there no longer adds an empty section.
+
 ## 1.297.0 -- 26 November 2026, night
 
 - **A program's freezes are logged with where it stood.** The new `Homer.Log.watchUi(iStallMs)`, called once on a program's window thread before its message loop, starts a quiet background thread that asks the window four times a second to note the time. When the window has not answered for iStallMs, the log gets a WARN line saying how long, with the window thread's call stack at that moment; again every five seconds while the freeze lasts, three stacks at most; and a line with its whole length when it ends. The stack is read by pausing the window thread for an instant, on a helper thread given one second, so the watch can never leave the window paused. DbDo calls it first, after BrailleMonitor froze it for 14 to 18 seconds with nothing in the log to say why.

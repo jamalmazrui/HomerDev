@@ -633,12 +633,49 @@ public static class InixCodec
     // so callers can log it (this class stays log-independent).
     public static bool writeValue(string sPath, string sSection, string sKey, string sValue)
     {
-        string sHeader = "[" + sSection + "]";
+        return writeValues(sPath, new string[][] { new string[] { sSection, sKey, sValue } });
+    }
+
+    // writeValues: many keys in one pass (26 November 2026). Each writeValue read the whole file and
+    // replaced it, so a caller saving 200 keys rewrote the file 200 times; DbDo's Recent Files saved
+    // about 2,000 keys each time a view changed, and with each File.Replace slowed by the computer's
+    // file scanning, a move of one row froze DbDo for 2 to 17 seconds (its stall watch caught it in
+    // ReplaceFile). writeValues reads once, applies every { section, key, value } in order with the
+    // same rules as writeValue, and writes once -- and not at all when no line changed, so saving a
+    // view that is already saved costs a read and nothing more. Returns false on I/O failure.
+    public static bool writeValues(string sPath, IEnumerable<string[]> lTriples)
+    {
         List<string> lsLines = new List<string>();
         if (File.Exists(sPath))
         {
             try { lsLines.AddRange(File.ReadAllLines(sPath, new UTF8Encoding(true))); } catch { return false; }
         }
+        bool bChanged = false;
+        foreach (string[] aTriple in lTriples)
+        {
+            if (aTriple == null || aTriple.Length < 3) continue;
+            if (setLines(lsLines, aTriple[0], aTriple[1], aTriple[2])) bChanged = true;
+        }
+        if (!bChanged) return true;
+        string sTemp = sPath + ".homer-write.tmp";
+        try {
+            using (StreamWriter w = new StreamWriter(sTemp, false, new UTF8Encoding(true))) {
+                w.NewLine = "\r\n";
+                foreach (string sLn in lsLines) w.WriteLine(sLn);
+            }
+            swapIn(sTemp, sPath);
+            return true;
+        }
+        catch {
+            try { if (File.Exists(sTemp)) File.Delete(sTemp); } catch (Exception) { }
+            return false;
+        }
+    }
+
+    // setLines: writeValue's rules applied to lines in memory. Returns true when a line changed.
+    private static bool setLines(List<string> lsLines, string sSection, string sKey, string sValue)
+    {
+        string sHeader = "[" + sSection + "]";
 
         int iSectionEnd = -1, iSectionStart = -1;
         for (int i = 0; i < lsLines.Count; i++)
@@ -682,9 +719,11 @@ public static class InixCodec
 
         if (iSectionStart < 0)
         {
+            if (lsNewLines.Count == 0) return false;  // nothing to remove, and no section to hold nothing
             if (lsLines.Count > 0 && lsLines[lsLines.Count - 1].Trim().Length > 0) lsLines.Add("");
             lsLines.Add(sHeader);
             lsLines.AddRange(lsNewLines);
+            return true;
         }
         else
         {
@@ -712,6 +751,13 @@ public static class InixCodec
             }
             if (iFound >= 0)
             {
+                // The same lines already there: nothing changes, so nothing need be written.
+                if (iFoundEnd - iFound + 1 == lsNewLines.Count)
+                {
+                    bool bSame = true;
+                    for (int n = 0; n < lsNewLines.Count && bSame; n++) bSame = lsLines[iFound + n] == lsNewLines[n];
+                    if (bSame) return false;
+                }
                 lsLines.RemoveRange(iFound, iFoundEnd - iFound + 1);
                 if (lsNewLines.Count > 0) lsLines.InsertRange(iFound, lsNewLines);
             }
@@ -719,21 +765,10 @@ public static class InixCodec
             {
                 lsLines.InsertRange(iSectionStart + 1, lsNewLines);
             }
-        }
-
-        string sTemp = sPath + ".homer-write.tmp";
-        try {
-            using (StreamWriter w = new StreamWriter(sTemp, false, new UTF8Encoding(true))) {
-                w.NewLine = "\r\n";
-                foreach (string sLn in lsLines) w.WriteLine(sLn);
-            }
-            swapIn(sTemp, sPath);
+            else return false;
             return true;
         }
-        catch {
-            try { if (File.Exists(sTemp)) File.Delete(sTemp); } catch (Exception) { }
-            return false;
-        }
+
     }
 
     // fileTask: the declared purpose of an .inix file, read from the "FileTask" key
