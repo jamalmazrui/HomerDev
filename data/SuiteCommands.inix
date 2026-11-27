@@ -1136,11 +1136,11 @@ status=implemented
 
 [DbDo sayStatus]
 name=Say Status
-keys=Alt+Z or Shift+Z
-change=keys listed with the suite key first, 21 November 2026
-reason=Alt+Z is the suite key, as in FileDir
+keys=
+change=retired 26 November 2026, was Alt+Z or Shift+Z
+reason=every fact it said has its own key (Shift+M, Alt+Delete, Shift+F, Shift+O; the table is in the title), and screen readers read the status bar themselves
 disposition=ruled
-status=implemented
+status=retired
 
 [DbDo sayTables]
 name=Say Tables
@@ -3854,11 +3854,11 @@ status=current
 
 [FileDir sayStatus]
 name=Say Status
-keys=Alt+Z or Shift+Z
-change=keys changed, was Alt+Z, 16 November 2026
-reason=Shift+Z as a second key, as in DbDo, once Zip left it
-disposition=accepted
-status=implemented
+keys=
+change=retired 26 November 2026, was Alt+Z or Shift+Z; the command is now Say Timer
+reason=the status line's date, size, order and filter have Shift+D, Shift+S, Shift+O and Shift+F; screen readers read the status bar themselves
+disposition=ruled
+status=retired
 
 [FileDir sayTime]
 name=Say Time
@@ -3869,9 +3869,9 @@ status=retired
 
 [FileDir sayTimer]
 name=Say Timer
-keys=
-status=retired
-change=retired 15 November 2026 (A15): Say Status (Alt+Z) says the timer
+keys=Shift+Z
+status=implemented
+change=back 26 November 2026 on Shift+Z, beside Timer Toggle on Alt+Shift+Z, when Say Status was retired; retired 15 November 2026 (A15)
 
 [FileDir sayType]
 name=Say Type

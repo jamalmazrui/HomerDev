@@ -722,8 +722,20 @@ public static class KeyMap {
     // label -- is spelled, the value alone, not its label; anything longer is shown in the read-only window, where the
     // screen reader can review and spell it. A third press starts again. testSay heard the old second press spell
     // whole long answers, such as Say Database's full path, which no one can follow by ear.
+    //
+    // THE SAY-WORD, THEN THE ANSWER (kit 1.299.0, 26 November 2026, Jamal's pattern). The first press says the command's
+    // word -- its name after "Say", as "Cell" for Say Cell, else the title the app passes -- as its own utterance, then
+    // the answer as one or more utterances of their own; an answer's own label that repeats the word ("cell: 79") is
+    // set aside, so the word is heard once. The second press does not say the word again: it spells the precise value
+    // -- answerPrecise's, when the app gives one (FileDir's size in bytes, where the first press said "1 KB") -- or
+    // shows a long one in the read-only window.
     public static bool answer(string sTitle, params string[] aParts) {
+        return answerPrecise(sTitle, null, aParts);
+    }
+
+    public static bool answerPrecise(string sTitle, string sPrecise, params string[] aParts) {
         if (aParts == null) aParts = new string[0];
+        string sWord = sayWord(sTitle);
         if (iPressCount == 2) {
             List<string> lsParts = new List<string>();
             foreach (string sPart in aParts) if (!string.IsNullOrEmpty(sPart) && sPart.Trim().Length > 0) lsParts.Add(sPart.Trim());
@@ -732,12 +744,44 @@ public static class KeyMap {
                 int iColon = sValue.IndexOf(": ");
                 if (iColon > 0) sValue = sValue.Substring(iColon + 2);
             }
+            if (!string.IsNullOrEmpty(sPrecise)) sValue = sPrecise;
             if (sValue.Length > 0 && sValue.Length <= 40) Say.sayForced(spelled(sValue));
-            else HelpDialog.show(Form.ActiveForm, sTitle, string.Join("\r\n", aParts));
+            else HelpDialog.show(Form.ActiveForm, sWord.Length > 0 ? sWord : sTitle, !string.IsNullOrEmpty(sPrecise) ? sPrecise : string.Join("\r\n", aParts));
             return true;
         }
-        Say.say(aParts);
+        List<string> lsSay = new List<string>();
+        if (sWord.Length > 0) lsSay.Add(sWord);
+        bool bFirst = true;
+        foreach (string sPart in aParts) {
+            if (string.IsNullOrEmpty(sPart) || sPart.Trim().Length == 0) continue;
+            string sSaid = sPart.Trim();
+            if (bFirst && sWord.Length > 0) sSaid = withoutLabel(sSaid, sWord, sTitle);
+            bFirst = false;
+            if (sSaid.Length > 0) lsSay.Add(sSaid);
+        }
+        Say.say(lsSay.ToArray());
         return true;
+    }
+
+    // sayWord: the word a Say command speaks first -- the running command's name after "Say", else the title.
+    public static string sayWord(string sTitle) {
+        string sName = (sRunningName ?? "").Replace("&", "").Trim();
+        if (sName.EndsWith("...")) sName = sName.Substring(0, sName.Length - 3).Trim();
+        if (sName.StartsWith("Say ", StringComparison.OrdinalIgnoreCase) && sName.Length > 4) return sName.Substring(4).Trim();
+        string sWord = (sTitle ?? "").Trim();
+        return string.Equals(sWord, "Information", StringComparison.OrdinalIgnoreCase) ? "" : sWord;   // a generic title is no word
+    }
+
+    // withoutLabel: an answer's first part without a leading "label:" that repeats the say-word or the title.
+    private static string withoutLabel(string sPart, string sWord, string sTitle) {
+        int iColon = sPart.IndexOf(':');
+        if (iColon <= 0) return sPart;
+        string sLabel = sPart.Substring(0, iColon).Trim();
+        string sLastWord = sWord.IndexOf(' ') >= 0 ? sWord.Substring(sWord.LastIndexOf(' ') + 1) : sWord;
+        if (string.Equals(sLabel, sWord, StringComparison.OrdinalIgnoreCase) || string.Equals(sLabel, sTitle ?? "", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(sLabel, sLastWord, StringComparison.OrdinalIgnoreCase))
+            return sPart.Substring(iColon + 1).Trim();
+        return sPart;
     }
 
     // spelled: text a screen reader reads one character at a time -- each

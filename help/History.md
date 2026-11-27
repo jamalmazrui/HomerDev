@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.301.0 -- 26 November 2026, before midnight
+
+- **1.300.0 went out without 1.299.0's files.** The 1.299.0 sources -- KeyMap.answerPrecise and the word-first Say pattern, Inix.writeValues, Log.watchUi, SuiteCatalog and SuiteCommands -- had not reached the computer that released 1.300.0, so 1.300.0 was published with 1.298.0's KeyMap, and DbDo failed to compile ("KeyMap does not contain a definition for answerPrecise"). 1.301.0 carries every file changed in 1.299.0 and 1.300.0, so the released kit holds both.
+
 ## 1.300.0 -- 26 November 2026, very late night
 
 - **Every pick list starts on the last choice, else the first item.** Any pick-one list an LbcDialog makes now opens on the item chosen there last time, keyed by the dialog's title and the list's label, and on its first item when there is no last time. The choice is noted when the dialog closes on any button but Cancel, Close or Help. A caller that starts a list on something particular, such as the current value of a cell, keeps that start. Before, only LbcAsk.listDialog remembered, so DbDo's Open Table and Open Template Database did not.

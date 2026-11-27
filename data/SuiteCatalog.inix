@@ -591,7 +591,10 @@ key=Shift+Space
 description=Say {what}
 
 [command Say Status]
-apps=DbDo, EdSharp, FileDir
+; EDSHARP ONLY (26 November 2026, Jamal: no Homer app reads its status bar whole; JAWS and NVDA have keys for that).
+; DbDo's said facts each with its own key, so it is retired there; FileDir's Shift+Z says the timer instead. EdSharp's
+; says whether the document is modified, and its encoding, which no other key says, so it stays.
+apps=EdSharp
 key=Alt+Z
 description=Say {what}
 
@@ -856,14 +859,8 @@ what=the marked items, or the current one
 [words Say Selected|HomerView]
 what=the selected text
 
-[words Say Status|DbDo]
-what=the table, the current record, the order and the filter
-
 [words Say Status|EdSharp]
 what=whether the document is modified, and its encoding on a second press
-
-[words Say Status|FileDir]
-what=the current item's date and size, then the order and filter, and the timer when one is set
 
 [words Say Yield|DbDo]
 what=records are in view
