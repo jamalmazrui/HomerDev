@@ -221,3 +221,9 @@ in `.gitignore`, so it does not appear in the public source browser.
 - **The console is for a person; the log is for debugging.**
 - **Settings are written the moment they are answered**, not at exit.
 - **Speak only what the screen reader cannot know.**
+- **A pick list starts on the last choice, else the first item.** LbcDialog
+  does this for every pick-one list given no start item, or the first item, so
+  give the list a title and label that name it, and pass a start item only when
+  the list should open on something particular, such as the current value.
+  A list built outside LbcDialog uses `LbcDialog.lastChoiceIn` and
+  `LbcDialog.noteChoice` to do the same.

@@ -1616,6 +1616,7 @@ public class LbcDialog : IDisposable
         lb.TabIndex = iTabIndex++;
         lb.Margin = new Padding(0, 0, 0, DefaultRowGap);
         populateListBox(lb, lsNames, sSelected);
+        rememberListChoice(lb, lsNames, sSelected);
         Label lblLast = currentLabelOrNull();
         lb.GotFocus += handleGotFocus;
         // Find-in-list keys. Ctrl+J prompts for a case-insensitive
@@ -1926,6 +1927,15 @@ public class LbcDialog : IDisposable
     private const int iHistoryDepth = 10;
     private static Dictionary<string, List<string>> dHistorySession = new Dictionary<string, List<string>>();
 
+    // KEPT ACROSS SESSIONS BY DEFAULT (kit 1.300.0, 26 November 2026, Jamal: Control+Shift+O and Control+T in DbDo
+    // forgot their last choice). Only FileDir filed its history, through historyRead and historyWrite, so in DbDo,
+    // EdSharp and every other app a pick list's last choice lasted one session. With no hooks, the kit now keeps the
+    // history itself in %LOCALAPPDATA%\<App>\configs\History.inix, one tab-separated line a key under [History].
+    private static string defaultHistoryFile()
+    {
+        try { return System.IO.Path.Combine(Paths.configs(), "History.inix"); } catch (Exception) { return ""; }
+    }
+
     private static List<string> historyFor(string sKey)
     {
         if (historyRead != null)
@@ -1936,6 +1946,18 @@ public class LbcDialog : IDisposable
                 if (lsFiled != null) return lsFiled;
             }
             catch (Exception) { }
+        }
+        else if (!dHistorySession.ContainsKey(sKey))
+        {
+            string sFile = defaultHistoryFile();
+            List<string> lsKept = new List<string>();
+            try
+            {
+                if (sFile.Length > 0 && System.IO.File.Exists(sFile))
+                    foreach (string sPart in InixCodec.readValue(sFile, "History", sKey, "").Split('\t')) if (sPart.Length > 0) lsKept.Add(sPart);
+            }
+            catch (Exception) { }
+            dHistorySession[sKey] = lsKept;
         }
         List<string> lsHere;
         if (!dHistorySession.TryGetValue(sKey, out lsHere)) { lsHere = new List<string>(); dHistorySession[sKey] = lsHere; }
@@ -1958,6 +1980,12 @@ public class LbcDialog : IDisposable
             try { historyWrite(sKey, lsNow); }
             catch (Exception) { }
         }
+        else
+        {
+            string sFile = defaultHistoryFile();
+            try { if (sFile.Length > 0) InixCodec.writeValue(sFile, "History", sKey, string.Join("\t", lsNow.ToArray())); }
+            catch (Exception) { }
+        }
     }
 
     // THE LAST CHOICE IN A PICK LIST (6 November 2026). A list that offers the same things each time starts on the
@@ -1967,6 +1995,18 @@ public class LbcDialog : IDisposable
     {
         List<string> lsPast = historyFor("Pick" + sKey);
         return lsPast.Count > 0 ? lsPast[0] : "";
+    }
+    // lastChoiceIn: the most recent choice under the key that the list still holds, or "". Several lists may share
+    // a title -- FileDir calls many of its lists Pick -- so the newest choice may belong to another list; the
+    // history goes back several choices, and the newest one this list offers is the one it means.
+    public static string lastChoiceIn(string sKey, IEnumerable<string> lsItems)
+    {
+        if (lsItems == null) return "";
+        List<string> lsHave = new List<string>(lsItems);
+        foreach (string sPast in historyFor("Pick" + sKey))
+            foreach (string sItem in lsHave)
+                if (string.Equals(sItem, sPast, StringComparison.OrdinalIgnoreCase)) return sItem;
+        return "";
     }
     public static void noteChoice(string sKey, string sValue)
     {
@@ -2563,6 +2603,50 @@ public class LbcDialog : IDisposable
         return true;
     }
 
+    // THE LAST CHOICE IN EVERY PICK LIST (26 November 2026). A Homer pick list opens on the item chosen there
+    // last time, and on its first item when there is no last time. Open Table in DbDo opened on whatever
+    // table came first, not the one opened last, because only some lists remembered. Now every pick-one
+    // list an LbcDialog makes remembers, keyed by the dialog's title and the list's label, and the choice is
+    // noted when the dialog closes on any button but Cancel, Close or Help. A caller that starts a list on
+    // something particular -- the current value of a cell, say -- keeps that start: the memory is used only
+    // when the caller gives no start, or gives the first item. The history persists through the app's
+    // historyRead and historyWrite hooks, or else the kit's own History.inix.
+    private Dictionary<ListBox, string> dRememberedLists = new Dictionary<ListBox, string>();
+    private void rememberListChoice(ListBox lb, IList<string> lsNames, string sSelected)
+    {
+        if (lsNames == null || lsNames.Count == 0) return;
+        if (!string.IsNullOrEmpty(sSelected) && !string.Equals(sSelected, lsNames[0], StringComparison.OrdinalIgnoreCase)) return;
+        string sKey = listChoiceKey(frm.Text, nameFromLabel());
+        if (sKey.Length == 0) return;
+        dRememberedLists[lb] = sKey;
+        string sLast = lastChoiceIn(sKey, lsNames);
+        if (sLast.Length == 0) return;
+        for (int i = 0; i < lb.Items.Count; i++) if (string.Equals(lb.Items[i].ToString(), sLast, StringComparison.OrdinalIgnoreCase)) { lb.SelectedIndex = i; break; }
+    }
+    // listChoiceKey: letters and digits of the title and label, the same key LbcAsk.listDialog uses.
+    private static string listChoiceKey(string sTitle, string sLabel)
+    {
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+        foreach (char c in (sTitle ?? "") + (sLabel ?? "")) if (char.IsLetterOrDigit(c)) sb.Append(c);
+        return sb.ToString();
+    }
+    // noteListChoices: file the item each remembering list is on. runOkCancel and runWithButtons call it; a
+    // dialog run with its own buttons (runPlain) calls it from the button that acts.
+    public void noteListChoices()
+    {
+        foreach (KeyValuePair<ListBox, string> kv in dRememberedLists)
+        {
+            try { if (kv.Key.SelectedIndex >= 0) noteChoice(kv.Value, kv.Key.Items[kv.Key.SelectedIndex].ToString()); }
+            catch (Exception) { }
+        }
+    }
+    private void noteListChoicesFor(string sButton)
+    {
+        if (string.IsNullOrEmpty(sButton)) return;
+        foreach (string sNot in new string[] { "Cancel", "Close", "Help" }) if (string.Equals(sButton, sNot, StringComparison.OrdinalIgnoreCase)) return;
+        noteListChoices();
+    }
+
     public bool runOkCancel()
     {
         return string.Equals(runWithButtons(new string[] { "OK", "Cancel" }),
@@ -2944,7 +3028,8 @@ public class LbcDialog : IDisposable
             };
         }
         frm.ShowDialog(owner);
-        if (sResult == "" && sBandResult != null) return sBandResult;
+        if (sResult == "" && sBandResult != null) sResult = sBandResult;
+        noteListChoicesFor(sResult);
         return sResult;
     }
 
@@ -4884,6 +4969,8 @@ public class LbcInixForm
                     foreach (string sOne in lsRange) lst.Items.Add(sOne);
                     if (lsPicked.Count > 0) lst.SelectedItem = lsPicked[0];
                     else if (sValue.Length > 0 && lsRange.Contains(sValue)) lst.SelectedItem = sValue;
+                    // A pick list with nothing given starts on its first item, never on no item at all.
+                    if (lst.SelectedIndex < 0 && lst.Items.Count > 0) lst.SelectedIndex = 0;
                     ctl = lst;
                     break;
                 case "combo":
@@ -6759,9 +6846,16 @@ if (bSort) lsOrder.Sort(delegate(int a, int b) { int iCompare = string.Compare(a
 List<string> lsNames = new List<string>();
 foreach (int iAt in lsOrder) lsNames.Add(aShown[iAt]);
 string sSelected = (iIndex >= 0 && iIndex < lsNames.Count) ? lsNames[iIndex] : lsNames[0];
+// THE LAST CHOICE, ELSE THE FIRST (kit 1.300.0, 26 November 2026): as listDialog does, a caller that opens the list on
+// its first item gets the item chosen last in the list of this title instead, when it is still there.
+string sChoiceKey = choiceKey(sTitle, "");
+if (iIndex <= 0) {
+string sLast = LbcDialog.lastChoiceIn(sChoiceKey, lsNames);
+if (sLast.Length > 0) sSelected = sLast;
+}
 using (LbcDialog dlg = new LbcDialog(sTitle, ownerForm())) {
 ListBox lb = dlg.addPickBox("&Choices", lsNames, sSelected, "");
-if (iIndex >= 0 && iIndex < lsNames.Count) lb.SelectedIndex = iIndex;
+lb.SelectedIndex = Math.Max(0, lsNames.IndexOf(sSelected));
 dlg.primaryList = lb;
 if (!dlg.runOkCancel()) {
 say("Cancel", true);
@@ -6769,6 +6863,7 @@ return "";
 }
 int iRow = dlg.listSourceIndex(lb, lb.SelectedIndex);
 if (iRow < 0 || iRow >= lsOrder.Count) return "";
+LbcDialog.noteChoice(sChoiceKey, lsNames[iRow]);
 return aValue[lsOrder[iRow]];
 }
 } // pick method
@@ -7390,8 +7485,8 @@ string sSelected = (iDefaultIndex >= 0 && iDefaultIndex < lsItems.Count) ? lsIte
 // the kit's history; a caller that names an item still gets that item.
 string sChoiceKey = choiceKey(sTitle, sLabel);
 if (iDefaultIndex <= 0) {
-string sLast = Homer.LbcDialog.lastChoice(sChoiceKey);
-if (sLast.Length > 0 && lsItems.Contains(sLast)) sSelected = sLast;
+string sLast = Homer.LbcDialog.lastChoiceIn(sChoiceKey, lsItems);
+if (sLast.Length > 0) sSelected = sLast;
 }
 using (Homer.LbcDialog dlg = new Homer.LbcDialog(sTitle, ownerForm())) {
 ListBox lb = string.IsNullOrEmpty(sLabel)

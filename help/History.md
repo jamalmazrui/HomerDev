@@ -7,6 +7,19 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.300.0 -- 26 November 2026, very late night
+
+- **Every pick list starts on the last choice, else the first item.** Any pick-one list an LbcDialog makes now opens on the item chosen there last time, keyed by the dialog's title and the list's label, and on its first item when there is no last time. The choice is noted when the dialog closes on any button but Cancel, Close or Help. A caller that starts a list on something particular, such as the current value of a cell, keeps that start. Before, only LbcAsk.listDialog remembered, so DbDo's Open Table and Open Template Database did not.
+- **The memory lasts between sessions in every app.** An app that does not file the kit's history itself, as FileDir does, now has it kept in History.inix in its configs folder, so LbcAsk.pick, the prompts and the pick lists remember after a restart.
+- **Lists that share a title remember apart.** The new LbcDialog.lastChoiceIn gives the newest past choice that the list still holds, so FileDir's many lists titled Pick each start where they should.
+- **A form's pick list never starts empty.** A list field in a band dialog with no value given starts on its first item rather than on no item.
+
+## 1.299.0 -- 26 November 2026, night
+
+- **A Say command says its word first, then its answer.** KeyMap.answer now speaks the command's word -- its name after "Say", as Cell for Say Cell, else the title the app passes -- as its own utterance, then the answer as utterances of their own. A label in the answer that repeats the word ("cell: 79") is set aside, so the word is heard once. A second press does not say the word again.
+- **A second press spells the precise value.** The new KeyMap.answerPrecise takes the exact value beside the spoken one: FileDir's Say Size says "1 KB" and spells "1234 bytes" on a second press; DbDo's Say Cell spells the value as stored.
+- **Say Status is EdSharp's alone.** No Homer app reads its status bar whole, since JAWS and NVDA have keys for that. DbDo's Say Status is retired, every fact it said having its own key, and FileDir's Shift+Z says the timer instead; Alt+Z is free in both. SuiteCatalog and SuiteCommands record it.
+
 ## 1.298.0 -- 26 November 2026, late night
 
 - **Many settings saved in one write.** The new `InixCodec.writeValues(sPath, triples)` reads an .inix file once, sets every { section, key, value } with writeValue's own rules, and writes the file once. Each writeValue had read and replaced the whole file, so a program saving hundreds of keys rewrote it hundreds of times. The stall watch's first report showed what that cost: DbDo frozen in ReplaceFile for 2 to 17 seconds whenever a row move or a filter changed the view, while it saved about 2,000 keys one file rewrite at a time.

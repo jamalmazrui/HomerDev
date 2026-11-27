@@ -195,6 +195,48 @@
 <h1 id="history">History</h1>
 <p>Each version is a level-2 heading, newest first, so your screen
 reader’s heading keys move from one version to the next.</p>
+<h2 id="november-2026-very-late-night">1.300.0 – 26 November 2026, very
+late night</h2>
+<ul>
+<li><strong>Every pick list starts on the last choice, else the first
+item.</strong> Any pick-one list an LbcDialog makes now opens on the
+item chosen there last time, keyed by the dialog’s title and the list’s
+label, and on its first item when there is no last time. The choice is
+noted when the dialog closes on any button but Cancel, Close or Help. A
+caller that starts a list on something particular, such as the current
+value of a cell, keeps that start. Before, only LbcAsk.listDialog
+remembered, so DbDo’s Open Table and Open Template Database did
+not.</li>
+<li><strong>The memory lasts between sessions in every app.</strong> An
+app that does not file the kit’s history itself, as FileDir does, now
+has it kept in History.inix in its configs folder, so LbcAsk.pick, the
+prompts and the pick lists remember after a restart.</li>
+<li><strong>Lists that share a title remember apart.</strong> The new
+LbcDialog.lastChoiceIn gives the newest past choice that the list still
+holds, so FileDir’s many lists titled Pick each start where they
+should.</li>
+<li><strong>A form’s pick list never starts empty.</strong> A list field
+in a band dialog with no value given starts on its first item rather
+than on no item.</li>
+</ul>
+<h2 id="november-2026-night">1.299.0 – 26 November 2026, night</h2>
+<ul>
+<li><strong>A Say command says its word first, then its answer.</strong>
+KeyMap.answer now speaks the command’s word – its name after “Say”, as
+Cell for Say Cell, else the title the app passes – as its own utterance,
+then the answer as utterances of their own. A label in the answer that
+repeats the word (“cell: 79”) is set aside, so the word is heard once. A
+second press does not say the word again.</li>
+<li><strong>A second press spells the precise value.</strong> The new
+KeyMap.answerPrecise takes the exact value beside the spoken one:
+FileDir’s Say Size says “1 KB” and spells “1234 bytes” on a second
+press; DbDo’s Say Cell spells the value as stored.</li>
+<li><strong>Say Status is EdSharp’s alone.</strong> No Homer app reads
+its status bar whole, since JAWS and NVDA have keys for that. DbDo’s Say
+Status is retired, every fact it said having its own key, and FileDir’s
+Shift+Z says the timer instead; Alt+Z is free in both. SuiteCatalog and
+SuiteCommands record it.</li>
+</ul>
 <h2 id="november-2026-late-night">1.298.0 – 26 November 2026, late
 night</h2>
 <ul>
@@ -212,7 +254,7 @@ again.</strong> writeValue and writeValues leave the file untouched when
 no line would change, and removing a key that is not there no longer
 adds an empty section.</li>
 </ul>
-<h2 id="november-2026-night">1.297.0 – 26 November 2026, night</h2>
+<h2 id="november-2026-night-1">1.297.0 – 26 November 2026, night</h2>
 <ul>
 <li><strong>A program’s freezes are logged with where it stood.</strong>
 The new <code>Homer.Log.watchUi(iStallMs)</code>, called once on a
@@ -337,7 +379,7 @@ apart from the program, such as a database too large for the installer.
 Like the shipped templates folder, it is read and never created by the
 program. DbDo is the first to read it.</li>
 </ul>
-<h2 id="november-2026-night-1">1.293.0 – 25 November 2026, night</h2>
+<h2 id="november-2026-night-2">1.293.0 – 25 November 2026, night</h2>
 <ul>
 <li><strong>SuiteCommands.offerHomerApps asks where a file goes
 next,</strong> the same way in every Homer program: the Homer programs
@@ -488,7 +530,7 @@ there.</li>
 <li><strong>SuiteCommands.inix</strong> adds DbDo’s Say Field Type
 (Alt+Shift+F) and records Say Cell’s change to the value alone.</li>
 </ul>
-<h2 id="november-2026-night-2">1.289.1 – 24 November 2026, night</h2>
+<h2 id="november-2026-night-3">1.289.1 – 24 November 2026, night</h2>
 <ul>
 <li><strong>Conversion.cs comes again, whole.</strong> EdSharp and
 FileDir stopped compiling on this computer: Conversion had no
@@ -560,7 +602,7 @@ the first user.</li>
 Control+Shift+V, and Paste File becomes Merge File on Alt+Shift+M,
 matching DbDo’s Merge Data.</li>
 </ul>
-<h2 id="november-2026-night-3">1.287.2 – 24 November 2026, night</h2>
+<h2 id="november-2026-night-4">1.287.2 – 24 November 2026, night</h2>
 <ul>
 <li><strong>A link inside a link is now settled.</strong> Cutting the
 sample keys made fixPages finish Quarto’s page again, and it left one
@@ -579,7 +621,7 @@ the file, and it failed a gate it had passed when built. The check now
 reads the guide as written. Harvests kept only because of this are
 deleted at the next build, as the rule says.</li>
 </ul>
-<h2 id="november-2026-night-4">1.287.1 – 24 November 2026, night</h2>
+<h2 id="november-2026-night-5">1.287.1 – 24 November 2026, night</h2>
 <ul>
 <li><strong>No secret key is ever published.</strong> GitHub refused
 AppHelpGuides’ push of Stripe.htm, four times, because Stripe’s help
@@ -598,7 +640,7 @@ reached GitHub into the next commit, made from the files as they are,
 with git reset –soft, which keeps every file. Nothing already on GitHub
 is rewritten.</li>
 </ul>
-<h2 id="november-2026-night-5">1.287.0 – 24 November 2026, night</h2>
+<h2 id="november-2026-night-6">1.287.0 – 24 November 2026, night</h2>
 <ul>
 <li><strong>Stripe and Link have readers.</strong> Their harvests of 20
 November were waiting in datawith nothing to build them. One reader
@@ -679,7 +721,7 @@ letter, a digit or Shift with a letter to quiet the reader’s typing
 echo, even where the app answers the key, because that would change the
 echo in every text box of the app too.</li>
 </ul>
-<h2 id="november-2026-night-6">1.282.0 – 23 November 2026, night</h2>
+<h2 id="november-2026-night-7">1.282.0 – 23 November 2026, night</h2>
 <ul>
 <li><strong>SuiteCommands.inix gains DbDo’s Read Headed family and Say
 Header.</strong> Read Headed Marked is on Alt+Shift+H and Read Headed

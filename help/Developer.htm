@@ -448,6 +448,13 @@ debugging.</strong></li>
 <li><strong>Settings are written the moment they are answered</strong>,
 not at exit.</li>
 <li><strong>Speak only what the screen reader cannot know.</strong></li>
+<li><strong>A pick list starts on the last choice, else the first
+item.</strong> LbcDialog does this for every pick-one list given no
+start item, or the first item, so give the list a title and label that
+name it, and pass a start item only when the list should open on
+something particular, such as the current value. A list built outside
+LbcDialog uses <code>LbcDialog.lastChoiceIn</code> and
+<code>LbcDialog.noteChoice</code> to do the same.</li>
 </ul>
 </main>
 </body>
