@@ -437,6 +437,13 @@ reason=S for Statistics, free since Edit Script moved to Alt+Shift+V; Alt+Shift,
 disposition=ruled
 status=implemented
 
+[DbDo getDatabase]
+name=Get Database
+keys=
+change=new 26 November 2026: a DbDo database from a path or url, a .db or a .zip with its files, copied into DbDo's data folder, where Open Template Database lists it
+reason=menu only, File menu G: getting a database is occasional; "DbDo database" is the term, as people say "an Access database"
+status=implemented
+
 [DbDo goToRecord]
 name=Go to Record
 keys=Control+G
@@ -607,8 +614,10 @@ reason=Open Database makes a working copy of every file that is not a database, 
 
 [DbDo openCellValue]
 name=Open Cell Value
-keys=Control+Enter
-status=current
+keys=Shift+Enter
+change=27 November 2026: from Control+Shift+H (26 November) and Control+Enter before it, which means OK in every Lbc dialog and a page break in EdSharp
+reason=Enter goes into a record's children, Shift+Enter out to what the cell names, as FileDir's Shift+Enter opens the item itself
+status=implemented
 
 [DbDo openCommandPrompt]
 name=Open Command Prompt
@@ -703,6 +712,13 @@ name=Play Tutorials
 keys=Alt+F12
 status=implemented
 reason=decision 1, the same key as EdSharp; free here
+
+[DbDo previewMarkdownInWebBrowser]
+name=Preview Markdown in Web Browser
+keys=Control+Shift+H
+change=new 27 November 2026: the record's Markdown field, found by its declared type, shown or not, as a web page; a pick list when there are several
+reason=EdSharp's name for the same act; H as in EdSharp's Control+H for HTML (Jamal); EdSharp's own has no key yet, since its Control+Shift+H is Hard Line Break
+status=implemented
 
 [DbDo previousRecord]
 name=Previous Record
@@ -1323,6 +1339,7 @@ status=implemented
 [DbDo updateFromTemplate]
 name=Update from Template
 keys=
+change=26 November 2026: Update Copies from Templates folded in as its All copies button, so the Help menu has one update item
 status=current
 
 [DbDo whereAmI]

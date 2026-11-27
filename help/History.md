@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.303.0 -- 27 November 2026, morning
+
+- **The suite catalog knows DbDo's Preview Markdown in Web Browser** on Control+Shift+H, EdSharp's name for the same act, and Open Cell Value's move to Shift+Enter, as Shift+Enter opens the item itself in FileDir. EdSharp's Preview Markdown in Web Browser has no key yet, since its Control+Shift+H is Hard Line Break.
+
+## 1.302.0 -- 26 November 2026, late evening
+
+- **The suite catalog knows DbDo's Get Database**, the File menu command that copies a shared DbDo database, from a path or a url, into DbDo's own folder. It also records that Update Copies from Templates is now Update from Template's All copies button.
+
 ## 1.301.0 -- 26 November 2026, before midnight
 
 - **1.300.0 went out without 1.299.0's files.** The 1.299.0 sources -- KeyMap.answerPrecise and the word-first Say pattern, Inix.writeValues, Log.watchUi, SuiteCatalog and SuiteCommands -- had not reached the computer that released 1.300.0, so 1.300.0 was published with 1.298.0's KeyMap, and DbDo failed to compile ("KeyMap does not contain a definition for answerPrecise"). 1.301.0 carries every file changed in 1.299.0 and 1.300.0, so the released kit holds both.
