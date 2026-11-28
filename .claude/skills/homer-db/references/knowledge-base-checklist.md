@@ -17,6 +17,7 @@ build that went wrong without it.
 - Descriptions and settings
 - The builder
 - Checks
+- One file, the whole package
 - Personal or shipped
 - Size and sharing
 
@@ -120,6 +121,20 @@ build that went wrong without it.
 - **describeFields, then checkTemplates --repair**, then checkDb with no
   failures, before anything is shipped or installed.
 - **Every saved search runs**, and checkTemplates reports its row count.
+
+## One file, the whole package
+
+- **The .db alone must be enough to share.** Whatever runs faster from disk,
+  everything a person needs is inside the file: the data, the full-text index
+  (an FTS5 table in the same file), the descriptions in defs, and the
+  settings, saved searches, scripts and reports in the files table.
+- **Pack as the builder finishes**, with describeFields' packCarried, the
+  build's own code, so a builder run alone still makes a whole package.
+- **Links must work on another computer.** A file:/// address names one
+  computer's disk. Where the source is a public repository, link the committed
+  file's public address instead, and log how many links stay local.
+- **Prove it.** Copy the .db alone into an empty folder, run every carried
+  saved search from its packed copy, and check the index's integrity there.
 
 ## Personal or shipped
 

@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.308.0 -- 28 November 2026, early morning
+
+- **The knowledge-base checklist makes one file the whole package.** A DbDo database must be shareable alone: data, full-text index, descriptions, and the settings, saved searches, scripts and reports packed into its files table as it is built. Links must work on another computer, so a file in a public repository is linked by its public address, not a file:/// path. The proof is to copy the .db alone into an empty folder and run every carried saved search there.
+
 ## 1.307.0 -- 27 November 2026, midnight
 
 - **relicense reads only what is published.** It passes over every file and folder LocalFiles.txt names, which never leave the computer, so a license claim there cannot matter. DbDo's tidy had taken about seven minutes in some cycles and four seconds in others, while relicense read the thousands of cached magazine pages in DbDo's data folder whenever the disk cache was cold.
