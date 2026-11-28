@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.304.0 -- 27 November 2026, night
+
+- **The homer-db skill has a checklist for knowledge bases**: databases built by a script from a collection someone already keeps, so DbDo can search, play, read and open every item. It covers the source, keys, the fields DbDo acts on (stream_url for Play Media, url for opening a page), values, full-text search, descriptions, the builder, checks, personal or shipped, and size. Each item came from a build that went wrong without it, such as a key that called a rebroadcast a repeat, and titles broken in two by wrapped HTML.
+
 ## 1.303.0 -- 27 November 2026, morning
 
 - **The suite catalog knows DbDo's Preview Markdown in Web Browser** on Control+Shift+H, EdSharp's name for the same act, and Open Cell Value's move to Shift+Enter, as Shift+Enter opens the item itself in FileDir. EdSharp's Preview Markdown in Web Browser has no key yet, since its Control+Shift+H is Hard Line Break.

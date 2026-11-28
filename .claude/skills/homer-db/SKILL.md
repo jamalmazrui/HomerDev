@@ -31,6 +31,12 @@ for the exact statements. After any change, run `scripts/checkDb` (from the
 kit, `checkDb <file or folder>`): it only reads, and its log lists every
 finding.
 
+Building a database from a collection someone already keeps -- a magazine,
+a set of directory pages, a folder of guides -- so DbDo can search, play and
+open every item? Go through
+[references/knowledge-base-checklist.md](references/knowledge-base-checklist.md)
+before the design and again before the first full build.
+
 ## A table, in its fixed order
 
 1. `<singular>_id INTEGER PRIMARY KEY AUTOINCREMENT` -- the English singular of
