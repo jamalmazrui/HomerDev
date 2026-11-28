@@ -123,6 +123,20 @@ def fixLicenseFile(sAppDir):
     return True
 
 
+def localPaths(sAppDir):
+    """What LocalFiles.txt names: files and folders that stay on this disk and are never published, as lower-case paths
+    relative to the app with forward slashes. NOT READ (27 November 2026): DbDo's tidy took about seven minutes in some
+    cycles and four seconds in others, here, walking the thousands of cached magazine pages in data\\BrailleForum
+    and data\\BrailleMonitor whenever the disk cache was cold. A license claim matters only in what is published."""
+    setPaths = set()
+    sPath = os.path.join(sAppDir, "LocalFiles.txt")
+    if not os.path.isfile(sPath): return setPaths
+    for sLine in open(sPath, encoding="utf-8-sig", errors="replace"):
+        sLine = sLine.strip()
+        if sLine and not sLine.startswith("#"): setPaths.add(sLine.replace("\\", "/").strip("/").lower())
+    return setPaths
+
+
 def rewriteClaims(sAppDir, sApp, bDryRun=False):
     """The app's own claims to another license become MIT. Returns files changed,
     or with bDryRun, a list of "file line N: text" for each claim, changing nothing."""
@@ -132,11 +146,15 @@ def rewriteClaims(sAppDir, sApp, bDryRun=False):
     oAlone = re.compile(r"(?i)^(\W*)(" + sGnu + r")(\W*)$")
     oCopyright = re.compile(r"(?i)copyright.*Jamal\s+Mazrui")
     iFiles = 0
+    setLocal = localPaths(sAppDir)
     for sDir, lsDirs, lsFiles in os.walk(sAppDir):
-        lsDirs[:] = [s for s in lsDirs if s.lower() not in lsSkipFolders]
+        sRel = os.path.relpath(sDir, sAppDir).replace("\\", "/").lower()
+        if sRel == ".": sRel = ""
+        lsDirs[:] = [s for s in lsDirs if s.lower() not in lsSkipFolders and ((sRel + "/" if sRel else "") + s.lower()) not in setLocal]
         for sName in lsFiles:
             sLower = sName.lower()
             if not sLower.endswith(lsTextExtensions): continue
+            if ((sRel + "/" if sRel else "") + sLower) in setLocal: continue
             if sLower in ("history.md", "history.htm", "license.md", "license.htm"): continue
             sPath = os.path.join(sDir, sName)
             try:

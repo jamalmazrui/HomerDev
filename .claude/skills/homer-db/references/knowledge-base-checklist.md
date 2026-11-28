@@ -32,6 +32,10 @@ build that went wrong without it.
   survey decides the columns.
 - **Skip what repeats.** Contents lists and appendixes list the same items
   again; read only the body.
+- **Keep what the source holds, and measure it.** A page made from another
+  format, such as Word's HTML of a PDF, can read out of order. Invent no
+  heading or list to mend it; log how many items kept their headings, so the
+  collection's structure is known.
 
 ## Records and keys
 
@@ -92,6 +96,10 @@ build that went wrong without it.
 
 ## The builder
 
+- **Share what every builder does in one module**: finding the source, --due,
+  the log named for its database, building beside the old file, the
+  descriptions, the index with its sample searches, and the sizes. Each new
+  knowledge base then holds only what its collection needs.
 - **A script in scripts with its .cmd wrapper**, finding the source folder from
   its argument, an environment variable, or a drive's root.
 - **--due rebuilds only when needed**: the database missing, or older than the

@@ -7,6 +7,14 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.307.0 -- 27 November 2026, midnight
+
+- **relicense reads only what is published.** It passes over every file and folder LocalFiles.txt names, which never leave the computer, so a license claim there cannot matter. DbDo's tidy had taken about seven minutes in some cycles and four seconds in others, while relicense read the thousands of cached magazine pages in DbDo's data folder whenever the disk cache was cold.
+
+## 1.306.0 -- 27 November 2026, before midnight
+
+- **The knowledge-base checklist adds two items from building three more.** Share what every builder does in one module, so each new knowledge base holds only what its collection needs; and keep what the source holds, measuring how much structure it kept rather than inventing any, since a page made from another format can read out of order.
+
 ## 1.305.0 -- 27 November 2026, late night
 
 - **The knowledge-base checklist learned from its first full builds.** Name constants as tidy wants them, since a script tidy renames is newer than its database and rebuilds it again; leave a database the installer excludes out of the installer's inputs, or each rebuild makes a new installer and push reads it again; and log the source's size, the database's size and each table's share, since a full collection can run far past an estimate.
