@@ -3817,6 +3817,38 @@ lEstates = [
         "sOkStatuses": "200, 202",
         "sExtraLinks": "",
     },
+    # QGIS (28 November 2026): the free desktop GIS, asked for as a tool for transit data analysis. Its help is a Sphinx
+    # site at docs.qgis.org, three manuals written for people using QGIS: the User Guide, the Training Manual and A Gentle
+    # Introduction to GIS. Pinned to 3.44, the release docs.qgis.org/latest served on 28 November 2026 (its own pages
+    # link to /3.44/, not /latest/), so the version list on every page cannot lead the crawl into 3.40, 3.34 or testing,
+    # and one release is gathered once. Refused: the PyQGIS cookbook, the server manual and the developers' guide
+    # (outside the fence: they are written for programmers and server administrators), the Training Manual's QGIS
+    # Server module and its page on contributing to the manual, every translated edition (only /en/ is inside), and
+    # Sphinx's own machinery (_sources, _images, _static, genindex, search). QGIS has no transit tools of its own;
+    # GTFS work is done with plugins, whose help is a README on GitHub, and those are not gathered here.
+    {
+        "sProduct": "QGIS",
+        "sScriptName": "getQgisHelp.py",
+        "sSystem": "the QGIS project's own documentation, published with Sphinx",
+        "sFolder": "QgisHelp",
+        "sLogName": "getQgisHelp.log",
+        "sZipName": "QgisHelp.zip",
+        "iMaxPages": 1500,
+        "nDelay": 1.5,
+        "sSeeds": ('"https://docs.qgis.org/3.44/en/docs/user_manual/index.html",\n'
+                   '              "https://docs.qgis.org/3.44/en/docs/training_manual/index.html",\n'
+                   '              "https://docs.qgis.org/3.44/en/docs/gentle_gis_introduction/index.html"'),
+        # The refusals look at the WHOLE address, so the lookahead stands before the host, not after the manual's
+        # name: placed after "training_manual/", it could never see "training_manual/qgis_server/" (the leading-path
+        # fault in fence-faults.md, caught here by a predicate before the first run).
+        "sFencePattern": (r"^(?!.*(_sources|_images|_static|_downloads|genindex|search\.html|training_manual/qgis_server/"
+                          r"|training_manual/appendix/contribute))"
+                          r"https://docs\.qgis\.org/3\.44/en/docs/(user_manual|training_manual|gentle_gis_introduction)/"),
+        "sSubjectPattern": "",
+        "sReadyPattern": r"(QGIS)",
+        "sOkStatuses": "200, 202",
+        "sExtraLinks": "",
+    },
 ]
 
 

@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.309.0 -- 28 November 2026, late morning
+
+- **QGIS joins the help guides.** makeHarvester gains a QGIS block that gathers three of the project's manuals from docs.qgis.org: the User Guide, the Training Manual and A Gentle Introduction to GIS. It is pinned to release 3.44, the one docs.qgis.org/latest served that day, so the version list on every page cannot lead it into older releases. The fence leaves out the PyQGIS cookbook, the server manual, the developers' guide, the Training Manual's QGIS Server module, translated editions and Sphinx's own files. A predicate caught the old leading-path fault before the first run: a refusal placed after the manual's name could never see the manual's name, so the refusals now stand before the host. buildGuide gains readQgis, which files each page under its manual and chapter in the publisher's words, drops each chapter's index page that only lists its sections, and takes the section number off each title so titles sort by their words.
+
 ## 1.308.0 -- 28 November 2026, early morning
 
 - **The knowledge-base checklist makes one file the whole package.** A DbDo database must be shareable alone: data, full-text index, descriptions, and the settings, saved searches, scripts and reports packed into its files table as it is built. Links must work on another computer, so a file in a public repository is linked by its public address, not a file:/// path. The proof is to copy the .db alone into an empty folder and run every carried saved search there.

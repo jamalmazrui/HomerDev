@@ -2101,6 +2101,104 @@ def readTwitch(sFolder):
     return lArticles
 
 
+# QGIS (28 November 2026). The categories are the manuals' own chapters and modules, in the publisher's own words,
+# each prefixed with its manual, so the User Guide, the Training Manual and A Gentle Introduction to GIS stay apart.
+dQgisChapters = {
+    "user_manual": ("User Guide", {
+        "introduction/getting_started": "Getting Started", "introduction/project_files": "Working with Project Files",
+        "introduction/qgis_gui": "QGIS GUI", "introduction/browser": "The Browser panel",
+        "introduction/qgis_configuration": "QGIS Configuration", "introduction/general_tools": "General Tools",
+        "introduction": "Getting Started", "working_with_projections": "Working with Projections",
+        "map_views": "Visualizing Maps", "expressions": "Level up with Expressions", "style_library": "The Style Library",
+        "managing_data_source": "Managing Data Source", "working_with_vector": "Working with Vector Data",
+        "working_with_raster": "Working with Raster Data", "working_with_mesh": "Working with Mesh Data",
+        "working_with_vector_tiles": "Working with Vector Tiles", "working_with_point_clouds": "Working with Point Clouds",
+        "working_with_3d_tiles": "Working with 3D Tiles", "print_layout": "Laying out the maps",
+        "working_with_ogc": "Working with OGC / ISO protocols", "working_with_gps": "Working with GPS Data",
+        "auth_system": "Authentication System", "grass_integration": "GRASS GIS Integration",
+        "processing": "QGIS processing framework", "processing_algs": "Processing providers and algorithms",
+        "plugins": "Plugins", "appendices": "Appendices", "literature_web": "Literature and Web References"}),
+    "training_manual": ("Training Manual", {
+        "foreword": "Course Introduction", "basic_map": "Creating and Exploring a Basic Map",
+        "vector_classification": "Classifying Vector Data", "map_composer": "Laying out the Maps",
+        "create_vector_data": "Creating Vector Data", "vector_analysis": "Vector Analysis", "rasters": "Rasters",
+        "complete_analysis": "Completing the Analysis", "qgis_plugins": "Plugins", "online_resources": "Online Resources",
+        "grass": "GRASS", "assessment": "Assessment", "forestry": "Forestry Application",
+        "database_concepts": "Database Concepts with PostgreSQL",
+        "spatial_databases": "Spatial Database Concepts with PostGIS / PostgreSQL",
+        "databases": "Using Spatial Databases in QGIS", "processing": "The QGIS processing guide",
+        "appendix": "Preparing Exercise Data"}),
+}
+
+
+def qgisCategory(sUrl):
+    """The category of one QGIS page, from its address: the manual, then its chapter or module. A chapter not in the
+    table keeps its folder's name, and the log says so, so a chapter QGIS adds later is seen rather than misfiled."""
+    oMatch = re.search(r"/docs/(user_manual|training_manual|gentle_gis_introduction)/(.*)$", sUrl)
+    if not oMatch: return ""
+    if oMatch.group(1) == "gentle_gis_introduction": return "A Gentle Introduction to GIS"
+    sManual, dChapters = dQgisChapters[oMatch.group(1)]
+    lParts = oMatch.group(2).split("/")
+    sKey = "/".join(lParts[:2]).rsplit(".", 1)[0]
+    sChapter = dChapters.get(sKey) or dChapters.get(lParts[0])
+    if not sChapter:
+        sChapter = lParts[0].replace("_", " ").capitalize()
+        logging.info("QGIS: chapter folder %s is not in the table; filed under %s", lParts[0], sChapter)
+    return sManual + ": " + sChapter
+
+
+def readQgis(sFolder):
+    """QGIS's three manuals, published with Sphinx's Read the Docs theme. The body is the region marked articleBody and
+    the title is its h1, with the chapter number ("23.8.") and the anchor mark taken off so titles sort by their words.
+    A chapter's index page is only a list of its sections, so that list is removed first and a page with nothing else
+    left is set aside and counted. The heading marks and the page's own local contents list go too: they link only
+    within a page the guide does not keep whole."""
+    dManifest = readManifest(sFolder)
+    lArticles = []
+    iIndexes = iRefused = 0
+    for sName in sorted(os.listdir(sFolder)):
+        if not sName.endswith(".html"): continue
+        sUrl = dManifest.get(sName, "")
+        if re.search(r"(_sources|genindex|search\.html|qgis_server|appendix_contribute)", sUrl or sName):
+            iRefused += 1
+            continue
+        sCategory = qgisCategory(sUrl)
+        if not sCategory:
+            iRefused += 1
+            logging.info("QGIS: %s is outside the three manuals; left out", sUrl or sName)
+            continue
+        sMarkup = readText(os.path.join(sFolder, sName))
+        sBody = (findBalanced(sMarkup, r'<div[^>]*itemprop="articleBody"', "div")
+                 or findBalanced(sMarkup, r'<div[^>]*role="main"', "div")
+                 or findBalanced(sMarkup, r"<main[^>]*>", "main"))
+        oTitle = re.search(r"(?is)<h1[^>]*>(.*?)</h1>", sBody or "")
+        if not sBody or not oTitle:
+            iRefused += 1
+            logging.info("QGIS: %s has no article region or no title; left out", sName)
+            continue
+        sTitle = re.sub(r"(?is)<a[^>]*class=[\"']headerlink[\"'][^>]*>.*?</a>", "", oTitle.group(1))
+        sTitle = re.sub(r"^\d+(\.\d+)*\.?\s+", "", stripTags(sTitle).rstrip("#\u00b6").strip()).strip()
+        if not sTitle: continue
+        # The h1 goes from the body: the guide's own heading carries the title, and the publisher's numbered copy
+        # ("23.8. Using processing from the command line") would sit under it as a second heading saying the same.
+        sBody = sBody.replace(oTitle.group(0), "", 1)
+        sBody = re.sub(r"(?is)<a[^>]*class=[\"']headerlink[\"'][^>]*>.*?</a>", "", sBody)
+        for sPattern, sTag in ((r'<div[^>]*class="[^"]*toctree-wrapper', "div"), (r'<nav[^>]*class="[^"]*contents', "nav"),
+                               (r'<div[^>]*class="[^"]*contents[^"]*topic', "div"), (r'<div[^>]*class="[^"]*rst-footer-buttons', "div")):
+            while True:
+                sBlock = findBalanced(sBody, sPattern, sTag)
+                if not sBlock: break
+                sBody = sBody.replace(sBlock, "", 1)
+        lBody = toMarkdown(sBody, 0, sUrl)
+        if len(" ".join(lBody).split()) - len(sTitle.split()) < 30:
+            iIndexes += 1
+            continue
+        lArticles.append((sCategory, sTitle, lBody))
+    logging.info("QGIS: %d articles read; %d chapter index pages holding only a list of sections set aside; %d pages "
+                 "outside the manuals left out", len(lArticles), iIndexes, iRefused)
+    return lArticles
+
+
 def readPiccyBot(sFolder):
     """PICCYBOT (23 November 2026). piccybot.com is one page drawn by script, gathered through Edge, and it holds the
     help there is: how the app works, its features, setting it up on WhatsApp and on Meta's Ray-Ban glasses, and a list
@@ -4895,6 +4993,9 @@ def main():
          "This guide holds Stripe's own support articles, gathered from support.stripe.com on 20 November 2026. Stripe is a service businesses use to take payments online and in person, send invoices, run subscriptions and get paid out to their bank. The articles are written for the people who run a Stripe account: payments, refunds and disputes, payouts, billing and invoices, taxes and tax forms, verifying a business, Connect for platforms and marketplaces, Terminal card readers, and keeping an account secure. The categories are Stripe's own topics.\r\n\r\nLeft out on purpose: articles for programmers, that is the API and Webhooks topics, the move off Stripe's older Sources API, and any article whose title names an API; legal notices and policy statements; and articles for Android alone, as this collection covers Windows, the web, iPhone and iPad, and Alexa. Stripe's developer documentation is a separate site and is not here. Link, Stripe's checkout for shoppers, has a guide of its own, Link.md."),
         ("Link", "LinkHelp", readLink, "Link.md", "Link help",
          "This guide holds the support articles for Link, gathered from support.link.com on 20 November 2026. Link is Stripe's way to save your payment details once and check out quickly at the many online stores that use Stripe. It covers your Link account, paying and purchases, verifying who you are, keeping your data private, the Link card and balance, buying cryptocurrency, and paying through AI agents. The categories are Link's own topics.\r\n\r\nLink is run by Stripe, whose help for businesses is a separate guide, Stripe.md. When a charge on your statement says it was sold through Link, the article on that charge explains who to contact."),
+        # MAPPING (28 November 2026)
+        ("QGIS", "QgisHelp", readQgis, "QGIS.md", "QGIS help",
+         "This guide holds the QGIS project's own documentation for QGIS 3.44, gathered from docs.qgis.org in November 2026. QGIS is a free, open-source geographic information system: a desktop program for making maps and for studying data tied to places, such as the bus stops, routes and timetables a transit agency publishes. It holds three of the project's manuals, each under its own headings: the User Guide, which documents every part of the program; the Training Manual, a course of lessons with exercises; and A Gentle Introduction to GIS, which explains the ideas behind maps and spatial data.\r\n\r\nFor transit work, three places are worth knowing first. The network analysis algorithms, which find shortest paths and the area reachable within a distance or time along a network, are in the User Guide under Processing providers and algorithms, and the Training Manual teaches them in its Vector Analysis module. Using processing from the command line, under QGIS processing framework, describes qgis_process, which runs any of those algorithms from a command prompt rather than the map window. QGIS has no tools of its own for GTFS, the format transit agencies publish schedules in; that work is done with plugins, whose help is kept by their own authors and is not here.\r\n\r\nThe manuals are written for every desktop system QGIS runs on, so a few passages speak of macOS or Linux; they are left as the publisher wrote them. Left out on purpose: the PyQGIS cookbook, the server manual and the developers' guide, which are written for programmers and server administrators; the Training Manual's module on QGIS Server; the manual's page on contributing to itself; and the translated editions. A chapter's opening page that only lists its sections is not repeated here, since its sections are."),
     ]
     # ONE ENTRY PER GUIDE (version 2). The plan had grown a second copy of twenty entries, from Org mode to Remote
     # Incident Manager, so those guides were built twice in every run; the first entry for a guide now wins.
