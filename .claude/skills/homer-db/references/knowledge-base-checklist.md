@@ -103,6 +103,9 @@ build that went wrong without it.
   line at least every ten seconds.
 - **Never stop the build.** No source folder means nothing to do; a failure is
   reported, and the build goes on.
+- **Write names tidy will not change.** A constant is named like a variable,
+  with no c_ in front. tidy renames an obsolete name, which makes the script
+  newer than its database, so the next build rebuilds it for nothing.
 
 ## Checks
 
@@ -116,14 +119,17 @@ build that went wrong without it.
   LocalFiles.txt names its script, its .cmd and its template folder, the
   installer excludes the folder, the build installs it in the user's own
   templates folder, its field sentences live in its own defs, and no public
-  document names it.
+  document names it. Leave its folder out of the installer's inputs too, or
+  every rebuild of it makes a new installer, and push reads it again.
 - **A shipped one** puts its sentences in fieldDescriptions.inix and is
   described in the app's help and history.
 
 ## Size and sharing
 
-- **Log the size and look at it.** A full-text database runs about twice the
-  size of its text, and zips to about a third.
+- **Log the size and where it goes.** Log the database's size beside its
+  source files' size, and each table and index from dbstat. Built with no
+  prefix indexes, a database has run 1.7 to 2.2 times its source, and zips to
+  about a third. A long prime shows up as a large prime index.
 - **Over 100 MB, it cannot go in a GitHub repository.** Share it as a release
   download that Get Database adds from its url.
 - **Copy only what may be shared, and credit the source.** The text belongs to

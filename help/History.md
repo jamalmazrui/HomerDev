@@ -7,6 +7,10 @@ author: "Jamal Mazrui"
 
 Each version is a level-2 heading, newest first, so your screen reader's heading keys move from one version to the next.
 
+## 1.305.0 -- 27 November 2026, late night
+
+- **The knowledge-base checklist learned from its first full builds.** Name constants as tidy wants them, since a script tidy renames is newer than its database and rebuilds it again; leave a database the installer excludes out of the installer's inputs, or each rebuild makes a new installer and push reads it again; and log the source's size, the database's size and each table's share, since a full collection can run far past an estimate.
+
 ## 1.304.0 -- 27 November 2026, night
 
 - **The homer-db skill has a checklist for knowledge bases**: databases built by a script from a collection someone already keeps, so DbDo can search, play, read and open every item. It covers the source, keys, the fields DbDo acts on (stream_url for Play Media, url for opening a page), values, full-text search, descriptions, the builder, checks, personal or shipped, and size. Each item came from a build that went wrong without it, such as a key that called a rebroadcast a repeat, and titles broken in two by wrapped HTML.
